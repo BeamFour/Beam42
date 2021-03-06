@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class OpticalSystem implements Container {
-    private final ArrayList<Element> elements;
+    private final List<Element> elements;
     private final Transform3Cache transform3Cache;
 
     @Override
@@ -13,14 +13,13 @@ public class OpticalSystem implements Container {
         return elements;
     }
 
-    public OpticalSystem(ArrayList<Element> elements, Transform3Cache transform3Cache) {
+    public OpticalSystem(List<Element> elements, Transform3Cache transform3Cache) {
         this.elements = elements;
         this.transform3Cache = transform3Cache;
     }
 
     public static class Builder {
         private final ArrayList<Element.Builder> elements = new ArrayList<>();
-        private Transform3Cache transform3Cache = new Transform3Cache();
 
         public Builder add(Element.Builder element) {
             this.elements.add(element);
@@ -29,13 +28,13 @@ public class OpticalSystem implements Container {
 
         public OpticalSystem build() {
             generateIds();
-            setCoordinates();
-            ArrayList<Element> elements = buildElements();
-            return null;
+            Transform3Cache transform3Cache = setCoordinates();
+            List<Element> elements = buildElements();
+            return new OpticalSystem(elements, transform3Cache);
         }
 
-        private ArrayList<Element> buildElements() {
-            ArrayList<Element> els = new ArrayList<>();
+        private List<Element> buildElements() {
+            List<Element> els = new ArrayList<>();
             for (Element.Builder e: elements) {
                 els.add(e.build());
             }
@@ -43,12 +42,13 @@ public class OpticalSystem implements Container {
         }
 
 
-        private void setCoordinates() {
-            transform3Cache = new Transform3Cache();
+        private Transform3Cache setCoordinates() {
+            Transform3Cache transform3Cache = new Transform3Cache();
             List<Group.Builder> parents = new ArrayList<>();
             for (Element.Builder e: elements) {
                 e.computeGlobalTransform(parents, transform3Cache);
             }
+            return transform3Cache;
         }
 
         private void generateIds() {

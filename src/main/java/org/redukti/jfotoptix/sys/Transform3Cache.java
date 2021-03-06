@@ -20,6 +20,14 @@ public class Transform3Cache {
         cache.put(pair, transform);
     }
 
+    public Transform3 getLocal2GlobalTransform(int id) {
+        return get(id, 0);
+    }
+
+    public Transform3 getGlobal2LocalTransform(int id) {
+        return get(0, id);
+    }
+
     static final class ElementPair {
         final int from;
         final int to;

@@ -35,22 +35,13 @@ public class OpticalSystem implements Container {
         return null;
     }
 
-    public Transform3 getGlobalTransform(Element e) {
-        return transform3Cache.get(e.id(), 0);
+    public Vector3 getPosition(Element e) {
+        return transform3Cache.getLocal2GlobalTransform(e.id()).transform(Vector3.vector3_0);
     }
-
-    public Transform3 getLocalTransform(Element e) {
-        return transform3Cache.get(0, e.id());
-    }
-
-    public Vector3 getAbsPosition(Element e) {
-        return getGlobalTransform(e).transform(Vector3.vector3_0);
-    }
-
-
 
     public static class Builder {
         private final ArrayList<Element.Builder> elements = new ArrayList<>();
+        private Transform3Cache transform3Cache;
 
         public Builder add(Element.Builder element) {
             this.elements.add(element);
@@ -73,7 +64,7 @@ public class OpticalSystem implements Container {
         }
 
         private Transform3Cache setCoordinates() {
-            Transform3Cache transform3Cache = new Transform3Cache();
+            transform3Cache = new Transform3Cache();
             List<Group.Builder> parents = new ArrayList<>();
             for (Element.Builder e: elements) {
                 e.computeGlobalTransform(parents, transform3Cache);
@@ -86,6 +77,23 @@ public class OpticalSystem implements Container {
             for (Element.Builder e: elements) {
                 e.setId(id);
             }
+        }
+
+        /**
+         * Sets element position using global coordinate system
+         * Needs a prior call to build so we have the transformations needed
+         */
+        public OpticalSystem updatePosition(Element.Builder e, Vector3 v) {
+            // FIXME
+            if (transform3Cache == null)
+                throw new IllegalStateException("build() must be called prior to updating position");
+            if (e.parent != null) {
+                e.localPosition(transform3Cache.getGlobal2LocalTransform(e.parent.id()).transform(v));
+            }
+            else {
+                e.localPosition(v);
+            }
+            return build();
         }
 
     }

@@ -51,6 +51,8 @@ public abstract class Element {
             return this;
         }
 
+        public int id() { return id;}
+
         public void computeGlobalTransform(List<Group.Builder> parents, Transform3Cache tcache) {
             Transform3 t = transform; // local transform
             for (int i = parents.size()-1; i >= 0; i--) {

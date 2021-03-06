@@ -34,7 +34,7 @@ public class TestCoordinates {
             OpticalSystem system1 = sys.build();
             Element s211e = system1.getGroup(0).getGroup(0).getSurface(0);
             Assertions.assertTrue(s211e.getLocalPosition().isEqual(Vector3.vector3_0, 1e-10));
-            Assertions.assertTrue(system1.getAbsPosition(s211e).isEqual(Vector3.vector3_0, 1e-10));
+            Assertions.assertTrue(system1.getPosition(s211e).isEqual(Vector3.vector3_0, 1e-10));
         }
 
         g21.localPosition(new Vector3(1, 2, 3));
@@ -43,7 +43,7 @@ public class TestCoordinates {
             OpticalSystem system1 = sys.build();
             Element s211e = system1.getGroup(0).getGroup(0).getSurface(0);
             Assertions.assertTrue(s211e.getLocalPosition().isEqual(Vector3.vector3_0, 1e-10));
-            Assertions.assertTrue(system1.getAbsPosition(s211e).isEqual(new Vector3(1,2,3), 1e-10));
+            Assertions.assertTrue(system1.getPosition(s211e).isEqual(new Vector3(1,2,3), 1e-10));
         }
 
         g1.localPosition(new Vector3(3, 2, 1));
@@ -51,7 +51,7 @@ public class TestCoordinates {
         {
             OpticalSystem system1 = sys.build();
             Element s211e = system1.getGroup(0).getGroup(0).getSurface(0);
-            Assertions.assertTrue(system1.getAbsPosition(s211e).isEqual(new Vector3(4,4,4), 1e-10));
+            Assertions.assertTrue(system1.getPosition(s211e).isEqual(new Vector3(4,4,4), 1e-10));
         }
 
         s211.localPosition(new Vector3(7, 7, 7));
@@ -59,16 +59,16 @@ public class TestCoordinates {
         {
             OpticalSystem system1 = sys.build();
             Element s211e = system1.getGroup(0).getGroup(0).getSurface(0);
-            Assertions.assertTrue(system1.getAbsPosition(s211e).isEqual(new Vector3(11, 11, 11), 1e-10));
+            Assertions.assertTrue(system1.getPosition(s211e).isEqual(new Vector3(11, 11, 11), 1e-10));
         }
 
-//        s211.set_position(math::Vector3(9, 9, 9));
-//
-//        if (!COMPARE_VECTOR3(s211->get_position(), math::Vector3(9, 9, 9)))
-//        fail(__LINE__);
-//
-//        if (!COMPARE_VECTOR3(s211->get_local_position(), math::Vector3(5, 5, 5)))
-//        fail(__LINE__);
+        {
+            OpticalSystem system1 = sys.build();
+            system1 = sys.updatePosition(s211, new Vector3(9, 9, 9));
+            Element s211e = system1.getGroup(0).getGroup(0).getSurface(0);
+            Assertions.assertTrue(system1.getPosition(s211e).isEqual(new Vector3(9,9,9), 1e-10));
+            Assertions.assertTrue(s211e.getLocalPosition().isEqual(new Vector3(5,5,5), 1e-10));
+        }
 
     }
 

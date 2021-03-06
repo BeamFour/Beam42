@@ -25,4 +25,25 @@ public class Transform3 {
         }
     }
 
+    private Transform3(Vector3 translation, Matrix3 linear, boolean useLinear) {
+        this.translation = translation;
+        this.linear = linear;
+        this.useLinear = useLinear;
+    }
+
+    Vector3 transformLinear(Vector3 v)
+    {
+        if (useLinear)
+            return this.linear.multiply(v);
+        else
+            return v;
+    }
+
+    public static Transform3 compose(Transform3 t, Transform3 b) {
+        Vector3 translation = t.transformLinear(b.translation).add(t.translation);
+        boolean useLinear = t.useLinear || b.useLinear;
+        Matrix3 linear = t.linear.multiply(b.linear);
+        return new Transform3(translation, linear, useLinear);
+    }
+
 }

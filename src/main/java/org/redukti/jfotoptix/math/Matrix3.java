@@ -42,5 +42,30 @@ public class Matrix3 {
         return new Matrix3(values);
     }
 
+    Vector3 multiply(Vector3 v) {
+        double[] r = new double[3];
+        for (int i = 0; i < 3; i++) {
+            double s = 0;
+            for (int k = 0; k < 3; k++) {
+                s += values[idx(i, k)] * v.values[k];
+            }
+            r[i] = s;
+        }
+        return new Vector3(r[0], r[1], r[2]);
+    }
 
+    Matrix3 multiply(Matrix3 m) {
+        double[] r = new double[9];
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                double s = 0;
+                for (int k = 0; k < 3; k++)
+                    s += this.values[idx(i, k)] * m.values[idx(k, j)];
+
+                r[idx(i, j)] = s;
+            }
+        }
+        return new Matrix3(r);
+    }
 }

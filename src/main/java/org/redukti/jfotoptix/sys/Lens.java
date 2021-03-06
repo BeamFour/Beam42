@@ -1,32 +1,20 @@
 package org.redukti.jfotoptix.sys;
 
-import org.redukti.jfotoptix.math.Vector3;
+import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector3Position;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class Lens extends Group {
 
-    private ArrayList<OpticalSurface> surfaces = new ArrayList<>();
-
-    public Lens(OpticalSystem opticalSystem, Group group, Vector3Position position) {
-        super(opticalSystem, group, position);
+    public Lens(Vector3Position position, Transform3 transform, List<Element> elementList) {
+        super(position, transform, elementList);
     }
 
-    public static class Builder extends Element.Builder {
-
-        private ArrayList<OpticalSurface> surfaces = new ArrayList<>();
-        private Vector3Position position = new Vector3Position(Vector3.vector3_0, Vector3.vector3_001);
-
-        public Builder position(Vector3Position position) {
-            this.position = position;
-            return this;
+    public static class Builder extends Group.Builder {
+        @Override
+        public Element build() {
+            return new Lens(position, transform, getElements());
         }
-
-        public Lens build() {
-            return new Lens(this.opticalSystem.build(), this.group.build(), position);
-        }
-
     }
-
 }

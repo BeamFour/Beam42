@@ -10,21 +10,21 @@ public class Transform3Cache {
 
     Map<ElementPair, Transform3> cache = new HashMap<>();
 
-    public Transform3 get(Element from, Element to) {
+    public Transform3 get(int from, int to) {
         ElementPair pair = new ElementPair(from, to);
         return cache.get(pair);
     }
 
-    public void put(Element from, Element to, Transform3 transform) {
+    public void put(int from, int to, Transform3 transform) {
         ElementPair pair = new ElementPair(from, to);
         cache.put(pair, transform);
     }
 
     static final class ElementPair {
-        final Element from;
-        final Element to;
+        final int from;
+        final int to;
 
-        public ElementPair(Element from, Element to) {
+        public ElementPair(int from, int to) {
             this.from = from;
             this.to = to;
         }
@@ -34,7 +34,6 @@ public class Transform3Cache {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             ElementPair that = (ElementPair) o;
-            // Identity based equality
             return from == that.from && to == that.to;
         }
 

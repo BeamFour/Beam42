@@ -71,6 +71,14 @@ public class Vector3 {
                 x() * b.y() - y() * b.x());
     }
 
+    public Vector3 add (Vector3 v)
+    {
+        double[] r = new double[N];
+        for (int i = 0; i < N; i++)
+            r[i] = values[i] + v.values[i];
+        return new Vector3(r[0], r[1], r[2]);
+    }
+
     @Override
     public String toString() {
         return "[" + x() + ',' + y() + ',' + z() + ']';

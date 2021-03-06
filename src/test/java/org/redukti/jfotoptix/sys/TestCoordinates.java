@@ -22,13 +22,11 @@ public class TestCoordinates {
                 .shape(Infinite.infinite);
 
         g22.add(s221);
-        //s221->set_parent(g22.get());
         g1.add(g21);
-        //g21->set_parent(g1.get());
         g1.add(g22);
-        //g22->set_parent(g1.get());
         g21.add(s211);
-        //s211->set_parent(g21.get());
+
+        sys.add(g1);
 
         //sys.add(g1);
     }

@@ -1,5 +1,9 @@
-package org.redukti.jfotopix.math;
+package org.redukti.jfotoptix.math;
 
+/**
+ * Vector with 3 components named x,y,z.
+ * Note that in the optical system the lens axis is z.
+ */
 public class Vector3 {
 
     private static final int N = 3;
@@ -67,5 +71,14 @@ public class Vector3 {
                 x() * b.y() - y() * b.x());
     }
 
+    @Override
+    public String toString() {
+        return "[" + x() + ',' + y() + ',' + z() + ']';
+    }
 
+    public final boolean isEqual(Vector3 other, double tolerance) {
+        return Math.abs(this.x() - other.x()) < tolerance &&
+                Math.abs(this.y() - other.y()) < tolerance &&
+                Math.abs(this.z() - other.z()) < tolerance;
+    }
 }

@@ -1,4 +1,4 @@
-package org.redukti.jfotopix.material;
+package org.redukti.jfotoptix.material;
 
 public abstract class MaterialBase {
     private String name;

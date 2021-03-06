@@ -1,4 +1,4 @@
-package org.redukti.jfotopix.sys;
+package org.redukti.jfotoptix.sys;
 
 import java.util.List;
 

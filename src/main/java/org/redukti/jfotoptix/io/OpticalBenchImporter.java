@@ -1,4 +1,4 @@
-package org.redukti.jfotopix.io;
+package org.redukti.jfotoptix.io;
 
 public class OpticalBenchImporter {
 }

@@ -1,4 +1,4 @@
-package org.redukti.jfotopix.math;
+package org.redukti.jfotoptix.math;
 
 public class Quaternion {
     final double x, y, z, w;

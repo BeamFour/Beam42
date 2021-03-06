@@ -1,4 +1,4 @@
-package org.redukti.jfotopix.math;
+package org.redukti.jfotoptix.math;
 
 public class Matrix3 {
     final double values[];

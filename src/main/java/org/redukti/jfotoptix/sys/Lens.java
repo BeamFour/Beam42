@@ -7,14 +7,14 @@ import java.util.List;
 
 public class Lens extends Group {
 
-    public Lens(Vector3Position position, Transform3 transform, List<Element> elementList) {
-        super(position, transform, elementList);
+    public Lens(int id, Vector3Position position, Transform3 transform, List<Element> elementList) {
+        super(id, position, transform, elementList);
     }
 
     public static class Builder extends Group.Builder {
         @Override
         public Element build() {
-            return new Lens(position, transform, getElements());
+            return new Lens(id, position, transform, getElements());
         }
     }
 }

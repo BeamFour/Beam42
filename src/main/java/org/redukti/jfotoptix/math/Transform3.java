@@ -4,7 +4,7 @@ public class Transform3 {
 
     public final Vector3 translation;
     public final Matrix3 linear;
-    final boolean useLinear;
+    public final boolean useLinear;
 
     public Transform3(Vector3Position position) {
         this.translation = position.translation();
@@ -25,7 +25,7 @@ public class Transform3 {
         }
     }
 
-    private Transform3(Vector3 translation, Matrix3 linear, boolean useLinear) {
+    public Transform3(Vector3 translation, Matrix3 linear, boolean useLinear) {
         this.translation = translation;
         this.linear = linear;
         this.useLinear = useLinear;
@@ -44,6 +44,18 @@ public class Transform3 {
         boolean useLinear = t.useLinear || b.useLinear;
         Matrix3 linear = t.linear.multiply(b.linear);
         return new Transform3(translation, linear, useLinear);
+    }
+
+    public Vector3 transform (Vector3 v)
+    {
+        return transformLinear(v).add(translation);
+    }
+
+    public Transform3 inverse ()
+    {
+        Matrix3 linear = this.linear.inverse ();
+        Vector3 translation = linear.multiply(this.translation.negate());
+        return new Transform3(translation, linear, true);
     }
 
 }

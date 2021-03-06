@@ -1,5 +1,8 @@
 package org.redukti.jfotoptix.sys;
 
+import org.redukti.jfotoptix.math.Transform3;
+import org.redukti.jfotoptix.math.Vector3;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -17,6 +20,34 @@ public class OpticalSystem implements Container {
         this.elements = elements;
         this.transform3Cache = transform3Cache;
     }
+
+    public Element getElement(int pos) {
+        if (pos >= 0 && pos < elements.size()) {
+            return elements.get(pos);
+        }
+        return null;
+    }
+
+    public Group getGroup(int pos) {
+        if (pos >= 0 && pos < elements.size() && elements.get(pos) instanceof Group) {
+            return (Group)elements.get(pos);
+        }
+        return null;
+    }
+
+    public Transform3 getGlobalTransform(Element e) {
+        return transform3Cache.get(e.id(), 0);
+    }
+
+    public Transform3 getLocalTransform(Element e) {
+        return transform3Cache.get(0, e.id());
+    }
+
+    public Vector3 getAbsPosition(Element e) {
+        return getGlobalTransform(e).transform(Vector3.vector3_0);
+    }
+
+
 
     public static class Builder {
         private final ArrayList<Element.Builder> elements = new ArrayList<>();
@@ -40,7 +71,6 @@ public class OpticalSystem implements Container {
             }
             return els;
         }
-
 
         private Transform3Cache setCoordinates() {
             Transform3Cache transform3Cache = new Transform3Cache();

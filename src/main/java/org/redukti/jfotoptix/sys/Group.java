@@ -10,14 +10,35 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Group extends Element implements Container {
     private final List<Element> elements;
 
-    public Group(Vector3Position p, Transform3 transform3, List<Element> elements) {
-        super(p, transform3);
+    public Group(int id, Vector3Position p, Transform3 transform3, List<Element> elements) {
+        super(id, p, transform3);
         this.elements = elements;
     }
 
     @Override
     public List<Element> elements() {
         return elements;
+    }
+
+    public Element getElement(int pos) {
+        if (pos >= 0 && pos < elements.size()) {
+            return elements.get(pos);
+        }
+        return null;
+    }
+
+    public Group getGroup(int pos) {
+        if (pos >= 0 && pos < elements.size() && elements.get(pos) instanceof Group) {
+            return (Group)elements.get(pos);
+        }
+        return null;
+    }
+
+    public Surface getSurface(int pos) {
+        if (pos >= 0 && pos < elements.size()  && elements.get(pos) instanceof Surface) {
+            return (Surface) elements.get(pos);
+        }
+        return null;
     }
 
     public static class Builder extends Element.Builder {
@@ -29,6 +50,7 @@ public class Group extends Element implements Container {
 
         public Group.Builder add(Element.Builder element) {
             this.elements.add(element);
+            element.parent(this);
             return this;
         }
 
@@ -42,6 +64,7 @@ public class Group extends Element implements Container {
 
         @Override
         public void computeGlobalTransform(List<Builder> parents, Transform3Cache tcache) {
+            super.computeGlobalTransform(parents, tcache);
             List<Builder> list = new ArrayList<>(parents);
             list.add(this);
             for (Element.Builder e: elements) {
@@ -51,7 +74,7 @@ public class Group extends Element implements Container {
 
         @Override
         public Element build() {
-            return new Group(position, transform, getElements());
+            return new Group(id, position, transform, getElements());
         }
 
         protected ArrayList<Element> getElements() {

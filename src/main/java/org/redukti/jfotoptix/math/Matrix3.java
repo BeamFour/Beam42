@@ -68,4 +68,57 @@ public class Matrix3 {
         }
         return new Matrix3(r);
     }
+
+    Matrix3 inverse() {
+        // inverse = adjugate / determinant
+        double s1 = values[idx(1, 1)] * values[idx(2, 2)] - values[idx(2, 1)] * values[idx(1, 2)];
+        double s2 = values[idx(1, 0)] * values[idx(2, 2)] - values[idx(2, 0)] * values[idx(1, 2)];
+        double s3 = values[idx(1, 0)] * values[idx(2, 1)] - values[idx(2, 0)] * values[idx(1, 1)];
+
+        double det = values[idx(0, 0)] * s1 - values[idx(0, 1)] * s2 + values[idx(0, 2)] * s3;
+
+        assert (det != 0.0);
+
+        double[] r = new double[9];
+        r[idx(0, 0)] = +s1 / det;
+        r[idx(0, 1)]
+                = -(values[idx(0, 1)] * values[idx(2, 2)] - values[idx(0, 2)] * values[idx(2, 1)]) / det;
+        r[idx(0, 2)]
+                = +(values[idx(0, 1)] * values[idx(1, 2)] - values[idx(0, 2)] * values[idx(1, 1)]) / det;
+
+        r[idx(1, 0)] = -s2 / det;
+        r[idx(1, 1)]
+                = +(values[idx(0, 0)] * values[idx(2, 2)] - values[idx(0, 2)] * values[idx(2, 0)]) / det;
+        r[idx(1, 2)]
+                = -(values[idx(0, 0)] * values[idx(1, 2)] - values[idx(0, 2)] * values[idx(1, 0)]) / det;
+
+        r[idx(2, 0)] = +s3 / det;
+        r[idx(2, 1)]
+                = -(values[idx(0, 0)] * values[idx(2, 1)] - values[idx(0, 1)] * values[idx(2, 0)]) / det;
+        r[idx(2, 2)]
+                = +(values[idx(0, 0)] * values[idx(1, 1)] - values[idx(0, 1)] * values[idx(1, 0)]) / det;
+
+        return new Matrix3(r);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append('[');
+        for (int i = 0; i < 3; i++) {
+            if (i > 0) {
+                sb.append(',');
+            }
+            sb.append('[');
+            for (int j = 0; j < 3; j++) {
+                if (j > 0) {
+                    sb.append(',');
+                }
+                sb.append(values[idx(i,j)]);
+            }
+            sb.append(']');
+        }
+        sb.append(']');
+        return sb.toString();
+    }
 }

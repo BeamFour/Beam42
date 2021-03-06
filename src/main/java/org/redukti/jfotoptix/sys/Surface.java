@@ -10,8 +10,8 @@ public class Surface extends Element {
     final Shape shape;
     final Curve curve;
 
-    public Surface(Vector3Position p, Transform3 transform, Curve curve, Shape shape) {
-        super(p, transform);
+    public Surface(int id, Vector3Position p, Transform3 transform, Curve curve, Shape shape) {
+        super(id, p, transform);
         this.curve = curve;
         this.shape = shape;
     }
@@ -27,7 +27,7 @@ public class Surface extends Element {
 
         @Override
         public Element build() {
-            return new Surface(position, transform, curve, shape);
+            return new Surface(id, position, transform, curve, shape);
         }
 
         public Builder shape(Shape shape) {

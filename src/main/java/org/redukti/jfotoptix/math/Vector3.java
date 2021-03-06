@@ -79,6 +79,14 @@ public class Vector3 {
         return new Vector3(r[0], r[1], r[2]);
     }
 
+    public Vector3 negate()
+    {
+        double[] r = new double[N];
+        for ( int i = 0; i < N; i++)
+            r[i] = -values[i];
+        return new Vector3(r[0], r[1], r[2]);
+    }
+
     @Override
     public String toString() {
         return "[" + x() + ',' + y() + ',' + z() + ']';

@@ -9,10 +9,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class Element {
 
+    final int id;
     final Vector3Position position;
     final Transform3 transform;
 
-    public Element(Vector3Position p, Transform3 transform) {
+    public Element(int id, Vector3Position p, Transform3 transform) {
+        this.id = id;
         this.position = p;
         this.transform = transform;
     }
@@ -20,15 +22,27 @@ public abstract class Element {
     public Vector3 getLocalPosition() {
         return this.transform.translation;
     }
+    public int id() { return id; }
 
     public static abstract class Builder {
         int id;
         Vector3Position position;
         Transform3 transform;
+        Element.Builder parent;
 
         public Builder position(Vector3Position position) {
             this.position = position;
             this.transform = new Transform3(position);
+            return this;
+        }
+
+        public Builder localPosition(Vector3 v) {
+            this.transform = new Transform3(v, this.transform.linear, this.transform.useLinear);
+            return this;
+        }
+
+        public Builder parent(Element.Builder parent) {
+            this.parent = parent;
             return this;
         }
 
@@ -44,6 +58,7 @@ public abstract class Element {
                 t = Transform3.compose(t, g.transform);
             }
             tcache.put(this.id, 0, t);
+            tcache.put(0, this.id, t.inverse());
         }
 
         public abstract Element build();

@@ -62,7 +62,7 @@ public abstract class Element {
             Transform3 t = transform; // local transform
             Element.Builder p = this.parent;
             while (p != null) {
-                t = Transform3.compose(t, p.transform);
+                t = t.compose(p.transform);
                 p = p.parent;
             }
             tcache.put(this.id, 0, t);

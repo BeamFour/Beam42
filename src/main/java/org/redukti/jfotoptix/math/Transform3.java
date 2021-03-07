@@ -36,10 +36,10 @@ public class Transform3 {
             return v;
     }
 
-    public static Transform3 compose(Transform3 t, Transform3 b) {
-        Vector3 translation = t.transformLinear(b.translation).add(t.translation);
-        boolean useLinear = t.useLinear || b.useLinear;
-        Matrix3 linear = t.linear.multiply(b.linear);
+    public Transform3 compose(Transform3 t) {
+        Vector3 translation = t.transformLinear(this.translation).add(t.translation);
+        boolean useLinear = t.useLinear || this.useLinear;
+        Matrix3 linear = t.linear.multiply(this.linear);
         return new Transform3(translation, linear, useLinear);
     }
 

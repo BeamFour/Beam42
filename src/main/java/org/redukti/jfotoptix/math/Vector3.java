@@ -40,6 +40,8 @@ public class Vector3 {
         return this.values[2];
     }
 
+    public double get(int i) {return this.values[i];}
+
 //    public Vector3 mul (Vector3 v)
 //    {
 //        double vec[] = new double[N];

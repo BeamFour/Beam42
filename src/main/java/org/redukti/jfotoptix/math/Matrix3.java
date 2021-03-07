@@ -101,6 +101,72 @@ public class Matrix3 {
         return new Matrix3(r);
     }
 
+    public static Matrix3 getRotationMatrix(int axis, double a) {
+        assert (axis < 3 && axis >= 0);
+
+        /*
+         * Note on convention used below.
+         *
+         * See https://mathworld.wolfram.com/RotationMatrix.html
+         * coordinate system rotations of the x-, y-, and z-axes in a
+         * counterclockwise direction when looking towards the origin give the
+         * matrices.
+         *
+         * This appears to correspond to xyz convention described in appendix A,
+         * Classical Mechanics, Goldstein, 3rd Ed. 'It appears that most U.S. and
+         * British aerodynamicists and pilots prefer the sequence in which the first
+         * rotation is the yaw angle (phi) about a z-axis, the second is the pitch
+         * angle (theta) about an intermediary y-axis, and the third is a bank or
+         * roll angle (psi) about the final x-axis.'
+         *
+         * Also see https://youtu.be/wg9bI8-Qx2Q
+         */
+        double[] r = new double[9];
+        switch (axis) {
+            case 0:
+                // rotation counter clockwise around the X axis
+                r[idx(0, 0)] = 1;
+                r[idx(0, 1)] = 0;
+                r[idx(0, 2)] = 0;
+                r[idx(1, 0)] = 0;
+                r[idx(1, 1)] = Math.cos(a);
+                r[idx(1, 2)] = Math.sin(a);
+                r[idx(2, 0)] = 0;
+                r[idx(2, 1)] = -Math.sin(a);
+                r[idx(2, 2)] = Math.cos(a);
+                break;
+
+            case 1:
+                // rotation counter clockwise around the Y axis
+                r[idx(0, 0)] = Math.cos(a);
+                r[idx(0, 1)] = 0;
+                r[idx(0, 2)] = -Math.sin(a);
+                r[idx(1, 0)] = 0;
+                r[idx(1, 1)] = 1;
+                r[idx(1, 2)] = 0;
+                r[idx(2, 0)] = Math.sin(a);
+                r[idx(2, 1)] = 0;
+                r[idx(2, 2)] = Math.cos(a);
+                break;
+
+            case 2:
+                // rotation counter clockwise around the Z axis
+                r[idx(0, 0)] = Math.cos(a);
+                r[idx(0, 1)] = Math.sin(a);
+                r[idx(0, 2)] = 0;
+                r[idx(1, 0)] = -Math.sin(a);
+                r[idx(1, 1)] = Math.cos(a);
+                r[idx(1, 2)] = 0;
+                r[idx(2, 0)] = 0;
+                r[idx(2, 1)] = 0;
+                r[idx(2, 2)] = 1;
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+        return new Matrix3(r);
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -114,7 +180,7 @@ public class Matrix3 {
                 if (j > 0) {
                     sb.append(',');
                 }
-                sb.append(values[idx(i,j)]);
+                sb.append(values[idx(i, j)]);
             }
             sb.append(']');
         }

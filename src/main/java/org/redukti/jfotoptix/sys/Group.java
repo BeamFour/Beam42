@@ -63,12 +63,10 @@ public class Group extends Element implements Container {
         }
 
         @Override
-        public void computeGlobalTransform(List<Builder> parents, Transform3Cache tcache) {
-            super.computeGlobalTransform(parents, tcache);
-            List<Builder> list = new ArrayList<>(parents);
-            list.add(this);
+        public void computeGlobalTransform(Transform3Cache tcache) {
+            super.computeGlobalTransform(tcache);
             for (Element.Builder e: elements) {
-                e.computeGlobalTransform(list, tcache);
+                e.computeGlobalTransform(tcache);
             }
         }
 

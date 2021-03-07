@@ -70,6 +70,14 @@ public class TestCoordinates {
             Assertions.assertTrue(s211e.getLocalPosition().isEqual(new Vector3(5,5,5), 1e-10));
         }
 
+        g21.rotate(0, 0, -90);
+        {
+            OpticalSystem system1 = sys.build();
+            Element s211e = system1.getGroup(0).getGroup(0).getSurface(0);
+            System.out.println(system1.getPosition(s211e));
+            Assertions.assertTrue(system1.getPosition(s211e).isEqual(new Vector3(-1, 9, 9), 1e-10));
+        }
+
     }
 
 }

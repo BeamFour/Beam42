@@ -51,13 +51,19 @@ public abstract class Element {
             return this;
         }
 
+        public Builder rotate(double x, double y, double z) {
+            this.transform = this.transform.linearRotation(new Vector3(x,y,z));
+            return this;
+        }
+
         public int id() { return id;}
 
-        public void computeGlobalTransform(List<Group.Builder> parents, Transform3Cache tcache) {
+        public void computeGlobalTransform(Transform3Cache tcache) {
             Transform3 t = transform; // local transform
-            for (int i = parents.size()-1; i >= 0; i--) {
-                Group.Builder g = parents.get(i);
-                t = Transform3.compose(t, g.transform);
+            Element.Builder p = this.parent;
+            while (p != null) {
+                t = Transform3.compose(t, p.transform);
+                p = p.parent;
             }
             tcache.put(this.id, 0, t);
             tcache.put(0, this.id, t.inverse());

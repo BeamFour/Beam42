@@ -9,16 +9,14 @@ public class Transform3 {
     public Transform3(Vector3Position position) {
         this.translation = position.translation();
         if (position.direction().x() == 0 && position.direction().y() == 0) {
-            if (position.direction().z () < 0.0) {
+            if (position.direction().z() < 0.0) {
                 this.linear = Matrix3.diag(1.0, 1.0, -1.0);
                 this.useLinear = true;
-            }
-            else {
+            } else {
                 this.linear = Matrix3.diag(1.0, 1.0, 1.0);
                 this.useLinear = false;
             }
-        }
-        else {
+        } else {
             Quaternion q = new Quaternion(Vector3.vector3_001, position.direction());
             this.linear = Matrix3.rotation(q);
             this.useLinear = true;
@@ -31,8 +29,7 @@ public class Transform3 {
         this.useLinear = useLinear;
     }
 
-    Vector3 transformLinear(Vector3 v)
-    {
+    Vector3 transformLinear(Vector3 v) {
         if (useLinear)
             return this.linear.multiply(v);
         else
@@ -46,16 +43,38 @@ public class Transform3 {
         return new Transform3(translation, linear, useLinear);
     }
 
-    public Vector3 transform (Vector3 v)
-    {
+    public Vector3 transform(Vector3 v) {
         return transformLinear(v).add(translation);
     }
 
-    public Transform3 inverse ()
-    {
-        Matrix3 linear = this.linear.inverse ();
+    public Transform3 inverse() {
+        Matrix3 linear = this.linear.inverse();
         Vector3 translation = linear.multiply(this.translation.negate());
         return new Transform3(translation, linear, true);
     }
+
+    public Transform3 linearRotation(Vector3 v) {
+        Transform3 t = this;
+        for (int i = 0; i < 3; i++) { // i stands for x,y,z axis
+            if (v.get(i) != 0.0) {
+                t = t.linearRotation(i, v.get(i));
+            }
+        }
+        return t;
+    }
+
+    Transform3 linearRotation(int axis, double dangle) {
+        return linearRotationRad(axis, Math.toRadians(dangle));
+    }
+
+    Transform3 linearRotationRad(int axis, double rangle) {
+        Matrix3 r = Matrix3.getRotationMatrix(axis, rangle);
+
+        Matrix3 linear = r.multiply(this.linear);
+        boolean use_linear = true;
+
+        return new Transform3(this.translation, linear, use_linear);
+    }
+
 
 }

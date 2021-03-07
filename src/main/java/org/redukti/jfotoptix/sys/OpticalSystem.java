@@ -65,9 +65,8 @@ public class OpticalSystem implements Container {
 
         private Transform3Cache setCoordinates() {
             transform3Cache = new Transform3Cache();
-            List<Group.Builder> parents = new ArrayList<>();
             for (Element.Builder e: elements) {
-                e.computeGlobalTransform(parents, transform3Cache);
+                e.computeGlobalTransform(transform3Cache);
             }
             return transform3Cache;
         }

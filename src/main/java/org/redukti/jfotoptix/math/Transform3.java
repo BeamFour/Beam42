@@ -36,10 +36,17 @@ public class Transform3 {
             return v;
     }
 
-    public Transform3 compose(Transform3 t) {
-        Vector3 translation = t.transformLinear(this.translation).add(t.translation);
-        boolean useLinear = t.useLinear || this.useLinear;
-        Matrix3 linear = t.linear.multiply(this.linear);
+    /**
+     * Composition. New translation is set to: apply parent's linear transformation on child translation and add parent translation.
+     * New linear matrix -s the product of the parent and child matrices.
+     * TODO check terminology is correct
+     * @param p Parent component
+     * @param c Child component
+     */
+    public static Transform3 compose(Transform3 p, Transform3 c) {
+        Vector3 translation = p.transformLinear(c.translation).add(p.translation);
+        boolean useLinear = p.useLinear || c.useLinear;
+        Matrix3 linear = p.linear.multiply(c.linear);
         return new Transform3(translation, linear, useLinear);
     }
 

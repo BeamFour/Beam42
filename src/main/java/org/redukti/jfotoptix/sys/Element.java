@@ -61,7 +61,7 @@ public abstract class Element {
             Transform3 t = transform; // local transform
             Element.Builder p = this.parent;
             while (p != null) {
-                t = t.compose(p.transform);
+                t = Transform3.compose(p.transform, t);
                 p = p.parent;
             }
             tcache.putLocal2GlobalTransform(this.id, t);  // Local to global

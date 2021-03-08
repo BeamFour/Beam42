@@ -4,7 +4,6 @@ import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Position;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class Element {
@@ -65,8 +64,8 @@ public abstract class Element {
                 t = t.compose(p.transform);
                 p = p.parent;
             }
-            tcache.put(this.id, 0, t);
-            tcache.put(0, this.id, t.inverse());
+            tcache.putLocal2GlobalTransform(this.id, t);  // Local to global
+            tcache.putGlobal2LocalTransform(this.id, t.inverse()); // Global to local
         }
 
         public abstract Element build();

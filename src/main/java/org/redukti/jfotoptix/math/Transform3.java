@@ -53,6 +53,10 @@ public class Transform3 {
         return new Transform3(translation, linear, true);
     }
 
+    /**
+     * Rotate by x, y, and z axis.
+     * @param v Vector with angles per axis
+     */
     public Transform3 linearRotation(Vector3 v) {
         Transform3 t = this;
         for (int i = 0; i < 3; i++) { // i stands for x,y,z axis
@@ -63,17 +67,19 @@ public class Transform3 {
         return t;
     }
 
+    /**
+     * Rotate around specified axis
+     * @param axis 0=x, 1=y, 2=z
+     * @param dangle Angle of rotation
+     */
     Transform3 linearRotation(int axis, double dangle) {
-        return linearRotationRad(axis, Math.toRadians(dangle));
+        return linearRotationRadians(axis, Math.toRadians(dangle));
     }
 
-    Transform3 linearRotationRad(int axis, double rangle) {
+    Transform3 linearRotationRadians(int axis, double rangle) {
         Matrix3 r = Matrix3.getRotationMatrix(axis, rangle);
-
         Matrix3 linear = r.multiply(this.linear);
-        boolean use_linear = true;
-
-        return new Transform3(this.translation, linear, use_linear);
+        return new Transform3(this.translation, linear, true);
     }
 
 

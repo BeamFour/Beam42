@@ -15,13 +15,21 @@ public class Transform3Cache {
         return cache.get(pair);
     }
 
-    public void put(int from, int to, Transform3 transform) {
+    private void put(int from, int to, Transform3 transform) {
         ElementPair pair = new ElementPair(from, to);
         cache.put(pair, transform);
     }
 
+    public void putLocal2GlobalTransform(int id, Transform3 t) {
+        put(id, 0, t);
+    }
+
     public Transform3 getLocal2GlobalTransform(int id) {
         return get(id, 0);
+    }
+
+    public void putGlobal2LocalTransform(int id, Transform3 t) {
+        put(0, id, t);
     }
 
     public Transform3 getGlobal2LocalTransform(int id) {

@@ -36,8 +36,7 @@ public abstract class DataSet {
     /** Interpolate y value corresponding to given x value in data
      set. data may be differentiated several times along the requested
      dimension.
-     @param deriv Differentiation count, 0 means y value, 1 means 1st
-     derivative...
+     @param deriv Differentiation count, 0 means y value, 1 means 1st derivative...
      @param dim Differentiation dimension
      */
     public abstract double interpolate (double x[], int deriv,
@@ -52,9 +51,7 @@ public abstract class DataSet {
         Range r = new Range(Double.MIN_VALUE, Double.MAX_VALUE);
 
         int d = get_dimensions ();
-        // unsigned int x[d];
         int[] x = new int[d];
-        // unsigned int c[d];
         int[] c = new int[d];
 
         for (int i = 0; i < d; i++)
@@ -94,17 +91,6 @@ public abstract class DataSet {
         }
     }
 
-    /** Select interpolation method */
-    //virtual void set_interpolation (Interpolation i) = 0;
-
-    /** Get current interpolation method */
-    public Interpolation get_interpolation () {
-        return _interpolation;
-    }
-
-    // FIXME dataset version number
-    /** Return version number which is incremented on each data set change/clear
-     */
     public int get_version () {
         return _version;
     }

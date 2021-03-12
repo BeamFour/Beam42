@@ -394,7 +394,7 @@ public class Interpolated1d {
         set_linear_poly(poly.get(0), vm1.x(), vm1.y(), d1);
 
         // first segment
-        set_cubic_poly(poly.get(10), vm1.x(), vm1.y(), v.x(), v.y(), d1, d2);
+        set_cubic_poly(poly.get(1), vm1.x(), vm1.y(), v.x(), v.y(), d1, d2);
 
         for (int i = 2; i < n - 1; i++) {
             vm2 = vm1;

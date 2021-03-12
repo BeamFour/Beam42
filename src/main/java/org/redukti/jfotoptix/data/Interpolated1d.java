@@ -9,6 +9,8 @@ import static org.redukti.jfotoptix.util.MathUtils.square;
 
 public class Interpolated1d extends DiscreteSetBase {
 
+
+
     static final class PolyS {
         double a, b, c, d;
 
@@ -369,36 +371,184 @@ public class Interpolated1d extends DiscreteSetBase {
         return interpolate_cubic(d, x);
     }
 
-    double update_cubic (int d, double x)
-    {
+    double update_cubic(int d, double x) {
         ArrayList<PolyS> poly = this._poly;
 
-        int n = super.get_count ();
+        int n = super.get_count();
 
         if (n < 4)
-            throw new IllegalStateException ("data set doesn't contains enough data");
+            throw new IllegalStateException("data set doesn't contains enough data");
 
         // FIXME
-        poly.ensureCapacity (n + 1);
+        poly.ensureCapacity(n + 1);
 
         double d0
-                = (super.get_y_value (1) - super.get_y_value (0)) / super.get_x_interval (0);
-        double dn = (super.get_y_value (n - 1) - super.get_y_value (n - 2))
-              / super.get_x_interval (n - 2);
+                = (super.get_y_value(1) - super.get_y_value(0)) / super.get_x_interval(0);
+        double dn = (super.get_y_value(n - 1) - super.get_y_value(n - 2))
+                / super.get_x_interval(n - 2);
         double[] dd = new double[n];
 
         compute_cubic_2nd_deriv(cubic_2nd_deriv_init_e.Cubic2ndDerivFirst, n, dd, d0, dn);
 
-        set_linear_poly (poly.get(0), super.get_x_value (0), super.get_y_value (0), d0);
+        set_linear_poly(poly.get(0), super.get_x_value(0), super.get_y_value(0), d0);
 
         for (int i = 1; i < n; i++)
-            set_cubic_poly2 (poly.get(i), super.get_x_value (i - 1), super.get_y_value (i - 1),
-            super.get_x_value (i), super.get_y_value (i), dd[i - 1], dd[i]);
+            set_cubic_poly2(poly.get(i), super.get_x_value(i - 1), super.get_y_value(i - 1),
+                    super.get_x_value(i), super.get_y_value(i), dd[i - 1], dd[i]);
 
-        set_linear_poly (poly.get(n), super.get_x_value (n - 1), super.get_y_value (n - 1),
-            dn);
+        set_linear_poly(poly.get(n), super.get_x_value(n - 1), super.get_y_value(n - 1),
+                dn);
 
-        return interpolate_cubic (d, x);
+        return interpolate_cubic(d, x);
+    }
+
+    double update_cubic2(int d, double x) {
+        ArrayList<PolyS> poly = this._poly;
+
+        int n = super.get_count();
+
+        if (n < 4)
+            throw new IllegalStateException("data set doesn't contains enough data");
+
+        // FIXME
+        poly.ensureCapacity(n + 1);
+
+        double d0
+                = (super.get_y_value(1) - super.get_y_value(0)) / super.get_x_interval(0);
+        double dn = (super.get_y_value(n - 1) - super.get_y_value(n - 2))
+                / super.get_x_interval(n - 2);
+        double[] dd = new double[n];
+
+        compute_cubic_2nd_deriv(cubic_2nd_deriv_init_e.Cubic2ndDerivFirst, n, dd, d0, dn);
+
+        set_quadratic_poly(poly.get(0), super.get_x_value(0), super.get_y_value(0), d0,
+                dd[0]);
+
+        for (int i = 1; i < n; i++)
+            set_cubic_poly2(poly.get(i), super.get_x_value(i - 1), super.get_y_value(i - 1),
+                    super.get_x_value(i), super.get_y_value(i), dd[i - 1], dd[i]);
+
+        set_quadratic_poly(poly.get(n), super.get_x_value(n - 1), super.get_y_value(n - 1),
+                dn, dd[n - 1]);
+
+        return interpolate_cubic(d, x);
+    }
+
+    double update_cubic_deriv_init(int d, double x) {
+        ArrayList<PolyS> poly = this._poly;
+
+        int n = super.get_count();
+
+        if (n < 4)
+            throw new IllegalStateException("data set doesn't contains enough data");
+
+        // FIXME
+        poly.ensureCapacity(n + 1);
+
+        // double dd[n];
+        double[] dd = new double[n];
+        double d0 = super.get_d_value(0);
+        double dn = super.get_d_value(n - 1);
+
+        compute_cubic_2nd_deriv(cubic_2nd_deriv_init_e.Cubic2ndDerivFirst, super.get_count(), dd, d0, dn);
+
+        set_linear_poly(poly.get(0), super.get_x_value(0), super.get_y_value(0), d0);
+
+        for (int i = 1; i < n; i++)
+            set_cubic_poly2(poly.get(i), super.get_x_value(i - 1), super.get_y_value(i - 1),
+                    super.get_x_value(i), super.get_y_value(i), dd[i - 1], dd[i]);
+
+        set_linear_poly(poly.get(n), super.get_x_value(n - 1), super.get_y_value(n - 1),
+                dn);
+
+        return interpolate_cubic(d, x);
+    }
+
+    double update_cubic2_deriv_init(int d, double x) {
+        ArrayList<PolyS> poly = this._poly;
+
+        int n = super.get_count();
+
+        if (n < 4)
+            throw new IllegalStateException("data set doesn't contains enough data");
+
+        // FIXME
+        poly.ensureCapacity(n + 1);
+
+        // double dd[n];
+        double[] dd = new double[n];
+        double d0 = super.get_d_value(0);
+        double dn = super.get_d_value(n - 1);
+
+        compute_cubic_2nd_deriv(cubic_2nd_deriv_init_e.Cubic2ndDerivFirst, super.get_count(), dd, d0, dn);
+
+        set_quadratic_poly(poly.get(0), super.get_x_value(0), super.get_y_value(0), d0,
+                dd[0]);
+
+        for (int i = 1; i < n; i++)
+            set_cubic_poly2(poly.get(i), super.get_x_value(i - 1), super.get_y_value(i - 1),
+                    super.get_x_value(i), super.get_y_value(i), dd[i - 1], dd[i]);
+
+        set_quadratic_poly(poly.get(n), super.get_x_value(n - 1), super.get_y_value(n - 1),
+                dn, dd[n - 1]);
+
+        return interpolate_cubic(d, x);
+    }
+
+    double update_cubic2_deriv(int d, double x) {
+        ArrayList<PolyS> poly = this._poly;
+
+        int n = super.get_count();
+
+        if (n < 4)
+            throw new IllegalStateException("data set doesn't contains enough data");
+
+        // FIXME
+        poly.ensureCapacity(n + 1);
+
+        double dd0
+                = (super.get_d_value(1) - super.get_d_value(0)) / super.get_x_interval(0);
+
+        set_quadratic_poly(poly.get(0), super.get_x_value(0), super.get_y_value(0),
+                super.get_d_value(0), dd0);
+
+        for (int i = 1; i < n; i++)
+            set_cubic_poly(poly.get(i), super.get_x_value(i - 1), super.get_y_value(i - 1),
+                    super.get_x_value(i), super.get_y_value(i),
+                    super.get_d_value(i - 1), super.get_d_value(i));
+
+        double ddn = (super.get_d_value(n - 1) - super.get_d_value(n - 2))
+                / super.get_x_interval(n - 2);
+
+        set_quadratic_poly(poly.get(n), super.get_x_value(n - 1), super.get_y_value(n - 1),
+                super.get_d_value(n - 1), ddn);
+
+        return interpolate_cubic(d, x);
+    }
+
+    double update_cubic_deriv(int d, double x) {
+        ArrayList<PolyS> poly = this._poly;
+
+        int n = super.get_count();
+
+        if (n < 4)
+            throw new IllegalStateException("data set doesn't contains enough data");
+
+        // FIXME
+        poly.ensureCapacity(n + 1);
+
+        set_linear_poly(poly.get(0), super.get_x_value(0), super.get_y_value(0),
+                super.get_d_value(0));
+
+        for (int i = 1; i < n; i++)
+            set_cubic_poly(poly.get(i), super.get_x_value(i - 1), super.get_y_value(i - 1),
+                    super.get_x_value(i), super.get_y_value(i),
+                    super.get_d_value(i - 1), super.get_d_value(i));
+
+        set_linear_poly(poly.get(n), super.get_x_value(n - 1), super.get_y_value(n - 1),
+                super.get_d_value(n - 1));
+
+        return interpolate_cubic(d, x);
     }
 
 }

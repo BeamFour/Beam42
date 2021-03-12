@@ -3,6 +3,8 @@ package org.redukti.jfotoptix.material;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static org.redukti.jfotoptix.material.Abbe.AbbeFormula.AbbeVd;
+import static org.redukti.jfotoptix.material.Abbe.AbbeFormula.AbbeVe;
 import static org.redukti.jfotoptix.material.AirFormula.AirBirch94Formula;
 import static org.redukti.jfotoptix.material.AirFormula.AirKohlrausch68Formula;
 
@@ -67,6 +69,30 @@ public class TestMaterials {
 
         Assertions.assertEquals(1.6029774, sellm.get_refractive_index(400., airk), 1e-7);
         Assertions.assertEquals(1.5711062, sellm.get_refractive_index(800., airk), 1e-7);
+    }
 
+    @Test
+    public void testAbbe() {
+        Air airm = new Air(AirKohlrausch68Formula);
+
+        // BAF3
+        Sellmeier sellm = new Sellmeier(1.32064267E+000, 8.87798715E-003, 1.33572683E-001,
+                4.20290346E-002, 8.85521821E-001, 1.11729167E+002);
+
+        Assertions.assertEquals(46.47, sellm.get_abbe_vd(), 0.01);
+
+        Abbe abbevd = new Abbe(AbbeVd, 1.582670, 46.47, .0001);
+        abbevd.set_measurement_medium(airm);
+
+        Assertions.assertEquals(1.605655, abbevd.get_refractive_index(400., airm), 1e-6);
+        Assertions.assertEquals(1.573845, abbevd.get_refractive_index(800., airm), 1e-6);
+
+        Assertions.assertEquals(46.18, sellm.get_abbe_ve(), 0.01);
+
+        Abbe abbeve = new Abbe(AbbeVe, 1.585648, 46.18, .0001);
+        abbevd.set_measurement_medium(airm);
+
+        Assertions.assertEquals(1.605655, abbeve.get_refractive_index(400., airm), 1e-6);
+        Assertions.assertEquals(1.573844, abbeve.get_refractive_index(800., airm), 1e-6);
     }
 }

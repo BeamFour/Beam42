@@ -21,6 +21,7 @@ public class Sellmeier extends Dielectric {
      * Create an empty sellmeier model
      */
     public Sellmeier() {
+        super("Sellmeier");
         _coeff = new double[0];
         _constant = 1.0;
     }

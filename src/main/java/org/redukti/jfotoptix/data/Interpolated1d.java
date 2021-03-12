@@ -9,6 +9,12 @@ import static org.redukti.jfotoptix.util.MathUtils.square;
 
 public class Interpolated1d {
 
+    enum cubic_2nd_deriv_init_e {
+        Cubic2ndDerivQuadratic,
+        Cubic2ndDerivFirst,
+        Cubic2ndDerivSecond,
+    }
+
     DiscreteSetBase dataSet;
 
     static final class PolyS {

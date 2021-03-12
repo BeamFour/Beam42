@@ -2,6 +2,8 @@ package org.redukti.jfotoptix.material;
 
 import org.redukti.jfotoptix.io.Rgb;
 
+import static org.redukti.jfotoptix.util.MathUtils.square;
+
 public abstract class MaterialBase {
     public final String name;
     public final double _temperature; // celcius
@@ -64,7 +66,6 @@ public abstract class MaterialBase {
                 / (4 * Math.PI * 0.001 /* 1 mm */);
     }
 
-    final double square(double x) { return x*x; }
 
     /** Get reflectance at normal incidence */
     public double get_normal_reflectance (MaterialBase from,

@@ -39,4 +39,25 @@ public abstract class RendererViewport extends Renderer {
     Vector2Pair _page;
 
     double _fov;
+
+    double x_scale (double x)
+    {
+        return ((x / (_page.b().x () - _page.a().x ())) * _2d_output_res.x ());
+    }
+
+    double y_scale (double y)
+    {
+        return ((y / (_page.b().y () - _page.a().y ())) * _2d_output_res.y ());
+    }
+
+    double x_trans_pos (double x)
+    {
+        return x_scale (x - _page.a().x ());
+    }
+
+    double y_trans_pos (double y)
+    {
+        return y_scale (y - _page.a().y ());
+    }
+
 }

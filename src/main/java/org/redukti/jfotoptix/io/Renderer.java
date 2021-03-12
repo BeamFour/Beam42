@@ -51,11 +51,17 @@ public abstract class Renderer {
     }
     enum PointStyle
     {
-        PointStyleDot,
-        PointStyleCross,
-        PointStyleRound,
-        PointStyleSquare,
-        PointStyleTriangle,
+        PointStyleDot(0),
+        PointStyleCross(1),
+        PointStyleRound(2),
+        PointStyleSquare(3),
+        PointStyleTriangle(4);
+
+        final int value;
+        PointStyle(int value) {
+            this.value = value;
+        }
+
     }
     double _feature_size;
 

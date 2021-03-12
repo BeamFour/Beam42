@@ -3,6 +3,7 @@ package org.redukti.jfotoptix.io;
 import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector2Pair;
 
+import static org.redukti.jfotoptix.io.Renderer.PointStyle.PointStyleCross;
 import static org.redukti.jfotoptix.io.Renderer.Style.StyleBackground;
 
 /**
@@ -179,13 +180,40 @@ public class RendererSvg extends Renderer2d {
         _out.append(" fill=\"").append(id).append("\"");
     }
 
+    static String[] ids = {"dot", "cross", "round", "square", "triangle"};
+
     @Override
     public void draw_point(Vector2 p, Rgb rgb, PointStyle s) {
 
+        if (s.value >= ids.length)
+            s = PointStyleCross;
+
+        Vector2 v2d = trans_pos(p);
+
+        svg_begin_use(ids[s.value], v2d.x(), v2d.y(), false);
+        svg_add_stroke(rgb);
+        svg_end();
+
     }
 
     @Override
-    public void draw_segment(Vector2Pair s, Rgb rgb) {
+    public void draw_segment(Vector2Pair l, Rgb rgb) {
+        Vector2 v2da = trans_pos(l.a());
+        Vector2 v2db = trans_pos(l.b());
+
+        svg_begin_line(v2da.x(), v2da.y(), v2db.x(), v2db.y(), false);
+        svg_add_stroke(rgb);
+        svg_end();
 
     }
+
+    Vector2 trans_pos(Vector2 v) {
+        return new Vector2(x_trans_pos(v.x()), y_trans_pos(v.y()));
+    }
+
+    double y_trans_pos(double y) {
+        return (((y - _page.b().y()) / (_page.a().y() - _page.b().y()))
+                * _2d_output_res.y());
+    }
+
 }

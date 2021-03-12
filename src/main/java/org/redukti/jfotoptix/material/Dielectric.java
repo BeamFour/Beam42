@@ -77,7 +77,11 @@ public abstract class Dielectric extends Solid {
     public abstract double get_measurement_index(double wavelen);
 
     public Dielectric() {
-        super("dielectric");
+        this("dielectric");
+    }
+
+    protected Dielectric(String name) {
+        super(name);
         _transmittance = new DiscreteSet();
         _temp_model = thermal_model_e.ThermalNone;
         _low_wavelen = 350.0;

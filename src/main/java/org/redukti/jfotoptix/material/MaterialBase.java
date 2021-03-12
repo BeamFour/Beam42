@@ -6,7 +6,7 @@ import static org.redukti.jfotoptix.util.MathUtils.square;
 
 public abstract class MaterialBase {
     public final String name;
-    public final double _temperature; // celcius
+    public double _temperature; // celcius
 
     public MaterialBase(String name, double temp) {
         this.name = name;
@@ -102,5 +102,9 @@ public abstract class MaterialBase {
 
     public double get_temperature() {
         return _temperature;
+    }
+
+    public void set_temperature(double temp) {
+        _temperature = temp;
     }
 }

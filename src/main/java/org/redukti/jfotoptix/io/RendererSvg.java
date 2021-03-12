@@ -147,6 +147,38 @@ public class RendererSvg extends Renderer2d {
         _out.append("</defs>").append(System.lineSeparator());
     }
 
+    void group_begin(String name) {
+        _out.append("<g>");
+        if (!name.isEmpty())
+            _out.append("<title>").append(name).append("</title>");
+        _out.append(System.lineSeparator());
+    }
+
+    void group_end() {
+        _out.append("</g>").append(System.lineSeparator());
+    }
+
+    void svg_begin_use(String id, double x, double y,
+                       boolean terminate) {
+        _out.append("<use ")
+                .append("x=\"").append(x).append("\" ")
+                .append("y=\"").append(y).append("\" ")
+                .append("xlink:href=\"#").append(id).append("\" ");
+
+        if (terminate)
+            _out.append(" />").append(System.lineSeparator());
+    }
+
+    void svg_add_stroke(Rgb rgb) {
+        _out.append(" stroke=\"");
+        write_srgb(rgb);
+        _out.append("\"");
+    }
+
+    void svg_add_id(String id) {
+        _out.append(" fill=\"").append(id).append("\"");
+    }
+
     @Override
     public void draw_point(Vector2 p, Rgb rgb, PointStyle s) {
 

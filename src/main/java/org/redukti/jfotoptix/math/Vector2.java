@@ -5,6 +5,9 @@ package org.redukti.jfotoptix.math;
  */
 public class Vector2 {
 
+    public static final Vector2 vector2_0 = new Vector2 (0.0, 0.0);
+    public static final Vector2 vector2_1 = new Vector2 (1.0, 1.0);
+
     private static final int N = 2;
 
     final double[] values;
@@ -34,6 +37,45 @@ public class Vector2 {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
             r[i] = values[i] + v.values[i];
+        return new Vector2(r);
+    }
+
+    public Vector2 subtract (Vector2 v)
+    {
+        double[] r = new double[N];
+        for (int i = 0; i < N; i++)
+            r[i] = values[i] - v.values[i];
+        return new Vector2(r);
+    }
+
+    public Vector2 divide(double scale) {
+        double[] r = new double[N];
+        for (int i = 0; i < N; i++)
+            r[i] = values[i] / scale;
+        return new Vector2(r);
+    }
+
+    public Vector2 multiply(double scale) {
+        double[] r = new double[N];
+        for (int i = 0; i < N; i++)
+            r[i] = values[i] * scale;
+        return new Vector2(r);
+    }
+
+    public Vector2 divide (Vector2 v)
+    {
+        double[] r = new double[N];
+        for (int i = 0; i < N; i++)
+            r[i] = values[i] / v.values[i];
+        return new Vector2(r);
+    }
+
+    /** element by element multiply */
+    public Vector2 mul (Vector2 v)
+    {
+        double[] r = new double[N];
+        for (int i = 0; i < N; i++)
+            r[i] = values[i] * v.values[i];
         return new Vector2(r);
     }
 

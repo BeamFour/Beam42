@@ -14,14 +14,14 @@ public abstract class DiscreteSetBase extends Set1d {
         }
     }
 
-    ArrayList<EntryS> data;
+    ArrayList<EntryS> data = new ArrayList<>();
 
     /**
      * Insert data pair in data set. If a pair with the same x
      * value exists, it will be replaced by the new
      * value. Derivative value may be provided as well.
      */
-    void add_data(double x, double y, double d) {
+    public void add_data(double x, double y, double d) {
         EntryS e = new EntryS(x, y, d);
 
         _version++;

@@ -22,7 +22,7 @@ public class Interpolated1d {
         }
     }
 
-    ArrayList<PolyS> poly;
+    ArrayList<PolyS> poly = new ArrayList<>();
 
     boolean invalid = true;
 
@@ -37,11 +37,8 @@ public class Interpolated1d {
     }
 
     void resizePoly(int n) {
-        poly.ensureCapacity(n);
-        for (int i = 0; i < n; i++) {
-            if (poly.get(i) == null) {
-                poly.set(i, new PolyS(0,0,0,0));
-            }
+        for (int i = poly.size(); i < n; i++) {
+            poly.add(new PolyS(0, 0, 0, 0));
         }
     }
 
@@ -55,8 +52,7 @@ public class Interpolated1d {
     }
 
     public double interpolate(double x, int d) {
-        switch (method)
-        {
+        switch (method) {
             case Nearest:
                 if (invalid) {
                     poly.clear();
@@ -70,31 +66,31 @@ public class Interpolated1d {
                 return interpolate_linear(d, x);
 
             case Quadratic:
-                return invalid ? update_quadratic(d,x) : interpolate_quadratic(d, x);
+                return invalid ? update_quadratic(d, x) : interpolate_quadratic(d, x);
 
             case CubicSimple:
-                return invalid ? update_cubic_simple(d,x) : interpolate_cubic(d, x);
+                return invalid ? update_cubic_simple(d, x) : interpolate_cubic(d, x);
 
             case CubicDeriv:
-                return invalid ? update_cubic_deriv(d,x) : interpolate_cubic(d, x);
+                return invalid ? update_cubic_deriv(d, x) : interpolate_cubic(d, x);
 
             case Cubic2Deriv:
-                return invalid ? update_cubic2_deriv(d,x) : interpolate_cubic(d, x);
+                return invalid ? update_cubic2_deriv(d, x) : interpolate_cubic(d, x);
 
             case CubicDerivInit:
-                return invalid ? update_cubic_deriv_init(d,x) : interpolate_cubic(d, x);
+                return invalid ? update_cubic_deriv_init(d, x) : interpolate_cubic(d, x);
 
             case Cubic2DerivInit:
-                return invalid ? update_cubic2_deriv_init(d,x) : interpolate_cubic(d, x);
+                return invalid ? update_cubic2_deriv_init(d, x) : interpolate_cubic(d, x);
 
             case Cubic:
-                return invalid ? update_cubic(d,x) : interpolate_cubic(d, x);
+                return invalid ? update_cubic(d, x) : interpolate_cubic(d, x);
 
             case Cubic2:
-                return invalid ? update_cubic2(d,x) : interpolate_cubic(d, x);
+                return invalid ? update_cubic2(d, x) : interpolate_cubic(d, x);
 
             default:
-                throw new IllegalStateException ("invalid interpolation selected");
+                throw new IllegalStateException("invalid interpolation selected");
         }
     }
 

@@ -46,7 +46,7 @@ public abstract class DataSet {
     /** Get minimal and maximal x values on dimension n found in data set */
     public abstract Range get_x_range (int dim);
 
-    /** Get minimal and maximal y values found in data set */s
+    /** Get minimal and maximal y values found in data set */
     public Range get_y_range ()
     {
         Range r = new Range(Double.MIN_VALUE, Double.MAX_VALUE);

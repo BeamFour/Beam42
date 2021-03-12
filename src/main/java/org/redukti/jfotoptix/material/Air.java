@@ -1,5 +1,7 @@
 package org.redukti.jfotoptix.material;
 
+import static org.redukti.jfotoptix.util.MathUtils.square;
+
 /**
  * Air optical material model
  * This class models optical properties of air. Refractive index

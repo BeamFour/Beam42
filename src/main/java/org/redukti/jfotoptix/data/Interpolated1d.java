@@ -28,6 +28,10 @@ public class Interpolated1d {
 
     Interpolation method = Interpolation.Linear;
 
+    public Interpolated1d(DiscreteSetBase dataSet) {
+        this.dataSet = dataSet;
+    }
+
     void invalidate() {
         this.invalid = true;
     }
@@ -46,7 +50,11 @@ public class Interpolated1d {
         invalidate();
     }
 
-    public double interpolate(int d, double x) {
+    public double interpolate(double x) {
+        return interpolate(x, 0);
+    }
+
+    public double interpolate(double x, int d) {
         switch (method)
         {
             case Nearest:

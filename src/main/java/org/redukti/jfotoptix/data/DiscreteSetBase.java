@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 public abstract class DiscreteSetBase extends Set1d {
 
-    class EntryS {
-        double x, y, d;
+    static final class EntryS {
+        final double x, y, d;
 
         public EntryS(double x, double y, double d) {
             this.x = x;
@@ -36,13 +36,6 @@ public abstract class DiscreteSetBase extends Set1d {
     }
 
     protected abstract void invalidate();
-
-    /**
-     * Reserve data entries
-     */
-    public void reserve(int n) {
-        data.ensureCapacity(n);
-    }
 
     /**
      * Clear all data

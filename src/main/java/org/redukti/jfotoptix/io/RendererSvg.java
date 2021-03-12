@@ -3,6 +3,9 @@ package org.redukti.jfotoptix.io;
 import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector2Pair;
 
+import java.text.NumberFormat;
+import java.util.EnumSet;
+
 import static org.redukti.jfotoptix.io.Renderer.PointStyle.PointStyleCross;
 import static org.redukti.jfotoptix.io.Renderer.Style.StyleBackground;
 
@@ -14,6 +17,10 @@ import static org.redukti.jfotoptix.io.Renderer.Style.StyleBackground;
 public class RendererSvg extends Renderer2d {
 
     StringBuilder _out = new StringBuilder();
+
+    String format(double value) {
+        return String.format("%.3f", value);
+    }
 
     /**
      * Create a new svg renderer with given resolution. The
@@ -31,6 +38,10 @@ public class RendererSvg extends Renderer2d {
         clear();
     }
 
+    RendererSvg(double width, double height) {
+        this(width, height, Rgb.rgb_white);
+    }
+
     /**
      * Create a new svg renderer with given resolution. The
      *
@@ -44,10 +55,10 @@ public class RendererSvg extends Renderer2d {
     void svg_begin_rect(double x1, double y1, double x2, double y2,
                         boolean terminate) {
         _out.append("<rect ")
-                .append("x=\"").append(x1).append("\" ")
-                .append("y=\"").append(y1).append("\" ")
-                .append("width=\"").append(x2 - x1).append("\" ")
-                .append("height=\"").append(y2 - y1).append("\" ");
+                .append("x=\"").append(format(x1)).append("\" ")
+                .append("y=\"").append(format(y1)).append("\" ")
+                .append("width=\"").append(format(x2 - x1)).append("\" ")
+                .append("height=\"").append(format(y2 - y1)).append("\" ");
 
         if (terminate)
             _out.append(" />").append(System.lineSeparator());
@@ -56,10 +67,10 @@ public class RendererSvg extends Renderer2d {
     void svg_begin_line(double x1, double y1, double x2, double y2,
                         boolean terminate) {
         _out.append("<line ")
-                .append("x1=\"").append(x1).append("\" ")
-                .append("y1=\"").append(y1).append("\" ")
-                .append("x2=\"").append(x2).append("\" ")
-                .append("y2=\"").append(y2).append("\" ");
+                .append("x1=\"").append(format(x1)).append("\" ")
+                .append("y1=\"").append(format(y1)).append("\" ")
+                .append("x2=\"").append(format(x2)).append("\" ")
+                .append("y2=\"").append(format(y2)).append("\" ");
 
         if (terminate)
             _out.append(" />").append(System.lineSeparator());
@@ -68,10 +79,10 @@ public class RendererSvg extends Renderer2d {
     void svg_begin_ellipse(double x, double y, double rx, double ry,
                            boolean terminate) {
         _out.append("<ellipse ")
-                .append("cx=\"").append(x).append("\" ")
-                .append("cy=\"").append(y).append("\" ")
-                .append("rx=\"").append(rx).append("\" ")
-                .append("ry=\"").append(ry).append("\" ");
+                .append("cx=\"").append(format(x)).append("\" ")
+                .append("cy=\"").append(format(y)).append("\" ")
+                .append("rx=\"").append(format(rx)).append("\" ")
+                .append("ry=\"").append(format(ry)).append("\" ");
 
         if (terminate)
             _out.append(" />").append(System.lineSeparator());
@@ -162,8 +173,8 @@ public class RendererSvg extends Renderer2d {
     void svg_begin_use(String id, double x, double y,
                        boolean terminate) {
         _out.append("<use ")
-                .append("x=\"").append(x).append("\" ")
-                .append("y=\"").append(y).append("\" ")
+                .append("x=\"").append(format(x)).append("\" ")
+                .append("y=\"").append(format(y)).append("\" ")
                 .append("xlink:href=\"#").append(id).append("\" ");
 
         if (terminate)
@@ -219,8 +230,9 @@ public class RendererSvg extends Renderer2d {
         svg_end();
     }
 
+    @Override
     public void draw_text(Vector2 v, Vector2 dir,
-                          String str, TextAlignMask a, int size,
+                          String str, EnumSet<TextAlignMask> a, int size,
                           Rgb rgb) {
         int margin = size / 2;
         Vector2 v2d = trans_pos(v);
@@ -230,37 +242,37 @@ public class RendererSvg extends Renderer2d {
 
         _out.append("<text style=\"font-size:").append(size).append(";");
 
-        if ((a.value & TextAlignMask.TextAlignLeft.value) != 0) {
+        if (a.contains(TextAlignMask.TextAlignLeft)) {
             //_out << "text-align:left;text-anchor:start;";
             x += margin;
-        } else if ((a.value & TextAlignMask.TextAlignRight.value) != 0) {
+        } else if (a.contains(TextAlignMask.TextAlignRight)) {
             _out.append("text-align:right;text-anchor:end;");
             x -= margin;
         } else
             _out.append("text-align:center;text-anchor:middle;");
 
-        if ((a.value & TextAlignMask.TextAlignTop.value) != 0)
+        if (a.contains(TextAlignMask.TextAlignTop))
             y += size + margin;
-        else if ((a.value & TextAlignMask.TextAlignBottom.value) != 0)
+        else if (a.contains(TextAlignMask.TextAlignBottom))
             y -= margin;
         else
             y += size / 2;
 
-        _out.append("\" x=\"").append(x).append("\" y=\"").append(y).append("\"");
+        _out.append("\" x=\"").append(format(x)).append("\" y=\"").append(y).append("\"");
 
         double ra = Math.toDegrees(Math.atan2(-dir.y(), dir.x()));
         if (ra != 0)
-            _out.append(" transform=\"rotate(").append(ra).append(",").append(xo).append(",").append(yo).append(")\"");
+            _out.append(" transform=\"rotate(").append(ra).append(",").append(format(xo)).append(",").append(format(yo)).append(")\"");
 
         svg_add_fill(rgb);
 
         _out.append(">").append(str).append("</text>").append(System.lineSeparator());
     }
 
-
-    public void draw_polygon(Vector2[] array, int count,
+    @Override
+    public void draw_polygon(Vector2[] array,
                              Rgb rgb, boolean filled, boolean closed) {
-        if (count < 3)
+        if (array.length < 3)
             return;
 
         closed = closed || filled;
@@ -282,10 +294,10 @@ public class RendererSvg extends Renderer2d {
 
         _out.append(" points=\"");
 
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < array.length; i++) {
             Vector2 v2d = trans_pos(array[i]);
 
-            _out.append(v2d.x()).append(",").append(v2d.y()).append(" ");
+            _out.append(format(v2d.x())).append(",").append(format(v2d.y())).append(" ");
         }
 
         _out.append("\" />").append(System.lineSeparator());
@@ -301,11 +313,11 @@ public class RendererSvg extends Renderer2d {
                 * _2d_output_res.y());
     }
 
-    public void write(StringBuilder s) {
+    public StringBuilder write(StringBuilder s) {
         s.append("<?xml version=\"1.0\" standalone=\"no\"?>").append(System.lineSeparator());
 
-        s.append("<svg width=\"").append(_2d_output_res.x()).append("px\" height=\"")
-                .append(_2d_output_res.y()).append("px\" ")
+        s.append("<svg width=\"").append(format(_2d_output_res.x())).append("px\" height=\"")
+                .append(format(_2d_output_res.y())).append("px\" ")
                 .append("version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" ")
                 .append("xmlns:xlink=\"http://www.w3.org/1999/xlink\">")
                 .append(System.lineSeparator());
@@ -314,6 +326,7 @@ public class RendererSvg extends Renderer2d {
         s.append(_out);
 
         s.append("</svg>").append(System.lineSeparator());
+        return s;
     }
 
 }

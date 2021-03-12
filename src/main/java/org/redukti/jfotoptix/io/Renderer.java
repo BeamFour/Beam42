@@ -4,6 +4,7 @@ import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector2Pair;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 
 /**
  Base class for rendering drivers
@@ -61,6 +62,16 @@ public abstract class Renderer {
         PointStyle(int value) {
             this.value = value;
         }
+        public static PointStyle of(int i) {
+            switch (i) {
+                case 0: return PointStyleDot;
+                case 1: return PointStyleCross;
+                case 2: return PointStyleRound;
+                case 3: return PointStyleSquare;
+                case 4: return PointStyleTriangle;
+                default: throw new IllegalArgumentException();
+            }
+        }
     }
 
     /** Specifies rendered text alignment */
@@ -104,6 +115,10 @@ public abstract class Renderer {
 
     /** @internal Draw a point in 2d */
     public abstract void draw_point (Vector2 p, Rgb rgb, PointStyle s);
+    public abstract void draw_text (Vector2 pos, Vector2 dir,
+                                    String str, EnumSet<TextAlignMask> a, int size,
+                                    Rgb rgb);
+
     public void draw_point(Vector2 p) {
         draw_point(p, Rgb.rgb_gray, PointStyle.PointStyleDot);
     }

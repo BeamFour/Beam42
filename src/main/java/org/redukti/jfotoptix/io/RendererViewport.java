@@ -3,6 +3,8 @@ package org.redukti.jfotoptix.io;
 import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector2Pair;
 
+import static org.redukti.jfotoptix.io.Renderer.Style.StyleForeground;
+
 public abstract class RendererViewport extends Renderer {
 
     /**
@@ -207,8 +209,20 @@ public abstract class RendererViewport extends Renderer {
     void set_window (Vector2Pair window, boolean keep_aspect)
     {
         Vector2 center = window.a().add(window.b()).divide(2);
-        Vector2 size = new Vector2(window.a().x () - window.a().x (),
+        Vector2 size = new Vector2(window.b().x () - window.a().x (),
             window.b().y () - window.b().y ());
         set_window (center, size, keep_aspect);
+    }
+
+    void draw_frame_2d ()
+    {
+        Vector2[] fr = new Vector2[4];
+
+        fr[0] = _window2d_fit.a();
+        fr[1] = new Vector2 (_window2d_fit.a().x (), _window2d_fit.b().y ());
+        fr[2] = _window2d_fit.b();
+        fr[3] = new Vector2 (_window2d_fit.b().x (), _window2d_fit.a().y ());
+
+        draw_polygon (fr, get_style_color (StyleForeground), false, true);
     }
 }

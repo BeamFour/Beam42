@@ -35,6 +35,8 @@ public abstract class DiscreteSetBase extends Set1d {
         invalidate();
     }
 
+
+
     protected abstract void invalidate();
 
     /**

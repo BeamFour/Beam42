@@ -34,6 +34,12 @@ public class Air extends MaterialBase {
         this._pressure = pressure;
     }
 
+    public Air(AirFormula formula, double pressure, double temp) {
+        super("air", temp);
+        this.airFormula = formula;
+        this._pressure = pressure;
+    }
+
     public Air(AirFormula formula) {
         this(formula, std_pressure);
     }

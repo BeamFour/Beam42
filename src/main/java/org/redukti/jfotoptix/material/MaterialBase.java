@@ -99,4 +99,8 @@ public abstract class MaterialBase {
         // FIXME color depends on material properties
         return new Rgb (1, 1, 1, 1);
     }
+
+    public double get_temperature() {
+        return _temperature;
+    }
 }

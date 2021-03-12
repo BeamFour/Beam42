@@ -29,6 +29,14 @@ public class Vector2 {
 
     public double get(int i) {return this.values[i];}
 
+    public Vector2 add (Vector2 v)
+    {
+        double[] r = new double[N];
+        for (int i = 0; i < N; i++)
+            r[i] = values[i] + v.values[i];
+        return new Vector2(r);
+    }
+
     @Override
     public String toString() {
         return "[" + x() + ',' + y() + ']';

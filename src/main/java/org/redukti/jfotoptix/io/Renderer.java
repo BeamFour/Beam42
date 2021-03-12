@@ -75,6 +75,10 @@ public abstract class Renderer {
         _styles_color[Style.StyleSurface.value] = new Rgb (0.5, 0.5, 1.0, 1.0);
         _styles_color[Style.StyleGlass.value] = new Rgb (0.8, 0.8, 1.0, 1.0);
     }
+    Rgb get_style_color (Style s)
+    {
+        return _styles_color[s.value];
+    }
 
     /** @internal Draw a point in 2d */
     public abstract void draw_point (Vector2 p, Rgb rgb, PointStyle s);

@@ -13,6 +13,11 @@ public class Rgb {
         this.a = alpha;
     }
 
+    Rgb negate ()
+    {
+        return new Rgb (1. - r, 1. - g, 1. - b, a);
+    }
+
     public static final Rgb rgb_black = new Rgb (0.0f, 0.0f, 0.0f, 1.0f);
     public static final  Rgb rgb_red = new Rgb (1.0f, 0.0f, 0.0f, 1.0f);
     public static final  Rgb rgb_green = new Rgb(0.0f, 1.0f, 0.0f, 1.0f);

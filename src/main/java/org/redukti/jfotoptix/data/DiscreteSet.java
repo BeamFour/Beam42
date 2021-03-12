@@ -1,6 +1,6 @@
 package org.redukti.jfotoptix.data;
 
-public class DiscreteSet extends DiscreteSetBase {
+public class DiscreteSet extends DiscreteSetBase implements InterpolatableDataSet {
 
     Interpolated1d interpolated1d;
 

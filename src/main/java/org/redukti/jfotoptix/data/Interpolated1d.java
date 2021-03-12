@@ -15,7 +15,7 @@ public class Interpolated1d {
         Cubic2ndDerivSecond,
     }
 
-    DiscreteSetBase dataSet;
+    InterpolatableDataSet dataSet;
 
     static final class PolyS {
         double a, b, c, d;
@@ -34,7 +34,7 @@ public class Interpolated1d {
 
     Interpolation method = Interpolation.Linear;
 
-    public Interpolated1d(DiscreteSetBase dataSet) {
+    public Interpolated1d(InterpolatableDataSet dataSet) {
         this.dataSet = dataSet;
     }
 

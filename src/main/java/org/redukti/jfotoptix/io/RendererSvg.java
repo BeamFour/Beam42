@@ -207,6 +207,91 @@ public class RendererSvg extends Renderer2d {
 
     }
 
+    public void draw_circle(Vector2 c, double r, Rgb rgb, boolean filled) {
+        Vector2 v2d = trans_pos(c);
+
+        svg_begin_ellipse(v2d.x(), v2d.y(), x_scale(r), y_scale(r), false);
+        svg_add_stroke(rgb);
+        if (filled)
+            svg_add_fill(rgb);
+        else
+            _out.append(" fill=\"none\"");
+        svg_end();
+    }
+
+    public void draw_text(Vector2 v, Vector2 dir,
+                          String str, TextAlignMask a, int size,
+                          Rgb rgb) {
+        int margin = size / 2;
+        Vector2 v2d = trans_pos(v);
+        double x = v2d.x();
+        double y = v2d.y();
+        double yo = y, xo = x;
+
+        _out.append("<text style=\"font-size:").append(size).append(";");
+
+        if ((a.value & TextAlignMask.TextAlignLeft.value) != 0) {
+            //_out << "text-align:left;text-anchor:start;";
+            x += margin;
+        } else if ((a.value & TextAlignMask.TextAlignRight.value) != 0) {
+            _out.append("text-align:right;text-anchor:end;");
+            x -= margin;
+        } else
+            _out.append("text-align:center;text-anchor:middle;");
+
+        if ((a.value & TextAlignMask.TextAlignTop.value) != 0)
+            y += size + margin;
+        else if ((a.value & TextAlignMask.TextAlignBottom.value) != 0)
+            y -= margin;
+        else
+            y += size / 2;
+
+        _out.append("\" x=\"").append(x).append("\" y=\"").append(y).append("\"");
+
+        double ra = Math.toDegrees(Math.atan2(-dir.y(), dir.x()));
+        if (ra != 0)
+            _out.append(" transform=\"rotate(").append(ra).append(",").append(xo).append(",").append(yo).append(")\"");
+
+        svg_add_fill(rgb);
+
+        _out.append(">").append(str).append("</text>").append(System.lineSeparator());
+    }
+
+
+    public void draw_polygon(Vector2[] array, int count,
+                             Rgb rgb, boolean filled, boolean closed) {
+        if (count < 3)
+            return;
+
+        closed = closed || filled;
+
+        if (closed) {
+            _out.append("<polygon");
+
+            if (filled)
+                svg_add_fill(rgb);
+            else {
+                _out.append(" fill=\"none\"");
+                svg_add_stroke(rgb);
+            }
+        } else {
+            _out.append("<polyline fill=\"none\"");
+
+            svg_add_stroke(rgb);
+        }
+
+        _out.append(" points=\"");
+
+        for (int i = 0; i < count; i++) {
+            Vector2 v2d = trans_pos(array[i]);
+
+            _out.append(v2d.x()).append(",").append(v2d.y()).append(" ");
+        }
+
+        _out.append("\" />").append(System.lineSeparator());
+    }
+
+
     Vector2 trans_pos(Vector2 v) {
         return new Vector2(x_trans_pos(v.x()), y_trans_pos(v.y()));
     }
@@ -214,6 +299,21 @@ public class RendererSvg extends Renderer2d {
     double y_trans_pos(double y) {
         return (((y - _page.b().y()) / (_page.a().y() - _page.b().y()))
                 * _2d_output_res.y());
+    }
+
+    public void write(StringBuilder s) {
+        s.append("<?xml version=\"1.0\" standalone=\"no\"?>").append(System.lineSeparator());
+
+        s.append("<svg width=\"").append(_2d_output_res.x()).append("px\" height=\"")
+                .append(_2d_output_res.y()).append("px\" ")
+                .append("version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" ")
+                .append("xmlns:xlink=\"http://www.w3.org/1999/xlink\">")
+                .append(System.lineSeparator());
+
+        // content
+        s.append(_out);
+
+        s.append("</svg>").append(System.lineSeparator());
     }
 
 }

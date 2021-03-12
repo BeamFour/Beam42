@@ -61,8 +61,24 @@ public abstract class Renderer {
         PointStyle(int value) {
             this.value = value;
         }
-
     }
+
+    /** Specifies rendered text alignment */
+    enum TextAlignMask
+    {
+        TextAlignCenter(1), //< Vertically centered
+        TextAlignLeft(2),
+        TextAlignRight(4),
+        TextAlignTop(8),
+        TextAlignBottom(16),
+        TextAlignMiddle(32); //< Horizontally centered
+
+        final int value;
+        TextAlignMask(int value) {
+            this.value = value;
+        }
+    };
+
     double _feature_size;
 
     Rgb[] _styles_color = new Rgb[Style.StyleLast.value];

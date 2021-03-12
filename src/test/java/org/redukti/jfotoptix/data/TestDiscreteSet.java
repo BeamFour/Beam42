@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class TestDiscreteSet {
 
     static final class DataPoint {
-        double a,b,c,d;
+        double a, b, c, d;
 
         public DataPoint(String line) {
             String[] values = line.split(" ");
@@ -38,7 +38,7 @@ public class TestDiscreteSet {
 
     private List<DataPoint> parseDataPoints(String name) throws IOException, URISyntaxException {
         return Files.readAllLines(Paths.get(this.getClass().getResource(name).toURI()))
-            .stream().map(e -> new DataPoint(e)).collect(Collectors.toList());
+                .stream().map(e -> new DataPoint(e)).collect(Collectors.toList());
     }
 
     private void doTest(Interpolation method) throws Exception {
@@ -46,18 +46,17 @@ public class TestDiscreteSet {
         List<DataPoint> results = parseDataPoints(expected);
         Assertions.assertTrue(results.size() > 0);
 
-        final double N = 15;
-        final double R = 10;
+        final double N = 15.0;
+        final double R = 10.0;
 
         DiscreteSet d = new DiscreteSet();
-        for (int i = 0; i < (int)N; i++) {
+        for (int i = 0; i < (int) N; i++) {
             d.add_data(lines.get(i).a, lines.get(i).b, lines.get(i).c);
         }
         d.setInterpolation(method);
 
         int i = 0;
-        for (double x = -N/2.0 - 2.0; x < N/2.0 + 2.0; x += 1.0/R)
-        {
+        for (double x = -N / 2.0 - 2.0; x < N / 2.0 + 2.0; x += 1.0 / R) {
             DataPoint ex = results.get(i++);
             double xx = ex.a;
             double y = ex.b;
@@ -118,7 +117,7 @@ public class TestDiscreteSet {
 
     @Test
     public void testCubic2Deriv() throws Exception {
-       doTest(Interpolation.Cubic2Deriv);
+        doTest(Interpolation.Cubic2Deriv);
     }
 
 }

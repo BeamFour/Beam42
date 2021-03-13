@@ -166,7 +166,7 @@ public abstract class Renderer {
         p[0] = new Vector2 (r, 0);
 
         for (int i = 0; i < count; i++, a += astep)
-            p[i] = v.add(new Vector2 (r * Math.cos (a), r * Math.sin (a)));
+            p[i] = v.plus(new Vector2 (r * Math.cos (a), r * Math.sin (a)));
 
         draw_polygon (p, rgb, filled, true);
     }

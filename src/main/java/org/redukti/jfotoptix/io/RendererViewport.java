@@ -91,7 +91,7 @@ public abstract class RendererViewport extends Renderer {
 
         Vector2 sby2 = s.divide(2.0);
         //  (center - s / 2., center + s / 2.)
-        _window2d_fit = new Vector2Pair(center.subtract(sby2), center.add(sby2));
+        _window2d_fit = new Vector2Pair(center.minus(sby2), center.plus(sby2));
 
         Vector2 ms0 = sby2;
         Vector2 ms1 = sby2;
@@ -100,25 +100,25 @@ public abstract class RendererViewport extends Renderer {
             case MarginLocal:
 //                ms[0] = ms[0] + _margin[0];
 //                ms[1] = ms[1] + _margin[1];
-                ms0 = ms0.add(_margin.v0);
-                ms1 = ms1.add(_margin.v1);
+                ms0 = ms0.plus(_margin.v0);
+                ms1 = ms1.plus(_margin.v1);
                 break;
             case MarginRatio:
 //                ms[0] = ms[0] + s.mul (_margin[0]);
 //                ms[1] = ms[1] + s.mul (_margin[1]);
-                ms0 = ms0.add(s.mul(_margin.v0));
-                ms1 = ms1.add(s.mul(_margin.v1));
+                ms0 = ms0.plus(s.ebeTimes(_margin.v0));
+                ms1 = ms1.plus(s.ebeTimes(_margin.v1));
                 break;
             case MarginOutput:
 //                ms[0] = ms[0] / (math::vector2_1 - _margin[0] / _2d_output_res * 2);
 //                ms[1] = ms[1] / (math::vector2_1 - _margin[1] / _2d_output_res * 2);
-                ms0 = ms0.divide(Vector2.vector2_1.subtract(_margin.v0.divide(_2d_output_res.multiply(2.0))));
-                ms1 = ms1.divide(Vector2.vector2_1.subtract(_margin.v1.divide(_2d_output_res.multiply(2.0))));
+                ms0 = ms0.ebeDivide(Vector2.vector2_1.minus(_margin.v0.ebeDivide(_2d_output_res.times(2.0))));
+                ms1 = ms1.ebeDivide(Vector2.vector2_1.minus(_margin.v1.ebeDivide(_2d_output_res.times(2.0))));
                 break;
         }
 
         //(center - ms[0], center + ms[1])
-        _window2d = new Vector2Pair(center.subtract(ms0), center.add(ms1));
+        _window2d = new Vector2Pair(center.minus(ms0), center.plus(ms1));
 
         update_2d_window();
         set_orthographic();
@@ -207,7 +207,7 @@ public abstract class RendererViewport extends Renderer {
 
     void set_window(Vector2Pair window, boolean keep_aspect) {
         //(window[0] + window[1]) / 2
-        Vector2 center = window.v0.add(window.v1).divide(2.0);
+        Vector2 center = window.v0.plus(window.v1).divide(2.0);
         //(window[1].x () - window[0].x (),
         //window[1].y () - window[0].y ());
         Vector2 size = new Vector2(window.v1.x() - window.v0.x(),

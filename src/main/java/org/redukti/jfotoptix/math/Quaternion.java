@@ -16,7 +16,7 @@ public class Quaternion {
         double _x = cp.x ();
         double _y = cp.y ();
         double _z = cp.z ();
-        double _w = a.dot(b) + 1.0;
+        double _w = a.dotProduct(b) + 1.0;
         double n = norm(_x, _y, _z, _w);
         x = _x/n;
         y = _y/n;

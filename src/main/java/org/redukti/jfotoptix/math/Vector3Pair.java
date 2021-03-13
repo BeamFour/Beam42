@@ -4,19 +4,17 @@ import java.util.Objects;
 
 public class Vector3Pair {
 
-    final Vector3 a;
-    final Vector3 b;
+    final Vector3 v0;
+    final Vector3 v1;
 
-    public Vector3Pair(Vector3 a, Vector3 b) {
-        Objects.requireNonNull(a);
+    public Vector3Pair(Vector3 v0, Vector3 b) {
+        Objects.requireNonNull(v0);
         Objects.requireNonNull(b);
-        this.a = a;
-        this.b = b;
+        this.v0 = v0;
+        this.v1 = b;
     }
-    public final Vector3 a() { return a; }
-    public final Vector3 b() { return b; }
 
     public final boolean isEquals(Vector3Pair other, double tolerance) {
-        return a.isEqual(other.a, tolerance) && b.isEqual(other.b, tolerance);
+        return v0.isEqual(other.v0, tolerance) && v1.isEqual(other.v1, tolerance);
     }
 }

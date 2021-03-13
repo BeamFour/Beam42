@@ -9,18 +9,18 @@ public class Vector3Position extends Vector3Pair {
     }
 
     public final Vector3 translation() {
-        return super.a();
+        return super.v0;
     }
 
     public final Vector3 direction() {
-        return super.b();
+        return super.v1;
     }
 
     @Override
     public String toString() {
         return "{" +
-                "translation=" + a +
-                ", direction=" + b +
+                "translation=" + v0 +
+                ", direction=" + v1 +
                 '}';
     }
 }

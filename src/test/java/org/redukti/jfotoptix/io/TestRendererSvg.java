@@ -38,17 +38,17 @@ public class TestRendererSvg {
         r.draw_polygon(v, Rgb.rgb_magenta, false, false);
 
         for (int i = 0; i < 5; i++)
-            v[i] = v[i].add(new Vector2(30, 0));
+            v[i] = v[i].plus(new Vector2(30, 0));
 
         r.draw_polygon(v, Rgb.rgb_magenta, true, false);
 
         for (int i = 0; i < 5; i++)
-            v[i] = v[i].add(new Vector2(30, 0));
+            v[i] = v[i].plus(new Vector2(30, 0));
 
         r.draw_polygon(v, Rgb.rgb_magenta, false, true);
 
         for (int i = 0; i < 5; i++)
-            v[i] = v[i].add(new Vector2(30, 0));
+            v[i] = v[i].plus(new Vector2(30, 0));
 
         r.draw_polygon(v, Rgb.rgb_magenta, true, true);
     }
@@ -69,7 +69,7 @@ public class TestRendererSvg {
         {
             Vector2 dir = new Vector2(Math.cos(ra), Math.sin(ra));
 
-            r.draw_segment(new Vector2Pair(pos, pos.add(dir.multiply(30))), Rgb.rgb_blue);
+            r.draw_segment(new Vector2Pair(pos, pos.plus(dir.times(30))), Rgb.rgb_blue);
             r.draw_text(pos, dir, "A long long long test string",
                     a, 12, Rgb.rgb_red);
         }

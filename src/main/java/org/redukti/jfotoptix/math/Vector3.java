@@ -51,14 +51,13 @@ public class Vector3 {
 //        return new Vector3(vec);
 //    }
 
-    public double dot (Vector3 v)
+    public double dotProduct(Vector3 v)
     {
         double r = 0;
         for (int i = 0; i < N; i++)
             r += values[i] * v.values[i];
         return r;
     }
-
 
     /**
      * The cross product a × b is defined as a vector c that is
@@ -73,12 +72,12 @@ public class Vector3 {
                 x() * b.y() - y() * b.x());
     }
 
-    public Vector3 add (Vector3 v)
+    public Vector3 plus(Vector3 v)
     {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
             r[i] = values[i] + v.values[i];
-        return new Vector3(r[0], r[1], r[2]);
+        return new Vector3(r);
     }
 
     public Vector3 negate()
@@ -86,7 +85,7 @@ public class Vector3 {
         double[] r = new double[N];
         for ( int i = 0; i < N; i++)
             r[i] = -values[i];
-        return new Vector3(r[0], r[1], r[2]);
+        return new Vector3(r);
     }
 
     @Override

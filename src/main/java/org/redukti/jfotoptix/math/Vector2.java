@@ -32,7 +32,7 @@ public class Vector2 {
 
     public double get(int i) {return this.values[i];}
 
-    public Vector2 add (Vector2 v)
+    public Vector2 plus(Vector2 v)
     {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
@@ -40,7 +40,7 @@ public class Vector2 {
         return new Vector2(r);
     }
 
-    public Vector2 subtract (Vector2 v)
+    public Vector2 minus(Vector2 v)
     {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
@@ -55,14 +55,17 @@ public class Vector2 {
         return new Vector2(r);
     }
 
-    public Vector2 multiply(double scale) {
+    public Vector2 times(double scale) {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
             r[i] = values[i] * scale;
         return new Vector2(r);
     }
 
-    public Vector2 divide (Vector2 v)
+    /**
+     * element by element divide
+     */
+    public Vector2 ebeDivide(Vector2 v)
     {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
@@ -71,7 +74,7 @@ public class Vector2 {
     }
 
     /** element by element multiply */
-    public Vector2 mul (Vector2 v)
+    public Vector2 ebeTimes(Vector2 v)
     {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)

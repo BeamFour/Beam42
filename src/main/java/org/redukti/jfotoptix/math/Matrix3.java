@@ -42,7 +42,7 @@ public class Matrix3 {
         return new Matrix3(values);
     }
 
-    Vector3 multiply(Vector3 v) {
+    Vector3 times(Vector3 v) {
         double[] r = new double[3];
         for (int i = 0; i < 3; i++) {
             double s = 0;
@@ -54,7 +54,7 @@ public class Matrix3 {
         return new Vector3(r[0], r[1], r[2]);
     }
 
-    Matrix3 multiply(Matrix3 m) {
+    Matrix3 times(Matrix3 m) {
         double[] r = new double[9];
 
         for (int i = 0; i < 3; i++) {

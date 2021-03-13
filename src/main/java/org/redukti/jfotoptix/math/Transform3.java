@@ -31,7 +31,7 @@ public class Transform3 {
 
     Vector3 transformLinear(Vector3 v) {
         if (useLinear)
-            return this.linear.multiply(v);
+            return this.linear.times(v);
         else
             return v;
     }
@@ -44,19 +44,19 @@ public class Transform3 {
      * @param c Child component
      */
     public static Transform3 compose(Transform3 p, Transform3 c) {
-        Vector3 translation = p.transformLinear(c.translation).add(p.translation);
+        Vector3 translation = p.transformLinear(c.translation).plus(p.translation);
         boolean useLinear = p.useLinear || c.useLinear;
-        Matrix3 linear = p.linear.multiply(c.linear);
+        Matrix3 linear = p.linear.times(c.linear);
         return new Transform3(translation, linear, useLinear);
     }
 
     public Vector3 transform(Vector3 v) {
-        return transformLinear(v).add(translation);
+        return transformLinear(v).plus(translation);
     }
 
     public Transform3 inverse() {
         Matrix3 linear = this.linear.inverse();
-        Vector3 translation = linear.multiply(this.translation.negate());
+        Vector3 translation = linear.times(this.translation.negate());
         return new Transform3(translation, linear, true);
     }
 
@@ -85,7 +85,7 @@ public class Transform3 {
 
     Transform3 linearRotationRadians(int axis, double rangle) {
         Matrix3 r = Matrix3.getRotationMatrix(axis, rangle);
-        Matrix3 linear = r.multiply(this.linear);
+        Matrix3 linear = r.times(this.linear);
         return new Transform3(this.translation, linear, true);
     }
 

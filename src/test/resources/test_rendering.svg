@@ -1,375 +1,375 @@
 <?xml version="1.0" standalone="no"?>
-<svg width="1600.000px" height="1200.000px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <rect x="0.000" y="0.000" width="1600.000" height="1200.000"  fill="#ffffff" />
+<svg width="1600px" height="1200px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <rect x="0" y="0" width="1600" height="1200"  fill="#ffffff" />
     <defs>
         <g id="dot">
-            <line x1="1.000" y1="1.000" x2="0.000" y2="0.000"  />
+            <line x1="1" y1="1" x2="0" y2="0"  />
         </g>
         <g id="cross">
-            <line x1="-3.000" y1="0.000" x2="3.000" y2="0.000"  />
-            <line x1="0.000" y1="-3.000" x2="0.000" y2="3.000"  />
+            <line x1="-3" y1="0" x2="3" y2="0"  />
+            <line x1="0" y1="-3" x2="0" y2="3"  />
         </g>
         <g id="square">
-            <line x1="-3.000" y1="-3.000" x2="-3.000" y2="3.000"  />
-            <line x1="-3.000" y1="3.000" x2="3.000" y2="3.000"  />
-            <line x1="3.000" y1="3.000" x2="3.000" y2="-3.000"  />
-            <line x1="3.000" y1="-3.000" x2="-3.000" y2="-3.000"  />
+            <line x1="-3" y1="-3" x2="-3" y2="3"  />
+            <line x1="-3" y1="3" x2="3" y2="3"  />
+            <line x1="3" y1="3" x2="3" y2="-3"  />
+            <line x1="3" y1="-3" x2="-3" y2="-3"  />
         </g>
         <g id="round">
-            <ellipse cx="0.000" cy="0.000" rx="3.000" ry="3.000"  fill="none" /></g>
+            <ellipse cx="0" cy="0" rx="3" ry="3"  fill="none" /></g>
         <g id="triangle">
-            <line x1="0.000" y1="-3.000" x2="-3.000" y2="3.000"  />
-            <line x1="-3.000" y1="3.000" x2="3.000" y2="3.000"  />
-            <line x1="0.000" y1="-3.000" x2="3.000" y2="3.000"  />
+            <line x1="0" y1="-3" x2="-3" y2="3"  />
+            <line x1="-3" y1="3" x2="3" y2="3"  />
+            <line x1="0" y1="-3" x2="3" y2="3"  />
         </g>
     </defs>
-    <ellipse cx="800.000" cy="600.000" rx="0.000" ry="0.000"  stroke="#00ff00" fill="none" />
-    <ellipse cx="800.000" cy="600.000" rx="63.492" ry="63.492"  stroke="#00ff00" fill="none" />
-    <ellipse cx="800.000" cy="600.000" rx="126.984" ry="126.984"  stroke="#00ff00" fill="none" />
-    <ellipse cx="800.000" cy="600.000" rx="190.476" ry="190.476"  stroke="#00ff00" fill="none" />
-    <ellipse cx="800.000" cy="600.000" rx="253.968" ry="253.968"  stroke="#00ff00" fill="none" />
-    <ellipse cx="800.000" cy="600.000" rx="317.460" ry="317.460"  stroke="#00ff00" fill="none" />
-    <ellipse cx="800.000" cy="600.000" rx="380.952" ry="380.952"  stroke="#00ff00" fill="none" />
-    <ellipse cx="800.000" cy="600.000" rx="444.444" ry="444.444"  stroke="#00ff00" fill="none" />
-    <ellipse cx="228.571" cy="600.000" rx="50.794" ry="50.794"  stroke="#7f7f7f" fill="#7f7f7f" />
-    <ellipse cx="419.048" cy="600.000" rx="50.794" ry="50.794"  stroke="#7f7f7f" fill="#7f7f7f" />
-    <ellipse cx="609.524" cy="600.000" rx="50.794" ry="50.794"  stroke="#7f7f7f" fill="#7f7f7f" />
-    <ellipse cx="800.000" cy="600.000" rx="50.794" ry="50.794"  stroke="#7f7f7f" fill="#7f7f7f" />
-    <ellipse cx="990.476" cy="600.000" rx="50.794" ry="50.794"  stroke="#7f7f7f" fill="#7f7f7f" />
-    <ellipse cx="1180.952" cy="600.000" rx="50.794" ry="50.794"  stroke="#7f7f7f" fill="#7f7f7f" />
-    <ellipse cx="1371.429" cy="600.000" rx="50.794" ry="50.794"  stroke="#7f7f7f" fill="#7f7f7f" />
-    <polyline fill="none" stroke="#ff00ff" points="736.508,917.460 768.254,853.968 704.762,790.476 863.492,758.730 831.746,917.460 " />
-    <polygon fill="#ff00ff" points="926.984,917.460 958.730,853.968 895.238,790.476 1053.968,758.730 1022.222,917.460 " />
-    <polygon fill="none" stroke="#ff00ff" points="1117.460,917.460 1149.206,853.968 1085.714,790.476 1244.444,758.730 1212.698,917.460 " />
-    <polygon fill="#ff00ff" points="1307.937,917.460 1339.683,853.968 1276.190,790.476 1434.921,758.730 1403.175,917.460 " />
-    <use x="228.571" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="260.317" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="292.063" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="323.810" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="355.556" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="387.302" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="419.048" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="450.794" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="482.540" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="514.286" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="546.032" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="577.778" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="609.524" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="641.270" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="673.016" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="704.762" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="736.508" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="768.254" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="800.000" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="831.746" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="863.492" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="895.238" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="926.984" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="958.730" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="990.476" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="1022.222" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="1053.968" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="1085.714" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="1117.460" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="1149.206" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="1180.952" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="1212.698" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="1244.444" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="1276.190" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="1307.937" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="1339.683" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="1371.429" y="1171.429" xlink:href="#dot"  stroke="#000000" />
-    <use x="228.571" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="260.317" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="292.063" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="323.810" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="355.556" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="387.302" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="419.048" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="450.794" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="482.540" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="514.286" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="546.032" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="577.778" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="609.524" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="641.270" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="673.016" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="704.762" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="736.508" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="768.254" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="800.000" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="831.746" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="863.492" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="895.238" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="926.984" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="958.730" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="990.476" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="1022.222" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="1053.968" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="1085.714" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="1117.460" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="1149.206" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="1180.952" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="1212.698" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="1244.444" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="1276.190" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="1307.937" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="1339.683" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="1371.429" y="1139.683" xlink:href="#cross"  stroke="#000000" />
-    <use x="228.571" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="260.317" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="292.063" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="323.810" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="355.556" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="387.302" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="419.048" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="450.794" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="482.540" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="514.286" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="546.032" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="577.778" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="609.524" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="641.270" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="673.016" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="704.762" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="736.508" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="768.254" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="800.000" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="831.746" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="863.492" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="895.238" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="926.984" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="958.730" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="990.476" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="1022.222" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="1053.968" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="1085.714" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="1117.460" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="1149.206" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="1180.952" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="1212.698" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="1244.444" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="1276.190" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="1307.937" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="1339.683" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="1371.429" y="1107.937" xlink:href="#round"  stroke="#000000" />
-    <use x="228.571" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="260.317" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="292.063" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="323.810" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="355.556" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="387.302" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="419.048" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="450.794" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="482.540" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="514.286" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="546.032" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="577.778" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="609.524" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="641.270" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="673.016" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="704.762" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="736.508" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="768.254" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="800.000" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="831.746" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="863.492" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="895.238" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="926.984" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="958.730" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="990.476" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="1022.222" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="1053.968" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="1085.714" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="1117.460" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="1149.206" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="1180.952" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="1212.698" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="1244.444" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="1276.190" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="1307.937" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="1339.683" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="1371.429" y="1076.190" xlink:href="#square"  stroke="#000000" />
-    <use x="228.571" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="260.317" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="292.063" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="323.810" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="355.556" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="387.302" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="419.048" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="450.794" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="482.540" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="514.286" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="546.032" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="577.778" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="609.524" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="641.270" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="673.016" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="704.762" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="736.508" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="768.254" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="800.000" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="831.746" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="863.492" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="895.238" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="926.984" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="958.730" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="990.476" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="1022.222" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="1053.968" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="1085.714" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="1117.460" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="1149.206" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="1180.952" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="1212.698" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="1244.444" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="1276.190" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="1307.937" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="1339.683" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <use x="1371.429" y="1044.444" xlink:href="#triangle"  stroke="#000000" />
-    <line x1="228.571" y1="28.571" x2="419.048" y2="28.571"  stroke="#0000ff" />
-    <text style="font-size:12;" x="234.571" y="34.57142857142857" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="28.571" x2="393.529" y2="-66.667"  stroke="#0000ff" />
-    <text style="font-size:12;" x="234.571" y="34.57142857142857" transform="rotate(-29.999999999999993,228.571,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="28.571" x2="323.810" y2="-136.386"  stroke="#0000ff" />
-    <text style="font-size:12;" x="234.571" y="34.57142857142857" transform="rotate(-59.99999999999999,228.571,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="28.571" x2="228.571" y2="-161.905"  stroke="#0000ff" />
-    <text style="font-size:12;" x="234.571" y="34.57142857142857" transform="rotate(-90.0,228.571,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="28.571" x2="133.333" y2="-136.386"  stroke="#0000ff" />
-    <text style="font-size:12;" x="234.571" y="34.57142857142857" transform="rotate(-120.00000000000001,228.571,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="28.571" x2="63.614" y2="-66.667"  stroke="#0000ff" />
-    <text style="font-size:12;" x="234.571" y="34.57142857142857" transform="rotate(-149.99999999999997,228.571,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="28.571" x2="38.095" y2="28.571"  stroke="#0000ff" />
-    <text style="font-size:12;" x="234.571" y="34.57142857142857" transform="rotate(-179.99999999999997,228.571,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="28.571" x2="63.614" y2="123.810"  stroke="#0000ff" />
-    <text style="font-size:12;" x="234.571" y="34.57142857142857" transform="rotate(150.00000000000003,228.571,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="28.571" x2="133.333" y2="193.529"  stroke="#0000ff" />
-    <text style="font-size:12;" x="234.571" y="34.57142857142857" transform="rotate(120.00000000000004,228.571,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="28.571" x2="228.571" y2="219.048"  stroke="#0000ff" />
-    <text style="font-size:12;" x="234.571" y="34.57142857142857" transform="rotate(90.00000000000003,228.571,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="28.571" x2="323.810" y2="193.529"  stroke="#0000ff" />
-    <text style="font-size:12;" x="234.571" y="34.57142857142857" transform="rotate(59.99999999999999,228.571,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="28.571" x2="393.529" y2="123.810"  stroke="#0000ff" />
-    <text style="font-size:12;" x="234.571" y="34.57142857142857" transform="rotate(29.99999999999998,228.571,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="28.571" x2="800.000" y2="28.571"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="34.57142857142857" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="28.571" x2="774.481" y2="-66.667"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="34.57142857142857" transform="rotate(-29.999999999999993,609.524,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="28.571" x2="704.762" y2="-136.386"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="34.57142857142857" transform="rotate(-59.99999999999999,609.524,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="28.571" x2="609.524" y2="-161.905"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="34.57142857142857" transform="rotate(-90.0,609.524,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="28.571" x2="514.286" y2="-136.386"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="34.57142857142857" transform="rotate(-120.00000000000001,609.524,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="28.571" x2="444.567" y2="-66.667"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="34.57142857142857" transform="rotate(-149.99999999999997,609.524,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="28.571" x2="419.048" y2="28.571"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="34.57142857142857" transform="rotate(-179.99999999999997,609.524,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="28.571" x2="444.567" y2="123.810"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="34.57142857142857" transform="rotate(150.00000000000003,609.524,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="28.571" x2="514.286" y2="193.529"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="34.57142857142857" transform="rotate(120.00000000000004,609.524,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="28.571" x2="609.524" y2="219.048"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="34.57142857142857" transform="rotate(90.00000000000003,609.524,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="28.571" x2="704.762" y2="193.529"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="34.57142857142857" transform="rotate(59.99999999999999,609.524,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="28.571" x2="774.481" y2="123.810"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="34.57142857142857" transform="rotate(29.99999999999998,609.524,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="990.476" y1="28.571" x2="1180.952" y2="28.571"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="984.476" y="34.57142857142857" fill="#ff0000">A long long long test string</text>
-    <line x1="990.476" y1="28.571" x2="1155.433" y2="-66.667"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="984.476" y="34.57142857142857" transform="rotate(-29.999999999999993,990.476,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="990.476" y1="28.571" x2="1085.714" y2="-136.386"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="984.476" y="34.57142857142857" transform="rotate(-59.99999999999999,990.476,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="990.476" y1="28.571" x2="990.476" y2="-161.905"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="984.476" y="34.57142857142857" transform="rotate(-90.0,990.476,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="990.476" y1="28.571" x2="895.238" y2="-136.386"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="984.476" y="34.57142857142857" transform="rotate(-120.00000000000001,990.476,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="990.476" y1="28.571" x2="825.519" y2="-66.667"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="984.476" y="34.57142857142857" transform="rotate(-149.99999999999997,990.476,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="990.476" y1="28.571" x2="800.000" y2="28.571"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="984.476" y="34.57142857142857" transform="rotate(-179.99999999999997,990.476,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="990.476" y1="28.571" x2="825.519" y2="123.810"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="984.476" y="34.57142857142857" transform="rotate(150.00000000000003,990.476,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="990.476" y1="28.571" x2="895.238" y2="193.529"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="984.476" y="34.57142857142857" transform="rotate(120.00000000000004,990.476,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="990.476" y1="28.571" x2="990.476" y2="219.048"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="984.476" y="34.57142857142857" transform="rotate(90.00000000000003,990.476,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="990.476" y1="28.571" x2="1085.714" y2="193.529"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="984.476" y="34.57142857142857" transform="rotate(59.99999999999999,990.476,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="990.476" y1="28.571" x2="1155.433" y2="123.810"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="984.476" y="34.57142857142857" transform="rotate(29.99999999999998,990.476,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="1371.429" y1="28.571" x2="1561.905" y2="28.571"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1371.429" y="46.57142857142857" fill="#ff0000">A long long long test string</text>
-    <line x1="1371.429" y1="28.571" x2="1536.386" y2="-66.667"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1371.429" y="46.57142857142857" transform="rotate(-29.999999999999993,1371.429,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="1371.429" y1="28.571" x2="1466.667" y2="-136.386"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1371.429" y="46.57142857142857" transform="rotate(-59.99999999999999,1371.429,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="1371.429" y1="28.571" x2="1371.429" y2="-161.905"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1371.429" y="46.57142857142857" transform="rotate(-90.0,1371.429,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="1371.429" y1="28.571" x2="1276.190" y2="-136.386"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1371.429" y="46.57142857142857" transform="rotate(-120.00000000000001,1371.429,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="1371.429" y1="28.571" x2="1206.471" y2="-66.667"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1371.429" y="46.57142857142857" transform="rotate(-149.99999999999997,1371.429,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="1371.429" y1="28.571" x2="1180.952" y2="28.571"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1371.429" y="46.57142857142857" transform="rotate(-179.99999999999997,1371.429,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="1371.429" y1="28.571" x2="1206.471" y2="123.810"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1371.429" y="46.57142857142857" transform="rotate(150.00000000000003,1371.429,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="1371.429" y1="28.571" x2="1276.190" y2="193.529"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1371.429" y="46.57142857142857" transform="rotate(120.00000000000004,1371.429,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="1371.429" y1="28.571" x2="1371.429" y2="219.048"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1371.429" y="46.57142857142857" transform="rotate(90.00000000000003,1371.429,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="1371.429" y1="28.571" x2="1466.667" y2="193.529"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1371.429" y="46.57142857142857" transform="rotate(59.99999999999999,1371.429,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="1371.429" y1="28.571" x2="1536.386" y2="123.810"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1371.429" y="46.57142857142857" transform="rotate(29.99999999999998,1371.429,28.571)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="409.524" x2="419.048" y2="409.524"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="228.571" y="415.5238095238095" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="409.524" x2="393.529" y2="314.286"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="228.571" y="415.5238095238095" transform="rotate(-29.999999999999993,228.571,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="409.524" x2="323.810" y2="244.567"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="228.571" y="415.5238095238095" transform="rotate(-59.99999999999999,228.571,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="409.524" x2="228.571" y2="219.048"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="228.571" y="415.5238095238095" transform="rotate(-90.0,228.571,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="409.524" x2="133.333" y2="244.567"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="228.571" y="415.5238095238095" transform="rotate(-120.00000000000001,228.571,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="409.524" x2="63.614" y2="314.286"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="228.571" y="415.5238095238095" transform="rotate(-149.99999999999997,228.571,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="409.524" x2="38.095" y2="409.524"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="228.571" y="415.5238095238095" transform="rotate(-179.99999999999997,228.571,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="409.524" x2="63.614" y2="504.762"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="228.571" y="415.5238095238095" transform="rotate(150.00000000000003,228.571,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="409.524" x2="133.333" y2="574.481"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="228.571" y="415.5238095238095" transform="rotate(120.00000000000004,228.571,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="409.524" x2="228.571" y2="600.000"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="228.571" y="415.5238095238095" transform="rotate(90.00000000000003,228.571,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="409.524" x2="323.810" y2="574.481"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="228.571" y="415.5238095238095" transform="rotate(59.99999999999999,228.571,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="228.571" y1="409.524" x2="393.529" y2="504.762"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="228.571" y="415.5238095238095" transform="rotate(29.99999999999998,228.571,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="409.524" x2="800.000" y2="409.524"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="403.5238095238095" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="409.524" x2="774.481" y2="314.286"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="403.5238095238095" transform="rotate(-29.999999999999993,609.524,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="409.524" x2="704.762" y2="244.567"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="403.5238095238095" transform="rotate(-59.99999999999999,609.524,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="409.524" x2="609.524" y2="219.048"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="403.5238095238095" transform="rotate(-90.0,609.524,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="409.524" x2="514.286" y2="244.567"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="403.5238095238095" transform="rotate(-120.00000000000001,609.524,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="409.524" x2="444.567" y2="314.286"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="403.5238095238095" transform="rotate(-149.99999999999997,609.524,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="409.524" x2="419.048" y2="409.524"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="403.5238095238095" transform="rotate(-179.99999999999997,609.524,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="409.524" x2="444.567" y2="504.762"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="403.5238095238095" transform="rotate(150.00000000000003,609.524,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="409.524" x2="514.286" y2="574.481"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="403.5238095238095" transform="rotate(120.00000000000004,609.524,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="409.524" x2="609.524" y2="600.000"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="403.5238095238095" transform="rotate(90.00000000000003,609.524,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="409.524" x2="704.762" y2="574.481"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="403.5238095238095" transform="rotate(59.99999999999999,609.524,409.524)" fill="#ff0000">A long long long test string</text>
-    <line x1="609.524" y1="409.524" x2="774.481" y2="504.762"  stroke="#0000ff" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="609.524" y="403.5238095238095" transform="rotate(29.99999999999998,609.524,409.524)" fill="#ff0000">A long long long test string</text>
-    <polygon fill="none" stroke="#000000" points="165.079,1076.190 165.079,123.810 1434.921,123.810 1434.921,1076.190 " />
+    <ellipse cx="800" cy="600" rx="0" ry="0"  stroke="#00ff00" fill="none" />
+    <ellipse cx="800" cy="600" rx="47.619" ry="47.619"  stroke="#00ff00" fill="none" />
+    <ellipse cx="800" cy="600" rx="95.238" ry="95.238"  stroke="#00ff00" fill="none" />
+    <ellipse cx="800" cy="600" rx="142.857" ry="142.857"  stroke="#00ff00" fill="none" />
+    <ellipse cx="800" cy="600" rx="190.476" ry="190.476"  stroke="#00ff00" fill="none" />
+    <ellipse cx="800" cy="600" rx="238.095" ry="238.095"  stroke="#00ff00" fill="none" />
+    <ellipse cx="800" cy="600" rx="285.714" ry="285.714"  stroke="#00ff00" fill="none" />
+    <ellipse cx="800" cy="600" rx="333.333" ry="333.333"  stroke="#00ff00" fill="none" />
+    <ellipse cx="371.429" cy="600" rx="38.095" ry="38.095"  stroke="#7f7f7f" fill="#7f7f7f" />
+    <ellipse cx="514.286" cy="600" rx="38.095" ry="38.095"  stroke="#7f7f7f" fill="#7f7f7f" />
+    <ellipse cx="657.143" cy="600" rx="38.095" ry="38.095"  stroke="#7f7f7f" fill="#7f7f7f" />
+    <ellipse cx="800" cy="600" rx="38.095" ry="38.095"  stroke="#7f7f7f" fill="#7f7f7f" />
+    <ellipse cx="942.857" cy="600" rx="38.095" ry="38.095"  stroke="#7f7f7f" fill="#7f7f7f" />
+    <ellipse cx="1085.714" cy="600" rx="38.095" ry="38.095"  stroke="#7f7f7f" fill="#7f7f7f" />
+    <ellipse cx="1228.571" cy="600" rx="38.095" ry="38.095"  stroke="#7f7f7f" fill="#7f7f7f" />
+    <polyline fill="none" stroke="#ff00ff" points="752.381,838.095 776.19,790.476 728.571,742.857 847.619,719.048 823.81,838.095 " />
+    <polygon fill="#ff00ff" points="895.238,838.095 919.048,790.476 871.429,742.857 990.476,719.048 966.667,838.095 " />
+    <polygon fill="none" stroke="#ff00ff" points="1038.095,838.095 1061.905,790.476 1014.286,742.857 1133.333,719.048 1109.524,838.095 " />
+    <polygon fill="#ff00ff" points="1180.952,838.095 1204.762,790.476 1157.143,742.857 1276.19,719.048 1252.381,838.095 " />
+    <use x="371.429" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="395.238" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="419.048" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="442.857" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="466.667" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="490.476" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="514.286" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="538.095" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="561.905" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="585.714" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="609.524" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="633.333" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="657.143" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="680.952" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="704.762" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="728.571" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="752.381" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="776.19" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="800" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="823.81" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="847.619" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="871.429" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="895.238" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="919.048" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="942.857" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="966.667" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="990.476" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="1014.286" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="1038.095" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="1061.905" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="1085.714" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="1109.524" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="1133.333" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="1157.143" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="1180.952" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="1204.762" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="1228.571" y="1028.571" xlink:href="#dot"  stroke="#000000" />
+    <use x="371.429" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="395.238" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="419.048" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="442.857" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="466.667" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="490.476" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="514.286" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="538.095" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="561.905" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="585.714" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="609.524" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="633.333" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="657.143" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="680.952" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="704.762" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="728.571" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="752.381" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="776.19" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="800" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="823.81" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="847.619" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="871.429" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="895.238" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="919.048" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="942.857" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="966.667" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="990.476" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="1014.286" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="1038.095" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="1061.905" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="1085.714" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="1109.524" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="1133.333" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="1157.143" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="1180.952" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="1204.762" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="1228.571" y="1004.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="371.429" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="395.238" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="419.048" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="442.857" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="466.667" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="490.476" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="514.286" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="538.095" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="561.905" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="585.714" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="609.524" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="633.333" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="657.143" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="680.952" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="704.762" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="728.571" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="752.381" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="776.19" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="800" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="823.81" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="847.619" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="871.429" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="895.238" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="919.048" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="942.857" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="966.667" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="990.476" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="1014.286" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="1038.095" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="1061.905" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="1085.714" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="1109.524" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="1133.333" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="1157.143" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="1180.952" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="1204.762" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="1228.571" y="980.952" xlink:href="#round"  stroke="#000000" />
+    <use x="371.429" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="395.238" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="419.048" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="442.857" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="466.667" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="490.476" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="514.286" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="538.095" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="561.905" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="585.714" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="609.524" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="633.333" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="657.143" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="680.952" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="704.762" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="728.571" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="752.381" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="776.19" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="800" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="823.81" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="847.619" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="871.429" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="895.238" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="919.048" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="942.857" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="966.667" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="990.476" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="1014.286" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="1038.095" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="1061.905" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="1085.714" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="1109.524" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="1133.333" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="1157.143" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="1180.952" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="1204.762" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="1228.571" y="957.143" xlink:href="#square"  stroke="#000000" />
+    <use x="371.429" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="395.238" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="419.048" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="442.857" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="466.667" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="490.476" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="514.286" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="538.095" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="561.905" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="585.714" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="609.524" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="633.333" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="657.143" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="680.952" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="704.762" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="728.571" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="752.381" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="776.19" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="800" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="823.81" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="847.619" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="871.429" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="895.238" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="919.048" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="942.857" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="966.667" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="990.476" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="1014.286" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="1038.095" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="1061.905" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="1085.714" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="1109.524" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="1133.333" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="1157.143" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="1180.952" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="1204.762" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <use x="1228.571" y="933.333" xlink:href="#triangle"  stroke="#000000" />
+    <line x1="371.429" y1="171.429" x2="514.286" y2="171.429"  stroke="#0000ff" />
+    <text style="font-size:12;" x="377.429" y="177.429" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="171.429" x2="495.146" y2="100"  stroke="#0000ff" />
+    <text style="font-size:12;" x="377.429" y="177.429" transform="rotate(-30,371.429,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="171.429" x2="442.857" y2="47.711"  stroke="#0000ff" />
+    <text style="font-size:12;" x="377.429" y="177.429" transform="rotate(-60,371.429,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="171.429" x2="371.429" y2="28.571"  stroke="#0000ff" />
+    <text style="font-size:12;" x="377.429" y="177.429" transform="rotate(-90,371.429,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="171.429" x2="300" y2="47.711"  stroke="#0000ff" />
+    <text style="font-size:12;" x="377.429" y="177.429" transform="rotate(-120,371.429,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="171.429" x2="247.711" y2="100"  stroke="#0000ff" />
+    <text style="font-size:12;" x="377.429" y="177.429" transform="rotate(-150,371.429,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="171.429" x2="228.571" y2="171.429"  stroke="#0000ff" />
+    <text style="font-size:12;" x="377.429" y="177.429" transform="rotate(-180,371.429,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="171.429" x2="247.711" y2="242.857"  stroke="#0000ff" />
+    <text style="font-size:12;" x="377.429" y="177.429" transform="rotate(150,371.429,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="171.429" x2="300" y2="295.146"  stroke="#0000ff" />
+    <text style="font-size:12;" x="377.429" y="177.429" transform="rotate(120,371.429,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="171.429" x2="371.429" y2="314.286"  stroke="#0000ff" />
+    <text style="font-size:12;" x="377.429" y="177.429" transform="rotate(90,371.429,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="171.429" x2="442.857" y2="295.146"  stroke="#0000ff" />
+    <text style="font-size:12;" x="377.429" y="177.429" transform="rotate(60,371.429,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="171.429" x2="495.146" y2="242.857"  stroke="#0000ff" />
+    <text style="font-size:12;" x="377.429" y="177.429" transform="rotate(30,371.429,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="171.429" x2="800" y2="171.429"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="177.429" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="171.429" x2="780.861" y2="100"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="177.429" transform="rotate(-30,657.143,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="171.429" x2="728.571" y2="47.711"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="177.429" transform="rotate(-60,657.143,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="171.429" x2="657.143" y2="28.571"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="177.429" transform="rotate(-90,657.143,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="171.429" x2="585.714" y2="47.711"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="177.429" transform="rotate(-120,657.143,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="171.429" x2="533.425" y2="100"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="177.429" transform="rotate(-150,657.143,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="171.429" x2="514.286" y2="171.429"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="177.429" transform="rotate(-180,657.143,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="171.429" x2="533.425" y2="242.857"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="177.429" transform="rotate(150,657.143,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="171.429" x2="585.714" y2="295.146"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="177.429" transform="rotate(120,657.143,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="171.429" x2="657.143" y2="314.286"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="177.429" transform="rotate(90,657.143,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="171.429" x2="728.571" y2="295.146"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="177.429" transform="rotate(60,657.143,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="171.429" x2="780.861" y2="242.857"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="177.429" transform="rotate(30,657.143,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="942.857" y1="171.429" x2="1085.714" y2="171.429"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="936.857" y="177.429" fill="#ff0000">A long long long test string</text>
+    <line x1="942.857" y1="171.429" x2="1066.575" y2="100"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="936.857" y="177.429" transform="rotate(-30,942.857,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="942.857" y1="171.429" x2="1014.286" y2="47.711"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="936.857" y="177.429" transform="rotate(-60,942.857,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="942.857" y1="171.429" x2="942.857" y2="28.571"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="936.857" y="177.429" transform="rotate(-90,942.857,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="942.857" y1="171.429" x2="871.429" y2="47.711"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="936.857" y="177.429" transform="rotate(-120,942.857,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="942.857" y1="171.429" x2="819.139" y2="100"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="936.857" y="177.429" transform="rotate(-150,942.857,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="942.857" y1="171.429" x2="800" y2="171.429"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="936.857" y="177.429" transform="rotate(-180,942.857,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="942.857" y1="171.429" x2="819.139" y2="242.857"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="936.857" y="177.429" transform="rotate(150,942.857,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="942.857" y1="171.429" x2="871.429" y2="295.146"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="936.857" y="177.429" transform="rotate(120,942.857,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="942.857" y1="171.429" x2="942.857" y2="314.286"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="936.857" y="177.429" transform="rotate(90,942.857,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="942.857" y1="171.429" x2="1014.286" y2="295.146"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="936.857" y="177.429" transform="rotate(60,942.857,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="942.857" y1="171.429" x2="1066.575" y2="242.857"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="936.857" y="177.429" transform="rotate(30,942.857,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="1228.571" y1="171.429" x2="1371.429" y2="171.429"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1228.571" y="189.429" fill="#ff0000">A long long long test string</text>
+    <line x1="1228.571" y1="171.429" x2="1352.289" y2="100"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1228.571" y="189.429" transform="rotate(-30,1228.571,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="1228.571" y1="171.429" x2="1300" y2="47.711"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1228.571" y="189.429" transform="rotate(-60,1228.571,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="1228.571" y1="171.429" x2="1228.571" y2="28.571"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1228.571" y="189.429" transform="rotate(-90,1228.571,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="1228.571" y1="171.429" x2="1157.143" y2="47.711"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1228.571" y="189.429" transform="rotate(-120,1228.571,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="1228.571" y1="171.429" x2="1104.854" y2="100"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1228.571" y="189.429" transform="rotate(-150,1228.571,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="1228.571" y1="171.429" x2="1085.714" y2="171.429"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1228.571" y="189.429" transform="rotate(-180,1228.571,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="1228.571" y1="171.429" x2="1104.854" y2="242.857"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1228.571" y="189.429" transform="rotate(150,1228.571,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="1228.571" y1="171.429" x2="1157.143" y2="295.146"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1228.571" y="189.429" transform="rotate(120,1228.571,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="1228.571" y1="171.429" x2="1228.571" y2="314.286"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1228.571" y="189.429" transform="rotate(90,1228.571,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="1228.571" y1="171.429" x2="1300" y2="295.146"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1228.571" y="189.429" transform="rotate(60,1228.571,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="1228.571" y1="171.429" x2="1352.289" y2="242.857"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="1228.571" y="189.429" transform="rotate(30,1228.571,171.429)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="457.143" x2="514.286" y2="457.143"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="371.429" y="463.143" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="457.143" x2="495.146" y2="385.714"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="371.429" y="463.143" transform="rotate(-30,371.429,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="457.143" x2="442.857" y2="333.425"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="371.429" y="463.143" transform="rotate(-60,371.429,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="457.143" x2="371.429" y2="314.286"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="371.429" y="463.143" transform="rotate(-90,371.429,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="457.143" x2="300" y2="333.425"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="371.429" y="463.143" transform="rotate(-120,371.429,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="457.143" x2="247.711" y2="385.714"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="371.429" y="463.143" transform="rotate(-150,371.429,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="457.143" x2="228.571" y2="457.143"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="371.429" y="463.143" transform="rotate(-180,371.429,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="457.143" x2="247.711" y2="528.571"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="371.429" y="463.143" transform="rotate(150,371.429,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="457.143" x2="300" y2="580.861"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="371.429" y="463.143" transform="rotate(120,371.429,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="457.143" x2="371.429" y2="600"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="371.429" y="463.143" transform="rotate(90,371.429,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="457.143" x2="442.857" y2="580.861"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="371.429" y="463.143" transform="rotate(60,371.429,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="371.429" y1="457.143" x2="495.146" y2="528.571"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="371.429" y="463.143" transform="rotate(30,371.429,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="457.143" x2="800" y2="457.143"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="451.143" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="457.143" x2="780.861" y2="385.714"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="451.143" transform="rotate(-30,657.143,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="457.143" x2="728.571" y2="333.425"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="451.143" transform="rotate(-60,657.143,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="457.143" x2="657.143" y2="314.286"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="451.143" transform="rotate(-90,657.143,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="457.143" x2="585.714" y2="333.425"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="451.143" transform="rotate(-120,657.143,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="457.143" x2="533.425" y2="385.714"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="451.143" transform="rotate(-150,657.143,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="457.143" x2="514.286" y2="457.143"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="451.143" transform="rotate(-180,657.143,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="457.143" x2="533.425" y2="528.571"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="451.143" transform="rotate(150,657.143,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="457.143" x2="585.714" y2="580.861"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="451.143" transform="rotate(120,657.143,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="457.143" x2="657.143" y2="600"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="451.143" transform="rotate(90,657.143,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="457.143" x2="728.571" y2="580.861"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="451.143" transform="rotate(60,657.143,457.143)" fill="#ff0000">A long long long test string</text>
+    <line x1="657.143" y1="457.143" x2="780.861" y2="528.571"  stroke="#0000ff" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="657.143" y="451.143" transform="rotate(30,657.143,457.143)" fill="#ff0000">A long long long test string</text>
+    <polygon fill="none" stroke="#000000" points="165.079,1076.19 165.079,123.81 1434.921,123.81 1434.921,1076.19 " />
 </svg>

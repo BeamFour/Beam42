@@ -3,7 +3,7 @@ package org.redukti.jfotoptix.io;
 import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector2Pair;
 
-import java.text.NumberFormat;
+import java.text.DecimalFormat;
 import java.util.EnumSet;
 
 import static org.redukti.jfotoptix.io.Renderer.PointStyle.PointStyleCross;
@@ -17,19 +17,22 @@ import static org.redukti.jfotoptix.io.Renderer.Style.StyleBackground;
 public class RendererSvg extends Renderer2d {
 
     StringBuilder _out = new StringBuilder();
+    DecimalFormat formatter = new DecimalFormat("####.###");
 
     String format(double value) {
-        return String.format("%.3f", value);
+        //return String.format("%.3f", value);
+        return formatter.format(value);
     }
 
     /**
      * Create a new svg renderer with given resolution. The
      *
-     * @ref write function must be used to write svg to output
+     * write function must be used to write svg to output
      * stream.
      */
     RendererSvg(double width, double height,
                 Rgb bg) {
+        super();
         _2d_output_res = new Vector2(width, height);
 
         _styles_color[StyleBackground.value] = bg;
@@ -45,7 +48,7 @@ public class RendererSvg extends Renderer2d {
     /**
      * Create a new svg renderer with given resolution. The
      *
-     * @ref write function must be used to write svg to output
+     * write function must be used to write svg to output
      * stream.
      */
     RendererSvg() {
@@ -204,20 +207,19 @@ public class RendererSvg extends Renderer2d {
         svg_begin_use(ids[s.value], v2d.x(), v2d.y(), false);
         svg_add_stroke(rgb);
         svg_end();
-
     }
 
     @Override
     public void draw_segment(Vector2Pair l, Rgb rgb) {
-        Vector2 v2da = trans_pos(l.a());
-        Vector2 v2db = trans_pos(l.b());
+        Vector2 v2da = trans_pos(l.v0);
+        Vector2 v2db = trans_pos(l.v1);
 
         svg_begin_line(v2da.x(), v2da.y(), v2db.x(), v2db.y(), false);
         svg_add_stroke(rgb);
         svg_end();
-
     }
 
+    @Override
     public void draw_circle(Vector2 c, double r, Rgb rgb, boolean filled) {
         Vector2 v2d = trans_pos(c);
 
@@ -256,13 +258,13 @@ public class RendererSvg extends Renderer2d {
         else if (a.contains(TextAlignMask.TextAlignBottom))
             y -= margin;
         else
-            y += size / 2;
+            y += size / 2.0;
 
-        _out.append("\" x=\"").append(format(x)).append("\" y=\"").append(y).append("\"");
+        _out.append("\" x=\"").append(format(x)).append("\" y=\"").append(format(y)).append("\"");
 
         double ra = Math.toDegrees(Math.atan2(-dir.y(), dir.x()));
         if (ra != 0)
-            _out.append(" transform=\"rotate(").append(ra).append(",").append(format(xo)).append(",").append(format(yo)).append(")\"");
+            _out.append(" transform=\"rotate(").append(format(ra)).append(",").append(format(xo)).append(",").append(format(yo)).append(")\"");
 
         svg_add_fill(rgb);
 
@@ -309,7 +311,7 @@ public class RendererSvg extends Renderer2d {
     }
 
     double y_trans_pos(double y) {
-        return (((y - _page.b().y()) / (_page.a().y() - _page.b().y()))
+        return (((y - _page.v1.y()) / (_page.v0.y() - _page.v1.y()))
                 * _2d_output_res.y());
     }
 

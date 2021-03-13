@@ -13,12 +13,12 @@ public class TestRendererSvg {
 
     void test_circle(Renderer r)
     {
-        for (double ra = 0; ra < 80 ; ra += 10)
+        for (double ra = 0; ra < 80.0 ; ra += 10.0)
         {
             r.draw_circle(Vector2.vector2_0, ra, Rgb.rgb_green, false);
         }
 
-        for (double x = -90; x < 90 + 1e-6 ; x += 30)
+        for (double x = -90.0; x < 90.0 + 1e-6 ; x += 30.0)
         {
             Vector2 v = new Vector2(x, 0.);
             r.draw_circle(v, 8, Rgb.rgb_gray, true);

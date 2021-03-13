@@ -90,6 +90,7 @@ public abstract class RendererViewport extends Renderer {
         }
 
         Vector2 sby2 = s.divide(2.0);
+        //  (center - s / 2., center + s / 2.)
         _window2d_fit = new Vector2Pair(center.subtract(sby2), center.add(sby2));
 
         Vector2 ms0 = sby2;
@@ -99,23 +100,24 @@ public abstract class RendererViewport extends Renderer {
             case MarginLocal:
 //                ms[0] = ms[0] + _margin[0];
 //                ms[1] = ms[1] + _margin[1];
-                ms0 = ms0.add(_margin.a());
-                ms1 = ms1.add(_margin.a());
+                ms0 = ms0.add(_margin.v0);
+                ms1 = ms1.add(_margin.v1);
                 break;
             case MarginRatio:
 //                ms[0] = ms[0] + s.mul (_margin[0]);
 //                ms[1] = ms[1] + s.mul (_margin[1]);
-                ms0 = ms0.add(s.mul(_margin.a()));
-                ms1 = ms1.add(s.mul(_margin.b()));
+                ms0 = ms0.add(s.mul(_margin.v0));
+                ms1 = ms1.add(s.mul(_margin.v1));
                 break;
             case MarginOutput:
 //                ms[0] = ms[0] / (math::vector2_1 - _margin[0] / _2d_output_res * 2);
 //                ms[1] = ms[1] / (math::vector2_1 - _margin[1] / _2d_output_res * 2);
-                ms0 = ms0.divide(Vector2.vector2_1.subtract(_margin.a().divide(_2d_output_res.multiply(2))));
-                ms1 = ms1.divide(Vector2.vector2_1.subtract(_margin.b().divide(_2d_output_res.multiply(2))));
+                ms0 = ms0.divide(Vector2.vector2_1.subtract(_margin.v0.divide(_2d_output_res.multiply(2.0))));
+                ms1 = ms1.divide(Vector2.vector2_1.subtract(_margin.v1.divide(_2d_output_res.multiply(2.0))));
                 break;
         }
 
+        //(center - ms[0], center + ms[1])
         _window2d = new Vector2Pair(center.subtract(ms0), center.add(ms1));
 
         update_2d_window();
@@ -139,11 +141,11 @@ public abstract class RendererViewport extends Renderer {
         int row = page / _cols;
         int col = page % _cols;
 
-        Vector2 size = new Vector2(_window2d.b().x() - _window2d.a().x(),
-                _window2d.b().y() - _window2d.a().y());
+        Vector2 size = new Vector2(_window2d.v1.x() - _window2d.v0.x(),
+                _window2d.v1.y() - _window2d.v0.y());
 
-        Vector2 a = new Vector2(_window2d.a().x() - size.x() * col,
-                _window2d.a().y() - size.y() * (_rows - 1 - row));
+        Vector2 a = new Vector2(_window2d.v0.x() - size.x() * col,
+                _window2d.v0.y() - size.y() * (_rows - 1 - row));
 
         Vector2 b = new Vector2(a.x() + size.x() * _cols, a.y() + size.y() * _rows);
 
@@ -151,19 +153,19 @@ public abstract class RendererViewport extends Renderer {
     }
 
     double x_scale(double x) {
-        return ((x / (_page.b().x() - _page.a().x())) * _2d_output_res.x());
+        return ((x / (_page.v1.x() - _page.v0.x())) * _2d_output_res.x());
     }
 
     double y_scale(double y) {
-        return ((y / (_page.b().y() - _page.a().y())) * _2d_output_res.y());
+        return ((y / (_page.v1.y() - _page.v0.y())) * _2d_output_res.y());
     }
 
     double x_trans_pos(double x) {
-        return x_scale(x - _page.a().x());
+        return x_scale(x - _page.v0.x());
     }
 
     double y_trans_pos(double y) {
-        return y_scale(y - _page.a().y());
+        return y_scale(y - _page.v0.y());
     }
 
     Vector2Pair get_window() {
@@ -182,47 +184,45 @@ public abstract class RendererViewport extends Renderer {
         set_margin_ratio(width, height, width, height);
     }
 
-    void set_margin (double left, double bottom, double right,
-                                  double top)
-    {
+    void set_margin(double left, double bottom, double right,
+                    double top) {
         _margin_type = margin_type_e.MarginLocal;
-        _margin = new Vector2Pair (new Vector2(left, bottom), new Vector2(right, top));
-        set_window (_window2d_fit, false);
+        _margin = new Vector2Pair(new Vector2(left, bottom), new Vector2(right, top));
+        set_window(_window2d_fit, false);
     }
 
-    void set_margin_ratio (double left, double bottom, double right,
-                                        double top)
-    {
+    void set_margin_ratio(double left, double bottom, double right,
+                          double top) {
         _margin_type = margin_type_e.MarginRatio;
-        _margin = new Vector2Pair (new Vector2(left, bottom), new Vector2(right, top));
-        set_window (_window2d_fit, false);
+        _margin = new Vector2Pair(new Vector2(left, bottom), new Vector2(right, top));
+        set_window(_window2d_fit, false);
     }
 
-    void set_margin_output (double left, double bottom, double right,
-                                         double top)
-    {
+    void set_margin_output(double left, double bottom, double right,
+                           double top) {
         _margin_type = margin_type_e.MarginOutput;
-        _margin = new Vector2Pair (new Vector2(left, bottom), new Vector2(right, top));
-        set_window (_window2d_fit, false);
+        _margin = new Vector2Pair(new Vector2(left, bottom), new Vector2(right, top));
+        set_window(_window2d_fit, false);
     }
 
-    void set_window (Vector2Pair window, boolean keep_aspect)
-    {
-        Vector2 center = window.a().add(window.b()).divide(2);
-        Vector2 size = new Vector2(window.b().x () - window.a().x (),
-            window.b().y () - window.b().y ());
-        set_window (center, size, keep_aspect);
+    void set_window(Vector2Pair window, boolean keep_aspect) {
+        //(window[0] + window[1]) / 2
+        Vector2 center = window.v0.add(window.v1).divide(2.0);
+        //(window[1].x () - window[0].x (),
+        //window[1].y () - window[0].y ());
+        Vector2 size = new Vector2(window.v1.x() - window.v0.x(),
+                window.v1.y() - window.v0.y());
+        set_window(center, size, keep_aspect);
     }
 
-    void draw_frame_2d ()
-    {
+    void draw_frame_2d() {
         Vector2[] fr = new Vector2[4];
 
-        fr[0] = _window2d_fit.a();
-        fr[1] = new Vector2 (_window2d_fit.a().x (), _window2d_fit.b().y ());
-        fr[2] = _window2d_fit.b();
-        fr[3] = new Vector2 (_window2d_fit.b().x (), _window2d_fit.a().y ());
+        fr[0] = _window2d_fit.v0;
+        fr[1] = new Vector2(_window2d_fit.v0.x(), _window2d_fit.v1.y());
+        fr[2] = _window2d_fit.v1;
+        fr[3] = new Vector2(_window2d_fit.v1.x(), _window2d_fit.v0.y());
 
-        draw_polygon (fr, get_style_color (StyleForeground), false, true);
+        draw_polygon(fr, get_style_color(StyleForeground), false, true);
     }
 }

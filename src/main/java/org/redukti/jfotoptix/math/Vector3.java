@@ -1,5 +1,7 @@
 package org.redukti.jfotoptix.math;
 
+import static org.redukti.jfotoptix.util.MathUtils.square;
+
 /**
  * Vector with 3 components named x,y,z.
  * Note that in the optical system the lens axis is z.
@@ -86,6 +88,29 @@ public class Vector3 {
         for ( int i = 0; i < N; i++)
             r[i] = -values[i];
         return new Vector3(r);
+    }
+
+    public Vector2 project_xy() {
+        return new Vector2(x (), y());
+    }
+
+    double len ()
+    {
+        double r = 0;
+        for (int i = 0; i < N; i++)
+            r += square (values[i]);
+        return Math.sqrt (r);
+    }
+
+    public Vector3 divide(double scale) {
+        double[] r = new double[N];
+        for (int i = 0; i < N; i++)
+            r[i] = values[i] / scale;
+        return new Vector3(r);
+    }
+
+    public Vector3 normalize() {
+        return this.divide(len());
     }
 
     @Override

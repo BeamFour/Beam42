@@ -17,7 +17,7 @@ import static org.redukti.jfotoptix.io.Renderer.Style.StyleBackground;
 public class RendererSvg extends Renderer2d {
 
     StringBuilder _out = new StringBuilder();
-    DecimalFormat formatter = new DecimalFormat("####.###");
+    final DecimalFormat formatter;
 
     String format(double value) {
         //return String.format("%.3f", value);
@@ -33,6 +33,15 @@ public class RendererSvg extends Renderer2d {
     RendererSvg(double width, double height,
                 Rgb bg) {
         super();
+
+        formatter = new DecimalFormat();
+        //formatter.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+        formatter.setMinimumIntegerDigits(1);
+        formatter.setMaximumFractionDigits(3);
+        formatter.setMinimumFractionDigits(0);
+        formatter.setDecimalSeparatorAlwaysShown(false);
+        formatter.setGroupingUsed(false);
+
         _2d_output_res = new Vector2(width, height);
 
         _styles_color[StyleBackground.value] = bg;

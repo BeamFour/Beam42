@@ -16,7 +16,7 @@ public class Infinite implements Shape {
 
     @Override
     public void get_pattern(Function<Vector2, Void> f, Distribution d, boolean unobstructed) {
-        throw new IllegalArgumentException ("can not distribute rays accross an infinite surface shape");
+        throw new IllegalArgumentException ("can not distribute rays across an infinite surface shape");
     }
 
     @Override

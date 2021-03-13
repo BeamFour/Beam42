@@ -37,12 +37,12 @@ public class Distribution {
         _pattern = p;
     }
 
-    Pattern get_pattern ()
+    public Pattern get_pattern ()
     {
         return _pattern;
     }
 
-    int get_radial_density ()
+    public int get_radial_density ()
     {
         return _radial_density;
     }
@@ -52,7 +52,7 @@ public class Distribution {
         _radial_density = density;
     }
 
-    double get_scaling ()
+    public double get_scaling ()
     {
         return _scaling;
     }

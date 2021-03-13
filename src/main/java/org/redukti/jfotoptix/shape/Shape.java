@@ -13,7 +13,7 @@ public interface Shape {
 
     /** Get points distributed on shape area with given pattern */
     void get_pattern (Function<Vector2,Void> f,
-                            Distribution d,
+                      Distribution d,
                       boolean unobstructed);
 
     /** Get distance between origin and farthest shape edge */

@@ -75,7 +75,7 @@ public abstract class RendererViewport extends Renderer {
         _2d_output_res = new Vector2(width, height);
     }
 
-    void set_window(Vector2 center, Vector2 size, boolean keep_aspect) {
+    public void set_window(Vector2 center, Vector2 size, boolean keep_aspect) {
         Vector2 s = size;
 
         if (keep_aspect) {
@@ -123,6 +123,13 @@ public abstract class RendererViewport extends Renderer {
         update_2d_window();
         set_orthographic();
         set_page(_pageid);
+    }
+
+    public void set_window (Vector2 center, double radius,
+                                  boolean keep_aspect)
+    {
+        Vector2 size = new Vector2(radius, radius);
+        set_window (center, size, keep_aspect);
     }
 
     void update_2d_window() {
@@ -205,7 +212,7 @@ public abstract class RendererViewport extends Renderer {
         set_window(_window2d_fit, false);
     }
 
-    void set_window(Vector2Pair window, boolean keep_aspect) {
+    public void set_window(Vector2Pair window, boolean keep_aspect) {
         //(window[0] + window[1]) / 2
         Vector2 center = window.v0.plus(window.v1).divide(2.0);
         //(window[1].x () - window[0].x (),

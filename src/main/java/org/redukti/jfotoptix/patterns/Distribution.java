@@ -1,5 +1,7 @@
 package org.redukti.jfotoptix.patterns;
 
+import static org.redukti.jfotoptix.patterns.Pattern.DefaultDist;
+
 /**
  Ray distribution pattern descriptor
 
@@ -30,6 +32,12 @@ public class Distribution {
         this._pattern = pattern;
         this._radial_density = radial_density;
         this._scaling = scaling;
+    }
+
+    public Distribution() {
+        _pattern = DefaultDist;
+        _radial_density = 5;
+        _scaling = 0.999;
     }
 
     void set_pattern (Pattern p)
@@ -69,7 +77,7 @@ public class Distribution {
             case SagittalDist:
             case MeridionalDist:
             case CrossDist:
-                _pattern = Pattern.DefaultDist;
+                _pattern = DefaultDist;
             default:;
         }
     }

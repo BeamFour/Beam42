@@ -30,7 +30,7 @@ public class RendererSvg extends Renderer2d {
      * write function must be used to write svg to output
      * stream.
      */
-    RendererSvg(double width, double height,
+    public RendererSvg(double width, double height,
                 Rgb bg) {
         super();
 

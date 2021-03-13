@@ -1,5 +1,6 @@
 package org.redukti.jfotoptix.io;
 
+import org.redukti.jfotoptix.math.Triangle2;
 import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector2Pair;
 
@@ -49,7 +50,7 @@ public abstract class Renderer {
             this.value = value;
         }
     }
-    enum PointStyle
+    public enum PointStyle
     {
         PointStyleDot(0),
         PointStyleCross(1),
@@ -170,4 +171,18 @@ public abstract class Renderer {
 
         draw_polygon (p, rgb, filled, true);
     }
+
+    public void draw_triangle (Triangle2 t, boolean filled, Rgb rgb)
+    {
+        draw_polygon (t._v, rgb, filled, true);
+    }
+
+    public void draw_box (Vector2Pair c, Rgb rgb)
+    {
+        draw_segment (new Vector2 (c.v0.x (), c.v0.y ()), new Vector2 (c.v1.x (), c.v0.y ()), rgb);
+        draw_segment (new Vector2 (c.v1.x (), c.v1.y ()), new Vector2 (c.v1.x (), c.v0.y ()), rgb);
+        draw_segment (new Vector2 (c.v1.x (), c.v1.y ()), new Vector2 (c.v0.x (), c.v1.y ()), rgb);
+        draw_segment (new Vector2 (c.v0.x (), c.v0.y ()), new Vector2 (c.v0.x (), c.v1.y ()), rgb);
+    }
+
 }

@@ -1,5 +1,6 @@
 package org.redukti.jfotoptix.shape;
 
+import org.redukti.jfotoptix.math.Triangle2;
 import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector2Pair;
 import org.redukti.jfotoptix.patterns.Distribution;
@@ -43,8 +44,7 @@ public interface Shape {
                             Function<Vector2,Void> f,
                               double resolution);
 
-//    /** Get shape teselation triangles */
-//    void get_triangles (const math::Triangle<2>::put_delegate_t &f,
-//                                double resolution) const = 0;
+    /** Get shape teselation triangles */
+    void get_triangles (Function<Triangle2,Void> f, double resolution);
 
 }

@@ -82,6 +82,14 @@ public class Vector2 {
         return new Vector2(r);
     }
 
+    public Vector2 negate()
+    {
+        double[] r = new double[N];
+        for ( int i = 0; i < N; i++)
+            r[i] = -values[i];
+        return new Vector2(r);
+    }
+
     @Override
     public String toString() {
         return "[" + x() + ',' + y() + ']';

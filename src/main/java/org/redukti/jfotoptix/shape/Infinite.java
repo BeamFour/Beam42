@@ -1,5 +1,6 @@
 package org.redukti.jfotoptix.shape;
 
+import org.redukti.jfotoptix.math.Triangle2;
 import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector2Pair;
 import org.redukti.jfotoptix.patterns.Distribution;
@@ -51,6 +52,11 @@ public class Infinite implements Shape {
 
     @Override
     public void get_contour(int contour, Function<Vector2, Void> f, double resolution) {
+
+    }
+
+    @Override
+    public void get_triangles(Function<Triangle2, Void> f, double resolution) {
 
     }
 }

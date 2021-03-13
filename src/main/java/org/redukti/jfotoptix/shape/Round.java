@@ -1,5 +1,6 @@
 package org.redukti.jfotoptix.shape;
 
+import org.redukti.jfotoptix.math.Triangle2;
 import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
@@ -11,13 +12,17 @@ public abstract class Round extends ShapeBase {
 
     static Random random = new Random();
 
-    boolean hole;
+    final boolean hole;
 
     abstract double get_xy_ratio();
 
     abstract double get_external_xradius();
 
     abstract double get_internal_xradius();
+
+    public Round(boolean hole) {
+        this.hole = hole;
+    }
 
     public void get_pattern(Function<Vector2, Void> f,
                             Distribution d,
@@ -186,74 +191,72 @@ public abstract class Round extends ShapeBase {
             f.apply(new Vector2(Math.cos(a1) * r, Math.sin(a1) * r * xyr));
     }
 
-//    template <class X, bool hole>
-//    void
-//    Round<X, hole>::get_triangles (const math::Triangle<2>::put_delegate_t &f,
-//                                   double resolution) const
-//    {
-//        static const double epsilon = 1e-8;
-//  const double xyr = 1.0 / X::get_xy_ratio ();
-//  const double rstep = get_radial_step (resolution);
-//
-//        double astep1;
-//        double r;
-//
-//        if (!hole)
-//        {
-//            r = rstep;
-//            astep1 = M_PI / 3;
-//
-//            // central hexagon
-//
-//            for (double a1 = 0; a1 < M_PI - epsilon; a1 += astep1)
-//            {
-//                math::Vector2 a (cos (a1) * rstep, sin (a1) * rstep * xyr);
-//                math::Vector2 b (cos (a1 + astep1) * rstep,
-//                    sin (a1 + astep1) * rstep * xyr);
-//                math::Vector2 z (0, 0);
-//
-//                f (math::Triangle<2> (b, a, z));
-//                f (math::Triangle<2> (-b, -a, z));
-//            }
-//        }
-//        else
-//        {
-//            r = X::get_internal_xradius ();
-//            astep1 = (M_PI / 3.0) / round (r / rstep);
-//        }
-//
-//        // hexapolar distributed triangles
-//
-//        for (; r < X::get_external_xradius () - epsilon; r += rstep)
-//        {
-//            double astep2 = (M_PI / 3.0) / round ((r + rstep) / rstep);
-//            double a1 = 0, a2 = 0;
-//
-//            while ((a1 < M_PI - epsilon) || (a2 < M_PI - epsilon))
-//            {
-//                math::Vector2 a (cos (a1) * r, sin (a1) * r * xyr);
-//                math::Vector2 b (cos (a2) * (r + rstep),
-//                    sin (a2) * (r + rstep) * xyr);
-//                math::Vector2 c;
-//
-//                if (a1 + epsilon > a2)
-//                {
-//                    a2 += astep2;
-//                    c = math::Vector2 (cos (a2) * (r + rstep),
-//                        sin (a2) * (r + rstep) * xyr);
-//                }
-//                else
-//                {
-//                    a1 += astep1;
-//                    c = math::Vector2 (cos (a1) * r, sin (a1) * r * xyr);
-//                }
-//
-//                f (math::Triangle<2> (a, c, b));
-//                f (math::Triangle<2> (-a, -c, -b));
-//            }
-//
-//            astep1 = astep2;
-//        }
-//    }
+    @Override
+    public void get_triangles (Function<Triangle2,Void> f, double resolution)
+    {
+        final double epsilon = 1e-8;
+        final double xyr = 1.0 / get_xy_ratio ();
+        final double rstep = get_radial_step (resolution);
+
+        double astep1;
+        double r;
+
+        if (!hole)
+        {
+            r = rstep;
+            astep1 = Math.PI / 3;
+
+            // central hexagon
+
+            for (double a1 = 0; a1 < Math.PI - epsilon; a1 += astep1)
+            {
+                Vector2 a = new Vector2 (Math.cos (a1) * rstep, Math.sin (a1) * rstep * xyr);
+                Vector2 b = new Vector2 (Math.cos (a1 + astep1) * rstep,
+                    Math.sin (a1 + astep1) * rstep * xyr);
+                Vector2 z = Vector2.vector2_0;
+
+                f.apply (new Triangle2 (b, a, z));
+                f.apply (new Triangle2 (b.negate(), a.negate(), z));
+            }
+        }
+        else
+        {
+            r = get_internal_xradius ();
+            astep1 = (Math.PI / 3.0) / Math.round (r / rstep);
+        }
+
+        // hexapolar distributed triangles
+
+        for (; r < get_external_xradius () - epsilon; r += rstep)
+        {
+            double astep2 = (Math.PI / 3.0) / Math.round ((r + rstep) / rstep);
+            double a1 = 0, a2 = 0;
+
+            while ((a1 < Math.PI - epsilon) || (a2 < Math.PI - epsilon))
+            {
+                Vector2 a = new Vector2(Math.cos (a1) * r, Math.sin (a1) * r * xyr);
+                Vector2 b = new Vector2 (Math.cos (a2) * (r + rstep),
+                    Math.sin (a2) * (r + rstep) * xyr);
+                Vector2 c;
+
+                if (a1 + epsilon > a2)
+                {
+                    a2 += astep2;
+                    c = new Vector2 (Math.cos (a2) * (r + rstep),
+                        Math.sin (a2) * (r + rstep) * xyr);
+                }
+                else
+                {
+                    a1 += astep1;
+                    c = new Vector2 (Math.cos (a1) * r, Math.sin (a1) * r * xyr);
+                }
+
+                f.apply (new Triangle2 (a, c, b));
+                f.apply (new Triangle2 (a.negate(), c.negate(), b.negate()));
+            }
+
+            astep1 = astep2;
+        }
+    }
 
 }

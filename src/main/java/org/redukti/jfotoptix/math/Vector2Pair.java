@@ -7,6 +7,8 @@ public class Vector2Pair {
     public final Vector2 v0;
     public final Vector2 v1;
 
+    public final static Vector2Pair vector2_pair_00 = new Vector2Pair(Vector2.vector2_0, Vector2.vector2_0);
+
     public Vector2Pair(Vector2 v0, Vector2 b) {
         Objects.requireNonNull(v0);
         Objects.requireNonNull(b);

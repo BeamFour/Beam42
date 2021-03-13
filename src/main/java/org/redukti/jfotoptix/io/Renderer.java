@@ -3,7 +3,6 @@ package org.redukti.jfotoptix.io;
 import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector2Pair;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 
 /**
@@ -118,21 +117,19 @@ public abstract class Renderer {
     public abstract void draw_text (Vector2 pos, Vector2 dir,
                                     String str, EnumSet<TextAlignMask> a, int size,
                                     Rgb rgb);
+    public abstract void draw_segment (Vector2Pair s, Rgb rgb);
 
     public void draw_point(Vector2 p) {
         draw_point(p, Rgb.rgb_gray, PointStyle.PointStyleDot);
     }
 
     /** @internal Draw a line segment in 2d */
-    public abstract void draw_segment (Vector2Pair s,
-                                       Rgb rgb);
     public void draw_segment (Vector2Pair s) {
         draw_segment(s, Rgb.rgb_gray);
     }
 
     /** @internal Draw a line segment in 2d */
-    public void draw_segment (Vector2 a, Vector2 b,
-                        Rgb rgb)
+    public void draw_segment (Vector2 a, Vector2 b, Rgb rgb)
     {
         draw_segment (new Vector2Pair (a, b), rgb);
     }
@@ -173,52 +170,4 @@ public abstract class Renderer {
 
         draw_polygon (p, rgb, filled, true);
     }
-
-
-//    /** @internal Draw a circle in 2d */
-//    virtual void draw_circle (const math::Vector2 &v, double r,
-//                            const Rgb &rgb = rgb_gray, bool filled = false);
-//    /** @internal Draw text in 2d */
-//    virtual void draw_text (const math::Vector2 &pos, const math::Vector2 &dir,
-//                          const std::string &str, TextAlignMask a, int size,
-//                          const Rgb &rgb = rgb_gray)
-//      = 0;
-//    /** @internal Draw polygon in 2d */
-//    virtual void draw_polygon (const math::Vector2 *array, unsigned int count,
-//                             const Rgb &rgb = rgb_gray, bool filled = false,
-//                               bool closed = true);
-//    /** @internal Draw a box in 2d */
-//    void draw_box (const math::VectorPair2 &corners, const Rgb &rgb = rgb_gray);
-//    /** @internal Draw a triangle in 2d */
-//    void draw_triangle (const math::Triangle<2> &t, bool filled = false,
-//                      const Rgb &rgb = rgb_gray);
-//
-//    /** @internal Draw a point in 3d */
-//    virtual void draw_point (const math::Vector3 &p, const Rgb &rgb = rgb_gray,
-//                           enum PointStyle s = PointStyleDot)
-//      = 0;
-//    /** @internal Draw a line segment in 3d */
-//    virtual void draw_segment (const math::VectorPair3 &l,
-//                             const Rgb &rgb = rgb_gray)
-//      = 0;
-//    /** @internal Draw a line segment in 3d */
-//    inline void draw_segment (const math::Vector3 &a, const math::Vector3 &b,
-//                            const Rgb &rgb = rgb_gray);
-//    /** @internal Draw polygon in 3d */
-//    virtual void draw_polygon (const math::Vector3 *array, unsigned int count,
-//                             const Rgb &rgb = rgb_gray, bool filled = false,
-//                               bool closed = true);
-//    /** @internal Draw text in 3d */
-//    virtual void draw_text (const math::Vector3 &pos, const math::Vector3 &dir,
-//                          const std::string &str, TextAlignMask a, int size,
-//                          const Rgb &rgb = rgb_gray)
-//      = 0;
-//
-//    /** @internal Draw filled triangle in 3d */
-//    virtual void draw_triangle (const math::Triangle<3> &t, const Rgb &rgb);
-//    /** @internal Draw filled triangle in 3d */
-//    virtual void draw_triangle (const math::Triangle<3> &t,
-//                              const math::Triangle<3> &gradient,
-//                              const Rgb &rgb);
-
 }

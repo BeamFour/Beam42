@@ -75,7 +75,7 @@ public abstract class Renderer {
     }
 
     /** Specifies rendered text alignment */
-    enum TextAlignMask
+    public enum TextAlignMask
     {
         TextAlignCenter(1), //< Vertically centered
         TextAlignLeft(2),

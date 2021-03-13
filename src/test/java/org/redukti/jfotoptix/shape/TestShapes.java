@@ -26,8 +26,6 @@ public class TestShapes {
         }
     }
 
-    ;
-
     shape_test_s st[] = {
             new shape_test_s("disk", new Disk(30))
     };

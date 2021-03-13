@@ -7,6 +7,7 @@ public class Vector2 {
 
     public static final Vector2 vector2_0 = new Vector2 (0.0, 0.0);
     public static final Vector2 vector2_1 = new Vector2 (1.0, 1.0);
+    public static final  Vector2 vector2_10 = new Vector2 (1.0, 0.0);
 
     private static final int N = 2;
 

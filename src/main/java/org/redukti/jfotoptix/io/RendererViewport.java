@@ -68,6 +68,10 @@ public abstract class RendererViewport extends Renderer {
         _cols = 1;
         _pageid = 0;
         _fov = 45.;
+        _page = Vector2Pair.vector2_pair_00;
+        _window2d = Vector2Pair.vector2_pair_00;
+        _window2d_fit = Vector2Pair.vector2_pair_00;
+        _2d_output_res = Vector2.vector2_0;
         //_precision (3), _format ()
     }
 
@@ -140,7 +144,7 @@ public abstract class RendererViewport extends Renderer {
      */
     protected abstract void set_orthographic();
 
-    void set_page(int page) {
+    public void set_page(int page) {
         if (page >= _cols * _rows)
             throw new IllegalArgumentException("set_page: no such page number in current layout");
 
@@ -231,5 +235,16 @@ public abstract class RendererViewport extends Renderer {
         fr[3] = new Vector2(_window2d_fit.v1.x(), _window2d_fit.v0.y());
 
         draw_polygon(fr, get_style_color(StyleForeground), false, true);
+    }
+
+    public void set_page_layout (int cols, int rows)
+    {
+        _cols = cols;
+        _rows = rows;
+        set_page (0);
+    }
+
+    public void set_feature_size(double v) {
+        _feature_size = v;
     }
 }

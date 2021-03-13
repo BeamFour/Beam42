@@ -2,17 +2,17 @@ package org.redukti.jfotoptix.sys;
 
 import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector3;
-import org.redukti.jfotoptix.math.Vector3Position;
+import org.redukti.jfotoptix.math.Vector3Pair;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class Element {
 
     final int id;
-    final Vector3Position position;
+    final Vector3Pair position;
     final Transform3 transform;
 
-    public Element(int id, Vector3Position p, Transform3 transform) {
+    public Element(int id, Vector3Pair p, Transform3 transform) {
         this.id = id;
         this.position = p;
         this.transform = transform;
@@ -25,11 +25,11 @@ public abstract class Element {
 
     public static abstract class Builder {
         int id;
-        Vector3Position position;
+        Vector3Pair position;
         Transform3 transform;
         Element.Builder parent;
 
-        public Builder position(Vector3Position position) {
+        public Builder position(Vector3Pair position) {
             this.position = position;
             this.transform = new Transform3(position);
             return this;

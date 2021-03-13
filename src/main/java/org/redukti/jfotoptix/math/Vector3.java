@@ -102,6 +102,13 @@ public class Vector3 {
         return Math.sqrt (r);
     }
 
+    public Vector3 times(double scale) {
+        double[] r = new double[N];
+        for (int i = 0; i < N; i++)
+            r[i] = values[i] * scale;
+        return new Vector3(r);
+    }
+
     public Vector3 divide(double scale) {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)

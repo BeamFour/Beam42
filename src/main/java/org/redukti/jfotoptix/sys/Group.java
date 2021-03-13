@@ -1,7 +1,7 @@
 package org.redukti.jfotoptix.sys;
 
 import org.redukti.jfotoptix.math.Transform3;
-import org.redukti.jfotoptix.math.Vector3Position;
+import org.redukti.jfotoptix.math.Vector3Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Group extends Element implements Container {
     private final List<Element> elements;
 
-    public Group(int id, Vector3Position p, Transform3 transform3, List<Element> elements) {
+    public Group(int id, Vector3Pair p, Transform3 transform3, List<Element> elements) {
         super(id, p, transform3);
         this.elements = elements;
     }
@@ -44,7 +44,7 @@ public class Group extends Element implements Container {
     public static class Builder extends Element.Builder {
         protected final ArrayList<Element.Builder> elements = new ArrayList<>();
 
-        public Group.Builder position(Vector3Position position) {
+        public Group.Builder position(Vector3Pair position) {
             return (Builder) super.position(position);
         }
 

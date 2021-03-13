@@ -6,8 +6,8 @@ public class Transform3 {
     public final Matrix3 linear;
     public final boolean useLinear;
 
-    public Transform3(Vector3Position position) {
-        this.translation = position.translation();
+    public Transform3(Vector3Pair position) {
+        this.translation = position.point();
         if (position.direction().x() == 0 && position.direction().y() == 0) {
             if (position.direction().z() < 0.0) {
                 this.linear = Matrix3.diag(1.0, 1.0, -1.0);

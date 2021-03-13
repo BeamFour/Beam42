@@ -1,5 +1,7 @@
 package org.redukti.jfotoptix.math;
 
+import static org.redukti.jfotoptix.util.MathUtils.square;
+
 /**
  * Vector with 2 components named x,y.
  */
@@ -89,6 +91,14 @@ public class Vector2 {
         for ( int i = 0; i < N; i++)
             r[i] = -values[i];
         return new Vector2(r);
+    }
+
+    public double len ()
+    {
+        double r = 0;
+        for (int i = 0; i < N; i++)
+            r += square (values[i]);
+        return Math.sqrt (r);
     }
 
     @Override

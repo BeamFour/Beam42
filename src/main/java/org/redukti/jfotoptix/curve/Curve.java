@@ -2,7 +2,7 @@ package org.redukti.jfotoptix.curve;
 
 import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector3;
-import org.redukti.jfotoptix.math.Vector3Position;
+import org.redukti.jfotoptix.math.Vector3Pair;
 
 public interface Curve {
     /** Get curve sagitta (z) at specified point */
@@ -15,7 +15,7 @@ public interface Curve {
     /** Get intersection point between curve and 3d ray. Return
      false if no intersection occurred. ray must have a position vector and
      direction vector (cosines). */
-    Vector3 intersect(Vector3Position ray);
+    Vector3 intersect(Vector3Pair ray);
 
     /** Get normal to curve surface at specified point. */
     Vector3 normal (Vector3 point);

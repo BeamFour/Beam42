@@ -2,7 +2,15 @@ package org.redukti.jfotoptix.math;
 
 import java.util.Objects;
 
+/*
+Notes:
+Plane can be represented as two vectors: point and normal
+Ray can be represented as two vectors: origin and direction
+*/
+
 public class Vector3Pair {
+
+    public static final Vector3Pair position_000_001 = new Vector3Pair(Vector3.vector3_0, Vector3.vector3_001);
 
     final Vector3 v0;
     final Vector3 v1;
@@ -14,7 +22,32 @@ public class Vector3Pair {
         this.v1 = b;
     }
 
+    public final Vector3 point() {
+        return v0;
+    }
+
+    public final Vector3 origin() {
+        return v0;
+    }
+
+    public final Vector3 direction() {
+        return v1;
+    }
+
+    public final Vector3 normal() {
+        return v1;
+    }
+
     public final boolean isEquals(Vector3Pair other, double tolerance) {
         return v0.isEqual(other.v0, tolerance) && v1.isEqual(other.v1, tolerance);
+    }
+
+    public double pl_ln_intersect_scale(Vector3Pair line) {
+        // See https://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection
+        // I think below v1 = normal, v0 = origin
+//        return (v0.dotProduct(v1) - v1.dotProduct(line.v0)) /
+//                (line.v1.dotProduct(v1));
+        return (origin().dotProduct(normal()) - normal().dotProduct(line.origin())) /
+                (line.normal().dotProduct(normal()));
     }
 }

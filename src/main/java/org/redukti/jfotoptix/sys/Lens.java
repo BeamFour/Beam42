@@ -1,13 +1,13 @@
 package org.redukti.jfotoptix.sys;
 
 import org.redukti.jfotoptix.math.Transform3;
-import org.redukti.jfotoptix.math.Vector3Position;
+import org.redukti.jfotoptix.math.Vector3Pair;
 
 import java.util.List;
 
 public class Lens extends Group {
 
-    public Lens(int id, Vector3Position position, Transform3 transform, List<Element> elementList) {
+    public Lens(int id, Vector3Pair position, Transform3 transform, List<Element> elementList) {
         super(id, position, transform, elementList);
     }
 

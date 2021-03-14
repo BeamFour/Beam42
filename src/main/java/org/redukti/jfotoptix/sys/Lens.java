@@ -24,26 +24,31 @@ public class Lens extends Group {
         List<OpticalSurface.Builder> opticalSurfaces = new ArrayList<>();
         int _last_pos = 0;
         MaterialBase _next_mat = null;
+        Stop.Builder _stop = null;
 
         @Override
         public Element build() {
             return new Lens(id, position, transform, getElements());
         }
 
-        public void add_surface(double curvature, double radius, double thickness, Abbe glass) {
+        public Lens.Builder add_surface(double curvature, double radius, double thickness, Abbe glass) {
             Curve curve;
             if (curvature == 0.)
                 curve = Flat.flat;
             else
                 curve = new Sphere(curvature);
-            add_surface(curve, new Disk(radius), thickness,
+            return add_surface(curve, new Disk(radius), thickness,
                     glass);
         }
 
-        public void add_surface(Curve curve, Shape shape, double thickness, MaterialBase glass) {
+        public Lens.Builder add_surface(double curvature, double radius, double thickness) {
+            return add_surface(curvature, radius, thickness, null);
+        }
+
+        public Lens.Builder add_surface(Curve curve, Shape shape, double thickness, MaterialBase glass) {
             assert (thickness >= 0.);
             OpticalSurface.Builder surface = new OpticalSurface.Builder()
-                    .position(new Vector3Pair(new Vector3(0, 0, _last_pos), Vector3.vector3_0))
+                    .position(new Vector3Pair(new Vector3(0, 0, _last_pos), Vector3.vector3_1))
                     .curve(curve)
                     .shape(shape)
                     .leftMaterial(_next_mat)
@@ -53,6 +58,23 @@ public class Lens extends Group {
             _next_mat = glass;
             _last_pos += thickness;
             super.elements.add(surface);
+            return this;
+        }
+
+        public Lens.Builder add_stop(double radius, double thickness) {
+            return add_stop(new Disk(radius), thickness);
+        }
+
+        public Lens.Builder add_stop (Shape shape, double thickness)
+        {
+            if (_stop != null)
+                throw new IllegalArgumentException ("Can not add more than one stop per Lens");
+            _stop = new Stop.Builder()
+                .position(new Vector3Pair (new Vector3(0, 0, _last_pos), Vector3.vector3_1))
+                    .shape(shape);
+            _last_pos += thickness;
+            super.elements.add(_stop);
+            return this;
         }
     }
 }

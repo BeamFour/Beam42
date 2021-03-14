@@ -6,7 +6,6 @@ import org.redukti.jfotoptix.patterns.Pattern;
 
 import java.util.Random;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static org.redukti.jfotoptix.util.MathUtils.square;
 
@@ -20,6 +19,12 @@ public abstract class ShapeBase implements Shape {
 
     @Override
     public void get_pattern(Consumer<Vector2> f,
+                            Distribution d,
+                            boolean unobstructed) {
+        get_base_pattern(f, d, unobstructed);
+    }
+
+    public final void get_base_pattern(Consumer<Vector2> f,
                             Distribution d,
                             boolean unobstructed) {
         final double epsilon = 1e-8;

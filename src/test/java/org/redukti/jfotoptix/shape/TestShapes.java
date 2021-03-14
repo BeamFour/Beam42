@@ -80,7 +80,7 @@ public class TestShapes {
                     r.draw_point(v, Rgb.rgb_green, PointStyleDot);
                 };
                 Distribution dist = new Distribution();
-                s.s.get_pattern(d, dist, false);
+                ((ShapeBase)s.s).get_base_pattern(d, dist, false);
             }
 
             System.out.println(rsvg.write(new StringBuilder()).toString());

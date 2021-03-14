@@ -3,7 +3,7 @@ package org.redukti.jfotoptix.curve;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 
-import static org.redukti.jfotoptix.util.MathUtils.square;
+import static org.redukti.jfotoptix.math.MathUtils.square;
 
 public class Sphere extends ConicBase {
 

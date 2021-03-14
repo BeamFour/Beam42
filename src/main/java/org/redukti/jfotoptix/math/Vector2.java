@@ -1,6 +1,6 @@
 package org.redukti.jfotoptix.math;
 
-import static org.redukti.jfotoptix.util.MathUtils.square;
+import static org.redukti.jfotoptix.math.MathUtils.square;
 
 /**
  * Vector with 2 components named x,y.

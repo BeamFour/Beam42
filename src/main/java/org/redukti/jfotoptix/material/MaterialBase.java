@@ -2,7 +2,7 @@ package org.redukti.jfotoptix.material;
 
 import org.redukti.jfotoptix.io.Rgb;
 
-import static org.redukti.jfotoptix.util.MathUtils.square;
+import static org.redukti.jfotoptix.math.MathUtils.square;
 
 public abstract class MaterialBase {
     public final String name;

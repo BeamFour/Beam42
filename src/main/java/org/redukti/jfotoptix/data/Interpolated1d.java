@@ -5,7 +5,7 @@ import org.redukti.jfotoptix.util.ArrayIndex2D;
 
 import java.util.ArrayList;
 
-import static org.redukti.jfotoptix.util.MathUtils.square;
+import static org.redukti.jfotoptix.math.MathUtils.square;
 
 public class Interpolated1d {
 

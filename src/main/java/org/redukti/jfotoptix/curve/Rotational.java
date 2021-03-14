@@ -2,7 +2,7 @@ package org.redukti.jfotoptix.curve;
 
 import org.redukti.jfotoptix.math.*;
 
-import static org.redukti.jfotoptix.util.MathUtils.square;
+import static org.redukti.jfotoptix.math.MathUtils.square;
 
 public abstract class Rotational extends CurveBase {
 

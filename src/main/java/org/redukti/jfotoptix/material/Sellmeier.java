@@ -1,6 +1,6 @@
 package org.redukti.jfotoptix.material;
 
-import static org.redukti.jfotoptix.util.MathUtils.square;
+import static org.redukti.jfotoptix.math.MathUtils.square;
 
 /**
  * Sellmeier model for optical glass material

@@ -8,7 +8,7 @@ import org.redukti.jfotoptix.patterns.Pattern;
 import java.util.Random;
 import java.util.function.Consumer;
 
-import static org.redukti.jfotoptix.util.MathUtils.square;
+import static org.redukti.jfotoptix.math.MathUtils.square;
 
 public abstract class Round extends ShapeBase {
 

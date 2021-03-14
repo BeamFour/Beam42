@@ -1,6 +1,6 @@
 package org.redukti.jfotoptix.util;
 
-public class ArrayIndex2D {
+public final class ArrayIndex2D {
     final int rowSize;
     final int colSize;
 
@@ -9,7 +9,7 @@ public class ArrayIndex2D {
         this.colSize = colSize;
     }
 
-    public int i(int row, int col)
+    public final int i(int row, int col)
     {
         return colSize * row + col;
     }

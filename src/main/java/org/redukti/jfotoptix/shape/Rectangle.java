@@ -35,7 +35,7 @@ public class Rectangle extends ShapeBase {
                             Distribution d, boolean unobstructed) {
         final double epsilon = 1e-8;
         Vector2 hs = _halfsize.times(d.get_scaling());
-        Vector2 step = hs.divide(d.get_radial_density() / 2.0);
+        Vector2 step = hs.divide((double)(d.get_radial_density () / 2));
 
         switch (d.get_pattern()) {
             case MeridionalDist: {

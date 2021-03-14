@@ -41,4 +41,10 @@ public class Vector2Pair {
     {
         return v0.plus(v1.times(ln_intersect_ln_scale (line)));
     }
+
+    /** Create a 2d vector pair and initialize vectors from
+     specified components of vectors from an other pair. */
+    public static Vector2Pair from(Vector3Pair v, int c0, int c1) {
+        return new Vector2Pair(Vector2.from(v.v0,c0,c1), Vector2.from(v.v1,c0,c1));
+    }
 }

@@ -73,8 +73,8 @@ public class Transform3 {
     public Transform3 linearRotation(Vector3 v) {
         Transform3 t = this;
         for (int i = 0; i < 3; i++) { // i stands for x,y,z axis
-            if (v.get(i) != 0.0) {
-                t = t.linearRotation(i, v.get(i));
+            if (v.v(i) != 0.0) {
+                t = t.linearRotation(i, v.v(i));
             }
         }
         return t;
@@ -93,6 +93,32 @@ public class Transform3 {
         Matrix3 r = Matrix3.getRotationMatrix(axis, rangle);
         Matrix3 linear = r.times(this.linear);
         return new Transform3(this.translation, linear, true);
+    }
+
+    public Vector3Pair transform_pair (Vector3Pair p)
+    {
+        return new Vector3Pair (transform (p.v0), transform (p.v1));
+    }
+
+    public Transform3 set_translation(Vector3 translation) {
+        return new Transform3(translation, linear, useLinear);
+    }
+
+    public Transform3 set_direction (Vector3 direction)
+    {
+        if (direction.x () == 0.0 && direction.y () == 0.0)
+        {
+            if (direction.z () < 0.0) {
+                return new Transform3(translation, Matrix3.diag(1.0, 1.0, -1.0), true);
+            }
+            else {
+                return new Transform3(translation, Matrix3.diag(1.0, 1.0, 1.0), false);
+            }
+        }
+        else
+        {
+            return new Transform3(translation, Matrix3.rotation(new Quaternion (Vector3.vector3_001, direction)), true);
+        }
     }
 
 }

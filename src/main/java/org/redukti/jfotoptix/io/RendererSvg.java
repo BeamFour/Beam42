@@ -50,7 +50,7 @@ public class RendererSvg extends Renderer2d {
         clear();
     }
 
-    RendererSvg(double width, double height) {
+    public RendererSvg(double width, double height) {
         this(width, height, Rgb.rgb_white);
     }
 

@@ -25,6 +25,9 @@ public class Vector3 {
         this.values[1] = y;
         this.values[2] = z;
     }
+    public Vector3(double v) {
+        this(v, v, v);
+    }
 
     private Vector3(double[] values) {
         this.values = values;
@@ -41,8 +44,6 @@ public class Vector3 {
     public final double z() {
         return this.values[2];
     }
-
-    public double get(int i) {return this.values[i];}
 
 //    public Vector3 mul (Vector3 v)
 //    {
@@ -122,6 +123,11 @@ public class Vector3 {
 
     public double v(int i) {
         return this.values[i];
+    }
+    public Vector3 v(int i, double d) {
+        double[] val = this.values.clone();
+        val[i] = d;
+        return new Vector3(val);
     }
 
     @Override

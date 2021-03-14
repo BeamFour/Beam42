@@ -1,7 +1,9 @@
 package org.redukti.jfotoptix.io;
 
+import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector2Pair;
+import org.redukti.jfotoptix.math.Vector3;
 
 import static org.redukti.jfotoptix.io.Renderer.Style.StyleForeground;
 
@@ -251,4 +253,23 @@ public abstract class RendererViewport extends Renderer {
     public void set_feature_size(double v) {
         _feature_size = v;
     }
+
+    public void set_camera_direction (Vector3 dir)
+    {
+        Transform3 t = get_camera_transform ();
+        t = t.set_direction (dir);
+        set_camera_transform (t);
+    }
+
+    public void set_camera_position (Vector3 pos)
+    {
+        Transform3 t = get_camera_transform ();
+        t = t.set_translation (pos);
+        set_camera_transform (t);
+    }
+
+    /** Get reference to 3d camera transform */
+    public abstract Transform3 get_camera_transform ();
+    /** Get modifiable reference to 3d camera transform */
+    public abstract void set_camera_transform (Transform3 t);
 }

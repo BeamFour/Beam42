@@ -104,6 +104,14 @@ public class Vector2 {
         return Math.sqrt (r);
     }
 
+    public static Vector2 from(Vector3 v3, int a, int b)
+    {
+        double[] r = new double[2];
+        r[0] = v3.v(a);
+        r[1] = v3.v(b);
+        return new Vector2(r);
+    }
+
     @Override
     public String toString() {
         return "[" + x() + ',' + y() + ']';

@@ -1,7 +1,7 @@
 package org.redukti.jfotoptix.sys;
 
-import org.redukti.jfotoptix.math.Transform3;
-import org.redukti.jfotoptix.math.Vector3;
+import org.redukti.jfotoptix.io.RendererSvg;
+import org.redukti.jfotoptix.math.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class OpticalSystem implements Container {
     private final List<Element> elements;
     private final Transform3Cache transform3Cache;
+    private boolean keep_aspect;
 
     @Override
     public List<Element> elements() {
@@ -38,6 +39,50 @@ public class OpticalSystem implements Container {
     public Vector3 getPosition(Element e) {
         return transform3Cache.getLocal2GlobalTransform(e.id()).transform(Vector3.vector3_0);
     }
+
+
+    public void draw_2d_fit(RendererSvg r) {
+        Vector3Pair b = get_bounding_box ();
+
+        r.set_window (Vector2Pair.from(b, 2, 1), keep_aspect);
+        r.set_camera_direction (Vector3.vector3_100);
+        r.set_camera_position (Vector3.vector3_0);
+
+        r.set_feature_size (b.v1.y () - b.v0.y () / 20.);
+    }
+
+    Vector3Pair get_bounding_box ()
+    {
+        Vector3 a = new Vector3(Double.MAX_VALUE);
+        Vector3 b = new Vector3(Double.MIN_VALUE);
+
+        for (Element e : elements())
+        {
+            Vector3Pair bi = e.get_bounding_box ();
+
+            if (bi.v0 == bi.v1)
+                continue;
+
+            bi = e.get_transform ().transform_pair (bi);
+
+            for (int j = 0; j < 3; j++)
+            {
+                if (bi.v0.v(j) > bi.v1.v(j))
+                    bi = Vector3Pair.swapElement(bi, j);
+
+                if (bi.v0.v(j) < a.v(j))
+                    a = a.v(j,bi.v0.v(j));
+
+                if (bi.v1.v(j) > b.v(j))
+                    b = b.v(j, bi.v1.v(j));
+            }
+        }
+        return new Vector3Pair (a, b);
+    }
+
+    public void draw_2d(RendererSvg renderer) {
+    }
+
 
     public static class Builder {
         private final ArrayList<Element.Builder> elements = new ArrayList<>();
@@ -94,7 +139,6 @@ public class OpticalSystem implements Container {
             }
             return build();
         }
-
     }
 
 }

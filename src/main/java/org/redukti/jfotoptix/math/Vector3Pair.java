@@ -12,8 +12,8 @@ public class Vector3Pair {
 
     public static final Vector3Pair position_000_001 = new Vector3Pair(Vector3.vector3_0, Vector3.vector3_001);
 
-    final Vector3 v0;
-    final Vector3 v1;
+    public final Vector3 v0;
+    public final Vector3 v1;
 
     public Vector3Pair(Vector3 v0, Vector3 b) {
         Objects.requireNonNull(v0);
@@ -49,5 +49,22 @@ public class Vector3Pair {
 //                (line.v1.dotProduct(v1));
         return (origin().dotProduct(normal()) - normal().dotProduct(line.origin())) /
                 (line.normal().dotProduct(normal()));
+    }
+
+    public static Vector3Pair swapElement(Vector3Pair p, int j) {
+        double[] n0 = new double[3];
+        double[] n1 = new double[3];
+
+        for (int i = 0; i < 3; i++) {
+            if (i == j) {
+                n0[i] = p.v1.v(i);
+                n1[i] = p.v0.v(i);
+            }
+            else {
+                n0[i] = p.v0.v(i);
+                n1[i] = p.v1.v(i);
+            }
+        }
+        return new Vector3Pair(new Vector3(n0[0],n0[1],n0[2]), new Vector3(n0[0],n0[1],n0[2]));
     }
 }

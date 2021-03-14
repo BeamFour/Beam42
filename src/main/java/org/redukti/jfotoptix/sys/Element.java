@@ -22,6 +22,13 @@ public abstract class Element {
         return this.transform.translation;
     }
     public int id() { return id; }
+    public Vector3Pair get_bounding_box ()
+    {
+        return new Vector3Pair(Vector3.vector3_0, Vector3.vector3_0);
+    }
+    public Transform3 get_transform() {
+        return transform;
+    }
 
     public static abstract class Builder {
         int id;

@@ -10,6 +10,10 @@ import java.util.function.Consumer;
 public class Rectangle extends ShapeBase {
     Vector2 _halfsize;
 
+    public Rectangle(double sqwidth) {
+        this._halfsize = new Vector2(sqwidth / 2., sqwidth / 2.);
+    }
+
     public Rectangle(double width, double height) {
         this._halfsize = new Vector2(width / 2., height / 2.);
     }

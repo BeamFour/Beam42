@@ -1,6 +1,12 @@
 package org.redukti.jfotoptix.examples;
 
+import org.redukti.jfotoptix.curve.Flat;
+import org.redukti.jfotoptix.io.RendererSvg;
 import org.redukti.jfotoptix.material.Abbe;
+import org.redukti.jfotoptix.math.Vector3;
+import org.redukti.jfotoptix.math.Vector3Pair;
+import org.redukti.jfotoptix.shape.Rectangle;
+import org.redukti.jfotoptix.sys.Image;
 import org.redukti.jfotoptix.sys.Lens;
 import org.redukti.jfotoptix.sys.OpticalSystem;
 
@@ -23,7 +29,17 @@ public class Tessar {
                         new Abbe(Abbe.AbbeFormula.AbbeVd, 1.623770, 56.8998, 0.0))
                 .add_surface(1/-0.021187519, 14.642815, 85.243965130);
         sys.add(lens);
+        Image.Builder image = new Image.Builder()
+                .position(new Vector3Pair(new Vector3(0, 0, 125.596), Vector3.vector3_001))
+                .curve(Flat.flat)
+                .shape(new Rectangle(5.0*2));
+        sys.add(image);
 
+        RendererSvg renderer = new RendererSvg( 800, 400);
+        OpticalSystem system = sys.build();
+        // draw 2d system layout
+        system.draw_2d_fit(renderer);
+        system.draw_2d(renderer);
     }
 
 

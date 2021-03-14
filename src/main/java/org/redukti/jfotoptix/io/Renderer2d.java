@@ -82,4 +82,15 @@ public abstract class Renderer2d extends RendererViewport {
                           Rgb rgb) {
         draw_text(project(pos), project(dir), str, EnumSet.of(a), size, rgb);
     }
+
+    /** Get reference to 3d camera transform */
+    @Override
+    public Transform3 get_camera_transform () {
+        return _cam_transform;
+    }
+    /** Get modifiable reference to 3d camera transform */
+    @Override
+    public void set_camera_transform (Transform3 t) {
+        this._cam_transform = t;
+    }
 }

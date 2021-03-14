@@ -120,6 +120,10 @@ public class Vector3 {
         return this.divide(len());
     }
 
+    public double v(int i) {
+        return this.values[i];
+    }
+
     @Override
     public String toString() {
         return "[" + x() + ',' + y() + ',' + z() + ']';

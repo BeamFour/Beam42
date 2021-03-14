@@ -3,7 +3,7 @@ package org.redukti.jfotoptix.curve;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 
-public class Flat extends RotationalSymmetric {
+public class Flat extends Rotational {
 
     public static Flat flat = new Flat();
 

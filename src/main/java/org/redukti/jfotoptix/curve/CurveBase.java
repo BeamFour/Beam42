@@ -6,6 +6,10 @@ public abstract class CurveBase implements Curve {
 
     @Override
     public Vector2 derivative(Vector2 xy) {
+        return base_derivative(xy);
+    }
+
+    protected Vector2 base_derivative(Vector2 xy) {
         //double abserr;
         DerivFunction dxf = (x) -> this.sagitta(new Vector2(x, xy.y()));
         DerivFunction dyf = (y) -> this.sagitta(new Vector2(xy.x(), y));
@@ -20,6 +24,10 @@ public abstract class CurveBase implements Curve {
 
     @Override
     public Vector3 intersect(Vector3Pair ray) {
+        return base_intersect(ray);
+    }
+
+    protected Vector3 base_intersect(Vector3Pair ray) {
         Vector3 origin;
         // initial intersection with z=0 plane
         {
@@ -65,8 +73,13 @@ public abstract class CurveBase implements Curve {
         return origin;
     }
 
+
     @Override
     public Vector3 normal(Vector3 point) {
+        return base_normal(point);
+    }
+
+    protected Vector3 base_normal(Vector3 point) {
         Vector2 d = derivative (point.project_xy ());
         return new Vector3 (d.x (), d.y (), -1.0).normalize();
     }

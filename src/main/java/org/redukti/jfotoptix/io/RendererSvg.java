@@ -171,14 +171,16 @@ public class RendererSvg extends Renderer2d {
         _out.append("</defs>").append(System.lineSeparator());
     }
 
-    void group_begin(String name) {
+    @Override
+    public void group_begin(String name) {
         _out.append("<g>");
         if (!name.isEmpty())
             _out.append("<title>").append(name).append("</title>");
         _out.append(System.lineSeparator());
     }
 
-    void group_end() {
+    @Override
+    public void group_end() {
         _out.append("</g>").append(System.lineSeparator());
     }
 

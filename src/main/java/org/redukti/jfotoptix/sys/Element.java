@@ -1,5 +1,6 @@
 package org.redukti.jfotoptix.sys;
 
+import org.redukti.jfotoptix.io.Renderer;
 import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
@@ -28,6 +29,17 @@ public abstract class Element {
     }
     public Transform3 get_transform() {
         return transform;
+    }
+
+    public void draw_element_2d (Renderer r)
+    {
+        r.group_begin ("element");
+        draw_2d_e (r);
+        r.group_end ();
+    }
+
+    public void draw_2d_e (Renderer r)
+    {
     }
 
     public static abstract class Builder {
@@ -65,6 +77,8 @@ public abstract class Element {
         public int id() { return id;}
 
         public void computeGlobalTransform(Transform3Cache tcache) {
+            //System.err.println("Computing coordinate for " + this);
+
             Transform3 t = transform; // local transform
             Element.Builder p = this.parent;
             while (p != null) {
@@ -76,5 +90,9 @@ public abstract class Element {
         }
 
         public abstract Element build();
+
+        public String toString() {
+            return getClass().getName() + ",id=" + id;
+        }
     }
 }

@@ -57,7 +57,7 @@ public class Lens extends Group {
             opticalSurfaces.add(surface);
             _next_mat = glass;
             _last_pos += thickness;
-            super.elements.add(surface);
+            add(surface);
             return this;
         }
 
@@ -73,8 +73,13 @@ public class Lens extends Group {
                 .position(new Vector3Pair (new Vector3(0, 0, _last_pos), Vector3.vector3_1))
                     .shape(shape);
             _last_pos += thickness;
-            super.elements.add(_stop);
+            add(_stop);
             return this;
+        }
+
+        @Override
+        public void computeGlobalTransform(Transform3Cache tcache) {
+            super.computeGlobalTransform(tcache);
         }
     }
 }

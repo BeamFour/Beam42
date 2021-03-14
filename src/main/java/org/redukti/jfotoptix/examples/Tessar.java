@@ -12,7 +12,7 @@ import org.redukti.jfotoptix.sys.OpticalSystem;
 
 public class Tessar {
 
-    public static void main() {
+    public static void main(String[] args) {
 
         OpticalSystem.Builder sys = new OpticalSystem.Builder();
         Lens.Builder lens = new Lens.Builder()
@@ -28,7 +28,7 @@ public class Tessar {
                 .add_surface(1/0.035104369,  14.642815, 7.996205852,
                         new Abbe(Abbe.AbbeFormula.AbbeVd, 1.623770, 56.8998, 0.0))
                 .add_surface(1/-0.021187519, 14.642815, 85.243965130);
-        sys.add(lens);
+        sys.add(lens.position(Vector3Pair.position_000_001));
         Image.Builder image = new Image.Builder()
                 .position(new Vector3Pair(new Vector3(0, 0, 125.596), Vector3.vector3_001))
                 .curve(Flat.flat)
@@ -40,6 +40,8 @@ public class Tessar {
         // draw 2d system layout
         system.draw_2d_fit(renderer);
         system.draw_2d(renderer);
+
+        System.out.println(renderer.write(new StringBuilder()).toString());
     }
 
 

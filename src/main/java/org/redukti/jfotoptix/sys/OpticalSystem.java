@@ -1,6 +1,7 @@
 package org.redukti.jfotoptix.sys;
 
 import org.redukti.jfotoptix.io.RendererSvg;
+import org.redukti.jfotoptix.io.Rgb;
 import org.redukti.jfotoptix.math.*;
 
 import java.util.ArrayList;
@@ -80,7 +81,15 @@ public class OpticalSystem implements Container {
         return new Vector3Pair (a, b);
     }
 
-    public void draw_2d(RendererSvg renderer) {
+    public void draw_2d(RendererSvg r) {
+        // optical axis
+        Vector3Pair b = get_bounding_box ();
+        r.draw_segment (new Vector2Pair (new Vector2(b.v0.z(), 0.), new Vector2(b.v1.z (), 0.)), Rgb.rgb_gray);
+
+        for (Element e : elements())
+        {
+            e.draw_element_2d (r);
+        }
     }
 
 

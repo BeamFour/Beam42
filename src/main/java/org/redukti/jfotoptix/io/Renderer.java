@@ -185,4 +185,11 @@ public abstract class Renderer {
         draw_segment (new Vector2 (c.v0.x (), c.v0.y ()), new Vector2 (c.v0.x (), c.v1.y ()), rgb);
     }
 
+    public void group_begin (String name)
+    {
+    }
+
+    public void group_end ()
+    {
+    }
 }

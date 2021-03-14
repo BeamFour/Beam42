@@ -44,13 +44,13 @@ public class Vector3Pair {
 
     public double pl_ln_intersect_scale(Vector3Pair line) {
         // See https://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection
-        // I think below v1 = normal, v0 = origin
-//        return (v0.dotProduct(v1) - v1.dotProduct(line.v0)) /
-//                (line.v1.dotProduct(v1));
         return (origin().dotProduct(normal()) - normal().dotProduct(line.origin())) /
                 (line.normal().dotProduct(normal()));
     }
 
+    /**
+     * Swap the given element between the member vectors and return a new pair
+     */
     public static Vector3Pair swapElement(Vector3Pair p, int j) {
         double[] n0 = new double[3];
         double[] n1 = new double[3];

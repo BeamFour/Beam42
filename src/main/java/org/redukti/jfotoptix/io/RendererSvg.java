@@ -207,7 +207,6 @@ public class RendererSvg extends Renderer2d {
 
     @Override
     public void draw_point(Vector2 p, Rgb rgb, PointStyle s) {
-
         if (s.value >= ids.length)
             s = PointStyleCross;
 

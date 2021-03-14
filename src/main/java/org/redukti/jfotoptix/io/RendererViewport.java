@@ -142,7 +142,11 @@ public abstract class RendererViewport extends Renderer {
     /**
      * Set 3d projection to orthographic, called from @mref set_window.
      */
-    protected abstract void set_orthographic();
+    public abstract void set_orthographic();
+
+    /** Set 3d perspective projection mode. This function reset the
+     viewport window to (-1,1). @see set_window @see set_fov */
+    public abstract void set_perspective ();
 
     public void set_page(int page) {
         if (page >= _cols * _rows)

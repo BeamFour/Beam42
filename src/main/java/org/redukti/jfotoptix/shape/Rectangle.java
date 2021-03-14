@@ -181,7 +181,7 @@ public class Rectangle extends ShapeBase {
     @Override
     public double get_outter_radius(Vector2 dir) {
         Vector2 e
-                = (Math.abs(dir.x() / dir.y()) < _halfsize.x() / _halfsize.y())
+                = (Math.abs(dir.x() / dir.y()) < (_halfsize.x() / _halfsize.y()))
                 ? Vector2.vector2_10
                 : Vector2.vector2_01;
 

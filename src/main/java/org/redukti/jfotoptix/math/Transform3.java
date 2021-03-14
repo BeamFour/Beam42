@@ -6,6 +6,12 @@ public class Transform3 {
     public final Matrix3 linear;
     public final boolean useLinear;
 
+    public Transform3() {
+        this.linear = Matrix3.diag(1.0, 1.0, 1.0);
+        this.useLinear = false;
+        this.translation = Vector3.vector3_1;
+    }
+
     public Transform3(Vector3Pair position) {
         this.translation = position.point();
         if (position.direction().x() == 0 && position.direction().y() == 0) {
@@ -88,6 +94,5 @@ public class Transform3 {
         Matrix3 linear = r.times(this.linear);
         return new Transform3(this.translation, linear, true);
     }
-
 
 }

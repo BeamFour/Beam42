@@ -9,7 +9,7 @@ import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.patterns.Distribution;
 
 import java.util.ArrayList;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import static org.redukti.jfotoptix.io.Renderer.PointStyle.PointStyleCross;
 import static org.redukti.jfotoptix.io.Renderer.PointStyle.PointStyleDot;
@@ -27,7 +27,8 @@ public class TestShapes {
     }
 
     shape_test_s st[] = {
-            new shape_test_s("disk", new Disk(30))
+            new shape_test_s("disk", new Disk(30.)),
+            new shape_test_s("rectangle", new Rectangle (70., 40.))
     };
 
     @Test
@@ -40,13 +41,12 @@ public class TestShapes {
             RendererSvg rsvg = new RendererSvg(800, 600, Rgb.rgb_black);
             RendererViewport r = rsvg;
 
-            r.set_window(Vector2.vector2_0, 70, true);
+            r.set_window(Vector2.vector2_0, 70., true);
 
             {
-                Function<Triangle2, Void> d = (Triangle2 t) -> {
+                Consumer<Triangle2> d = (Triangle2 t) -> {
                     r.draw_triangle(t, true, new Rgb(.2, .2, .2, 1.0));
                     r.draw_triangle(t, false, Rgb.rgb_gray);
-                    return null;
                 };
                 s.s.get_triangles(d, 10.);
             }
@@ -54,15 +54,14 @@ public class TestShapes {
             for (int c = 0; c < s.s.get_contour_count(); c++) {
 
                 final ArrayList<Vector2> poly = new ArrayList<>();
-                Function<Vector2, Void> d = (Vector2 v) -> {
+                Consumer<Vector2> d = (Vector2 v) -> {
                     poly.add(v);
-                    return null;
                 };
                 s.s.get_contour(c, d, 10.);
                 r.draw_polygon(poly.toArray(new Vector2[poly.size()]), Rgb.rgb_yellow, false, true);
             }
 
-            for (double a = 0; a < 2.0 * Math.PI - 1e-8; a += 2.0 * Math.PI / 50) {
+            for (double a = 0; a < 2.0 * Math.PI - 1e-8; a += 2.0 * Math.PI / 50.0) {
                 Vector2 d = new Vector2(Math.cos(a), Math.sin(a));
 
                 double ro = s.s.get_outter_radius(d);
@@ -77,9 +76,8 @@ public class TestShapes {
             r.draw_box(s.s.get_bounding_box(), Rgb.rgb_cyan);
 
             {
-                Function<Vector2, Void> d = (Vector2 v) -> {
+                Consumer<Vector2> d = (Vector2 v) -> {
                     r.draw_point(v, Rgb.rgb_green, PointStyleDot);
-                    return null;
                 };
                 Distribution dist = new Distribution();
                 s.s.get_pattern(d, dist, false);

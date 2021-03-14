@@ -10,6 +10,7 @@ public class Vector2 {
     public static final Vector2 vector2_0 = new Vector2 (0.0, 0.0);
     public static final Vector2 vector2_1 = new Vector2 (1.0, 1.0);
     public static final  Vector2 vector2_10 = new Vector2 (1.0, 0.0);
+    public static final  Vector2 vector2_01 = new Vector2 (0.0, 1.0);
 
     private static final int N = 2;
 
@@ -28,12 +29,14 @@ public class Vector2 {
     public final double x() {
         return this.values[0];
     }
-
     public final double y() {
         return this.values[1];
     }
 
-    public double get(int i) {return this.values[i];}
+    public final Vector2 x(double value) { return new Vector2(value, y()); }
+    public final Vector2 y(double value) { return new Vector2(x(), value); }
+
+    public double v(int i) {return this.values[i];}
 
     public Vector2 plus(Vector2 v)
     {

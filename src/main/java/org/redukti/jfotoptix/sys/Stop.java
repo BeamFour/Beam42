@@ -24,5 +24,9 @@ public class Stop extends Surface {
         public Stop.Builder curve(Curve curve) {
             return (Stop.Builder) super.curve(curve);
         }
+
+        public Stop build() {
+            return new Stop(id, position, transform, curve, shape);
+        }
     }
 }

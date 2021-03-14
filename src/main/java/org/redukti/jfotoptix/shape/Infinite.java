@@ -5,6 +5,7 @@ import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector2Pair;
 import org.redukti.jfotoptix.patterns.Distribution;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class Infinite implements Shape {
@@ -16,7 +17,7 @@ public class Infinite implements Shape {
     }
 
     @Override
-    public void get_pattern(Function<Vector2, Void> f, Distribution d, boolean unobstructed) {
+    public void get_pattern(Consumer<Vector2> f, Distribution d, boolean unobstructed) {
         throw new IllegalArgumentException ("can not distribute rays across an infinite surface shape");
     }
 
@@ -51,12 +52,12 @@ public class Infinite implements Shape {
     }
 
     @Override
-    public void get_contour(int contour, Function<Vector2, Void> f, double resolution) {
+    public void get_contour(int contour, Consumer<Vector2> f, double resolution) {
 
     }
 
     @Override
-    public void get_triangles(Function<Triangle2, Void> f, double resolution) {
+    public void get_triangles(Consumer<Triangle2> f, double resolution) {
 
     }
 }

@@ -10,6 +10,7 @@ import org.redukti.jfotoptix.patterns.Pattern;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static org.redukti.jfotoptix.io.Renderer.PointStyle.PointStyleCross;
@@ -31,7 +32,8 @@ public class TestPatterns {
     }
 
     TestPatterns.shape_test_s st[] = {
-            new TestPatterns.shape_test_s("disk", new Disk(30), false)
+            new TestPatterns.shape_test_s("disk", new Disk(30), false),
+            new TestPatterns.shape_test_s("rectangle", new Rectangle (70., 40.), false)
     };
 
     @Test
@@ -66,16 +68,15 @@ public class TestPatterns {
 
                 System.out.println(s.name + " " + pname[j] + System.lineSeparator());
 
-                r.set_window(Vector2.vector2_0, 70, true);
+                r.set_window(Vector2.vector2_0, 70., true);
                 r.set_feature_size(.1);
 
                 ArrayList<Vector2> pts = new ArrayList<>();
 
                 try {
                     Distribution dist = new Distribution(p, 5, 0.999);
-                    Function<Vector2, Void> de = (Vector2 v2d) -> {
+                    Consumer<Vector2> de = (Vector2 v2d) -> {
                         pts.add(v2d);
-                        return null;
                     };
                     s.s.get_pattern(de, dist, s.unobstructed);
                 } catch (Exception e) {
@@ -117,9 +118,8 @@ public class TestPatterns {
 
                 for (int c = 0; c < s.s.get_contour_count(); c++) {
                     ArrayList<Vector2> poly = new ArrayList<>();
-                    Function<Vector2, Void> de = (Vector2 v2d) -> {
+                    Consumer<Vector2> de = (Vector2 v2d) -> {
                         poly.add(v2d);
-                        return null;
                     };
                     s.s.get_contour(c, de, 10.);
                     r.draw_polygon(poly.toArray(new Vector2[poly.size()]), Rgb.rgb_black, false, true);

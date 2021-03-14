@@ -5,6 +5,7 @@ import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
 
 import java.util.Random;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static org.redukti.jfotoptix.util.MathUtils.square;
@@ -12,13 +13,13 @@ import static org.redukti.jfotoptix.util.MathUtils.square;
 public abstract class ShapeBase implements Shape {
     static Random random = new Random();
 
-    private void add_pattern_point(Vector2 v, boolean unobstructed, Shape shape, Function<Vector2, Void> f) {
+    private void add_pattern_point(Vector2 v, boolean unobstructed, Shape shape, Consumer<Vector2> f) {
         if (unobstructed || shape.inside(v))
-            f.apply(v);
+            f.accept(v);
     }
 
     @Override
-    public void get_pattern(Function<Vector2, Void> f,
+    public void get_pattern(Consumer<Vector2> f,
                             Distribution d,
                             boolean unobstructed) {
         final double epsilon = 1e-8;

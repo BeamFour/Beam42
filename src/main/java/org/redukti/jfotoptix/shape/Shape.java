@@ -5,7 +5,7 @@ import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector2Pair;
 import org.redukti.jfotoptix.patterns.Distribution;
 
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 public interface Shape {
 
@@ -13,7 +13,7 @@ public interface Shape {
     boolean inside (Vector2 point);
 
     /** Get points distributed on shape area with given pattern */
-    void get_pattern (Function<Vector2,Void> f,
+    void get_pattern (Consumer<Vector2> f,
                       Distribution d,
                       boolean unobstructed);
 
@@ -41,10 +41,10 @@ public interface Shape {
     /** Get contour polygone points for specified contour id. First
      contour is always outter edge. @see get_contour_count */
     void get_contour (int contour,
-                            Function<Vector2,Void> f,
+                            Consumer<Vector2> f,
                               double resolution);
 
     /** Get shape teselation triangles */
-    void get_triangles (Function<Triangle2,Void> f, double resolution);
+    void get_triangles (Consumer<Triangle2> f, double resolution);
 
 }

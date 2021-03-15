@@ -62,12 +62,14 @@ public class Interpolated1d {
             case Nearest:
                 if (invalid) {
                     poly.clear();
+                    invalid = false;
                 }
                 return interpolate_nearest(d, x);
 
             case Linear:
                 if (invalid) {
                     poly.clear();
+                    invalid = false;
                 }
                 return interpolate_linear(d, x);
 

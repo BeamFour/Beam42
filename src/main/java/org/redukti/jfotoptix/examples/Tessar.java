@@ -14,8 +14,9 @@ public class Tessar {
 
     public static void main(String[] args) {
 
-        OpticalSystem.Builder sys = new OpticalSystem.Builder();
-        Lens.Builder lens = new Lens.Builder()
+        OpticalSystem.Builder systemBuilder = new OpticalSystem.Builder();
+        Lens.Builder lensBuilder = new Lens.Builder()
+                .position(Vector3Pair.position_000_001)
                 .add_surface(1/0.031186861,  14.934638, 4.627804137,
                     new Abbe(Abbe.AbbeFormula.AbbeVd, 1.607170, 59.5002, 0.0))
                 .add_surface(0,              14.934638, 5.417429465)
@@ -28,15 +29,14 @@ public class Tessar {
                 .add_surface(1/0.035104369,  14.642815, 7.996205852,
                         new Abbe(Abbe.AbbeFormula.AbbeVd, 1.623770, 56.8998, 0.0))
                 .add_surface(1/-0.021187519, 14.642815, 85.243965130);
-        sys.add(lens.position(Vector3Pair.position_000_001));
-        Image.Builder image = new Image.Builder()
+        Image.Builder imagePlaneBuilder = new Image.Builder()
                 .position(new Vector3Pair(new Vector3(0, 0, 125.596), Vector3.vector3_001))
                 .curve(Flat.flat)
                 .shape(new Rectangle(5.0*2));
-        sys.add(image);
+        systemBuilder.add(imagePlaneBuilder);
 
         RendererSvg renderer = new RendererSvg( 800, 400);
-        OpticalSystem system = sys.build();
+        OpticalSystem system = systemBuilder.build();
         // draw 2d system layout
         system.draw_2d_fit(renderer);
         system.draw_2d(renderer);

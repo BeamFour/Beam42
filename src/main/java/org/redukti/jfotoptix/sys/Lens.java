@@ -31,6 +31,13 @@ public class Lens extends Group {
             return new Lens(id, position, transform, getElements());
         }
 
+        /**
+         * Add an optical surface
+         * @param curvature curvature of the surface, 1/r
+         * @param radius the radius of the disk
+         * @param thickness the thickness after this surface
+         * @param glass the material after this surface
+         */
         public Lens.Builder add_surface(double curvature, double radius, double thickness, Abbe glass) {
             Curve curve;
             if (curvature == 0.)
@@ -53,7 +60,6 @@ public class Lens extends Group {
                     .shape(shape)
                     .leftMaterial(_next_mat)
                     .rightMaterial(glass);
-
             opticalSurfaces.add(surface);
             _next_mat = glass;
             _last_pos += thickness;
@@ -80,6 +86,11 @@ public class Lens extends Group {
         @Override
         public void computeGlobalTransform(Transform3Cache tcache) {
             super.computeGlobalTransform(tcache);
+        }
+
+        @Override
+        public Lens.Builder position(Vector3Pair position) {
+            return (Lens.Builder) super.position(position);
         }
     }
 }

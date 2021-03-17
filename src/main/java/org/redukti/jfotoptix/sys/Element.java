@@ -12,6 +12,7 @@ public abstract class Element {
     final int id;
     final Vector3Pair position;
     final Transform3 transform;
+    OpticalSystem _system;
 
     public Element(int id, Vector3Pair p, Transform3 transform) {
         this.id = id;
@@ -31,15 +32,21 @@ public abstract class Element {
         return transform;
     }
 
-    public void draw_element_2d (Renderer r)
+    public void draw_element_2d (Renderer r, Element ref)
     {
         r.group_begin ("element");
-        draw_2d_e (r);
+        draw_2d_e (r, ref);
         r.group_end ();
     }
 
-    public void draw_2d_e (Renderer r)
+    public void draw_2d_e (Renderer r, Element ref)
     {
+    }
+    Transform3 get_transform_to (Element e)
+    {
+        assert (_system != null);
+        return e != null ? _system.get_transform (this, e)
+           : _system.get_global_transform (this);
     }
 
     public static abstract class Builder {

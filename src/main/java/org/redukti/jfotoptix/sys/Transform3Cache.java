@@ -36,6 +36,18 @@ public class Transform3Cache {
         return get(0, id);
     }
 
+    public Transform3 transform_cache_update(int from, int to) {
+        assert (from != to);
+        Transform3 e = get(from, to);
+        if (e == null) {
+            Transform3 t1 = getLocal2GlobalTransform(from);
+            Transform3 t2 = getLocal2GlobalTransform(to);
+            e = Transform3.compose(t1, t2.inverse());
+            put(from, to, e);
+        }
+        return e;
+    }
+
     static final class ElementPair {
         final int from;
         final int to;

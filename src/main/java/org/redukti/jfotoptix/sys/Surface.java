@@ -1,6 +1,7 @@
 package org.redukti.jfotoptix.sys;
 
 import org.redukti.jfotoptix.curve.Curve;
+import org.redukti.jfotoptix.io.Renderer;
 import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 import org.redukti.jfotoptix.shape.Shape;
@@ -15,6 +16,11 @@ public class Surface extends Element {
         this.curve = curve;
         this.shape = shape;
     }
+
+    public Shape get_shape() { return shape; }
+
+    public Curve get_curve() { return curve; }
+    public Renderer.Style get_style() { return Renderer.Style.StyleSurface; }
 
     public static class Builder extends Element.Builder {
         Shape shape;

@@ -1,5 +1,6 @@
 package org.redukti.jfotoptix.sys;
 
+import org.redukti.jfotoptix.io.Renderer;
 import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 
@@ -8,15 +9,15 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Group extends Element implements Container {
-    private final List<Element> elements;
+    private final List<? extends Element> elements;
 
-    public Group(int id, Vector3Pair p, Transform3 transform3, List<Element> elements) {
+    public Group(int id, Vector3Pair p, Transform3 transform3, List<? extends Element> elements) {
         super(id, p, transform3);
         this.elements = elements;
     }
 
     @Override
-    public List<Element> elements() {
+    public List<? extends Element> elements() {
         return elements;
     }
 
@@ -39,6 +40,15 @@ public class Group extends Element implements Container {
             return (Surface) elements.get(pos);
         }
         return null;
+    }
+
+
+
+    @Override
+    public void draw_2d_e(Renderer r, Element ref) {
+        for (Element e: elements) {
+            e.draw_element_2d(r, ref);
+        }
     }
 
     public static class Builder extends Element.Builder {

@@ -108,7 +108,7 @@ public abstract class Renderer {
         _styles_color[Style.StyleSurface.value] = new Rgb (0.5, 0.5, 1.0, 1.0);
         _styles_color[Style.StyleGlass.value] = new Rgb (0.8, 0.8, 1.0, 1.0);
     }
-    Rgb get_style_color (Style s)
+    public Rgb get_style_color (Style s)
     {
         return _styles_color[s.value];
     }

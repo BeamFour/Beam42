@@ -88,10 +88,18 @@ public class OpticalSystem implements Container {
 
         for (Element e : elements())
         {
-            e.draw_element_2d (r);
+            e.draw_element_2d (r, null);
         }
     }
 
+    Transform3 get_transform (Element from, Element to)
+    {
+        return transform3Cache.transform_cache_update (from.id (), to.id ());
+    }
+
+    Transform3 get_global_transform(Element e) {
+        return transform3Cache.getLocal2GlobalTransform(e.id());
+    }
 
     public static class Builder {
         private final ArrayList<Element.Builder> elements = new ArrayList<>();

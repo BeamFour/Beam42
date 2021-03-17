@@ -46,6 +46,7 @@ public class Transform3 {
      * Composition. New translation is set to: apply parent's linear transformation on child translation and add parent translation.
      * New linear matrix -s the product of the parent and child matrices.
      * TODO check terminology is correct
+     *
      * @param p Parent component
      * @param c Child component
      */
@@ -68,6 +69,7 @@ public class Transform3 {
 
     /**
      * Rotate by x, y, and z axis.
+     *
      * @param v Vector with angles per axis
      */
     public Transform3 linearRotation(Vector3 v) {
@@ -82,7 +84,8 @@ public class Transform3 {
 
     /**
      * Rotate around specified axis
-     * @param axis 0=x, 1=y, 2=z
+     *
+     * @param axis   0=x, 1=y, 2=z
      * @param dangle Angle of rotation
      */
     Transform3 linearRotation(int axis, double dangle) {
@@ -95,29 +98,23 @@ public class Transform3 {
         return new Transform3(this.translation, linear, true);
     }
 
-    public Vector3Pair transform_pair (Vector3Pair p)
-    {
-        return new Vector3Pair (transform (p.v0), transform (p.v1));
+    public Vector3Pair transform_pair(Vector3Pair p) {
+        return new Vector3Pair(transform(p.v0), transform(p.v1));
     }
 
     public Transform3 set_translation(Vector3 translation) {
         return new Transform3(translation, linear, useLinear);
     }
 
-    public Transform3 set_direction (Vector3 direction)
-    {
-        if (direction.x () == 0.0 && direction.y () == 0.0)
-        {
-            if (direction.z () < 0.0) {
+    public Transform3 set_direction(Vector3 direction) {
+        if (direction.x() == 0.0 && direction.y() == 0.0) {
+            if (direction.z() < 0.0) {
                 return new Transform3(translation, Matrix3.diag(1.0, 1.0, -1.0), true);
-            }
-            else {
+            } else {
                 return new Transform3(translation, Matrix3.diag(1.0, 1.0, 1.0), false);
             }
-        }
-        else
-        {
-            return new Transform3(translation, Matrix3.rotation(new Quaternion (Vector3.vector3_001, direction)), true);
+        } else {
+            return new Transform3(translation, Matrix3.rotation(new Quaternion(Vector3.vector3_001, direction)), true);
         }
     }
 

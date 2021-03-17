@@ -21,6 +21,10 @@ public class OpticalSurface extends Surface {
         mat[1] = right;
     }
 
+    public MaterialBase get_material(int i) {
+        return mat[i];
+    }
+
     public static class Builder extends Surface.Builder {
         MaterialBase left;
         MaterialBase right;

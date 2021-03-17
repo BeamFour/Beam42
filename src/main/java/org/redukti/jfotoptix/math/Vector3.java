@@ -94,6 +94,9 @@ public class Vector3 {
     public Vector2 project_xy() {
         return new Vector2(x (), y());
     }
+    public Vector2 project_zy() {
+        return new Vector2(z (), y());
+    }
 
     double len ()
     {

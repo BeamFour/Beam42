@@ -20,6 +20,9 @@ public class Vector3 {
     final double[] values;
 
     public Vector3(double x, double y, double z) {
+        if (Double.isNaN(x) || Double.isNaN(y) || Double.isNaN(z)) {
+            throw new IllegalArgumentException("NaN");
+        }
         this.values = new double[N];
         this.values[0] = x;
         this.values[1] = y;
@@ -43,6 +46,10 @@ public class Vector3 {
 
     public final double z() {
         return this.values[2];
+    }
+
+    public final Vector3 z(double v) {
+        return new Vector3(x(), y(), v);
     }
 
 //    public Vector3 mul (Vector3 v)

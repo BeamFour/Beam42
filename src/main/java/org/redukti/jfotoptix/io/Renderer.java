@@ -1,8 +1,6 @@
 package org.redukti.jfotoptix.io;
 
-import org.redukti.jfotoptix.math.Triangle2;
-import org.redukti.jfotoptix.math.Vector2;
-import org.redukti.jfotoptix.math.Vector2Pair;
+import org.redukti.jfotoptix.math.*;
 
 import java.util.EnumSet;
 
@@ -112,6 +110,7 @@ public abstract class Renderer {
     {
         return _styles_color[s.value];
     }
+    public double get_feature_size() { return _feature_size; }
 
     /** @internal Draw a point in 2d */
     public abstract void draw_point (Vector2 p, Rgb rgb, PointStyle s);
@@ -119,6 +118,7 @@ public abstract class Renderer {
                                     String str, EnumSet<TextAlignMask> a, int size,
                                     Rgb rgb);
     public abstract void draw_segment (Vector2Pair s, Rgb rgb);
+    public abstract void draw_segment(Vector3Pair s, Rgb rgb);
 
     public void draw_point(Vector2 p) {
         draw_point(p, Rgb.rgb_gray, PointStyle.PointStyleDot);
@@ -137,6 +137,11 @@ public abstract class Renderer {
     public void draw_segment (Vector2 a, Vector2 b)
     {
         draw_segment (a, b, Rgb.rgb_gray);
+    }
+
+    public void draw_segment (Vector3 a, Vector3 b, Rgb rgb)
+    {
+        draw_segment (new Vector3Pair(a, b), rgb);
     }
 
 /**********************************************************************

@@ -22,6 +22,9 @@ public abstract class Renderer2d extends RendererViewport {
     Transform3 _cam_transform = new Transform3();
     double _eye_dist;
 
+    public Renderer2d() {
+    }
+
     @Override
     public void set_perspective() {
         double out_ratio

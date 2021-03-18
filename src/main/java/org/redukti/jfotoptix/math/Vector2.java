@@ -17,9 +17,16 @@ public class Vector2 {
     final double[] values;
 
     public Vector2(double x, double y) {
+        if (Double.isNaN(x) || Double.isNaN(y)) {
+            throw new IllegalArgumentException("NaN");
+        }
         this.values = new double[N];
         this.values[0] = x;
         this.values[1] = y;
+    }
+
+    public Vector2(double v) {
+        this(v,v);
     }
 
     private Vector2(double[] values) {

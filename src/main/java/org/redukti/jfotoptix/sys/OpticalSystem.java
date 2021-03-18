@@ -114,7 +114,9 @@ public class OpticalSystem implements Container {
             generateIds();
             Transform3Cache transform3Cache = setCoordinates();
             List<Element> elements = buildElements();
-            return new OpticalSystem(elements, transform3Cache);
+            OpticalSystem system = new OpticalSystem(elements, transform3Cache);
+            system.elements().forEach(e -> e.set_system(system));
+            return system;
         }
 
         private List<Element> buildElements() {

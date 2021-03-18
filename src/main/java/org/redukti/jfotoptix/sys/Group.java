@@ -42,6 +42,12 @@ public class Group extends Element implements Container {
         return null;
     }
 
+    void set_system(OpticalSystem system) {
+        this._system = system;
+        for (Element e: elements()) {
+            e.set_system(system);
+        }
+    }
 
 
     @Override

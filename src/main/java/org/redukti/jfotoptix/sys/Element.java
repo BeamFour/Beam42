@@ -49,6 +49,10 @@ public abstract class Element {
            : _system.get_global_transform (this);
     }
 
+    void set_system(OpticalSystem system) {
+        this._system = system;
+    }
+
     public static abstract class Builder {
         int id;
         Vector3Pair position;

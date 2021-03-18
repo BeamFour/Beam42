@@ -9,7 +9,7 @@ public class Transform3 {
     public Transform3() {
         this.linear = Matrix3.diag(1.0, 1.0, 1.0);
         this.useLinear = false;
-        this.translation = Vector3.vector3_1;
+        this.translation = Vector3.vector3_0;
     }
 
     public Transform3(Vector3Pair position) {

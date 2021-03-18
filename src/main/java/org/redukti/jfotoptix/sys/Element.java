@@ -5,6 +5,7 @@ import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class Element {
@@ -51,6 +52,35 @@ public abstract class Element {
 
     void set_system(OpticalSystem system) {
         this._system = system;
+    }
+
+    public static Vector3Pair get_bounding_box (List<? extends Element> elementList)
+    {
+        Vector3 a = new Vector3(Double.MAX_VALUE);
+        Vector3 b = new Vector3(Double.MIN_VALUE);
+
+        for (Element e : elementList)
+        {
+            Vector3Pair bi = e.get_bounding_box ();
+
+            if (bi.v0 == bi.v1)
+                continue;
+
+            bi = e.get_transform ().transform_pair (bi);
+
+            for (int j = 0; j < 3; j++)
+            {
+                if (bi.v0.v(j) > bi.v1.v(j))
+                    bi = Vector3Pair.swapElement(bi, j);
+
+                if (bi.v0.v(j) < a.v(j))
+                    a = a.v(j,bi.v0.v(j));
+
+                if (bi.v1.v(j) > b.v(j))
+                    b = b.v(j, bi.v1.v(j));
+            }
+        }
+        return new Vector3Pair (a, b);
     }
 
     public static abstract class Builder {

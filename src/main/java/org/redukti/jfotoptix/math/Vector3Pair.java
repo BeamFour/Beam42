@@ -38,6 +38,9 @@ public class Vector3Pair {
         return v1;
     }
 
+    public final double z0() { return  v0.z(); }
+    public final double z1() { return  v1.z(); }
+
     public final boolean isEquals(Vector3Pair other, double tolerance) {
         return v0.isEqual(other.v0, tolerance) && v1.isEqual(other.v1, tolerance);
     }

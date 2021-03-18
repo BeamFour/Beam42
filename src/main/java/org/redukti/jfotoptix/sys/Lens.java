@@ -145,6 +145,12 @@ public class Lens extends Group {
         }
     }
 
+    @Override
+    void set_system(OpticalSystem system) {
+        super.set_system(system);
+        _stop.set_system(system);
+    }
+
     public static class Builder extends Group.Builder {
         List<OpticalSurface.Builder> opticalSurfaces = new ArrayList<>();
         int _last_pos = 0;

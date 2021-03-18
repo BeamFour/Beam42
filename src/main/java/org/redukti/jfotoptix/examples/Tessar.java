@@ -29,6 +29,7 @@ public class Tessar {
                 .add_surface(1/0.035104369,  14.642815, 7.996205852,
                         new Abbe(Abbe.AbbeFormula.AbbeVd, 1.623770, 56.8998, 0.0))
                 .add_surface(1/-0.021187519, 14.642815, 85.243965130);
+        systemBuilder.add(lensBuilder);
         Image.Builder imagePlaneBuilder = new Image.Builder()
                 .position(new Vector3Pair(new Vector3(0, 0, 125.596), Vector3.vector3_001))
                 .curve(Flat.flat)

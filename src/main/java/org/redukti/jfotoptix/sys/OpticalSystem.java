@@ -1,6 +1,8 @@
 package org.redukti.jfotoptix.sys;
 
+import org.redukti.jfotoptix.io.Renderer;
 import org.redukti.jfotoptix.io.RendererSvg;
+import org.redukti.jfotoptix.io.RendererViewport;
 import org.redukti.jfotoptix.io.Rgb;
 import org.redukti.jfotoptix.math.*;
 
@@ -41,8 +43,8 @@ public class OpticalSystem implements Container {
         return transform3Cache.getLocal2GlobalTransform(e.id()).transform(Vector3.vector3_0);
     }
 
-
-    public void draw_2d_fit(RendererSvg r) {
+    @Override
+    public void draw_2d_fit(RendererViewport r, boolean keep_aspect) {
         Vector3Pair b = get_bounding_box ();
 
         r.set_window (Vector2Pair.from(b, 2, 1), keep_aspect);
@@ -52,33 +54,25 @@ public class OpticalSystem implements Container {
         r.set_feature_size (b.v1.y () - b.v0.y () / 20.);
     }
 
-    Vector3Pair get_bounding_box ()
-    {
-        Vector3 a = new Vector3(Double.MAX_VALUE);
-        Vector3 b = new Vector3(Double.MIN_VALUE);
+    @Override
+    public void draw_2d(Renderer r) {
+        // optical axis
+        Vector3Pair b = get_bounding_box ();
+        r.draw_segment (new Vector2Pair (new Vector2(b.z0 (), 0.), new Vector2(b.z1 (), 0.)), Rgb.rgb_gray);
 
         for (Element e : elements())
         {
-            Vector3Pair bi = e.get_bounding_box ();
-
-            if (bi.v0 == bi.v1)
-                continue;
-
-            bi = e.get_transform ().transform_pair (bi);
-
-            for (int j = 0; j < 3; j++)
-            {
-                if (bi.v0.v(j) > bi.v1.v(j))
-                    bi = Vector3Pair.swapElement(bi, j);
-
-                if (bi.v0.v(j) < a.v(j))
-                    a = a.v(j,bi.v0.v(j));
-
-                if (bi.v1.v(j) > b.v(j))
-                    b = b.v(j, bi.v1.v(j));
-            }
+            e.draw_element_2d(r, null);
         }
-        return new Vector3Pair (a, b);
+    }
+
+    public void draw_2d_fit(RendererSvg r) {
+        draw_2d_fit(r, keep_aspect);
+    }
+
+    public Vector3Pair get_bounding_box ()
+    {
+        return Element.get_bounding_box(elements);
     }
 
     public void draw_2d(RendererSvg r) {
@@ -115,7 +109,9 @@ public class OpticalSystem implements Container {
             Transform3Cache transform3Cache = setCoordinates();
             List<Element> elements = buildElements();
             OpticalSystem system = new OpticalSystem(elements, transform3Cache);
-            system.elements().forEach(e -> e.set_system(system));
+            for (Element e: system.elements()) {
+                e.set_system(system);
+            }
             return system;
         }
 

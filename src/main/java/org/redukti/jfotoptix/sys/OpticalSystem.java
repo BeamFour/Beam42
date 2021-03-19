@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class OpticalSystem implements Container {
     private final List<Element> elements;
     private final Transform3Cache transform3Cache;
-    private boolean keep_aspect;
+    private boolean keep_aspect = true;
 
     @Override
     public List<Element> elements() {

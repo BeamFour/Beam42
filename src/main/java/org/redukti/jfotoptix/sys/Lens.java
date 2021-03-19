@@ -195,7 +195,7 @@ public class Lens extends Group {
         public Lens.Builder add_surface(Curve curve, Shape shape, double thickness, MaterialBase glass) {
             assert (thickness >= 0.);
             OpticalSurface.Builder surface = new OpticalSurface.Builder()
-                    .position(new Vector3Pair(new Vector3(0, 0, _last_pos), Vector3.vector3_1))
+                    .position(new Vector3Pair(new Vector3(0, 0, _last_pos), Vector3.vector3_001))
                     .curve(curve)
                     .shape(shape)
                     .leftMaterial(_next_mat)
@@ -215,7 +215,7 @@ public class Lens extends Group {
             if (_stop != null)
                 throw new IllegalArgumentException("Can not add more than one stop per Lens");
             _stop = new Stop.Builder()
-                    .position(new Vector3Pair(new Vector3(0, 0, _last_pos), Vector3.vector3_1))
+                    .position(new Vector3Pair(new Vector3(0, 0, _last_pos), Vector3.vector3_001))
                     .shape(shape);
             _last_pos += thickness;
             add(_stop);

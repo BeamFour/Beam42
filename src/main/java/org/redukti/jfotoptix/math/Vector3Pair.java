@@ -60,10 +60,12 @@ public class Vector3Pair {
 
         for (int i = 0; i < 3; i++) {
             if (i == j) {
+                // swap
                 n0[i] = p.v1.v(i);
                 n1[i] = p.v0.v(i);
             }
             else {
+                // retain original
                 n0[i] = p.v0.v(i);
                 n1[i] = p.v1.v(i);
             }

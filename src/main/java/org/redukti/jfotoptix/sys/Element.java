@@ -24,30 +24,33 @@ public abstract class Element {
     public Vector3 getLocalPosition() {
         return this.transform.translation;
     }
-    public int id() { return id; }
-    public Vector3Pair get_bounding_box ()
-    {
+
+    public int id() {
+        return id;
+    }
+
+    public Vector3Pair get_bounding_box() {
         return new Vector3Pair(Vector3.vector3_0, Vector3.vector3_0);
     }
+
     public Transform3 get_transform() {
         return transform;
     }
 
-    public void draw_element_2d (Renderer r, Element ref)
-    {
-        r.group_begin ("element");
-        draw_2d_e (r, ref);
-        r.group_end ();
+    public void draw_element_2d(Renderer r, Element ref) {
+        r.group_begin("element");
+        draw_2d_e(r, ref);
+        r.group_end();
     }
 
-    public void draw_2d_e (Renderer r, Element ref)
-    {
+    public void draw_2d_e(Renderer r, Element ref) {
     }
-    Transform3 get_transform_to (Element e)
-    {
+
+    Transform3 get_transform_to(Element e) {
         assert (_system != null);
-        return e != null ? _system.get_transform (this, e)
-           : _system.get_global_transform (this);
+        return e != null
+                ? _system.get_transform(this, e)
+                : _system.get_global_transform(this);
     }
 
     void set_system(OpticalSystem system) {
@@ -61,33 +64,30 @@ public abstract class Element {
                 ", transform=" + transform;
     }
 
-    public static Vector3Pair get_bounding_box (List<? extends Element> elementList)
-    {
+    public static Vector3Pair get_bounding_box(List<? extends Element> elementList) {
         Vector3 a = new Vector3(Double.MAX_VALUE);
         Vector3 b = new Vector3(Double.MIN_VALUE);
 
-        for (Element e : elementList)
-        {
-            Vector3Pair bi = e.get_bounding_box ();
+        for (Element e : elementList) {
+            Vector3Pair bi = e.get_bounding_box();
 
             if (bi.v0 == bi.v1)
                 continue;
 
-            bi = e.get_transform ().transform_pair (bi);
+            bi = e.get_transform().transform_pair(bi);
 
-            for (int j = 0; j < 3; j++)
-            {
+            for (int j = 0; j < 3; j++) {
                 if (bi.v0.v(j) > bi.v1.v(j))
                     bi = Vector3Pair.swapElement(bi, j);
 
                 if (bi.v0.v(j) < a.v(j))
-                    a = a.v(j,bi.v0.v(j));
+                    a = a.v(j, bi.v0.v(j));
 
                 if (bi.v1.v(j) > b.v(j))
                     b = b.v(j, bi.v1.v(j));
             }
         }
-        return new Vector3Pair (a, b);
+        return new Vector3Pair(a, b);
     }
 
     public static abstract class Builder {
@@ -118,11 +118,13 @@ public abstract class Element {
         }
 
         public Builder rotate(double x, double y, double z) {
-            this.transform = this.transform.linearRotation(new Vector3(x,y,z));
+            this.transform = this.transform.linearRotation(new Vector3(x, y, z));
             return this;
         }
 
-        public int id() { return id;}
+        public int id() {
+            return id;
+        }
 
         public void computeGlobalTransform(Transform3Cache tcache) {
             //System.err.println("Computing coordinate for " + this);

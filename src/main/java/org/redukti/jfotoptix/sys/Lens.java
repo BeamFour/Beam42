@@ -158,7 +158,7 @@ public class Lens extends Group {
 
     public static class Builder extends Group.Builder {
         List<OpticalSurface.Builder> opticalSurfaces = new ArrayList<>();
-        int _last_pos = 0;
+        double _last_pos = 0;
         MaterialBase _next_mat = null;
         Stop.Builder _stop = null;
 

@@ -11,7 +11,6 @@ import org.redukti.jfotoptix.patterns.Pattern;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static org.redukti.jfotoptix.io.Renderer.PointStyle.PointStyleCross;
 import static org.redukti.jfotoptix.io.Renderer.TextAlignMask.TextAlignBottom;
@@ -33,7 +32,9 @@ public class TestPatterns {
 
     TestPatterns.shape_test_s st[] = {
             new TestPatterns.shape_test_s("disk", new Disk(30), false),
-            new TestPatterns.shape_test_s("rectangle", new Rectangle (70., 40.), false)
+            new TestPatterns.shape_test_s("rectangle", new Rectangle(70., 40.), false),
+            new TestPatterns.shape_test_s("ellipse1", new Ellipse(20, 30), false),
+            new TestPatterns.shape_test_s("ellipse2", new Ellipse(30, 20), false),
     };
 
     @Test

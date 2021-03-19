@@ -1,0 +1,377 @@
+<?xml version="1.0" standalone="no"?>
+<svg width="800px" height="600px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <rect x="0" y="0" width="800" height="600"  fill="#000000" />
+    <defs>
+        <g id="dot">
+            <line x1="1" y1="1" x2="0" y2="0"  />
+        </g>
+        <g id="cross">
+            <line x1="-3" y1="0" x2="3" y2="0"  />
+            <line x1="0" y1="-3" x2="0" y2="3"  />
+        </g>
+        <g id="square">
+            <line x1="-3" y1="-3" x2="-3" y2="3"  />
+            <line x1="-3" y1="3" x2="3" y2="3"  />
+            <line x1="3" y1="3" x2="3" y2="-3"  />
+            <line x1="3" y1="-3" x2="-3" y2="-3"  />
+        </g>
+        <g id="round">
+            <ellipse cx="0" cy="0" rx="3" ry="3"  fill="none" /></g>
+        <g id="triangle">
+            <line x1="0" y1="-3" x2="-3" y2="3"  />
+            <line x1="-3" y1="3" x2="3" y2="3"  />
+            <line x1="0" y1="-3" x2="3" y2="3"  />
+        </g>
+    </defs>
+    <polygon fill="#333333" points="429.762,270.543 459.524,300 400,300 " />
+    <polygon fill="none" stroke="#7f7f7f" points="429.762,270.543 459.524,300 400,300 " />
+    <polygon fill="#333333" points="370.238,329.457 340.476,300 400,300 " />
+    <polygon fill="none" stroke="#7f7f7f" points="370.238,329.457 340.476,300 400,300 " />
+    <polygon fill="#333333" points="370.238,270.543 429.762,270.543 400,300 " />
+    <polygon fill="none" stroke="#7f7f7f" points="370.238,270.543 429.762,270.543 400,300 " />
+    <polygon fill="#333333" points="429.762,329.457 370.238,329.457 400,300 " />
+    <polygon fill="none" stroke="#7f7f7f" points="429.762,329.457 370.238,329.457 400,300 " />
+    <polygon fill="#333333" points="340.476,300 370.238,270.543 400,300 " />
+    <polygon fill="none" stroke="#7f7f7f" points="340.476,300 370.238,270.543 400,300 " />
+    <polygon fill="#333333" points="459.524,300 429.762,329.457 400,300 " />
+    <polygon fill="none" stroke="#7f7f7f" points="459.524,300 429.762,329.457 400,300 " />
+    <polygon fill="#333333" points="459.524,300 503.098,265.986 519.048,300 " />
+    <polygon fill="none" stroke="#7f7f7f" points="459.524,300 503.098,265.986 519.048,300 " />
+    <polygon fill="#333333" points="340.476,300 296.902,334.014 280.952,300 " />
+    <polygon fill="none" stroke="#7f7f7f" points="340.476,300 296.902,334.014 280.952,300 " />
+    <polygon fill="#333333" points="459.524,300 429.762,270.543 503.098,265.986 " />
+    <polygon fill="none" stroke="#7f7f7f" points="459.524,300 429.762,270.543 503.098,265.986 " />
+    <polygon fill="#333333" points="340.476,300 370.238,329.457 296.902,334.014 " />
+    <polygon fill="none" stroke="#7f7f7f" points="340.476,300 370.238,329.457 296.902,334.014 " />
+    <polygon fill="#333333" points="429.762,270.543 459.524,241.087 503.098,265.986 " />
+    <polygon fill="none" stroke="#7f7f7f" points="429.762,270.543 459.524,241.087 503.098,265.986 " />
+    <polygon fill="#333333" points="370.238,329.457 340.476,358.913 296.902,334.014 " />
+    <polygon fill="none" stroke="#7f7f7f" points="370.238,329.457 340.476,358.913 296.902,334.014 " />
+    <polygon fill="#333333" points="429.762,270.543 400,231.973 459.524,241.087 " />
+    <polygon fill="none" stroke="#7f7f7f" points="429.762,270.543 400,231.973 459.524,241.087 " />
+    <polygon fill="#333333" points="370.238,329.457 400,368.027 340.476,358.913 " />
+    <polygon fill="none" stroke="#7f7f7f" points="370.238,329.457 400,368.027 340.476,358.913 " />
+    <polygon fill="#333333" points="429.762,270.543 370.238,270.543 400,231.973 " />
+    <polygon fill="none" stroke="#7f7f7f" points="429.762,270.543 370.238,270.543 400,231.973 " />
+    <polygon fill="#333333" points="370.238,329.457 429.762,329.457 400,368.027 " />
+    <polygon fill="none" stroke="#7f7f7f" points="370.238,329.457 429.762,329.457 400,368.027 " />
+    <polygon fill="#333333" points="370.238,270.543 340.476,241.087 400,231.973 " />
+    <polygon fill="none" stroke="#7f7f7f" points="370.238,270.543 340.476,241.087 400,231.973 " />
+    <polygon fill="#333333" points="429.762,329.457 459.524,358.913 400,368.027 " />
+    <polygon fill="none" stroke="#7f7f7f" points="429.762,329.457 459.524,358.913 400,368.027 " />
+    <polygon fill="#333333" points="370.238,270.543 296.902,265.986 340.476,241.087 " />
+    <polygon fill="none" stroke="#7f7f7f" points="370.238,270.543 296.902,265.986 340.476,241.087 " />
+    <polygon fill="#333333" points="429.762,329.457 503.098,334.014 459.524,358.913 " />
+    <polygon fill="none" stroke="#7f7f7f" points="429.762,329.457 503.098,334.014 459.524,358.913 " />
+    <polygon fill="#333333" points="370.238,270.543 340.476,300 296.902,265.986 " />
+    <polygon fill="none" stroke="#7f7f7f" points="370.238,270.543 340.476,300 296.902,265.986 " />
+    <polygon fill="#333333" points="429.762,329.457 459.524,300 503.098,334.014 " />
+    <polygon fill="none" stroke="#7f7f7f" points="429.762,329.457 459.524,300 503.098,334.014 " />
+    <polygon fill="#333333" points="340.476,300 280.952,300 296.902,265.986 " />
+    <polygon fill="none" stroke="#7f7f7f" points="340.476,300 280.952,300 296.902,265.986 " />
+    <polygon fill="#333333" points="459.524,300 519.048,300 503.098,334.014 " />
+    <polygon fill="none" stroke="#7f7f7f" points="459.524,300 519.048,300 503.098,334.014 " />
+    <polygon fill="#333333" points="519.048,300 567.802,265.1 578.571,300 " />
+    <polygon fill="none" stroke="#7f7f7f" points="519.048,300 567.802,265.1 578.571,300 " />
+    <polygon fill="#333333" points="280.952,300 232.198,334.9 221.429,300 " />
+    <polygon fill="none" stroke="#7f7f7f" points="280.952,300 232.198,334.9 221.429,300 " />
+    <polygon fill="#333333" points="519.048,300 503.098,265.986 567.802,265.1 " />
+    <polygon fill="none" stroke="#7f7f7f" points="519.048,300 503.098,265.986 567.802,265.1 " />
+    <polygon fill="#333333" points="280.952,300 296.902,334.014 232.198,334.9 " />
+    <polygon fill="none" stroke="#7f7f7f" points="280.952,300 296.902,334.014 232.198,334.9 " />
+    <polygon fill="#333333" points="503.098,265.986 536.794,234.409 567.802,265.1 " />
+    <polygon fill="none" stroke="#7f7f7f" points="503.098,265.986 536.794,234.409 567.802,265.1 " />
+    <polygon fill="#333333" points="296.902,334.014 263.206,365.591 232.198,334.9 " />
+    <polygon fill="none" stroke="#7f7f7f" points="296.902,334.014 263.206,365.591 232.198,334.9 " />
+    <polygon fill="#333333" points="503.098,265.986 459.524,241.087 536.794,234.409 " />
+    <polygon fill="none" stroke="#7f7f7f" points="503.098,265.986 459.524,241.087 536.794,234.409 " />
+    <polygon fill="#333333" points="296.902,334.014 340.476,358.913 263.206,365.591 " />
+    <polygon fill="none" stroke="#7f7f7f" points="296.902,334.014 340.476,358.913 263.206,365.591 " />
+    <polygon fill="#333333" points="459.524,241.087 489.286,211.63 536.794,234.409 " />
+    <polygon fill="none" stroke="#7f7f7f" points="459.524,241.087 489.286,211.63 536.794,234.409 " />
+    <polygon fill="#333333" points="340.476,358.913 310.714,388.37 263.206,365.591 " />
+    <polygon fill="none" stroke="#7f7f7f" points="340.476,358.913 310.714,388.37 263.206,365.591 " />
+    <polygon fill="#333333" points="459.524,241.087 431.009,199.509 489.286,211.63 " />
+    <polygon fill="none" stroke="#7f7f7f" points="459.524,241.087 431.009,199.509 489.286,211.63 " />
+    <polygon fill="#333333" points="340.476,358.913 368.991,400.491 310.714,388.37 " />
+    <polygon fill="none" stroke="#7f7f7f" points="340.476,358.913 368.991,400.491 310.714,388.37 " />
+    <polygon fill="#333333" points="459.524,241.087 400,231.973 431.009,199.509 " />
+    <polygon fill="none" stroke="#7f7f7f" points="459.524,241.087 400,231.973 431.009,199.509 " />
+    <polygon fill="#333333" points="340.476,358.913 400,368.027 368.991,400.491 " />
+    <polygon fill="none" stroke="#7f7f7f" points="340.476,358.913 400,368.027 368.991,400.491 " />
+    <polygon fill="#333333" points="400,231.973 368.991,199.509 431.009,199.509 " />
+    <polygon fill="none" stroke="#7f7f7f" points="400,231.973 368.991,199.509 431.009,199.509 " />
+    <polygon fill="#333333" points="400,368.027 431.009,400.491 368.991,400.491 " />
+    <polygon fill="none" stroke="#7f7f7f" points="400,368.027 431.009,400.491 368.991,400.491 " />
+    <polygon fill="#333333" points="400,231.973 340.476,241.087 368.991,199.509 " />
+    <polygon fill="none" stroke="#7f7f7f" points="400,231.973 340.476,241.087 368.991,199.509 " />
+    <polygon fill="#333333" points="400,368.027 459.524,358.913 431.009,400.491 " />
+    <polygon fill="none" stroke="#7f7f7f" points="400,368.027 459.524,358.913 431.009,400.491 " />
+    <polygon fill="#333333" points="340.476,241.087 310.714,211.63 368.991,199.509 " />
+    <polygon fill="none" stroke="#7f7f7f" points="340.476,241.087 310.714,211.63 368.991,199.509 " />
+    <polygon fill="#333333" points="459.524,358.913 489.286,388.37 431.009,400.491 " />
+    <polygon fill="none" stroke="#7f7f7f" points="459.524,358.913 489.286,388.37 431.009,400.491 " />
+    <polygon fill="#333333" points="340.476,241.087 263.206,234.409 310.714,211.63 " />
+    <polygon fill="none" stroke="#7f7f7f" points="340.476,241.087 263.206,234.409 310.714,211.63 " />
+    <polygon fill="#333333" points="459.524,358.913 536.794,365.591 489.286,388.37 " />
+    <polygon fill="none" stroke="#7f7f7f" points="459.524,358.913 536.794,365.591 489.286,388.37 " />
+    <polygon fill="#333333" points="340.476,241.087 296.902,265.986 263.206,234.409 " />
+    <polygon fill="none" stroke="#7f7f7f" points="340.476,241.087 296.902,265.986 263.206,234.409 " />
+    <polygon fill="#333333" points="459.524,358.913 503.098,334.014 536.794,365.591 " />
+    <polygon fill="none" stroke="#7f7f7f" points="459.524,358.913 503.098,334.014 536.794,365.591 " />
+    <polygon fill="#333333" points="296.902,265.986 232.198,265.1 263.206,234.409 " />
+    <polygon fill="none" stroke="#7f7f7f" points="296.902,265.986 232.198,265.1 263.206,234.409 " />
+    <polygon fill="#333333" points="503.098,334.014 567.802,334.9 536.794,365.591 " />
+    <polygon fill="none" stroke="#7f7f7f" points="503.098,334.014 567.802,334.9 536.794,365.591 " />
+    <polygon fill="#333333" points="296.902,265.986 280.952,300 232.198,265.1 " />
+    <polygon fill="none" stroke="#7f7f7f" points="296.902,265.986 280.952,300 232.198,265.1 " />
+    <polygon fill="#333333" points="503.098,334.014 519.048,300 567.802,334.9 " />
+    <polygon fill="none" stroke="#7f7f7f" points="503.098,334.014 519.048,300 567.802,334.9 " />
+    <polygon fill="#333333" points="280.952,300 221.429,300 232.198,265.1 " />
+    <polygon fill="none" stroke="#7f7f7f" points="280.952,300 221.429,300 232.198,265.1 " />
+    <polygon fill="#333333" points="519.048,300 578.571,300 567.802,334.9 " />
+    <polygon fill="none" stroke="#7f7f7f" points="519.048,300 578.571,300 567.802,334.9 " />
+    <polygon fill="#333333" points="578.571,300 629.982,264.787 638.095,300 " />
+    <polygon fill="none" stroke="#7f7f7f" points="578.571,300 629.982,264.787 638.095,300 " />
+    <polygon fill="#333333" points="221.429,300 170.018,335.213 161.905,300 " />
+    <polygon fill="none" stroke="#7f7f7f" points="221.429,300 170.018,335.213 161.905,300 " />
+    <polygon fill="#333333" points="578.571,300 567.802,265.1 629.982,264.787 " />
+    <polygon fill="none" stroke="#7f7f7f" points="578.571,300 567.802,265.1 629.982,264.787 " />
+    <polygon fill="#333333" points="221.429,300 232.198,334.9 170.018,335.213 " />
+    <polygon fill="none" stroke="#7f7f7f" points="221.429,300 232.198,334.9 170.018,335.213 " />
+    <polygon fill="#333333" points="567.802,265.1 606.197,231.973 629.982,264.787 " />
+    <polygon fill="none" stroke="#7f7f7f" points="567.802,265.1 606.197,231.973 629.982,264.787 " />
+    <polygon fill="#333333" points="232.198,334.9 193.803,368.027 170.018,335.213 " />
+    <polygon fill="none" stroke="#7f7f7f" points="232.198,334.9 193.803,368.027 170.018,335.213 " />
+    <polygon fill="#333333" points="567.802,265.1 536.794,234.409 606.197,231.973 " />
+    <polygon fill="none" stroke="#7f7f7f" points="567.802,265.1 536.794,234.409 606.197,231.973 " />
+    <polygon fill="#333333" points="232.198,334.9 263.206,365.591 193.803,368.027 " />
+    <polygon fill="none" stroke="#7f7f7f" points="232.198,334.9 263.206,365.591 193.803,368.027 " />
+    <polygon fill="#333333" points="536.794,234.409 568.359,203.795 606.197,231.973 " />
+    <polygon fill="none" stroke="#7f7f7f" points="536.794,234.409 568.359,203.795 606.197,231.973 " />
+    <polygon fill="#333333" points="263.206,365.591 231.641,396.205 193.803,368.027 " />
+    <polygon fill="none" stroke="#7f7f7f" points="263.206,365.591 231.641,396.205 193.803,368.027 " />
+    <polygon fill="#333333" points="536.794,234.409 489.286,211.63 568.359,203.795 " />
+    <polygon fill="none" stroke="#7f7f7f" points="536.794,234.409 489.286,211.63 568.359,203.795 " />
+    <polygon fill="#333333" points="263.206,365.591 310.714,388.37 231.641,396.205 " />
+    <polygon fill="none" stroke="#7f7f7f" points="263.206,365.591 310.714,388.37 231.641,396.205 " />
+    <polygon fill="#333333" points="489.286,211.63 519.048,182.173 568.359,203.795 " />
+    <polygon fill="none" stroke="#7f7f7f" points="489.286,211.63 519.048,182.173 568.359,203.795 " />
+    <polygon fill="#333333" points="310.714,388.37 280.952,417.827 231.641,396.205 " />
+    <polygon fill="none" stroke="#7f7f7f" points="310.714,388.37 280.952,417.827 231.641,396.205 " />
+    <polygon fill="#333333" points="489.286,211.63 461.624,168.582 519.048,182.173 " />
+    <polygon fill="none" stroke="#7f7f7f" points="489.286,211.63 461.624,168.582 519.048,182.173 " />
+    <polygon fill="#333333" points="310.714,388.37 338.376,431.418 280.952,417.827 " />
+    <polygon fill="none" stroke="#7f7f7f" points="310.714,388.37 338.376,431.418 280.952,417.827 " />
+    <polygon fill="#333333" points="489.286,211.63 431.009,199.509 461.624,168.582 " />
+    <polygon fill="none" stroke="#7f7f7f" points="489.286,211.63 431.009,199.509 461.624,168.582 " />
+    <polygon fill="#333333" points="310.714,388.37 368.991,400.491 338.376,431.418 " />
+    <polygon fill="none" stroke="#7f7f7f" points="310.714,388.37 368.991,400.491 338.376,431.418 " />
+    <polygon fill="#333333" points="431.009,199.509 400,163.946 461.624,168.582 " />
+    <polygon fill="none" stroke="#7f7f7f" points="431.009,199.509 400,163.946 461.624,168.582 " />
+    <polygon fill="#333333" points="368.991,400.491 400,436.054 338.376,431.418 " />
+    <polygon fill="none" stroke="#7f7f7f" points="368.991,400.491 400,436.054 338.376,431.418 " />
+    <polygon fill="#333333" points="431.009,199.509 368.991,199.509 400,163.946 " />
+    <polygon fill="none" stroke="#7f7f7f" points="431.009,199.509 368.991,199.509 400,163.946 " />
+    <polygon fill="#333333" points="368.991,400.491 431.009,400.491 400,436.054 " />
+    <polygon fill="none" stroke="#7f7f7f" points="368.991,400.491 431.009,400.491 400,436.054 " />
+    <polygon fill="#333333" points="368.991,199.509 338.376,168.582 400,163.946 " />
+    <polygon fill="none" stroke="#7f7f7f" points="368.991,199.509 338.376,168.582 400,163.946 " />
+    <polygon fill="#333333" points="431.009,400.491 461.624,431.418 400,436.054 " />
+    <polygon fill="none" stroke="#7f7f7f" points="431.009,400.491 461.624,431.418 400,436.054 " />
+    <polygon fill="#333333" points="368.991,199.509 310.714,211.63 338.376,168.582 " />
+    <polygon fill="none" stroke="#7f7f7f" points="368.991,199.509 310.714,211.63 338.376,168.582 " />
+    <polygon fill="#333333" points="431.009,400.491 489.286,388.37 461.624,431.418 " />
+    <polygon fill="none" stroke="#7f7f7f" points="431.009,400.491 489.286,388.37 461.624,431.418 " />
+    <polygon fill="#333333" points="310.714,211.63 280.952,182.173 338.376,168.582 " />
+    <polygon fill="none" stroke="#7f7f7f" points="310.714,211.63 280.952,182.173 338.376,168.582 " />
+    <polygon fill="#333333" points="489.286,388.37 519.048,417.827 461.624,431.418 " />
+    <polygon fill="none" stroke="#7f7f7f" points="489.286,388.37 519.048,417.827 461.624,431.418 " />
+    <polygon fill="#333333" points="310.714,211.63 231.641,203.795 280.952,182.173 " />
+    <polygon fill="none" stroke="#7f7f7f" points="310.714,211.63 231.641,203.795 280.952,182.173 " />
+    <polygon fill="#333333" points="489.286,388.37 568.359,396.205 519.048,417.827 " />
+    <polygon fill="none" stroke="#7f7f7f" points="489.286,388.37 568.359,396.205 519.048,417.827 " />
+    <polygon fill="#333333" points="310.714,211.63 263.206,234.409 231.641,203.795 " />
+    <polygon fill="none" stroke="#7f7f7f" points="310.714,211.63 263.206,234.409 231.641,203.795 " />
+    <polygon fill="#333333" points="489.286,388.37 536.794,365.591 568.359,396.205 " />
+    <polygon fill="none" stroke="#7f7f7f" points="489.286,388.37 536.794,365.591 568.359,396.205 " />
+    <polygon fill="#333333" points="263.206,234.409 193.803,231.973 231.641,203.795 " />
+    <polygon fill="none" stroke="#7f7f7f" points="263.206,234.409 193.803,231.973 231.641,203.795 " />
+    <polygon fill="#333333" points="536.794,365.591 606.197,368.027 568.359,396.205 " />
+    <polygon fill="none" stroke="#7f7f7f" points="536.794,365.591 606.197,368.027 568.359,396.205 " />
+    <polygon fill="#333333" points="263.206,234.409 232.198,265.1 193.803,231.973 " />
+    <polygon fill="none" stroke="#7f7f7f" points="263.206,234.409 232.198,265.1 193.803,231.973 " />
+    <polygon fill="#333333" points="536.794,365.591 567.802,334.9 606.197,368.027 " />
+    <polygon fill="none" stroke="#7f7f7f" points="536.794,365.591 567.802,334.9 606.197,368.027 " />
+    <polygon fill="#333333" points="232.198,265.1 170.018,264.787 193.803,231.973 " />
+    <polygon fill="none" stroke="#7f7f7f" points="232.198,265.1 170.018,264.787 193.803,231.973 " />
+    <polygon fill="#333333" points="567.802,334.9 629.982,335.213 606.197,368.027 " />
+    <polygon fill="none" stroke="#7f7f7f" points="567.802,334.9 629.982,335.213 606.197,368.027 " />
+    <polygon fill="#333333" points="232.198,265.1 221.429,300 170.018,264.787 " />
+    <polygon fill="none" stroke="#7f7f7f" points="232.198,265.1 221.429,300 170.018,264.787 " />
+    <polygon fill="#333333" points="567.802,334.9 578.571,300 629.982,335.213 " />
+    <polygon fill="none" stroke="#7f7f7f" points="567.802,334.9 578.571,300 629.982,335.213 " />
+    <polygon fill="#333333" points="221.429,300 161.905,300 170.018,264.787 " />
+    <polygon fill="none" stroke="#7f7f7f" points="221.429,300 161.905,300 170.018,264.787 " />
+    <polygon fill="#333333" points="578.571,300 638.095,300 629.982,335.213 " />
+    <polygon fill="none" stroke="#7f7f7f" points="578.571,300 638.095,300 629.982,335.213 " />
+    <polygon fill="none" stroke="#ffff00" points="638.095,300 629.982,264.787 606.197,231.973 568.359,203.795 519.048,182.173 461.624,168.582 400,163.946 338.376,168.582 280.952,182.173 231.641,203.795 193.803,231.973 170.018,264.787 161.905,300 170.018,335.213 193.803,368.027 231.641,396.205 280.952,417.827 338.376,431.418 400,436.054 461.624,431.418 519.048,417.827 568.359,396.205 606.197,368.027 629.982,335.213 " />
+    <use x="638.095" y="300" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="632.482" y="270.631" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="617.179" y="244.238" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="595.708" y="222.514" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="571.581" y="205.672" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="547.192" y="193.059" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="523.769" y="183.773" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="501.757" y="176.997" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="481.17" y="172.096" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="461.826" y="168.613" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="443.464" y="166.232" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="425.801" y="164.747" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="408.554" y="164.033" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="391.446" y="164.033" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="374.199" y="164.747" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="356.536" y="166.232" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="338.174" y="168.613" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="318.83" y="172.096" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="298.243" y="176.997" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="276.231" y="183.773" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="252.808" y="193.059" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="228.419" y="205.672" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="204.292" y="222.514" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="182.821" y="244.238" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="167.518" y="270.631" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="161.905" y="300" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="167.518" y="329.369" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="182.821" y="355.762" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="204.292" y="377.486" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="228.419" y="394.328" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="252.808" y="406.941" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="276.231" y="416.227" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="298.243" y="423.003" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="318.83" y="427.904" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="338.174" y="431.387" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="356.536" y="433.768" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="374.199" y="435.253" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="391.446" y="435.967" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="408.554" y="435.967" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="425.801" y="435.253" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="443.464" y="433.768" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="461.826" y="431.387" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="481.17" y="427.904" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="501.757" y="423.003" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="523.769" y="416.227" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="547.192" y="406.941" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="571.581" y="394.328" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="595.708" y="377.486" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="617.179" y="355.762" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <use x="632.482" y="329.369" xlink:href="#cross"  stroke="#ff00ff" />
+    <use x="400" y="300" xlink:href="#cross"  stroke="#00ffff" />
+    <ellipse cx="400" cy="300" rx="238.095" ry="238.095"  stroke="#ff0000" fill="none" />
+    <ellipse cx="400" cy="300" rx="136.054" ry="136.054"  stroke="#0000ff" fill="none" />
+    <line x1="161.905" y1="436.054" x2="638.095" y2="436.054"  stroke="#00ffff" />
+    <line x1="638.095" y1="163.946" x2="638.095" y2="436.054"  stroke="#00ffff" />
+    <line x1="638.095" y1="163.946" x2="161.905" y2="163.946"  stroke="#00ffff" />
+    <line x1="161.905" y1="436.054" x2="161.905" y2="163.946"  stroke="#00ffff" />
+    <use x="441.198" y="252.429" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="358.802" y="252.429" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="441.198" y="347.571" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="358.802" y="347.571" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="441.198" y="204.857" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="358.802" y="204.857" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="441.198" y="395.143" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="358.802" y="395.143" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="482.396" y="276.214" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="317.604" y="276.214" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="482.396" y="323.786" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="317.604" y="323.786" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="482.396" y="228.643" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="317.604" y="228.643" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="482.396" y="371.357" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="317.604" y="371.357" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="482.396" y="181.071" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="317.604" y="181.071" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="482.396" y="418.929" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="317.604" y="418.929" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="523.594" y="252.429" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="276.406" y="252.429" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="523.594" y="347.571" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="276.406" y="347.571" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="523.594" y="204.857" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="276.406" y="204.857" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="523.594" y="395.143" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="276.406" y="395.143" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="564.792" y="276.214" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="235.208" y="276.214" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="564.792" y="323.786" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="235.208" y="323.786" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="564.792" y="228.643" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="235.208" y="228.643" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="564.792" y="371.357" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="235.208" y="371.357" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="605.99" y="252.429" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="194.01" y="252.429" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="605.99" y="347.571" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="194.01" y="347.571" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="400" y="276.214" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="400" y="323.786" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="400" y="228.643" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="400" y="371.357" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="400" y="181.071" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="400" y="418.929" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="441.198" y="300" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="358.802" y="300" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="523.594" y="300" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="276.406" y="300" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="605.99" y="300" xlink:href="#dot"  stroke="#00ff00" />
+    <use x="194.01" y="300" xlink:href="#dot"  stroke="#00ff00" />
+</svg>

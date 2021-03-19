@@ -28,7 +28,9 @@ public class TestShapes {
 
     shape_test_s st[] = {
             new shape_test_s("disk", new Disk(30.)),
-            new shape_test_s("rectangle", new Rectangle (70., 40.))
+            new shape_test_s("rectangle", new Rectangle(70., 40.)),
+            new shape_test_s("ellipse1", new Ellipse(20, 35)),
+            new shape_test_s("ellipse2", new Ellipse(35, 20)),
     };
 
     @Test
@@ -80,7 +82,7 @@ public class TestShapes {
                     r.draw_point(v, Rgb.rgb_green, PointStyleDot);
                 };
                 Distribution dist = new Distribution();
-                ((ShapeBase)s.s).get_base_pattern(d, dist, false);
+                ((ShapeBase) s.s).get_base_pattern(d, dist, false);
             }
 
             System.out.println(rsvg.write(new StringBuilder()).toString());

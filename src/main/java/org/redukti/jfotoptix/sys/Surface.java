@@ -107,6 +107,15 @@ public class Surface extends Element {
                 new Vector3(sb.v1.x(), sb.v1.y(), ms));
     }
 
+    @Override
+    public String toString() {
+        return "Surface{" +
+                super.toString()+
+                ", shape=" + shape +
+                ", curve=" + curve +
+                '}';
+    }
+
     public static class Builder extends Element.Builder {
         Shape shape;
         Curve curve;

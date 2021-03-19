@@ -38,6 +38,7 @@ public class Tessar {
 
         RendererSvg renderer = new RendererSvg( 800, 400);
         OpticalSystem system = systemBuilder.build();
+        System.out.println(system);
         // draw 2d system layout
         system.draw_2d_fit(renderer);
         system.draw_2d(renderer);

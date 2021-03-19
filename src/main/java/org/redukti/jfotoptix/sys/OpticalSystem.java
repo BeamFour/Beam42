@@ -95,6 +95,15 @@ public class OpticalSystem implements Container {
         return transform3Cache.getLocal2GlobalTransform(e.id());
     }
 
+    @Override
+    public String toString() {
+        return "OpticalSystem{" +
+                "elements=" + elements +
+                ", transform3Cache=" + transform3Cache +
+                ", keep_aspect=" + keep_aspect +
+                '}';
+    }
+
     public static class Builder {
         private final ArrayList<Element.Builder> elements = new ArrayList<>();
         private Transform3Cache transform3Cache;

@@ -54,6 +54,13 @@ public abstract class Element {
         this._system = system;
     }
 
+    @Override
+    public String toString() {
+        return "id=" + id +
+                ", position=" + position +
+                ", transform=" + transform;
+    }
+
     public static Vector3Pair get_bounding_box (List<? extends Element> elementList)
     {
         Vector3 a = new Vector3(Double.MAX_VALUE);

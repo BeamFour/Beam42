@@ -55,4 +55,11 @@ public class Disk extends Round {
         Vector2 hs = new Vector2(_radius, _radius);
         return new Vector2Pair(hs.negate(), hs);
     }
+
+    @Override
+    public String toString() {
+        return "Disk{" +
+                "radius=" + _radius +
+                '}';
+    }
 }

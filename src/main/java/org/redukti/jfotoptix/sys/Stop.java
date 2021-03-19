@@ -33,6 +33,13 @@ public class Stop extends Surface {
         r.group_end ();
     }
 
+    @Override
+    public String toString() {
+        return "Stop{" +
+                "external_radius=" + _external_radius +
+                '}';
+    }
+
     public static class Builder extends Surface.Builder {
         @Override
         public Stop.Builder position(Vector3Pair position) {

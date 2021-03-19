@@ -70,4 +70,8 @@ public class Vector3Pair {
         }
         return new Vector3Pair(new Vector3(n0[0],n0[1],n0[2]), new Vector3(n0[0],n0[1],n0[2]));
     }
+
+    public String toString() {
+        return "[" + v0.toString() + "," + v1.toString() + "]";
+    }
 }

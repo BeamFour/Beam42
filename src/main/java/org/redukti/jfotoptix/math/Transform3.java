@@ -118,4 +118,7 @@ public class Transform3 {
         }
     }
 
+    public String toString() {
+        return "{translation=" + this.translation.toString()+",matrix="+this.linear+",useLinear="+this.useLinear+"}";
+    }
 }

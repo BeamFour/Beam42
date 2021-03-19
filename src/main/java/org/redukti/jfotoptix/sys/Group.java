@@ -85,6 +85,19 @@ public class Group extends Element implements Container {
         }
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("id=" + id +
+                ", position=" + position +
+                ", transform=" + transform)
+                .append(System.lineSeparator());
+        for (Element e: elements) {
+            sb.append('\t').append(e.toString()).append(System.lineSeparator());
+        }
+        return sb.toString();
+    }
+
     public static class Builder extends Element.Builder {
         protected final ArrayList<Element.Builder> elements = new ArrayList<>();
 

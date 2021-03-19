@@ -11,6 +11,11 @@ public class Image extends Surface {
         super(id, p, transform, curve, shape);
     }
 
+    @Override
+    public String toString() {
+        return "Image{" + super.toString() + "}";
+    }
+
     public static class Builder extends Surface.Builder {
         @Override
         public Image.Builder position(Vector3Pair position) {

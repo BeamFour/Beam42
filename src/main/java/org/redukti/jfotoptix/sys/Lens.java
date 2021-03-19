@@ -151,6 +151,11 @@ public class Lens extends Group {
         _stop.set_system(system);
     }
 
+    @Override
+    public String toString() {
+        return "Lens{"+ super.toString() + "}";
+    }
+
     public static class Builder extends Group.Builder {
         List<OpticalSurface.Builder> opticalSurfaces = new ArrayList<>();
         int _last_pos = 0;

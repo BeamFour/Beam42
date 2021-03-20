@@ -122,6 +122,15 @@ public abstract class Element {
             return this;
         }
 
+        public Transform3 transform() {
+            return transform;
+        }
+
+        public Element.Builder transform(Transform3 transform3) {
+            this.transform = transform3;
+            return this;
+        }
+
         public int id() {
             return id;
         }

@@ -15,11 +15,15 @@ public class Vector3Pair {
     public final Vector3 v0;
     public final Vector3 v1;
 
-    public Vector3Pair(Vector3 v0, Vector3 b) {
+    /**
+     * @param v0 First vector, origin / point
+     * @param v1 Second vector, direction / normal
+     */
+    public Vector3Pair(Vector3 v0, Vector3 v1) {
         Objects.requireNonNull(v0);
-        Objects.requireNonNull(b);
+        Objects.requireNonNull(v1);
         this.v0 = v0;
-        this.v1 = b;
+        this.v1 = v1;
     }
 
     public final Vector3 point() {
@@ -50,7 +54,10 @@ public class Vector3Pair {
         return (origin().dotProduct(normal()) - normal().dotProduct(line.origin())) /
                 (line.normal().dotProduct(normal()));
     }
-
+    public Vector3 pl_ln_intersect (Vector3Pair line)
+    {
+        return line.v0.plus(line.v1.times(pl_ln_intersect_scale (line)));
+    }
     /**
      * Swap the given element between the member vectors and return a new pair
      */

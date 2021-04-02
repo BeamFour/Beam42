@@ -33,4 +33,11 @@ public class LightRay {
         this(Vector3Pair.position_000_001);
     }
 
+    public void set_intensity(double intensity) {
+        this._intensity = intensity;
+    }
+
+    public void set_wavelen(double wavelen) {
+        this._wavelen = wavelen;
+    }
 }

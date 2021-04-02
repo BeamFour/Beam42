@@ -3,6 +3,7 @@ package org.redukti.jfotoptix.tracing;
 import org.redukti.jfotoptix.light.LightRay;
 import org.redukti.jfotoptix.material.MaterialBase;
 import org.redukti.jfotoptix.math.Vector3;
+import org.redukti.jfotoptix.math.Vector3Pair;
 import org.redukti.jfotoptix.sys.Element;
 
 /**
@@ -24,8 +25,8 @@ public class TracedRay extends LightRay {
     TracedRay _next;                      // pointer to sibling generated ray
     boolean _lost;                      // does the ray intersect with an element ?
 
-    public TracedRay() {
-        super();
+    public TracedRay(Vector3 origin, Vector3 direction) {
+        super(new Vector3Pair(origin, direction));
         _len = Double.MAX_VALUE;
         _creator = null;
         _parent = null;

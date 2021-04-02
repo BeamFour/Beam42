@@ -90,6 +90,14 @@ public class Vector3 {
         return new Vector3(r);
     }
 
+    public Vector3 minus(Vector3 v)
+    {
+        double[] r = new double[N];
+        for (int i = 0; i < N; i++)
+            r[i] = values[i] - v.values[i];
+        return new Vector3(r);
+    }
+
     public Vector3 negate()
     {
         double[] r = new double[N];

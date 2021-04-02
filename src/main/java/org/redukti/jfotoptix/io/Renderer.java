@@ -12,7 +12,7 @@ import java.util.EnumSet;
  */
 public abstract class Renderer {
     /** Specifies light ray intensity rendering mode */
-    enum IntensityMode
+    public enum IntensityMode
     {
         /** light ray intensity is ignored, no blending is performed while rendering
          ray */

@@ -46,12 +46,24 @@ public abstract class Element {
     public void draw_2d_e(Renderer r, Element ref) {
     }
 
-    Transform3 get_transform_to(Element e) {
+    public Transform3 get_transform_to(Element e) {
         assert (_system != null);
         return e != null
                 ? _system.get_transform(this, e)
                 : _system.get_global_transform(this);
     }
+
+    public Transform3 get_global_transform ()
+    {
+        assert (_system != null);
+        return _system.get_global_transform (this);
+    }
+
+//    public Transform3 get_local_transform ()
+//    {
+//        assert (_system != null);
+//        return _system.get_local_transform (this);
+//    }
 
     void set_system(OpticalSystem system) {
         this._system = system;

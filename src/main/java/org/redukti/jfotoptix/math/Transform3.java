@@ -35,7 +35,7 @@ public class Transform3 {
         this.useLinear = useLinear;
     }
 
-    Vector3 transformLinear(Vector3 v) {
+    public Vector3 transformLinear(Vector3 v) {
         if (useLinear)
             return this.linear.times(v);
         else

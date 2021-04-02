@@ -48,7 +48,7 @@ public class SpectralLine {
     
     /** Create a spectral line with specified wavelen and
      intensity. */
-    SpectralLine (double wavelen, double intensity) {
+    public SpectralLine (double wavelen, double intensity) {
         this._wavelen = wavelen;
         this._intensity = intensity;
     }
@@ -64,7 +64,7 @@ public class SpectralLine {
         return _intensity;
     }
     /** get rgb color associated spectral line, ignore intensity */
-    Rgb get_color ()
+    public Rgb get_color ()
     {
         return get_wavelen_color (_wavelen);
     }

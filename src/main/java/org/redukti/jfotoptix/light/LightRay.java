@@ -40,4 +40,16 @@ public class LightRay {
     public void set_wavelen(double wavelen) {
         this._wavelen = wavelen;
     }
+
+    public Vector3Pair get_ray() {
+        return _ray;
+    }
+
+    public double get_intensity() {
+        return _intensity;
+    }
+
+    public double get_wavelen() {
+        return _wavelen;
+    }
 }

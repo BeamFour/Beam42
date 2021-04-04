@@ -2,8 +2,10 @@ package org.redukti.jfotoptix.tracing;
 
 import org.redukti.jfotoptix.io.Renderer;
 import org.redukti.jfotoptix.patterns.Distribution;
+import org.redukti.jfotoptix.sys.Element;
 import org.redukti.jfotoptix.sys.OpticalSurface;
 
+import java.util.List;
 import java.util.Map;
 
 public class TraceParameters {
@@ -21,7 +23,7 @@ public class TraceParameters {
     };
 
 
-    //std::shared_ptr<Sequence> _sequence;
+    List<Element> _sequence;
     Distribution _default_distribution;
     Map<OpticalSurface, Distribution> _s_distribution;
     int _max_bounce;

@@ -113,7 +113,7 @@ public class Vector3 {
         return new Vector2(z (), y());
     }
 
-    double len ()
+    public double len ()
     {
         double r = 0;
         for (int i = 0; i < N; i++)

@@ -59,13 +59,23 @@ public class TracedRay extends LightRay {
     public void set_creator(Element e) {
         this._creator = e;
     }
+    public Element get_creator() {
+        return _creator;
+    }
+
+    public void set_len(double v) {
+        this._len = v;
+    }
+    public double get_len() {
+        return _len;
+    }
 
     public Vector3 get_position(Element e) {
         return _creator.get_transform_to(e).transform(_ray.origin());
     }
 
     public Vector3 get_direction(Element e) {
-        return _creator.get_transform_to(e).transformLinear(_ray.direction());
+        return _creator.get_transform_to(e).transform_linear(_ray.direction());
     }
 
     public Vector3 get_position() {
@@ -73,7 +83,19 @@ public class TracedRay extends LightRay {
     }
 
     public Vector3 get_direction() {
-        return _creator.get_global_transform().transformLinear(_ray.direction());
+        return _creator.get_global_transform().transform_linear(_ray.direction());
     }
 
+
+    public void set_intercept_intensity(double v) {
+        this._intercept_intensity = v;
+    }
+
+    public MaterialBase get_material() {
+        return _material;
+    }
+
+    public void set_material(MaterialBase mat) {
+        _material = mat;
+    }
 }

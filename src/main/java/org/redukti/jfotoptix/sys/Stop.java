@@ -40,6 +40,10 @@ public class Stop extends Surface {
                 '}';
     }
 
+    public double get_external_radius() {
+        return _external_radius;
+    }
+
     public static class Builder extends Surface.Builder {
         @Override
         public Stop.Builder position(Vector3Pair position) {

@@ -6,11 +6,15 @@ import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.material.Abbe;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
+import org.redukti.jfotoptix.patterns.Distribution;
+import org.redukti.jfotoptix.patterns.Pattern;
 import org.redukti.jfotoptix.shape.Rectangle;
 import org.redukti.jfotoptix.sys.Image;
 import org.redukti.jfotoptix.sys.Lens;
 import org.redukti.jfotoptix.sys.OpticalSystem;
 import org.redukti.jfotoptix.sys.PointSource;
+import org.redukti.jfotoptix.tracing.RayTraceParameters;
+import org.redukti.jfotoptix.tracing.RayTracer;
 
 public class Tessar {
 
@@ -52,6 +56,16 @@ public class Tessar {
         system.draw_2d(renderer);
 
         System.out.println(renderer.write(new StringBuilder()).toString());
+
+        RayTraceParameters parameters = new RayTraceParameters(system);
+
+        RayTracer rayTracer = new RayTracer();
+        parameters.set_default_distribution (
+                new Distribution(Pattern.MeridionalDist, 10, 0.999));
+        // TODO set save generated state on point source
+        System.out.println(parameters.sequenceToString(new StringBuilder()).toString());
+
+        //rayTracer.trace(system, parameters);
     }
 
 

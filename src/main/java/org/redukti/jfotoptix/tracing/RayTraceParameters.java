@@ -8,6 +8,7 @@ import org.redukti.jfotoptix.sys.Element;
 import org.redukti.jfotoptix.sys.OpticalSurface;
 import org.redukti.jfotoptix.sys.OpticalSystem;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -37,11 +38,13 @@ public class RayTraceParameters {
     double _lost_ray_length;
 
     public RayTraceParameters(OpticalSystem system) {
-        this._sequence = system.elements();
+        this._sequence = new ArrayList<>();
         this._sequential_mode = true;
         this._intensity_mode = RayTracer.TraceIntensityMode.Simpletrace;
         this._propagation_mode = PropagationMode.RayPropagation;
         this._max_bounce = 50;
+        this._unobstructed = false;
+        this._lost_ray_length = 1000;
         for (Element e: system.elements()) {
             add(e);
         }
@@ -86,5 +89,15 @@ public class RayTraceParameters {
         return _unobstructed;
     }
 
+    public void set_default_distribution(Distribution distribution) {
+        _default_distribution = distribution;
+    }
+
+    public StringBuilder sequenceToString(StringBuilder sb) {
+        for (Element e: _sequence) {
+            sb.append(e.toString()).append(System.lineSeparator());
+        }
+        return sb;
+    }
 
 }

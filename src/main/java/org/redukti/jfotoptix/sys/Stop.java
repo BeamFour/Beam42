@@ -36,7 +36,8 @@ public class Stop extends Surface {
     @Override
     public String toString() {
         return "Stop{" +
-                "external_radius=" + _external_radius +
+                super.toString() +
+                ", external_radius=" + _external_radius +
                 '}';
     }
 

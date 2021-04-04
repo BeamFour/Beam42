@@ -99,7 +99,6 @@ public class OpticalSystem implements Container {
 //        return transform3Cache.getGlobal2LocalTransform(e.id());
 //    }
 
-
     @Override
     public String toString() {
         return "OpticalSystem{" +

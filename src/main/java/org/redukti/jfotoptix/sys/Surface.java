@@ -109,11 +109,9 @@ public class Surface extends Element {
 
     @Override
     public String toString() {
-        return "Surface{" +
-                super.toString()+
+        return super.toString()+
                 ", shape=" + shape +
-                ", curve=" + curve +
-                '}';
+                ", curve=" + curve;
     }
 
     public static class Builder extends Element.Builder {

@@ -6,6 +6,8 @@ import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 import org.redukti.jfotoptix.shape.Shape;
 
+import java.util.Objects;
+
 public class OpticalSurface extends Surface {
     MaterialBase[] mat = new MaterialBase[2];
 
@@ -23,6 +25,14 @@ public class OpticalSurface extends Surface {
 
     public MaterialBase get_material(int i) {
         return mat[i];
+    }
+
+    public String toString() {
+        return "OpticalSurface{" +
+                super.toString() +
+                ", left material=" + Objects.toString(mat[0]) +
+                ", right material=" + Objects.toString(mat[1]) +
+                '}';
     }
 
     public static class Builder extends Surface.Builder {

@@ -37,6 +37,10 @@ public class PointSource extends RaySource {
         return _mode;
     }
 
+    public String toString() {
+        return "PointSource{" + super.toString() + "}";
+    }
+
     public static class Builder extends RaySource.Builder {
 
         SourceInfinityMode _mode;

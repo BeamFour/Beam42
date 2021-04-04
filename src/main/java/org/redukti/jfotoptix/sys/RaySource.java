@@ -40,5 +40,15 @@ public class RaySource extends Element {
             _min_intensity = Math.min (_min_intensity, l.get_intensity ());
             return this;
         }
+
+        public Builder add_spectral_line (double wavelen)
+        {
+            SpectralLine l = new SpectralLine(wavelen, 1.0);
+            _spectrum.add (l);
+            _max_intensity = Math.max (_max_intensity, l.get_intensity ());
+            _min_intensity = Math.min (_min_intensity, l.get_intensity ());
+            return this;
+        }
+
     }
 }

@@ -41,7 +41,7 @@ public class PointSource extends RaySource {
 
         SourceInfinityMode _mode;
 
-        Builder(SourceInfinityMode m, Vector3 pos_dir) {
+        public Builder(SourceInfinityMode m, Vector3 pos_dir) {
             position(m == SourceInfinityMode.SourceAtInfinity
                     // position of infinity source is only used for trace::Sequence
                     // sort See
@@ -51,10 +51,15 @@ public class PointSource extends RaySource {
             _mode = m;
         }
 
+        @Override
+        public PointSource.Builder add_spectral_line(double wavelen) {
+            super.add_spectral_line(wavelen);
+            return this;
+        }
 
         @Override
-        public Element build() {
-            return null;
+        public PointSource build() {
+            return new PointSource(id, position, transform, _min_intensity, _max_intensity, _spectrum);
         }
     }
 

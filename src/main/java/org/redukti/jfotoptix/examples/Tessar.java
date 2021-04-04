@@ -2,6 +2,7 @@ package org.redukti.jfotoptix.examples;
 
 import org.redukti.jfotoptix.curve.Flat;
 import org.redukti.jfotoptix.io.RendererSvg;
+import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.material.Abbe;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
@@ -9,6 +10,7 @@ import org.redukti.jfotoptix.shape.Rectangle;
 import org.redukti.jfotoptix.sys.Image;
 import org.redukti.jfotoptix.sys.Lens;
 import org.redukti.jfotoptix.sys.OpticalSystem;
+import org.redukti.jfotoptix.sys.PointSource;
 
 public class Tessar {
 
@@ -35,6 +37,12 @@ public class Tessar {
                 .curve(Flat.flat)
                 .shape(new Rectangle(5.0*2));
         systemBuilder.add(imagePlaneBuilder);
+
+        PointSource.Builder ps = new PointSource.Builder(PointSource.SourceInfinityMode.SourceAtInfinity, Vector3.vector3_001)
+                .add_spectral_line(SpectralLine.d)
+                .add_spectral_line(SpectralLine.C)
+                .add_spectral_line(SpectralLine.F);
+        systemBuilder.add(ps);
 
         RendererSvg renderer = new RendererSvg( 800, 400);
         OpticalSystem system = systemBuilder.build();

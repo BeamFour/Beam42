@@ -74,6 +74,11 @@ public abstract class Element {
         return _system.get_transform (this, e).transform (Vector3.vector3_0);
     }
 
+    public Vector3 get_position ()
+    {
+        return _system.get_global_transform (this).transform (Vector3.vector3_0);
+    }
+
     @Override
     public String toString() {
         return "id=" + id +

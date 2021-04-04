@@ -4,12 +4,8 @@ import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
-import org.redukti.jfotoptix.patterns.Distribution;
-import org.redukti.jfotoptix.tracing.TraceParameters;
-import org.redukti.jfotoptix.tracing.TracedRay;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 public class PointSource extends RaySource {
 

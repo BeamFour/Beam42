@@ -13,10 +13,7 @@ import java.util.function.Consumer;
 
 public class RayGenerator {
 
-    Set<Double> _wavelengths = new HashSet<>();
-    List<TracedRay> _rays = new ArrayList<>();
-
-    List<TracedRay> get_lightrays_(TraceParameters parameters,
+       List<TracedRay> get_lightrays_(RayTraceParameters parameters,
                                    PointSource source,
                                    Element target,
                                    PointSource.SourceInfinityMode mode) {
@@ -67,16 +64,15 @@ public class RayGenerator {
         return rays;
     }
 
-    void generate_rays_simple(TraceParameters parameters, PointSource source, List<Element> targets) {
-        for (SpectralLine l : source.spectrum()) {
-            add_ray_wavelen(l.get_wavelen());
-        }
+    public List<TracedRay> generate_rays_simple(RayTraceParameters parameters, PointSource source, List<Element> targets) {
+//        Set<Double> wavelengths = new HashSet<>();
+//        for (SpectralLine l : source.spectrum()) {
+//            wavelengths.add(l.get_wavelen());
+//        }
+        List<TracedRay> rays = new ArrayList<>();
         for (Element target : targets) {
-            _rays.addAll(get_lightrays_(parameters, source, target, source.mode()));
+            rays.addAll(get_lightrays_(parameters, source, target, source.mode()));
         }
-    }
-
-    private void add_ray_wavelen(double wavelen) {
-        _wavelengths.add(wavelen);
+        return rays;
     }
 }

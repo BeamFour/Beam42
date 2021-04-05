@@ -5,6 +5,7 @@ import org.redukti.jfotoptix.curve.Flat;
 import org.redukti.jfotoptix.curve.Sphere;
 import org.redukti.jfotoptix.io.Renderer;
 import org.redukti.jfotoptix.material.Abbe;
+import org.redukti.jfotoptix.material.Air;
 import org.redukti.jfotoptix.material.MaterialBase;
 import org.redukti.jfotoptix.material.Solid;
 import org.redukti.jfotoptix.math.*;
@@ -159,7 +160,7 @@ public class Lens extends Group {
 
     public static class Builder extends Group.Builder {
         double _last_pos = 0;
-        MaterialBase _next_mat = null;
+        MaterialBase _next_mat = Air.air;
         Stop.Builder _stop = null;
 
         @Override
@@ -196,6 +197,9 @@ public class Lens extends Group {
 
         public Lens.Builder add_surface(Curve curve, Shape shape, double thickness, MaterialBase glass) {
             assert (thickness >= 0.);
+            if (glass == null) {
+                glass = Air.air;
+            }
             OpticalSurface.Builder surface = new OpticalSurface.Builder()
                     .position(new Vector3Pair(new Vector3(0, 0, _last_pos), Vector3.vector3_001))
                     .curve(curve)

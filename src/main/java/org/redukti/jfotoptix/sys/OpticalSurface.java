@@ -1,6 +1,7 @@
 package org.redukti.jfotoptix.sys;
 
 import org.redukti.jfotoptix.curve.Curve;
+import org.redukti.jfotoptix.material.Air;
 import org.redukti.jfotoptix.material.MaterialBase;
 import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector3Pair;
@@ -36,8 +37,8 @@ public class OpticalSurface extends Surface {
     }
 
     public static class Builder extends Surface.Builder {
-        MaterialBase left;
-        MaterialBase right;
+        MaterialBase left = Air.air;
+        MaterialBase right = Air.air;
 
         @Override
         public OpticalSurface.Builder position(Vector3Pair position) {

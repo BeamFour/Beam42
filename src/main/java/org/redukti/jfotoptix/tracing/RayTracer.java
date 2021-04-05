@@ -242,11 +242,11 @@ public class RayTracer {
 
         // refracted ray direction
         Vector3 direction = refract(surface, local, intersect.normal(), index);
-        if (direction != null) {
+        if (direction == null) {
+            // total internal reflection
             Vector3 o = intersect.origin();
             Vector3 dir = reflect(surface, local, intersect.normal());
             TracedRay r = new TracedRay(o, dir);
-            // total internal reflection
 
             r.set_wavelen(wl);
             r.set_intensity(incident.get_intensity());

@@ -3,25 +3,23 @@ package org.redukti.jfotoptix.light;
 import org.redukti.jfotoptix.math.Vector3Pair;
 
 /**
- Describe a ray of light
-
- This class is used to describe a ray of light. It contains
- geometrical and physical information about a light ray.
+ * Describe a ray of light
+ * <p>
+ * This class is used to describe a ray of light. It contains
+ * geometrical and physical information about a light ray.
  */
 public class LightRay {
     protected Vector3Pair _ray;
     protected double _wavelen;
     protected double _intensity;
 
-    public LightRay (Vector3Pair ray, double intensity, double wavelen)
-    {
+    public LightRay(Vector3Pair ray, double intensity, double wavelen) {
         this._ray = ray;
         this._intensity = intensity;
         this._wavelen = wavelen;
     }
 
-    public LightRay (Vector3Pair ray)
-    {
+    public LightRay(Vector3Pair ray) {
         this(ray, 1.0, SpectralLine.d);
     }
 
@@ -52,4 +50,9 @@ public class LightRay {
     public double get_wavelen() {
         return _wavelen;
     }
+
+    public String toString() {
+        return "LightRay{wavelen=" + _wavelen + ",origin=" + _ray.origin() + ",direction=" + _ray.direction() + '}';
+    }
+
 }

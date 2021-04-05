@@ -13,6 +13,7 @@ import org.redukti.jfotoptix.shape.Shape;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Lens extends Group {
 
@@ -22,13 +23,13 @@ public class Lens extends Group {
     }
 
     OpticalSystem opticalSystem;
-    List<OpticalSurface> surfaces;
+    List<OpticalSurface> _surfaces;
     final Stop _stop;
 
-    public Lens(int id, Vector3Pair position, Transform3 transform, List<OpticalSurface> elementList, Stop stop) {
+    public Lens(int id, Vector3Pair position, Transform3 transform, List<OpticalSurface> surfaces, List<Element> elementList, Stop stop) {
         super(id, position, transform, elementList);
         this._stop = stop;
-        this.surfaces = elementList;
+        this._surfaces = surfaces;
     }
 
     @Override
@@ -41,7 +42,7 @@ public class Lens extends Group {
         if (elements().isEmpty())
             return;
 
-        OpticalSurface first = surfaces.get(0);
+        OpticalSurface first = _surfaces.get(0);
         if (first.get_material(1) != first.get_material(0)) {
             if (!grp) {
                 r.group_begin("");
@@ -50,9 +51,9 @@ public class Lens extends Group {
             first.draw_2d_e(r, ref);
         }
 
-        for (int i = 0; i < surfaces.size() - 1; i++) {
-            OpticalSurface left = surfaces.get(i);
-            OpticalSurface right = surfaces.get(i + 1);
+        for (int i = 0; i < _surfaces.size() - 1; i++) {
+            OpticalSurface left = _surfaces.get(i);
+            OpticalSurface right = _surfaces.get(i + 1);
 
             if (left.get_material(1) == null || !(left.get_material(1) instanceof Solid)) {
                 if (grp) {
@@ -157,22 +158,18 @@ public class Lens extends Group {
     }
 
     public static class Builder extends Group.Builder {
-        List<OpticalSurface.Builder> opticalSurfaces = new ArrayList<>();
         double _last_pos = 0;
         MaterialBase _next_mat = null;
         Stop.Builder _stop = null;
 
         @Override
         public Element build() {
-            Stop stop = null;
-            ArrayList<OpticalSurface> myels = new ArrayList<>();
-            ArrayList<Element> els = new ArrayList<>();
-            for (OpticalSurface.Builder e : opticalSurfaces) {
-                OpticalSurface s = e.build();
-                myels.add(s);
-                els.add(s);
-            }
-            return new Lens(id, position, transform, myels, _stop.build());
+            ArrayList<Element> elements = getElements();
+            Stop stop = (Stop) elements.stream().filter(e -> e instanceof Stop).findFirst().orElse(null);
+            List<OpticalSurface> surfaces = elements.stream().filter(e -> e instanceof OpticalSurface)
+                    .map (e -> (OpticalSurface)e)
+                    .collect(Collectors.toList());
+            return new Lens(id, position, transform, surfaces, elements, stop);
         }
 
         /**
@@ -205,7 +202,6 @@ public class Lens extends Group {
                     .shape(shape)
                     .leftMaterial(_next_mat)
                     .rightMaterial(glass);
-            opticalSurfaces.add(surface);
             _next_mat = glass;
             _last_pos += thickness;
             add(surface);
@@ -221,6 +217,7 @@ public class Lens extends Group {
                 throw new IllegalArgumentException("Can not add more than one stop per Lens");
             _stop = new Stop.Builder()
                     .position(new Vector3Pair(new Vector3(0, 0, _last_pos), Vector3.vector3_001))
+                    .curve(Flat.flat)
                     .shape(shape);
             _last_pos += thickness;
             add(_stop);

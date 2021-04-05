@@ -146,6 +146,8 @@ public class RayTracer {
         } else if (e instanceof Stop) {
             Stop surface = (Stop) e;
             process_rays(surface, TraceIntensityMode.Simpletrace, result, input);
+        } else if (e instanceof Image) {
+            ;
         } else {
             throw new UnsupportedOperationException();
         }

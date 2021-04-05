@@ -98,4 +98,8 @@ public class TracedRay extends LightRay {
     public void set_material(MaterialBase mat) {
         _material = mat;
     }
+
+    public String toString() {
+        return "TracedRay{src="+_creator.id()+"wavelen="+_wavelen+",origin="+_ray.origin()+",direction="+_ray.direction()+",len="+_len+'}';
+    }
 }

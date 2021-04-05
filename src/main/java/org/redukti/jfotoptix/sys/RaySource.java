@@ -37,10 +37,6 @@ public class RaySource extends Element {
         double _max_intensity = 1.0;
         MaterialBase _mat = null;
 
-        public Builder() {
-            add_spectral_line(new SpectralLine(SpectralLine.d, 1.0));
-        }
-
         public Builder add_spectral_line (SpectralLine l)
         {
             _spectrum.add (l);

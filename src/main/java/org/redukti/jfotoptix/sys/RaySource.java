@@ -1,6 +1,8 @@
 package org.redukti.jfotoptix.sys;
 
 import org.redukti.jfotoptix.light.SpectralLine;
+import org.redukti.jfotoptix.material.Air;
+import org.redukti.jfotoptix.material.MaterialBase;
 import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 
@@ -11,6 +13,7 @@ public class RaySource extends Element {
 
     List<SpectralLine> _spectrum;
     double _min_intensity, _max_intensity;
+    MaterialBase _mat = Air.air; // FIXME - should be settable
 
     public RaySource(int id, Vector3Pair p, Transform3 transform, double min_intensity, double max_intensity, List<SpectralLine> spectrum) {
         super(id, p, transform);
@@ -23,11 +26,16 @@ public class RaySource extends Element {
         return _spectrum;
     }
 
+    public MaterialBase get_material() {
+        return _mat;
+    }
+
     public static abstract class Builder extends Element.Builder {
 
         List<SpectralLine> _spectrum = new ArrayList<>();
         double _min_intensity = 1.0;
         double _max_intensity = 1.0;
+        MaterialBase _mat = null;
 
         public Builder() {
             add_spectral_line(new SpectralLine(SpectralLine.d, 1.0));
@@ -47,6 +55,11 @@ public class RaySource extends Element {
             _spectrum.add (l);
             _max_intensity = Math.max (_max_intensity, l.get_intensity ());
             _min_intensity = Math.min (_min_intensity, l.get_intensity ());
+            return this;
+        }
+
+        public Builder set_material(MaterialBase mat) {
+            _mat = mat;
             return this;
         }
 

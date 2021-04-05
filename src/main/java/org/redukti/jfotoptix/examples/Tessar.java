@@ -65,7 +65,7 @@ public class Tessar {
         // TODO set save generated state on point source
         System.out.println(parameters.sequenceToString(new StringBuilder()).toString());
 
-        //rayTracer.trace(system, parameters);
+        rayTracer.trace(system, parameters);
     }
 
 

@@ -9,6 +9,7 @@ import org.redukti.jfotoptix.sys.OpticalSurface;
 import org.redukti.jfotoptix.sys.OpticalSystem;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public class RayTraceParameters {
 
     List<Element> _sequence;
     Distribution _default_distribution;
-    Map<OpticalSurface, Distribution> _s_distribution;
+    Map<OpticalSurface, Distribution> _s_distribution = new HashMap<>();
     int _max_bounce;
     RayTracer.TraceIntensityMode _intensity_mode;
     boolean _sequential_mode;
@@ -73,7 +74,7 @@ public class RayTraceParameters {
     }
 
     public double get_lost_ray_length () {
-        return 0.0;
+        return _lost_ray_length;
     }
 
     public Distribution get_distribution (OpticalSurface s)

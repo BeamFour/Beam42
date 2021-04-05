@@ -30,8 +30,6 @@ public class RayTracer {
         Polarizedtrace
     }
 
-    ;
-
     public RayTraceResults trace(OpticalSystem system, RayTraceParameters parameters) {
         RayTraceResults result = new RayTraceResults(system);
         result.parameters = parameters;
@@ -104,7 +102,8 @@ public class RayTracer {
                 List<Element> elist = new ArrayList<>();
                 if (entrance != null)
                     elist.add(entrance);
-                rayGenerator.generate_rays_simple(parameters, source, elist);
+                List<TracedRay> rays = rayGenerator.generate_rays_simple(parameters, source, elist);
+                generated.addAll(rays);
             } else {
                 process_rays(element, m, result, source_rays);
                 // swap ray buffers
@@ -133,14 +132,24 @@ public class RayTracer {
     }
 
     private void process_rays_polarized(Element e, RayTraceResults result, List<TracedRay> input) {
+        throw new UnsupportedOperationException();
     }
 
     private void process_rays_intensity(Element e, RayTraceResults result, List<TracedRay> input) {
+        throw new UnsupportedOperationException();
     }
 
     private void process_rays_simple(Element e, RayTraceResults result, List<TracedRay> input) {
+        if (e instanceof OpticalSurface) {
+            OpticalSurface surface = (OpticalSurface) e;
+            process_rays(surface, TraceIntensityMode.Simpletrace, result, input);
+        } else if (e instanceof Stop) {
+            Stop surface = (Stop) e;
+            process_rays(surface, TraceIntensityMode.Simpletrace, result, input);
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
-
 
     void process_rays(OpticalSurface surface, TraceIntensityMode m, RayTraceResults result,
                       List<TracedRay> input) {
@@ -388,7 +397,7 @@ public class RayTracer {
         boolean ir = true; // FIXME  _intercept_reemit || result.get_params ().is_sequential ();
 
         if (ir && surface.get_shape().inside(v)) {
-            // reemit incident ray
+            // re-emit incident ray
             TracedRay r = new TracedRay(intersect.origin(), incident.get_ray().direction());
 
             r.set_wavelen(incident.get_wavelen());

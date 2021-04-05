@@ -15,8 +15,8 @@ public class RayTraceResults {
     static final class RaysAtElement {
             List<TracedRay> _intercepted = new ArrayList<>(); // list of rays for each intercepted surfaces
             List<TracedRay> _generated = new ArrayList<>(); // list of rays for each generator surfaces
-            boolean _save_intercepted_list = false;
-            boolean _save_generated_list = false;
+            boolean _save_intercepted_list = true;
+            boolean _save_generated_list = true;
     }
 
     Map<Integer, RaysAtElement> raysByElement = new HashMap<>();

@@ -137,20 +137,18 @@ public class RayTracer {
     }
 
     private List<TracedRay> process_rays_simple(Element e, RayTraceResults result, List<TracedRay> input) {
-        if (e instanceof OpticalSurface) {
-            OpticalSurface surface = (OpticalSurface) e;
+        if (e instanceof Surface) {
+            Surface surface = (Surface) e;
             return process_rays(surface, TraceIntensityMode.Simpletrace, result, input);
         } else if (e instanceof Stop) {
             Stop surface = (Stop) e;
             return process_rays(surface, TraceIntensityMode.Simpletrace, result, input);
-        } else if (e instanceof Image) {
-            return Collections.emptyList();
         } else {
             throw new UnsupportedOperationException();
         }
     }
 
-    List<TracedRay> process_rays(OpticalSurface surface, TraceIntensityMode m, RayTraceResults result,
+    List<TracedRay> process_rays(Surface surface, TraceIntensityMode m, RayTraceResults result,
                       List<TracedRay> input) {
         RayTraceParameters params = result._parameters;
         List<TracedRay> rays = new ArrayList<>();
@@ -210,7 +208,7 @@ public class RayTracer {
         } else if (surface instanceof Stop) {
             return trace_ray_simple((Stop) surface, result, incident, local, pt);
         } else {
-            throw new UnsupportedOperationException();
+            return null;
         }
     }
 
@@ -296,8 +294,7 @@ public class RayTracer {
      * @param normal Normal to the intercept
      * @param mu     Ration of refractive index
      */
-    Vector3
-    compute_refraction(OpticalSurface surface, Vector3Pair ray, Vector3 normal, double mu) {
+    Vector3 compute_refraction(OpticalSurface surface, Vector3Pair ray, Vector3 normal, double mu) {
         Vector3 N = normal.times(-1.0); // Because we changed sign at intersection
         // See Feder paper p632
         double O2 = N.dotProduct(N);
@@ -356,7 +353,7 @@ public class RayTracer {
         return ray.direction().minus(normal.times(2.0 * cosi));
     }
 
-    private Vector3Pair intersect(OpticalSurface surface, RayTraceParameters params, Vector3Pair ray) {
+    private Vector3Pair intersect(Surface surface, RayTraceParameters params, Vector3Pair ray) {
         Vector3 origin = surface.get_curve().intersect(ray);
         if (origin == null)
             return null;

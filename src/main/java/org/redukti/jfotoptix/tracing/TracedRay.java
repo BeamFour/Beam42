@@ -122,6 +122,6 @@ public class TracedRay extends LightRay {
     }
 
     public String toString() {
-        return "TracedRay{src=" + _creator.id() + "wavelen=" + _wavelen + ",origin=" + _ray.origin() + ",direction=" + _ray.direction() + ",len=" + _len + '}';
+        return "TracedRay{src=" + _creator.id() + ",wavelen=" + _wavelen + ",origin=" + _ray.origin() + ",direction=" + _ray.direction() + ",len=" + _len + '}';
     }
 }

@@ -70,7 +70,7 @@ public class SpectralLine {
     }
 
     /** get rgb color associated with wavelen */
-    static Rgb get_wavelen_color (double wl) {
+    public static Rgb get_wavelen_color (double wl) {
         // based on algorithm from Dan Bruton
         // (www.physics.sfasu.edu/astro/color.html)
 

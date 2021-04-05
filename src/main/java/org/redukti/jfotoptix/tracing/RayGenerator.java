@@ -16,7 +16,9 @@ import java.util.function.Consumer;
 
 public class RayGenerator {
 
-       List<TracedRay> get_lightrays_(RayTraceParameters parameters,
+       List<TracedRay> get_lightrays_(
+               RayTraceResults result,
+               RayTraceParameters parameters,
                                    PointSource source,
                                    Element target,
                                    PointSource.SourceInfinityMode mode) {
@@ -52,7 +54,7 @@ public class RayGenerator {
 
             for (SpectralLine l : source.spectrum()) {
                 // generated rays use source coordinates
-                TracedRay ray = new TracedRay(position, direction);
+                TracedRay ray = result.newRay(position, direction);
                 ray.set_creator(source);
                 ray.set_intensity(l.get_intensity()); // FIXME depends on distance from
                 // source and pattern density
@@ -69,14 +71,14 @@ public class RayGenerator {
         return rays;
     }
 
-    public List<TracedRay> generate_rays_simple(RayTraceParameters parameters, PointSource source, List<Element> targets) {
+    public List<TracedRay> generate_rays_simple(RayTraceResults result, RayTraceParameters parameters, PointSource source, List<Element> targets) {
 //        Set<Double> wavelengths = new HashSet<>();
 //        for (SpectralLine l : source.spectrum()) {
 //            wavelengths.add(l.get_wavelen());
 //        }
         List<TracedRay> rays = new ArrayList<>();
         for (Element target : targets) {
-            rays.addAll(get_lightrays_(parameters, source, target, source.mode()));
+            rays.addAll(get_lightrays_(result, parameters, source, target, source.mode()));
         }
         return rays;
     }

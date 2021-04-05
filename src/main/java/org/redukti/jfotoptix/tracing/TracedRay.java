@@ -34,14 +34,14 @@ public class TracedRay extends LightRay {
         _lost = true;
     }
 
-    public TracedRay(LightRay r) {
-        super(r);
-        _len = Double.MAX_VALUE;
-        _creator = null;
-        _parent = null;
-        _child = null;
-        _lost = true;
-    }
+//    public TracedRay(LightRay r) {
+//        super(r);
+//        _len = Double.MAX_VALUE;
+//        _creator = null;
+//        _parent = null;
+//        _child = null;
+//        _lost = true;
+//    }
 
     public void add_generated(TracedRay r) {
         assert (r._parent == null);
@@ -59,6 +59,7 @@ public class TracedRay extends LightRay {
     public void set_creator(Element e) {
         this._creator = e;
     }
+
     public Element get_creator() {
         return _creator;
     }
@@ -66,6 +67,7 @@ public class TracedRay extends LightRay {
     public void set_len(double v) {
         this._len = v;
     }
+
     public double get_len() {
         return _len;
     }
@@ -99,7 +101,27 @@ public class TracedRay extends LightRay {
         _material = mat;
     }
 
+    public boolean is_lost() {
+        return _lost;
+    }
+
+    public Element get_intercept_element() {
+        return _i_element;
+    }
+
+    public Vector3 get_intercept_point() {
+        return _point;
+    }
+
+    public TracedRay get_next_child() {
+        return _next;
+    }
+
+    public TracedRay get_first_child() {
+        return _child;
+    }
+
     public String toString() {
-        return "TracedRay{src="+_creator.id()+"wavelen="+_wavelen+",origin="+_ray.origin()+",direction="+_ray.direction()+",len="+_len+'}';
+        return "TracedRay{src=" + _creator.id() + "wavelen=" + _wavelen + ",origin=" + _ray.origin() + ",direction=" + _ray.direction() + ",len=" + _len + '}';
     }
 }

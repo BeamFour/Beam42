@@ -14,6 +14,8 @@ import org.redukti.jfotoptix.sys.Lens;
 import org.redukti.jfotoptix.sys.OpticalSystem;
 import org.redukti.jfotoptix.sys.PointSource;
 import org.redukti.jfotoptix.tracing.RayTraceParameters;
+import org.redukti.jfotoptix.tracing.RayTraceRenderer;
+import org.redukti.jfotoptix.tracing.RayTraceResults;
 import org.redukti.jfotoptix.tracing.RayTracer;
 
 public class Tessar {
@@ -55,8 +57,6 @@ public class Tessar {
         system.draw_2d_fit(renderer);
         system.draw_2d(renderer);
 
-        System.out.println(renderer.write(new StringBuilder()).toString());
-
         RayTraceParameters parameters = new RayTraceParameters(system);
 
         RayTracer rayTracer = new RayTracer();
@@ -65,7 +65,10 @@ public class Tessar {
         // TODO set save generated state on point source
         System.out.println(parameters.sequenceToString(new StringBuilder()).toString());
 
-        rayTracer.trace(system, parameters);
+        RayTraceResults result = rayTracer.trace(system, parameters);
+        RayTraceRenderer.draw_2d(renderer, result, false, null);
+
+        System.out.println(renderer.write(new StringBuilder()).toString());
     }
 
 

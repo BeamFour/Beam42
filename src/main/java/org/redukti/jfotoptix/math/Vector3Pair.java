@@ -83,4 +83,8 @@ public class Vector3Pair {
     public String toString() {
         return "[" + v0.toString() + "," + v1.toString() + "]";
     }
+
+    public double x1() {
+        return v1.x();
+    }
 }

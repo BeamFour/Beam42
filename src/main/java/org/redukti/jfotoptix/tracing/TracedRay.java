@@ -34,15 +34,6 @@ public class TracedRay extends LightRay {
         _lost = true;
     }
 
-//    public TracedRay(LightRay r) {
-//        super(r);
-//        _len = Double.MAX_VALUE;
-//        _creator = null;
-//        _parent = null;
-//        _child = null;
-//        _lost = true;
-//    }
-
     public void add_generated(TracedRay r) {
         assert (r._parent == null);
         r._parent = this;
@@ -87,7 +78,6 @@ public class TracedRay extends LightRay {
     public Vector3 get_direction() {
         return _creator.get_global_transform().transform_linear(_ray.direction());
     }
-
 
     public void set_intercept_intensity(double v) {
         this._intercept_intensity = v;

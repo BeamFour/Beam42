@@ -11,14 +11,14 @@ public class Abbe extends Dielectric {
     }
 
     double _n, _q, _a;
-    AbbeFormula m;
+    AbbeFormula _m;
 
     /**
      * Create an abbe glass model
      */
     public Abbe(AbbeFormula m, double n, double v, double dpgF) {
         super(m.name());
-        this.m = m;
+        this._m = m;
         _n = n;
         _q = (n - 1.) / v;
         _a = (v * -0.001682) + 0.6438 + dpgF;
@@ -35,7 +35,7 @@ public class Abbe extends Dielectric {
         double w3 = w2 * wl;
         double f;
 
-        switch (m) {
+        switch (_m) {
             // fitting code can be found is /extra/abbe_model_fit/ directory
 
             case AbbeVd:

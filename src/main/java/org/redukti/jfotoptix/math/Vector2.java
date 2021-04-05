@@ -14,15 +14,15 @@ public class Vector2 {
 
     private static final int N = 2;
 
-    final double[] values;
+    final double[] _values;
 
     public Vector2(double x, double y) {
         if (Double.isNaN(x) || Double.isNaN(y)) {
             throw new IllegalArgumentException("NaN");
         }
-        this.values = new double[N];
-        this.values[0] = x;
-        this.values[1] = y;
+        this._values = new double[N];
+        this._values[0] = x;
+        this._values[1] = y;
     }
 
     public Vector2(double v) {
@@ -30,26 +30,26 @@ public class Vector2 {
     }
 
     private Vector2(double[] values) {
-        this.values = values;
+        this._values = values;
     }
 
     public final double x() {
-        return this.values[0];
+        return this._values[0];
     }
     public final double y() {
-        return this.values[1];
+        return this._values[1];
     }
 
     public final Vector2 x(double value) { return new Vector2(value, y()); }
     public final Vector2 y(double value) { return new Vector2(x(), value); }
 
-    public double v(int i) {return this.values[i];}
+    public double v(int i) {return this._values[i];}
 
     public Vector2 plus(Vector2 v)
     {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
-            r[i] = values[i] + v.values[i];
+            r[i] = _values[i] + v._values[i];
         return new Vector2(r);
     }
 
@@ -57,21 +57,21 @@ public class Vector2 {
     {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
-            r[i] = values[i] - v.values[i];
+            r[i] = _values[i] - v._values[i];
         return new Vector2(r);
     }
 
     public Vector2 divide(double scale) {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
-            r[i] = values[i] / scale;
+            r[i] = _values[i] / scale;
         return new Vector2(r);
     }
 
     public Vector2 times(double scale) {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
-            r[i] = values[i] * scale;
+            r[i] = _values[i] * scale;
         return new Vector2(r);
     }
 
@@ -82,7 +82,7 @@ public class Vector2 {
     {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
-            r[i] = values[i] / v.values[i];
+            r[i] = _values[i] / v._values[i];
         return new Vector2(r);
     }
 
@@ -91,7 +91,7 @@ public class Vector2 {
     {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
-            r[i] = values[i] * v.values[i];
+            r[i] = _values[i] * v._values[i];
         return new Vector2(r);
     }
 
@@ -99,7 +99,7 @@ public class Vector2 {
     {
         double[] r = new double[N];
         for ( int i = 0; i < N; i++)
-            r[i] = -values[i];
+            r[i] = -_values[i];
         return new Vector2(r);
     }
 
@@ -107,7 +107,7 @@ public class Vector2 {
     {
         double r = 0;
         for (int i = 0; i < N; i++)
-            r += square (values[i]);
+            r += square (_values[i]);
         return Math.sqrt (r);
     }
 

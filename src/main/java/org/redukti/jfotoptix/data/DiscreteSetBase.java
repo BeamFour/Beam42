@@ -14,7 +14,7 @@ public abstract class DiscreteSetBase extends Set1d {
         }
     }
 
-    ArrayList<EntryS> data = new ArrayList<>();
+    ArrayList<EntryS> _data = new ArrayList<>();
 
     /**
      * Insert data pair in data set. If a pair with the same x
@@ -28,10 +28,10 @@ public abstract class DiscreteSetBase extends Set1d {
 
         int di = get_interval(x);
 
-        if (di > 0 && (data.get(di - 1).x == x))
-            data.set(di - 1, e);
+        if (di > 0 && (_data.get(di - 1).x == x))
+            _data.set(di - 1, e);
         else
-            data.add(di, e);
+            _data.add(di, e);
         invalidate();
     }
 
@@ -43,7 +43,7 @@ public abstract class DiscreteSetBase extends Set1d {
      * Clear all data
      */
     public void clear() {
-        data.clear();
+        _data.clear();
         _version++;
         invalidate();
     }
@@ -52,29 +52,29 @@ public abstract class DiscreteSetBase extends Set1d {
      * Get stored derivative value at index x
      */
     public double get_d_value(int n) {
-        assert (n < data.size());
-        return data.get(n).d;
+        assert (n < _data.size());
+        return _data.get(n).d;
     }
 
     // inherited from Set1d
     public int get_count() {
-        return data.size();
+        return _data.size();
     }
 
     public double get_x_value(int n) {
-        assert (n < data.size());
-        return data.get(n).x;
+        assert (n < _data.size());
+        return _data.get(n).x;
     }
 
     public double get_y_value(int n) {
-        assert (n < data.size());
-        return data.get(n).y;
+        assert (n < _data.size());
+        return _data.get(n).y;
     }
 
     public Range get_x_range() {
-        if (data.isEmpty())
+        if (_data.isEmpty())
             throw new IllegalStateException("_data set contains no _data");
-        return new Range(data.get(0).x, data.get(data.size() - 1).x);
+        return new Range(_data.get(0).x, _data.get(_data.size() - 1).x);
     }
 
     /**
@@ -82,12 +82,12 @@ public abstract class DiscreteSetBase extends Set1d {
      */
     public int get_interval(double x) {
         int min_idx = 0;
-        int max_idx = data.size() + 1;
+        int max_idx = _data.size() + 1;
 
         while (max_idx - min_idx > 1) {
             int p = (max_idx + min_idx) / 2;
 
-            if (x >= data.get(p - 1).x)
+            if (x >= _data.get(p - 1).x)
                 min_idx = p;
             else
                 max_idx = p;
@@ -100,12 +100,12 @@ public abstract class DiscreteSetBase extends Set1d {
      */
     public int get_nearest(double x) {
         int min_idx = 0;
-        int max_idx = data.size();
+        int max_idx = _data.size();
 
         while (max_idx - min_idx > 1) {
             int p = (max_idx + min_idx) / 2;
 
-            if (x + x >= data.get(p - 1).x + data.get(p).x)
+            if (x + x >= _data.get(p - 1).x + _data.get(p).x)
                 min_idx = p;
             else
                 max_idx = p;
@@ -114,10 +114,10 @@ public abstract class DiscreteSetBase extends Set1d {
     }
 
     public double get_x_interval(int x) {
-        return data.get(x + 1).x - data.get(x).x;
+        return _data.get(x + 1).x - _data.get(x).x;
     }
 
     public double get_x_interval(int x1, int x2) {
-        return data.get(x2).x - data.get(x1).x;
+        return _data.get(x2).x - _data.get(x1).x;
     }
 }

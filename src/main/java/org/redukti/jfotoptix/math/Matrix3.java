@@ -1,10 +1,10 @@
 package org.redukti.jfotoptix.math;
 
 public class Matrix3 {
-    final double values[];
+    final double _values[];
 
     private Matrix3(double[] values) {
-        this.values = values;
+        this._values = values;
     }
 
     static int idx(int row, int col) {
@@ -47,7 +47,7 @@ public class Matrix3 {
         for (int i = 0; i < 3; i++) {
             double s = 0;
             for (int k = 0; k < 3; k++) {
-                s += values[idx(i, k)] * v.values[k];
+                s += _values[idx(i, k)] * v.values[k];
             }
             r[i] = s;
         }
@@ -61,7 +61,7 @@ public class Matrix3 {
             for (int j = 0; j < 3; j++) {
                 double s = 0;
                 for (int k = 0; k < 3; k++)
-                    s += this.values[idx(i, k)] * m.values[idx(k, j)];
+                    s += this._values[idx(i, k)] * m._values[idx(k, j)];
 
                 r[idx(i, j)] = s;
             }
@@ -71,32 +71,32 @@ public class Matrix3 {
 
     Matrix3 inverse() {
         // inverse = adjugate / determinant
-        double s1 = values[idx(1, 1)] * values[idx(2, 2)] - values[idx(2, 1)] * values[idx(1, 2)];
-        double s2 = values[idx(1, 0)] * values[idx(2, 2)] - values[idx(2, 0)] * values[idx(1, 2)];
-        double s3 = values[idx(1, 0)] * values[idx(2, 1)] - values[idx(2, 0)] * values[idx(1, 1)];
+        double s1 = _values[idx(1, 1)] * _values[idx(2, 2)] - _values[idx(2, 1)] * _values[idx(1, 2)];
+        double s2 = _values[idx(1, 0)] * _values[idx(2, 2)] - _values[idx(2, 0)] * _values[idx(1, 2)];
+        double s3 = _values[idx(1, 0)] * _values[idx(2, 1)] - _values[idx(2, 0)] * _values[idx(1, 1)];
 
-        double det = values[idx(0, 0)] * s1 - values[idx(0, 1)] * s2 + values[idx(0, 2)] * s3;
+        double det = _values[idx(0, 0)] * s1 - _values[idx(0, 1)] * s2 + _values[idx(0, 2)] * s3;
 
         assert (det != 0.0);
 
         double[] r = new double[9];
         r[idx(0, 0)] = +s1 / det;
         r[idx(0, 1)]
-                = -(values[idx(0, 1)] * values[idx(2, 2)] - values[idx(0, 2)] * values[idx(2, 1)]) / det;
+                = -(_values[idx(0, 1)] * _values[idx(2, 2)] - _values[idx(0, 2)] * _values[idx(2, 1)]) / det;
         r[idx(0, 2)]
-                = +(values[idx(0, 1)] * values[idx(1, 2)] - values[idx(0, 2)] * values[idx(1, 1)]) / det;
+                = +(_values[idx(0, 1)] * _values[idx(1, 2)] - _values[idx(0, 2)] * _values[idx(1, 1)]) / det;
 
         r[idx(1, 0)] = -s2 / det;
         r[idx(1, 1)]
-                = +(values[idx(0, 0)] * values[idx(2, 2)] - values[idx(0, 2)] * values[idx(2, 0)]) / det;
+                = +(_values[idx(0, 0)] * _values[idx(2, 2)] - _values[idx(0, 2)] * _values[idx(2, 0)]) / det;
         r[idx(1, 2)]
-                = -(values[idx(0, 0)] * values[idx(1, 2)] - values[idx(0, 2)] * values[idx(1, 0)]) / det;
+                = -(_values[idx(0, 0)] * _values[idx(1, 2)] - _values[idx(0, 2)] * _values[idx(1, 0)]) / det;
 
         r[idx(2, 0)] = +s3 / det;
         r[idx(2, 1)]
-                = -(values[idx(0, 0)] * values[idx(2, 1)] - values[idx(0, 1)] * values[idx(2, 0)]) / det;
+                = -(_values[idx(0, 0)] * _values[idx(2, 1)] - _values[idx(0, 1)] * _values[idx(2, 0)]) / det;
         r[idx(2, 2)]
-                = +(values[idx(0, 0)] * values[idx(1, 1)] - values[idx(0, 1)] * values[idx(1, 0)]) / det;
+                = +(_values[idx(0, 0)] * _values[idx(1, 1)] - _values[idx(0, 1)] * _values[idx(1, 0)]) / det;
 
         return new Matrix3(r);
     }
@@ -180,7 +180,7 @@ public class Matrix3 {
                 if (j > 0) {
                     sb.append(',');
                 }
-                sb.append(values[idx(i, j)]);
+                sb.append(_values[idx(i, j)]);
             }
             sb.append(']');
         }

@@ -17,11 +17,11 @@ import static org.redukti.jfotoptix.io.Renderer.Style.StyleBackground;
 public class RendererSvg extends Renderer2d {
 
     StringBuilder _out = new StringBuilder();
-    final DecimalFormat formatter;
+    final DecimalFormat _decimal_format;
 
     String format(double value) {
         //return String.format("%.3f", value);
-        return formatter.format(value);
+        return _decimal_format.format(value);
     }
 
     /**
@@ -34,13 +34,13 @@ public class RendererSvg extends Renderer2d {
                 Rgb bg) {
         super();
 
-        formatter = new DecimalFormat();
+        _decimal_format = new DecimalFormat();
         //formatter.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
-        formatter.setMinimumIntegerDigits(1);
-        formatter.setMaximumFractionDigits(3);
-        formatter.setMinimumFractionDigits(0);
-        formatter.setDecimalSeparatorAlwaysShown(false);
-        formatter.setGroupingUsed(false);
+        _decimal_format.setMinimumIntegerDigits(1);
+        _decimal_format.setMaximumFractionDigits(3);
+        _decimal_format.setMinimumFractionDigits(0);
+        _decimal_format.setDecimalSeparatorAlwaysShown(false);
+        _decimal_format.setGroupingUsed(false);
 
         _2d_output_res = new Vector2(width, height);
 

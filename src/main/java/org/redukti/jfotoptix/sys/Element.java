@@ -10,23 +10,23 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class Element {
 
-    final int id;
-    final Vector3Pair position;
-    final Transform3 transform;
+    final int _id;
+    final Vector3Pair _position;
+    final Transform3 _transform;
     OpticalSystem _system;
 
     public Element(int id, Vector3Pair p, Transform3 transform) {
-        this.id = id;
-        this.position = p;
-        this.transform = transform;
+        this._id = id;
+        this._position = p;
+        this._transform = transform;
     }
 
     public Vector3 getLocalPosition() {
-        return this.transform.translation;
+        return this._transform.translation;
     }
 
     public int id() {
-        return id;
+        return _id;
     }
 
     public Vector3Pair get_bounding_box() {
@@ -34,7 +34,7 @@ public abstract class Element {
     }
 
     public Transform3 get_transform() {
-        return transform;
+        return _transform;
     }
 
     public void draw_element_2d(Renderer r, Element ref) {
@@ -81,9 +81,9 @@ public abstract class Element {
 
     @Override
     public String toString() {
-        return "id=" + id +
-                ", position=" + position +
-                ", transform=" + transform;
+        return "id=" + _id +
+                ", position=" + _position +
+                ", transform=" + _transform;
     }
 
     public static Vector3Pair get_bounding_box(List<? extends Element> elementList) {

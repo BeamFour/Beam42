@@ -88,9 +88,9 @@ public class Group extends Element implements Container {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("id=" + id +
-                ", position=" + position +
-                ", transform=" + transform)
+        sb.append("id=" + _id +
+                ", position=" + _position +
+                ", transform=" + _transform)
                 .append(System.lineSeparator());
         for (Element e: elements) {
             sb.append('\t').append(e.toString()).append(System.lineSeparator());

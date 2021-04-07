@@ -94,7 +94,7 @@ public class Surface extends Element {
     public Vector3Pair get_bounding_box() {
         Vector2Pair sb = shape.get_bounding_box();
 
-        // FIXME we assume curve is symetric here
+        // FIXME we assume curve is symmetric here
         double z = 0;
         double ms = curve.sagitta(new Vector2(shape.max_radius()));
 

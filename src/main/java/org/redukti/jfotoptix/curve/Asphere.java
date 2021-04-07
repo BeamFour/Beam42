@@ -333,7 +333,10 @@ public class Asphere extends ConicBase {
         //static int count = 0;
         //count++;
         if (_feder_algo) {
-            return compute_intersection(ray.origin(), ray.direction(), this).point();
+            Vector3Pair v3p = compute_intersection(ray.origin(), ray.direction(), this);
+            if (v3p == null)
+                return null;
+            return v3p.point();
             // normal.normalize();
             //	  if (ok && count % 25 == 0)
             //	    {

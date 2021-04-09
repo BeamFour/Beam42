@@ -78,8 +78,9 @@ public class Asphere extends ConicBase {
         for (int j = 0; j < 3; j++)
             delta_length[j] = -origin.v(j);
         Vector3 result = origin.plus(direction.times(L));
+        result = result.z(result.z()-t);
         Vector3 N = Vector3.vector3_0;
-        result = new Vector3(result.x(), result.y(), result.z() - t);
+
         /* Now (result) has x1, y1, z1 */
 
   /* The ray has been traced to the osculating sphere with
@@ -131,8 +132,8 @@ public class Asphere extends ConicBase {
       /* Get the direction numbers for the normal to the
          aspheric: */
             /* Feder equation (13), l */
-            temp = S._c + N.z() * deform_dz_dxy(S, s_2);
             double z1 = temp;
+            temp = S._c + N.z() * deform_dz_dxy(S, s_2);
             /* Feder equation (14), m */
             double y1 = -result.y() * temp;
             /* Feder equation (15), n */

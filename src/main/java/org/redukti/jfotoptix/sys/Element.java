@@ -92,6 +92,8 @@ public abstract class Element {
 
         for (Element e : elementList) {
             Vector3Pair bi = e.get_bounding_box();
+            if (bi == null) // FIXME - this is a temp solution to failure
+                continue;
 
             if (bi.v0 == bi.v1)
                 continue;

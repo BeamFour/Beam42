@@ -97,6 +97,10 @@ public class Surface extends Element {
         // FIXME we assume curve is symmetric here
         double z = 0;
         double ms = curve.sagitta(new Vector2(shape.max_radius()));
+        if (Double.isNaN(ms)) {
+            System.err.println("Invalid sagitta at " + shape.max_radius());
+            return null;
+        }
 
         if (z > ms) {
             double temp = z;

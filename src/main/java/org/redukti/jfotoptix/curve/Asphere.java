@@ -1,3 +1,7 @@
+/*
+The software is ported from Goptical, hence is licensed under the GPL.
+Copyright (c) 2021 Dibyendu Majumdar
+*/
 package org.redukti.jfotoptix.curve;
 
 import org.redukti.jfotoptix.math.Vector2;

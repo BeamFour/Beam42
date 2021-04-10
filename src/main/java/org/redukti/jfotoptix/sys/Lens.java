@@ -149,8 +149,8 @@ public class Lens extends Group {
         }
 
         @Override
-        public void computeGlobalTransform(Transform3Cache tcache) {
-            super.computeGlobalTransform(tcache);
+        public void compute_global_transforms(Transform3Cache tcache) {
+            super.compute_global_transforms(tcache);
         }
 
         @Override

@@ -114,10 +114,10 @@ public class Group extends Element implements Container {
         }
 
         @Override
-        public void computeGlobalTransform(Transform3Cache tcache) {
-            super.computeGlobalTransform(tcache);
+        public void compute_global_transforms(Transform3Cache tcache) {
+            super.compute_global_transforms(tcache);
             for (Element.Builder e: elements) {
-                e.computeGlobalTransform(tcache);
+                e.compute_global_transforms(tcache);
             }
         }
 

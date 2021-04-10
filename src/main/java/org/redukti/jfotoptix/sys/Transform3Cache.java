@@ -34,31 +34,31 @@ import java.util.Objects;
 
 public class Transform3Cache {
 
-    Map<ElementPair, Transform3> cache = new HashMap<>();
+    Map<ElementPair, Transform3> _cache = new HashMap<>();
 
     public Transform3 get(int from, int to) {
         ElementPair pair = new ElementPair(from, to);
-        return cache.get(pair);
+        return _cache.get(pair);
     }
 
     private void put(int from, int to, Transform3 transform) {
         ElementPair pair = new ElementPair(from, to);
-        cache.put(pair, transform);
+        _cache.put(pair, transform);
     }
 
-    public void putLocal2GlobalTransform(int id, Transform3 t) {
+    public void put_local_2_global_transform(int id, Transform3 t) {
         put(id, 0, t);
     }
 
-    public Transform3 getLocal2GlobalTransform(int id) {
+    public Transform3 local_2_global_transform(int id) {
         return get(id, 0);
     }
 
-    public void putGlobal2LocalTransform(int id, Transform3 t) {
+    public void put_global_2_local_transform(int id, Transform3 t) {
         put(0, id, t);
     }
 
-    public Transform3 getGlobal2LocalTransform(int id) {
+    public Transform3 global_2_local_transform(int id) {
         return get(0, id);
     }
 
@@ -66,8 +66,8 @@ public class Transform3Cache {
         assert (from != to);
         Transform3 e = get(from, to);
         if (e == null) {
-            Transform3 t1 = getLocal2GlobalTransform(from);
-            Transform3 t2 = getLocal2GlobalTransform(to);
+            Transform3 t1 = local_2_global_transform(from);
+            Transform3 t2 = local_2_global_transform(to);
             e = Transform3.compose(t1, t2.inverse());
             put(from, to, e);
         }

@@ -46,7 +46,7 @@ public abstract class Element {
         this._transform = transform;
     }
 
-    public Vector3 getLocalPosition() {
+    public Vector3 local_position() {
         return this._transform.translation;
     }
 
@@ -175,7 +175,7 @@ public abstract class Element {
             return id;
         }
 
-        public void computeGlobalTransform(Transform3Cache tcache) {
+        public void compute_global_transforms(Transform3Cache tcache) {
             //System.err.println("Computing coordinate for " + this);
 
             Transform3 t = transform; // local transform
@@ -184,8 +184,8 @@ public abstract class Element {
                 t = Transform3.compose(p.transform, t);
                 p = p.parent;
             }
-            tcache.putLocal2GlobalTransform(this.id, t);  // Local to global
-            tcache.putGlobal2LocalTransform(this.id, t.inverse()); // Global to local
+            tcache.put_local_2_global_transform(this.id, t);  // Local to global
+            tcache.put_global_2_local_transform(this.id, t.inverse()); // Global to local
         }
 
         public abstract Element build();

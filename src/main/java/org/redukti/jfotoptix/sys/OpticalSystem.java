@@ -35,50 +35,50 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class OpticalSystem implements Container {
-    private final List<Element> elements;
-    private final Transform3Cache transform3Cache;
+    private final List<Element> _elements;
+    private final Transform3Cache _transform3Cache;
     private boolean keep_aspect = true;
 
     @Override
     public List<Element> elements() {
-        return elements;
+        return _elements;
     }
 
     public OpticalSystem(List<Element> elements, Transform3Cache transform3Cache) {
-        this.elements = elements;
-        this.transform3Cache = transform3Cache;
+        this._elements = elements;
+        this._transform3Cache = transform3Cache;
     }
 
     public Element getElement(int pos) {
-        if (pos >= 0 && pos < elements.size()) {
-            return elements.get(pos);
+        if (pos >= 0 && pos < _elements.size()) {
+            return _elements.get(pos);
         }
         return null;
     }
 
     public Group getGroup(int pos) {
-        if (pos >= 0 && pos < elements.size() && elements.get(pos) instanceof Group) {
-            return (Group)elements.get(pos);
+        if (pos >= 0 && pos < _elements.size() && _elements.get(pos) instanceof Group) {
+            return (Group) _elements.get(pos);
         }
         return null;
     }
 
     public Vector3 getPosition(Element e) {
-        return transform3Cache.getLocal2GlobalTransform(e.id()).transform(Vector3.vector3_0);
+        return _transform3Cache.local_2_global_transform(e.id()).transform(Vector3.vector3_0);
     }
 
     public Vector3Pair get_bounding_box ()
     {
-        return Element.get_bounding_box(elements);
+        return Element.get_bounding_box(_elements);
     }
 
     Transform3 get_transform (Element from, Element to)
     {
-        return transform3Cache.transform_cache_update (from.id (), to.id ());
+        return _transform3Cache.transform_cache_update (from.id (), to.id ());
     }
 
     Transform3 get_global_transform(Element e) {
-        return transform3Cache.getLocal2GlobalTransform(e.id());
+        return _transform3Cache.local_2_global_transform(e.id());
     }
 
 //    Transform3 get_local_transform(Element e) {
@@ -88,8 +88,8 @@ public class OpticalSystem implements Container {
     @Override
     public String toString() {
         return "OpticalSystem{" +
-                "elements=" + elements +
-                ", transform3Cache=" + transform3Cache +
+                "elements=" + _elements +
+                ", transform3Cache=" + _transform3Cache +
                 ", keep_aspect=" + keep_aspect +
                 '}';
     }
@@ -125,7 +125,7 @@ public class OpticalSystem implements Container {
         private Transform3Cache setCoordinates() {
             transform3Cache = new Transform3Cache();
             for (Element.Builder e: elements) {
-                e.computeGlobalTransform(transform3Cache);
+                e.compute_global_transforms(transform3Cache);
             }
             return transform3Cache;
         }
@@ -146,7 +146,7 @@ public class OpticalSystem implements Container {
             if (transform3Cache == null)
                 throw new IllegalStateException("build() must be called prior to updating position");
             if (e.parent != null) {
-                e.localPosition(transform3Cache.getGlobal2LocalTransform(e.parent.id()).transform(v));
+                e.localPosition(transform3Cache.global_2_local_transform(e.parent.id()).transform(v));
             }
             else {
                 e.localPosition(v);

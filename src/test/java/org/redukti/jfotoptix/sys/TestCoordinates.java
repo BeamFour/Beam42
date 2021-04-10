@@ -33,7 +33,7 @@ public class TestCoordinates {
         {
             OpticalSystem system1 = sys.build();
             Element s211e = system1.getGroup(0).getGroup(0).getSurface(0);
-            Assertions.assertTrue(s211e.getLocalPosition().isEqual(Vector3.vector3_0, 1e-10));
+            Assertions.assertTrue(s211e.local_position().isEqual(Vector3.vector3_0, 1e-10));
             Assertions.assertTrue(system1.getPosition(s211e).isEqual(Vector3.vector3_0, 1e-10));
         }
 
@@ -42,7 +42,7 @@ public class TestCoordinates {
         {
             OpticalSystem system1 = sys.build();
             Element s211e = system1.getGroup(0).getGroup(0).getSurface(0);
-            Assertions.assertTrue(s211e.getLocalPosition().isEqual(Vector3.vector3_0, 1e-10));
+            Assertions.assertTrue(s211e.local_position().isEqual(Vector3.vector3_0, 1e-10));
             Assertions.assertTrue(system1.getPosition(s211e).isEqual(new Vector3(1, 2, 3), 1e-10));
         }
 
@@ -67,7 +67,7 @@ public class TestCoordinates {
             system1 = sys.updatePosition(s211, new Vector3(9, 9, 9));
             Element s211e = system1.getGroup(0).getGroup(0).getSurface(0);
             Assertions.assertTrue(system1.getPosition(s211e).isEqual(new Vector3(9, 9, 9), 1e-10));
-            Assertions.assertTrue(s211e.getLocalPosition().isEqual(new Vector3(5, 5, 5), 1e-10));
+            Assertions.assertTrue(s211e.local_position().isEqual(new Vector3(5, 5, 5), 1e-10));
         }
 
         g21.rotate(0, 0, -90);
@@ -81,7 +81,7 @@ public class TestCoordinates {
             OpticalSystem system1 = sys.build();
             system1 = sys.updatePosition(s211, new Vector3(3, 4, 5));
             Element s211e = system1.getGroup(0).getGroup(0).getSurface(0);
-            Assertions.assertTrue(s211e.getLocalPosition().isEqual(new Vector3(0, 1, 1), 1e-10));
+            Assertions.assertTrue(s211e.local_position().isEqual(new Vector3(0, 1, 1), 1e-10));
         }
 
         g1.rotate(0, 0, 90);

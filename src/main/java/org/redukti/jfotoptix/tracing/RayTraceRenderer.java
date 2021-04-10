@@ -110,7 +110,6 @@ public class RayTraceRenderer {
         if (ray.is_lost()) {
             if (!draw_lost)
                 return false;
-
             v1 = t1.transform(ray.get_ray().origin().plus(ray.get_ray().direction().times(lost_len)));
         } else {
             i_element = ray.get_intercept_element();

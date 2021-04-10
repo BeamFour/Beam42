@@ -94,7 +94,7 @@ public class TracedRay extends LightRay {
     }
 
     public Vector3 get_direction(Element e) {
-        return _creator.get_transform_to(e).transform_linear(_ray.direction());
+        return _creator.get_transform_to(e).apply_rotation(_ray.direction());
     }
 
     public Vector3 get_position() {
@@ -102,7 +102,7 @@ public class TracedRay extends LightRay {
     }
 
     public Vector3 get_direction() {
-        return _creator.get_global_transform().transform_linear(_ray.direction());
+        return _creator.get_global_transform().apply_rotation(_ray.direction());
     }
 
     public void set_intercept_intensity(double v) {

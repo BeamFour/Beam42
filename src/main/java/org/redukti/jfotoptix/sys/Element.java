@@ -153,7 +153,7 @@ public abstract class Element {
         }
 
         public Builder localPosition(Vector3 v) {
-            this.transform = new Transform3(v, this.transform.linear, this.transform.useLinear);
+            this.transform = new Transform3(v, this.transform.rotation_matrix, this.transform.use_rotation_matrix);
             return this;
         }
 
@@ -168,7 +168,7 @@ public abstract class Element {
         }
 
         public Builder rotate(double x, double y, double z) {
-            this.transform = this.transform.linearRotation(new Vector3(x, y, z));
+            this.transform = this.transform.rotate_axis_by_angles(new Vector3(x, y, z));
             return this;
         }
 

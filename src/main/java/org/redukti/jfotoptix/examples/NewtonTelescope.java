@@ -131,7 +131,7 @@ public class NewtonTelescope {
                         .position(new Vector3Pair(new Vector3 (0, -_offset, _offset), Vector3.vector3_001))
                         .curve(Flat.flat)
                         .shape(_secondary_shape);
-                _secondary.transform(_secondary.transform().linearRotation(new Vector3(-135, 0, 0)));
+                _secondary.transform(_secondary.transform().rotate_axis_by_angles(new Vector3(-135, 0, 0)));
                 add (_primary);
                 add (_secondary);
                 return this;

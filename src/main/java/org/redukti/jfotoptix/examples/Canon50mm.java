@@ -1,6 +1,7 @@
 package org.redukti.jfotoptix.examples;
 
 import org.redukti.jfotoptix.importers.OpticalBenchDataImporter;
+import org.redukti.jfotoptix.layout.SystemLayout;
 import org.redukti.jfotoptix.rendering.RendererSvg;
 import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.math.Matrix3;
@@ -44,8 +45,10 @@ public class Canon50mm {
         OpticalSystem system = systemBuilder.build();
         System.out.println(system);
         // draw 2d system layout
-        system.draw_2d_fit(renderer);
-        system.draw_2d(renderer);
+//        system.draw_2d_fit(renderer);
+//        system.draw_2d(renderer);
+        SystemLayout systemLayout = new SystemLayout();
+        systemLayout.layout2d(renderer, system);
 
         RayTraceParameters parameters = new RayTraceParameters(system);
 

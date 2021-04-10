@@ -63,14 +63,14 @@ public abstract class Element {
         return _transform;
     }
 
-    public void draw_element_2d(Renderer r, Element ref) {
-        r.group_begin("element");
-        draw_2d_e(r, ref);
-        r.group_end();
-    }
-
-    public void draw_2d_e(Renderer r, Element ref) {
-    }
+//    public void draw_element_2d(Renderer r, Element ref) {
+//        r.group_begin("element");
+//        draw_2d_e(r, ref);
+//        r.group_end();
+//    }
+//
+//    public void draw_2d_e(Renderer r, Element ref) {
+//    }
 
     public Transform3 get_transform_to(Element e) {
         assert (_system != null);

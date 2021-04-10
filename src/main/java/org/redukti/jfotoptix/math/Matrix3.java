@@ -244,4 +244,12 @@ public class Matrix3 {
         sb.append(']');
         return sb.toString();
     }
+
+    public final boolean isEquals(Matrix3 other, double tolerance) {
+        for (int i = 0; i < _values.length; i++) {
+            if (Math.abs(_values[i]-other._values[i]) > tolerance)
+                return false;
+        }
+        return true;
+    }
 }

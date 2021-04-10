@@ -29,7 +29,6 @@ package org.redukti.jfotoptix.tracing;
 import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.material.Air;
 import org.redukti.jfotoptix.material.MaterialBase;
-import org.redukti.jfotoptix.math.Matrix3;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 import org.redukti.jfotoptix.patterns.Distribution;
@@ -37,30 +36,28 @@ import org.redukti.jfotoptix.sys.Element;
 import org.redukti.jfotoptix.sys.OpticalSurface;
 import org.redukti.jfotoptix.sys.PointSource;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class RayGenerator {
 
-       List<TracedRay> get_lightrays_(
-               RayTraceResults result,
-               RayTraceParameters parameters,
-                                   PointSource source,
-                                   Element target,
-                                   PointSource.SourceInfinityMode mode) {
-        OpticalSurface starget;
+    List<TracedRay> generate_rays(
+            RayTraceResults result,
+            RayTraceParameters parameters,
+            PointSource source,
+            Element target,
+            PointSource.SourceInfinityMode mode) {
         if (!(target instanceof OpticalSurface)) {
             return Collections.emptyList();
         }
-        starget = (OpticalSurface) target;
-
+        final OpticalSurface target_surface = (OpticalSurface) target;
         double rlen = parameters.get_lost_ray_length();
-        Distribution d = parameters.get_distribution(starget);
+        Distribution d = parameters.get_distribution(target_surface);
         final List<TracedRay> rays = new ArrayList<>();
-
-        Consumer<Vector3> de = (Vector3 i) -> {
-            Vector3 r = starget.get_transform_to(source).transform(
-                    i); // pattern point on target surface
+        Consumer<Vector3> de = (Vector3 v) -> {
+            Vector3 r = target_surface.get_transform_to(source).transform(v); // pattern point on target surface
             Vector3 direction;
             Vector3 position;
 
@@ -69,15 +66,15 @@ public class RayGenerator {
                     position = Vector3.vector3_0;
                     direction = r.normalize();
                     break;
-
                 default:
                 case SourceAtInfinity:
                     direction = Vector3.vector3_001;
-                    position = new Vector3Pair(starget.get_position(source).minus(Vector3.vector3_001.times(rlen)),
-                            Vector3.vector3_001).pl_ln_intersect(new Vector3Pair(r, direction));
+                    position = new Vector3Pair(
+                            target_surface.get_position(source).minus(Vector3.vector3_001.times(rlen)),
+                            Vector3.vector3_001)
+                            .pl_ln_intersect(new Vector3Pair(r, direction));
                     break;
             }
-
             for (SpectralLine l : source.spectrum()) {
                 // generated rays use source coordinates
                 TracedRay ray = result.newRay(position, direction);
@@ -93,18 +90,14 @@ public class RayGenerator {
                 rays.add(ray);
             }
         };
-        starget.get_pattern(de, d, parameters.get_unobstructed());
+        target_surface.get_pattern(de, d, parameters.get_unobstructed());
         return rays;
     }
 
     public List<TracedRay> generate_rays_simple(RayTraceResults result, RayTraceParameters parameters, PointSource source, List<Element> targets) {
-//        Set<Double> wavelengths = new HashSet<>();
-//        for (SpectralLine l : source.spectrum()) {
-//            wavelengths.add(l.get_wavelen());
-//        }
         List<TracedRay> rays = new ArrayList<>();
         for (Element target : targets) {
-            rays.addAll(get_lightrays_(result, parameters, source, target, source.mode()));
+            rays.addAll(generate_rays(result, parameters, source, target, source.mode()));
         }
         return rays;
     }

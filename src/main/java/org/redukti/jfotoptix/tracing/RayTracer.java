@@ -163,11 +163,11 @@ public class RayTracer {
     }
 
     private List<TracedRay> process_rays_simple(Element e, RayTraceResults result, List<TracedRay> input) {
-        if (e instanceof Surface) {
-            Surface surface = (Surface) e;
-            return process_rays(surface, TraceIntensityMode.Simpletrace, result, input);
-        } else if (e instanceof Stop) {
+        if (e instanceof Stop) {
             Stop surface = (Stop) e;
+            return process_rays(surface, TraceIntensityMode.Simpletrace, result, input);
+        } else if (e instanceof Surface) {
+            Surface surface = (Surface) e;
             return process_rays(surface, TraceIntensityMode.Simpletrace, result, input);
         } else {
             throw new UnsupportedOperationException();
@@ -175,7 +175,7 @@ public class RayTracer {
     }
 
     List<TracedRay> process_rays(Surface surface, TraceIntensityMode m, RayTraceResults result,
-                      List<TracedRay> input) {
+                                 List<TracedRay> input) {
         RayTraceParameters params = result._parameters;
         List<TracedRay> rays = new ArrayList<>();
         for (TracedRay i : input) {
@@ -197,9 +197,9 @@ public class RayTracer {
     }
 
     TracedRay trace_ray(Surface surface, TraceIntensityMode m,
-                   RayTraceResults result, TracedRay incident,
-                   Vector3Pair local,
-                   Vector3Pair pt) {
+                        RayTraceResults result, TracedRay incident,
+                        Vector3Pair local,
+                        Vector3Pair pt) {
         incident.set_len((pt.origin().minus(local.origin())).len());
         incident.set_intercept(surface, pt.origin());
 

@@ -1,9 +1,9 @@
 package org.redukti.jfotoptix.shape;
 
 import org.junit.jupiter.api.Test;
-import org.redukti.jfotoptix.io.RendererSvg;
-import org.redukti.jfotoptix.io.RendererViewport;
-import org.redukti.jfotoptix.io.Rgb;
+import org.redukti.jfotoptix.rendering.RendererSvg;
+import org.redukti.jfotoptix.rendering.RendererViewport;
+import org.redukti.jfotoptix.rendering.Rgb;
 import org.redukti.jfotoptix.math.Triangle2;
 import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.patterns.Distribution;
@@ -11,8 +11,8 @@ import org.redukti.jfotoptix.patterns.Distribution;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
-import static org.redukti.jfotoptix.io.Renderer.PointStyle.PointStyleCross;
-import static org.redukti.jfotoptix.io.Renderer.PointStyle.PointStyleDot;
+import static org.redukti.jfotoptix.rendering.Renderer.PointStyle.PointStyleCross;
+import static org.redukti.jfotoptix.rendering.Renderer.PointStyle.PointStyleDot;
 
 public class TestShapes {
 

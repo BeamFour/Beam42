@@ -26,7 +26,6 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.tracing;
 
-import org.redukti.jfotoptix.io.Renderer;
 import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
 import org.redukti.jfotoptix.sys.Container;

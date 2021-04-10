@@ -1,7 +1,7 @@
 package org.redukti.jfotoptix.examples;
 
 import org.redukti.jfotoptix.importers.OpticalBenchDataImporter;
-import org.redukti.jfotoptix.io.RendererSvg;
+import org.redukti.jfotoptix.rendering.RendererSvg;
 import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.math.Matrix3;
 import org.redukti.jfotoptix.math.Vector3;

@@ -1,4 +1,4 @@
-package org.redukti.jfotoptix.io;
+package org.redukti.jfotoptix.rendering;
 
 import org.junit.jupiter.api.Test;
 import org.redukti.jfotoptix.math.Vector2;
@@ -6,8 +6,8 @@ import org.redukti.jfotoptix.math.Vector2Pair;
 
 import java.util.EnumSet;
 
-import static org.redukti.jfotoptix.io.Renderer.Style.StyleForeground;
-import static org.redukti.jfotoptix.io.Renderer.TextAlignMask.*;
+import static org.redukti.jfotoptix.rendering.Renderer.Style.StyleForeground;
+import static org.redukti.jfotoptix.rendering.Renderer.TextAlignMask.*;
 
 public class TestRendererSvg {
 

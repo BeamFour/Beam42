@@ -24,14 +24,14 @@ Original GNU Optical License and Authors are as follows:
  */
 
 
-package org.redukti.jfotoptix.io;
+package org.redukti.jfotoptix.rendering;
 
 import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector2Pair;
 import org.redukti.jfotoptix.math.Vector3;
 
-import static org.redukti.jfotoptix.io.Renderer.Style.StyleForeground;
+import static org.redukti.jfotoptix.rendering.Renderer.Style.StyleForeground;
 
 public abstract class RendererViewport extends Renderer {
 

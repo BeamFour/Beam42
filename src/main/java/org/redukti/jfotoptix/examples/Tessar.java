@@ -27,7 +27,7 @@ Original GNU Optical License and Authors are as follows:
 package org.redukti.jfotoptix.examples;
 
 import org.redukti.jfotoptix.curve.Flat;
-import org.redukti.jfotoptix.io.RendererSvg;
+import org.redukti.jfotoptix.rendering.RendererSvg;
 import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.material.Abbe;
 import org.redukti.jfotoptix.math.Vector3;

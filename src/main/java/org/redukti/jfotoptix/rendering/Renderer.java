@@ -24,7 +24,7 @@ Original GNU Optical License and Authors are as follows:
  */
 
 
-package org.redukti.jfotoptix.io;
+package org.redukti.jfotoptix.rendering;
 
 import org.redukti.jfotoptix.math.*;
 

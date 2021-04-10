@@ -29,7 +29,7 @@ package org.redukti.jfotoptix.sys;
 import org.redukti.jfotoptix.curve.Curve;
 import org.redukti.jfotoptix.curve.Flat;
 import org.redukti.jfotoptix.curve.Sphere;
-import org.redukti.jfotoptix.io.Renderer;
+import org.redukti.jfotoptix.rendering.Renderer;
 import org.redukti.jfotoptix.material.Abbe;
 import org.redukti.jfotoptix.material.Air;
 import org.redukti.jfotoptix.material.MaterialBase;

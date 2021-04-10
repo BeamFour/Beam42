@@ -1,9 +1,9 @@
 package org.redukti.jfotoptix.shape;
 
 import org.junit.jupiter.api.Test;
-import org.redukti.jfotoptix.io.RendererSvg;
-import org.redukti.jfotoptix.io.RendererViewport;
-import org.redukti.jfotoptix.io.Rgb;
+import org.redukti.jfotoptix.rendering.RendererSvg;
+import org.redukti.jfotoptix.rendering.RendererViewport;
+import org.redukti.jfotoptix.rendering.Rgb;
 import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
@@ -12,9 +12,9 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.function.Consumer;
 
-import static org.redukti.jfotoptix.io.Renderer.PointStyle.PointStyleCross;
-import static org.redukti.jfotoptix.io.Renderer.TextAlignMask.TextAlignBottom;
-import static org.redukti.jfotoptix.io.Renderer.TextAlignMask.TextAlignCenter;
+import static org.redukti.jfotoptix.rendering.Renderer.PointStyle.PointStyleCross;
+import static org.redukti.jfotoptix.rendering.Renderer.TextAlignMask.TextAlignBottom;
+import static org.redukti.jfotoptix.rendering.Renderer.TextAlignMask.TextAlignCenter;
 
 
 public class TestPatterns {

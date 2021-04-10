@@ -24,7 +24,7 @@ Original GNU Optical License and Authors are as follows:
  */
 
 
-package org.redukti.jfotoptix.io;
+package org.redukti.jfotoptix.rendering;
 
 import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector2Pair;
@@ -32,8 +32,8 @@ import org.redukti.jfotoptix.math.Vector2Pair;
 import java.text.DecimalFormat;
 import java.util.EnumSet;
 
-import static org.redukti.jfotoptix.io.Renderer.PointStyle.PointStyleCross;
-import static org.redukti.jfotoptix.io.Renderer.Style.StyleBackground;
+import static org.redukti.jfotoptix.rendering.Renderer.PointStyle.PointStyleCross;
+import static org.redukti.jfotoptix.rendering.Renderer.Style.StyleBackground;
 
 /**
  * SVG file rendering driver

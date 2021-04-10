@@ -211,8 +211,15 @@ public abstract class RendererViewport extends Renderer {
         return y_scale(y - _page.v0.y());
     }
 
-    Vector2Pair get_window() {
+    public Vector2Pair get_window2d_fit() {
         return _window2d_fit;
+    }
+    public Vector2Pair get_window2d() {
+        return _window2d;
+    }
+
+    public Vector2 get_2d_output_res() {
+        return _2d_output_res;
     }
 
     void set_margin_output(double width, double height) {

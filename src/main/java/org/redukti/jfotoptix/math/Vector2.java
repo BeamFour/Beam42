@@ -26,6 +26,8 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.math;
 
+import java.util.Arrays;
+
 import static org.redukti.jfotoptix.math.MathUtils.square;
 
 /**
@@ -70,6 +72,11 @@ public class Vector2 {
     public final Vector2 y(double value) { return new Vector2(x(), value); }
 
     public double v(int i) {return this._values[i];}
+    public Vector2 set(int i, double v) {
+        double[] values = Arrays.copyOf(_values, _values.length);
+        values[i] = v;
+        return new Vector2(values);
+    }
 
     public Vector2 plus(Vector2 v)
     {

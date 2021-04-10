@@ -23,14 +23,40 @@ Original GNU Optical License and Authors are as follows:
       Author: Alexandre Becoulet
  */
 
-package org.redukti.jfotoptix.data;
+package org.redukti.jfotoptix.plotting;
 
-public class Range {
-    public double first;
-    public double second;
+/**
+ * Specifies available styles for 2d and 3d plot data rendering
+ */
+public enum PlotStyleMask {
+    /**
+     * Draw lines between knots
+     */
+    LinePlot(1),
+    /**
+     * Draw points for each knot
+     */
+    PointPlot(2),
+    /**
+     * Draw a smooth curve
+     */
+    InterpolatePlot(4),
+    /**
+     * Print ploted values near knots
+     */
+    ValuePlot(8),
+    /**
+     * Draw filled 3d surface
+     */
+    Filled(16);
 
-    public Range(double first, double second) {
-        this.first = first;
-        this.second = second;
+    PlotStyleMask(int value) {
+        this._value = value;
+    }
+
+    final int _value;
+
+    public int value() {
+        return _value;
     }
 }

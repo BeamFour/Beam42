@@ -119,7 +119,7 @@ public class Transform3 {
     }
 
     Transform3 linearRotationRadians(int axis, double rangle) {
-        Matrix3 r = Matrix3.getRotationMatrix(axis, rangle);
+        Matrix3 r = Matrix3.get_rotation_matrix(axis, rangle);
         Matrix3 linear = r.times(this.linear);
         return new Transform3(this.translation, linear, true);
     }

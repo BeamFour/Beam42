@@ -26,7 +26,12 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.math;
 
+/**
+ * 3D Matrix class - immutable implementation.
+ */
 public class Matrix3 {
+
+    /* row major storage for 3d matrix */
     final double _values[];
 
     private Matrix3(double[] values) {
@@ -37,6 +42,7 @@ public class Matrix3 {
         return row * 3 + col;
     }
 
+    /* Create a diagonal matrix with given values */
     public static Matrix3 diag(double x, double y, double z) {
         double values[] = new double[9];
         values[idx(0, 0)] = x;
@@ -45,6 +51,7 @@ public class Matrix3 {
         return new Matrix3(values);
     }
 
+    /*
     // Quaternion to Rotation Matrix
     // Q = (x, y, z, w)
     // 1-2y^2-2z^2      2xy-2wz         2xz+2wy
@@ -52,6 +59,7 @@ public class Matrix3 {
     // 2xz-2yw          2yz+2xw         1-2x^2-2y^2
     //
     // see https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation
+    */
     public static Matrix3 rotation(Quaternion q) {
         double values[] = new double[9];
         values[idx(0, 0)] = 1.0 - 2.0 * (q.y * q.y + q.z * q.z);
@@ -68,7 +76,8 @@ public class Matrix3 {
         return new Matrix3(values);
     }
 
-    Vector3 times(Vector3 v) {
+    /** Matrix times vector */
+    public final Vector3 times(Vector3 v) {
         double[] r = new double[3];
         for (int i = 0; i < 3; i++) {
             double s = 0;
@@ -80,7 +89,8 @@ public class Matrix3 {
         return new Vector3(r[0], r[1], r[2]);
     }
 
-    Matrix3 times(Matrix3 m) {
+    /** Martrix times matrix */
+    public final Matrix3 times(Matrix3 m) {
         double[] r = new double[9];
 
         for (int i = 0; i < 3; i++) {
@@ -95,7 +105,8 @@ public class Matrix3 {
         return new Matrix3(r);
     }
 
-    Matrix3 inverse() {
+    /** Matrix inverse */
+    public final Matrix3 inverse() {
         // inverse = adjugate / determinant
         double s1 = _values[idx(1, 1)] * _values[idx(2, 2)] - _values[idx(2, 1)] * _values[idx(1, 2)];
         double s2 = _values[idx(1, 0)] * _values[idx(2, 2)] - _values[idx(2, 0)] * _values[idx(1, 2)];
@@ -127,7 +138,11 @@ public class Matrix3 {
         return new Matrix3(r);
     }
 
-    public static Matrix3 getRotationMatrix(int axis, double a) {
+    /** Get rotation matrix for rotation about axis.
+     * @param axis the axis of rotation, x=0, y=1, z=2
+     * @param angleInRadians the angle to rotate in radians
+     */
+    public static Matrix3 get_rotation_matrix(int axis, double angleInRadians) {
         assert (axis < 3 && axis >= 0);
 
         /*
@@ -155,40 +170,40 @@ public class Matrix3 {
                 r[idx(0, 1)] = 0;
                 r[idx(0, 2)] = 0;
                 r[idx(1, 0)] = 0;
-                r[idx(1, 1)] = Math.cos(a);
-                r[idx(1, 2)] = Math.sin(a);
+                r[idx(1, 1)] = Math.cos(angleInRadians);
+                r[idx(1, 2)] = Math.sin(angleInRadians);
                 r[idx(2, 0)] = 0;
-                r[idx(2, 1)] = -Math.sin(a);
-                r[idx(2, 2)] = Math.cos(a);
+                r[idx(2, 1)] = -Math.sin(angleInRadians);
+                r[idx(2, 2)] = Math.cos(angleInRadians);
                 break;
 
             case 1:
                 // rotation counter clockwise around the Y axis
-                r[idx(0, 0)] = Math.cos(a);
+                r[idx(0, 0)] = Math.cos(angleInRadians);
                 r[idx(0, 1)] = 0;
-                r[idx(0, 2)] = -Math.sin(a);
+                r[idx(0, 2)] = -Math.sin(angleInRadians);
                 r[idx(1, 0)] = 0;
                 r[idx(1, 1)] = 1;
                 r[idx(1, 2)] = 0;
-                r[idx(2, 0)] = Math.sin(a);
+                r[idx(2, 0)] = Math.sin(angleInRadians);
                 r[idx(2, 1)] = 0;
-                r[idx(2, 2)] = Math.cos(a);
+                r[idx(2, 2)] = Math.cos(angleInRadians);
                 break;
 
             case 2:
                 // rotation counter clockwise around the Z axis
-                r[idx(0, 0)] = Math.cos(a);
-                r[idx(0, 1)] = Math.sin(a);
+                r[idx(0, 0)] = Math.cos(angleInRadians);
+                r[idx(0, 1)] = Math.sin(angleInRadians);
                 r[idx(0, 2)] = 0;
-                r[idx(1, 0)] = -Math.sin(a);
-                r[idx(1, 1)] = Math.cos(a);
+                r[idx(1, 0)] = -Math.sin(angleInRadians);
+                r[idx(1, 1)] = Math.cos(angleInRadians);
                 r[idx(1, 2)] = 0;
                 r[idx(2, 0)] = 0;
                 r[idx(2, 1)] = 0;
                 r[idx(2, 2)] = 1;
                 break;
             default:
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("Invalid rotation axis, must be 0=x, 1=y or 2=z");
         }
         return new Matrix3(r);
     }

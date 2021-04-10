@@ -26,7 +26,6 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.sys;
 
-import org.redukti.jfotoptix.rendering.Renderer;
 import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
@@ -62,15 +61,6 @@ public abstract class Element {
     public Transform3 get_transform() {
         return _transform;
     }
-
-//    public void draw_element_2d(Renderer r, Element ref) {
-//        r.group_begin("element");
-//        draw_2d_e(r, ref);
-//        r.group_end();
-//    }
-//
-//    public void draw_2d_e(Renderer r, Element ref) {
-//    }
 
     public Transform3 get_transform_to(Element e) {
         assert (_system != null);

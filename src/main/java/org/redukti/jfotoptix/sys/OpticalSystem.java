@@ -26,11 +26,9 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.sys;
 
-import org.redukti.jfotoptix.rendering.Renderer;
-import org.redukti.jfotoptix.rendering.RendererSvg;
-import org.redukti.jfotoptix.rendering.RendererViewport;
-import org.redukti.jfotoptix.rendering.Rgb;
-import org.redukti.jfotoptix.math.*;
+import org.redukti.jfotoptix.math.Transform3;
+import org.redukti.jfotoptix.math.Vector3;
+import org.redukti.jfotoptix.math.Vector3Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,48 +67,10 @@ public class OpticalSystem implements Container {
         return transform3Cache.getLocal2GlobalTransform(e.id()).transform(Vector3.vector3_0);
     }
 
-//    @Override
-//    public void draw_2d_fit(RendererViewport r, boolean keep_aspect) {
-//        Vector3Pair b = get_bounding_box ();
-//
-//        r.set_window (Vector2Pair.from(b, 2, 1), keep_aspect);
-//        r.set_camera_direction (Vector3.vector3_100);
-//        r.set_camera_position (Vector3.vector3_0);
-//
-//        r.set_feature_size (b.v1.y () - b.v0.y () / 20.);
-//    }
-//
-//    @Override
-//    public void draw_2d(Renderer r) {
-//        // optical axis
-//        Vector3Pair b = get_bounding_box ();
-//        r.draw_segment (new Vector2Pair (new Vector2(b.z0 (), 0.), new Vector2(b.z1 (), 0.)), Rgb.rgb_gray);
-//
-//        for (Element e : elements())
-//        {
-//            e.draw_element_2d(r, null);
-//        }
-//    }
-//
-//    public void draw_2d_fit(RendererSvg r) {
-//        draw_2d_fit(r, keep_aspect);
-//    }
-
     public Vector3Pair get_bounding_box ()
     {
         return Element.get_bounding_box(elements);
     }
-
-//    public void draw_2d(RendererSvg r) {
-//        // optical axis
-//        Vector3Pair b = get_bounding_box ();
-//        r.draw_segment (new Vector2Pair (new Vector2(b.v0.z(), 0.), new Vector2(b.v1.z (), 0.)), Rgb.rgb_gray);
-//
-//        for (Element e : elements())
-//        {
-//            e.draw_element_2d (r, null);
-//        }
-//    }
 
     Transform3 get_transform (Element from, Element to)
     {

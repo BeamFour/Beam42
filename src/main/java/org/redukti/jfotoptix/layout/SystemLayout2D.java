@@ -10,7 +10,7 @@ import org.redukti.jfotoptix.sys.*;
 
 import java.util.List;
 
-public class SystemLayout {
+public class SystemLayout2D {
 
     public void layout2d(RendererSvg r, OpticalSystem system) {
         draw_2d_fit(r, system);

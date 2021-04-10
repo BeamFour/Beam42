@@ -27,7 +27,7 @@ Original GNU Optical License and Authors are as follows:
 package org.redukti.jfotoptix.examples;
 
 import org.redukti.jfotoptix.curve.Flat;
-import org.redukti.jfotoptix.layout.SystemLayout;
+import org.redukti.jfotoptix.layout.SystemLayout2D;
 import org.redukti.jfotoptix.rendering.RendererSvg;
 import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.material.Abbe;
@@ -80,11 +80,11 @@ public class Tessar {
         RendererSvg renderer = new RendererSvg( 800, 400);
         OpticalSystem system = systemBuilder.build();
         System.out.println(system);
-        SystemLayout systemLayout = new SystemLayout();
+        SystemLayout2D systemLayout2D = new SystemLayout2D();
         // draw 2d system layout
 //        system.draw_2d_fit(renderer);
 //        system.draw_2d(renderer);
-        systemLayout.layout2d(renderer, system);
+        systemLayout2D.layout2d(renderer, system);
 
         RayTraceParameters parameters = new RayTraceParameters(system);
 

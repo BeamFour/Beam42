@@ -29,6 +29,7 @@ package org.redukti.jfotoptix.math;
 public class Transform3 {
 
     public final Vector3 translation;
+    /* Rotation matrix to rotate a unit vector toward z to the required direction */
     public final Matrix3 linear;
     public final boolean useLinear;
 
@@ -49,8 +50,9 @@ public class Transform3 {
                 this.useLinear = false;
             }
         } else {
-            Quaternion q = new Quaternion(Vector3.vector3_001, position.direction());
-            this.linear = Matrix3.rotation(q);
+            // Get a rotation matrix representing the rotation of unit vector in z
+            // to the direction vector.
+            this.linear = Matrix3.get_rotation_between(Vector3.vector3_001, position.direction());
             this.useLinear = true;
         }
     }
@@ -140,7 +142,7 @@ public class Transform3 {
                 return new Transform3(translation, Matrix3.diag(1.0, 1.0, 1.0), false);
             }
         } else {
-            return new Transform3(translation, Matrix3.rotation(new Quaternion(Vector3.vector3_001, direction)), true);
+            return new Transform3(translation, Matrix3.get_rotation_between(Vector3.vector3_001, direction), true);
         }
     }
 

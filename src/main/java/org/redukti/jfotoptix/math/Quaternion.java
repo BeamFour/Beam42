@@ -36,18 +36,25 @@ public class Quaternion {
         this.w = w;
     }
 
-    Quaternion (Vector3 a, Vector3 b)
+    public static Quaternion get_rotation_between (Vector3 a, Vector3 b)
     {
+        // Do not know the source of following equation
+        // Believe it generates a Quaternion representing the rotation
+        // of vector a to vector b
+        // Closest match of the algo:
+        // https://stackoverflow.com/questions/1171849/finding-quaternion-representing-the-rotation-from-one-vector-to-another
+
         Vector3 cp = a.crossProduct (b);
         double _x = cp.x ();
         double _y = cp.y ();
         double _z = cp.z ();
         double _w = a.dotProduct(b) + 1.0;
         double n = norm(_x, _y, _z, _w);
-        x = _x/n;
-        y = _y/n;
-        z = _z/n;
-        w = _w/n;
+        _x = _x/n;
+        _y = _y/n;
+        _z = _z/n;
+        _w = _w/n;
+        return new Quaternion(_x,_y,_z,_w);
     }
 
     static final double norm (double x, double y, double z, double w)

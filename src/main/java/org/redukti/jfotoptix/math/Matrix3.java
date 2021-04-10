@@ -60,7 +60,7 @@ public class Matrix3 {
     //
     // see https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation
     */
-    public static Matrix3 rotation(Quaternion q) {
+    public static Matrix3 to_rotation_matrix(Quaternion q) {
         double values[] = new double[9];
         values[idx(0, 0)] = 1.0 - 2.0 * (q.y * q.y + q.z * q.z);
         values[idx(1, 0)] = 2.0 * (q.x * q.y + q.z * q.w);
@@ -74,6 +74,22 @@ public class Matrix3 {
         values[idx(1, 2)] = 2.0 * (q.y * q.z - q.x * q.w);
         values[idx(2, 2)] = 1.0 - 2.0 * (q.x * q.x + q.y * q.y);
         return new Matrix3(values);
+    }
+
+    /**
+     * Get a rotation matrix that describes the rotation of vector a
+     * to obtain vector 3.
+     * @param a Unit vector
+     * @param b Unit vector
+     */
+    public static Matrix3 get_rotation_between(Vector3 a, Vector3 b) {
+        // Do not know the source of following equation
+        // Believe it generates a Quaternion representing the rotation
+        // of vector a to vector b
+        // Closest match of the algo:
+        // https://stackoverflow.com/questions/1171849/finding-quaternion-representing-the-rotation-from-one-vector-to-another
+        Quaternion q = Quaternion.get_rotation_between(a, b);
+        return to_rotation_matrix(q);
     }
 
     /** Matrix times vector */

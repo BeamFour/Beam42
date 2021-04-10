@@ -66,7 +66,6 @@ public abstract class Rotational extends CurveBase {
         return xy.times(p / r);
     }
 
-
     public Vector3 normal(Vector3 point) {
         return rotational_normal(point);
     }

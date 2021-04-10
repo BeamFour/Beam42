@@ -97,7 +97,6 @@ public abstract class CurveBase implements Curve {
         return origin;
     }
 
-
     @Override
     public Vector3 normal(Vector3 point) {
         return base_normal(point);

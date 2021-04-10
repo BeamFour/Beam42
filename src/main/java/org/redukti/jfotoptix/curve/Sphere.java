@@ -90,14 +90,14 @@ t= (sqrt((Bz^2+By^2+Bx^2)*R^2+(-Bz^2-By^2)*d^2+(2*Az*Bx*Bz+2*Ay*Bx*By)
 
         s = Math.sqrt(s);
 
-        // there are 2 possible sphere/line colision point, keep the right
+        // there are 2 possible sphere/line collision point, keep the right
         // one depending on ray direction
         if (_roc * bz > 0)
             s = -s;
 
         double t = (s - (bz * d + ax_bx + ay_by)); // / bz2_by2_bx2;
 
-        // do not colide if line intersection is before ray start position
+        // do not collide if line intersection is before ray start position
         if (t <= 0)
             return null;
 

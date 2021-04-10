@@ -46,16 +46,17 @@ public class Asphere extends ConicBase {
      * optical axis, so below we switch from x to z.
      */
     public static Vector3Pair compute_intersection(Vector3 origin, Vector3 direction, Asphere S) {
-  /* NOTE: variable 't' was
-   used by Feder as the vertex separation between previous
-   surface and this surface. In the new scheme, in which rays
-   are transformed to the coordinate system of the surface
-   before tracing, 't' is _zero_. It is still present in this
-   code to enable comparison with the Feder paper; the
-   optimizing compiler will eliminate it from the
-   expressions. */
         /* direction (X,Y,Z) is the vector along the ray to the surface */
         /* origin (x,y,z) is the vector form of the vertex of the surface */
+        /*
+        NOTE: variable 't' was
+        used by Feder as the vertex separation between previous
+        surface and this surface. In the new scheme, in which rays
+        are transformed to the coordinate system of the surface
+        before tracing, 't' is _zero_. It is still present in this
+        code to enable comparison with the Feder paper; the
+        optimizing compiler will eliminate it from the
+        expressions. */
         /* Feder paper equation (1) */
         double t = 0;
         double e = (t * origin.z()) - origin.dotProduct(direction);
@@ -82,29 +83,31 @@ public class Asphere extends ConicBase {
         for (int j = 0; j < 3; j++)
             delta_length[j] = -origin.v(j);
         Vector3 result = origin.plus(direction.times(L));
-        result = result.z(result.z()-t);
+        result = result.z(result.z() - t);
         Vector3 N = Vector3.vector3_0;
 
         /* Now (result) has x1, y1, z1 */
 
-  /* The ray has been traced to the osculating sphere with
-     curvature c1. Now we will iterate to get the intercept with
-     the nearby aspheric surface. Suppose the (rotationally
-     symmetric) aspheric is given by $$x = f(y,z)$$, and is a
-     function of $y^2 + z^2$ only. For a spherical surface, one
-     has $$x = r - (r^2 - s^2)^{1\over2}$$, where $s^2 = y^2 +
-     z^2$. For a general surface one may add deformation terms
-     to this expression and obtain $$x = c s^2 / (1 + (1 - c^2
-     s^2)^{1\over2})) + (A_2 s^2 + A_4 s^4 + ...) = f$$.  The
-     equation is expressed in this form in order to avoid
-     indeterminacy as c approaches zero, and in order to
-     represent surfaces that are nearly spherical. Near-spheres
-     cannot be handled well by a power series alone, especially
-     in the neighborhood of $s = 1 / c$.
+        /*
+        The ray has been traced to the osculating sphere with
+        curvature c1. Now we will iterate to get the intercept with
+        the nearby aspheric surface. Suppose the (rotationally
+        symmetric) aspheric is given by $$x = f(y,z)$$, and is a
+        function of $y^2 + z^2$ only. For a spherical surface, one
+        has $$x = r - (r^2 - s^2)^{1\over2}$$, where $s^2 = y^2 +
+        z^2$. For a general surface one may add deformation terms
+        to this expression and obtain $$x = c s^2 / (1 + (1 - c^2
+        s^2)^{1\over2})) + (A_2 s^2 + A_4 s^4 + ...) = f$$.  The
+        equation is expressed in this form in order to avoid
+        indeterminacy as c approaches zero, and in order to
+        represent surfaces that are nearly spherical. Near-spheres
+        cannot be handled well by a power series alone, especially
+        in the neighborhood of $s = 1 / c$.
 
-     In this implementation we include a term for the numerical
-     eccentricity so that we can trace any pure conic section
-     without using the $A_i$ terms. */
+        In this implementation we include a term for the numerical
+        eccentricity so that we can trace any pure conic section
+        without using the $A_i$ terms.
+        */
         final int TOLMAX = 10;
         double tolerance = 1e-15;
         int j = 0;
@@ -114,13 +117,15 @@ public class Asphere extends ConicBase {
             /* Feder equation s^2 = x^2 + y^2, section E */
             double s_2 = result.y() * result.y() + result.x() * result.x();
 
-      /* Get the point on aspheric which is at the same radius as
-         the intercept of the ray. Then compute a tangent plane to
-         the aspheric at this point and find where it intersects
-         the ray.  This point will lie very close to the aspheric
-         surface.  The first step is to compute the z-coordinate
-         on the aspheric surface using $\overline{z}_0 = f(x_0,
-         y_0)$. */
+            /*
+            Get the point on aspheric which is at the same radius as
+            the intercept of the ray. Then compute a tangent plane to
+            the aspheric at this point and find where it intersects
+            the ray.  This point will lie very close to the aspheric
+            surface.  The first step is to compute the z-coordinate
+            on the aspheric surface using $\overline{z}_0 = f(x_0,
+            y_0)$.
+            */
             /* (1 - k*c^2*s^2)^(1/2) - part of equation (12) */
             double temp = Math.sqrt(1.0 - S._c * S._c * s_2 * S._k);
             if (Double.isNaN(temp) || (1.0 + temp) == 0.0) {
@@ -133,8 +138,8 @@ public class Asphere extends ConicBase {
             double x_bar_0 = (S._c * s_2) / (1.0 + temp) + deform_sagitta(S, s_2);
             delta = Math.abs(result.z() - x_bar_0);
 
-      /* Get the direction numbers for the normal to the
-         aspheric: */
+            /* Get the direction numbers for the normal to the
+               aspheric: */
             /* Feder equation (13), l */
             double z1 = temp;
             temp = S._c + N.z() * deform_dz_dxy(S, s_2);

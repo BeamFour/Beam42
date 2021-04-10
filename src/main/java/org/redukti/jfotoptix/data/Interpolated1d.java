@@ -339,7 +339,7 @@ public class Interpolated1d {
         }
     }
 
-    public double interpolate_quadratic(int d, double x) {
+    double interpolate_quadratic(int d, double x) {
         PolyS p = _poly.get(_data_set.get_nearest(x));
 
         switch (d) {

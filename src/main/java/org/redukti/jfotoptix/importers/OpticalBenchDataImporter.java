@@ -551,12 +551,4 @@ public class OpticalBenchDataImporter {
         return Math.toRadians(view_angles.get_value_as_double(scenario)
                 / 2.0);
     }
-
-    public static void main(String[] args) throws Exception {
-
-        LensSpecifications specs = new LensSpecifications();
-        specs.parse_file("C:\\work\\github\\goptical\\data\\canon-rf-50mmf1.2\\canon-rf-50mmf1.2.txt");
-
-    }
-
 }

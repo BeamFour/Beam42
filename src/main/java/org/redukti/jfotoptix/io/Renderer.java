@@ -138,7 +138,7 @@ public abstract class Renderer {
     }
     public double get_feature_size() { return _feature_size; }
 
-    /** @internal Draw a point in 2d */
+    /** Draw a point in 2d */
     public abstract void draw_point (Vector2 p, Rgb rgb, PointStyle s);
     public abstract void draw_text (Vector2 pos, Vector2 dir,
                                     String str, EnumSet<TextAlignMask> a, int size,
@@ -150,12 +150,12 @@ public abstract class Renderer {
         draw_point(p, Rgb.rgb_gray, PointStyle.PointStyleDot);
     }
 
-    /** @internal Draw a line segment in 2d */
+    /** Draw a line segment in 2d */
     public void draw_segment (Vector2Pair s) {
         draw_segment(s, Rgb.rgb_gray);
     }
 
-    /** @internal Draw a line segment in 2d */
+    /**  Draw a line segment in 2d */
     public void draw_segment (Vector2 a, Vector2 b, Rgb rgb)
     {
         draw_segment (new Vector2Pair (a, b), rgb);

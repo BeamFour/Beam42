@@ -73,7 +73,7 @@ public abstract class DataSet {
     /** Get minimal and maximal y values found in data set */
     public Range get_y_range ()
     {
-        Range r = new Range(Double.MIN_VALUE, Double.MAX_VALUE);
+        Range r = new Range(Double.MAX_VALUE, Double.MIN_VALUE);
 
         int d = get_dimensions ();
         int[] x = new int[d];

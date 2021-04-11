@@ -1,0 +1,135 @@
+<?xml version="1.0" standalone="no"?>
+<svg width="800px" height="600px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <rect x="0" y="0" width="800" height="600"  fill="#ffffff" />
+    <defs>
+        <g id="dot">
+            <line x1="1" y1="1" x2="0" y2="0"  />
+        </g>
+        <g id="cross">
+            <line x1="-3" y1="0" x2="3" y2="0"  />
+            <line x1="0" y1="-3" x2="0" y2="3"  />
+        </g>
+        <g id="square">
+            <line x1="-3" y1="-3" x2="-3" y2="3"  />
+            <line x1="-3" y1="3" x2="3" y2="3"  />
+            <line x1="3" y1="3" x2="3" y2="-3"  />
+            <line x1="3" y1="-3" x2="-3" y2="-3"  />
+        </g>
+        <g id="round">
+            <ellipse cx="0" cy="0" rx="3" ry="3"  fill="none" /></g>
+        <g id="triangle">
+            <line x1="0" y1="-3" x2="-3" y2="3"  />
+            <line x1="-3" y1="3" x2="3" y2="3"  />
+            <line x1="0" y1="-3" x2="3" y2="3"  />
+        </g>
+    </defs>
+    <polygon fill="none" stroke="#000000" points="82.54,538.095 82.54,61.905 717.46,61.905 717.46,538.095 " />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="400" y="590.524" fill="#000000">The X axis</text>
+    <line x1="82.54" y1="361.994" x2="717.46" y2="361.994"  stroke="#000000" />
+    <use x="82.54" y="361.994" xlink:href="#cross"  stroke="#000000" />
+    <use x="82.54" y="61.905" xlink:href="#cross"  stroke="#000000" />
+    <use x="82.54" y="538.095" xlink:href="#cross"  stroke="#000000" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="82.54" y="556.095" fill="#000000">-20.0</text>
+    <use x="196.799" y="361.994" xlink:href="#cross"  stroke="#000000" />
+    <use x="196.799" y="61.905" xlink:href="#cross"  stroke="#000000" />
+    <use x="196.799" y="538.095" xlink:href="#cross"  stroke="#000000" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="196.799" y="556.095" fill="#000000">-15.0</text>
+    <use x="311.058" y="361.994" xlink:href="#cross"  stroke="#000000" />
+    <use x="311.058" y="61.905" xlink:href="#cross"  stroke="#000000" />
+    <use x="311.058" y="538.095" xlink:href="#cross"  stroke="#000000" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="311.058" y="556.095" fill="#000000">-10.0</text>
+    <use x="425.317" y="361.994" xlink:href="#cross"  stroke="#000000" />
+    <use x="425.317" y="61.905" xlink:href="#cross"  stroke="#000000" />
+    <use x="425.317" y="538.095" xlink:href="#cross"  stroke="#000000" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="425.317" y="556.095" fill="#000000">-5.00</text>
+    <use x="539.576" y="361.994" xlink:href="#cross"  stroke="#000000" />
+    <use x="539.576" y="61.905" xlink:href="#cross"  stroke="#000000" />
+    <use x="539.576" y="538.095" xlink:href="#cross"  stroke="#000000" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="539.576" y="556.095" fill="#000000">0.00</text>
+    <use x="653.835" y="361.994" xlink:href="#cross"  stroke="#000000" />
+    <use x="653.835" y="61.905" xlink:href="#cross"  stroke="#000000" />
+    <use x="653.835" y="538.095" xlink:href="#cross"  stroke="#000000" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="653.835" y="556.095" fill="#000000">5.00</text>
+    <use x="768.094" y="361.994" xlink:href="#cross"  stroke="#000000" />
+    <use x="768.094" y="61.905" xlink:href="#cross"  stroke="#000000" />
+    <use x="768.094" y="538.095" xlink:href="#cross"  stroke="#000000" />
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="768.094" y="556.095" fill="#000000">10.0</text>
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="20.635" y="306" transform="rotate(-90,20.635,300)" fill="#000000">The Y axis (x10^-1)</text>
+    <line x1="539.576" y1="538.095" x2="539.576" y2="61.905"  stroke="#000000" />
+    <use x="539.576" y="549.841" xlink:href="#cross"  stroke="#000000" />
+    <use x="717.46" y="549.841" xlink:href="#cross"  stroke="#000000" />
+    <use x="82.54" y="549.841" xlink:href="#cross"  stroke="#000000" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="555.841" fill="#000000">-3.00</text>
+    <use x="539.576" y="487.225" xlink:href="#cross"  stroke="#000000" />
+    <use x="717.46" y="487.225" xlink:href="#cross"  stroke="#000000" />
+    <use x="82.54" y="487.225" xlink:href="#cross"  stroke="#000000" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="493.225" fill="#000000">-2.00</text>
+    <use x="539.576" y="424.609" xlink:href="#cross"  stroke="#000000" />
+    <use x="717.46" y="424.609" xlink:href="#cross"  stroke="#000000" />
+    <use x="82.54" y="424.609" xlink:href="#cross"  stroke="#000000" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="430.609" fill="#000000">-1.00</text>
+    <use x="539.576" y="361.994" xlink:href="#cross"  stroke="#000000" />
+    <use x="717.46" y="361.994" xlink:href="#cross"  stroke="#000000" />
+    <use x="82.54" y="361.994" xlink:href="#cross"  stroke="#000000" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="367.994" fill="#000000">0.00</text>
+    <use x="539.576" y="299.378" xlink:href="#cross"  stroke="#000000" />
+    <use x="717.46" y="299.378" xlink:href="#cross"  stroke="#000000" />
+    <use x="82.54" y="299.378" xlink:href="#cross"  stroke="#000000" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="305.378" fill="#000000">1.00</text>
+    <use x="539.576" y="236.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="717.46" y="236.762" xlink:href="#cross"  stroke="#000000" />
+    <use x="82.54" y="236.762" xlink:href="#cross"  stroke="#000000" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="242.762" fill="#000000">2.00</text>
+    <use x="539.576" y="174.147" xlink:href="#cross"  stroke="#000000" />
+    <use x="717.46" y="174.147" xlink:href="#cross"  stroke="#000000" />
+    <use x="82.54" y="174.147" xlink:href="#cross"  stroke="#000000" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="180.147" fill="#000000">3.00</text>
+    <use x="539.576" y="111.531" xlink:href="#cross"  stroke="#000000" />
+    <use x="717.46" y="111.531" xlink:href="#cross"  stroke="#000000" />
+    <use x="82.54" y="111.531" xlink:href="#cross"  stroke="#000000" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="117.531" fill="#000000">4.00</text>
+    <use x="539.576" y="48.916" xlink:href="#cross"  stroke="#000000" />
+    <use x="717.46" y="48.916" xlink:href="#cross"  stroke="#000000" />
+    <use x="82.54" y="48.916" xlink:href="#cross"  stroke="#000000" />
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="54.916" fill="#000000">5.00</text>
+    <text style="font-size:18;text-align:center;text-anchor:middle;" x="539.576" y="370.994" fill="#000000">A simple test plot</text>
+    <line x1="82.54" y1="243.512" x2="93.966" y2="118.675"  stroke="#ff0000" />
+    <line x1="93.966" y1="118.675" x2="124.621" y2="127.11"  stroke="#ff0000" />
+    <line x1="124.621" y1="127.11" x2="156.826" y2="482.938"  stroke="#ff0000" />
+    <line x1="156.826" y1="482.938" x2="171.476" y2="538.095"  stroke="#ff0000" />
+    <line x1="171.476" y1="538.095" x2="177.345" y2="529.568"  stroke="#ff0000" />
+    <line x1="177.345" y1="529.568" x2="187.832" y2="482.917"  stroke="#ff0000" />
+    <line x1="187.832" y1="482.917" x2="192.873" y2="452.987"  stroke="#ff0000" />
+    <line x1="192.873" y1="452.987" x2="219.312" y2="363.552"  stroke="#ff0000" />
+    <line x1="219.312" y1="363.552" x2="253.347" y2="522.082"  stroke="#ff0000" />
+    <line x1="253.347" y1="522.082" x2="274.19" y2="497.181"  stroke="#ff0000" />
+    <line x1="274.19" y1="497.181" x2="275.196" y2="490.326"  stroke="#ff0000" />
+    <line x1="275.196" y1="490.326" x2="286.622" y2="381.683"  stroke="#ff0000" />
+    <line x1="286.622" y1="381.683" x2="287.458" y2="371.999"  stroke="#ff0000" />
+    <line x1="287.458" y1="371.999" x2="308.485" y2="126.427"  stroke="#ff0000" />
+    <line x1="308.485" y1="126.427" x2="342.548" y2="152.241"  stroke="#ff0000" />
+    <line x1="342.548" y1="152.241" x2="368.834" y2="454.898"  stroke="#ff0000" />
+    <line x1="368.834" y1="454.898" x2="373.681" y2="493.604"  stroke="#ff0000" />
+    <line x1="373.681" y1="493.604" x2="384.225" y2="536.535"  stroke="#ff0000" />
+    <line x1="384.225" y1="536.535" x2="389.96" y2="535.529"  stroke="#ff0000" />
+    <line x1="389.96" y1="535.529" x2="404.811" y2="473.606"  stroke="#ff0000" />
+    <line x1="404.811" y1="473.606" x2="437.1" y2="367.367"  stroke="#ff0000" />
+    <line x1="437.1" y1="367.367" x2="467.645" y2="517.975"  stroke="#ff0000" />
+    <line x1="467.645" y1="517.975" x2="478.868" y2="537.284"  stroke="#ff0000" />
+    <line x1="478.868" y1="537.284" x2="486.78" y2="513.458"  stroke="#ff0000" />
+    <line x1="486.78" y1="513.458" x2="496.048" y2="444.623"  stroke="#ff0000" />
+    <line x1="496.048" y1="444.623" x2="504.45" y2="352.81"  stroke="#ff0000" />
+    <line x1="504.45" y1="352.81" x2="533.301" y2="61.905"  stroke="#ff0000" />
+    <line x1="533.301" y1="61.905" x2="566.582" y2="252.35"  stroke="#ff0000" />
+    <line x1="566.582" y1="252.35" x2="584.199" y2="454.819"  stroke="#ff0000" />
+    <line x1="584.199" y1="454.819" x2="587.938" y2="485.671"  stroke="#ff0000" />
+    <line x1="587.938" y1="485.671" x2="599.091" y2="535.822"  stroke="#ff0000" />
+    <line x1="599.091" y1="535.822" x2="601.283" y2="537.941"  stroke="#ff0000" />
+    <line x1="601.283" y1="537.941" x2="625.31" y2="442.758"  stroke="#ff0000" />
+    <line x1="625.31" y1="442.758" x2="659.586" y2="390.739"  stroke="#ff0000" />
+    <line x1="659.586" y1="390.739" x2="683.103" y2="518.313"  stroke="#ff0000" />
+    <line x1="683.103" y1="518.313" x2="684.744" y2="524.37"  stroke="#ff0000" />
+    <line x1="684.744" y1="524.37" x2="695.982" y2="534.902"  stroke="#ff0000" />
+    <line x1="695.982" y1="534.902" x2="699.262" y2="526.045"  stroke="#ff0000" />
+    <line x1="699.262" y1="526.045" x2="717.46" y2="380.625"  stroke="#ff0000" />
+</svg>

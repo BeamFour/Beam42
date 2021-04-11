@@ -35,6 +35,6 @@ public class Test2DPlot {
         PlotRenderer plot_r = new PlotRenderer();
         RendererSvg renderer = new RendererSvg(800, 600);
         plot_r.draw_plot(renderer, p);
-        System.out.println(renderer.toString());
+        System.out.println(renderer.write(new StringBuilder()).toString());
     }
 }

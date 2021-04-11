@@ -254,7 +254,8 @@ public class PlotRenderer {
                 else if (useunit || usep10) {
                     lx += " (";
                     if (usep10)
-                        lx += String.format("x10^%i", pow10);
+                        //lx += String.format("x10^%i", pow10);
+                        lx += String.format("x10^%d", pow10);
                     if (useunit && usep10)
                         lx += " ";
                     if (useunit)

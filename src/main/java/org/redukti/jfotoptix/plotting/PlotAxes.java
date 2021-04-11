@@ -96,6 +96,13 @@ public class PlotAxes {
     Vector3 _pos;
     Vector3 _origin;
 
+    public PlotAxes() {
+        _grid = false;
+        _frame = true;
+        _pos = Vector3.vector3_0;
+        _origin = Vector3.vector3_0;
+    }
+
     static final int _axes_bits[] = {AxisMask.X.get_value(), AxisMask.Y.get_value(), AxisMask.Z.get_value()};
 
     /**

@@ -27,13 +27,11 @@ package org.redukti.jfotoptix.plotting;
 
 import org.redukti.jfotoptix.data.Range;
 import org.redukti.jfotoptix.data.Set1d;
-import org.redukti.jfotoptix.math.Vector2;
-import org.redukti.jfotoptix.math.Vector2Pair;
-import org.redukti.jfotoptix.math.Vector3;
-import org.redukti.jfotoptix.math.Vector3Pair;
+import org.redukti.jfotoptix.math.*;
 import org.redukti.jfotoptix.rendering.Renderer;
 import org.redukti.jfotoptix.rendering.RendererViewport;
 
+import java.text.DecimalFormat;
 import java.util.EnumSet;
 
 import static org.redukti.jfotoptix.rendering.Renderer.PointStyle.PointStyleCross;
@@ -41,6 +39,12 @@ import static org.redukti.jfotoptix.rendering.Renderer.Style.StyleForeground;
 import static org.redukti.jfotoptix.rendering.Renderer.TextAlignMask.*;
 
 public class PlotRenderer {
+
+    final DecimalFormat _decimal_format;
+
+    public PlotRenderer() {
+        _decimal_format = MathUtils.decimal_format();
+    }
 
     void draw_plot(RendererViewport r, Plot plot) {
         switch (plot.get_dimensions()) {
@@ -188,6 +192,10 @@ public class PlotRenderer {
                 false);
     }
 
+    static final String[] sc = {"y", "z", "a", "f", "p", "n", "u", "m", "",
+                                "k", "M", "G", "T", "P", "E", "Z", "Y"};
+
+
     void draw_axes_2d(RendererViewport renderer, PlotAxes a) {
         int N = 2;
         Vector2 p = new Vector2(a.get_position().x(), a.get_position().y());
@@ -198,7 +206,7 @@ public class PlotRenderer {
         Vector2Pair _window2d = renderer.get_window2d();
         Vector2Pair _window2d_fit = renderer.get_window2d_fit();
 
-        if (a._frame && N == 2)
+        if (a._frame)
             draw_frame_2d(renderer);
 
         for (int i = 0; i < N; i++) {
@@ -207,17 +215,14 @@ public class PlotRenderer {
 
             double s = step[i] = Math.abs(a.get_tics_step(i, r));
 
-            min[i] = (int) Math.rint((r.first - p.v(i)) / s);
-            max[i] = (int) Math.rint((r.second - p.v(i)) / s);
+            min[i] = MathUtils.trunc((r.first - p.v(i)) / s);
+            max[i] = MathUtils.trunc((r.second - p.v(i)) / s);
 
             pow10 = ax._pow10_scale ? (int) Math.floor(Math.log10(s)) : 0;
 
             String si_unit = "";
 
             if (ax._si_prefix) {
-                String sc[]
-                        = {"y", "z", "a", "f", "p", "n", "u", "m", "",
-                        "k", "M", "G", "T", "P", "E", "Z", "Y"};
                 int u = (24 + pow10 + ax._pow10) / 3;
                 if (u >= 0 && u < 17) {
                     si_unit = sc[u] + ax._unit;
@@ -242,7 +247,7 @@ public class PlotRenderer {
                     ld = Vector2.vector2_01;
                     break;
                 default:
-                    throw new IllegalStateException();
+                    throw new IllegalArgumentException("Invalid axis " + i);
             }
 
             // axis label
@@ -345,9 +350,7 @@ public class PlotRenderer {
             EnumSet<Renderer.TextAlignMask> align1 = EnumSet.of(TextAlignRight, TextAlignMiddle);
             EnumSet<Renderer.TextAlignMask> align2 = EnumSet.of(TextAlignTop, TextAlignCenter);
 
-            String s = String.format("%.3g",
-                    (x + p.v(i) - a._origin.v(i)) / Math.pow(10., pow10));
-
+            String s = _decimal_format.format((x + p.v(i) - a._origin.v(i)) / Math.pow(10., pow10));
             switch (N) {
                 case 2:
                     EnumSet<Renderer.TextAlignMask> align = i == 0 ? align0

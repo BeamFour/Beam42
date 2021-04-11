@@ -26,6 +26,7 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.rendering;
 
+import org.redukti.jfotoptix.math.MathUtils;
 import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector2Pair;
 
@@ -60,16 +61,8 @@ public class RendererSvg extends Renderer2d {
                 Rgb bg) {
         super();
 
-        _decimal_format = new DecimalFormat();
-        //formatter.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
-        _decimal_format.setMinimumIntegerDigits(1);
-        _decimal_format.setMaximumFractionDigits(3);
-        _decimal_format.setMinimumFractionDigits(0);
-        _decimal_format.setDecimalSeparatorAlwaysShown(false);
-        _decimal_format.setGroupingUsed(false);
-
+        _decimal_format = MathUtils.decimal_format();
         _2d_output_res = new Vector2(width, height);
-
         _styles_color[StyleBackground.value] = bg;
         _styles_color[Style.StyleForeground.value] = bg.negate();
 

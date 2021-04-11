@@ -29,69 +29,57 @@
     <use x="82.54" y="361.994" xlink:href="#cross"  stroke="#000000" />
     <use x="82.54" y="61.905" xlink:href="#cross"  stroke="#000000" />
     <use x="82.54" y="538.095" xlink:href="#cross"  stroke="#000000" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="82.54" y="556.095" fill="#000000">-20.0</text>
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="82.54" y="556.095" fill="#000000">-20</text>
     <use x="196.799" y="361.994" xlink:href="#cross"  stroke="#000000" />
     <use x="196.799" y="61.905" xlink:href="#cross"  stroke="#000000" />
     <use x="196.799" y="538.095" xlink:href="#cross"  stroke="#000000" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="196.799" y="556.095" fill="#000000">-15.0</text>
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="196.799" y="556.095" fill="#000000">-15</text>
     <use x="311.058" y="361.994" xlink:href="#cross"  stroke="#000000" />
     <use x="311.058" y="61.905" xlink:href="#cross"  stroke="#000000" />
     <use x="311.058" y="538.095" xlink:href="#cross"  stroke="#000000" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="311.058" y="556.095" fill="#000000">-10.0</text>
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="311.058" y="556.095" fill="#000000">-10</text>
     <use x="425.317" y="361.994" xlink:href="#cross"  stroke="#000000" />
     <use x="425.317" y="61.905" xlink:href="#cross"  stroke="#000000" />
     <use x="425.317" y="538.095" xlink:href="#cross"  stroke="#000000" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="425.317" y="556.095" fill="#000000">-5.00</text>
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="425.317" y="556.095" fill="#000000">-5</text>
     <use x="539.576" y="361.994" xlink:href="#cross"  stroke="#000000" />
     <use x="539.576" y="61.905" xlink:href="#cross"  stroke="#000000" />
     <use x="539.576" y="538.095" xlink:href="#cross"  stroke="#000000" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="539.576" y="556.095" fill="#000000">0.00</text>
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="539.576" y="556.095" fill="#000000">0</text>
     <use x="653.835" y="361.994" xlink:href="#cross"  stroke="#000000" />
     <use x="653.835" y="61.905" xlink:href="#cross"  stroke="#000000" />
     <use x="653.835" y="538.095" xlink:href="#cross"  stroke="#000000" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="653.835" y="556.095" fill="#000000">5.00</text>
-    <use x="768.094" y="361.994" xlink:href="#cross"  stroke="#000000" />
-    <use x="768.094" y="61.905" xlink:href="#cross"  stroke="#000000" />
-    <use x="768.094" y="538.095" xlink:href="#cross"  stroke="#000000" />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="768.094" y="556.095" fill="#000000">10.0</text>
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="653.835" y="556.095" fill="#000000">5</text>
     <text style="font-size:12;text-align:center;text-anchor:middle;" x="20.635" y="306" transform="rotate(-90,20.635,300)" fill="#000000">The Y axis (x10^-1)</text>
     <line x1="539.576" y1="538.095" x2="539.576" y2="61.905"  stroke="#000000" />
-    <use x="539.576" y="549.841" xlink:href="#cross"  stroke="#000000" />
-    <use x="717.46" y="549.841" xlink:href="#cross"  stroke="#000000" />
-    <use x="82.54" y="549.841" xlink:href="#cross"  stroke="#000000" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="555.841" fill="#000000">-3.00</text>
     <use x="539.576" y="487.225" xlink:href="#cross"  stroke="#000000" />
     <use x="717.46" y="487.225" xlink:href="#cross"  stroke="#000000" />
     <use x="82.54" y="487.225" xlink:href="#cross"  stroke="#000000" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="493.225" fill="#000000">-2.00</text>
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="493.225" fill="#000000">-2</text>
     <use x="539.576" y="424.609" xlink:href="#cross"  stroke="#000000" />
     <use x="717.46" y="424.609" xlink:href="#cross"  stroke="#000000" />
     <use x="82.54" y="424.609" xlink:href="#cross"  stroke="#000000" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="430.609" fill="#000000">-1.00</text>
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="430.609" fill="#000000">-1</text>
     <use x="539.576" y="361.994" xlink:href="#cross"  stroke="#000000" />
     <use x="717.46" y="361.994" xlink:href="#cross"  stroke="#000000" />
     <use x="82.54" y="361.994" xlink:href="#cross"  stroke="#000000" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="367.994" fill="#000000">0.00</text>
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="367.994" fill="#000000">0</text>
     <use x="539.576" y="299.378" xlink:href="#cross"  stroke="#000000" />
     <use x="717.46" y="299.378" xlink:href="#cross"  stroke="#000000" />
     <use x="82.54" y="299.378" xlink:href="#cross"  stroke="#000000" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="305.378" fill="#000000">1.00</text>
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="305.378" fill="#000000">1</text>
     <use x="539.576" y="236.762" xlink:href="#cross"  stroke="#000000" />
     <use x="717.46" y="236.762" xlink:href="#cross"  stroke="#000000" />
     <use x="82.54" y="236.762" xlink:href="#cross"  stroke="#000000" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="242.762" fill="#000000">2.00</text>
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="242.762" fill="#000000">2</text>
     <use x="539.576" y="174.147" xlink:href="#cross"  stroke="#000000" />
     <use x="717.46" y="174.147" xlink:href="#cross"  stroke="#000000" />
     <use x="82.54" y="174.147" xlink:href="#cross"  stroke="#000000" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="180.147" fill="#000000">3.00</text>
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="180.147" fill="#000000">3</text>
     <use x="539.576" y="111.531" xlink:href="#cross"  stroke="#000000" />
     <use x="717.46" y="111.531" xlink:href="#cross"  stroke="#000000" />
     <use x="82.54" y="111.531" xlink:href="#cross"  stroke="#000000" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="117.531" fill="#000000">4.00</text>
-    <use x="539.576" y="48.916" xlink:href="#cross"  stroke="#000000" />
-    <use x="717.46" y="48.916" xlink:href="#cross"  stroke="#000000" />
-    <use x="82.54" y="48.916" xlink:href="#cross"  stroke="#000000" />
-    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="54.916" fill="#000000">5.00</text>
+    <text style="font-size:12;text-align:right;text-anchor:end;" x="76.54" y="117.531" fill="#000000">4</text>
     <text style="font-size:18;text-align:center;text-anchor:middle;" x="400" y="39.952" fill="#000000">A simple test plot</text>
     <line x1="82.54" y1="243.512" x2="93.966" y2="118.675"  stroke="#ff0000" />
     <line x1="93.966" y1="118.675" x2="124.621" y2="127.11"  stroke="#ff0000" />

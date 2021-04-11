@@ -43,15 +43,14 @@ import static org.redukti.jfotoptix.rendering.Renderer.TextAlignMask.*;
 public class PlotRenderer {
 
     void draw_plot(RendererViewport r, Plot plot) {
-        Vector2Pair _window2d = r.get_window2d();
-        Vector2Pair _window2d_fit = r.get_window2d_fit();
         switch (plot.get_dimensions()) {
-            case 1:
-
+            case 1: {
                 set_2d_plot_window(r, plot);
                 draw_axes_2d(r, plot.get_axes());
 
                 // plot title
+                Vector2Pair _window2d = r.get_window2d();
+                Vector2Pair _window2d_fit = r.get_window2d_fit();
                 r.draw_text(
                         new Vector2((_window2d.v0.x() + _window2d.v1.x()) / 2.,
                                 (_window2d_fit.v1.y() + _window2d.v1.y()) / 2.),
@@ -66,6 +65,9 @@ public class PlotRenderer {
                 }
 
                 break;
+            }
+            default:
+                throw new IllegalArgumentException("Unsupported dimensions " + plot.get_dimensions());
         }
     }
 

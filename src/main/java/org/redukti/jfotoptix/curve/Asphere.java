@@ -59,11 +59,11 @@ public class Asphere extends ConicBase {
         expressions. */
         /* Feder paper equation (1) */
         double t = 0;
-        double e = (t * origin.z()) - origin.dotProduct(direction);
+        double e = (t * origin.z()) - origin.dot(direction);
         /* Feder paper equation (2) */
         double M_1x = origin.z() + e * direction.z() - t;
         /* Feder paper equation (3) */
-        double M_1_2 = origin.dotProduct(origin) - (e * e) + (t * t) - (2.0 * t * origin.z());
+        double M_1_2 = origin.dot(origin) - (e * e) + (t * t) - (2.0 * t * origin.z());
         double r_1_2 = 1. / (S._c * S._c);
         if (M_1_2 > r_1_2) {
             M_1_2 = r_1_2; /* SPECIAL RULE! 96-01-22 */
@@ -150,7 +150,7 @@ public class Asphere extends ConicBase {
             N = new Vector3(x1, y1, z1);
 
             /* Get the distance from aspheric point to ray intercept */
-            double G_0 = N.z() * (x_bar_0 - result.z()) / (direction.dotProduct(N));
+            double G_0 = N.z() * (x_bar_0 - result.z()) / (direction.dot(N));
 
             /* and compute new estimate of intercept point: */
             result = result.plus(direction.times(G_0));

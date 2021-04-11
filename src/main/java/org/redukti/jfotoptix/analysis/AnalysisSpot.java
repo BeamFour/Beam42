@@ -65,7 +65,7 @@ public class AnalysisSpot extends AnalysisPointImage {
         super(system);
         _axes = new PlotAxes();
         _axes.set_show_axes (false, PlotAxes.AxisMask.XY);
-        _axes.set_label ("Saggital distance", PlotAxes.AxisMask.X);
+        _axes.set_label ("Sagittal distance", PlotAxes.AxisMask.X);
         _axes.set_label ("Tangential distance", PlotAxes.AxisMask.Y);
         _axes.set_unit ("m", true, true, -3, PlotAxes.AxisMask.XY);
     }

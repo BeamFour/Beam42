@@ -44,11 +44,11 @@ public class Quaternion {
         // Closest match of the algo:
         // https://stackoverflow.com/questions/1171849/finding-quaternion-representing-the-rotation-from-one-vector-to-another
 
-        Vector3 cp = a.crossProduct (b);
+        Vector3 cp = a.cross(b);
         double _x = cp.x ();
         double _y = cp.y ();
         double _z = cp.z ();
-        double _w = a.dotProduct(b) + 1.0;
+        double _w = a.dot(b) + 1.0;
         double n = norm(_x, _y, _z, _w);
         _x = _x/n;
         _y = _y/n;
@@ -62,5 +62,35 @@ public class Quaternion {
         return Math.sqrt (x * x + y * y + z * z + w * w);
     }
 
+    public String toString() {
+        return "["+x+','+y+','+z+','+w+']';
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Quaternion that = (Quaternion) o;
+
+        if (Double.compare(that.x, x) != 0) return false;
+        if (Double.compare(that.y, y) != 0) return false;
+        if (Double.compare(that.z, z) != 0) return false;
+        return Double.compare(that.w, w) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(x);
+        result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(y);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(z);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(w);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
 }

@@ -16,4 +16,10 @@ public class QuaternionTest {
         }
     }
 
+    // test taken from https://github.com/toji/gl-matrix
+    @Test
+    public void testAtRightAngle() {
+        Quaternion q = Quaternion.get_rotation_between(Vector3.vector3_010, Vector3.vector3_100);
+        Assertions.assertEquals(q, new Quaternion(0.0,0.0,-0.7071067811865475,0.7071067811865475));
+    }
 }

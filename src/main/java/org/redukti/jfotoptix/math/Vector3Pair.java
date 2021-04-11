@@ -77,8 +77,8 @@ public class Vector3Pair {
 
     public double pl_ln_intersect_scale(Vector3Pair line) {
         // See https://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection
-        return (origin().dotProduct(normal()) - normal().dotProduct(line.origin())) /
-                (line.normal().dotProduct(normal()));
+        return (origin().dot(normal()) - normal().dot(line.origin())) /
+                (line.normal().dot(normal()));
     }
     public Vector3 pl_ln_intersect (Vector3Pair line)
     {

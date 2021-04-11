@@ -320,8 +320,8 @@ public class RayTracer {
     Vector3 compute_refraction(OpticalSurface surface, Vector3Pair ray, Vector3 normal, double mu) {
         Vector3 N = normal.times(-1.0); // Because we changed sign at intersection
         // See Feder paper p632
-        double O2 = N.dotProduct(N);
-        double E1 = ray.direction().dotProduct(N);
+        double O2 = N.dot(N);
+        double E1 = ray.direction().dot(N);
         double E1_ = Math.sqrt(O2 * (1.0 - mu * mu) + mu * mu * E1 * E1);
         if (Double.isNaN(E1_)) {
             return null;
@@ -339,7 +339,7 @@ public class RayTracer {
         assert (Math.abs(normal.len() - 1.0) < 1e-10);
         assert (Math.abs((ray.direction().len()) - 1.0) < 1e-10);
 
-        double cosi = normal.dotProduct(ray.direction());
+        double cosi = normal.dot(ray.direction());
         double sint2 = MathUtils.square(refract_index) * (1.0 - MathUtils.square(cosi));
 
         if (sint2 > 1.0)
@@ -371,7 +371,7 @@ public class RayTracer {
         assert (Math.abs(normal.len() - 1.0) < 1e-10);
         assert (Math.abs((ray.direction().len()) - 1.0) < 1e-10);
 
-        double cosi = normal.dotProduct(ray.direction());
+        double cosi = normal.dot(ray.direction());
 
         return ray.direction().minus(normal.times(2.0 * cosi));
     }

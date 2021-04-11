@@ -84,16 +84,7 @@ public class Vector3 {
         return new Vector3(x(), y(), v);
     }
 
-//    public Vector3 mul (Vector3 v)
-//    {
-//        double vec[] = new double[N];
-//        for (int i = 0; i < N; i++)
-//            vec[i] = this.values[i] * v.values[i];
-//
-//        return new Vector3(vec);
-//    }
-
-    public double dotProduct(Vector3 v)
+    public double dot(Vector3 v)
     {
         double r = 0;
         for (int i = 0; i < N; i++)
@@ -108,7 +99,7 @@ public class Vector3 {
      *
      * https://en.wikipedia.org/wiki/Cross_product
      */
-    public Vector3 crossProduct(Vector3 b) {
+    public Vector3 cross(Vector3 b) {
         return new Vector3(y() * b.z() - z() * b.y(),
                 z() * b.x() - x() * b.z(),
                 x() * b.y() - y() * b.x());

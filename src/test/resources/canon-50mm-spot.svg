@@ -24,7 +24,7 @@
         </g>
     </defs>
     <polygon fill="none" stroke="#ffffff" points="30.952,269.048 30.952,30.952 269.048,30.952 269.048,269.048 " />
-    <text style="font-size:12;text-align:center;text-anchor:middle;" x="150" y="298.262" fill="#ffffff">Saggital distance (um)</text>
+    <text style="font-size:12;text-align:center;text-anchor:middle;" x="150" y="298.262" fill="#ffffff">Sagittal distance (um)</text>
     <use x="70.635" y="30.952" xlink:href="#cross"  stroke="#ffffff" />
     <use x="70.635" y="269.048" xlink:href="#cross"  stroke="#ffffff" />
     <text style="font-size:12;text-align:center;text-anchor:middle;" x="70.635" y="287.048" fill="#ffffff">-44</text>

@@ -96,7 +96,7 @@ public class Distribution {
         _scaling = margin;
     }
 
-    void set_uniform_pattern ()
+    public void set_uniform_pattern ()
     {
         switch (_pattern)
         {

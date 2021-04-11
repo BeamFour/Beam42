@@ -32,7 +32,7 @@ public class PlotAxes {
     /**
      * Specify axes
      */
-    enum AxisMask {
+    public enum AxisMask {
         X(1),
         Y(2),
         Z(4),
@@ -125,7 +125,7 @@ public class PlotAxes {
     /**
      * @This sets tics count. @see {set_tics_step, set_tics_base}
      */
-    void set_tics_count(int count, AxisMask a) {
+    public void set_tics_count(int count, AxisMask a) {
         for (int i = 0; i < _axes_bits.length; i++) {
             if ((a.get_value() & _axes_bits[i]) != 0) {
                 _axes[i]._count = count;
@@ -161,7 +161,7 @@ public class PlotAxes {
     /**
      * This sets axis tics values origin.
      */
-    void set_origin(Vector3 origin) {
+    public void set_origin(Vector3 origin) {
         _origin = origin;
     }
 
@@ -175,7 +175,7 @@ public class PlotAxes {
     /**
      * This returns axis position
      */
-    void set_position(Vector3 position) {
+    public void set_position(Vector3 position) {
         _pos = position;
     }
 
@@ -218,7 +218,7 @@ public class PlotAxes {
     /**
      * @This sets axes visibility.
      */
-    void set_show_axes(boolean show, AxisMask a) {
+    public void set_show_axes(boolean show, AxisMask a) {
         for (int i = 0; i < _axes_bits.length; i++) {
             if ((a.get_value() & _axes_bits[i]) != 0) {
                 _axes[i]._axis = show;
@@ -278,7 +278,7 @@ public class PlotAxes {
     /**
      * This set axis label
      */
-    void set_label(String label, AxisMask a) {
+    public void set_label(String label, AxisMask a) {
         for (int i = 0; i < _axes_bits.length; i++) {
             if ((a.get_value() & _axes_bits[i]) != 0) {
                 _axes[i]._label = label;
@@ -297,7 +297,7 @@ public class PlotAxes {
      * and the @tt pow10 parameter can be used to scale base unit
      * by power of ten (useful when input data use scaled SI base unit).
      */
-    void set_unit(String unit, boolean pow10_scale,
+    public void set_unit(String unit, boolean pow10_scale,
                   boolean si_prefix, int pow10, AxisMask a) {
         for (int i = 0; i < _axes_bits.length; i++) {
             if ((a.get_value() & _axes_bits[i]) != 0) {

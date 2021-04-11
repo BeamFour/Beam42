@@ -74,6 +74,12 @@ public class Vector3 {
         return this.values[2];
     }
 
+    public final Vector3 x(double v) {
+        return new Vector3(v, y(), z());
+    }
+    public final Vector3 y(double v) {
+        return new Vector3(x(), v, z());
+    }
     public final Vector3 z(double v) {
         return new Vector3(x(), y(), v);
     }

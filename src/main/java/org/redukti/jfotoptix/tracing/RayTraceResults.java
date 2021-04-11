@@ -27,7 +27,9 @@ Original GNU Optical License and Authors are as follows:
 package org.redukti.jfotoptix.tracing;
 
 import org.redukti.jfotoptix.math.Vector3;
+import org.redukti.jfotoptix.math.Vector3Pair;
 import org.redukti.jfotoptix.sys.Element;
+import org.redukti.jfotoptix.sys.Image;
 import org.redukti.jfotoptix.sys.RaySource;
 import org.redukti.jfotoptix.sys.Surface;
 
@@ -57,9 +59,53 @@ public class RayTraceResults {
     public List<TracedRay> get_generated(Element e) {
         RaysAtElement er = get_element_result (e);
         if (er == null) {
-            throw new IllegalArgumentException("No traced rays at element " + e);
+            throw new IllegalArgumentException("No generated rays at element " + e);
         }
         return er._generated;
+    }
+
+    public Vector3 get_intercepted_center(Image image) {
+        Vector3Pair win = get_intercepted_window (image);
+        return (win.v0.plus(win.v1)).divide(2);
+    }
+
+    public List<TracedRay> get_intercepted(Element e) {
+        RaysAtElement er = get_element_result (e);
+        if (er == null) {
+            throw new IllegalArgumentException("No intercepted rays at element " + e);
+        }
+        return er._intercepted;
+    }
+
+    public Vector3Pair get_intercepted_window (Surface s)
+    {
+        List<TracedRay> intercepts = get_intercepted (s);
+
+        if (intercepts.isEmpty ())
+            throw new IllegalArgumentException ("no ray intercepts found on the surface");
+
+        Vector3 first = intercepts.get(0).get_intercept_point ();
+        Vector3 second = first;
+        for (TracedRay i : intercepts)
+        {
+            Vector3 ip = i.get_intercept_point ();
+
+            if (first.x () > ip.x ())
+                first = first.x (ip.x ());
+            else if (second.x () < ip.x ())
+                second = second.x (ip.x ());
+
+            if (first.y () > ip.y ())
+                first = first.y (ip.y ());
+            else if (second.y () < ip.y ())
+                second = second.y (ip.y ());
+
+            if (first.z () > ip.z ())
+                first = first.z (ip.z ());
+            else if (second.z () < ip.z ())
+                second = second.z (ip.z ());
+        }
+        return new Vector3Pair(first, second);
     }
 
     public List<RaySource> get_source_list() {
@@ -109,5 +155,21 @@ public class RayTraceResults {
         }
         return res;
     }
+
+    public Vector3 get_intercepted_centroid(Image image) {
+        List<TracedRay> intercepts = get_intercepted (image);
+        int count = 0;
+        Vector3 center = Vector3.vector3_0;
+        if (intercepts.isEmpty ())
+            throw new IllegalArgumentException ("no ray intercepts found on the surface");
+        for (TracedRay i : intercepts)
+        {
+            center = center.plus(i.get_intercept_point ());
+            count++;
+        }
+        center = center.divide(count);
+        return center;
+    }
+
 
 }

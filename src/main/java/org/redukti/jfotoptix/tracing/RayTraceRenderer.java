@@ -78,7 +78,7 @@ public class RayTraceRenderer {
         }
     }
 
-    static Rgb ray_to_rgb(LightRay ray) {
+    public static Rgb ray_to_rgb(LightRay ray) {
 //        switch (_ray_color_mode)
 //        {
 //            case RayColorWavelen:

@@ -43,7 +43,7 @@ public class PlotRenderer {
     final DecimalFormat _decimal_format;
 
     public PlotRenderer() {
-        _decimal_format = MathUtils.decimal_format();
+        _decimal_format = MathUtils.decimal_format(0);
     }
 
     void draw_plot(RendererViewport r, Plot plot) {
@@ -196,7 +196,7 @@ public class PlotRenderer {
                                 "k", "M", "G", "T", "P", "E", "Z", "Y"};
 
 
-    void draw_axes_2d(RendererViewport renderer, PlotAxes a) {
+    public void draw_axes_2d(RendererViewport renderer, PlotAxes a) {
         int N = 2;
         Vector2 p = new Vector2(a.get_position().x(), a.get_position().y());
         int pow10;

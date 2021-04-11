@@ -33,14 +33,18 @@ public class MathUtils {
     public static int trunc(double value) {
         return (int)(value<0 ? Math.ceil(value) : Math.floor(value));
     }
-    public static DecimalFormat decimal_format() {
+    public static DecimalFormat decimal_format(int maxFractionDigits) {
         DecimalFormat _decimal_format = new DecimalFormat();
         //formatter.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
         _decimal_format.setMinimumIntegerDigits(1);
-        _decimal_format.setMaximumFractionDigits(3);
+        _decimal_format.setMaximumFractionDigits(maxFractionDigits);
         _decimal_format.setMinimumFractionDigits(0);
         _decimal_format.setDecimalSeparatorAlwaysShown(false);
         _decimal_format.setGroupingUsed(false);
         return _decimal_format;
     }
+    public static DecimalFormat decimal_format() {
+        return decimal_format(3);
+    }
+
 }

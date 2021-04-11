@@ -118,12 +118,17 @@ public class RayTraceParameters {
     public void set_default_distribution(Distribution distribution) {
         _default_distribution = distribution;
     }
+    public Distribution get_default_distribution() { return _default_distribution; }
 
     public StringBuilder sequenceToString(StringBuilder sb) {
         for (Element e: _sequence) {
             sb.append(e.toString()).append(System.lineSeparator());
         }
         return sb;
+    }
+
+    public List<Element> get_sequence() {
+        return _sequence;
     }
 
 }

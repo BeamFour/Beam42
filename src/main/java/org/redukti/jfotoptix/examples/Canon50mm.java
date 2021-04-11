@@ -1,5 +1,6 @@
 package org.redukti.jfotoptix.examples;
 
+import org.redukti.jfotoptix.analysis.AnalysisSpot;
 import org.redukti.jfotoptix.importers.OpticalBenchDataImporter;
 import org.redukti.jfotoptix.layout.SystemLayout2D;
 import org.redukti.jfotoptix.rendering.RendererSvg;
@@ -8,6 +9,7 @@ import org.redukti.jfotoptix.math.Matrix3;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
+import org.redukti.jfotoptix.rendering.Rgb;
 import org.redukti.jfotoptix.sys.OpticalSystem;
 import org.redukti.jfotoptix.sys.PointSource;
 import org.redukti.jfotoptix.tracing.RayTraceParameters;
@@ -61,6 +63,9 @@ public class Canon50mm {
         RayTraceResults result = rayTracer.trace(system, parameters);
         RayTraceRenderer.draw_2d(renderer, result, false, null);
 
+        renderer =  new RendererSvg (300, 300, Rgb.rgb_black);
+        AnalysisSpot spot = new AnalysisSpot(system);
+        spot.draw_diagram(renderer, true);
         System.out.println(renderer.write(new StringBuilder()).toString());
 
     }

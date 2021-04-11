@@ -135,7 +135,7 @@ public class RendererSvg extends Renderer2d {
         _out.append(" />").append(System.lineSeparator());
     }
 
-    void clear() {
+    public void clear() {
         _out.setLength(0);
 
         // background

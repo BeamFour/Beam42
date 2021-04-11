@@ -36,6 +36,10 @@ public class Quaternion {
         this.w = w;
     }
 
+    /**
+     * Get shortest arc rotation between for a to be in the same direction as b.
+     * Both vectors must be unit vectors.
+     */
     public static Quaternion get_rotation_between (Vector3 a, Vector3 b)
     {
         // Do not know the source of following equation
@@ -43,6 +47,9 @@ public class Quaternion {
         // of vector a to vector b
         // Closest match of the algo:
         // https://stackoverflow.com/questions/1171849/finding-quaternion-representing-the-rotation-from-one-vector-to-another
+        // FIXME It seems this implementation is not safe
+        // See QuaternionBase<Derived>::setFromTwoVectors in eigen library
+        // Also stackoverflow discussion
 
         Vector3 cp = a.cross(b);
         double _x = cp.x ();

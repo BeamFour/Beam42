@@ -79,16 +79,16 @@ public class Matrix3 {
     /**
      * Get a rotation matrix that describes the rotation of vector a
      * to obtain vector 3.
-     * @param a Unit vector
-     * @param b Unit vector
+     * @param from Unit vector
+     * @param to Unit vector
      */
-    public static Matrix3 get_rotation_between(Vector3 a, Vector3 b) {
+    public static Matrix3 get_rotation_between(Vector3 from, Vector3 to) {
         // Do not know the source of following equation
         // Believe it generates a Quaternion representing the rotation
         // of vector a to vector b
         // Closest match of the algo:
         // https://stackoverflow.com/questions/1171849/finding-quaternion-representing-the-rotation-from-one-vector-to-another
-        Quaternion q = Quaternion.get_rotation_between(a, b);
+        Quaternion q = Quaternion.get_rotation_between(from, to);
         return to_rotation_matrix(q);
     }
 

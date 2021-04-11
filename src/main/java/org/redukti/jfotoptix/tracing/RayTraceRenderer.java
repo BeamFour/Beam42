@@ -78,16 +78,11 @@ public class RayTraceRenderer {
         }
     }
 
-    public static Rgb ray_to_rgb(LightRay ray) {
-//        switch (_ray_color_mode)
-//        {
-//            case RayColorWavelen:
+    /**
+     * Get color to use for a ray
+     */
+    static Rgb ray_to_rgb(LightRay ray) {
         return SpectralLine.get_wavelen_color(ray.get_wavelen());
-
-//            default:
-//            case RayColorFixed:
-//                return get_style_color (StyleRay);
-//        }
     }
 
     static void draw_ray_line(Renderer r, Vector2Pair l, TracedRay ray) {
@@ -97,7 +92,6 @@ public class RayTraceRenderer {
     static void draw_ray_line(Renderer r, Vector3Pair l, TracedRay ray) {
         r.draw_segment(l, ray_to_rgb(ray));
     }
-
 
     static boolean draw_traced_ray_recurs(Renderer renderer, TracedRay ray, double lost_len,
                                           Element ref, boolean hit_image, int D, boolean draw_lost) {

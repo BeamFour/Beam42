@@ -26,6 +26,7 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.analysis;
 
+import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.math.MathUtils;
 import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector2Pair;
@@ -36,7 +37,6 @@ import org.redukti.jfotoptix.rendering.Renderer;
 import org.redukti.jfotoptix.rendering.RendererViewport;
 import org.redukti.jfotoptix.sys.OpticalSystem;
 import org.redukti.jfotoptix.sys.Surface;
-import org.redukti.jfotoptix.tracing.RayTraceRenderer;
 import org.redukti.jfotoptix.tracing.TracedRay;
 
 /**
@@ -115,7 +115,7 @@ public class AnalysisSpot extends AnalysisPointImage {
         {
             // dont need global transform here, draw ray intercept points in
             // surface local coordinates.
-            renderer.draw_point (ray.get_intercept_point ().project_xy (), RayTraceRenderer.ray_to_rgb (ray), Renderer.PointStyle.PointStyleDot);
+            renderer.draw_point (ray.get_intercept_point ().project_xy (), SpectralLine.get_wavelen_color(ray.get_wavelen()), Renderer.PointStyle.PointStyleDot);
         }
     }
 

@@ -99,6 +99,7 @@ public class SpectralLine {
     public static Rgb get_wavelen_color (double wl) {
         // based on algorithm from Dan Bruton
         // (www.physics.sfasu.edu/astro/color.html)
+        // http://www.physics.sfasu.edu/astro/color/spectra.html
 
         if (wl < 380.0 || wl > 780.0)
             return Rgb.rgb_black;

@@ -119,7 +119,7 @@ public abstract class Renderer {
     Rgb[] _styles_color = new Rgb[Style.StyleLast.value];
     RayColorMode _ray_color_mode;
     IntensityMode _intensity_mode;
-    float _max_intensity; // max ray intensity updated on
+    //double _max_intensity; // max ray intensity updated on
 
     public Renderer()
     {
@@ -223,4 +223,8 @@ public abstract class Renderer {
     public void group_end ()
     {
     }
+
+//    public void set_max_intensity(double v) {
+//        _max_intensity = v;
+//    }
 }

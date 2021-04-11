@@ -1,3 +1,29 @@
+/*
+The software is ported from Goptical, hence is licensed under the GPL.
+Copyright (c) 2021 Dibyendu Majumdar
+
+Original GNU Optical License and Authors are as follows:
+
+      The Goptical library is free software; you can redistribute it
+      and/or modify it under the terms of the GNU General Public
+      License as published by the Free Software Foundation; either
+      version 3 of the License, or (at your option) any later version.
+
+      The Goptical library is distributed in the hope that it will be
+      useful, but WITHOUT ANY WARRANTY; without even the implied
+      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+      See the GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public
+      License along with the Goptical library; if not, write to the
+      Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+      Boston, MA 02111-1307 USA
+
+      Copyright (C) 2010-2011 Free Software Foundation, Inc
+      Author: Alexandre Becoulet
+ */
+
+
 package org.redukti.jfotoptix.analysis;
 
 import org.redukti.jfotoptix.math.MathUtils;
@@ -13,13 +39,23 @@ import org.redukti.jfotoptix.sys.Surface;
 import org.redukti.jfotoptix.tracing.RayTraceRenderer;
 import org.redukti.jfotoptix.tracing.TracedRay;
 
+/**
+ Spot diagram analysis
+
+ This class is designed to plot spot diagram and perform
+ related analysis.
+ */
 public class AnalysisSpot extends AnalysisPointImage {
 
+    /** spot centroid */
     Vector3 _centroid;
 
     boolean _processed_analysis;
+    /** spot maximum radius */
     double _max_radius;
+    /** spot root mean square radius */
     double _rms_radius;
+    /** amount of light intensity in the whole spot */
     double _tot_intensity;
     double _useful_radius;
 
@@ -73,8 +109,8 @@ public class AnalysisSpot extends AnalysisPointImage {
 
     void draw_intercepts (RendererViewport renderer, Surface s)
     {
-        double _max_intensity = _results.get_max_ray_intensity ();
-
+//        double max_intensity = _results.get_max_ray_intensity ();
+//        renderer.set_max_intensity(max_intensity);
         for (TracedRay ray : _results.get_intercepted (s))
         {
             // dont need global transform here, draw ray intercept points in

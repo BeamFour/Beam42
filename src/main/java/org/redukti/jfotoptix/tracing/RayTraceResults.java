@@ -41,10 +41,10 @@ import java.util.Map;
 public class RayTraceResults {
 
     static final class RaysAtElement {
-            List<TracedRay> _intercepted = new ArrayList<>(); // list of rays for each intercepted surfaces
-            List<TracedRay> _generated = new ArrayList<>(); // list of rays for each generator surfaces
-            boolean _save_intercepted_list = true;
-            boolean _save_generated_list = true;
+        List<TracedRay> _intercepted = new ArrayList<>(); // list of rays for each intercepted surfaces
+        List<TracedRay> _generated = new ArrayList<>(); // list of rays for each generator surfaces
+        boolean _save_intercepted_list = true;
+        boolean _save_generated_list = true;
     }
 
     Map<Integer, RaysAtElement> raysByElement = new HashMap<>();
@@ -57,7 +57,7 @@ public class RayTraceResults {
     }
 
     public List<TracedRay> get_generated(Element e) {
-        RaysAtElement er = get_element_result (e);
+        RaysAtElement er = get_element_result(e);
         if (er == null) {
             throw new IllegalArgumentException("No generated rays at element " + e);
         }
@@ -65,45 +65,43 @@ public class RayTraceResults {
     }
 
     public Vector3 get_intercepted_center(Image image) {
-        Vector3Pair win = get_intercepted_window (image);
+        Vector3Pair win = get_intercepted_window(image);
         return (win.v0.plus(win.v1)).divide(2);
     }
 
     public List<TracedRay> get_intercepted(Element e) {
-        RaysAtElement er = get_element_result (e);
+        RaysAtElement er = get_element_result(e);
         if (er == null) {
             throw new IllegalArgumentException("No intercepted rays at element " + e);
         }
         return er._intercepted;
     }
 
-    public Vector3Pair get_intercepted_window (Surface s)
-    {
-        List<TracedRay> intercepts = get_intercepted (s);
+    public Vector3Pair get_intercepted_window(Surface s) {
+        List<TracedRay> intercepts = get_intercepted(s);
 
-        if (intercepts.isEmpty ())
-            throw new IllegalArgumentException ("no ray intercepts found on the surface");
+        if (intercepts.isEmpty())
+            throw new IllegalArgumentException("No ray intercepts found on the surface " + s);
 
-        Vector3 first = intercepts.get(0).get_intercept_point ();
+        Vector3 first = intercepts.get(0).get_intercept_point();
         Vector3 second = first;
-        for (TracedRay i : intercepts)
-        {
-            Vector3 ip = i.get_intercept_point ();
+        for (TracedRay i : intercepts) {
+            Vector3 ip = i.get_intercept_point();
 
-            if (first.x () > ip.x ())
-                first = first.x (ip.x ());
-            else if (second.x () < ip.x ())
-                second = second.x (ip.x ());
+            if (first.x() > ip.x())
+                first = first.x(ip.x());
+            else if (second.x() < ip.x())
+                second = second.x(ip.x());
 
-            if (first.y () > ip.y ())
-                first = first.y (ip.y ());
-            else if (second.y () < ip.y ())
-                second = second.y (ip.y ());
+            if (first.y() > ip.y())
+                first = first.y(ip.y());
+            else if (second.y() < ip.y())
+                second = second.y(ip.y());
 
-            if (first.z () > ip.z ())
-                first = first.z (ip.z ());
-            else if (second.z () < ip.z ())
-                second = second.z (ip.z ());
+            if (first.z() > ip.z())
+                first = first.z(ip.z());
+            else if (second.z() < ip.z())
+                second = second.z(ip.z());
         }
         return new Vector3Pair(first, second);
     }
@@ -116,8 +114,7 @@ public class RayTraceResults {
         return _parameters;
     }
 
-    RaysAtElement get_element_result (Element e)
-    {
+    RaysAtElement get_element_result(Element e) {
         RaysAtElement re = raysByElement.get(e.id());
         if (re == null) {
             re = new RaysAtElement();
@@ -126,8 +123,7 @@ public class RayTraceResults {
         return re;
     }
 
-    public void add_intercepted (Surface s, TracedRay ray)
-    {
+    public void add_intercepted(Surface s, TracedRay ray) {
         RaysAtElement er = get_element_result(s);
         er._intercepted.add(ray);
     }
@@ -142,14 +138,10 @@ public class RayTraceResults {
         return ray;
     }
 
-    public double get_max_ray_intensity ()
-    {
+    public double get_max_ray_intensity() {
         double res = 0;
-
-        for (TracedRay r : _rays)
-        {
-            double i = r.get_intensity ();
-
+        for (TracedRay r : _rays) {
+            double i = r.get_intensity();
             if (i > res)
                 res = i;
         }
@@ -157,19 +149,16 @@ public class RayTraceResults {
     }
 
     public Vector3 get_intercepted_centroid(Image image) {
-        List<TracedRay> intercepts = get_intercepted (image);
+        List<TracedRay> intercepts = get_intercepted(image);
         int count = 0;
         Vector3 center = Vector3.vector3_0;
-        if (intercepts.isEmpty ())
-            throw new IllegalArgumentException ("no ray intercepts found on the surface");
-        for (TracedRay i : intercepts)
-        {
-            center = center.plus(i.get_intercept_point ());
+        if (intercepts.isEmpty())
+            throw new IllegalArgumentException("no ray intercepts found on the surface");
+        for (TracedRay i : intercepts) {
+            center = center.plus(i.get_intercept_point());
             count++;
         }
         center = center.divide(count);
         return center;
     }
-
-
 }

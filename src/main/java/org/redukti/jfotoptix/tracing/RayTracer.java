@@ -119,9 +119,8 @@ public class RayTracer {
             RayTraceResults.RaysAtElement er = result.get_element_result(element);
 
             generated = er._generated != null ? er._generated : tmp[swaped].rays;
-//            result._generated_queue = generated;
             generated.clear();
-//
+
             if (element instanceof PointSource) {
                 PointSource source = (PointSource) element;
                 result.add_source(source);
@@ -138,8 +137,6 @@ public class RayTracer {
             source_rays = generated;
             swaped ^= 1;
         }
-
-        // result._generated_queue = 0;
     }
 
     List<TracedRay> process_rays(Element e, TraceIntensityMode m, RayTraceResults result, List<TracedRay> input) {
@@ -405,8 +402,7 @@ public class RayTracer {
         if (v.len() > surface.get_external_radius())
             return null;
 
-        boolean ir = true;
-        ; // FIXME _intercept_reemit || params.is_sequential ();
+        boolean ir = true; // FIXME _intercept_reemit || params.is_sequential ();
 
         if (!ir && surface.get_shape().inside(v))
             return null;
@@ -464,5 +460,4 @@ public class RayTracer {
         }
         return rays;
     }
-
 }

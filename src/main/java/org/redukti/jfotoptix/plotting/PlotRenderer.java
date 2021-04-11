@@ -278,10 +278,8 @@ public class PlotRenderer {
             boolean oor = false;
             for (int j = 0; j < N; j++)
                 oor |= (j != i
-                        && ((p.v(j)
-                        <= Math.min(_window2d_fit.v0.v(j), _window2d_fit.v1.v(j)))
-                        || (p.v(j) >= Math.max(_window2d_fit.v0.v(j),
-                        _window2d_fit.v1.v(j)))));
+                        && ((p.v(j) <= Math.min(_window2d_fit.v0.v(j), _window2d_fit.v1.v(j)))
+                        || (p.v(j) >= Math.max(_window2d_fit.v0.v(j), _window2d_fit.v1.v(j)))));
 
             // draw axis
             if (!oor && ax._axis) {

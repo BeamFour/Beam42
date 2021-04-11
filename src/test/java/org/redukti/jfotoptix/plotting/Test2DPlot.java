@@ -17,12 +17,11 @@ public class Test2DPlot {
         final double N = 40.0;
         double x = -N / 2.0;
 
-        d1.setInterpolation(Cubic2);
-
         for (int i = 0; i < N; i++) {
             d1.add_data(x, Math.cos(x / 3.) * Math.cos(x) / 2., 0.0);
             x += Math.abs(Math.sin(i) + .5);
         }
+        d1.setInterpolation(Cubic2);
 
         Plot p = new Plot();
 
@@ -30,7 +29,7 @@ public class Test2DPlot {
         p.get_axes().set_label("The Y axis", PlotAxes.AxisMask.Y);
         p.set_title("A simple test plot");
 
-        p.add_plot_data(d1, Rgb.rgb_red, "None", PlotStyleMask.LinePlot.value());
+        p.add_plot_data(d1, Rgb.rgb_red, "data",  PlotStyleMask.InterpolatePlot.value() | PlotStyleMask.PointPlot.value());
 
         PlotRenderer plot_r = new PlotRenderer();
         RendererSvg renderer = new RendererSvg(800, 600);

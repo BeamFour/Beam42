@@ -182,7 +182,9 @@ public class RayTracer {
                     = ray.get_creator().get_transform_to(surface);
             Vector3Pair local = t.transform_line(ray.get_ray());
 
-            Vector3Pair pt = intersect(surface, params, local);
+            Vector3Pair pt = surface instanceof Stop ?
+                    intersect((Stop)surface, params, local) :
+                    intersect(surface, params, local);
             if (pt != null) {
                 result.add_intercepted(surface, ray);
                 TracedRay cray = trace_ray(surface, m, result, ray, local, pt);

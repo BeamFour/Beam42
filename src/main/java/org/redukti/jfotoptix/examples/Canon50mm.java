@@ -62,6 +62,7 @@ public class Canon50mm {
 
         RayTraceResults result = rayTracer.trace(system, parameters);
         RayTraceRenderer.draw_2d(renderer, result, false, null);
+        System.out.println(renderer.write(new StringBuilder()).toString());
 
         renderer =  new RendererSvg (300, 300, Rgb.rgb_black);
         AnalysisSpot spot = new AnalysisSpot(system);

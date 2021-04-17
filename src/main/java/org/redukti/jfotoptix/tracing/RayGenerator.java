@@ -28,7 +28,7 @@ package org.redukti.jfotoptix.tracing;
 
 import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.material.Air;
-import org.redukti.jfotoptix.material.MaterialBase;
+import org.redukti.jfotoptix.material.Medium;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 import org.redukti.jfotoptix.patterns.Distribution;
@@ -82,7 +82,7 @@ public class RayGenerator {
                 ray.set_intensity(l.get_intensity()); // FIXME depends on distance from
                 // source and pattern density
                 ray.set_wavelen(l.get_wavelen());
-                MaterialBase material = source.get_material();
+                Medium material = source.get_material();
                 if (material == null) {
                     material = Air.air; // FIXME centralize as env - original uses env proxy.
                 }

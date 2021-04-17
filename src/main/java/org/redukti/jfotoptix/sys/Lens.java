@@ -31,7 +31,7 @@ import org.redukti.jfotoptix.curve.Flat;
 import org.redukti.jfotoptix.curve.Sphere;
 import org.redukti.jfotoptix.material.Abbe;
 import org.redukti.jfotoptix.material.Air;
-import org.redukti.jfotoptix.material.MaterialBase;
+import org.redukti.jfotoptix.material.Medium;
 import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
@@ -80,7 +80,7 @@ public class Lens extends Group {
 
     public static class Builder extends Group.Builder {
         double _last_pos = 0;
-        MaterialBase _next_mat = Air.air;
+        Medium _next_mat = Air.air;
         Stop.Builder _stop = null;
 
         @Override
@@ -115,7 +115,7 @@ public class Lens extends Group {
             return add_surface(curvature, radius, thickness, null);
         }
 
-        public Lens.Builder add_surface(Curve curve, Shape shape, double thickness, MaterialBase glass) {
+        public Lens.Builder add_surface(Curve curve, Shape shape, double thickness, Medium glass) {
             assert (thickness >= 0.);
             if (glass == null) {
                 glass = Air.air;

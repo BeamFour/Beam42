@@ -26,7 +26,7 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.tracing;
 
-import org.redukti.jfotoptix.material.MaterialBase;
+import org.redukti.jfotoptix.material.Medium;
 import org.redukti.jfotoptix.math.*;
 import org.redukti.jfotoptix.sys.*;
 
@@ -248,8 +248,8 @@ public class RayTracer {
 
     private TracedRay trace_ray_simple(OpticalSurface surface, RayTraceResults result, TracedRay incident, Vector3Pair local, Vector3Pair intersect) {
         boolean right_to_left = intersect.normal().z() > 0;
-        MaterialBase prev_mat = surface.get_material(right_to_left ? 1 : 0);
-        MaterialBase next_mat = surface.get_material(!right_to_left ? 1 : 0);
+        Medium prev_mat = surface.get_material(right_to_left ? 1 : 0);
+        Medium next_mat = surface.get_material(!right_to_left ? 1 : 0);
 
         // check ray didn't "escaped" from its material
         // std::cout << prev_mat->name << " " << next_mat->name <<

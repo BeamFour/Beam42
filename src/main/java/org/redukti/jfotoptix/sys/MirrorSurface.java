@@ -27,7 +27,7 @@ Original GNU Optical License and Authors are as follows:
 package org.redukti.jfotoptix.sys;
 
 import org.redukti.jfotoptix.curve.Curve;
-import org.redukti.jfotoptix.material.MaterialBase;
+import org.redukti.jfotoptix.material.Medium;
 import org.redukti.jfotoptix.material.Mirror;
 import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector3Pair;
@@ -35,7 +35,7 @@ import org.redukti.jfotoptix.shape.Shape;
 
 public class MirrorSurface extends OpticalSurface {
 
-    public MirrorSurface(int id, Vector3Pair p, Transform3 transform, Curve curve, Shape shape, MaterialBase left, MaterialBase right) {
+    public MirrorSurface(int id, Vector3Pair p, Transform3 transform, Curve curve, Shape shape, Medium left, Medium right) {
         super(id, p, transform, curve, shape, left, right);
     }
 
@@ -65,18 +65,18 @@ public class MirrorSurface extends OpticalSurface {
         }
 
         @Override
-        public MirrorSurface.Builder leftMaterial(MaterialBase left) {
+        public MirrorSurface.Builder leftMaterial(Medium left) {
             return (MirrorSurface.Builder)super.leftMaterial(left);
         }
-        public MirrorSurface.Builder metal(MaterialBase left) {
+        public MirrorSurface.Builder metal(Medium left) {
             return (MirrorSurface.Builder)super.leftMaterial(left);
         }
 
         @Override
-        public MirrorSurface.Builder rightMaterial(MaterialBase right) {
+        public MirrorSurface.Builder rightMaterial(Medium right) {
             return (MirrorSurface.Builder) super.rightMaterial(right);
         }
-        public MirrorSurface.Builder air(MaterialBase right) {
+        public MirrorSurface.Builder air(Medium right) {
             return (MirrorSurface.Builder) super.rightMaterial(right);
         }
 
@@ -90,10 +90,10 @@ public class MirrorSurface extends OpticalSurface {
             return this;
         }
 
-        MaterialBase metal() {
+        Medium metal() {
             return this.left;
         }
-        MaterialBase air() {
+        Medium air() {
             return this.right;
         }
 

@@ -91,7 +91,7 @@ public abstract class Dielectric extends Solid {
     /**
      * medium used during refractive index measurement
      */
-    MaterialBase _measurement_medium;
+    Medium _measurement_medium;
 
     double _last_wavelen;
     double _last_get_refractive_index;
@@ -163,7 +163,7 @@ public abstract class Dielectric extends Solid {
         _temp_model = thermal_model_e.ThermalNone;
     }
 
-    public void set_measurement_medium(MaterialBase medium) {
+    public void set_measurement_medium(Medium medium) {
         assert (medium != this);
         _measurement_medium = medium;
     }

@@ -26,7 +26,7 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.material;
 
-public class Mirror extends MaterialBase {
+public class Mirror extends Medium {
 
     public static final Mirror mirror = new Mirror();
 

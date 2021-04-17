@@ -42,7 +42,7 @@ import static org.redukti.jfotoptix.math.MathUtils.square;
  * Global variables air and std_air are available with
  * default parameters and Birch model.
  */
-public class Air extends MaterialBase {
+public class Air extends Medium {
 
     /**
      * Standard air pressure is 101325 @em Pa

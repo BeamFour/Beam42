@@ -26,7 +26,7 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.material;
 
-public abstract class Solid extends MaterialBase {
+public abstract class Solid extends Medium {
     public final double _thermal_expansion;    // thermal expansion coefficient
     public final double _thermal_conductivity; // thermal conductivity W/m.K
     public final double _density;              // density g/cm^3

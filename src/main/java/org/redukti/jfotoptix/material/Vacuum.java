@@ -26,7 +26,7 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.material;
 
-public class Vacuum extends MaterialBase {
+public class Vacuum extends Medium {
 
     public Vacuum() {
         super("Vacuum");

@@ -30,16 +30,16 @@ import org.redukti.jfotoptix.rendering.Rgb;
 
 import static org.redukti.jfotoptix.math.MathUtils.square;
 
-public abstract class MaterialBase {
+public abstract class Medium {
     public final String name;
     public double _temperature; // celcius
 
-    public MaterialBase(String name, double temp) {
+    public Medium(String name, double temp) {
         this.name = name;
         this._temperature = temp;
     }
 
-    public MaterialBase(String name) {
+    public Medium(String name) {
         this(name, 20.0);
     }
 
@@ -79,7 +79,7 @@ public abstract class MaterialBase {
 
     /** Get material relative refractive index in given medium at specified
      * wavelen in @em nm. */
-    public double get_refractive_index (double wavelen, MaterialBase env) {
+    public double get_refractive_index (double wavelen, Medium env) {
         return get_refractive_index (wavelen) / env.get_refractive_index (wavelen);
     }
 
@@ -94,8 +94,8 @@ public abstract class MaterialBase {
 
 
     /** Get reflectance at normal incidence */
-    public double get_normal_reflectance (MaterialBase from,
-                                           double wavelen) {
+    public double get_normal_reflectance (Medium from,
+                                          double wavelen) {
         // default reflectance at normal incidence, valid for metal and dielectric
         // material
         // McGraw Hill, Handbook of optics, vol1, 1995, 5-10 (47)
@@ -109,8 +109,8 @@ public abstract class MaterialBase {
     }
 
     /** Get transmittance at normal incidence */
-    public double get_normal_transmittance (MaterialBase from,
-                                             double wavelen) {
+    public double get_normal_transmittance (Medium from,
+                                            double wavelen) {
         // default transmittance at normal incidence, valid for non absorbing material
         // McGraw Hill, Handbook of optics, vol1, 1995, 5-8 (23)
 

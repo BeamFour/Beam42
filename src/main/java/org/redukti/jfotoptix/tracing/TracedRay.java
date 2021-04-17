@@ -27,7 +27,7 @@ Original GNU Optical License and Authors are as follows:
 package org.redukti.jfotoptix.tracing;
 
 import org.redukti.jfotoptix.light.LightRay;
-import org.redukti.jfotoptix.material.MaterialBase;
+import org.redukti.jfotoptix.material.Medium;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 import org.redukti.jfotoptix.sys.Element;
@@ -44,7 +44,7 @@ public class TracedRay extends LightRay {
     double _intercept_intensity;     // intersection point intensity
     double _len;                     // ray length
     Element _creator;    // element which generated this ray
-    MaterialBase _material; // material
+    Medium _material; // material
     Element _i_element;        // intersect element
     TracedRay _parent;                    // ray which generated this one
     TracedRay _child;                     // pointer to generated ray
@@ -109,11 +109,11 @@ public class TracedRay extends LightRay {
         this._intercept_intensity = v;
     }
 
-    public MaterialBase get_material() {
+    public Medium get_material() {
         return _material;
     }
 
-    public void set_material(MaterialBase mat) {
+    public void set_material(Medium mat) {
         _material = mat;
     }
 

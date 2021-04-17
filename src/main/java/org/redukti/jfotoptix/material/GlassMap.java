@@ -40,6 +40,11 @@ public class GlassMap extends Solid {
         return index.doubleValue();
     }
 
+    @Override
+    public String toString() {
+        return name + "{d=" + indexMap.get(SpectralLine.d) + ",C="+ indexMap.get(SpectralLine.C) + ",F=" + indexMap.get(SpectralLine.F) + '}';
+    }
+
     public static GlassMap glassByName(String name) {
         return glasses.get(name);
     }

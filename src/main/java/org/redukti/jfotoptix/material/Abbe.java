@@ -26,6 +26,8 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.material;
 
+import org.redukti.jfotoptix.light.SpectralLine;
+
 public class Abbe extends Dielectric {
 
     /**
@@ -36,7 +38,7 @@ public class Abbe extends Dielectric {
         AbbeVe, //< Abbe number of Fraunhofer @em e line
     }
 
-    double _n, _q, _a;
+    double _n, _q, _a, _v;
     AbbeFormula _m;
 
     /**
@@ -46,6 +48,7 @@ public class Abbe extends Dielectric {
         super(m.name());
         this._m = m;
         _n = n;
+        _v = v;
         _q = (n - 1.) / v;
         _a = (v * -0.001682) + 0.6438 + dpgF;
     }
@@ -82,5 +85,10 @@ public class Abbe extends Dielectric {
         }
 
         return _n + _q * f;
+    }
+
+    @Override
+    public String toString() {
+        return _m.name() +  "{nd=" + _n + ",vd="+ _v + ",d=" + get_refractive_index(SpectralLine.d) +'}';
     }
 }

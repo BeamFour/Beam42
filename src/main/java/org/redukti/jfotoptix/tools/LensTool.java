@@ -22,7 +22,7 @@ public class LensTool {
     public static void main(String[] args) throws Exception {
 
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
-        specs.parse_file("C:\\work\\github\\jfotoptix\\examples\\nikor-58mm-f0.95\\nikkor-z-58mmf0.95_ex1.txt");
+        specs.parse_file("C:\\work\\github\\jfotoptix\\examples\\sigma-40mm-f1.4\\Sigma-40mmf1.4.txt");
         OpticalSystem.Builder systemBuilder = OpticalBenchDataImporter.buildSystem(specs, 0);
         double angleOfView = OpticalBenchDataImporter.getAngleOfViewInRadians (specs, 0);
         Vector3 direction = Vector3.vector3_001;

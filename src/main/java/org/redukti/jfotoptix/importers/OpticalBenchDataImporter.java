@@ -8,6 +8,7 @@ import org.redukti.jfotoptix.curve.Asphere;
 import org.redukti.jfotoptix.curve.Flat;
 import org.redukti.jfotoptix.material.Abbe;
 import org.redukti.jfotoptix.material.Air;
+import org.redukti.jfotoptix.material.GlassMap;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 import org.redukti.jfotoptix.shape.Disk;
@@ -134,6 +135,7 @@ public class OpticalBenchDataImporter {
             refractive_index_ = 0;
             abbe_vd_ = 0;
             is_cover_glass_ = false;
+            glass_name_ = null;
         }
 
         SurfaceType get_surface_type() {
@@ -208,6 +210,11 @@ public class OpticalBenchDataImporter {
         void  set_is_cover_glass(boolean is_cover_glass) {
             is_cover_glass_ = is_cover_glass;
         }
+
+        void set_glass_name(String name) { glass_name_ = name; }
+
+        String get_glass_name() { return glass_name_; }
+
 //        void
 //        dump (FILE *fp, unsigned scenario = 0)
 //        {
@@ -227,6 +234,7 @@ public class OpticalBenchDataImporter {
         double abbe_vd_;
         boolean is_cover_glass_;
         AsphericalData aspherical_data_;
+        String glass_name_;
     }
 
     public static final class LensSpecifications {
@@ -326,6 +334,9 @@ public class OpticalBenchDataImporter {
                         /* abbe vd */
                         if (words.length >= 6 && words[5].length() > 0) {
                             surface_data.set_abbe_vd(parseDouble(words[5]));
+                        }
+                        if (words.length >= 7 && words[6].length() > 0) {
+                            surface_data.set_glass_name(words[6]);
                         }
                         surfaces_.add(surface_data);
                     }
@@ -480,13 +491,19 @@ public class OpticalBenchDataImporter {
         double aperture_radius = surface.get_diameter() / 2.0;
         double refractive_index = surface.get_refractive_index();
         double abbe_vd = surface.get_abbe_vd();
+        String glass_name = surface.get_glass_name();
         if (surface.get_surface_type() == SurfaceType.aperture_stop) {
             lens.add_stop(aperture_radius, thickness);
             return thickness;
         }
         AsphericalData aspherical_data = surface.get_aspherical_data();
         if (aspherical_data == null) {
-            if (refractive_index != 0.0) {
+            if (glass_name != null && GlassMap.glassByName(glass_name) != null) {
+                lens.add_surface(
+                        radius, aperture_radius, thickness,
+                        GlassMap.glassByName(glass_name));
+            }
+            else if (refractive_index != 0.0) {
                 if (abbe_vd == 0.0) {
                     //fprintf (stderr, "Abbe vd not specified for surface %d\n",
                     //        surface.get_id ());
@@ -508,7 +525,14 @@ public class OpticalBenchDataImporter {
         double a12 = aspherical_data.data(6);
         double a14 = aspherical_data.data(7);
 
-        if (refractive_index > 0.0) {
+        if (glass_name != null && GlassMap.glassByName(glass_name) != null) {
+            lens.add_surface(
+                    new Asphere(radius, k, a4, a6, a8, a10, a12,
+                            a14),
+                    new Disk(aperture_radius), thickness,
+                    GlassMap.glassByName(glass_name));
+        }
+        else if (refractive_index > 0.0) {
             lens.add_surface(
                     new Asphere(radius, k, a4, a6, a8, a10, a12,
                             a14),
@@ -523,7 +547,7 @@ public class OpticalBenchDataImporter {
         return thickness;
     }
 
-    public static OpticalSystem.Builder buildSystem(   LensSpecifications specs, int scenario) {
+    public static OpticalSystem.Builder buildSystem(LensSpecifications specs, int scenario) {
         OpticalSystem.Builder sys = new OpticalSystem.Builder();
         /* anchor lens */
         Lens.Builder lens = new Lens.Builder().position(Vector3Pair.position_000_001);

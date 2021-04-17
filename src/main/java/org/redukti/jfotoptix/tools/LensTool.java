@@ -19,21 +19,59 @@ import org.redukti.jfotoptix.tracing.RayTracer;
 
 public class LensTool {
 
-    public static void main(String[] args) throws Exception {
+    static final class Args {
+        int scenario = 0;
+        String filename = null;
+        String outputType = "layout";
+        boolean skewRays = false;
+        boolean dumpSystem = false;
+    }
 
+    static Args parseArguments(String[] args) {
+        Args arguments = new Args();
+        for (int i = 0; i < args.length; i++) {
+            String arg1 = args[i];
+            String arg2 = i+1 < args.length ? args[i+1] : null;
+            if (arg1.equals("--specfile")) {
+                arguments.filename = arg2;
+                i++;
+            }
+            else if (arg1.equals("--scenario")) {
+                arguments.scenario = Integer.parseInt(arg2);
+                i++;
+            }
+            else if (arg1.equals("--output")) {
+                arguments.outputType = arg2;
+                i++;
+            }
+            else if (arg1.equals("--skew")) {
+                arguments.skewRays = true;
+            }
+            else if (arg1.equals("--dump-system")) {
+                arguments.dumpSystem = true;
+            }
+        }
+        return arguments;
+    }
+
+
+    public static void main(String[] args) throws Exception {
+        Args arguments = parseArguments(args);
+        if (arguments.filename == null) {
+            System.err.println("Usage: --specfile inputfile [--scenario num] [--skew] [--output layout|spot] [--dump-system]");
+            System.exit(1);
+        }
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
-        specs.parse_file("C:\\work\\github\\jfotoptix\\examples\\sigma-40mm-f1.4\\Sigma-40mmf1.4.txt");
-        OpticalSystem.Builder systemBuilder = OpticalBenchDataImporter.buildSystem(specs, 0);
-        double angleOfView = OpticalBenchDataImporter.getAngleOfViewInRadians (specs, 0);
+        specs.parse_file(arguments.filename);
+        OpticalSystem.Builder systemBuilder = OpticalBenchDataImporter.buildSystem(specs, arguments.scenario);
+        double angleOfView = OpticalBenchDataImporter.getAngleOfViewInRadians (specs, arguments.scenario);
         Vector3 direction = Vector3.vector3_001;
-        boolean skew = true;
-        if (skew)
+        if (arguments.skewRays)
         {
             // Construct unit vector at an angle
             //      double z1 = cos (angleOfView);
             //      double y1 = sin (angleOfView);
             //      unit_vector = math::Vector3 (0, y1, z1);
-
             Matrix3 r = Matrix3.get_rotation_matrix(0, angleOfView);
             direction = r.times(direction);
         }
@@ -43,31 +81,31 @@ public class LensTool {
                 .add_spectral_line(SpectralLine.F);
         systemBuilder.add(ps);
 
-        RendererSvg renderer = new RendererSvg( 800, 400);
         OpticalSystem system = systemBuilder.build();
-        System.out.println(system);
-        // draw 2d system layout
-        SystemLayout2D systemLayout2D = new SystemLayout2D();
-        systemLayout2D.layout2d(renderer, system);
-
-        RayTraceParameters parameters = new RayTraceParameters(system);
-
-        RayTracer rayTracer = new RayTracer();
-        parameters.set_default_distribution (
-                new Distribution(Pattern.MeridionalDist, 10, 0.999));
-        // TODO set save generated state on point source
-        System.out.println(parameters.sequenceToString(new StringBuilder()).toString());
-
-        RayTraceResults result = rayTracer.trace(system, parameters);
-        RayTraceRenderer.draw_2d(renderer, result, false, null);
-        System.out.println(renderer.write(new StringBuilder()).toString());
-        System.out.println();
-        System.out.println();
-
-        renderer =  new RendererSvg (300, 300, Rgb.rgb_black);
-        AnalysisSpot spot = new AnalysisSpot(system);
-        spot.draw_diagram(renderer, true);
-        System.out.println(renderer.write(new StringBuilder()).toString());
-
+        if (arguments.dumpSystem) {
+            System.out.println(system);
+        }
+        if (arguments.outputType.equals("layout")) {
+            // draw 2d system layout
+            RendererSvg renderer = new RendererSvg( 800, 400);
+            SystemLayout2D systemLayout2D = new SystemLayout2D();
+            systemLayout2D.layout2d(renderer, system);
+            RayTraceParameters parameters = new RayTraceParameters(system);
+            RayTracer rayTracer = new RayTracer();
+            parameters.set_default_distribution(
+                    new Distribution(Pattern.MeridionalDist, 10, 0.999));
+            if (arguments.dumpSystem) {
+                System.out.println(parameters.sequenceToString(new StringBuilder()).toString());
+            }
+            RayTraceResults result = rayTracer.trace(system, parameters);
+            RayTraceRenderer.draw_2d(renderer, result, false, null);
+            System.out.println(renderer.write(new StringBuilder()).toString());
+        }
+        if (arguments.outputType.equals("spot")) {
+            RendererSvg renderer = new RendererSvg(300, 300, Rgb.rgb_black);
+            AnalysisSpot spot = new AnalysisSpot(system);
+            spot.draw_diagram(renderer, true);
+            System.out.println(renderer.write(new StringBuilder()).toString());
+        }
     }
 }

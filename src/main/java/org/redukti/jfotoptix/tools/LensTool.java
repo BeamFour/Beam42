@@ -93,7 +93,7 @@ public class LensTool {
             RayTraceParameters parameters = new RayTraceParameters(system);
             RayTracer rayTracer = new RayTracer();
             parameters.set_default_distribution(
-                    new Distribution(Pattern.MeridionalDist, 10, 0.999));
+                    new Distribution(Pattern.MeridionalDist, 20, 0.999));
             if (arguments.dumpSystem) {
                 System.out.println(parameters.sequenceToString(new StringBuilder()).toString());
             }

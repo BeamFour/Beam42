@@ -27,6 +27,11 @@ public class TestMaterials {
 
         airk = new Air(AirKohlrausch68Formula, 0, 30.);
         Assertions.assertEquals(1.0, airk.get_refractive_index(550), 1e-7);
+
+        airk = new Air(AirKohlrausch68Formula);
+        System.out.println("d " + airk.get_refractive_index(SpectralLine.d));
+        System.out.println("C " + airk.get_refractive_index(SpectralLine.C));
+        System.out.println("F " + airk.get_refractive_index(SpectralLine.F));
     }
 
     @Test
@@ -39,6 +44,11 @@ public class TestMaterials {
 
         airb = new Air(AirBirch94Formula, 0, 30.0);
         Assertions.assertEquals(1., airb.get_refractive_index(550), 1e-7);
+
+        airb = new Air(AirBirch94Formula);
+        System.out.println("d " + airb.get_refractive_index(SpectralLine.d));
+        System.out.println("C " + airb.get_refractive_index(SpectralLine.C));
+        System.out.println("F " + airb.get_refractive_index(SpectralLine.F));
     }
 
     @Test

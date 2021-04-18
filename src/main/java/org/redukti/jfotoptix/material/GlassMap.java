@@ -188,6 +188,28 @@ public class GlassMap extends Solid {
         glasses.put("CaF2",new GlassMap("CaF2",1.43384,1.43245,1.437));
         glasses.put("J-SFH5",new GlassMap("J-SFH5",1.755750,1.747048,1.777633));
 
+        glasses.put("Q-FK01AS",new GlassMap("Q-FK01AS",1.49653,1.49467,1.500755));
+        glasses.put("Q-FKH1S",new GlassMap("Q-FKH1S",1.49731,1.495471,1.501498));
+        glasses.put("Q-FKH2S",new GlassMap("Q-FKH2S",1.45562,1.454089,1.459079));
+        glasses.put("Q-PSKH1S",new GlassMap("Q-PSKH1S",1.59255,1.589901,1.598633));
+        glasses.put("Q-PSKH2S",new GlassMap("Q-PSKH2S",1.61875,1.615791,1.625499));
+        glasses.put("Q-PSKH4S",new GlassMap("Q-PSKH4S",1.59245,1.589733,1.598586));
+        glasses.put("Q-SK15S",new GlassMap("Q-SK15S",1.62291,1.619659,1.630343));
+        glasses.put("Q-SK52S",new GlassMap("Q-SK52S",1.58286,1.579869,1.589664));
+        glasses.put("Q-SK55S",new GlassMap("Q-SK55S",1.58887,1.58592,1.595552));
+        glasses.put("Q-SF6S",new GlassMap("Q-SF6S",1.80301,1.793991,1.825442));
+        glasses.put("Q-LAK52S",new GlassMap("Q-LAK52S",1.67798,1.674224,1.686575));
+        glasses.put("Q-LAK53S",new GlassMap("Q-LAK53S",1.69343,1.689487,1.702497));
+        glasses.put("Q-LAF010S",new GlassMap("Q-LAF010S",1.743,1.738458,1.753545));
+        glasses.put("Q-LAFPH1S",new GlassMap("Q-LAFPH1S",1.743104,1.738575,1.753606));
+        glasses.put("Q-LASF03S",new GlassMap("Q-LASF03S",1.80604,1.800166,1.819952));
+        glasses.put("Q-LASFH11S",new GlassMap("Q-LASFH11S",1.77387,1.768949,1.785326));
+        glasses.put("Q-LASFH12S",new GlassMap("Q-LASFH12S",1.79063,1.78537,1.802946));
+        glasses.put("Q-LASFH58S",new GlassMap("Q-LASFH58S",1.85108,1.844781,1.865992));
+        glasses.put("Q-LASFH59S",new GlassMap("Q-LASFH59S",1.82098,1.815228,1.834544));
+        glasses.put("Q-LASFPH2S",new GlassMap("Q-LASFPH2S",1.765437,1.760519,1.776892));
+        glasses.put("Q-LASFPH3S",new GlassMap("Q-LASFPH3S",1.795256,1.789992,1.807566));
+
         // Hoya
         glasses.put("FC5",new GlassMap("FC5",1.48749,1.48535,1.49227));
         glasses.put("FCD1",new GlassMap("FCD1",1.497,1.49514,1.50123));

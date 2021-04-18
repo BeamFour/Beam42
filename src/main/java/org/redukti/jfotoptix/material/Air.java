@@ -48,8 +48,8 @@ public class Air extends Medium {
      * Standard air pressure is 101325 @em Pa
      */
     static final double std_pressure = 101325.;
-    public static final Air std_air = new Air(AirFormula.AirBirch94Formula);
-    public static final Air air = new Air(AirFormula.AirBirch94Formula);
+    public static final Air std_air = new Air(/* AirFormula.AirBirch94Formula */ AirFormula.AirSimple);
+    public static final Air air = std_air;
 
     public final double _pressure;
     public final AirFormula airFormula;
@@ -126,7 +126,7 @@ public class Air extends Medium {
                         / (1.0 + (_temperature - 15.0) * 0.0034785));
             }
             default:
-                throw new IllegalStateException();
+                return 1.0;
         }
     }
 

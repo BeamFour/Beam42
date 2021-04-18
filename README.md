@@ -12,7 +12,10 @@ to worry about.
 I chose Java as the language as it is the quickest option for me to 
 port to, but Kotlin would be nice as it will allow targeting JavaScript or the JVM.
 
-C# is another option.
+C# is another option - and there is an initial port at https://github.com/dibyendumajumdar/nfotoptix.
+
+To ease comparison with the original C++ version - fow now we have some naming conventions that are carried over from the C++ code. This will be changed
+in due course to align with the Java coding style.
 
 ## License
 

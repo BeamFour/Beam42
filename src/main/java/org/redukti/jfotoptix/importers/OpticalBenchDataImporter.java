@@ -555,7 +555,11 @@ public class OpticalBenchDataImporter {
         double image_pos = 0.0;
         List<LensSurface> surfaces = specs.get_surfaces();
         for (int i = 0; i < surfaces.size(); i++) {
-            double thickness = add_surface(lens, surfaces.get(i), scenario);
+            double thickness;
+            if (surfaces.get(i).get_surface_type() == SurfaceType.field_stop)
+                thickness = surfaces.get(i).get_thickness(scenario);
+            else
+                thickness = add_surface(lens, surfaces.get(i), scenario);
             image_pos += thickness;
         }
         // printf ("Image position is at %f\n", image_pos);

@@ -2,6 +2,13 @@
 
 This is work-in-progress Java port of https://github.com/dibyendumajumdar/goptical.
 
+## Current Features
+
+* Setup an optical system, draw it and do basic ray tracing
+* So spot analysis 
+* Contains a rendering kit that outputs to SVG
+* Contains a small plotting framework
+
 ## Why?
 
 The C++ code base is hard to maintain, refactor or change.

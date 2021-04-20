@@ -40,19 +40,25 @@ import org.redukti.jfotoptix.sys.RaySource;
 
 import java.util.List;
 
+/** 
+ * The RayTraceRenderer class is responsible for drawing the results of a ray
+ * trace. 
+ */
 public class RayTraceRenderer {
 
     /**
-     * Draw all tangential rays using specified renderer. Only rays
-     * which end up hitting the image plane are drawn when @tt
-     * hit_image is set.
+     * Draws all tangential rays using specified renderer. Only rays
+     * which end up hitting the image plane are drawn when hit_image is set.
      */
     public static void draw_2d(Renderer r, RayTraceResults result, boolean hit_image /*= false*/,
                                Element ref /* = null */) {
         r.group_begin("rays");
         draw_trace_result2d(r, result, ref, hit_image);
         r.group_end();
+    }
 
+    public static void draw_2d(Renderer r, RayTraceResults result) {
+        draw_2d(r, result, false, null);
     }
 
     private static void draw_trace_result2d(Renderer renderer, RayTraceResults result, Element ref, boolean hit_image) {
@@ -60,7 +66,7 @@ public class RayTraceRenderer {
         double lost_len = result.get_params().get_lost_ray_length();
 
         if (sl.isEmpty())
-            throw new IllegalArgumentException("No source found in trace result");
+            throw new IllegalArgumentException("No ray source found in trace result");
 
         double max_intensity = result.get_max_ray_intensity();
 

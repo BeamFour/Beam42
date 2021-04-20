@@ -1,4 +1,4 @@
-# JFotoptix
+# jFotoptix
 
 This is work-in-progress Java port of https://github.com/dibyendumajumdar/goptical.
 

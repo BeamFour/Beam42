@@ -98,8 +98,9 @@ public class LensTool {
                 System.out.println(parameters.sequenceToString(new StringBuilder()).toString());
             }
             RayTraceResults result = rayTracer.trace(system, parameters);
-            RayTraceRenderer.draw_2d(renderer, result, false, null);
+            RayTraceRenderer.draw_2d(renderer, result, true, null);
             System.out.println(renderer.write(new StringBuilder()).toString());
+            result.report();
         }
         if (arguments.outputType.equals("spot")) {
             RendererSvg renderer = new RendererSvg(300, 300, Rgb.rgb_black);

@@ -161,4 +161,37 @@ public class RayTraceResults {
         center = center.divide(count);
         return center;
     }
+
+    public void report() {
+        System.out.println("Ray Trace Report");
+        System.out.println("================");
+        List<RaySource> sl = get_source_list();
+        if (sl.isEmpty())
+            throw new IllegalArgumentException("No source found in trace result");
+
+        for (RaySource s : sl) {
+            List<TracedRay> rl = get_generated(s);
+            for (TracedRay ray : rl) {
+                if (hitImage(ray, true)) {
+                    report(ray);
+                }
+            }
+        }
+    }
+
+    private boolean hitImage(TracedRay ray, boolean tangential) {
+        if (ray.get_intercept_element() != null && ray.get_intercept_element() instanceof Image) {
+            return true;
+        }
+        if (ray.get_first_child() == null) {
+            return false;
+        }
+        if (tangential && Math.abs(ray.get_ray().x1()) > 1e-6)
+            return false;
+        return hitImage(ray.get_first_child(), tangential);
+    }
+
+    private void report(TracedRay ray) {
+        System.out.println(ray);
+    }
 }

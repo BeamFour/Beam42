@@ -30,7 +30,7 @@ public class RayOpticsExporter {
                 .append("osp.pupil = PupilSpec(osp, key=['image', 'f/#'], value=").append(f_number.get_value_as_double(scenario)).append(")\n")
                 .append("osp.field_of_view = FieldSpec(osp, key=['object', 'angle'], flds=[0., ").append(get_angle_of_view(system, scenario)).append("])\n")
                 .append("osp.spectral_region = WvlSpec([(486.1327, 0.5), (587.5618, 1.0), (656.2725, 0.5)], ref_wl=1)\n")
-                .append("opm.system_spec.title = ").append(title).append("\n")
+                .append("opm.system_spec.title = \"").append(title).append("\"\n")
                 .append("opm.system_spec.dimensions = 'MM'\n")
                 .append("opm.radius_mode = True\n");
     }

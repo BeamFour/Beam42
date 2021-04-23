@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'idea'
+    id 'application'
 }
 
 group 'org.redukti'
@@ -8,6 +9,10 @@ version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+}
+
+application {
+    mainClass = 'org.redukti.jfotoptix.tools.LensTool'
 }
 
 dependencies {

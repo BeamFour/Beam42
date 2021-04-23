@@ -65,7 +65,7 @@ public class Canon50mm {
         System.out.println(renderer.write(new StringBuilder()).toString());
 
         renderer =  new RendererSvg (300, 300, Rgb.rgb_black);
-        AnalysisSpot spot = new AnalysisSpot(system);
+        AnalysisSpot spot = new AnalysisSpot(system, 50);
         spot.draw_diagram(renderer, true);
         System.out.println(renderer.write(new StringBuilder()).toString());
 

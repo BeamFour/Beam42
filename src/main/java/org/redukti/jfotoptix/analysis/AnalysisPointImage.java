@@ -51,7 +51,7 @@ public class AnalysisPointImage {
     List<TracedRay> _intercepts;
     RayTraceResults _results;
 
-    public AnalysisPointImage (OpticalSystem system)
+    public AnalysisPointImage (OpticalSystem system, int radial_density)
     {
         _system = system;
         _tracer = new RayTracer();
@@ -60,7 +60,7 @@ public class AnalysisPointImage {
         _intercepts = new ArrayList<>();
         _params = new RayTraceParameters(system);
         _params.set_default_distribution (
-                new Distribution (Pattern.HexaPolarDist, 50, 0.999));
+                new Distribution (Pattern.HexaPolarDist, radial_density, 0.999));
         _params.get_default_distribution ().set_uniform_pattern ();
     }
 

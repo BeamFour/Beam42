@@ -84,6 +84,38 @@ public class OpticalSystem implements Container {
 //        return transform3Cache.getGlobal2LocalTransform(e.id());
 //    }
 
+    /**
+     * Returns a flat sequence of elements, ordered by z
+     */
+    public List<Element> get_sequence() {
+        List<Element> sequence = new ArrayList<>();
+        for (Element e: elements()) {
+            add(sequence, e);
+        }
+        sequence.sort((a,b) -> {
+            double z1 = a.get_position().z();
+            double z2 = b.get_position().z();
+            if (z1 > z2)
+                return 1;
+            else if (z1 < z2)
+                return -1;
+            else
+                return 0;
+        });
+        return sequence;
+    }
+
+    private void add(List<Element> sequence, Element e) {
+        if (e instanceof Container) {
+            Container c = (Container) e;
+            for (Element e1: c.elements()) {
+                add(sequence, e1);
+            }
+        }
+        else
+            sequence.add(e);
+    }
+
     @Override
     public String toString() {
         return "OpticalSystem{" +

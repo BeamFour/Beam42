@@ -25,6 +25,10 @@ public class LensTool {
         String outputType = "layout";
         boolean skewRays = false;
         boolean dumpSystem = false;
+        int trace_density = 20;
+        int spot_density = 50;
+        boolean include_lost_rays = true;
+        boolean only_d_line = false;
     }
 
     static Args parseArguments(String[] args) {
@@ -50,6 +54,20 @@ public class LensTool {
             else if (arg1.equals("--dump-system")) {
                 arguments.dumpSystem = true;
             }
+            else if (arg1.equals("--exclude-lost-rays")) {
+                arguments.include_lost_rays = false;
+            }
+            else if (arg1.equals("--trace-density")) {
+                arguments.trace_density = Integer.parseInt(arg2);
+                i++;
+            }
+            else if (arg1.equals("--spot-density")) {
+                arguments.spot_density = Integer.parseInt(arg2);
+                i++;
+            }
+            else if (arg1.equals("--only-d-line")) {
+                arguments.only_d_line = true;
+            }
         }
         return arguments;
     }
@@ -58,7 +76,9 @@ public class LensTool {
     public static void main(String[] args) throws Exception {
         Args arguments = parseArguments(args);
         if (arguments.filename == null) {
-            System.err.println("Usage: --specfile inputfile [--scenario num] [--skew] [--output layout|spot] [--dump-system]");
+            System.err.println("Usage: --specfile inputfile [--scenario num] [--skew] [--output layout|spot] [--dump-system] [--exclude-lost-rays] [--spot-density n] [--trace-density n] [--only-d-line]");
+            System.err.println("       --spot-density defaults to 50");
+            System.err.println("       --trace-density defaults to 20");
             System.exit(1);
         }
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
@@ -76,9 +96,11 @@ public class LensTool {
             direction = r.times(direction);
         }
         PointSource.Builder ps = new PointSource.Builder(PointSource.SourceInfinityMode.SourceAtInfinity, direction)
-                .add_spectral_line(SpectralLine.d)
-                .add_spectral_line(SpectralLine.C)
-                .add_spectral_line(SpectralLine.F);
+                .add_spectral_line(SpectralLine.d);
+        if (!arguments.only_d_line) {
+            ps.add_spectral_line(SpectralLine.C)
+                    .add_spectral_line(SpectralLine.F);
+        }
         systemBuilder.add(ps);
 
         OpticalSystem system = systemBuilder.build();
@@ -93,18 +115,18 @@ public class LensTool {
             RayTraceParameters parameters = new RayTraceParameters(system);
             RayTracer rayTracer = new RayTracer();
             parameters.set_default_distribution(
-                    new Distribution(Pattern.MeridionalDist, 20, 0.999));
+                    new Distribution(Pattern.MeridionalDist, arguments.trace_density, 0.999));
             if (arguments.dumpSystem) {
                 System.out.println(parameters.sequenceToString(new StringBuilder()).toString());
             }
             RayTraceResults result = rayTracer.trace(system, parameters);
-            RayTraceRenderer.draw_2d(renderer, result, true, null);
+            RayTraceRenderer.draw_2d(renderer, result, !arguments.include_lost_rays, null);
             System.out.println(renderer.write(new StringBuilder()).toString());
             result.report();
         }
         if (arguments.outputType.equals("spot")) {
             RendererSvg renderer = new RendererSvg(300, 300, Rgb.rgb_black);
-            AnalysisSpot spot = new AnalysisSpot(system);
+            AnalysisSpot spot = new AnalysisSpot(system, arguments.spot_density);
             spot.draw_diagram(renderer, true);
             System.out.println(renderer.write(new StringBuilder()).toString());
         }

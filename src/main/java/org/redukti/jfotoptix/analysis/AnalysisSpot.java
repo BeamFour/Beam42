@@ -61,8 +61,8 @@ public class AnalysisSpot extends AnalysisPointImage {
 
     protected PlotAxes _axes;
 
-    public AnalysisSpot(OpticalSystem system) {
-        super(system);
+    public AnalysisSpot(OpticalSystem system, int radial_density) {
+        super(system, radial_density);
         _axes = new PlotAxes();
         _axes.set_show_axes (false, PlotAxes.AxisMask.XY);
         _axes.set_label ("Sagittal distance", PlotAxes.AxisMask.X);

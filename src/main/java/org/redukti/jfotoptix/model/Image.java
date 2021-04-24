@@ -57,7 +57,7 @@ public class Image extends Surface {
         }
 
         public Image build() {
-            return new Image(id, position, transform, curve, shape);
+            return new Image(_id, _position, _transform, curve, shape);
         }
     }
 }

@@ -67,7 +67,7 @@ public class Stop extends Surface {
         }
 
         public Stop build() {
-            return new Stop(id, position, transform, curve, shape);
+            return new Stop(_id, _position, _transform, curve, shape);
         }
     }
 }

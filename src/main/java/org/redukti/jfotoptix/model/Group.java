@@ -34,35 +34,35 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Group extends Element implements Container {
-    protected final List<? extends Element> elements;
+    protected final List<? extends Element> _elements;
 
     public Group(int id, Vector3Pair p, Transform3 transform3, List<? extends Element> elements) {
         super(id, p, transform3);
-        this.elements = elements;
+        this._elements = elements;
     }
 
     @Override
     public List<? extends Element> elements() {
-        return elements;
+        return _elements;
     }
 
     public Element getElement(int pos) {
-        if (pos >= 0 && pos < elements.size()) {
-            return elements.get(pos);
+        if (pos >= 0 && pos < _elements.size()) {
+            return _elements.get(pos);
         }
         return null;
     }
 
     public Group getGroup(int pos) {
-        if (pos >= 0 && pos < elements.size() && elements.get(pos) instanceof Group) {
-            return (Group)elements.get(pos);
+        if (pos >= 0 && pos < _elements.size() && _elements.get(pos) instanceof Group) {
+            return (Group) _elements.get(pos);
         }
         return null;
     }
 
     public Surface getSurface(int pos) {
-        if (pos >= 0 && pos < elements.size()  && elements.get(pos) instanceof Surface) {
-            return (Surface) elements.get(pos);
+        if (pos >= 0 && pos < _elements.size()  && _elements.get(pos) instanceof Surface) {
+            return (Surface) _elements.get(pos);
         }
         return null;
     }
@@ -76,7 +76,7 @@ public class Group extends Element implements Container {
 
     public Vector3Pair get_bounding_box ()
     {
-        return Element.get_bounding_box(elements);
+        return Element.get_bounding_box(_elements);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class Group extends Element implements Container {
                 ", position=" + _position +
                 ", transform=" + _transform)
                 .append(System.lineSeparator());
-        for (Element e: elements) {
+        for (Element e: _elements) {
             sb.append('\t').append(e.toString()).append(System.lineSeparator());
         }
         return sb.toString();
@@ -105,10 +105,10 @@ public class Group extends Element implements Container {
             return this;
         }
 
-        public Group.Builder setId(AtomicInteger id) {
-            this.id = id.incrementAndGet();
+        public Group.Builder set_id(AtomicInteger id) {
+            this._id = id.incrementAndGet();
             for (Element.Builder e: elements) {
-                e.setId(id);
+                e.set_id(id);
             }
             return this;
         }
@@ -123,7 +123,7 @@ public class Group extends Element implements Container {
 
         @Override
         public Element build() {
-            return new Group(id, position, transform, getElements());
+            return new Group(_id, _position, _transform, getElements());
         }
 
         protected ArrayList<Element> getElements() {

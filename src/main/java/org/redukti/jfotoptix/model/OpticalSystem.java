@@ -37,7 +37,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class OpticalSystem implements Container {
     protected final List<Element> _elements;
     protected final Transform3Cache _transform3Cache;
-    protected boolean keep_aspect = true;
 
     @Override
     public List<Element> elements() {
@@ -90,7 +89,6 @@ public class OpticalSystem implements Container {
         return "OpticalSystem{" +
                 "elements=" + _elements +
                 ", transform3Cache=" + _transform3Cache +
-                ", keep_aspect=" + keep_aspect +
                 '}';
     }
 
@@ -133,7 +131,7 @@ public class OpticalSystem implements Container {
         private void generateIds() {
             AtomicInteger id = new AtomicInteger(0);
             for (Element.Builder e: elements) {
-                e.setId(id);
+                e.set_id(id);
             }
         }
 
@@ -145,8 +143,8 @@ public class OpticalSystem implements Container {
             // FIXME
             if (transform3Cache == null)
                 throw new IllegalStateException("build() must be called prior to updating position");
-            if (e.parent != null) {
-                e.localPosition(transform3Cache.global_2_local_transform(e.parent.id()).transform(v));
+            if (e._parent != null) {
+                e.localPosition(transform3Cache.global_2_local_transform(e._parent.id()).transform(v));
             }
             else {
                 e.localPosition(v);

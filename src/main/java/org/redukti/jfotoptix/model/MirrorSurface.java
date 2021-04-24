@@ -99,7 +99,7 @@ public class MirrorSurface extends OpticalSurface {
 
         @Override
         public OpticalSurface build() {
-            return new MirrorSurface(id, position, transform, curve, shape,
+            return new MirrorSurface(_id, _position, _transform, curve, shape,
                     _light_from_left ?  air() : metal(),
                     _light_from_left ? metal() : air() );
         }

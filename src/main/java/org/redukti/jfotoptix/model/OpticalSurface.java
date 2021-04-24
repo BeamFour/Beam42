@@ -36,7 +36,7 @@ import org.redukti.jfotoptix.shape.Shape;
 import java.util.Objects;
 
 public class OpticalSurface extends Surface {
-    protected Medium[] mat = new Medium[2];
+    protected Medium[] _mat = new Medium[2];
 
     public OpticalSurface(int id,
                           Vector3Pair p,
@@ -46,19 +46,19 @@ public class OpticalSurface extends Surface {
                           Medium left,
                           Medium right) {
         super(id, p, transform, curve, shape);
-        mat[0] = left;
-        mat[1] = right;
+        _mat[0] = left;
+        _mat[1] = right;
     }
 
     public Medium get_material(int i) {
-        return mat[i];
+        return _mat[i];
     }
 
     public String toString() {
         return "OpticalSurface{" +
                 super.toString() +
-                ", left material=" + Objects.toString(mat[0]) +
-                ", right material=" + Objects.toString(mat[1]) +
+                ", left material=" + Objects.toString(_mat[0]) +
+                ", right material=" + Objects.toString(_mat[1]) +
                 '}';
     }
 
@@ -90,7 +90,7 @@ public class OpticalSurface extends Surface {
         }
 
         public OpticalSurface build() {
-            return new OpticalSurface(id, position, transform, curve, shape, left, right);
+            return new OpticalSurface(_id, _position, _transform, curve, shape, left, right);
         }
 
     }

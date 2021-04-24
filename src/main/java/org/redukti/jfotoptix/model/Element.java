@@ -131,67 +131,67 @@ public abstract class Element {
     }
 
     public static abstract class Builder {
-        protected int id;
-        protected Vector3Pair position;
-        protected Transform3 transform;
-        protected Element.Builder parent;
+        protected int _id;
+        protected Vector3Pair _position;
+        protected Transform3 _transform;
+        protected Element.Builder _parent;
 
         public Builder position(Vector3Pair position) {
-            this.position = position;
-            this.transform = new Transform3(position);
+            this._position = position;
+            this._transform = new Transform3(position);
             return this;
         }
 
         public Builder localPosition(Vector3 v) {
-            this.transform = new Transform3(v, this.transform.rotation_matrix, this.transform.use_rotation_matrix);
+            this._transform = new Transform3(v, this._transform.rotation_matrix, this._transform.use_rotation_matrix);
             return this;
         }
 
         public Builder parent(Element.Builder parent) {
-            this.parent = parent;
+            this._parent = parent;
             return this;
         }
 
-        public Builder setId(AtomicInteger id) {
-            this.id = id.incrementAndGet();
+        public Builder set_id(AtomicInteger id) {
+            this._id = id.incrementAndGet();
             return this;
         }
 
         public Builder rotate(double x, double y, double z) {
-            this.transform = this.transform.rotate_axis_by_angles(new Vector3(x, y, z));
+            this._transform = this._transform.rotate_axis_by_angles(new Vector3(x, y, z));
             return this;
         }
 
         public Transform3 transform() {
-            return transform;
+            return _transform;
         }
 
         public Element.Builder transform(Transform3 transform3) {
-            this.transform = transform3;
+            this._transform = transform3;
             return this;
         }
 
         public int id() {
-            return id;
+            return _id;
         }
 
         public void compute_global_transforms(Transform3Cache tcache) {
             //System.err.println("Computing coordinate for " + this);
 
-            Transform3 t = transform; // local transform
-            Element.Builder p = this.parent;
+            Transform3 t = _transform; // local transform
+            Element.Builder p = this._parent;
             while (p != null) {
-                t = Transform3.compose(p.transform, t);
-                p = p.parent;
+                t = Transform3.compose(p._transform, t);
+                p = p._parent;
             }
-            tcache.put_local_2_global_transform(this.id, t);  // Local to global
-            tcache.put_global_2_local_transform(this.id, t.inverse()); // Global to local
+            tcache.put_local_2_global_transform(this._id, t);  // Local to global
+            tcache.put_global_2_local_transform(this._id, t.inverse()); // Global to local
         }
 
         public abstract Element build();
 
         public String toString() {
-            return getClass().getName() + ",id=" + id;
+            return getClass().getName() + ",id=" + _id;
         }
     }
 }

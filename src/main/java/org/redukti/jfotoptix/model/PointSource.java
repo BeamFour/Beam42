@@ -52,7 +52,7 @@ public class PointSource extends RaySource {
         SourceAtInfinity,
     }
 
-    SourceInfinityMode _mode;
+    protected SourceInfinityMode _mode;
 
     public PointSource(int id, Vector3Pair p, Transform3 transform, double min_intensity, double max_intensity, List<SpectralLine> spectrum, SourceInfinityMode mode) {
         super(id, p, transform, min_intensity, max_intensity, spectrum);
@@ -89,7 +89,7 @@ public class PointSource extends RaySource {
 
         @Override
         public PointSource build() {
-            return new PointSource(id, position, transform, _min_intensity, _max_intensity, _spectrum, _mode);
+            return new PointSource(_id, _position, _transform, _min_intensity, _max_intensity, _spectrum, _mode);
         }
     }
 

@@ -48,7 +48,6 @@ public class Lens extends Group {
         SlopeEdge,
     }
 
-    protected OpticalSystem opticalSystem;
     protected List<OpticalSurface> _surfaces;
     protected final Stop _stop;
 
@@ -89,7 +88,7 @@ public class Lens extends Group {
             List<OpticalSurface> surfaces = elements.stream().filter(e -> e instanceof OpticalSurface)
                     .map (e -> (OpticalSurface)e)
                     .collect(Collectors.toList());
-            return new Lens(id, position, transform, surfaces, elements, stop);
+            return new Lens(_id, _position, _transform, surfaces, elements, stop);
         }
 
         /**

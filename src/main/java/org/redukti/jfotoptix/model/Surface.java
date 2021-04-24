@@ -36,21 +36,21 @@ import java.util.function.Consumer;
 
 public class Surface extends Element {
 
-    protected final Shape shape;
-    protected final Curve curve;
+    protected final Shape _shape;
+    protected final Curve _curve;
 
     public Surface(int id, Vector3Pair p, Transform3 transform, Curve curve, Shape shape) {
         super(id, p, transform);
-        this.curve = curve;
-        this.shape = shape;
+        this._curve = curve;
+        this._shape = shape;
     }
 
     public Shape get_shape() {
-        return shape;
+        return _shape;
     }
 
     public Curve get_curve() {
-        return curve;
+        return _curve;
     }
 
     public Renderer.Style get_style() {
@@ -60,21 +60,21 @@ public class Surface extends Element {
     public void get_pattern(Consumer<Vector3> f,
                             Distribution d, boolean unobstructed) {
         Consumer<Vector2> de = (v2d) -> {
-            f.accept(new Vector3(v2d.x(), v2d.y(), curve.sagitta(v2d)));
+            f.accept(new Vector3(v2d.x(), v2d.y(), _curve.sagitta(v2d)));
         };
 
         // get distribution from shape
-        shape.get_pattern(de, d, unobstructed);
+        _shape.get_pattern(de, d, unobstructed);
     }
 
     public Vector3Pair get_bounding_box() {
-        Vector2Pair sb = shape.get_bounding_box();
+        Vector2Pair sb = _shape.get_bounding_box();
 
         // FIXME we assume curve is symmetric here
         double z = 0;
-        double ms = curve.sagitta(new Vector2(shape.max_radius()));
+        double ms = _curve.sagitta(new Vector2(_shape.max_radius()));
         if (Double.isNaN(ms)) {
-            System.err.println("Invalid sagitta at " + shape.max_radius());
+            System.err.println("Invalid sagitta at " + _shape.max_radius());
             return null;
         }
 
@@ -90,8 +90,8 @@ public class Surface extends Element {
     @Override
     public String toString() {
         return super.toString() +
-                ", shape=" + shape +
-                ", curve=" + curve;
+                ", shape=" + _shape +
+                ", curve=" + _curve;
     }
 
     public static class Builder extends Element.Builder {
@@ -105,7 +105,7 @@ public class Surface extends Element {
 
         @Override
         public Element build() {
-            return new Surface(id, position, transform, curve, shape);
+            return new Surface(_id, _position, _transform, curve, shape);
         }
 
         public Builder shape(Shape shape) {

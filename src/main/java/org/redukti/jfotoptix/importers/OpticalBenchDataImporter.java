@@ -6,16 +6,16 @@ package org.redukti.jfotoptix.importers;
 
 import org.redukti.jfotoptix.curve.Asphere;
 import org.redukti.jfotoptix.curve.Flat;
-import org.redukti.jfotoptix.material.Abbe;
-import org.redukti.jfotoptix.material.Air;
-import org.redukti.jfotoptix.material.GlassMap;
+import org.redukti.jfotoptix.medium.Abbe;
+import org.redukti.jfotoptix.medium.Air;
+import org.redukti.jfotoptix.medium.GlassMap;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 import org.redukti.jfotoptix.shape.Disk;
 import org.redukti.jfotoptix.shape.Rectangle;
-import org.redukti.jfotoptix.sys.Image;
-import org.redukti.jfotoptix.sys.Lens;
-import org.redukti.jfotoptix.sys.OpticalSystem;
+import org.redukti.jfotoptix.model.Image;
+import org.redukti.jfotoptix.model.Lens;
+import org.redukti.jfotoptix.model.OpticalSystem;
 
 import java.io.File;
 import java.nio.file.Files;

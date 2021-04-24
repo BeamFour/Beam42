@@ -24,11 +24,11 @@ Original GNU Optical License and Authors are as follows:
  */
 
 
-package org.redukti.jfotoptix.sys;
+package org.redukti.jfotoptix.model;
 
 import org.redukti.jfotoptix.curve.Curve;
-import org.redukti.jfotoptix.material.Air;
-import org.redukti.jfotoptix.material.Medium;
+import org.redukti.jfotoptix.medium.Air;
+import org.redukti.jfotoptix.medium.Medium;
 import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 import org.redukti.jfotoptix.shape.Shape;

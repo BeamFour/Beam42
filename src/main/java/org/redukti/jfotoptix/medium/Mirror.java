@@ -24,13 +24,40 @@ Original GNU Optical License and Authors are as follows:
  */
 
 
-package org.redukti.jfotoptix.sys;
+package org.redukti.jfotoptix.medium;
 
-import org.redukti.jfotoptix.math.Vector3Pair;
+public class Mirror extends Medium {
 
-import java.util.List;
+    public static final Mirror mirror = new Mirror();
 
-public interface Container {
-    List<? extends Element> elements();
-    Vector3Pair get_bounding_box ();
+    public Mirror() {
+        super("mirror");
+    }
+
+    @Override
+    public boolean is_opaque() {
+        return true;
+    }
+
+    @Override
+    public boolean is_reflecting() {
+        return true;
+    }
+
+    @Override
+    public double get_refractive_index(double wavelen) {
+        return 1.0;
+    }
+
+    @Override
+    public double get_internal_transmittance (double wavelen,
+                                              double thickness) {
+        return 0.0;
+    }
+
+    @Override
+    public double get_extinction_coef (double wavelen) {
+        return 9999.0;
+    }
+
 }

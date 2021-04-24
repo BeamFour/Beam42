@@ -1,13 +1,13 @@
-package org.redukti.jfotoptix.material;
+package org.redukti.jfotoptix.medium;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.redukti.jfotoptix.light.SpectralLine;
 
-import static org.redukti.jfotoptix.material.Abbe.AbbeFormula.AbbeVd;
-import static org.redukti.jfotoptix.material.Abbe.AbbeFormula.AbbeVe;
-import static org.redukti.jfotoptix.material.AirFormula.AirBirch94Formula;
-import static org.redukti.jfotoptix.material.AirFormula.AirKohlrausch68Formula;
+import static org.redukti.jfotoptix.medium.Abbe.AbbeFormula.AbbeVd;
+import static org.redukti.jfotoptix.medium.Abbe.AbbeFormula.AbbeVe;
+import static org.redukti.jfotoptix.medium.AirFormula.AirBirch94Formula;
+import static org.redukti.jfotoptix.medium.AirFormula.AirKohlrausch68Formula;
 
 public class TestMaterials {
 

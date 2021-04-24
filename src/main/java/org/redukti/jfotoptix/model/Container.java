@@ -24,31 +24,13 @@ Original GNU Optical License and Authors are as follows:
  */
 
 
-package org.redukti.jfotoptix.material;
+package org.redukti.jfotoptix.model;
 
-public class Vacuum extends Medium {
+import org.redukti.jfotoptix.math.Vector3Pair;
 
-    public Vacuum() {
-        super("Vacuum");
-    }
+import java.util.List;
 
-    public boolean is_opaque() {
-        return false;
-    }
-
-    public boolean is_reflecting() {
-        return false;
-    }
-
-    public double get_internal_transmittance(double wavelen, double thickness) {
-        return 1.0;
-    }
-
-    public double get_extinction_coef(double wavelen) {
-        return 0.0;
-    }
-
-    public double get_refractive_index(double wavelen) {
-        return 1.0;
-    }
+public interface Container {
+    List<? extends Element> elements();
+    Vector3Pair get_bounding_box ();
 }

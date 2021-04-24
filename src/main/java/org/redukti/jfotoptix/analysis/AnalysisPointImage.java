@@ -27,8 +27,8 @@ package org.redukti.jfotoptix.analysis;
 
 import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
-import org.redukti.jfotoptix.sys.Image;
-import org.redukti.jfotoptix.sys.OpticalSystem;
+import org.redukti.jfotoptix.model.Image;
+import org.redukti.jfotoptix.model.OpticalSystem;
 import org.redukti.jfotoptix.tracing.RayTraceParameters;
 import org.redukti.jfotoptix.tracing.RayTraceResults;
 import org.redukti.jfotoptix.tracing.RayTracer;

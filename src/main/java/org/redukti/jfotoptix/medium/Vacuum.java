@@ -24,40 +24,31 @@ Original GNU Optical License and Authors are as follows:
  */
 
 
-package org.redukti.jfotoptix.sys;
+package org.redukti.jfotoptix.medium;
 
-import org.redukti.jfotoptix.curve.Curve;
-import org.redukti.jfotoptix.math.Transform3;
-import org.redukti.jfotoptix.math.Vector3Pair;
-import org.redukti.jfotoptix.shape.Shape;
+public class Vacuum extends Medium {
 
-public class Image extends Surface {
-
-    public Image(int id, Vector3Pair p, Transform3 transform, Curve curve, Shape shape) {
-        super(id, p, transform, curve, shape);
+    public Vacuum() {
+        super("Vacuum");
     }
 
-    @Override
-    public String toString() {
-        return "Image{" + super.toString() + "}";
+    public boolean is_opaque() {
+        return false;
     }
 
-    public static class Builder extends Surface.Builder {
-        @Override
-        public Image.Builder position(Vector3Pair position) {
-            return (Image.Builder) super.position(position);
-        }
+    public boolean is_reflecting() {
+        return false;
+    }
 
-        public Image.Builder shape(Shape shape) {
-            return (Image.Builder) super.shape(shape);
-        }
+    public double get_internal_transmittance(double wavelen, double thickness) {
+        return 1.0;
+    }
 
-        public Image.Builder curve(Curve curve) {
-            return (Image.Builder) super.curve(curve);
-        }
+    public double get_extinction_coef(double wavelen) {
+        return 0.0;
+    }
 
-        public Image build() {
-            return new Image(id, position, transform, curve, shape);
-        }
+    public double get_refractive_index(double wavelen) {
+        return 1.0;
     }
 }

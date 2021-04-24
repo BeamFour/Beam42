@@ -1,4 +1,4 @@
-package org.redukti.jfotoptix.sys;
+package org.redukti.jfotoptix.model;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

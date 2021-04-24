@@ -24,22 +24,11 @@ Original GNU Optical License and Authors are as follows:
  */
 
 
-package org.redukti.jfotoptix.material;
+package org.redukti.jfotoptix.medium;
 
-public abstract class Solid extends Medium {
-    public final double _thermal_expansion;    // thermal expansion coefficient
-    public final double _thermal_conductivity; // thermal conductivity W/m.K
-    public final double _density;              // density g/cm^3
-    public final double _young_modulus;
-    public final double _poisson_ratio;
-
-    public Solid (String name)
-    {
-        super(name);
-        _thermal_expansion = 0.0;
-        _thermal_conductivity = 0.0;
-        _density = 0.0;
-        _young_modulus = 0.0;
-        _poisson_ratio = 0.0;
-    }
+/** Specify air refractive index model used by Air class. */
+public enum AirFormula {
+    AirBirch94Formula,      //< Birch, Metrologia, 1994, 31, 315
+    AirKohlrausch68Formula, //< F. Kohlrausch, Praktische Physik, 1968, 1, 408
+    AirSimple // refractive index 1
 }

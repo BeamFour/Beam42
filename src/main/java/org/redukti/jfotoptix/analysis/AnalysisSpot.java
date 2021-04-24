@@ -35,8 +35,8 @@ import org.redukti.jfotoptix.plotting.PlotAxes;
 import org.redukti.jfotoptix.plotting.PlotRenderer;
 import org.redukti.jfotoptix.rendering.Renderer;
 import org.redukti.jfotoptix.rendering.RendererViewport;
-import org.redukti.jfotoptix.sys.OpticalSystem;
-import org.redukti.jfotoptix.sys.Surface;
+import org.redukti.jfotoptix.model.OpticalSystem;
+import org.redukti.jfotoptix.model.Surface;
 import org.redukti.jfotoptix.tracing.TracedRay;
 
 /**

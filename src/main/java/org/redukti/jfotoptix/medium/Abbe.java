@@ -24,7 +24,7 @@ Original GNU Optical License and Authors are as follows:
  */
 
 
-package org.redukti.jfotoptix.material;
+package org.redukti.jfotoptix.medium;
 
 import org.redukti.jfotoptix.light.SpectralLine;
 

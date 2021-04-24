@@ -1,4 +1,4 @@
-package org.redukti.jfotoptix.material;
+package org.redukti.jfotoptix.medium;
 
 import org.redukti.jfotoptix.light.SpectralLine;
 

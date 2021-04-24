@@ -48,18 +48,18 @@ import org.redukti.jfotoptix.tracing.TracedRay;
 public class AnalysisSpot extends AnalysisPointImage {
 
     /** spot centroid */
-    Vector3 _centroid;
+    protected Vector3 _centroid;
 
-    boolean _processed_analysis;
+    protected boolean _processed_analysis;
     /** spot maximum radius */
-    double _max_radius;
+    protected double _max_radius;
     /** spot root mean square radius */
-    double _rms_radius;
+    protected double _rms_radius;
     /** amount of light intensity in the whole spot */
-    double _tot_intensity;
-    double _useful_radius;
+    protected double _tot_intensity;
+    protected double _useful_radius;
 
-    PlotAxes _axes;
+    protected PlotAxes _axes;
 
     public AnalysisSpot(OpticalSystem system) {
         super(system);

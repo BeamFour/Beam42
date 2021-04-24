@@ -41,15 +41,15 @@ import java.util.List;
  * Point image analysis base class
  */
 public class AnalysisPointImage {
-    OpticalSystem _system;
-    RayTracer _tracer;
-    RayTraceParameters _params;
-    boolean _processed_trace;
+    protected OpticalSystem _system;
+    protected RayTracer _tracer;
+    protected RayTraceParameters _params;
+    protected boolean _processed_trace;
     /** Image plan that collect rays for analysis */
-    Image _image;
-    /** The rays intercepted at image place */
-    List<TracedRay> _intercepts;
-    RayTraceResults _results;
+    protected Image _image;
+    /** The rays intercepted at image plane */
+    protected List<TracedRay> _intercepts;
+    protected RayTraceResults _results;
 
     public AnalysisPointImage (OpticalSystem system)
     {

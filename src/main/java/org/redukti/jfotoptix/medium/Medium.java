@@ -31,11 +31,11 @@ import org.redukti.jfotoptix.rendering.Rgb;
 import static org.redukti.jfotoptix.math.MathUtils.square;
 
 public abstract class Medium {
-    public final String name;
-    public double _temperature; // celcius
+    protected final String _name;
+    protected double _temperature; // celcius
 
     public Medium(String name, double temp) {
-        this.name = name;
+        this._name = name;
         this._temperature = temp;
     }
 

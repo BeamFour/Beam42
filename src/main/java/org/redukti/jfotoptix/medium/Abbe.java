@@ -38,8 +38,8 @@ public class Abbe extends Dielectric {
         AbbeVe, //< Abbe number of Fraunhofer @em e line
     }
 
-    double _n, _q, _a, _v;
-    AbbeFormula _m;
+    protected double _n, _q, _a, _v;
+    protected AbbeFormula _m;
 
     /**
      * Create an abbe glass model

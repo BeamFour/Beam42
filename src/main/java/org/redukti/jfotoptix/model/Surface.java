@@ -36,8 +36,8 @@ import java.util.function.Consumer;
 
 public class Surface extends Element {
 
-    final Shape shape;
-    final Curve curve;
+    protected final Shape shape;
+    protected final Curve curve;
 
     public Surface(int id, Vector3Pair p, Transform3 transform, Curve curve, Shape shape) {
         super(id, p, transform);

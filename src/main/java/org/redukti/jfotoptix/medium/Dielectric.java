@@ -77,24 +77,24 @@ public abstract class Dielectric extends Solid {
         ThermalDnDt
     }
 
-    thermal_model_e _temp_model;
-    double _temp_d0, _temp_d1, _temp_d2;
-    double _temp_e0, _temp_e1;
-    double _temp_wl_tk;
+    protected thermal_model_e _temp_model;
+    protected double _temp_d0, _temp_d1, _temp_d2;
+    protected double _temp_e0, _temp_e1;
+    protected double _temp_wl_tk;
 
     /**
      * wavelen data validity range (nm)
      */
-    double _low_wavelen;
-    double _high_wavelen;
+    protected double _low_wavelen;
+    protected double _high_wavelen;
 
     /**
      * medium used during refractive index measurement
      */
-    Medium _measurement_medium;
+    protected Medium _measurement_medium;
 
-    double _last_wavelen;
-    double _last_get_refractive_index;
+    protected double _last_wavelen;
+    protected double _last_get_refractive_index;
 
     /**
      * Get material relative refractive index in measurment medium

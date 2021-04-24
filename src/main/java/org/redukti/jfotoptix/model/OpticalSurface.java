@@ -36,7 +36,7 @@ import org.redukti.jfotoptix.shape.Shape;
 import java.util.Objects;
 
 public class OpticalSurface extends Surface {
-    Medium[] mat = new Medium[2];
+    protected Medium[] mat = new Medium[2];
 
     public OpticalSurface(int id,
                           Vector3Pair p,

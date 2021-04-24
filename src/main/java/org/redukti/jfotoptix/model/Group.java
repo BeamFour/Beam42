@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Group extends Element implements Container {
-    private final List<? extends Element> elements;
+    protected final List<? extends Element> elements;
 
     public Group(int id, Vector3Pair p, Transform3 transform3, List<? extends Element> elements) {
         super(id, p, transform3);

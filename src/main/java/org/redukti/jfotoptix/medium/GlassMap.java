@@ -7,18 +7,18 @@ import java.util.Map;
 
 public class GlassMap extends Solid {
 
-    Map<Double, Double> indexMap = new HashMap<>();
+    protected Map<Double, Double> _index_map = new HashMap<>();
 
     public GlassMap(String name, Map<Double, Double> indices) {
         super(name);
-        this.indexMap = indices;
+        this._index_map = indices;
     }
 
     public GlassMap(String name, double d_index, double C, double F) {
         super(name);
-        indexMap.put(SpectralLine.d, d_index);
-        indexMap.put(SpectralLine.C, C);
-        indexMap.put(SpectralLine.F, F);
+        _index_map.put(SpectralLine.d, d_index);
+        _index_map.put(SpectralLine.C, C);
+        _index_map.put(SpectralLine.F, F);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class GlassMap extends Solid {
 
     @Override
     public double get_refractive_index(double wavelen) {
-        Double index = indexMap.get(wavelen);
+        Double index = _index_map.get(wavelen);
         if (index == null) {
             throw new IllegalArgumentException("Do not know how to get the refractive index for wavelen " + wavelen);
         }
@@ -42,7 +42,7 @@ public class GlassMap extends Solid {
 
     @Override
     public String toString() {
-        return name + "{d=" + indexMap.get(SpectralLine.d) + ",C="+ indexMap.get(SpectralLine.C) + ",F=" + indexMap.get(SpectralLine.F) + '}';
+        return _name + "{d=" + _index_map.get(SpectralLine.d) + ",C="+ _index_map.get(SpectralLine.C) + ",F=" + _index_map.get(SpectralLine.F) + '}';
     }
 
     public static GlassMap glassByName(String name) {

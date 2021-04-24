@@ -37,9 +37,9 @@ import java.util.List;
 
 public class RaySource extends Element {
 
-    List<SpectralLine> _spectrum;
-    double _min_intensity, _max_intensity;
-    Medium _mat = Air.air; // FIXME - should be settable
+    protected List<SpectralLine> _spectrum;
+    protected double _min_intensity, _max_intensity;
+    protected Medium _mat = Air.std_air; // FIXME - should be settable
 
     public RaySource(int id, Vector3Pair p, Transform3 transform, double min_intensity, double max_intensity, List<SpectralLine> spectrum) {
         super(id, p, transform);

@@ -33,7 +33,7 @@ import org.redukti.jfotoptix.shape.Shape;
 
 public class Stop extends Surface {
 
-    double _external_radius;
+    protected double _external_radius;
 
     public Stop(int id, Vector3Pair p, Transform3 transform, Curve curve, Shape shape) {
         super(id, p, transform, curve, shape);

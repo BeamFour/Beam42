@@ -35,9 +35,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class OpticalSystem implements Container {
-    private final List<Element> _elements;
-    private final Transform3Cache _transform3Cache;
-    private boolean keep_aspect = true;
+    protected final List<Element> _elements;
+    protected final Transform3Cache _transform3Cache;
+    protected boolean keep_aspect = true;
 
     @Override
     public List<Element> elements() {

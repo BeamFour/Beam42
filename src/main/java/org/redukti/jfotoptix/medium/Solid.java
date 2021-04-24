@@ -27,11 +27,11 @@ Original GNU Optical License and Authors are as follows:
 package org.redukti.jfotoptix.medium;
 
 public abstract class Solid extends Medium {
-    public final double _thermal_expansion;    // thermal expansion coefficient
-    public final double _thermal_conductivity; // thermal conductivity W/m.K
-    public final double _density;              // density g/cm^3
-    public final double _young_modulus;
-    public final double _poisson_ratio;
+    protected final double _thermal_expansion;    // thermal expansion coefficient
+    protected final double _thermal_conductivity; // thermal conductivity W/m.K
+    protected final double _density;              // density g/cm^3
+    protected final double _young_modulus;
+    protected final double _poisson_ratio;
 
     public Solid (String name)
     {

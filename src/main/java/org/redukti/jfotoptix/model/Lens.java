@@ -48,9 +48,9 @@ public class Lens extends Group {
         SlopeEdge,
     }
 
-    OpticalSystem opticalSystem;
-    List<OpticalSurface> _surfaces;
-    final Stop _stop;
+    protected OpticalSystem opticalSystem;
+    protected List<OpticalSurface> _surfaces;
+    protected final Stop _stop;
 
     public Lens(int id, Vector3Pair position, Transform3 transform, List<OpticalSurface> surfaces, List<Element> elementList, Stop stop) {
         super(id, position, transform, elementList);

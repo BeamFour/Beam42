@@ -34,7 +34,7 @@ import java.util.Objects;
 
 public class Transform3Cache {
 
-    Map<ElementPair, Transform3> _cache = new HashMap<>();
+    protected Map<ElementPair, Transform3> _cache = new HashMap<>();
 
     public Transform3 get(int from, int to) {
         ElementPair pair = new ElementPair(from, to);

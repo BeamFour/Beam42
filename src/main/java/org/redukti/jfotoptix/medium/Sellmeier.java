@@ -40,8 +40,8 @@ import static org.redukti.jfotoptix.math.MathUtils.square;
  */
 public class Sellmeier extends Dielectric {
 
-    double[] _coeff;
-    double _constant;
+    protected double[] _coeff;
+    protected double _constant;
 
     /**
      * Create an empty sellmeier model

@@ -35,10 +35,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class Element {
 
-    final int _id;
-    final Vector3Pair _position;
-    final Transform3 _transform;
-    OpticalSystem _system;
+    protected final int _id;
+    protected final Vector3Pair _position;
+    protected final Transform3 _transform;
+    protected OpticalSystem _system;
 
     public Element(int id, Vector3Pair p, Transform3 transform) {
         this._id = id;
@@ -131,10 +131,10 @@ public abstract class Element {
     }
 
     public static abstract class Builder {
-        int id;
-        Vector3Pair position;
-        Transform3 transform;
-        Element.Builder parent;
+        protected int id;
+        protected Vector3Pair position;
+        protected Transform3 transform;
+        protected Element.Builder parent;
 
         public Builder position(Vector3Pair position) {
             this.position = position;

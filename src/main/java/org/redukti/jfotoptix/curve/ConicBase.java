@@ -33,6 +33,8 @@ public abstract class ConicBase extends RotationalRoc {
         _sh = sc + 1;
     }
 
+    // FIXME this looks wrong
+    // As SC = -e^2
     public double get_eccentricity ()
     {
         return Math.sqrt (-_sh + 1.0);

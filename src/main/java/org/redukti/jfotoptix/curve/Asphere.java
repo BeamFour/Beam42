@@ -26,11 +26,14 @@ import org.redukti.jfotoptix.math.Vector3Pair;
  * 0 < K < 1, hemelipsoid of revolution about major axis
  * K = 1, hemisphere
  * K > 1, hemelipsoid of revolution about minor axis
+ *
+ * I believe K = 1 + Schwarzschild Constant
+ *
  */
 public class Asphere extends ConicBase {
     final double _r;        /* radius */
     final double _c;        /* curvature = 1/_r */
-    final double _k;        /* K - eccentricity constant */
+    final double _k;        /* K = 1 + Schwarzschild Constant =  */
     final double _A4;       /* deformation polynomial coefficient */
     final double _A6;       /* deformation polynomial coefficient */
     final double _A8;       /* deformation polynomial coefficient */
@@ -41,7 +44,7 @@ public class Asphere extends ConicBase {
 
     public Asphere(double r, double k, double A4, double A6, double A8, double A10,
                    double A12, double A14) {
-        super(r, k);
+        super(r, k-1);
         _r = r;
         _c = 1.0 / r;
         _k = k;

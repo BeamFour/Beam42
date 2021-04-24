@@ -51,17 +51,17 @@ public class Ellipse extends Round {
 
 
     @Override
-    double get_xy_ratio() {
+    public double get_xy_ratio() {
         return _xy_ratio;
     }
 
     @Override
-    double get_external_xradius() {
+    public double get_external_xradius() {
         return _xr;
     }
 
     @Override
-    double get_internal_xradius() {
+    public double get_internal_xradius() {
         return 0.0;
     }
 

@@ -29,6 +29,7 @@ package org.redukti.jfotoptix.model;
 import org.redukti.jfotoptix.curve.Curve;
 import org.redukti.jfotoptix.math.*;
 import org.redukti.jfotoptix.patterns.Distribution;
+import org.redukti.jfotoptix.patterns.PatternGenerator;
 import org.redukti.jfotoptix.rendering.Renderer;
 import org.redukti.jfotoptix.shape.Shape;
 
@@ -64,7 +65,8 @@ public class Surface extends Element {
         };
 
         // get distribution from shape
-        _shape.get_pattern(de, d, unobstructed);
+        //_shape.get_pattern(de, d, unobstructed);
+        PatternGenerator.get_pattern(_shape, de, d, unobstructed);
     }
 
     public Vector3Pair get_bounding_box() {

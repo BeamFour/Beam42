@@ -34,7 +34,7 @@ import org.redukti.jfotoptix.patterns.Distribution;
 import java.util.function.Consumer;
 
 public class Rectangle extends ShapeBase {
-    Vector2 _halfsize;
+    protected Vector2 _halfsize;
 
     public Rectangle(double sqwidth) {
         this._halfsize = new Vector2(sqwidth / 2., sqwidth / 2.);
@@ -60,79 +60,79 @@ public class Rectangle extends ShapeBase {
                 && Math.abs(point.y()) <= _halfsize.y());
     }
 
-    @Override
-    public void get_pattern(Consumer<Vector2> f,
-                            Distribution d, boolean unobstructed) {
-        final double epsilon = 1e-8;
-        Vector2 hs = _halfsize.times(d.get_scaling());
-        Vector2 step = hs.divide((double)(d.get_radial_density () / 2));
-
-        switch (d.get_pattern()) {
-            case MeridionalDist: {
-                f.accept(Vector2.vector2_0);
-
-                for (double y = step.y(); y < hs.y() + epsilon; y += step.y()) {
-                    f.accept(new Vector2(0, y));
-                    f.accept(new Vector2(0, -y));
-                }
-                break;
-            }
-
-            case SagittalDist: {
-                f.accept(Vector2.vector2_0);
-
-                for (double x = step.x(); x < hs.x() + epsilon; x += step.x()) {
-                    f.accept(new Vector2(x, 0));
-                    f.accept(new Vector2(-x, 0));
-                }
-                break;
-            }
-
-            case CrossDist: {
-                f.accept(Vector2.vector2_0);
-
-                for (double x = step.x(); x < hs.x() + epsilon; x += step.x()) {
-                    f.accept(new Vector2(x, 0));
-                    f.accept(new Vector2(-x, 0));
-                }
-
-                for (double y = step.y(); y < hs.y() + epsilon; y += step.y()) {
-                    f.accept(new Vector2(0, y));
-                    f.accept(new Vector2(0, -y));
-                }
-                break;
-            }
-
-            case DefaultDist:
-            case SquareDist: {
-                double x, y;
-
-                f.accept(Vector2.vector2_0);
-
-                for (x = step.x(); x < hs.x() + epsilon; x += step.x())
-                    for (y = step.y(); y < hs.y() + epsilon; y += step.y()) {
-                        f.accept(new Vector2(x, y));
-                        f.accept(new Vector2(-x, y));
-                        f.accept(new Vector2(x, -y));
-                        f.accept(new Vector2(-x, -y));
-                    }
-
-                for (x = step.x(); x < hs.x() + epsilon; x += step.x()) {
-                    f.accept(new Vector2(x, 0));
-                    f.accept(new Vector2(-x, 0));
-                }
-
-                for (y = step.y(); y < hs.y() + epsilon; y += step.y()) {
-                    f.accept(new Vector2(0, y));
-                    f.accept(new Vector2(0, -y));
-                }
-                break;
-            }
-
-            default:
-                super.get_pattern(f, d, unobstructed);
-        }
-    }
+//    @Override
+//    public void get_pattern(Consumer<Vector2> f,
+//                            Distribution d, boolean unobstructed) {
+//        final double epsilon = 1e-8;
+//        Vector2 hs = _halfsize.times(d.get_scaling());
+//        Vector2 step = hs.divide((double)(d.get_radial_density () / 2));
+//
+//        switch (d.get_pattern()) {
+//            case MeridionalDist: {
+//                f.accept(Vector2.vector2_0);
+//
+//                for (double y = step.y(); y < hs.y() + epsilon; y += step.y()) {
+//                    f.accept(new Vector2(0, y));
+//                    f.accept(new Vector2(0, -y));
+//                }
+//                break;
+//            }
+//
+//            case SagittalDist: {
+//                f.accept(Vector2.vector2_0);
+//
+//                for (double x = step.x(); x < hs.x() + epsilon; x += step.x()) {
+//                    f.accept(new Vector2(x, 0));
+//                    f.accept(new Vector2(-x, 0));
+//                }
+//                break;
+//            }
+//
+//            case CrossDist: {
+//                f.accept(Vector2.vector2_0);
+//
+//                for (double x = step.x(); x < hs.x() + epsilon; x += step.x()) {
+//                    f.accept(new Vector2(x, 0));
+//                    f.accept(new Vector2(-x, 0));
+//                }
+//
+//                for (double y = step.y(); y < hs.y() + epsilon; y += step.y()) {
+//                    f.accept(new Vector2(0, y));
+//                    f.accept(new Vector2(0, -y));
+//                }
+//                break;
+//            }
+//
+//            case DefaultDist:
+//            case SquareDist: {
+//                double x, y;
+//
+//                f.accept(Vector2.vector2_0);
+//
+//                for (x = step.x(); x < hs.x() + epsilon; x += step.x())
+//                    for (y = step.y(); y < hs.y() + epsilon; y += step.y()) {
+//                        f.accept(new Vector2(x, y));
+//                        f.accept(new Vector2(-x, y));
+//                        f.accept(new Vector2(x, -y));
+//                        f.accept(new Vector2(-x, -y));
+//                    }
+//
+//                for (x = step.x(); x < hs.x() + epsilon; x += step.x()) {
+//                    f.accept(new Vector2(x, 0));
+//                    f.accept(new Vector2(-x, 0));
+//                }
+//
+//                for (y = step.y(); y < hs.y() + epsilon; y += step.y()) {
+//                    f.accept(new Vector2(0, y));
+//                    f.accept(new Vector2(0, -y));
+//                }
+//                break;
+//            }
+//
+//            default:
+//                super.get_pattern(f, d, unobstructed);
+//        }
+//    }
 
     @Override
     public Vector2Pair get_bounding_box() {
@@ -142,6 +142,10 @@ public class Rectangle extends ShapeBase {
     @Override
     public int get_contour_count() {
         return 1;
+    }
+
+    public Vector2 get_half_size() {
+        return _halfsize;
     }
 
     @Override

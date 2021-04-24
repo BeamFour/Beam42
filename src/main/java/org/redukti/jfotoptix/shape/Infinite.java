@@ -42,10 +42,10 @@ public class Infinite implements Shape {
         return true;
     }
 
-    @Override
-    public void get_pattern(Consumer<Vector2> f, Distribution d, boolean unobstructed) {
-        throw new IllegalArgumentException ("can not distribute rays across an infinite surface shape");
-    }
+//    @Override
+//    public void get_pattern(Consumer<Vector2> f, Distribution d, boolean unobstructed) {
+//        throw new IllegalArgumentException ("can not distribute rays across an infinite surface shape");
+//    }
 
     @Override
     public double max_radius() {

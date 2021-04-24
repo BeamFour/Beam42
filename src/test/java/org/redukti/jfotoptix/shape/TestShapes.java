@@ -1,6 +1,7 @@
 package org.redukti.jfotoptix.shape;
 
 import org.junit.jupiter.api.Test;
+import org.redukti.jfotoptix.patterns.PatternGenerator;
 import org.redukti.jfotoptix.rendering.RendererSvg;
 import org.redukti.jfotoptix.rendering.RendererViewport;
 import org.redukti.jfotoptix.rendering.Rgb;
@@ -82,9 +83,9 @@ public class TestShapes {
                     r.draw_point(v, Rgb.rgb_green, PointStyleDot);
                 };
                 Distribution dist = new Distribution();
-                ((ShapeBase) s.s).get_base_pattern(d, dist, false);
+                PatternGenerator.get_pattern_base((ShapeBase) s.s, d, dist, false);
             }
-
+            System.out.println(fname);
             System.out.println(rsvg.write(new StringBuilder()).toString());
         }
 

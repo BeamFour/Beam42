@@ -1,6 +1,7 @@
 package org.redukti.jfotoptix.shape;
 
 import org.junit.jupiter.api.Test;
+import org.redukti.jfotoptix.patterns.PatternGenerator;
 import org.redukti.jfotoptix.rendering.RendererSvg;
 import org.redukti.jfotoptix.rendering.RendererViewport;
 import org.redukti.jfotoptix.rendering.Rgb;
@@ -79,7 +80,7 @@ public class TestPatterns {
                     Consumer<Vector2> de = (Vector2 v2d) -> {
                         pts.add(v2d);
                     };
-                    s.s.get_pattern(de, dist, s.unobstructed);
+                    PatternGenerator.get_pattern(s.s, de, dist, s.unobstructed);
                 } catch (Exception e) {
                     continue;
                 }
@@ -132,8 +133,8 @@ public class TestPatterns {
             }
 
             //      r.draw_pages_grid(io::rgb_black);
+            System.out.println(fname);
             System.out.println(rsvg.write(new StringBuilder()).toString());
-
         }
     }
 }

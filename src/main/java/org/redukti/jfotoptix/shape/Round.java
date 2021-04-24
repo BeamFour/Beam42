@@ -42,130 +42,130 @@ public abstract class Round extends ShapeBase {
 
     final boolean hole;
 
-    abstract double get_xy_ratio();
+    public abstract double get_xy_ratio();
 
-    abstract double get_external_xradius();
+    public abstract double get_external_xradius();
 
-    abstract double get_internal_xradius();
+    public abstract double get_internal_xradius();
 
     public Round(boolean hole) {
         this.hole = hole;
     }
 
-    public void get_pattern(Consumer<Vector2> f,
-                            Distribution d,
-                            boolean unobstructed) {
-        final double epsilon = 1e-8;
-        final double xyr = 1.0 / get_xy_ratio();
-        final double tr = get_external_xradius() * d.get_scaling();
-        boolean obstructed = hole && !unobstructed;
-        final double hr = obstructed
-                ? get_internal_xradius() * (2.0 - d.get_scaling())
-                : 0.0;
-        int rdens = (int) Math.floor((double) d.get_radial_density()
-                - (d.get_radial_density() * (hr / tr)));
-        rdens = Math.max(1, rdens);
-        final double step = (tr - hr) / rdens;
-
-        Pattern p = d.get_pattern();
-
-        switch (p) {
-            case MeridionalDist: {
-
-                if (!obstructed)
-                    f.accept(Vector2.vector2_0);
-
-                final double bound = obstructed ? hr - epsilon : epsilon;
-
-                for (double r = tr; r > bound; r -= step) {
-                    f.accept(new Vector2(0, r * xyr));
-                    f.accept(new Vector2(0, -r * xyr));
-                }
-            }
-            break;
-
-            case SagittalDist: {
-
-                if (!obstructed)
-                    f.accept(Vector2.vector2_0);
-
-                final double bound = obstructed ? hr - epsilon : epsilon;
-
-                for (double r = tr; r > bound; r -= step) {
-                    f.accept(new Vector2(r, 0));
-                    f.accept(new Vector2(-r, 0));
-                }
-            }
-            break;
-
-            case CrossDist: {
-
-                if (!obstructed)
-                    f.accept(Vector2.vector2_0);
-
-                final double bound = obstructed ? hr - epsilon : epsilon;
-
-                for (double r = tr; r > bound; r -= step) {
-                    f.accept(new Vector2(0, r * xyr));
-                    f.accept(new Vector2(r, 0));
-                    f.accept(new Vector2(0, -r * xyr));
-                    f.accept(new Vector2(-r, 0));
-                }
-            }
-            break;
-
-            case RandomDist: {
-                if (!obstructed)
-                    f.accept(Vector2.vector2_0);
-
-                final double bound = obstructed ? hr - epsilon : epsilon;
-
-                double tr1 = tr / 20.0;
-                for (double r = tr1; r > bound; r -= step) {
-                    double astep = (Math.PI / 3) / Math.ceil(r / step);
-                    // angle
-                    for (double a = 0; a < 2 * Math.PI - epsilon; a += astep) {
-                        Vector2 v = new Vector2(Math.sin(a) * r + (random.nextDouble() - .5) * step,
-                                Math.cos(a) * r * xyr + (random.nextDouble() - .5) * step);
-                        double h = Math.hypot(v.x(), v.y() / xyr);
-                        if (h < tr && (h > hr || unobstructed))
-                            f.accept(v);
-                    }
-                }
-            }
-            break;
-
-            case DefaultDist:
-            case HexaPolarDist: {
-
-                if (!obstructed)
-                    f.accept(Vector2.vector2_0);
-
-                final double bound = obstructed ? hr - epsilon : epsilon;
-
-                for (double r = tr; r > bound; r -= step) {
-                    double astep = (Math.PI / 3) / Math.ceil(r / step);
-
-                    for (double a = 0; a < 2 * Math.PI - epsilon; a += astep)
-                        f.accept(new Vector2(Math.sin(a) * r, Math.cos(a) * r * xyr));
-                }
-            }
-            break;
-
-            default: {
-                Consumer<Vector2> f2 = (Vector2 v) -> {
-                    // unobstructed pattern must be inside external
-                    // radius
-                    if (square(v.x())
-                            + square(v.y() / xyr)
-                            < square(tr))
-                        f.accept(v);
-                };
-                super.get_pattern(f2, d, unobstructed);
-                break;
-            }
-        }
-    }
+//    public void get_pattern(Consumer<Vector2> f,
+//                            Distribution d,
+//                            boolean unobstructed) {
+//        final double epsilon = 1e-8;
+//        final double xyr = 1.0 / get_xy_ratio();
+//        final double tr = get_external_xradius() * d.get_scaling();
+//        boolean obstructed = hole && !unobstructed;
+//        final double hr = obstructed
+//                ? get_internal_xradius() * (2.0 - d.get_scaling())
+//                : 0.0;
+//        int rdens = (int) Math.floor((double) d.get_radial_density()
+//                - (d.get_radial_density() * (hr / tr)));
+//        rdens = Math.max(1, rdens);
+//        final double step = (tr - hr) / rdens;
+//
+//        Pattern p = d.get_pattern();
+//
+//        switch (p) {
+//            case MeridionalDist: {
+//
+//                if (!obstructed)
+//                    f.accept(Vector2.vector2_0);
+//
+//                final double bound = obstructed ? hr - epsilon : epsilon;
+//
+//                for (double r = tr; r > bound; r -= step) {
+//                    f.accept(new Vector2(0, r * xyr));
+//                    f.accept(new Vector2(0, -r * xyr));
+//                }
+//            }
+//            break;
+//
+//            case SagittalDist: {
+//
+//                if (!obstructed)
+//                    f.accept(Vector2.vector2_0);
+//
+//                final double bound = obstructed ? hr - epsilon : epsilon;
+//
+//                for (double r = tr; r > bound; r -= step) {
+//                    f.accept(new Vector2(r, 0));
+//                    f.accept(new Vector2(-r, 0));
+//                }
+//            }
+//            break;
+//
+//            case CrossDist: {
+//
+//                if (!obstructed)
+//                    f.accept(Vector2.vector2_0);
+//
+//                final double bound = obstructed ? hr - epsilon : epsilon;
+//
+//                for (double r = tr; r > bound; r -= step) {
+//                    f.accept(new Vector2(0, r * xyr));
+//                    f.accept(new Vector2(r, 0));
+//                    f.accept(new Vector2(0, -r * xyr));
+//                    f.accept(new Vector2(-r, 0));
+//                }
+//            }
+//            break;
+//
+//            case RandomDist: {
+//                if (!obstructed)
+//                    f.accept(Vector2.vector2_0);
+//
+//                final double bound = obstructed ? hr - epsilon : epsilon;
+//
+//                double tr1 = tr / 20.0;
+//                for (double r = tr1; r > bound; r -= step) {
+//                    double astep = (Math.PI / 3) / Math.ceil(r / step);
+//                    // angle
+//                    for (double a = 0; a < 2 * Math.PI - epsilon; a += astep) {
+//                        Vector2 v = new Vector2(Math.sin(a) * r + (random.nextDouble() - .5) * step,
+//                                Math.cos(a) * r * xyr + (random.nextDouble() - .5) * step);
+//                        double h = Math.hypot(v.x(), v.y() / xyr);
+//                        if (h < tr && (h > hr || unobstructed))
+//                            f.accept(v);
+//                    }
+//                }
+//            }
+//            break;
+//
+//            case DefaultDist:
+//            case HexaPolarDist: {
+//
+//                if (!obstructed)
+//                    f.accept(Vector2.vector2_0);
+//
+//                final double bound = obstructed ? hr - epsilon : epsilon;
+//
+//                for (double r = tr; r > bound; r -= step) {
+//                    double astep = (Math.PI / 3) / Math.ceil(r / step);
+//
+//                    for (double a = 0; a < 2 * Math.PI - epsilon; a += astep)
+//                        f.accept(new Vector2(Math.sin(a) * r, Math.cos(a) * r * xyr));
+//                }
+//            }
+//            break;
+//
+//            default: {
+//                Consumer<Vector2> f2 = (Vector2 v) -> {
+//                    // unobstructed pattern must be inside external
+//                    // radius
+//                    if (square(v.x())
+//                            + square(v.y() / xyr)
+//                            < square(tr))
+//                        f.accept(v);
+//                };
+//                super.get_pattern(f2, d, unobstructed);
+//                break;
+//            }
+//        }
+//    }
 
     @Override
     public int get_contour_count() {
@@ -271,4 +271,7 @@ public abstract class Round extends ShapeBase {
         }
     }
 
+    public boolean get_hole() {
+        return hole;
+    }
 }

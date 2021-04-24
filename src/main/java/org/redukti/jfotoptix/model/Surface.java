@@ -76,7 +76,7 @@ public class Surface extends Element {
         double z = 0;
         double ms = _curve.sagitta(new Vector2(_shape.max_radius()));
         if (Double.isNaN(ms)) {
-            System.err.println("Invalid sagitta at " + _shape.max_radius());
+            //System.err.println("Invalid sagitta at " + _shape.max_radius());
             return null;
         }
 

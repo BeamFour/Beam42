@@ -114,7 +114,7 @@ public abstract class Dielectric extends Solid {
         _high_wavelen = 750.0;
         _measurement_medium = std_air;
         _last_wavelen = 0;
-        _transmittance.setInterpolation(Cubic);
+        _transmittance.set_interpolation(Cubic);
     }
 
     public boolean is_opaque() {

@@ -53,7 +53,7 @@ public class TestDiscreteSet {
         for (int i = 0; i < (int) N; i++) {
             d.add_data(lines.get(i).a, lines.get(i).b, lines.get(i).c);
         }
-        d.setInterpolation(method);
+        d.set_interpolation(method);
 
         int i = 0;
         for (double x = -N / 2.0 - 2.0; x < N / 2.0 + 2.0; x += 1.0 / R) {

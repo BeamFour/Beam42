@@ -39,7 +39,7 @@ public abstract class DiscreteSetBase extends Set1d {
         }
     }
 
-    ArrayList<EntryS> _data = new ArrayList<>();
+    protected ArrayList<EntryS> _data = new ArrayList<>();
 
     /**
      * Insert data pair in data set. If a pair with the same x
@@ -59,8 +59,6 @@ public abstract class DiscreteSetBase extends Set1d {
             _data.add(di, e);
         invalidate();
     }
-
-
 
     protected abstract void invalidate();
 

@@ -40,7 +40,7 @@ public class Interpolated1d {
         Cubic2ndDerivSecond,
     }
 
-    InterpolatableDataSet _data_set;
+    protected InterpolatableDataSet _data_set;
 
     static final class PolyS {
         double a, b, c, d;
@@ -53,11 +53,11 @@ public class Interpolated1d {
         }
     }
 
-    ArrayList<PolyS> _poly = new ArrayList<>();
+    protected ArrayList<PolyS> _poly = new ArrayList<>();
 
-    boolean _invalid = true;
+    protected boolean _invalid = true;
 
-    Interpolation _method = Interpolation.Linear;
+    protected Interpolation _method = Interpolation.Linear;
 
     public Interpolated1d(InterpolatableDataSet dataSet) {
         this._data_set = dataSet;

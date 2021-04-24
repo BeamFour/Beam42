@@ -31,15 +31,15 @@ import org.redukti.jfotoptix.math.Vector3Pair;
  *
  */
 public class Asphere extends ConicBase {
-    final double _r;        /* radius */
-    final double _c;        /* curvature = 1/_r */
-    final double _k;        /* K = 1 + Schwarzschild Constant =  */
-    final double _A4;       /* deformation polynomial coefficient */
-    final double _A6;       /* deformation polynomial coefficient */
-    final double _A8;       /* deformation polynomial coefficient */
-    final double _A10;      /* deformation polynomial coefficient */
-    final double _A12;      /* deformation polynomial coefficient */
-    final double _A14;      /* deformation polynomial coefficient */
+    protected final double _r;        /* radius */
+    protected final double _c;        /* curvature = 1/_r */
+    protected final double _k;        /* K = 1 + Schwarzschild Constant =  */
+    protected final double _A4;       /* deformation polynomial coefficient */
+    protected final double _A6;       /* deformation polynomial coefficient */
+    protected final double _A8;       /* deformation polynomial coefficient */
+    protected final double _A10;      /* deformation polynomial coefficient */
+    protected final double _A12;      /* deformation polynomial coefficient */
+    protected final double _A14;      /* deformation polynomial coefficient */
     boolean _feder_algo = true; /* Use the algorithms by Feder */
 
     public Asphere(double r, double k, double A4, double A6, double A8, double A10,

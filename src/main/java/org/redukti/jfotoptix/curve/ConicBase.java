@@ -26,7 +26,7 @@ package org.redukti.jfotoptix.curve;
 
 public abstract class ConicBase extends RotationalRoc {
 
-    double _sh; // Schwarzschild constant + 1
+    protected double _sh; // Schwarzschild constant + 1
 
     public ConicBase (double roc, double sc) {
         super (roc);

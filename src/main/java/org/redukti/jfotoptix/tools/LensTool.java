@@ -25,8 +25,8 @@ public class LensTool {
         String outputType = "layout";
         boolean skewRays = false;
         boolean dumpSystem = false;
-        int trace_density = 20;
-        int spot_density = 50;
+        int trace_density = 10;
+        int spot_density = 20;
         boolean include_lost_rays = true;
         boolean only_d_line = false;
     }

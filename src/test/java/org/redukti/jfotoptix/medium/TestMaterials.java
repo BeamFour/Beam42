@@ -101,13 +101,12 @@ public class TestMaterials {
         Assertions.assertEquals(46.18, sellm.get_abbe_ve(), 0.01);
 
         Abbe abbeve = new Abbe(AbbeVe, 1.585648, 46.18, .0001);
-        abbevd.set_measurement_medium(airm);
+        abbeve.set_measurement_medium(airm);
 
         Assertions.assertEquals(1.605655, abbeve.get_refractive_index(400., airm), 1e-6);
         Assertions.assertEquals(1.573844, abbeve.get_refractive_index(800., airm), 1e-6);
 
         GlassMap Hikari_FKH1 = new GlassMap("J-FKH1",1.49782,1.49598,1.502009);
-        abbevd.set_measurement_medium(airm);
         Assertions.assertEquals(1.49782, Hikari_FKH1.get_refractive_index(SpectralLine.d), 1e-6);
         Assertions.assertEquals(1.49598, Hikari_FKH1.get_refractive_index(SpectralLine.C), 1e-6);
         Assertions.assertEquals(1.502009, Hikari_FKH1.get_refractive_index(SpectralLine.F), 1e-6);

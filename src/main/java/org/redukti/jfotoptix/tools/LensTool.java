@@ -63,8 +63,8 @@ public class LensTool {
         }
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(arguments.filename);
-        OpticalSystem.Builder systemBuilder = OpticalBenchDataImporter.buildSystem(specs, arguments.scenario);
-        double angleOfView = OpticalBenchDataImporter.getAngleOfViewInRadians (specs, arguments.scenario);
+        OpticalSystem.Builder systemBuilder = OpticalBenchDataImporter.build_system(specs, arguments.scenario);
+        double angleOfView = OpticalBenchDataImporter.get_angle_of_view_in_radians(specs, arguments.scenario);
         Vector3 direction = Vector3.vector3_001;
         if (arguments.skewRays)
         {

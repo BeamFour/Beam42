@@ -42,7 +42,7 @@ public class Vector2 {
 
     private static final int N = 2;
 
-    final double[] _values;
+    private final double[] _values;
 
     public Vector2(double x, double y) {
         if (Double.isNaN(x) || Double.isNaN(y)) {

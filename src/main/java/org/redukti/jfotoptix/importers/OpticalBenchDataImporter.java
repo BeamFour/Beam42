@@ -37,36 +37,36 @@ public class OpticalBenchDataImporter {
 
     static final class DescriptiveData {
         String get_title() {
-            return title_;
+            return _title;
         }
 
         void set_title(String title) {
-            title_ = title;
+            _title = title;
         }
 
-        String title_;
+        String _title;
     }
 
     static final class Variable {
         Variable(String name) {
-            this.name_ = name;
-            this.values_ = new ArrayList<>();
+            this._name = name;
+            this._values = new ArrayList<>();
         }
 
         String name() {
-            return name_;
+            return _name;
         }
 
         void add_value(String value) {
-            values_.add(value);
+            _values.add(value);
         }
 
         int num_scenarios() {
-            return values_.size();
+            return _values.size();
         }
 
         String get_value(int scenario) {
-            return values_.get(scenario);
+            return _values.get(scenario);
         }
 
         double get_value_as_double(int scenario) {
@@ -78,44 +78,34 @@ public class OpticalBenchDataImporter {
             }
         }
 
-        String name_;
-        List<String> values_;
+        private String _name;
+        private List<String> _values;
     }
 
     static final class AsphericalData {
         AsphericalData(int surface_number) {
-            this.surface_number_ = surface_number;
-            this.data_ = new ArrayList<>();
+            this._surface_number = surface_number;
+            this._data = new ArrayList<>();
         }
 
         void add_data(double d) {
-            data_.add(d);
+            _data.add(d);
         }
 
         int data_points() {
-            return data_.size();
+            return _data.size();
         }
 
         double data(int i) {
-            return i >= 0 && i < data_.size() ? data_.get(i) : 0.0;
+            return i >= 0 && i < _data.size() ? _data.get(i) : 0.0;
         }
 
-        //        void
-//        dump (FILE *fp)
-//        {
-//            fprintf (fp, "Aspheric values[%d] = ", surface_number_);
-//            for (int i = 0; i < data_points (); i++)
-//            {
-//                fprintf (fp, "%.12g ", data (i));
-//            }
-//            fputc ('\n', fp);
-//        }
         int get_surface_number() {
-            return surface_number_;
+            return _surface_number;
         }
 
-        int surface_number_;
-        List<Double> data_;
+        private int _surface_number;
+        private List<Double> _data;
     }
 
     enum SurfaceType {
@@ -128,113 +118,103 @@ public class OpticalBenchDataImporter {
 
     static final class LensSurface {
         LensSurface(int id) {
-            id_ = id;
-            surface_type_ = SurfaceType.surface;
-            radius_ = 0;
-            diameter_ = 0;
-            refractive_index_ = 0;
-            abbe_vd_ = 0;
-            is_cover_glass_ = false;
-            glass_name_ = null;
+            _id = id;
+            _surface_type = SurfaceType.surface;
+            _radius = 0;
+            _diameter = 0;
+            _refractive_index = 0;
+            _abbe_vd = 0;
+            _is_cover_glass = false;
+            _glass_name = null;
         }
 
         SurfaceType get_surface_type() {
-            return surface_type_;
+            return _surface_type;
         }
 
         void set_surface_type(SurfaceType surface_type) {
-            surface_type_ = surface_type;
+            _surface_type = surface_type;
         }
 
         double get_radius() {
-            return radius_;
+            return _radius;
         }
 
         void set_radius(double radius) {
-            radius_ = radius;
+            _radius = radius;
         }
 
         double get_thickness(int scenario) {
-            if (scenario < thickness_by_scenario_.size())
-                return thickness_by_scenario_.get(scenario);
+            if (scenario < _thickness_by_scenario.size())
+                return _thickness_by_scenario.get(scenario);
             else {
-                assert (1 == thickness_by_scenario_.size());
-                return thickness_by_scenario_.get(0);
+                assert (1 == _thickness_by_scenario.size());
+                return _thickness_by_scenario.get(0);
             }
         }
 
         void add_thickness(double thickness) {
-            thickness_by_scenario_.add(thickness);
+            _thickness_by_scenario.add(thickness);
         }
 
         double get_diameter() {
-            return diameter_;
+            return _diameter;
         }
 
         void set_diameter(double value) {
-            diameter_ = value;
+            _diameter = value;
         }
 
         double get_refractive_index() {
-            return refractive_index_;
+            return _refractive_index;
         }
 
         void set_refractive_index(double refractive_index) {
-            refractive_index_ = refractive_index;
+            _refractive_index = refractive_index;
         }
 
         double get_abbe_vd() {
-            return abbe_vd_;
+            return _abbe_vd;
         }
 
         void set_abbe_vd(double abbe_vd) {
-            abbe_vd_ = abbe_vd;
+            _abbe_vd = abbe_vd;
         }
 
         AsphericalData get_aspherical_data() {
-            return aspherical_data_;
+            return _aspherical_data;
         }
 
         void set_aspherical_data(AsphericalData aspherical_data) {
-            aspherical_data_ = aspherical_data;
+            _aspherical_data = aspherical_data;
         }
 
         int get_id() {
-            return id_;
+            return _id;
         }
 
         boolean is_cover_glass() {
-            return is_cover_glass_;
+            return _is_cover_glass;
         }
 
         void  set_is_cover_glass(boolean is_cover_glass) {
-            is_cover_glass_ = is_cover_glass;
+            _is_cover_glass = is_cover_glass;
         }
 
-        void set_glass_name(String name) { glass_name_ = name; }
+        void set_glass_name(String name) { _glass_name = name; }
 
-        String get_glass_name() { return glass_name_; }
+        String get_glass_name() { return _glass_name; }
 
-//        void
-//        dump (FILE *fp, unsigned scenario = 0)
-//        {
-//            fprintf (fp,
-//                    "Surface[%d] = type=%s radius=%.12g thickness=%.12g diameter "
-//                    "= %.12g nd = %.12g vd = %.12g\n",
-//                    id_, SurfaceTypeNames[surface_type_], radius_,
-//                    get_thickness (scenario), diameter_, refractive_index_, abbe_vd_);
-//        }
-
-        int id_;
-        SurfaceType surface_type_;
-        double radius_;
-        List<Double> thickness_by_scenario_ = new ArrayList<>();
-        double diameter_;
-        double refractive_index_;
-        double abbe_vd_;
-        boolean is_cover_glass_;
-        AsphericalData aspherical_data_;
-        String glass_name_;
+        private int _id;
+        private SurfaceType _surface_type;
+        private double _radius;
+        private List<Double> _thickness_by_scenario = new ArrayList<>();
+        private double _diameter;
+        private double _refractive_index;
+        private double _abbe_vd;
+        private boolean _is_cover_glass;
+        private AsphericalData _aspherical_data;
+        private String _glass_name;
     }
 
     public static final class LensSpecifications {
@@ -383,18 +363,6 @@ public class OpticalBenchDataImporter {
             return null;
         }
 
-        //        void
-//        dump (FILE *fp = stdout, unsigned scenario = 0)
-//        {
-//            for (int i = 0; i < surfaces_.size (); i++)
-//            {
-//                surfaces_.at (i)->dump (fp, scenario);
-//                if (surfaces_.at (i)->get_aspherical_data ())
-//                {
-//                    surfaces_.at (i)->get_aspherical_data ()->dump (fp);
-//                }
-//            }
-//        }
         double get_image_height() {
             Variable var = find_variable("Image Height");
             if (var != null)
@@ -424,27 +392,23 @@ public class OpticalBenchDataImporter {
                 surface_builder.add_thickness(parseDouble(value));
             }
         }
-
         DescriptiveData get_descriptive_data() {
             return descriptive_data_;
         }
-
         List<Variable> get_variables() {
             return variables_;
         }
-
         List<LensSurface> get_surfaces() {
             return surfaces_;
         }
-
         List<AsphericalData> get_aspherical_data() {
             return aspherical_data_;
         }
 
-        DescriptiveData descriptive_data_ = new DescriptiveData();
-        List<Variable> variables_ = new ArrayList<>();
-        List<LensSurface> surfaces_ = new ArrayList<>();
-        List<AsphericalData> aspherical_data_ = new ArrayList<>();
+        private DescriptiveData descriptive_data_ = new DescriptiveData();
+        private List<Variable> variables_ = new ArrayList<>();
+        private List<LensSurface> surfaces_ = new ArrayList<>();
+        private List<AsphericalData> aspherical_data_ = new ArrayList<>();
     }
 
     enum Section {
@@ -456,8 +420,8 @@ public class OpticalBenchDataImporter {
     }
 
     static final class SectionMapping {
-        String name;
-        Section section;
+        final String name;
+        final Section section;
 
         public SectionMapping(String name, Section section) {
             this.name = name;
@@ -547,11 +511,10 @@ public class OpticalBenchDataImporter {
         return thickness;
     }
 
-    public static OpticalSystem.Builder buildSystem(LensSpecifications specs, int scenario) {
+    public static OpticalSystem.Builder build_system(LensSpecifications specs, int scenario) {
         OpticalSystem.Builder sys = new OpticalSystem.Builder();
         /* anchor lens */
         Lens.Builder lens = new Lens.Builder().position(Vector3Pair.position_000_001);
-
         double image_pos = 0.0;
         List<LensSurface> surfaces = specs.get_surfaces();
         for (int i = 0; i < surfaces.size(); i++) {
@@ -562,19 +525,16 @@ public class OpticalBenchDataImporter {
                 thickness = add_surface(lens, surfaces.get(i), scenario);
             image_pos += thickness;
         }
-        // printf ("Image position is at %f\n", image_pos);
         sys.add(lens);
-
         Image.Builder image = new Image.Builder().position(
                 new Vector3Pair(new Vector3(0, 0, image_pos), Vector3.vector3_001))
                 .curve(Flat.flat)
                 .shape(new Rectangle(specs.get_image_height() * 2.));
         sys.add(image);
-
         return sys;
     }
 
-    public static double getAngleOfViewInRadians(   LensSpecifications specs_, int scenario) {
+    public static double get_angle_of_view_in_radians(LensSpecifications specs_, int scenario) {
         Variable view_angles = specs_.find_variable("Angle of View");
         return Math.toRadians(view_angles.get_value_as_double(scenario)
                 / 2.0);

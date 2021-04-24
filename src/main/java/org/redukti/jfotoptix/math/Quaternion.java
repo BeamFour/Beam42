@@ -27,7 +27,7 @@ Original GNU Optical License and Authors are as follows:
 package org.redukti.jfotoptix.math;
 
 public class Quaternion {
-    final double x, y, z, w;
+    public final double x, y, z, w;
 
     public Quaternion(double x, double y, double z, double w) {
         this.x = x;

@@ -35,8 +35,8 @@ import org.redukti.jfotoptix.rendering.Rgb;
  constants for wave length of standard rays
  */
 public class SpectralLine {
-    double _wavelen;
-    double _intensity;
+    protected final double _wavelen;
+    protected final double _intensity;
 
     /** red colored line at 645nm */
     public static final double red = 645.0;

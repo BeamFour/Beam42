@@ -1,6 +1,7 @@
 package org.redukti.jfotoptix.tools;
 
 import org.redukti.jfotoptix.importers.OpticalBenchDataImporter;
+import org.redukti.jfotoptix.medium.GlassMap;
 
 import java.util.List;
 
@@ -85,11 +86,22 @@ public class RayOpticsExporter {
             thickness += s.get_thickness(scenario);
             if (s.get_surface_type() == OpticalBenchDataImporter.SurfaceType.surface) {
                 if (s.get_refractive_index() != 0.0) {
-                    fp.append("sm.add_surface([")
-                            .append(s.get_radius()).append(",")
-                            .append(thickness).append(",")
-                            .append(s.get_refractive_index()).append(",")
-                            .append(s.get_abbe_vd()).append("])\n");
+                    String glassName = s.get_glass_name();
+                    GlassMap glassMap = glassName != null ? GlassMap.glassByName(glassName) : null;
+                    if (glassMap != null && glassMap.get_manufacturer() != null) {
+                        fp.append("sm.add_surface([")
+                                .append(s.get_radius()).append(",")
+                                .append(thickness).append(",'")
+                                .append(glassMap.get_name()).append("','")
+                                .append(glassMap.get_manufacturer()).append("'])\n");
+                    }
+                    else {
+                        fp.append("sm.add_surface([")
+                                .append(s.get_radius()).append(",")
+                                .append(thickness).append(",")
+                                .append(s.get_refractive_index()).append(",")
+                                .append(s.get_abbe_vd()).append("])\n");
+                    }
                 } else {
                     fp.append("sm.add_surface([")
                             .append(s.get_radius()).append(",")

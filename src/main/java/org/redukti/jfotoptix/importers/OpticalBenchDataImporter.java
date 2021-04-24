@@ -203,7 +203,7 @@ public class OpticalBenchDataImporter {
 
         void set_glass_name(String name) { _glass_name = name; }
 
-        String get_glass_name() { return _glass_name; }
+        public String get_glass_name() { return _glass_name; }
 
         private int _id;
         private SurfaceType _surface_type;

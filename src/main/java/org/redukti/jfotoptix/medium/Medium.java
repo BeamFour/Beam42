@@ -133,4 +133,8 @@ public abstract class Medium {
     public void set_temperature(double temp) {
         _temperature = temp;
     }
+
+    public String get_name() {
+        return _name;
+    }
 }

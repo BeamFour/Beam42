@@ -35,8 +35,8 @@ public class OpticalBenchDataImporter {
         }
     }
 
-    static final class DescriptiveData {
-        String get_title() {
+    public static final class DescriptiveData {
+        public String get_title() {
             return _title;
         }
 
@@ -47,7 +47,7 @@ public class OpticalBenchDataImporter {
         String _title;
     }
 
-    static final class Variable {
+    public static final class Variable {
         Variable(String name) {
             this._name = name;
             this._values = new ArrayList<>();
@@ -61,7 +61,7 @@ public class OpticalBenchDataImporter {
             _values.add(value);
         }
 
-        int num_scenarios() {
+        public int num_scenarios() {
             return _values.size();
         }
 
@@ -69,7 +69,7 @@ public class OpticalBenchDataImporter {
             return _values.get(scenario);
         }
 
-        double get_value_as_double(int scenario) {
+        public double get_value_as_double(int scenario) {
             String s = get_value(scenario);
             try {
                 return parseDouble(s);
@@ -82,7 +82,7 @@ public class OpticalBenchDataImporter {
         private List<String> _values;
     }
 
-    static final class AsphericalData {
+    public static final class AsphericalData {
         AsphericalData(int surface_number) {
             this._surface_number = surface_number;
             this._data = new ArrayList<>();
@@ -96,7 +96,7 @@ public class OpticalBenchDataImporter {
             return _data.size();
         }
 
-        double data(int i) {
+        public double data(int i) {
             return i >= 0 && i < _data.size() ? _data.get(i) : 0.0;
         }
 
@@ -108,7 +108,7 @@ public class OpticalBenchDataImporter {
         private List<Double> _data;
     }
 
-    enum SurfaceType {
+    public enum SurfaceType {
         surface,
         aperture_stop,
         field_stop
@@ -116,7 +116,7 @@ public class OpticalBenchDataImporter {
 
     static String SurfaceTypeNames[] = {"S", "AS", "FS"};
 
-    static final class LensSurface {
+    public static final class LensSurface {
         LensSurface(int id) {
             _id = id;
             _surface_type = SurfaceType.surface;
@@ -128,7 +128,7 @@ public class OpticalBenchDataImporter {
             _glass_name = null;
         }
 
-        SurfaceType get_surface_type() {
+        public SurfaceType get_surface_type() {
             return _surface_type;
         }
 
@@ -136,7 +136,7 @@ public class OpticalBenchDataImporter {
             _surface_type = surface_type;
         }
 
-        double get_radius() {
+        public double get_radius() {
             return _radius;
         }
 
@@ -144,7 +144,7 @@ public class OpticalBenchDataImporter {
             _radius = radius;
         }
 
-        double get_thickness(int scenario) {
+        public double get_thickness(int scenario) {
             if (scenario < _thickness_by_scenario.size())
                 return _thickness_by_scenario.get(scenario);
             else {
@@ -157,7 +157,7 @@ public class OpticalBenchDataImporter {
             _thickness_by_scenario.add(thickness);
         }
 
-        double get_diameter() {
+        public double get_diameter() {
             return _diameter;
         }
 
@@ -165,7 +165,7 @@ public class OpticalBenchDataImporter {
             _diameter = value;
         }
 
-        double get_refractive_index() {
+        public double get_refractive_index() {
             return _refractive_index;
         }
 
@@ -173,7 +173,7 @@ public class OpticalBenchDataImporter {
             _refractive_index = refractive_index;
         }
 
-        double get_abbe_vd() {
+        public double get_abbe_vd() {
             return _abbe_vd;
         }
 
@@ -181,7 +181,7 @@ public class OpticalBenchDataImporter {
             _abbe_vd = abbe_vd;
         }
 
-        AsphericalData get_aspherical_data() {
+        public AsphericalData get_aspherical_data() {
             return _aspherical_data;
         }
 
@@ -346,7 +346,7 @@ public class OpticalBenchDataImporter {
             return true;
         }
 
-        Variable find_variable(String name) {
+        public Variable find_variable(String name) {
             for (int i = 0; i < variables_.size(); i++) {
                 if (name.equals(variables_.get(i).name())) {
                     return variables_.get(i);
@@ -392,13 +392,13 @@ public class OpticalBenchDataImporter {
                 surface_builder.add_thickness(parseDouble(value));
             }
         }
-        DescriptiveData get_descriptive_data() {
+        public DescriptiveData get_descriptive_data() {
             return descriptive_data_;
         }
         List<Variable> get_variables() {
             return variables_;
         }
-        List<LensSurface> get_surfaces() {
+        public List<LensSurface> get_surfaces() {
             return surfaces_;
         }
         List<AsphericalData> get_aspherical_data() {

@@ -31,6 +31,7 @@ public abstract class RotationalRoc extends Rotational {
         this._roc = _roc;
     }
 
+    @Override
     public double get_curvature() {
         return 1.0/_roc;
     }

@@ -3,6 +3,7 @@ package org.redukti.jfotoptix.examples;
 import org.redukti.jfotoptix.analysis.AnalysisSpot;
 import org.redukti.jfotoptix.importers.OpticalBenchDataImporter;
 import org.redukti.jfotoptix.layout.SystemLayout2D;
+import org.redukti.jfotoptix.parax.YNUTrace;
 import org.redukti.jfotoptix.rendering.RendererSvg;
 import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.math.Matrix3;
@@ -68,6 +69,9 @@ public class Canon50mm {
         AnalysisSpot spot = new AnalysisSpot(system, 50);
         spot.draw_diagram(renderer, true);
         System.out.println(renderer.write(new StringBuilder()).toString());
+
+        YNUTrace ynuTrace = new YNUTrace();
+        ynuTrace.trace(system, -1e9, 0.1);
 
     }
 }

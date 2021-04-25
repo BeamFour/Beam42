@@ -42,6 +42,11 @@ public class Flat extends Rotational {
         return 1.0;
     }
 
+    @Override
+    public double get_curvature() {
+        return 0.0;
+    }
+
     /*
 
 intersection d'un plan defini par :

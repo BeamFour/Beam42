@@ -10,6 +10,10 @@ public class ParaxialTrace {
 
     public static void main(String[] args) throws Exception {
 
+        /*
+           Modern Optical Enginerring, W.J.Smith.
+           Section 2.6, Example D.
+         */
         OpticalSystem.Builder systemBuilder = new OpticalSystem.Builder();
         Lens.Builder lensBuilder = new Lens.Builder()
                 .position(Vector3Pair.position_000_001)

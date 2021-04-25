@@ -35,8 +35,8 @@ import org.redukti.jfotoptix.shape.Shape;
 
 public class MirrorSurface extends OpticalSurface {
 
-    public MirrorSurface(int id, Vector3Pair p, Transform3 transform, Curve curve, Shape shape, Medium left, Medium right) {
-        super(id, p, transform, curve, shape, left, right);
+    public MirrorSurface(int id, Vector3Pair p, Transform3 transform, Curve curve, Shape shape, Medium left, Medium right, double thickness) {
+        super(id, p, transform, curve, shape, left, right, thickness);
     }
 
     public static class Builder extends OpticalSurface.Builder {
@@ -90,6 +90,12 @@ public class MirrorSurface extends OpticalSurface {
             return this;
         }
 
+        @Override
+        public MirrorSurface.Builder thickness(double t) {
+            super.thickness(t);
+            return this;
+        }
+
         Medium metal() {
             return this.left;
         }
@@ -101,7 +107,8 @@ public class MirrorSurface extends OpticalSurface {
         public OpticalSurface build() {
             return new MirrorSurface(_id, _position, _transform, curve, shape,
                     _light_from_left ?  air() : metal(),
-                    _light_from_left ? metal() : air() );
+                    _light_from_left ? metal() : air(),
+                    _thickness);
         }
     }
 }

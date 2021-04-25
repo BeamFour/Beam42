@@ -68,7 +68,8 @@ public class Lens extends Group {
     @Override
     void set_system(OpticalSystem system) {
         super.set_system(system);
-        _stop.set_system(system);
+        if (_stop != null)
+            _stop.set_system(system);
     }
 
     @Override
@@ -123,7 +124,8 @@ public class Lens extends Group {
                     .curve(curve)
                     .shape(shape)
                     .leftMaterial(_next_mat)
-                    .rightMaterial(glass);
+                    .rightMaterial(glass)
+                    .thickness(thickness);
             _next_mat = glass;
             _last_pos += thickness;
             add(surface);

@@ -34,7 +34,7 @@ import org.redukti.jfotoptix.shape.Shape;
 public class Image extends Surface {
 
     public Image(int id, Vector3Pair p, Transform3 transform, Curve curve, Shape shape) {
-        super(id, p, transform, curve, shape);
+        super(id, p, transform, curve, shape, 0.0);
     }
 
     @Override

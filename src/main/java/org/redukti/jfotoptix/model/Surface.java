@@ -39,11 +39,13 @@ public class Surface extends Element {
 
     protected final Shape _shape;
     protected final Curve _curve;
+    protected double _thickness;
 
-    public Surface(int id, Vector3Pair p, Transform3 transform, Curve curve, Shape shape) {
+    public Surface(int id, Vector3Pair p, Transform3 transform, Curve curve, Shape shape, double thickness) {
         super(id, p, transform);
         this._curve = curve;
         this._shape = shape;
+        this._thickness = thickness;
     }
 
     public Shape get_shape() {
@@ -53,6 +55,7 @@ public class Surface extends Element {
     public Curve get_curve() {
         return _curve;
     }
+    public double get_thickness() { return _thickness; }
 
     public Renderer.Style get_style() {
         return Renderer.Style.StyleSurface;
@@ -99,6 +102,7 @@ public class Surface extends Element {
     public static class Builder extends Element.Builder {
         Shape shape;
         Curve curve;
+        double _thickness = 0.0;
 
         @Override
         public Surface.Builder position(Vector3Pair position) {
@@ -107,7 +111,7 @@ public class Surface extends Element {
 
         @Override
         public Element build() {
-            return new Surface(_id, _position, _transform, curve, shape);
+            return new Surface(_id, _position, _transform, curve, shape, _thickness);
         }
 
         public Builder shape(Shape shape) {
@@ -117,6 +121,11 @@ public class Surface extends Element {
 
         public Builder curve(Curve curve) {
             this.curve = curve;
+            return this;
+        }
+
+        public Surface.Builder thickness(double t) {
+            this._thickness = t;
             return this;
         }
     }

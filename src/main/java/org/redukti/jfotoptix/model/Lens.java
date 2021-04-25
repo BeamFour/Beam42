@@ -142,7 +142,8 @@ public class Lens extends Group {
             _stop = new Stop.Builder()
                     .position(new Vector3Pair(new Vector3(0, 0, _last_pos), Vector3.vector3_001))
                     .curve(Flat.flat)
-                    .shape(shape);
+                    .shape(shape)
+                    .thickness(thickness);
             _last_pos += thickness;
             add(_stop);
             return this;

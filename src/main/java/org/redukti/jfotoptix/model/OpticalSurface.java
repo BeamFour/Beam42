@@ -37,7 +37,6 @@ import java.util.Objects;
 
 public class OpticalSurface extends Surface {
     protected Medium[] _mat = new Medium[2];
-    protected double _thickness;
 
     public OpticalSurface(int id,
                           Vector3Pair p,
@@ -47,16 +46,14 @@ public class OpticalSurface extends Surface {
                           Medium left,
                           Medium right,
                           double thickness) {
-        super(id, p, transform, curve, shape);
+        super(id, p, transform, curve, shape, thickness);
         _mat[0] = left;
         _mat[1] = right;
-        _thickness = thickness;
     }
 
     public Medium get_material(int i) {
         return _mat[i];
     }
-    public double get_thickness() { return _thickness; }
 
     public String toString() {
         return "OpticalSurface{" +
@@ -69,7 +66,6 @@ public class OpticalSurface extends Surface {
     public static class Builder extends Surface.Builder {
         Medium left = Air.air;
         Medium right = Air.air;
-        double _thickness = 0.0;
 
         @Override
         public OpticalSurface.Builder position(Vector3Pair position) {
@@ -95,7 +91,7 @@ public class OpticalSurface extends Surface {
         }
 
         public OpticalSurface.Builder thickness(double t) {
-            this._thickness = t;
+            super.thickness(t);
             return this;
         }
 

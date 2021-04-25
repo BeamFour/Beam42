@@ -35,8 +35,8 @@ public class Stop extends Surface {
 
     protected double _external_radius;
 
-    public Stop(int id, Vector3Pair p, Transform3 transform, Curve curve, Shape shape) {
-        super(id, p, transform, curve, shape);
+    public Stop(int id, Vector3Pair p, Transform3 transform, Curve curve, Shape shape, double thickness) {
+        super(id, p, transform, curve, shape, thickness);
         _external_radius = shape.max_radius () * 2.0;
     }
 
@@ -66,8 +66,13 @@ public class Stop extends Surface {
             return (Stop.Builder) super.curve(curve);
         }
 
+        public Stop.Builder thickness(double t) {
+            super.thickness(t);
+            return this;
+        }
+
         public Stop build() {
-            return new Stop(_id, _position, _transform, curve, shape);
+            return new Stop(_id, _position, _transform, curve, shape, _thickness);
         }
     }
 }

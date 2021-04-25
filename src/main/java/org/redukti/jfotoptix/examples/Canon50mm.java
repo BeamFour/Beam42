@@ -71,7 +71,7 @@ public class Canon50mm {
         System.out.println(renderer.write(new StringBuilder()).toString());
 
         YNUTrace ynuTrace = new YNUTrace();
-        ynuTrace.trace(system, -1e9, 0.1);
+        ynuTrace.trace(system, -1e10, 1.0);
 
     }
 }

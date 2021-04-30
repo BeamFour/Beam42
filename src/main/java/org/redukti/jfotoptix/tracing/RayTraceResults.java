@@ -132,6 +132,10 @@ public class RayTraceResults {
         _sources.add(source);
     }
 
+    public void add_sources(List<? extends RaySource> source) {
+        _sources.addAll(source);
+    }
+
     public TracedRay newRay(Vector3 origin, Vector3 direction) {
         TracedRay ray = new TracedRay(origin, direction);
         _rays.add(ray);

@@ -53,3 +53,8 @@ originY	391
 ppmm	6.033
 [notes]
 Bill: Related to Sigma 40mm Art
+-o layout.svg --trace-density 10 --scenario 0 --output layout --specfile C:\work\github\jfotoptix\examples\sigma-40mm-f1.4\Sigma-40mmf1.4.txt
+-o layout-skew.svg --trace-density 10 --skew --scenario 0 --output layout --specfile C:\work\github\jfotoptix\examples\sigma-40mm-f1.4\Sigma-40mmf1.4.txt
+-o spot.svg --spot-density 50 --scenario 0 --output spot --specfile C:\work\github\jfotoptix\examples\sigma-40mm-f1.4\Sigma-40mmf1.4.txt
+-o spot-skew.svg --spot-density 50 --skew --scenario 0 --output spot --specfile C:\work\github\jfotoptix\examples\sigma-40mm-f1.4\Sigma-40mmf1.4.txt
+

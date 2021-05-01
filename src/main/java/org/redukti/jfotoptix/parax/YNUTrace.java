@@ -24,25 +24,8 @@ public class YNUTrace {
         double y1 = initial_height - t0*initial_angle;
         double u1 = initial_angle; // -y1/l1;
         double y2 = y1;
-        double stopThickness = 0;
         for (Element e: seq) {
-            if (e instanceof OpticalSurface) {
-                y1 = y2;
-                OpticalSurface surface = (OpticalSurface) e;
-                Medium leftMedium = surface.get_material(0);
-                double t1 = surface.get_thickness()+stopThickness;
-                Medium rightMedium = surface.get_material(1);
-                double C1 = surface.get_curve().get_curvature();
-                double n1 = leftMedium.get_refractive_index(SpectralLine.d);
-                double n1_ = rightMedium.get_refractive_index(SpectralLine.d);
-                double n1_u1_ = -y1 *(n1_ - n1) * C1 + n1*u1;
-                y2 = y1 + t1 * (n1_u1_)/n1_;
-                u1 = n1_u1_/n1_;
-                stopThickness = 0.0; // Not a stop
-            }
-            else if (e instanceof Stop) {
-//                stopThickness = ((Stop)e).get_thickness();
-//                continue;
+            if (e instanceof Stop) {
                 y1 = y2;
                 Stop surface = (Stop) e;
                 Medium leftMedium = Air.air;
@@ -54,7 +37,19 @@ public class YNUTrace {
                 double n1_u1_ = -y1 *(n1_ - n1) * C1 + n1*u1;
                 y2 = y1 + t1 * (n1_u1_)/n1_;
                 u1 = n1_u1_/n1_;
-                stopThickness = 0.0; // Not a stop
+            }
+            else if (e instanceof OpticalSurface) {
+                y1 = y2;
+                OpticalSurface surface = (OpticalSurface) e;
+                Medium leftMedium = surface.get_material(0);
+                double t1 = surface.get_thickness();
+                Medium rightMedium = surface.get_material(1);
+                double C1 = surface.get_curve().get_curvature();
+                double n1 = leftMedium.get_refractive_index(SpectralLine.d);
+                double n1_ = rightMedium.get_refractive_index(SpectralLine.d);
+                double n1_u1_ = -y1 *(n1_ - n1) * C1 + n1*u1;
+                y2 = y1 + t1 * (n1_u1_)/n1_;
+                u1 = n1_u1_/n1_;
             }
             else {
                 continue;

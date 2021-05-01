@@ -69,10 +69,10 @@ public class RayGenerator {
                 default:
                 case SourceAtInfinity:
                     direction = Vector3.vector3_001;
-                    position = new Vector3Pair(
+                    Vector3Pair plane = new Vector3Pair(
                             target_surface.get_position(source).minus(Vector3.vector3_001.times(rlen)),
-                            Vector3.vector3_001)
-                            .pl_ln_intersect(new Vector3Pair(r, direction));
+                            Vector3.vector3_001);
+                    position = plane.pl_ln_intersect(new Vector3Pair(r, direction));
                     break;
             }
             for (SpectralLine l : source.spectrum()) {

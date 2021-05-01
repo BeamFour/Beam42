@@ -163,7 +163,7 @@ public class RayOpticsExporter {
             String arg1 = args[i];
             String arg2 = i + 1 < args.length ? args[i + 1] : null;
             if (arg1.equals("--specfile")) {
-                arguments.filename = arg2;
+                arguments.specfile = arg2;
                 i++;
             } else if (arg1.equals("--scenario")) {
                 arguments.scenario = Integer.parseInt(arg2);
@@ -175,12 +175,12 @@ public class RayOpticsExporter {
 
     public static void main(String[] args) throws Exception {
         LensTool.Args arguments = parseArguments(args);
-        if (arguments.filename == null) {
+        if (arguments.specfile == null) {
             System.err.println("Usage: --specfile inputfile [--scenario num]");
             System.exit(1);
         }
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
-        specs.parse_file(arguments.filename);
+        specs.parse_file(arguments.specfile);
         RayOpticsExporter exporter = new RayOpticsExporter();
         System.out.println(exporter.generate(specs, arguments.scenario));
     }

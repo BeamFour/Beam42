@@ -18,12 +18,18 @@ import org.redukti.jfotoptix.tracing.RayTraceRenderer;
 import org.redukti.jfotoptix.tracing.RayTraceResults;
 import org.redukti.jfotoptix.tracing.RayTracer;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
+
 public class LensTool {
 
     static final class Args {
         int scenario = 0;
-        String filename = null;
+        String specfile = null;
         String outputType = "layout";
+        String outputFile = null;
         boolean skewRays = false;
         boolean dumpSystem = false;
         int trace_density = 10;
@@ -38,7 +44,11 @@ public class LensTool {
             String arg1 = args[i];
             String arg2 = i+1 < args.length ? args[i+1] : null;
             if (arg1.equals("--specfile")) {
-                arguments.filename = arg2;
+                arguments.specfile = arg2;
+                i++;
+            }
+            else if (arg1.equals("-o")) {
+                arguments.outputFile = arg2;
                 i++;
             }
             else if (arg1.equals("--scenario")) {
@@ -76,14 +86,16 @@ public class LensTool {
 
     public static void main(String[] args) throws Exception {
         Args arguments = parseArguments(args);
-        if (arguments.filename == null) {
-            System.err.println("Usage: --specfile inputfile [--scenario num] [--skew] [--output layout|spot] [--dump-system] [--exclude-lost-rays] [--spot-density n] [--trace-density n] [--only-d-line]");
+        if (arguments.specfile == null) {
+            System.err.println("Usage: --specfile inputfile [--scenario num] [--skew] [--output layout|spot] [--dump-system] [--exclude-lost-rays] [--spot-density n] [--trace-density n] [--only-d-line] [--output outfilename]");
             System.err.println("       --spot-density defaults to 50");
             System.err.println("       --trace-density defaults to 20");
+            System.err.println("       --scenario defaults to 0");
+            System.err.println("       Output file will be created in the same location as the specfile");
             System.exit(1);
         }
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
-        specs.parse_file(arguments.filename);
+        specs.parse_file(arguments.specfile);
         OpticalSystem.Builder systemBuilder = OpticalBenchDataImporter.build_system(specs, arguments.scenario);
         double angleOfView = OpticalBenchDataImporter.get_angle_of_view_in_radians(specs, arguments.scenario);
         Vector3 direction = Vector3.vector3_001;
@@ -122,16 +134,32 @@ public class LensTool {
             }
             RayTraceResults result = rayTracer.trace(system, parameters);
             RayTraceRenderer.draw_2d(renderer, result, !arguments.include_lost_rays, null);
-            System.out.println(renderer.write(new StringBuilder()).toString());
+            if (arguments.outputFile != null) {
+                createOutputFile(arguments, renderer.write(new StringBuilder()).toString());
+            }
+            else {
+                System.out.println(renderer.write(new StringBuilder()).toString());
+            }
             result.report();
         }
-        if (arguments.outputType.equals("spot")) {
+        else if (arguments.outputType.equals("spot")) {
             RendererSvg renderer = new RendererSvg(300, 300, Rgb.rgb_black);
             AnalysisSpot spot = new AnalysisSpot(system, arguments.spot_density);
             spot.draw_diagram(renderer, true);
-            System.out.println(renderer.write(new StringBuilder()).toString());
+            if (arguments.outputFile != null) {
+                createOutputFile(arguments, renderer.write(new StringBuilder()).toString());
+            }
+            else {
+                System.out.println(renderer.write(new StringBuilder()).toString());
+            }
         }
         YNUTrace ynuTrace = new YNUTrace();
         ynuTrace.trace(system, 1.0, 0.0, -1e10);
+    }
+
+    private static void createOutputFile(Args arguments, String string) throws IOException {
+        Path path = new File(arguments.specfile).toPath().toAbsolutePath();
+        Path outpath = Paths.get(path.getParent().toString(), arguments.outputFile);
+        Files.write(outpath, string.getBytes(StandardCharsets.UTF_8), StandardOpenOption.TRUNCATE_EXISTING);
     }
 }

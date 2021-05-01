@@ -29,14 +29,15 @@ package org.redukti.jfotoptix.model;
 import org.redukti.jfotoptix.curve.Curve;
 import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector3Pair;
+import org.redukti.jfotoptix.medium.Air;
 import org.redukti.jfotoptix.shape.Shape;
 
-public class Stop extends Surface {
+public class Stop extends OpticalSurface {
 
     protected double _external_radius;
 
     public Stop(int id, Vector3Pair p, Transform3 transform, Curve curve, Shape shape, double thickness) {
-        super(id, p, transform, curve, shape, thickness);
+        super(id, p, transform, curve, shape, Air.air, Air.air, thickness);
         _external_radius = shape.max_radius () * 2.0;
     }
 

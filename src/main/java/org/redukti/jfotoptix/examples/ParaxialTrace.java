@@ -27,5 +27,6 @@ public class ParaxialTrace {
 
         YNUTrace ynuTrace = new YNUTrace();
         ynuTrace.trace(system, 0.0, 0.0333, -300);
+        ynuTrace.trace(system, 20.0, -0.0666, -300);
     }
 }

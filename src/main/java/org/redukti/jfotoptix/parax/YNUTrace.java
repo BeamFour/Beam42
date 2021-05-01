@@ -1,9 +1,11 @@
 package org.redukti.jfotoptix.parax;
 
 import org.redukti.jfotoptix.light.SpectralLine;
-import org.redukti.jfotoptix.medium.Air;
+import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.medium.Medium;
-import org.redukti.jfotoptix.model.*;
+import org.redukti.jfotoptix.model.Element;
+import org.redukti.jfotoptix.model.OpticalSurface;
+import org.redukti.jfotoptix.model.OpticalSystem;
 
 import java.util.List;
 
@@ -21,6 +23,7 @@ public class YNUTrace {
            Also see section 5.9 in MIL-HDBK-141
          */
         double y1 = object_height - object_distance*initial_angle; // y = height
+        double y1_ = y1;
         double u1 = initial_angle;  // angle
         double y2 = y1;
         for (Element e: seq) {
@@ -37,6 +40,8 @@ public class YNUTrace {
                 // Calculate y for next surface
                 y2 = y1 + t1 * (n1_u1_)/n1_;    // Eq 56 in MIL-HDBK-141
                 u1 = n1_u1_/n1_; // ray angle
+                double aoi = u1 + y1 * C1;
+                System.out.println("id="+ e.id() + new Vector3(y1, u1, aoi).toString());
             }
             else {
                 continue;
@@ -44,6 +49,7 @@ public class YNUTrace {
         }
         double l = -y1/u1;
         System.out.println(l);
+        System.out.println(-1.0/u1);
     }
 
 }

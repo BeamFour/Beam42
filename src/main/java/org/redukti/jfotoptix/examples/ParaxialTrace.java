@@ -26,8 +26,6 @@ public class ParaxialTrace {
         OpticalSystem system = systemBuilder.build();
 
         YNUTrace ynuTrace = new YNUTrace();
-        ynuTrace.trace(system, -300.0, 10);
-
-
+        ynuTrace.trace(system, 0.0, 0.0333, -300);
     }
 }

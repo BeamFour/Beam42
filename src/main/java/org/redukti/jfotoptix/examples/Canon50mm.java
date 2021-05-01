@@ -13,10 +13,7 @@ import org.redukti.jfotoptix.patterns.Pattern;
 import org.redukti.jfotoptix.rendering.Rgb;
 import org.redukti.jfotoptix.model.OpticalSystem;
 import org.redukti.jfotoptix.model.PointSource;
-import org.redukti.jfotoptix.tracing.RayTraceParameters;
-import org.redukti.jfotoptix.tracing.RayTraceRenderer;
-import org.redukti.jfotoptix.tracing.RayTraceResults;
-import org.redukti.jfotoptix.tracing.RayTracer;
+import org.redukti.jfotoptix.tracing.*;
 
 public class Canon50mm {
 
@@ -55,7 +52,7 @@ public class Canon50mm {
 
         RayTraceParameters parameters = new RayTraceParameters(system);
 
-        RayTracer rayTracer = new RayTracer();
+        SequentialRayTracer rayTracer = new SequentialRayTracer();
         parameters.set_default_distribution (
                 new Distribution(Pattern.MeridionalDist, 10, 0.999));
         // TODO set save generated state on point source
@@ -71,7 +68,7 @@ public class Canon50mm {
         System.out.println(renderer.write(new StringBuilder()).toString());
 
         YNUTrace ynuTrace = new YNUTrace();
-        ynuTrace.trace(system, -1e10, 1.0);
+        ynuTrace.trace(system, 0.0, 1.0, -1e10);
 
     }
 }

@@ -6,6 +6,7 @@ import org.redukti.jfotoptix.layout.SystemLayout2D;
 import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.math.Matrix3;
 import org.redukti.jfotoptix.math.Vector3;
+import org.redukti.jfotoptix.parax.YNUTrace;
 import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
 import org.redukti.jfotoptix.rendering.RendererSvg;
@@ -130,5 +131,7 @@ public class LensTool {
             spot.draw_diagram(renderer, true);
             System.out.println(renderer.write(new StringBuilder()).toString());
         }
+        YNUTrace ynuTrace = new YNUTrace();
+        ynuTrace.trace(system, 1.0, 0.0, -1e10);
     }
 }

@@ -16,6 +16,23 @@ public class ParaxFirstOrder {
     double effective_focal_length;
     double back_focal_length;
     double optical_invariant;
+    double object_distance;
+    double image_distance;
+    double power;
+    double pp1;
+    double ppk;
+    double ffl;
+    double fno;
+    double enp_dist;
+    double enp_radius;
+    double exp_dist;
+    double exp_radius;
+    double m;
+    double red;
+    double n_obj;
+    double n_img;
+    double img_ht;
+    double obj_ang;
 
     public static ParaxFirstOrder compute(OpticalSystem system) {
 
@@ -119,6 +136,7 @@ public class ParaxFirstOrder {
         double yu_bar_ht = ybar0;
         double yu_bar_slp = slpbar0;
 
+        // Get height at first surface from object height
         yu_ht = yu_ht + 1e10 * yu_slp;
         yu_bar_ht = yu_bar_ht + 1e10 * yu_bar_slp;
 
@@ -128,6 +146,53 @@ public class ParaxFirstOrder {
 
         pfo.optical_invariant = n * (ax_ray.get(first).v(0) * yu_bar_slp
                 - pr_ray.get(first).v(0) * yu_slp);
+
+        // Fill in the contents of the FirstOrderData struct
+        pfo.object_distance = thi0;
+        pfo.image_distance = seq.get(seq.size()-1).get_thickness();
+        if (ck1 == 0.0) {
+            pfo.power = 0.0;
+            pfo.effective_focal_length = 0.0;
+            pfo.pp1 = 0.0;
+            pfo.ppk = 0.0;
+        }
+        else {
+            pfo.power = -ck1;
+            pfo.effective_focal_length = -1.0 / ck1;
+            pfo.pp1 = (dk1 - 1.0) * (n_0 / ck1);
+            pfo.ppk = (p_ray.get(last).v(0) - 1.0) * (n_k / ck1);
+            pfo.ffl = pfo.pp1 - pfo.effective_focal_length;
+            pfo.back_focal_length = pfo.effective_focal_length - pfo.ppk;
+            pfo.fno = -1.0 / (2.0 * n_k * ax_ray.get(last).v(1));
+        }
+        pfo.m = ak1 + ck1*pfo.image_distance/n_k;
+        pfo.red = dk1 + ck1*pfo.object_distance;
+        pfo.n_obj = n_0;
+        pfo.n_img = n_k;
+        pfo.img_ht = -pfo.optical_invariant/(n_k*ax_ray.get(last).v(1));
+        pfo.obj_ang = Math.toDegrees(Math.atan(yu_bar_slp));
+        if (yu_bar_slp != 0) {
+            double nu_pr0 = n_0 * yu_bar_slp;
+            pfo.enp_dist = -pr_ray.get(first).v(0) / nu_pr0;
+            pfo.enp_radius = Math.abs(pfo.optical_invariant / nu_pr0);
+        }
+        else {
+            pfo.enp_dist = -1e10;
+            pfo.enp_radius = 1e10;
+        }
+
+//        if (pr_ray.get(last).v(1) != 0) {
+//            pfo.exp_dist = -(pr_ray[-1][ht] / pr_ray[-1][slp] - fod.img_dist)
+//            pfo.exp_radius = abs(fod.opt_inv / (n_k * pr_ray[-1][slp]))
+//        }
+//        else {
+//            pfo.exp_dist = -1e10;
+//            pfo.exp_radius = 1e10;
+//        }
+//
+//    # compute object and image space numerical apertures
+//        fod.obj_na = n_0*math.sin(math.atan(seq_model.z_dir[0]*ax_ray[0][slp]))
+//        fod.img_na = n_k*math.sin(math.atan(seq_model.z_dir[-1]*ax_ray[-1][slp]))
 
         return pfo;
     }

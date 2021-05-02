@@ -91,7 +91,7 @@ public class LensTool {
     public static void main(String[] args) throws Exception {
         Args arguments = parseArguments(args);
         if (arguments.specfile == null) {
-            System.err.println("Usage: --specfile inputfile [--scenario num] [--skew] [--output layout|spot] [--dump-system] [--exclude-lost-rays] [--spot-density n] [--trace-density n] [--only-d-line] [--output outfilename]");
+            System.err.println("Usage: --specfile inputfile [--scenario num] [--skew] [--output layout|spot] [--dump-system] [--exclude-lost-rays] [--spot-density n] [--trace-density n] [--only-d-line] [--output outfilename] [--dont-use-glass-types]");
             System.err.println("       --spot-density defaults to 50");
             System.err.println("       --trace-density defaults to 20");
             System.err.println("       --scenario defaults to 0");

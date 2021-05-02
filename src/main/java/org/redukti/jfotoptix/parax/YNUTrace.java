@@ -24,8 +24,8 @@ public class YNUTrace {
      *                        to be the initial height y where the ray intersects the first surface.
      * @return A map of element id to the values
      */
-    public Map<Integer, Vector3> trace(List<OpticalSurface> seq, double object_height, double initial_slope_angle, double object_distance) {
-        Map<Integer, Vector3> tracedata = new LinkedHashMap<>();
+    public Map<Integer, YNUTraceData> trace(List<OpticalSurface> seq, double object_height, double initial_slope_angle, double object_distance) {
+        Map<Integer, YNUTraceData> tracedata = new LinkedHashMap<>();
         /*
            The implementation below is based on description in
            Modern Optical Engineering, W.J.Smith.
@@ -55,14 +55,14 @@ public class YNUTrace {
                 aoi = u1 + y1 * C1; // Eq 1.51 in handbook of Optical Dsign
                 //double power = surface.power(SpectralLine.d);
                 System.out.println("id="+ e.id() + new Vector3(y1, u1, aoi).toString());
-                tracedata.put(e.id(), new Vector3(y1, u1, aoi));
+                tracedata.put(e.id(), new YNUTraceData(y1, u1, aoi));
             }
             else {
                 continue;
             }
         }
         // FIXME we should add this against the image surface
-        tracedata.put(0, new Vector3(y2, u1, aoi)); // For the image plane, but perhaps we should make Image an OpticalSurface
+        tracedata.put(0, new YNUTraceData(y2, u1, aoi)); // For the image plane, but perhaps we should make Image an OpticalSurface
         //double l = -y1/u1;
         //System.out.println(l);
         //System.out.println(-1.0/u1);

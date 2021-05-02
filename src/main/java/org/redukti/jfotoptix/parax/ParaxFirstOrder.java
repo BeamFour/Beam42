@@ -13,8 +13,9 @@ import java.util.stream.Collectors;
 
 public class ParaxFirstOrder {
 
-    double effective_focal_length; // effective focal length
-    double back_focal_length; // back focal length
+    double effective_focal_length;
+    double back_focal_length;
+    double optical_invariant;
 
     public static ParaxFirstOrder compute(OpticalSystem system) {
 
@@ -33,8 +34,7 @@ public class ParaxFirstOrder {
         pfo.back_focal_length = -p_ray.get(last).v(0)/u_k;
 
         double n = seq.get(0).get_material(0).get_refractive_index(SpectralLine.d);
-        double inv = n * (p_ray.get(first).v(0) * p_ray.get(first).v(1)
-                    - p_ray.get(first).v(0) * q_ray.get(first).v(1));
+
 
         double phi = -(1.0*u_k)/1.0;
         double fE = 1/phi;
@@ -119,9 +119,15 @@ public class ParaxFirstOrder {
         double yu_bar_ht = ybar0;
         double yu_bar_slp = slpbar0;
 
+        yu_ht = yu_ht + 1e10 * yu_slp;
+        yu_bar_ht = yu_bar_ht + 1e10 * yu_bar_slp;
+
         // We have the starting coordinates, now trace the rays
-        Map<Integer, Vector3> ax_ray = tracer.trace(seq, yu_ht, yu_slp, -1e10);
-        Map<Integer, Vector3> pr_ray = tracer.trace(seq, yu_bar_ht, yu_bar_slp, -1e10);
+        Map<Integer, Vector3> ax_ray = tracer.trace(seq, yu_ht, yu_slp, 0.0);
+        Map<Integer, Vector3> pr_ray = tracer.trace(seq, yu_bar_ht, yu_bar_slp, 0.0);
+
+        pfo.optical_invariant = n * (ax_ray.get(first).v(0) * yu_bar_slp
+                - pr_ray.get(first).v(0) * yu_slp);
 
         return pfo;
     }

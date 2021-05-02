@@ -20,7 +20,9 @@ public class YNUTrace {
            Section 2.6, Example D.
            Also see section 5.9 in MIL-HDBK-141
          */
-        double y1 = object_height + object_distance*initial_angle; // y = height
+        double y1 = object_distance != 0.0 ?
+                object_height + object_distance*initial_angle:
+                object_height; // y = height
         double y1_ = y1;
         double u1 = initial_angle;  // angle
         double y2 = y1;

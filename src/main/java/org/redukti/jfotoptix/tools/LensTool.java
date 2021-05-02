@@ -6,13 +6,13 @@ import org.redukti.jfotoptix.layout.SystemLayout2D;
 import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.math.Matrix3;
 import org.redukti.jfotoptix.math.Vector3;
-import org.redukti.jfotoptix.parax.YNUTrace;
+import org.redukti.jfotoptix.model.OpticalSystem;
+import org.redukti.jfotoptix.model.PointSource;
+import org.redukti.jfotoptix.parax.ParaxFirstOrder;
 import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
 import org.redukti.jfotoptix.rendering.RendererSvg;
 import org.redukti.jfotoptix.rendering.Rgb;
-import org.redukti.jfotoptix.model.OpticalSystem;
-import org.redukti.jfotoptix.model.PointSource;
 import org.redukti.jfotoptix.tracing.RayTraceParameters;
 import org.redukti.jfotoptix.tracing.RayTraceRenderer;
 import org.redukti.jfotoptix.tracing.RayTraceResults;
@@ -21,7 +21,10 @@ import org.redukti.jfotoptix.tracing.RayTracer;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 public class LensTool {
 
@@ -157,8 +160,8 @@ public class LensTool {
                 System.out.println(renderer.write(new StringBuilder()).toString());
             }
         }
-        YNUTrace ynuTrace = new YNUTrace();
-        ynuTrace.trace(system, 1.0, 0.0, -1e10);
+        ParaxFirstOrder pfo = ParaxFirstOrder.compute(system);
+        System.out.println(pfo);
     }
 
     private static void createOutputFile(Args arguments, String string) throws IOException {

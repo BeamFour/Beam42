@@ -59,7 +59,8 @@ public class Abbe extends Dielectric {
 
     @Override
     public double get_refractive_index(double wavelen) {
-        if (m == AbbeFormula.AbbeVd && wavelen == SpectralLine.d)
+        if (_m == AbbeFormula.AbbeVd && wavelen == SpectralLine.d)
+            // If we know the exact wavelength index then return that
             return _n;
         return super.get_refractive_index(wavelen);
     }

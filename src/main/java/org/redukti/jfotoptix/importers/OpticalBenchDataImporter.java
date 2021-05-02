@@ -511,7 +511,7 @@ public class OpticalBenchDataImporter {
         return thickness;
     }
 
-    public static OpticalSystem.Builder buildSystem(LensSpecifications specs, int scenario,
+    public static OpticalSystem.Builder build_system(LensSpecifications specs, int scenario,
         boolean use_glass_types) {
         OpticalSystem.Builder sys = new OpticalSystem.Builder();
         /* anchor lens */

@@ -8,7 +8,7 @@ import org.redukti.jfotoptix.math.Matrix3;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.model.OpticalSystem;
 import org.redukti.jfotoptix.model.PointSource;
-import org.redukti.jfotoptix.parax.ParaxFirstOrder;
+import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
 import org.redukti.jfotoptix.rendering.RendererSvg;
@@ -160,7 +160,7 @@ public class LensTool {
                 System.out.println(renderer.write(new StringBuilder()).toString());
             }
         }
-        ParaxFirstOrder pfo = ParaxFirstOrder.compute(system);
+        ParaxialFirstOrderInfo pfo = ParaxialFirstOrderInfo.compute(system);
         System.out.println(pfo);
     }
 

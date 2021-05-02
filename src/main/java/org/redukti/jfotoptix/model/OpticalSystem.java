@@ -37,15 +37,27 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class OpticalSystem implements Container {
     protected final List<Element> _elements;
     protected final Transform3Cache _transform3Cache;
+    protected double _angle_of_view;
+    protected double _f_number;
 
     @Override
     public List<Element> elements() {
         return _elements;
     }
 
-    public OpticalSystem(List<Element> elements, Transform3Cache transform3Cache) {
+    public OpticalSystem(List<Element> elements, Transform3Cache transform3Cache, double angle_of_view, double f_number) {
         this._elements = elements;
         this._transform3Cache = transform3Cache;
+        this._angle_of_view = angle_of_view;
+        this._f_number = f_number;
+    }
+
+    public double get_angle_of_view() {
+        return this._angle_of_view;
+    }
+
+    public double get_f_number() {
+        return this._f_number;
     }
 
     public Element getElement(int pos) {
@@ -127,9 +139,21 @@ public class OpticalSystem implements Container {
     public static class Builder {
         private final ArrayList<Element.Builder> elements = new ArrayList<>();
         private Transform3Cache transform3Cache;
+        private double _angle_of_view;
+        private double _f_number;
 
         public Builder add(Element.Builder element) {
             this.elements.add(element);
+            return this;
+        }
+
+        public OpticalSystem.Builder angle_of_view(double v) {
+            this._angle_of_view = v;
+            return this;
+        }
+
+        public OpticalSystem.Builder f_number(double v) {
+            this._f_number = v;
             return this;
         }
 
@@ -137,7 +161,7 @@ public class OpticalSystem implements Container {
             generateIds();
             Transform3Cache transform3Cache = setCoordinates();
             List<Element> elements = buildElements();
-            OpticalSystem system = new OpticalSystem(elements, transform3Cache);
+            OpticalSystem system = new OpticalSystem(elements, transform3Cache, _angle_of_view, _f_number);
             for (Element e: system.elements()) {
                 e.set_system(system);
             }

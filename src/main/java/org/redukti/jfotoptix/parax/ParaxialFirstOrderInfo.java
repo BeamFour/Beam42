@@ -1,8 +1,14 @@
+// Large sections of the following implementation are ported from
+// https://github.com/mjhoptics/ray-optics
+// SD 3-Clause License
+//
+//Copyright (c) 2017-2021, Michael J. Hayford
+//All rights reserved.
+
 package org.redukti.jfotoptix.parax;
 
 import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.math.Vector3;
-import org.redukti.jfotoptix.model.Element;
 import org.redukti.jfotoptix.model.OpticalSurface;
 import org.redukti.jfotoptix.model.OpticalSystem;
 import org.redukti.jfotoptix.model.Stop;
@@ -11,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ParaxFirstOrder {
+public class ParaxialFirstOrderInfo {
 
     double effective_focal_length;
     double back_focal_length;
@@ -36,7 +42,10 @@ public class ParaxFirstOrder {
     double obj_na;
     double img_na;
 
-    public static ParaxFirstOrder compute(OpticalSystem system) {
+    static final int HEIGHT = 0;
+    static final int SLOPE = 1;
+
+    public static ParaxialFirstOrderInfo compute(OpticalSystem system) {
 
         YNUTrace tracer = new YNUTrace();
         List<OpticalSurface> seq = system.get_sequence().stream().filter(e -> e instanceof OpticalSurface).map(e -> (OpticalSurface)e).collect(Collectors.toList());
@@ -45,33 +54,26 @@ public class ParaxFirstOrder {
         // Trace a ray that has unit angle from infinity
         Map<Integer, Vector3> q_ray = tracer.trace(seq, 1e10, 1.0, -1e10);
 
-        // The following implementation is ported from
-        // https://github.com/mjhoptics/ray-optics
-        // SD 3-Clause License
-        //
-        //Copyright (c) 2017-2021, Michael J. Hayford
-        //All rights reserved.
-
         int first = seq.get(0).id();
         int last = seq.get(seq.size()-1).id();
-        ParaxFirstOrder pfo = new ParaxFirstOrder();
-        double u_k = p_ray.get(last).v(1);
-        pfo.effective_focal_length = -p_ray.get(first).v(0)/u_k;
-        pfo.back_focal_length = -p_ray.get(last).v(0)/u_k;
+        ParaxialFirstOrderInfo pfo = new ParaxialFirstOrderInfo();
+        double u_k = p_ray.get(last).v(SLOPE);
+        pfo.effective_focal_length = -p_ray.get(first).v(HEIGHT)/u_k;
+        pfo.back_focal_length = -p_ray.get(last).v(HEIGHT)/u_k;
 
         double n = seq.get(0).get_material(0).get_refractive_index(SpectralLine.d);
         double n_k = 1.0*seq.get(seq.size()-1).get_material(1).get_refractive_index(SpectralLine.d); // FIXME 1.0 is z_dir
-        double ak1 = p_ray.get(last).v(0);
-        double bk1 = q_ray.get(last).v(0);
-        double ck1 = n_k * p_ray.get(last).v(1);
-        double dk1 = n_k * q_ray.get(last).v(1);
+        double ak1 = p_ray.get(last).v(HEIGHT);
+        double bk1 = q_ray.get(last).v(HEIGHT);
+        double ck1 = n_k * p_ray.get(last).v(SLOPE);
+        double dk1 = n_k * q_ray.get(last).v(SLOPE);
 
         Stop stop = seq.stream().filter(e-> e instanceof Stop).map(e -> (Stop)e).findFirst().orElse(null);
         double n_s = 1.0*stop.get_material(0).get_refractive_index(SpectralLine.d); // FIXME 1.0 is z_dir
-        double as1 = p_ray.get(stop.id()).v(0);
-        double bs1 = q_ray.get(stop.id()).v(0);
-        double cs1 = n_s*p_ray.get(stop.id()).v(1);
-        double ds1 = n_s*q_ray.get(stop.id()).v(1);
+        double as1 = p_ray.get(stop.id()).v(HEIGHT);
+        double bs1 = q_ray.get(stop.id()).v(HEIGHT);
+        double cs1 = n_s*p_ray.get(stop.id()).v(SLOPE);
+        double ds1 = n_s*q_ray.get(stop.id()).v(SLOPE);
 
         // find entrance pupil location w.r.t. first surface
         double ybar1 = -bs1;
@@ -87,7 +89,7 @@ public class ParaxFirstOrder {
         String pupil_aperture = "aperture";
         String obj_img_key = "image";
         String value_key = "f/#";
-        double pupil_value = 0.98;
+        double pupil_value = system.get_f_number();
 
         double slp0 = 0.0;
         if (obj_img_key.equals("object")) {
@@ -112,7 +114,7 @@ public class ParaxFirstOrder {
         String field = "field";
         obj_img_key = "object";
         value_key = "angle";
-        double max_fld = 19.98;
+        double max_fld = system.get_angle_of_view();
         int fn = 1;
         double ang = 0.0;
         double slpbar0 = 0.0;
@@ -147,8 +149,8 @@ public class ParaxFirstOrder {
         Map<Integer, Vector3> ax_ray = tracer.trace(seq, yu_ht, yu_slp, 0.0);
         Map<Integer, Vector3> pr_ray = tracer.trace(seq, yu_bar_ht, yu_bar_slp, 0.0);
 
-        pfo.optical_invariant = n * (ax_ray.get(first).v(0) * yu_bar_slp
-                - pr_ray.get(first).v(0) * yu_slp);
+        pfo.optical_invariant = n * (ax_ray.get(first).v(HEIGHT) * yu_bar_slp
+                - pr_ray.get(first).v(HEIGHT) * yu_slp);
 
         // Fill in the contents of the FirstOrderData struct
         pfo.object_distance = thi0;
@@ -163,20 +165,20 @@ public class ParaxFirstOrder {
             pfo.power = -ck1;
             pfo.effective_focal_length = -1.0 / ck1;
             pfo.pp1 = (dk1 - 1.0) * (n_0 / ck1);
-            pfo.ppk = (p_ray.get(last).v(0) - 1.0) * (n_k / ck1);
+            pfo.ppk = (p_ray.get(last).v(HEIGHT) - 1.0) * (n_k / ck1);
             pfo.ffl = pfo.pp1 - pfo.effective_focal_length;
             pfo.back_focal_length = pfo.effective_focal_length - pfo.ppk;
-            pfo.fno = -1.0 / (2.0 * n_k * ax_ray.get(last).v(1));
+            pfo.fno = -1.0 / (2.0 * n_k * ax_ray.get(last).v(SLOPE));
         }
         pfo.m = ak1 + ck1*pfo.image_distance/n_k;
         pfo.red = dk1 + ck1*pfo.object_distance;
         pfo.n_obj = n_0;
         pfo.n_img = n_k;
-        pfo.img_ht = -pfo.optical_invariant/(n_k*ax_ray.get(last).v(1));
+        pfo.img_ht = -pfo.optical_invariant/(n_k*ax_ray.get(last).v(SLOPE));
         pfo.obj_ang = Math.toDegrees(Math.atan(yu_bar_slp));
         if (yu_bar_slp != 0) {
             double nu_pr0 = n_0 * yu_bar_slp;
-            pfo.enp_dist = -pr_ray.get(first).v(0) / nu_pr0;
+            pfo.enp_dist = -pr_ray.get(first).v(HEIGHT) / nu_pr0;
             pfo.enp_radius = Math.abs(pfo.optical_invariant / nu_pr0);
         }
         else {
@@ -184,9 +186,9 @@ public class ParaxFirstOrder {
             pfo.enp_radius = 1e10;
         }
 
-        if (pr_ray.get(last).v(1) != 0) {
-            pfo.exp_dist = -(pr_ray.get(0).v(0) / pr_ray.get(0).v(1) - pfo.image_distance);
-            pfo.exp_radius = Math.abs(pfo.optical_invariant / (n_k * pr_ray.get(0).v(1)));
+        if (pr_ray.get(last).v(SLOPE) != 0) {
+            pfo.exp_dist = -(pr_ray.get(0).v(HEIGHT) / pr_ray.get(0).v(SLOPE) - pfo.image_distance);
+            pfo.exp_radius = Math.abs(pfo.optical_invariant / (n_k * pr_ray.get(0).v(SLOPE)));
         }
         else {
             pfo.exp_dist = -1e10;
@@ -195,7 +197,7 @@ public class ParaxFirstOrder {
 
         // compute object and image space numerical apertures
         pfo.obj_na = n_0*Math.sin(Math.atan(1.0*yu_slp)); // FIXME 1.0 is z_dir
-        pfo.img_na = n_k*Math.sin(Math.atan(1.0*ax_ray.get(0).v(1))); // FIXME 1.0 is z_dir
+        pfo.img_na = n_k*Math.sin(Math.atan(1.0*ax_ray.get(0).v(SLOPE))); // FIXME 1.0 is z_dir
 
         return pfo;
     }

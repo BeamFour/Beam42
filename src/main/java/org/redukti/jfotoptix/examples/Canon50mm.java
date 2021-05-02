@@ -66,9 +66,5 @@ public class Canon50mm {
         AnalysisSpot spot = new AnalysisSpot(system, 50);
         spot.draw_diagram(renderer, true);
         System.out.println(renderer.write(new StringBuilder()).toString());
-
-        YNUTrace ynuTrace = new YNUTrace();
-        ynuTrace.trace(system, 1.0, 0.0, 1e10);
-        ynuTrace.trace(system, 1e10, 1.0, 1e10);
     }
 }

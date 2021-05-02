@@ -3,8 +3,14 @@ package org.redukti.jfotoptix.examples;
 import org.redukti.jfotoptix.math.Vector3Pair;
 import org.redukti.jfotoptix.medium.GlassMap;
 import org.redukti.jfotoptix.model.Lens;
+import org.redukti.jfotoptix.model.OpticalSurface;
 import org.redukti.jfotoptix.model.OpticalSystem;
 import org.redukti.jfotoptix.parax.YNUTrace;
+import org.redukti.jfotoptix.parax.YNUTraceData;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ParaxialTrace {
 
@@ -26,7 +32,8 @@ public class ParaxialTrace {
         OpticalSystem system = systemBuilder.build();
 
         YNUTrace ynuTrace = new YNUTrace();
-        ynuTrace.trace(system, 0.0, 0.0333, -300);
-        ynuTrace.trace(system, 20.0, -0.0666, -300);
+        List<OpticalSurface> seq = system.get_sequence().stream().filter(e -> e instanceof OpticalSurface).map(e -> (OpticalSurface)e).collect(Collectors.toList());
+        Map<Integer, YNUTraceData> data = ynuTrace.trace(seq, 10.0, 0.0333, 0);
+        System.out.println(-data.get(seq.get(seq.size()-1).id()).height/data.get(seq.get(seq.size()-1).id()).slope);
     }
 }

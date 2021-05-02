@@ -1,7 +1,6 @@
 package org.redukti.jfotoptix.parax;
 
 import org.redukti.jfotoptix.light.SpectralLine;
-import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.medium.Medium;
 import org.redukti.jfotoptix.model.Element;
 import org.redukti.jfotoptix.model.OpticalSurface;
@@ -54,8 +53,9 @@ public class YNUTrace {
                 u1 = n1_u1_/n1_; // ray angle
                 aoi = u1 + y1 * C1; // Eq 1.51 in handbook of Optical Dsign
                 //double power = surface.power(SpectralLine.d);
-                System.out.println("id="+ e.id() + new Vector3(y1, u1, aoi).toString());
-                tracedata.put(e.id(), new YNUTraceData(y1, u1, aoi));
+                YNUTraceData data = new YNUTraceData(y1, u1, aoi);
+                System.out.println("id="+ e.id() + data);
+                tracedata.put(e.id(), data);
             }
             else {
                 continue;

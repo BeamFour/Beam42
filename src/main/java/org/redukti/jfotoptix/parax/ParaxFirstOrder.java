@@ -90,7 +90,6 @@ public class ParaxFirstOrder {
         double pupil_value = 0.98;
 
         double slp0 = 0.0;
-        double slpk = 0.0;
         if (obj_img_key.equals("object")) {
             if (value_key.equals("pupil")) {
                 slp0 = 0.5 * pupil_value / obj2enp_dist;
@@ -100,10 +99,10 @@ public class ParaxFirstOrder {
         }
         else if(obj_img_key.equals("image")) {
             if (value_key.equals("f/#")) {
-                slpk = -1.0 / (2.0 * pupil_value);
+                double slpk = -1.0 / (2.0 * pupil_value);
                 slp0 = slpk / red;
             } else if (value_key.equals("NA")) {
-                slpk = n_k * Math.tan(Math.asin(pupil_value / n_k));
+                double slpk = n_k * Math.tan(Math.asin(pupil_value / n_k));
                 slp0 = slpk / red;
             }
         }

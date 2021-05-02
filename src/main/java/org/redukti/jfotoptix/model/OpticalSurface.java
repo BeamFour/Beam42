@@ -56,6 +56,9 @@ public class OpticalSurface extends Surface {
     }
 
     public double power(double wvln) {
+        // Power of a spherical optical surface is
+        // phi = (n'-n)c
+        // Equation 1.52 in handbook of optical design
         return _mat[0].get_refractive_index(wvln)/_mat[1].get_refractive_index(wvln) * get_curve().get_curvature();
     }
 

@@ -27,10 +27,10 @@ Original GNU Optical License and Authors are as follows:
 package org.redukti.jfotoptix.model;
 
 import org.redukti.jfotoptix.curve.Curve;
-import org.redukti.jfotoptix.medium.Air;
-import org.redukti.jfotoptix.medium.Medium;
 import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector3Pair;
+import org.redukti.jfotoptix.medium.Air;
+import org.redukti.jfotoptix.medium.Medium;
 import org.redukti.jfotoptix.shape.Shape;
 
 import java.util.Objects;
@@ -53,6 +53,10 @@ public class OpticalSurface extends Surface {
 
     public Medium get_material(int i) {
         return _mat[i];
+    }
+
+    public double power(double wvln) {
+        return _mat[0].get_refractive_index(wvln)/_mat[1].get_refractive_index(wvln) * get_curve().get_curvature();
     }
 
     public String toString() {

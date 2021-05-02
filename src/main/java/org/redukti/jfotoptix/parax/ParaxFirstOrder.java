@@ -33,6 +33,8 @@ public class ParaxFirstOrder {
     double n_img;
     double img_ht;
     double obj_ang;
+    double obj_na;
+    double img_na;
 
     public static ParaxFirstOrder compute(OpticalSystem system) {
 
@@ -43,6 +45,13 @@ public class ParaxFirstOrder {
         // Trace a ray that has unit angle from infinity
         Map<Integer, Vector3> q_ray = tracer.trace(seq, 1e10, 1.0, -1e10);
 
+        // The following implementation is ported from
+        // https://github.com/mjhoptics/ray-optics
+        // SD 3-Clause License
+        //
+        //Copyright (c) 2017-2021, Michael J. Hayford
+        //All rights reserved.
+
         int first = seq.get(0).id();
         int last = seq.get(seq.size()-1).id();
         ParaxFirstOrder pfo = new ParaxFirstOrder();
@@ -51,19 +60,14 @@ public class ParaxFirstOrder {
         pfo.back_focal_length = -p_ray.get(last).v(0)/u_k;
 
         double n = seq.get(0).get_material(0).get_refractive_index(SpectralLine.d);
-
-
-        double phi = -(1.0*u_k)/1.0;
-        double fE = 1/phi;
-
-        double n_k = seq.get(seq.size()-1).get_material(1).get_refractive_index(SpectralLine.d);
+        double n_k = 1.0*seq.get(seq.size()-1).get_material(1).get_refractive_index(SpectralLine.d); // FIXME 1.0 is z_dir
         double ak1 = p_ray.get(last).v(0);
         double bk1 = q_ray.get(last).v(0);
         double ck1 = n_k * p_ray.get(last).v(1);
         double dk1 = n_k * q_ray.get(last).v(1);
 
         Stop stop = seq.stream().filter(e-> e instanceof Stop).map(e -> (Stop)e).findFirst().orElse(null);
-        double n_s = 1.0*stop.get_material(0).get_refractive_index(SpectralLine.d);
+        double n_s = 1.0*stop.get_material(0).get_refractive_index(SpectralLine.d); // FIXME 1.0 is z_dir
         double as1 = p_ray.get(stop.id()).v(0);
         double bs1 = q_ray.get(stop.id()).v(0);
         double cs1 = n_s*p_ray.get(stop.id()).v(1);
@@ -181,18 +185,18 @@ public class ParaxFirstOrder {
             pfo.enp_radius = 1e10;
         }
 
-//        if (pr_ray.get(last).v(1) != 0) {
-//            pfo.exp_dist = -(pr_ray[-1][ht] / pr_ray[-1][slp] - fod.img_dist)
-//            pfo.exp_radius = abs(fod.opt_inv / (n_k * pr_ray[-1][slp]))
-//        }
-//        else {
-//            pfo.exp_dist = -1e10;
-//            pfo.exp_radius = 1e10;
-//        }
-//
-//    # compute object and image space numerical apertures
-//        fod.obj_na = n_0*math.sin(math.atan(seq_model.z_dir[0]*ax_ray[0][slp]))
-//        fod.img_na = n_k*math.sin(math.atan(seq_model.z_dir[-1]*ax_ray[-1][slp]))
+        if (pr_ray.get(last).v(1) != 0) {
+            pfo.exp_dist = -(pr_ray.get(0).v(0) / pr_ray.get(0).v(1) - pfo.image_distance);
+            pfo.exp_radius = Math.abs(pfo.optical_invariant / (n_k * pr_ray.get(0).v(1)));
+        }
+        else {
+            pfo.exp_dist = -1e10;
+            pfo.exp_radius = 1e10;
+        }
+
+        // compute object and image space numerical apertures
+        pfo.obj_na = n_0*Math.sin(Math.atan(1.0*yu_slp)); // FIXME 1.0 is z_dir
+        pfo.img_na = n_k*Math.sin(Math.atan(1.0*ax_ray.get(0).v(1))); // FIXME 1.0 is z_dir
 
         return pfo;
     }
@@ -202,6 +206,26 @@ public class ParaxFirstOrder {
         return "ParaxFirstOrder{" +
                 "effective_focal_length=" + effective_focal_length +
                 ", back_focal_length=" + back_focal_length +
+                ", optical_invariant=" + optical_invariant +
+                ", object_distance=" + object_distance +
+                ", image_distance=" + image_distance +
+                ", power=" + power +
+                ", pp1=" + pp1 +
+                ", ppk=" + ppk +
+                ", ffl=" + ffl +
+                ", fno=" + fno +
+                ", enp_dist=" + enp_dist +
+                ", enp_radius=" + enp_radius +
+                ", exp_dist=" + exp_dist +
+                ", exp_radius=" + exp_radius +
+                ", m=" + m +
+                ", red=" + red +
+                ", n_obj=" + n_obj +
+                ", n_img=" + n_img +
+                ", img_ht=" + img_ht +
+                ", obj_ang=" + obj_ang +
+                ", obj_na=" + obj_na +
+                ", img_na=" + img_na +
                 '}';
     }
 }

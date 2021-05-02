@@ -100,16 +100,6 @@ public class OpticalBenchDataImporter {
             return i >= 0 && i < data_.size() ? data_.get(i) : 0.0;
         }
 
-        //        void
-//        dump (FILE *fp)
-//        {
-//            fprintf (fp, "Aspheric values[%d] = ", surface_number_);
-//            for (int i = 0; i < data_points (); i++)
-//            {
-//                fprintf (fp, "%.12g ", data (i));
-//            }
-//            fputc ('\n', fp);
-//        }
         int get_surface_number() {
             return surface_number_;
         }
@@ -214,16 +204,6 @@ public class OpticalBenchDataImporter {
         void set_glass_name(String name) { glass_name_ = name; }
 
         String get_glass_name() { return glass_name_; }
-
-//        void
-//        dump (FILE *fp, unsigned scenario = 0)
-//        {
-//            fprintf (fp,
-//                    "Surface[%d] = type=%s radius=%.12g thickness=%.12g diameter "
-//                    "= %.12g nd = %.12g vd = %.12g\n",
-//                    id_, SurfaceTypeNames[surface_type_], radius_,
-//                    get_thickness (scenario), diameter_, refractive_index_, abbe_vd_);
-//        }
 
         int id_;
         SurfaceType surface_type_;
@@ -383,18 +363,6 @@ public class OpticalBenchDataImporter {
             return null;
         }
 
-        //        void
-//        dump (FILE *fp = stdout, unsigned scenario = 0)
-//        {
-//            for (int i = 0; i < surfaces_.size (); i++)
-//            {
-//                surfaces_.at (i)->dump (fp, scenario);
-//                if (surfaces_.at (i)->get_aspherical_data ())
-//                {
-//                    surfaces_.at (i)->get_aspherical_data ()->dump (fp);
-//                }
-//            }
-//        }
         double get_image_height() {
             Variable var = find_variable("Image Height");
             if (var != null)
@@ -485,7 +453,7 @@ public class OpticalBenchDataImporter {
     }
 
     private static double add_surface(Lens.Builder lens, LensSurface surface,
-                       int scenario) {
+                       int scenario, boolean use_glass_types) {
         double thickness = surface.get_thickness(scenario);
         double radius = surface.get_radius();
         double aperture_radius = surface.get_diameter() / 2.0;
@@ -498,7 +466,7 @@ public class OpticalBenchDataImporter {
         }
         AsphericalData aspherical_data = surface.get_aspherical_data();
         if (aspherical_data == null) {
-            if (glass_name != null && GlassMap.glassByName(glass_name) != null) {
+            if (use_glass_types && glass_name != null && GlassMap.glassByName(glass_name) != null) {
                 lens.add_surface(
                         radius, aperture_radius, thickness,
                         GlassMap.glassByName(glass_name));
@@ -525,7 +493,7 @@ public class OpticalBenchDataImporter {
         double a12 = aspherical_data.data(6);
         double a14 = aspherical_data.data(7);
 
-        if (glass_name != null && GlassMap.glassByName(glass_name) != null) {
+        if (use_glass_types && glass_name != null && GlassMap.glassByName(glass_name) != null) {
             lens.add_surface(
                     new Asphere(radius, k, a4, a6, a8, a10, a12,
                             a14),
@@ -547,7 +515,8 @@ public class OpticalBenchDataImporter {
         return thickness;
     }
 
-    public static OpticalSystem.Builder buildSystem(LensSpecifications specs, int scenario) {
+    public static OpticalSystem.Builder buildSystem(LensSpecifications specs, int scenario,
+        boolean use_glass_types) {
         OpticalSystem.Builder sys = new OpticalSystem.Builder();
         /* anchor lens */
         Lens.Builder lens = new Lens.Builder().position(Vector3Pair.position_000_001);
@@ -559,7 +528,7 @@ public class OpticalBenchDataImporter {
             if (surfaces.get(i).get_surface_type() == SurfaceType.field_stop)
                 thickness = surfaces.get(i).get_thickness(scenario);
             else
-                thickness = add_surface(lens, surfaces.get(i), scenario);
+                thickness = add_surface(lens, surfaces.get(i), scenario, use_glass_types);
             image_pos += thickness;
         }
         // printf ("Image position is at %f\n", image_pos);

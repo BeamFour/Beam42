@@ -58,6 +58,13 @@ public class Abbe extends Dielectric {
     }
 
     @Override
+    public double get_refractive_index(double wavelen) {
+        if (m == AbbeFormula.AbbeVd && wavelen == SpectralLine.d)
+            return _n;
+        return super.get_refractive_index(wavelen);
+    }
+
+    @Override
     public double get_measurement_index(double wavelen) {
         double wl = wavelen / 1000.;
         double w2 = wl * wl;

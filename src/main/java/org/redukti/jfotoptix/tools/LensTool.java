@@ -25,6 +25,7 @@ public class LensTool {
         String outputType = "layout";
         boolean skewRays = false;
         boolean dumpSystem = false;
+        boolean use_glass_types = true;
     }
 
     static Args parseArguments(String[] args) {
@@ -46,6 +47,9 @@ public class LensTool {
             }
             else if (arg1.equals("--skew")) {
                 arguments.skewRays = true;
+            }
+            else if (arg1.equals("--dont-use-glass-types")) {
+                arguments.use_glass_types = false;
             }
             else if (arg1.equals("--dump-system")) {
                 arguments.dumpSystem = true;

@@ -40,8 +40,8 @@ package org.redukti.jfotoptix.data;
  ..., xn known parameters to access the stored y value.
  */
 public abstract class DataSet {
-    int _version;
-    Interpolation _interpolation;
+    protected int _version;
+    protected Interpolation _interpolation;
 
     /** Get total number of dimensions */
     public abstract int get_dimensions ();

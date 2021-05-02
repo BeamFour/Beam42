@@ -35,8 +35,8 @@ import org.redukti.jfotoptix.plotting.PlotAxes;
 import org.redukti.jfotoptix.plotting.PlotRenderer;
 import org.redukti.jfotoptix.rendering.Renderer;
 import org.redukti.jfotoptix.rendering.RendererViewport;
-import org.redukti.jfotoptix.sys.OpticalSystem;
-import org.redukti.jfotoptix.sys.Surface;
+import org.redukti.jfotoptix.model.OpticalSystem;
+import org.redukti.jfotoptix.model.Surface;
 import org.redukti.jfotoptix.tracing.TracedRay;
 
 /**
@@ -48,21 +48,21 @@ import org.redukti.jfotoptix.tracing.TracedRay;
 public class AnalysisSpot extends AnalysisPointImage {
 
     /** spot centroid */
-    Vector3 _centroid;
+    protected Vector3 _centroid;
 
-    boolean _processed_analysis;
+    protected boolean _processed_analysis;
     /** spot maximum radius */
-    double _max_radius;
+    protected double _max_radius;
     /** spot root mean square radius */
-    double _rms_radius;
+    protected double _rms_radius;
     /** amount of light intensity in the whole spot */
-    double _tot_intensity;
-    double _useful_radius;
+    protected double _tot_intensity;
+    protected double _useful_radius;
 
-    PlotAxes _axes;
+    protected PlotAxes _axes;
 
-    public AnalysisSpot(OpticalSystem system) {
-        super(system);
+    public AnalysisSpot(OpticalSystem system, int radial_density) {
+        super(system, radial_density);
         _axes = new PlotAxes();
         _axes.set_show_axes (false, PlotAxes.AxisMask.XY);
         _axes.set_label ("Sagittal distance", PlotAxes.AxisMask.X);

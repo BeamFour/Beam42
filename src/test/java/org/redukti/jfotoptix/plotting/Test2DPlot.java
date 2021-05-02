@@ -21,7 +21,7 @@ public class Test2DPlot {
             d1.add_data(x, Math.cos(x / 3.) * Math.cos(x) / 2., 0.0);
             x += Math.abs(Math.sin(i) + .5);
         }
-        d1.setInterpolation(Cubic2);
+        d1.set_interpolation(Cubic2);
 
         Plot p = new Plot();
 

@@ -259,12 +259,12 @@
     <polygon fill="none" stroke="#000000" points="545.351,300 542.616,276.733 534.741,256.273 522.676,241.087 507.875,233.006 492.125,233.006 477.324,241.087 465.259,256.273 457.384,276.733 454.649,300 457.384,323.267 465.259,343.727 477.324,358.913 492.125,366.994 507.875,366.994 522.676,358.913 534.741,343.727 542.616,323.267 " />
     <text style="font-size:18;text-align:center;text-anchor:middle;" x="500" y="388.506" fill="#7f7f7f">hexpolar: 91 points</text>
     <use x="700" y="300" xlink:href="#cross"  stroke="#ff0000" />
-    <use x="697.595" y="294.662" xlink:href="#cross"  stroke="#ff0000" />
-    <use x="703.844" y="296.519" xlink:href="#cross"  stroke="#ff0000" />
-    <use x="699.108" y="304.913" xlink:href="#cross"  stroke="#ff0000" />
-    <use x="699.85" y="301.973" xlink:href="#cross"  stroke="#ff0000" />
-    <use x="696.832" y="299.832" xlink:href="#cross"  stroke="#ff0000" />
-    <use x="694.897" y="295.845" xlink:href="#cross"  stroke="#ff0000" />
+    <use x="699.556" y="293.419" xlink:href="#cross"  stroke="#ff0000" />
+    <use x="700.221" y="301.373" xlink:href="#cross"  stroke="#ff0000" />
+    <use x="701.261" y="300.779" xlink:href="#cross"  stroke="#ff0000" />
+    <use x="698.093" y="302.454" xlink:href="#cross"  stroke="#ff0000" />
+    <use x="701.659" y="302.415" xlink:href="#cross"  stroke="#ff0000" />
+    <use x="694.059" y="298.301" xlink:href="#cross"  stroke="#ff0000" />
     <polygon fill="none" stroke="#000000" points="745.351,300 742.616,276.733 734.741,256.273 722.676,241.087 707.875,233.006 692.125,233.006 677.324,241.087 665.259,256.273 657.384,276.733 654.649,300 657.384,323.267 665.259,343.727 677.324,358.913 692.125,366.994 707.875,366.994 722.676,358.913 734.741,343.727 742.616,323.267 " />
     <text style="font-size:18;text-align:center;text-anchor:middle;" x="700" y="388.506" fill="#7f7f7f">random: 7 points</text>
 </svg>

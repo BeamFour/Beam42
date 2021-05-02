@@ -205,7 +205,7 @@ public abstract class Renderer {
 
     public void draw_triangle (Triangle2 t, boolean filled, Rgb rgb)
     {
-        draw_polygon (t._v, rgb, filled, true);
+        draw_polygon (t.as_array(), rgb, filled, true);
     }
 
     public void draw_box (Vector2Pair c, Rgb rgb)

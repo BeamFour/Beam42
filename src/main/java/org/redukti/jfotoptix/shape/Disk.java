@@ -41,17 +41,17 @@ public class Disk extends Round {
     }
 
     @Override
-    double get_xy_ratio() {
+    public double get_xy_ratio() {
         return 1.0;
     }
 
     @Override
-    double get_external_xradius() {
+    public double get_external_xradius() {
         return _radius;
     }
 
     @Override
-    double get_internal_xradius() {
+    public double get_internal_xradius() {
         return 0;
     }
 

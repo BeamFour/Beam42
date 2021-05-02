@@ -34,9 +34,9 @@ import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector2Pair;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
-import org.redukti.jfotoptix.sys.Element;
-import org.redukti.jfotoptix.sys.Image;
-import org.redukti.jfotoptix.sys.RaySource;
+import org.redukti.jfotoptix.model.Element;
+import org.redukti.jfotoptix.model.Image;
+import org.redukti.jfotoptix.model.RaySource;
 
 import java.util.List;
 

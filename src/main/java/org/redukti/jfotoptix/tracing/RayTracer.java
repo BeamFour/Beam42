@@ -26,9 +26,9 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.tracing;
 
-import org.redukti.jfotoptix.material.Medium;
+import org.redukti.jfotoptix.medium.Medium;
 import org.redukti.jfotoptix.math.*;
-import org.redukti.jfotoptix.sys.*;
+import org.redukti.jfotoptix.model.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -228,10 +228,11 @@ public class RayTracer {
     }
 
     private TracedRay trace_ray_simple(Surface surface, RayTraceResults result, TracedRay incident, Vector3Pair local, Vector3Pair pt) {
-        if (surface instanceof OpticalSurface) {
-            return trace_ray_simple((OpticalSurface) surface, result, incident, local, pt);
-        } else if (surface instanceof Stop) {
+        if (surface instanceof Stop) {
             return trace_ray_simple((Stop) surface, result, incident, local, pt);
+        }
+        else if (surface instanceof OpticalSurface) {
+            return trace_ray_simple((OpticalSurface) surface, result, incident, local, pt);
         } else {
             return null;
         }

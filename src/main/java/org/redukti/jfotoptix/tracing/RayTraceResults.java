@@ -28,10 +28,10 @@ package org.redukti.jfotoptix.tracing;
 
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
-import org.redukti.jfotoptix.sys.Element;
-import org.redukti.jfotoptix.sys.Image;
-import org.redukti.jfotoptix.sys.RaySource;
-import org.redukti.jfotoptix.sys.Surface;
+import org.redukti.jfotoptix.model.Element;
+import org.redukti.jfotoptix.model.Image;
+import org.redukti.jfotoptix.model.RaySource;
+import org.redukti.jfotoptix.model.Surface;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -132,6 +132,10 @@ public class RayTraceResults {
         _sources.add(source);
     }
 
+    public void add_sources(List<? extends RaySource> source) {
+        _sources.addAll(source);
+    }
+
     public TracedRay newRay(Vector3 origin, Vector3 direction) {
         TracedRay ray = new TracedRay(origin, direction);
         _rays.add(ray);
@@ -160,5 +164,38 @@ public class RayTraceResults {
         }
         center = center.divide(count);
         return center;
+    }
+
+    public void report() {
+        System.out.println("Ray Trace Report");
+        System.out.println("================");
+        List<RaySource> sl = get_source_list();
+        if (sl.isEmpty())
+            throw new IllegalArgumentException("No source found in trace result");
+
+        for (RaySource s : sl) {
+            List<TracedRay> rl = get_generated(s);
+            for (TracedRay ray : rl) {
+                if (hitImage(ray, true)) {
+                    report(ray);
+                }
+            }
+        }
+    }
+
+    private boolean hitImage(TracedRay ray, boolean tangential) {
+        if (ray.get_intercept_element() != null && ray.get_intercept_element() instanceof Image) {
+            return true;
+        }
+        if (ray.get_first_child() == null) {
+            return false;
+        }
+        if (tangential && Math.abs(ray.get_ray().x1()) > 1e-6)
+            return false;
+        return hitImage(ray.get_first_child(), tangential);
+    }
+
+    private void report(TracedRay ray) {
+        System.out.println(ray);
     }
 }

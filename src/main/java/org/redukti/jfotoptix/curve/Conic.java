@@ -60,10 +60,7 @@ public class Conic extends ConicBase {
         final double by = ray.direction().y();
         final double bz = ray.direction().z();
 
-  /*
-    find intersection point between conical section and ray,
-    telescope optics, page 266
-  */
+        /* find intersection point between conical section and ray, Telescope Optics, Rutten & van Venrooij, page 266 */
         double a = (_sh * MathUtils.square(bz) + MathUtils.square(by) + MathUtils.square(bx));
         double b = ((_sh * bz * az + by * ay + bx * ax) / _roc - bz) * 2.0;
         double c = (_sh * MathUtils.square(az) + MathUtils.square(ay) + MathUtils.square(ax))
@@ -73,6 +70,7 @@ public class Conic extends ConicBase {
         double t;
 
         if (a == 0) {
+            /* when A = 0 there is only 1 solution */
             t = -c / b;
         } else {
             double d = MathUtils.square(b) - 4.0 * a * c / _roc;

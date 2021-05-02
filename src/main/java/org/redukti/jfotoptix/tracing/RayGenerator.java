@@ -27,14 +27,14 @@ Original GNU Optical License and Authors are as follows:
 package org.redukti.jfotoptix.tracing;
 
 import org.redukti.jfotoptix.light.SpectralLine;
-import org.redukti.jfotoptix.material.Air;
-import org.redukti.jfotoptix.material.Medium;
+import org.redukti.jfotoptix.medium.Air;
+import org.redukti.jfotoptix.medium.Medium;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 import org.redukti.jfotoptix.patterns.Distribution;
-import org.redukti.jfotoptix.sys.Element;
-import org.redukti.jfotoptix.sys.OpticalSurface;
-import org.redukti.jfotoptix.sys.PointSource;
+import org.redukti.jfotoptix.model.Element;
+import org.redukti.jfotoptix.model.OpticalSurface;
+import org.redukti.jfotoptix.model.PointSource;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -69,10 +69,10 @@ public class RayGenerator {
                 default:
                 case SourceAtInfinity:
                     direction = Vector3.vector3_001;
-                    position = new Vector3Pair(
+                    Vector3Pair plane = new Vector3Pair(
                             target_surface.get_position(source).minus(Vector3.vector3_001.times(rlen)),
-                            Vector3.vector3_001)
-                            .pl_ln_intersect(new Vector3Pair(r, direction));
+                            Vector3.vector3_001);
+                    position = plane.pl_ln_intersect(new Vector3Pair(r, direction));
                     break;
             }
             for (SpectralLine l : source.spectrum()) {

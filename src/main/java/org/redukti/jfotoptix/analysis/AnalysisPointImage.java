@@ -27,8 +27,8 @@ package org.redukti.jfotoptix.analysis;
 
 import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
-import org.redukti.jfotoptix.sys.Image;
-import org.redukti.jfotoptix.sys.OpticalSystem;
+import org.redukti.jfotoptix.model.Image;
+import org.redukti.jfotoptix.model.OpticalSystem;
 import org.redukti.jfotoptix.tracing.RayTraceParameters;
 import org.redukti.jfotoptix.tracing.RayTraceResults;
 import org.redukti.jfotoptix.tracing.RayTracer;
@@ -41,17 +41,17 @@ import java.util.List;
  * Point image analysis base class
  */
 public class AnalysisPointImage {
-    OpticalSystem _system;
-    RayTracer _tracer;
-    RayTraceParameters _params;
-    boolean _processed_trace;
+    protected OpticalSystem _system;
+    protected RayTracer _tracer;
+    protected RayTraceParameters _params;
+    protected boolean _processed_trace;
     /** Image plan that collect rays for analysis */
-    Image _image;
-    /** The rays intercepted at image place */
-    List<TracedRay> _intercepts;
-    RayTraceResults _results;
+    protected Image _image;
+    /** The rays intercepted at image plane */
+    protected List<TracedRay> _intercepts;
+    protected RayTraceResults _results;
 
-    public AnalysisPointImage (OpticalSystem system)
+    public AnalysisPointImage (OpticalSystem system, int radial_density)
     {
         _system = system;
         _tracer = new RayTracer();
@@ -60,7 +60,7 @@ public class AnalysisPointImage {
         _intercepts = new ArrayList<>();
         _params = new RayTraceParameters(system);
         _params.set_default_distribution (
-                new Distribution (Pattern.HexaPolarDist, 50, 0.999));
+                new Distribution (Pattern.HexaPolarDist, radial_density, 0.999));
         _params.get_default_distribution ().set_uniform_pattern ();
     }
 

@@ -48,3 +48,7 @@ originX	45
 originY	115
 ppmm	2.436
 [notes]
+--trace-density 10 --scenario 0 --output layout --specfile C:\work\github\jfotoptix\examples\canon-50mm-f1.2\canon-rf-50mmf1.2.txt
+--trace-density 10 --skew --scenario 0 --output layout --specfile C:\work\github\jfotoptix\examples\canon-50mm-f1.2\canon-rf-50mmf1.2.txt
+--spot-density 20 --scenario 0 --output spot --specfile C:\work\github\jfotoptix\examples\canon-50mm-f1.2\canon-rf-50mmf1.2.txt
+--spot-density 20 --skew --scenario 0 --output spot --specfile C:\work\github\jfotoptix\examples\canon-50mm-f1.2\canon-rf-50mmf1.2.txt

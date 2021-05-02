@@ -43,35 +43,35 @@ public class Vector3 {
     public static final Vector3 vector3_010 = new Vector3(0.0, 1.0, 0.0);
     public static final Vector3 vector3_100 = new Vector3(1.0, 0.0, 0.0);
 
-    final double[] values;
+    final double[] _values;
 
     public Vector3(double x, double y, double z) {
         if (Double.isNaN(x) || Double.isNaN(y) || Double.isNaN(z)) {
             throw new IllegalArgumentException("NaN");
         }
-        this.values = new double[N];
-        this.values[0] = x;
-        this.values[1] = y;
-        this.values[2] = z;
+        this._values = new double[N];
+        this._values[0] = x;
+        this._values[1] = y;
+        this._values[2] = z;
     }
     public Vector3(double v) {
         this(v, v, v);
     }
 
     private Vector3(double[] values) {
-        this.values = values;
+        this._values = values;
     }
 
     public final double x() {
-        return this.values[0];
+        return this._values[0];
     }
 
     public final double y() {
-        return this.values[1];
+        return this._values[1];
     }
 
     public final double z() {
-        return this.values[2];
+        return this._values[2];
     }
 
     public final Vector3 x(double v) {
@@ -88,7 +88,7 @@ public class Vector3 {
     {
         double r = 0;
         for (int i = 0; i < N; i++)
-            r += values[i] * v.values[i];
+            r += _values[i] * v._values[i];
         return r;
     }
 
@@ -109,7 +109,7 @@ public class Vector3 {
     {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
-            r[i] = values[i] + v.values[i];
+            r[i] = _values[i] + v._values[i];
         return new Vector3(r);
     }
 
@@ -117,7 +117,7 @@ public class Vector3 {
     {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
-            r[i] = values[i] - v.values[i];
+            r[i] = _values[i] - v._values[i];
         return new Vector3(r);
     }
 
@@ -125,7 +125,7 @@ public class Vector3 {
     {
         double[] r = new double[N];
         for ( int i = 0; i < N; i++)
-            r[i] = -values[i];
+            r[i] = -_values[i];
         return new Vector3(r);
     }
 
@@ -140,21 +140,21 @@ public class Vector3 {
     {
         double r = 0;
         for (int i = 0; i < N; i++)
-            r += square (values[i]);
+            r += square (_values[i]);
         return Math.sqrt (r);
     }
 
     public Vector3 times(double scale) {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
-            r[i] = values[i] * scale;
+            r[i] = _values[i] * scale;
         return new Vector3(r);
     }
 
     public Vector3 divide(double scale) {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
-            r[i] = values[i] / scale;
+            r[i] = _values[i] / scale;
         return new Vector3(r);
     }
 
@@ -163,10 +163,10 @@ public class Vector3 {
     }
 
     public double v(int i) {
-        return this.values[i];
+        return this._values[i];
     }
     public Vector3 v(int i, double d) {
-        double[] val = this.values.clone();
+        double[] val = this._values.clone();
         val[i] = d;
         return new Vector3(val);
     }

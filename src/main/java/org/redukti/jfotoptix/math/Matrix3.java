@@ -32,7 +32,7 @@ package org.redukti.jfotoptix.math;
 public class Matrix3 {
 
     /* row major storage for 3d matrix */
-    final double _values[];
+    private final double _values[];
 
     private Matrix3(double[] values) {
         this._values = values;
@@ -98,7 +98,7 @@ public class Matrix3 {
         for (int i = 0; i < 3; i++) {
             double s = 0;
             for (int k = 0; k < 3; k++) {
-                s += _values[idx(i, k)] * v.values[k];
+                s += _values[idx(i, k)] * v._values[k];
             }
             r[i] = s;
         }

@@ -27,10 +27,10 @@ Original GNU Optical License and Authors are as follows:
 package org.redukti.jfotoptix.tracing;
 
 import org.redukti.jfotoptix.light.LightRay;
-import org.redukti.jfotoptix.material.Medium;
+import org.redukti.jfotoptix.medium.Medium;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
-import org.redukti.jfotoptix.sys.Element;
+import org.redukti.jfotoptix.model.Element;
 
 /**
  * Propagated light ray class
@@ -138,6 +138,6 @@ public class TracedRay extends LightRay {
     }
 
     public String toString() {
-        return "TracedRay{src=" + _creator.id() + ",wavelen=" + _wavelen + ",origin=" + _ray.origin() + ",direction=" + _ray.direction() + ",len=" + _len + '}';
+        return "TracedRay{from=" + _creator.id() + ",to=" + (_i_element != null ? _i_element.id() : "null") + ",wavelen=" + _wavelen + ",origin=" + _ray.origin() + ",direction=" + _ray.direction() + ",intercept=" + _point + '}';
     }
 }

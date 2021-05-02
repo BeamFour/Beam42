@@ -43,4 +43,6 @@ public interface Curve {
 
     /** Get normal to curve surface at specified point. */
     Vector3 normal (Vector3 point);
+
+    double get_curvature();
 }

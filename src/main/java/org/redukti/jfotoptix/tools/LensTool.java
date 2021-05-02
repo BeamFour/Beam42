@@ -6,26 +6,37 @@ import org.redukti.jfotoptix.layout.SystemLayout2D;
 import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.math.Matrix3;
 import org.redukti.jfotoptix.math.Vector3;
+import org.redukti.jfotoptix.parax.YNUTrace;
 import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
 import org.redukti.jfotoptix.rendering.RendererSvg;
 import org.redukti.jfotoptix.rendering.Rgb;
-import org.redukti.jfotoptix.sys.OpticalSystem;
-import org.redukti.jfotoptix.sys.PointSource;
+import org.redukti.jfotoptix.model.OpticalSystem;
+import org.redukti.jfotoptix.model.PointSource;
 import org.redukti.jfotoptix.tracing.RayTraceParameters;
 import org.redukti.jfotoptix.tracing.RayTraceRenderer;
 import org.redukti.jfotoptix.tracing.RayTraceResults;
 import org.redukti.jfotoptix.tracing.RayTracer;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
+
 public class LensTool {
 
     static final class Args {
         int scenario = 0;
-        String filename = null;
+        String specfile = null;
         String outputType = "layout";
+        String outputFile = null;
         boolean skewRays = false;
         boolean dumpSystem = false;
         boolean use_glass_types = true;
+        int trace_density = 10;
+        int spot_density = 20;
+        boolean include_lost_rays = true;
+        boolean only_d_line = false;
     }
 
     static Args parseArguments(String[] args) {
@@ -34,7 +45,11 @@ public class LensTool {
             String arg1 = args[i];
             String arg2 = i+1 < args.length ? args[i+1] : null;
             if (arg1.equals("--specfile")) {
-                arguments.filename = arg2;
+                arguments.specfile = arg2;
+                i++;
+            }
+            else if (arg1.equals("-o")) {
+                arguments.outputFile = arg2;
                 i++;
             }
             else if (arg1.equals("--scenario")) {
@@ -54,6 +69,20 @@ public class LensTool {
             else if (arg1.equals("--dump-system")) {
                 arguments.dumpSystem = true;
             }
+            else if (arg1.equals("--exclude-lost-rays")) {
+                arguments.include_lost_rays = false;
+            }
+            else if (arg1.equals("--trace-density")) {
+                arguments.trace_density = Integer.parseInt(arg2);
+                i++;
+            }
+            else if (arg1.equals("--spot-density")) {
+                arguments.spot_density = Integer.parseInt(arg2);
+                i++;
+            }
+            else if (arg1.equals("--only-d-line")) {
+                arguments.only_d_line = true;
+            }
         }
         return arguments;
     }
@@ -61,14 +90,18 @@ public class LensTool {
 
     public static void main(String[] args) throws Exception {
         Args arguments = parseArguments(args);
-        if (arguments.filename == null) {
-            System.err.println("Usage: --specfile inputfile [--scenario num] [--skew] [--output layout|spot] [--dump-system]");
+        if (arguments.specfile == null) {
+            System.err.println("Usage: --specfile inputfile [--scenario num] [--skew] [--output layout|spot] [--dump-system] [--exclude-lost-rays] [--spot-density n] [--trace-density n] [--only-d-line] [--output outfilename]");
+            System.err.println("       --spot-density defaults to 50");
+            System.err.println("       --trace-density defaults to 20");
+            System.err.println("       --scenario defaults to 0");
+            System.err.println("       Output file will be created in the same location as the specfile");
             System.exit(1);
         }
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
-        specs.parse_file(arguments.filename);
-        OpticalSystem.Builder systemBuilder = OpticalBenchDataImporter.buildSystem(specs, arguments.scenario);
-        double angleOfView = OpticalBenchDataImporter.getAngleOfViewInRadians (specs, arguments.scenario);
+        specs.parse_file(arguments.specfile);
+        OpticalSystem.Builder systemBuilder = OpticalBenchDataImporter.build_system(specs, arguments.scenario);
+        double angleOfView = OpticalBenchDataImporter.get_angle_of_view_in_radians(specs, arguments.scenario);
         Vector3 direction = Vector3.vector3_001;
         if (arguments.skewRays)
         {
@@ -80,9 +113,11 @@ public class LensTool {
             direction = r.times(direction);
         }
         PointSource.Builder ps = new PointSource.Builder(PointSource.SourceInfinityMode.SourceAtInfinity, direction)
-                .add_spectral_line(SpectralLine.d)
-                .add_spectral_line(SpectralLine.C)
-                .add_spectral_line(SpectralLine.F);
+                .add_spectral_line(SpectralLine.d);
+        if (!arguments.only_d_line) {
+            ps.add_spectral_line(SpectralLine.C)
+                    .add_spectral_line(SpectralLine.F);
+        }
         systemBuilder.add(ps);
 
         OpticalSystem system = systemBuilder.build();
@@ -97,19 +132,38 @@ public class LensTool {
             RayTraceParameters parameters = new RayTraceParameters(system);
             RayTracer rayTracer = new RayTracer();
             parameters.set_default_distribution(
-                    new Distribution(Pattern.MeridionalDist, 20, 0.999));
+                    new Distribution(Pattern.MeridionalDist, arguments.trace_density, 0.999));
             if (arguments.dumpSystem) {
                 System.out.println(parameters.sequenceToString(new StringBuilder()).toString());
             }
             RayTraceResults result = rayTracer.trace(system, parameters);
-            RayTraceRenderer.draw_2d(renderer, result, false, null);
-            System.out.println(renderer.write(new StringBuilder()).toString());
+            RayTraceRenderer.draw_2d(renderer, result, !arguments.include_lost_rays, null);
+            if (arguments.outputFile != null) {
+                createOutputFile(arguments, renderer.write(new StringBuilder()).toString());
+            }
+            else {
+                System.out.println(renderer.write(new StringBuilder()).toString());
+            }
+            result.report();
         }
-        if (arguments.outputType.equals("spot")) {
+        else if (arguments.outputType.equals("spot")) {
             RendererSvg renderer = new RendererSvg(300, 300, Rgb.rgb_black);
-            AnalysisSpot spot = new AnalysisSpot(system);
+            AnalysisSpot spot = new AnalysisSpot(system, arguments.spot_density);
             spot.draw_diagram(renderer, true);
-            System.out.println(renderer.write(new StringBuilder()).toString());
+            if (arguments.outputFile != null) {
+                createOutputFile(arguments, renderer.write(new StringBuilder()).toString());
+            }
+            else {
+                System.out.println(renderer.write(new StringBuilder()).toString());
+            }
         }
+        YNUTrace ynuTrace = new YNUTrace();
+        ynuTrace.trace(system, 1.0, 0.0, -1e10);
+    }
+
+    private static void createOutputFile(Args arguments, String string) throws IOException {
+        Path path = new File(arguments.specfile).toPath().toAbsolutePath();
+        Path outpath = Paths.get(path.getParent().toString(), arguments.outputFile);
+        Files.write(outpath, string.getBytes(StandardCharsets.UTF_8), StandardOpenOption.TRUNCATE_EXISTING);
     }
 }

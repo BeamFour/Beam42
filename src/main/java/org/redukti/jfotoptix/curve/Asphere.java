@@ -8,21 +8,43 @@ import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 
+/**
+ * Let
+ * s^2 = x^2 + y^2
+ *
+ * Sagitta equation:
+ *
+ * z = f(s) = c*s^2/(1 + (1 - c^2*K*s^2)^(1/2)) + A_4*s^4 + A_6*s^6 + A_8*s^8
+ * + A_10*s^10 + A_12*s^12 + A_14*s^14
+ *
+ * Above equation corresponds to the eq (16) in 'General Ray-Tracing Procedure'
+ * paper. The equation used in Feder paper is slightly different.
+ *
+ * Above, c = 1/r, curvature.
+ * K < 0, hyperboloid
+ * K = 0, Paraboloid
+ * 0 < K < 1, hemelipsoid of revolution about major axis
+ * K = 1, hemisphere
+ * K > 1, hemelipsoid of revolution about minor axis
+ *
+ * I believe K = 1 + Schwarzschild Constant
+ *
+ */
 public class Asphere extends ConicBase {
-    final double _r;        /* radius */
-    final double _c;        /* curvature = 1/_r */
-    final double _k;        /* K - eccentricity constant */
-    final double _A4;       /* deformation polynomial coefficient */
-    final double _A6;       /* deformation polynomial coefficient */
-    final double _A8;       /* deformation polynomial coefficient */
-    final double _A10;      /* deformation polynomial coefficient */
-    final double _A12;      /* deformation polynomial coefficient */
-    final double _A14;      /* deformation polynomial coefficient */
+    protected final double _r;        /* radius */
+    protected final double _c;        /* curvature = 1/_r */
+    protected final double _k;        /* K = 1 + Schwarzschild Constant =  */
+    protected final double _A4;       /* deformation polynomial coefficient */
+    protected final double _A6;       /* deformation polynomial coefficient */
+    protected final double _A8;       /* deformation polynomial coefficient */
+    protected final double _A10;      /* deformation polynomial coefficient */
+    protected final double _A12;      /* deformation polynomial coefficient */
+    protected final double _A14;      /* deformation polynomial coefficient */
     boolean _feder_algo = true; /* Use the algorithms by Feder */
 
     public Asphere(double r, double k, double A4, double A6, double A8, double A10,
                    double A12, double A14) {
-        super(r, k);
+        super(r, k-1);
         _r = r;
         _c = 1.0 / r;
         _k = k;
@@ -44,6 +66,8 @@ public class Asphere extends ConicBase {
      * https://github.com/dibyendumajumdar/ray.
      * Note that Feder's paper uses x-axis rather than z-axis as the
      * optical axis, so below we switch from x to z.
+     *
+     * Returns null if no intersection was found.
      */
     public static Vector3Pair compute_intersection(Vector3 origin, Vector3 direction, Asphere S) {
         /* direction (X,Y,Z) is the vector along the ray to the surface */
@@ -72,7 +96,7 @@ public class Asphere extends ConicBase {
         double xi_1 = Math.sqrt((direction.z() * direction.z())
                 - S._c * (S._c * M_1_2 - 2.0 * M_1x));
         if (Double.isNaN(xi_1)) { /* NaN! reject this ray! */
-            System.err.println("Nan value\n");
+            //System.err.println("Nan value\n");
             return null;
         }
         /* Feder paper equation (5) */
@@ -129,7 +153,7 @@ public class Asphere extends ConicBase {
             /* (1 - k*c^2*s^2)^(1/2) - part of equation (12) */
             double temp = Math.sqrt(1.0 - S._c * S._c * s_2 * S._k);
             if (Double.isNaN(temp) || (1.0 + temp) == 0.0) {
-                System.err.println("Nan or zero divide value\n");
+                //System.err.println("Nan or zero divide value\n");
                 return null;
             }
             /* Feder equation (12) */
@@ -157,7 +181,7 @@ public class Asphere extends ConicBase {
         }
         while ((delta > tolerance) && (++j < TOLMAX));
         if (j >= TOLMAX) {
-            System.err.println(String.format("rayTrace: delta=%g, reached %d iterations!?!\n", delta, j));
+            //System.err.println(String.format("rayTrace: delta=%g, reached %d iterations!?!\n", delta, j));
             return null;
         }
         return new Vector3Pair(result, N);

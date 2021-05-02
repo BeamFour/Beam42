@@ -26,13 +26,15 @@ package org.redukti.jfotoptix.curve;
 
 public abstract class ConicBase extends RotationalRoc {
 
-    double _sh; // Schwarzschild constant + 1
+    protected double _sh; // Schwarzschild constant + 1
 
     public ConicBase (double roc, double sc) {
         super (roc);
         _sh = sc + 1;
     }
 
+    // FIXME this looks wrong
+    // As SC = -e^2
     public double get_eccentricity ()
     {
         return Math.sqrt (-_sh + 1.0);

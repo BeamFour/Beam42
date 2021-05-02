@@ -34,9 +34,9 @@ import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 import org.redukti.jfotoptix.shape.Disk;
 import org.redukti.jfotoptix.shape.Ellipse;
-import org.redukti.jfotoptix.sys.Element;
-import org.redukti.jfotoptix.sys.Group;
-import org.redukti.jfotoptix.sys.MirrorSurface;
+import org.redukti.jfotoptix.model.Element;
+import org.redukti.jfotoptix.model.Group;
+import org.redukti.jfotoptix.model.MirrorSurface;
 
 import java.util.ArrayList;
 import java.util.List;

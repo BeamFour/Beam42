@@ -39,9 +39,9 @@ public interface Shape {
     boolean inside (Vector2 point);
 
     /** Get points distributed on shape area with given pattern */
-    void get_pattern (Consumer<Vector2> f,
-                      Distribution d,
-                      boolean unobstructed);
+//    void get_pattern (Consumer<Vector2> f,
+//                      Distribution d,
+//                      boolean unobstructed);
 
     /** Get distance between origin and farthest shape edge */
     double max_radius ();

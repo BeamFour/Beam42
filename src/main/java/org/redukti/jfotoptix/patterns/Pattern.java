@@ -44,5 +44,7 @@ public enum Pattern {
     /** Hexapolar pattern, suitable for circular shapes */
     HexaPolarDist,
     /** Random distribution */
-    RandomDist
+    RandomDist,
+    /** User defined */
+    UserDefined,
 }

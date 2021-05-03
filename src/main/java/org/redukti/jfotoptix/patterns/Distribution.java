@@ -26,6 +26,10 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.patterns;
 
+import org.redukti.jfotoptix.math.Vector2;
+
+import java.util.List;
+
 import static org.redukti.jfotoptix.patterns.Pattern.DefaultDist;
 
 /**
@@ -43,6 +47,7 @@ public class Distribution {
     Pattern _pattern;
     int _radial_density;
     double _scaling;
+    List<Vector2> _user_defined_points;
 
     /** Creates a distribution pattern with specified pattern,
      radial ray density and scaling.
@@ -58,6 +63,14 @@ public class Distribution {
         this._pattern = pattern;
         this._radial_density = radial_density;
         this._scaling = scaling;
+    }
+
+    public void set_user_defined_points(List<Vector2> points) {
+        this._user_defined_points = points;
+    }
+
+    public List<Vector2> get_user_defined_points() {
+        return this._user_defined_points;
     }
 
     public Distribution() {

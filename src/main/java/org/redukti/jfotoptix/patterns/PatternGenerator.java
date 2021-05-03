@@ -6,6 +6,7 @@ import org.redukti.jfotoptix.shape.Round;
 import org.redukti.jfotoptix.shape.Shape;
 import org.redukti.jfotoptix.shape.ShapeBase;
 
+import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -181,6 +182,16 @@ public class PatternGenerator {
                 break;
             }
 
+            case UserDefined: {
+                List<Vector2> points = d.get_user_defined_points();
+                if (points != null && !points.isEmpty()) {
+                    for (Vector2 v: points) {
+                        f.accept(v);
+                    }
+                }
+                break;
+            }
+
             default:
                 throw new IllegalArgumentException("distribution pattern not supported for this shape");
         }
@@ -286,6 +297,16 @@ public class PatternGenerator {
             }
             break;
 
+            case UserDefined: {
+                List<Vector2> points = d.get_user_defined_points();
+                if (points != null && !points.isEmpty()) {
+                    for (Vector2 v: points) {
+                        f.accept(v);
+                    }
+                }
+                break;
+            }
+
             default: {
                 Consumer<Vector2> f2 = (Vector2 v) -> {
                     // unobstructed pattern must be inside external
@@ -365,6 +386,16 @@ public class PatternGenerator {
                 for (y = step.y(); y < hs.y() + epsilon; y += step.y()) {
                     f.accept(new Vector2(0, y));
                     f.accept(new Vector2(0, -y));
+                }
+                break;
+            }
+
+            case UserDefined: {
+                List<Vector2> points = d.get_user_defined_points();
+                if (points != null && !points.isEmpty()) {
+                    for (Vector2 v: points) {
+                        f.accept(v);
+                    }
                 }
                 break;
             }

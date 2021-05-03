@@ -1,19 +1,25 @@
 package org.redukti.jfotoptix.examples;
 
 import org.redukti.jfotoptix.analysis.AnalysisSpot;
+import org.redukti.jfotoptix.analysis.ChiefRayFinder;
 import org.redukti.jfotoptix.importers.OpticalBenchDataImporter;
 import org.redukti.jfotoptix.layout.SystemLayout2D;
-import org.redukti.jfotoptix.parax.YNUTrace;
-import org.redukti.jfotoptix.rendering.RendererSvg;
 import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.math.Matrix3;
+import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector3;
-import org.redukti.jfotoptix.patterns.Distribution;
-import org.redukti.jfotoptix.patterns.Pattern;
-import org.redukti.jfotoptix.rendering.Rgb;
 import org.redukti.jfotoptix.model.OpticalSystem;
 import org.redukti.jfotoptix.model.PointSource;
-import org.redukti.jfotoptix.tracing.*;
+import org.redukti.jfotoptix.patterns.Distribution;
+import org.redukti.jfotoptix.patterns.Pattern;
+import org.redukti.jfotoptix.rendering.RendererSvg;
+import org.redukti.jfotoptix.rendering.Rgb;
+import org.redukti.jfotoptix.tracing.RayTraceParameters;
+import org.redukti.jfotoptix.tracing.RayTraceRenderer;
+import org.redukti.jfotoptix.tracing.RayTraceResults;
+import org.redukti.jfotoptix.tracing.SequentialRayTracer;
+
+import java.util.List;
 
 public class Canon50mm {
 
@@ -41,24 +47,28 @@ public class Canon50mm {
                 .add_spectral_line(SpectralLine.F);
         systemBuilder.add(ps);
 
-        RendererSvg renderer = new RendererSvg( 800, 400);
         OpticalSystem system = systemBuilder.build();
         System.out.println(system);
+
         // draw 2d system layout
-//        system.draw_2d_fit(renderer);
-//        system.draw_2d(renderer);
+        RendererSvg renderer = new RendererSvg( 800, 400);
         SystemLayout2D systemLayout2D = new SystemLayout2D();
         systemLayout2D.layout2d(renderer, system);
 
         RayTraceParameters parameters = new RayTraceParameters(system);
 
         SequentialRayTracer rayTracer = new SequentialRayTracer();
-        parameters.set_default_distribution (
-                new Distribution(Pattern.MeridionalDist, 10, 0.999));
+        Distribution d = new Distribution(Pattern.UserDefined, 10, 0.999);
+        d.set_user_defined_points(List.of(new Vector2(0,-20.2)));
+        parameters.set_default_distribution (d);
         // TODO set save generated state on point source
         System.out.println(parameters.sequenceToString(new StringBuilder()).toString());
 
         RayTraceResults result = rayTracer.trace(system, parameters);
+        RayTraceRenderer.draw_2d(renderer, result, false, null);
+        System.out.println(renderer.write(new StringBuilder()).toString());
+
+        result = ChiefRayFinder.findChiefRay(system);
         RayTraceRenderer.draw_2d(renderer, result, false, null);
         System.out.println(renderer.write(new StringBuilder()).toString());
 

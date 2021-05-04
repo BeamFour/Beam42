@@ -1,0 +1,7 @@
+ 4 surfaces         VPHGrating.OPT
+  Index     Z     Type?   Gx,g/um   Order   Diam
+---------:-----:--------:----------:-----:---------
+         :  1  :  Lens  :          :     :  5
+  1.50   : 1.5 :  Lens  :  1.00    :  1  :  5
+  1.50   :  2  :  Lens  :          :     :  5
+         :  3  :        :          :     :  5

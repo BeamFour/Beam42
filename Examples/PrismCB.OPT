@@ -1,0 +1,14 @@
+  11 surfaces         PrismCB.OPT
+  index    Type                  Z          Curv      Aspher     pitch        Diam
+----------:-----:-----------:------------:----------:----------:-----.------:-------:-------
+          :     :collim lens:    1       :  +2      : -2.25    :            :  2    :
+  1.5000  :     :Collim lens:    2       :   0      :          :            :  2    :
+          :CBin :           :    3       :          :          :            :  2    :
+          :CBout:           :    4       :          :          :   11.279678a  2    :
+          :     :Prism surf :    5       :   0      :          :  -20       :  2    :
+  N-BK7   :     :Prism surf :    6       :   0      :          :  +20       :  2    :
+          :CBin :           :    7       :          :          :  -11.279678A  2    :
+          :CBout:           :    8       :          :          :            :  2    :
+          :     :Camera lens:    9       :   0      :          :            :  2    :
+  1.5000  :     :Camera lens:   10       : -2       : -2.25    :            :  2    :
+          :     :focus      :   11       :          :          :            :  2    :

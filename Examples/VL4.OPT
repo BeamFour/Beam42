@@ -1,0 +1,11 @@
+  2 surfaces   VL4.OPT       exercising each of 20 explicit VLS groove density parameters
+  Z,mm  tilt pitch roll Diam Type?   Order VX00 VY00 VX10 VX20 VX30 VX40 VY01 VY02 VY03 VY04 VY10 VY11 VY12 VY13 VY20 VY21 VY22 VY30 VY31 VY40
+-------:----:-----:----:----:-------:-----:----:----:----:----:----:----:----:----:----:----:----:----:----:----:----:----:----:----:----:----:--
+  100  :  0 :   0 : 0  : 20 :Mirror :  1  : 1  :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :
+    0  :  0 :   0 :    :100 :       :     :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :
+       :    :     :    :    :       :     : ok : ok : ok : ok : ok : ok : ok : ok : ok : ok : ok : ok : ok : ok : ok : ok : ok : ok : ok : ok :
+       :    :     :    :    :       :     :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :
+       :    :     :    :    :       :     :"GX":"GY" are synonyms for "VX00" and "VY00"     :    :    :    :    :    :    :    :    :    :    :
+       :    :     :    :    :       :     :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :
+       :    :     :    :    :       :     :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :
+       :    :     :    :    :       :     :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :    :

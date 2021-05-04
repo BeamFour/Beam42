@@ -1,0 +1,6 @@
+ 3 surfaces          SquareGrating.OPT
+  Index   x      Z   pitch   Type?  Gx,g/um Order  Dx   Dy  f
+-------:-----:-----:------:--------:-------:-----:----:----:-:--------
+       :  0  :   5 :      :  Lens  :       :     :  4 : 4  :S:
+  1.66 :  0  :   6 :      :  Lens  : 1.667 :  1  :  4 : 4  :S:
+       :  2  :  12 :  15  :  Iris  :       :     :  4 : 4  :S:

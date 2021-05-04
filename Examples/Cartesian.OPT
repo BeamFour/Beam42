@@ -1,0 +1,10 @@
+   4 surfaces     Cartesian.OPT
+  index    Type      Z         Curv       Aspher     pitch        Diam
+----------:-----:------------:----------:----------:-----.------:-------:-------
+          :iris :   0.5      :          :          :            :  1.0  :
+          :     :    1       :  +2      : -2.25    :            :  1.00 :
+  1.5     :     :    2       :  -2      : -2.25    :            :  1.0  :
+          :film :    3       :          :          :            :  1    :
+
+Cartesian Ovals :    two aplanatic  hyperbolic refracting lens surfaces;
+Curvature=Power/(n-1) and Asphericity = -n^2.

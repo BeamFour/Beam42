@@ -1,0 +1,6 @@
+ 3 surfaces       TransGrating.OPT
+  Index     Z     Type?   Gx,g/um   Order   Diam
+---------:-----:--------:----------:-----:---------
+         :  1  :  Lens  :  0.60    :  1  :  5
+  1.50   :  2  :  Lens  :          :     :  5
+         :  3  :        :          :     :  5

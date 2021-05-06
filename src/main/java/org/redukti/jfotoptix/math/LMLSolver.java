@@ -48,6 +48,14 @@ public class LMLSolver {
     private double[][] alpha;      // local
     private double[][] amatrix;    // local
 
+    /**
+     * Builds an instance of the solver.
+     *
+     * @param gH User defined function
+     * @param gtol Tolerance
+     * @param gnparms # of parameters to adjust
+     * @param gnpts # of points to fit to
+     */
     public LMLSolver(LMLFunction gH, double gtol, int gnparms, int gnpts)
     // Constructor sets up private fields, including host for callbacks.
     {

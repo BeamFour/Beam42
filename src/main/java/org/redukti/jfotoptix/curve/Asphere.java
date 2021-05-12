@@ -62,6 +62,42 @@ public class Asphere extends ConicBase {
         this._feder_algo = feder_algo;
     }
 
+    public double get_c() {
+        return _c;
+    }
+
+    public double get_k() {
+        return _k;
+    }
+
+    public double get_A2() {
+        return 0.0;
+    }
+
+    public double get_A4() {
+        return _A4;
+    }
+
+    public double get_A6() {
+        return _A6;
+    }
+
+    public double get_A8() {
+        return _A8;
+    }
+
+    public double get_A10() {
+        return _A10;
+    }
+
+    public double get_A12() {
+        return _A12;
+    }
+
+    public double get_A14() {
+        return _A14;
+    }
+
     /* computes intersection using Feder's equations - code is taken from
      * https://github.com/dibyendumajumdar/ray.
      * Note that Feder's paper uses x-axis rather than z-axis as the

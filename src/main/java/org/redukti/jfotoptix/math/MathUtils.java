@@ -46,5 +46,14 @@ public class MathUtils {
     public static DecimalFormat decimal_format() {
         return decimal_format(3);
     }
+    public static DecimalFormat decimal_format_scientific(int maxFractionDigits) {
+        DecimalFormat _decimal_format = new DecimalFormat("0.0E0");
+        //formatter.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+        _decimal_format.setMinimumIntegerDigits(1);
+        _decimal_format.setMaximumFractionDigits(maxFractionDigits);
+        _decimal_format.setDecimalSeparatorAlwaysShown(false);
+        _decimal_format.setGroupingUsed(true);
+        return _decimal_format;
+    }
 
 }

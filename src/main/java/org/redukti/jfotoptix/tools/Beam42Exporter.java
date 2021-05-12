@@ -5,10 +5,20 @@ import org.redukti.jfotoptix.curve.Curve;
 import org.redukti.jfotoptix.importers.OpticalBenchDataImporter;
 import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.math.MathUtils;
+import org.redukti.jfotoptix.math.Matrix3;
+import org.redukti.jfotoptix.math.Vector2;
+import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.model.*;
+import org.redukti.jfotoptix.patterns.Distribution;
+import org.redukti.jfotoptix.patterns.Pattern;
+import org.redukti.jfotoptix.shape.Round;
+import org.redukti.jfotoptix.shape.Shape;
+import org.redukti.jfotoptix.tracing.*;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class Beam42Exporter {
@@ -207,6 +217,110 @@ public class Beam42Exporter {
         return arguments;
     }
 
+    static final ColumnDef[] ray_columns = {
+            new ColumnDef("X0", 20, MathUtils.decimal_format(12)),
+            new ColumnDef("Y0", 20, MathUtils.decimal_format(12)),
+            new ColumnDef("Z0", 20, MathUtils.decimal_format(12)),
+            new ColumnDef("U0", 20, MathUtils.decimal_format(12)),
+            new ColumnDef("V0", 20, MathUtils.decimal_format(12)),
+            new ColumnDef("W0", 20, MathUtils.decimal_format(21)),
+            new ColumnDef("xfinal", 16, null),
+            new ColumnDef("notes", 30, null),
+//            new ColumnDef("@", 20, MathUtils.decimal_format(10)),
+    };
+
+    static final int X0_col = 0;
+    static final int Y0_col = 1;
+    static final int Z0_col = 2;
+    static final int U0_col = 3;
+    static final int V0_col = 4;
+    static final int W0_col = 5;
+    static final int xfinal_col = 6;
+    static final int notes_col = 7;
+    static final int At_col = 99;
+
+
+    static String generate_rays_table2(List<TracedRay> rays, Vector3 direction) {
+        StringBuilder sb = new StringBuilder();
+        double wvln = SpectralLine.d/1000.0;
+        sb.append(rays.size()).append(" rays").append(System.lineSeparator());
+        generate_heading(sb, ray_columns);
+        generate_heading_line(sb, ray_columns);
+        for (TracedRay ray: rays) {
+            //Vector3 pt = ray.get_intercept_point();
+            Vector3 pt = ray.get_position();
+            sb.append(ray_columns[X0_col].pad(pt.x())).append(":")
+                    .append(ray_columns[Y0_col].pad(pt.y())).append(":")
+                    .append(ray_columns[Z0_col].pad(pt.z())).append(":")
+                    .append(ray_columns[U0_col].pad(direction.x())).append(":")
+                    .append(ray_columns[V0_col].pad(direction.y())).append(":")
+                    .append(ray_columns[W0_col].pad(direction.z())).append(":")
+//                    .append(ray_columns[At_col].pad(wvln)).append(":")
+                    .append(ray_columns[xfinal_col].pad("")).append(":")
+                    .append(ray_columns[notes_col].pad("")).append(":")
+                    .append(" ").append(System.lineSeparator());
+
+        }
+        return sb.toString();
+    }
+
+    static String generate_rays_table(List<Vector3> rays, Vector3 direction) {
+        StringBuilder sb = new StringBuilder();
+        double wvln = SpectralLine.d/1000.0;
+        sb.append(rays.size()).append(" rays").append(System.lineSeparator());
+        generate_heading(sb, ray_columns);
+        generate_heading_line(sb, ray_columns);
+        for (Vector3 pt: rays) {
+            sb.append(ray_columns[X0_col].pad(pt.x())).append(":")
+                    .append(ray_columns[Y0_col].pad(pt.y())).append(":")
+                    .append(ray_columns[Z0_col].pad(pt.z())).append(":")
+                    .append(ray_columns[U0_col].pad(direction.x())).append(":")
+                    .append(ray_columns[V0_col].pad(direction.y())).append(":")
+                    .append(ray_columns[W0_col].pad(direction.z())).append(":")
+//                    .append(ray_columns[At_col].pad(wvln)).append(":")
+                    .append(ray_columns[xfinal_col].pad("")).append(":")
+                    .append(ray_columns[notes_col].pad("")).append(":")
+                    .append(" ").append(System.lineSeparator());
+
+        }
+        return sb.toString();
+    }
+
+
+    private static void get_pattern_meridional(OpticalSurface surface, double obj_angle, Consumer<Vector3> f) {
+        Asphere curve = (Asphere) surface.get_curve();
+        Round shape = (Round) surface.get_shape();
+        final double hr = shape.get_internal_xradius() * (2.0 - 0.999);
+        final double tr = shape.get_external_xradius() * 0.999;
+        final double epsilon = 1e-8;
+        final double bound = epsilon;
+        final int density = 10;
+        int rdens = (int) Math.floor((double) density
+                - (density * (hr / tr)));
+        rdens = Math.max(1, rdens);
+        final double step = (tr - hr) / rdens;
+        final double xyr = 1.0 / shape.get_xy_ratio();
+
+        for (double r = tr; r > bound; r -= step) {
+            //double y = r * xyr;
+            double y = r;
+            double z = curve.sagitta(new Vector2(0, y));
+            double distance = 10.0 + z;
+            double y_ht = -distance * Math.tan(obj_angle) - y;
+            Vector3 pt = new Vector3(0, y_ht, -distance);
+            f.accept(pt);
+        }
+    }
+
+    static String generate_rays_table(OpticalSurface surface, double obj_angle) {
+        Vector3 direction = new Vector3(0, Math.sin(obj_angle), Math.cos(obj_angle));
+        List<Vector3> list = new ArrayList<>();
+        get_pattern_meridional(surface, obj_angle, (v) -> {
+            list.add(v);
+        });
+        return generate_rays_table(list, direction);
+    }
+
     public static void main(String[] args) throws Exception {
         System.out.println("[" + new StringPadding(10).pad_left("abc") + "]");
         System.out.println("length = " + new StringPadding(10).pad_left("abc").length());
@@ -215,11 +329,67 @@ public class Beam42Exporter {
             System.err.println("Usage: --specfile inputfile [--scenario num]");
             System.exit(1);
         }
+        arguments.only_d_line = true;
+        arguments.skewRays = true;
+
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(arguments.specfile);
-        OpticalSystem system = OpticalBenchDataImporter.build_system(specs, arguments.scenario, arguments.use_glass_types).build();
+        OpticalSystem.Builder systemBuilder = OpticalBenchDataImporter.build_system(specs, arguments.scenario, arguments.use_glass_types);
+        OpticalSystem system = systemBuilder.build();
         Beam42Exporter exporter = new Beam42Exporter();
         System.out.println(exporter.generate(specs, system, arguments.scenario));
+
+        double angleOfView = OpticalBenchDataImporter.get_angle_of_view_in_radians(specs, arguments.scenario);
+        Vector3 direction = Vector3.vector3_001;
+        if (arguments.skewRays)
+        {
+            // Construct unit vector at an angle
+            //      double z1 = cos (angleOfView);
+            //      double y1 = sin (angleOfView);
+            //      unit_vector = math::Vector3 (0, y1, z1);
+            Matrix3 r = Matrix3.get_rotation_matrix(0, angleOfView);
+            direction = r.times(direction);
+        }
+
+        System.out.println("DIRECTION " + direction.toString());
+
+        PointSource.Builder ps = new PointSource.Builder(PointSource.SourceInfinityMode.SourceAtInfinity, direction)
+                .add_spectral_line(SpectralLine.d);
+        if (!arguments.only_d_line) {
+            ps.add_spectral_line(SpectralLine.C)
+                    .add_spectral_line(SpectralLine.F);
+        }
+        systemBuilder.add(ps);
+        system = systemBuilder.build();
+        RayTraceParameters parameters = new RayTraceParameters(system);
+        RayTracer rayTracer = new RayTracer();
+        parameters.set_default_distribution(
+                new Distribution(Pattern.MeridionalDist, arguments.trace_density, 0.999));
+        if (arguments.dumpSystem) {
+            System.out.println(parameters.sequenceToString(new StringBuilder()).toString());
+        }
+        RayTraceResults result = rayTracer.trace(system, parameters);
+
+        Element firstSurface = system.get_sequence().stream().filter(e -> e instanceof OpticalSurface).findFirst().orElse(null);
+        System.out.println(generate_rays_table((OpticalSurface) firstSurface, angleOfView));
+//        List<TracedRay> rays_at_first_surface = result.get_intercepted(firstSurface);
+
+        //Element source = system.get_sequence().stream().filter(e -> e instanceof RaySource).findFirst().orElse(null);
+
+
+        //List<TracedRay> rays_at_source = result.get_generated(source);
+        //System.out.println(generate_rays_table(rays_at_source, direction));
+//
+//        OpticalSurface s1 = (OpticalSurface) firstSurface;
+//        Asphere curve = (Asphere) s1.get_curve();
+//        double obj_angle = angleOfView;
+//        double distance = 10.0 - curve.sagitta(new Vector2(0, 15.0));
+//        //distance = 939.811951160431;
+//        double y_ht = -distance * Math.tan(obj_angle) - 15.0;
+//        Vector3 pt = new Vector3(0, y_ht, distance);
+//        Vector3 cosines = new Vector3(0, Math.sin(obj_angle), Math.cos(obj_angle));
+//
+//        System.out.println(pt.toString() + " " + cosines.toString());
     }
 
 }

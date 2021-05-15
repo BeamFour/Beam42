@@ -454,11 +454,6 @@ public class OptParser extends ParserBase {
         DMF.giFlags[OMEDIANEEDED] = bAllRefractNumeric ? FALSE : TRUE;
     }
 
-    char getTag(int f, int r) {
-        // FIXME
-        return ' ';
-    }
-
     boolean isAdjustable(int jsurf, int iatt)
     // Tests for range of adjustable attributes & tag chars.
     // Assumes that oI2F[] and cTags[][] are properly set.

@@ -100,6 +100,10 @@ public abstract class ParserBase {
         return len;
     }
 
+    public char getTag(int f, int jrow)
+    {
+        return charTable[jrow][iFieldTagCol[f]];
+    }
 
     public int getFieldInfo()
     // field start is the transition (start or colon)->noncolon

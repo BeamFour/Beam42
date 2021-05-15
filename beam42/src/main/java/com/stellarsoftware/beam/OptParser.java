@@ -1,19 +1,21 @@
 package com.stellarsoftware.beam;
 
-import java.util.*;
+import java.util.ArrayList;
 
 import static com.stellarsoftware.beam.B4constants.*;
 
-public class OptParser {
+/* Parses .OPT files */
+public class OptParser extends ParserBase {
 
-    Map<Integer, Integer> head2columns = new LinkedHashMap<>();
-    Map<Integer, Integer> column2head = new LinkedHashMap<>();
+    char cTags[][] = new char[JMAX][MAXFIELDS];
+    char typetag[] = new char[JMAX];
+    String headers[] = new String[MAXFIELDS];
+    int oF2I[] = new int[MAXFIELDS]; /* Maps field type to column */
+    int oI2F[] = new int[ONPARMS]; /* Maps column to field type */
+    String oglasses[] = new String[JMAX + 1];
+
     int nsurfs;
-    String description;
-    List<String[]> data = new ArrayList<>();
-    ArrayList<String> oglasses = new ArrayList<>();
     ArrayList<Adjustment> adjustables = new ArrayList<Adjustment>();
-    char typetag[] = new char[JMAX]; // FIXME not yet populated
     double dOsize = 0.0;
 
     public static int getOptFieldAttrib(String s)
@@ -31,7 +33,7 @@ public class OptParser {
         s = s.trim();
         int len = s.length();
         if (len < 1)
-          return B4constants.ABSENT;
+          return ABSENT;
         c0 = s.charAt(0);                  // save case of c0
         c0up = Character.toUpperCase(c0);
         if ((len == 4) && (c0up == 'V'))
@@ -52,102 +54,102 @@ public class OptParser {
                     {
                        case '1': switch(c2up)
                        {
-                          case '0': return B4constants.OA10;
-                          case '1': return B4constants.OA11;
-                          case '2': return B4constants.OA12;
-                          case '3': return B4constants.OA13;
-                          case '4': return B4constants.OA14;
+                          case '0': return OA10;
+                          case '1': return OA11;
+                          case '2': return OA12;
+                          case '3': return OA13;
+                          case '4': return OA14;
                           case '5':
                           case '6':
                           case '7':
                           case '8':
-                          case '9': return B4constants.ABSENT;
-                          default: return B4constants.OA1;
+                          case '9': return ABSENT;
+                          default: return OA1;
                        }
-                       case '2': return B4constants.OA2;
-                       case '3': return B4constants.OA3;
-                       case '4': return B4constants.OA4;
-                       case '5': return B4constants.OA5;
-                       case '6': return B4constants.OA6;
-                       case '7': return B4constants.OA7;
-                       case '8': return B4constants.OA8;
-                       case '9': return B4constants.OA9;
+                       case '2': return OA2;
+                       case '3': return OA3;
+                       case '4': return OA4;
+                       case '5': return OA5;
+                       case '6': return OA6;
+                       case '7': return OA7;
+                       case '8': return OA8;
+                       case '9': return OA9;
                        case 'C': return OTYPE; // "ACTION"
                     }
                     if (s.endsWith("X"))
-                      return B4constants.OASPHX;
+                      return OASPHX;
                     if (s.endsWith("Y") && (len < 9)) // allows 'asphericity'
-                      return B4constants.OASPHY;
-                    return B4constants.OASPHER;
+                      return OASPHY;
+                    return OASPHER;
 
           case 'C':
           case 'c': if (s.contains("X"))  // curvatures
-                      return B4constants.OCURVX;
+                      return OCURVX;
                     if (s.contains("Y"))
-                      return B4constants.OCURVY;
-                    return B4constants.OCURVE;
+                      return OCURVY;
+                    return OCURVE;
 
           case 'D': if (s.contains("X"))
-                      return B4constants.OODIAX;
+                      return OODIAX;
                     if (s.contains("Y"))
-                      return B4constants.OODIAY;
-                    return B4constants.OODIAM;
+                      return OODIAY;
+                    return OODIAM;
 
           case 'd': if (s.contains("X"))
-                      return B4constants.OIDIAX;
+                      return OIDIAX;
                     if (s.contains("Y"))
-                      return B4constants.OIDIAY;
-                    return B4constants.OIDIAM;
+                      return OIDIAY;
+                    return OIDIAM;
 
           case 'F':
-          case 'f': return B4constants.OFORM;  // "form" = nonnumerical
+          case 'f': return OFORM;  // "form" = nonnumerical
 
           case 'G':
           case 'g': switch(c1up)   // Group or Grating groove density
                     {
-                       case 'R': return B4constants.OGROUP;
-                       case 'X': return B4constants.OGX;
-                       case 'Y': return B4constants.OGY;
+                       case 'R': return OGROUP;
+                       case 'X': return OGX;
+                       case 'Y': return OGY;
                        // case '1': return OVLS1;    // removed 22 March 2016 A192
                        // case '2': return OVLS2;
                        // case '3': return OVLS3;
                        // case '4': return OVLS4;
                     }
-                    return B4constants.ABSENT;
+                    return ABSENT;
 
           case 'H':
           case 'h': if (len < 4)
-                return B4constants.ABSENT;
+                return ABSENT;
                 if (c1up=='G')
-                   return B4constants.OHGAUSS;  // height of 2D Gaussian
+                   return OHGAUSS;  // height of 2D Gaussian
 
                 switch(c3up)         // HOE entries
                 {
                     case 'L':
-                    case 'l': return B4constants.OHOELAM;
+                    case 'l': return OHOELAM;
                     case 'X':
                     case 'x': if (c4up == '1')
-                                return B4constants.OHOEX1;
+                                return OHOEX1;
                               if (c4up == '2')
-                                return B4constants.OHOEX2;
-                              return B4constants.ABSENT;
+                                return OHOEX2;
+                              return ABSENT;
                     case 'Y':
                     case 'y': if (c4up == '1')
-                                return B4constants.OHOEY1;
+                                return OHOEY1;
                               if (c4up == '2')
-                                return B4constants.OHOEY2;
-                              return B4constants.ABSENT;
+                                return OHOEY2;
+                              return ABSENT;
                     case 'Z':
                     case 'z': if (c4up == '1')
-                                return B4constants.OHOEZ1;
+                                return OHOEZ1;
                               if (c4up == '2')
-                                return B4constants.OHOEZ2;
-                              return B4constants.ABSENT;
+                                return OHOEZ2;
+                              return ABSENT;
                 }
-                return B4constants.ABSENT;
+                return ABSENT;
 
           case 'I':
-          case 'i': return B4constants.OREFRACT;  // refractive index or glass name
+          case 'i': return OREFRACT;  // refractive index or glass name
 
           case 'L':
           case 'l':
@@ -156,61 +158,61 @@ public class OptParser {
 
           case 'N':
           case 'n':  if (c1up=='S')
-                       return B4constants.ONSPIDER;
+                       return ONSPIDER;
                      if (c1up=='X')
-                       return B4constants.ONARRAYX;
+                       return ONARRAYX;
                      if (c1up=='Y')
-                       return B4constants.ONARRAYY;
-                     return B4constants.ABSENT;
+                       return ONARRAYY;
+                     return ABSENT;
 
           case 'O':  // OffIX, OffIY, OffOX, OffOY
-          case 'o':  if ((c3up=='O') && (c4up=='X')) return B4constants.OFFOX;
-                     if ((c3up=='O') && (c4up=='Y')) return B4constants.OFFOY;
-                     if ((c3up=='I') && (c4up=='X')) return B4constants.OFFIX;
-                     if ((c3up=='I') && (c4up=='Y')) return B4constants.OFFIY;
-                     return B4constants.OORDER;
+          case 'o':  if ((c3up=='O') && (c4up=='X')) return OFFOX;
+                     if ((c3up=='O') && (c4up=='Y')) return OFFOY;
+                     if ((c3up=='I') && (c4up=='X')) return OFFIX;
+                     if ((c3up=='I') && (c4up=='Y')) return OFFIY;
+                     return OORDER;
 
           case 'P':
-          case 'p':  return B4constants.OPITCH;
+          case 'p':  return OPITCH;
 
           case 'R':
-          case 'r':  if (c1up=='G') return B4constants.ORGAUSS;   // 2D Gaussian radius or sigma
-                     if ((c2up=='C') && (c3up=='X')) return B4constants.ORADX;
-                     if ((c2up=='C') && (c3up=='Y')) return B4constants.ORADY;
-                     if (c2up=='C') return B4constants.ORAD;
-                     return B4constants.OROLL;
+          case 'r':  if (c1up=='G') return ORGAUSS;   // 2D Gaussian radius or sigma
+                     if ((c2up=='C') && (c3up=='X')) return ORADX;
+                     if ((c2up=='C') && (c3up=='Y')) return ORADY;
+                     if (c2up=='C') return ORAD;
+                     return OROLL;
 
           case 'S':
-          case 's':  if (c1up=='C')  return B4constants.OSCATTER;  // angle, degrees
-                     return B4constants.OSHAPE;
+          case 's':  if (c1up=='C')  return OSCATTER;  // angle, degrees
+                     return OSHAPE;
 
           case 'T':
           case 't':  if (c1up == 'Y')  return OTYPE;
-                     return B4constants.OTILT;     // tilt.
+                     return OTILT;     // tilt.
 
           case 'V':   // twenty curl-free explicit VLS coefficients
           case 'v':
-                     if (svls.equals("VX00")) return B4constants.OGX;    // synonym
-                     if (svls.equals("VX10")) return B4constants.OVX10;
-                     if (svls.equals("VX20")) return B4constants.OVX20;
-                     if (svls.equals("VX30")) return B4constants.OVX30;
-                     if (svls.equals("VX40")) return B4constants.OVX40;
-                     if (svls.equals("VY00")) return B4constants.OGY;    // synonym
-                     if (svls.equals("VY01")) return B4constants.OVY01;
-                     if (svls.equals("VY02")) return B4constants.OVY02;
-                     if (svls.equals("VY03")) return B4constants.OVY03;
-                     if (svls.equals("VY04")) return B4constants.OVY04;
-                     if (svls.equals("VY10")) return B4constants.OVY10;
-                     if (svls.equals("VY11")) return B4constants.OVY11;
-                     if (svls.equals("VY12")) return B4constants.OVY12;
-                     if (svls.equals("VY13")) return B4constants.OVY13;
-                     if (svls.equals("VY20")) return B4constants.OVY20;
-                     if (svls.equals("VY21")) return B4constants.OVY21;
-                     if (svls.equals("VY22")) return B4constants.OVY22;
-                     if (svls.equals("VY30")) return B4constants.OVY30;
-                     if (svls.equals("VY31")) return B4constants.OVY31;
-                     if (svls.equals("VY40")) return B4constants.OVY40;
-                     return B4constants.ABSENT;
+                     if (svls.equals("VX00")) return OGX;    // synonym
+                     if (svls.equals("VX10")) return OVX10;
+                     if (svls.equals("VX20")) return OVX20;
+                     if (svls.equals("VX30")) return OVX30;
+                     if (svls.equals("VX40")) return OVX40;
+                     if (svls.equals("VY00")) return OGY;    // synonym
+                     if (svls.equals("VY01")) return OVY01;
+                     if (svls.equals("VY02")) return OVY02;
+                     if (svls.equals("VY03")) return OVY03;
+                     if (svls.equals("VY04")) return OVY04;
+                     if (svls.equals("VY10")) return OVY10;
+                     if (svls.equals("VY11")) return OVY11;
+                     if (svls.equals("VY12")) return OVY12;
+                     if (svls.equals("VY13")) return OVY13;
+                     if (svls.equals("VY20")) return OVY20;
+                     if (svls.equals("VY21")) return OVY21;
+                     if (svls.equals("VY22")) return OVY22;
+                     if (svls.equals("VY30")) return OVY30;
+                     if (svls.equals("VY31")) return OVY31;
+                     if (svls.equals("VY40")) return OVY40;
+                     return ABSENT;
 
 
                     /***************************************
@@ -255,99 +257,79 @@ public class OptParser {
 
           case 'W':
           case 'w':  if (c1up=='S')
-                       return B4constants.OWSPIDER;
-                     else return B4constants.ABSENT;
+                       return OWSPIDER;
+                     else return ABSENT;
 
           case 'X':
-          case 'x':  return B4constants.OX;
+          case 'x':  return OX;
 
           case 'Y':
-          case 'y':  return B4constants.OY;
+          case 'y':  return OY;
 
           case 'Z':
           case 'z':  if (c1up=='E')  // e.g.Zern6
                      {
                         int i = U.suckInt(s);
-                        return ((i>=0) && (i<36)) ? B4constants.OZ00+i : B4constants.ABSENT;
+                        return ((i>=0) && (i<36)) ? OZ00+i : ABSENT;
                      }
-                     else return B4constants.OZ;
+                     else return OZ;
 
-          default:   return B4constants.ABSENT;
+          default:   return ABSENT;
         }
     } //---end of getOptFieldAttrib----------
 
-    String[] splitLine(String line) {
-        List<String> words = new ArrayList<>();
-        while (line.length() > 0) {
-            int pos = line.indexOf(':');
-            if (pos < 0) {
-                words.add(line);
-                break;
-            } else if (pos == 0) {
-                words.add("");
-                line = line.substring(1);
-            } else {
-                words.add(line.substring(0, pos));
-                line = line.substring(pos + 1);
-            }
-        }
-        return words.toArray(new String[words.size()]);
-    }
+    void setupDefaults() {
+        //-------------set up default surface data--------------
 
-    void parseCountAndDescriptionLine(String line) {
-        int index = line.indexOf(' ');
-        String countPart = line;
-        if (index > 0) {
-            countPart = line.substring(0, index+1);
-            description = line.substring(index+1);
-        }
-        nsurfs = U.suckInt(countPart);
-    }
+        DMF.giFlags[OMEDIANEEDED] = FALSE; // ok=notNeeded; TRUE=needed
 
-    void parseHeadingLine(String line) {
-        String[] fields = splitLine(line);
-        for (int i = 0; i < fields.length; i++) {
-            int h = getOptFieldAttrib(fields[i]);
-            if (h == B4constants.OABSENT) {
-                System.out.println("Heading [" + fields[i] + " not recognized; ignoring");
-                continue;
-            }
-            head2columns.put(h, i);
-            column2head.put(i, h);
+        for (int j=1; j<=MAXSURFS; j++)
+        {
+            oglasses[j] = "";
+            for (int ia=0; ia<ONPARMS; ia++)
+                RT13.surfs[j][ia] = -0.0; // minus zero means blank entry.
+
+            RT13.surfs[j][OREFRACT] = 1.0;
+        }
+
+        for (int f=0; f<MAXFIELDS; f++)
+            headers[f] = "";
+
+        for (int r=0; r<JMAX; r++)
+        {
+            typetag[r] = ':';
+            for (int f=0; f<MAXFIELDS; f++)
+                cTags[r][f] = ':';
         }
     }
 
-    void parseDataLine(String line) {
-        String[] fields = splitLine(line);
-        data.add(fields);
-    }
 
-    String getFieldTrim(int ifield, int row) {
-        String[] fields = data.get(row); // FIXME row offset
-        if (ifield > fields.length && fields[ifield] != null)
-            return fields[ifield].trim();
-        return "";
-    }
+    void parseHeadingLine() {
+        //--build the two one-way lookup tables for field IDs-------
 
-    // empty returns -0.0; badnum returns Double.NaN
-    // U.suckDouble() includes trimming and -0 for empty.
-    double getFieldDouble(int ifield, int row) {
-        String[] fields = data.get(row); // FIXME row offset
-        if (ifield > fields.length && fields[ifield] != null)
-            return U.suckDouble(fields[ifield]);
-        return -0.0;
-    }
+        for (int i=0; i<ONPARMS; i++)   // ABSENT = -1
+            oI2F[i] = ABSENT;
 
-    int getNFields(int row) {
-        // FXME row needs adjustment
-        String[] fields = data.get(row);
-        return fields.length;
+        for (int f=0; f<MAXFIELDS; f++) // ABSENT = -1
+            oF2I[f] = ABSENT;
+
+        int ntries=0, nunrecognized=0;
+        for (int f=0; f<nfields; f++)
+        {
+            ntries++;
+            int iatt = OptParser.getOptFieldAttrib(headers[f]); // bottom of this file...
+            oF2I[f] = iatt;
+            if ((iatt > ABSENT) && (iatt < ONPARMS))
+                oI2F[iatt] = f;
+            else
+                nunrecognized++;  // unused.
+        }
     }
 
     void parseOpticType() {
         //-----first parse the optics type column---------
 
-        int ifield = head2columns.get(OTYPE);
+        int ifield = oI2F[OTYPE];
         if (ifield > ABSENT)
             for (int jsurf=1; jsurf<=nsurfs; jsurf++)
             {
@@ -420,9 +402,8 @@ public class OptParser {
 
                     default: RT13.surfs[jsurf][OTYPE] = OTLENS; break;
                 }
-                //FIXME typetag[jsurf] = getTag(ifield, 2+jsurf);
+                typetag[jsurf] = getTag(ifield, 2+jsurf);
             };
-
     }
 
     void parseOpticFormColumn() {
@@ -431,7 +412,7 @@ public class OptParser {
         for (int jsurf=1; jsurf<=nsurfs; jsurf++)
             RT13.surfs[jsurf][OFORM] = OFELLIP;  // default
 
-        int ifield = head2columns.get(OFORM);
+        int ifield = oI2F[OFORM];
         if (ifield > ABSENT)
             for (int jsurf=1; jsurf<=nsurfs; jsurf++)
             {
@@ -455,16 +436,16 @@ public class OptParser {
         //---if refraction LUT is needed, OREFRACT will be NaN.----
 
         for (int jsurf=1; jsurf<=nsurfs; jsurf++)
-            oglasses.set(jsurf, "");       // default: all numeric
+            oglasses[jsurf] = new String("");       // default: all numeric
 
         boolean bAllRefractNumeric = true;       // default: true;
 
-        int ifield = head2columns.get(OREFRACT);
+        int ifield = oI2F[OREFRACT];
         if (ifield > ABSENT)
             for (int jsurf=1; jsurf<=nsurfs; jsurf++)
             {
-                oglasses.set(jsurf, getFieldTrim(ifield, 2+jsurf));
-                RT13.surfs[jsurf][OREFRACT] = U.suckDouble(oglasses.get(jsurf));
+                oglasses[jsurf] = getFieldTrim(ifield, 2+jsurf);
+                RT13.surfs[jsurf][OREFRACT] = U.suckDouble(oglasses[jsurf]);
                 if (Double.isNaN(RT13.surfs[jsurf][OREFRACT]))
                     bAllRefractNumeric = false;
                 if (0.0 == RT13.surfs[jsurf][OREFRACT])
@@ -485,8 +466,8 @@ public class OptParser {
     {
         if ((iatt < 0) || (iatt > OFINALADJ))
             return false;
-        int field = head2columns.get(iatt);
-        if ((field < 0) || (field >= getNFields(jsurf)))
+        int field = oI2F[iatt];
+        if ((field < 0) || (field >= nfields))
             return false;
         char c = getTag(field, jsurf+2);  // cTags[jsurf][field];
         return isAdjustableTag(c);
@@ -498,15 +479,15 @@ public class OptParser {
         return (c=='?') || Character.isLetter(c);
     }
 
-    private int iParseAdjustables(int nsurfs)
+    int iParseAdjustables(int nsurfs)
     // fills in private ArrayList of adjustables, with slaves.
     // Returns how many groups were found based on tags.
     {
         boolean bLookedAt[] = new boolean[nsurfs+1];
         adjustables.clear();
-        for (int field=0; field<head2columns.size(); field++) // nfields
+        for (int field=0; field<nfields; field++)
         {
-            int attrib = head2columns.get(field);
+            int attrib = oF2I[field];
             if ((attrib<0) || (attrib>OFINALADJ))  // or other validity test
                 continue;
 
@@ -563,10 +544,9 @@ public class OptParser {
         double d;
         for (int jsurf=1; jsurf<=nsurfs; jsurf++)
         {
-            int nfields = getNFields(jsurf);
             for (int f=0; f<nfields; f++)
             {
-                int ia = column2head.get(f);   // attribute of this surface
+                int ia = oF2I[f];   // attribute of this surface
 
                 if (ia == OTYPE)    // types were analyzed above...
                     continue;
@@ -638,20 +618,17 @@ public class OptParser {
 
     void parseDiameters() {
         //-------evaluate diameters DIAX, DIAY-------------------
-        for (int j=1; j<=nsurfs; j++)
-        {
+        for (int j = 1; j <= nsurfs; j++) {
             boolean bM = RT13.surfs[j][OIDIAM] > 0.0;
             boolean bX = RT13.surfs[j][OIDIAX] > 0.0;
             boolean bY = RT13.surfs[j][OIDIAY] > 0.0;
-            if (!bX)
-            {
+            if (!bX) {
                 if (bM)
                     RT13.surfs[j][OIDIAX] = RT13.surfs[j][OIDIAM];
                 else if (bY)
                     RT13.surfs[j][OIDIAX] = RT13.surfs[j][OIDIAY];
             }
-            if (!bY)
-            {
+            if (!bY) {
                 if (bM)
                     RT13.surfs[j][OIDIAY] = RT13.surfs[j][OIDIAM];
                 else if (bX)
@@ -660,15 +637,13 @@ public class OptParser {
             bM = RT13.surfs[j][OODIAM] > 0.0;
             bX = RT13.surfs[j][OODIAX] > 0.0;
             bY = RT13.surfs[j][OODIAY] > 0.0;
-            if (!bX)
-            {
+            if (!bX) {
                 if (bM)
                     RT13.surfs[j][OODIAX] = RT13.surfs[j][OODIAM];
                 else if (bY)
                     RT13.surfs[j][OODIAX] = RT13.surfs[j][OODIAY];
             }
-            if (!bY)
-            {
+            if (!bY) {
                 if (bM)
                     RT13.surfs[j][OODIAY] = RT13.surfs[j][OODIAM];
                 else if (bX)
@@ -676,8 +651,7 @@ public class OptParser {
             }
         }
         boolean bAllDiamsPresent = true;
-        for (int j=1; j<=nsurfs; j++)
-        {
+        for (int j = 1; j <= nsurfs; j++) {
             boolean bX = RT13.surfs[j][OODIAX] > 0.0;
             boolean bY = RT13.surfs[j][OODIAY] > 0.0;
             if (!bX || !bY)
@@ -868,25 +842,28 @@ public class OptParser {
             dOsize = 1.0;
     }
 
-    void parse(String[] lines) {
-        if (lines.length < 3) {
-            throw new IllegalArgumentException("At least 3 lines must be present in the input");
-        }
-        parseCountAndDescriptionLine(lines[0]);
-        parseHeadingLine(lines[1]);
-        // Ignore the --- line
-        for (int i = 3; i < lines.length; i++) {
-            parseDataLine(lines[i]);
-        }
+    void parseHeaders() {
+        //----get headers using getFieldTrim()---------------
+        for (int f=0; f<nfields; f++)
+            headers[f] = getFieldTrim(f, 1);
+    }
+
+    @Override
+    public void parse() {
+        setupDefaults();
+        parseHeaders();
+        parseHeadingLine();
         setDefaultOpticType();
         parseOpticType();
         parseOpticFormColumn();
         parseRefractionData();
+        parseNumericData();
         parseAdjustables();
         parseDiameters();
         //------------set the Euler angle matrix------------------
         RT13.setEulers();
         testGroovyness();
+        verifyArrayDims();
         classifyProfileSolvers();
         calcDOsize();
     }

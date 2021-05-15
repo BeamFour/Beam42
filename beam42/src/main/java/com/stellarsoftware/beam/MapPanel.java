@@ -1,9 +1,7 @@
 package com.stellarsoftware.beam;
 
-import javax.swing.*;      // Graphics2D features
-import java.io.*;          // Save as file 
+import java.io.*;          // Save as file
 import java.util.*;        // ArrayList
-import java.awt.*;         // Action
 import java.awt.event.*;   // Events
 
 @SuppressWarnings("serial")
@@ -371,7 +369,7 @@ public class MapPanel extends GPanel // implements Runnable
         }
         if (nums.indexOf(ch1) >= 0)              // optics?
         {
-            ij[0] = OEJIF.getOptFieldAttrib(s); 
+            ij[0] = OptParser.getOptFieldAttrib(s);
  
             if (ch1 == 'F')
               ij[1] = ngroups;                   // ngroups is valid here. 

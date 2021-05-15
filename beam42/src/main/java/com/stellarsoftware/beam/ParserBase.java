@@ -347,4 +347,29 @@ public abstract class ParserBase {
     }
 
     public abstract void parse();
+
+    //-----------protected internal methods for derived classes-----------
+    public int getLineCount()
+    {
+        return getAllLineLengths();
+    }
+
+    public int getGuideNumber()
+    // Returns the intended number of user records in the table.
+    {
+        String s = new String(charTable[0], 0, 20);
+        return U.suckInt(s);
+    }
+
+    protected void vPreParse(int results[])
+    // Called by extended class to pre-gather table information.
+    {
+        for (int i=0; i<NGENERIC; i++)
+            results[i] = 0;
+        results[GPRESENT] = 1;
+        results[GNLINES] = getLineCount();
+        int nguide = getGuideNumber();
+        results[GNRECORDS] = Math.min(nguide, results[GNLINES]-3);
+        results[GNFIELDS] = getFieldInfo();
+    }
 }

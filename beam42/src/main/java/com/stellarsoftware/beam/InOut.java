@@ -103,7 +103,7 @@ class InOut implements B4constants
             for (int f=0; f<rnfields; f++)    // field loop
             {
                 //int op = REJIF.rF2I[f];
-                int op = DMF.rejif.model().rF2I()[f];
+                int op = DMF.rejif.model().rF2I(f);
                 if (op == RNOTE)  // ray note message here....
                 {
                     int stat = RT13.getStatus(kray); 

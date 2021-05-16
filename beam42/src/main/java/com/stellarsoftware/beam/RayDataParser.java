@@ -15,11 +15,11 @@ public class RayDataParser extends ParserBase {
     private int     nrays, nfields, fwfe;
     private ArrayList<Adjustment> adjustables;
 
-    public int[] rF2I() {
-        return rF2I;
+    public int rF2I(int i) {
+        return rF2I[i];
     }
-    public int[] rI2F() {
-        return rI2F;
+    public int rI2F(int i) {
+        return rI2F[i];
     }
 
     public String wavenames(int i) {

@@ -31,11 +31,11 @@ class MEJIF extends EJIF
 
     ///////////////// private MEJIF items/////////////
 
-    private static String  text = new String();
+//    private static String  text = new String();
 
     // these next two are public to allow DMF validity checks.
-    public  static String  mwaves[] = new String[MAXFIELDS];      
-    public  static String  mglasses[] = new String[MAXMEDIA+1];  
+//    public  static String  mwaves[] = new String[MAXFIELDS];
+//    public  static String  mglasses[] = new String[MAXMEDIA+1];
 
 
     public MEJIF(int iXY, String gfname)
@@ -43,6 +43,10 @@ class MEJIF extends EJIF
     {
         super(2, iXY, ".MED", gfname, MAXMEDIA, new MediaParser());
         myFpath = gfname; 
+    }
+
+    public MediaParser model() {
+        return (MediaParser) parser;
     }
 
 //    void parse()  // replaces the abstract parse() in EJIF

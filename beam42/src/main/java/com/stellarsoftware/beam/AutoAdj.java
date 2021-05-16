@@ -348,7 +348,7 @@ class AdjHost implements B4constants
             {
                 // int op = rayEditor.rF2I[f];  ?? warning from Xlint
                 //int op = REJIF.rF2I[f];         // this works: 8 Oct 2014
-                int op = DMF.rejif.rF2I()[f];
+                int op = DMF.rejif.model().rF2I()[f];
                 if (op == RNOTE)  // ray note message here....
                 {
                     String s = sResults[RT13.getStatus(kray)] 

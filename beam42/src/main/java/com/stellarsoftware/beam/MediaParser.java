@@ -4,8 +4,8 @@ import static com.stellarsoftware.beam.B4constants.*;
 
 public class MediaParser extends ParserBase {
 
-    String mwaves[] = new String[MAXFIELDS];
-    String mglasses[] = new String[MAXMEDIA + 1];
+    private String mwaves[] = new String[MAXFIELDS];
+    private String mglasses[] = new String[MAXMEDIA + 1];
 
     @Override
     public void parse()  // replaces the abstract parse() in EJIF
@@ -86,4 +86,12 @@ public class MediaParser extends ParserBase {
         // System.out.println("MEJIF finds nwaves = " + DMF.giFlags[MNWAVES]);
         // System.out.println("MEJIF finds nglasses = " + DMF.giFlags[MNGLASSES]);
     } // end of parse().
+
+    public String mglasses(int i) {
+        return this.mglasses[i];
+    }
+
+    public String mwaves(int i) {
+        return this.mwaves[i];
+    }
 }

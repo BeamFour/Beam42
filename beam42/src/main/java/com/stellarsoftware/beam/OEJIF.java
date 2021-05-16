@@ -1,7 +1,6 @@
 package com.stellarsoftware.beam;
 
 import java.util.*;         // ArrayList
-import javax.swing.*;       // JMenuItem
 
 
 @SuppressWarnings("serial")
@@ -33,7 +32,7 @@ class OEJIF extends EJIF
         myFpath = gfname;                        // field of EJIF.
     }
 
-    public OptParser parser() {
+    public OptParser model() {
         return (OptParser) parser;
     }
 
@@ -565,7 +564,7 @@ class OEJIF extends EJIF
 //    }
 
     public double getOsize() {
-        return parser().getOsize();
+        return model().getOsize();
     }
 
 //
@@ -584,7 +583,7 @@ class OEJIF extends EJIF
 //    }
 //
     public double getAdjValue(int i) {
-        return parser().getAdjValue(i);
+        return model().getAdjValue(i);
     }
 
 
@@ -598,7 +597,7 @@ class OEJIF extends EJIF
 //    }
 
     public int getAdjAttrib(int i) {
-        return parser().getAdjAttrib(i);
+        return model().getAdjAttrib(i);
     }
 
 //
@@ -612,7 +611,7 @@ class OEJIF extends EJIF
 //    }
 
     public int getAdjSurf(int i) {
-        return parser().getAdjSurf(i);
+        return model().getAdjSurf(i);
     }
 
 //
@@ -627,7 +626,7 @@ class OEJIF extends EJIF
 //
 
     public int getAdjField(int i) {
-        return parser().getAdjField(i);
+        return model().getAdjField(i);
     }
 
 //    public ArrayList<Integer> getSlaves(int i)
@@ -641,7 +640,7 @@ class OEJIF extends EJIF
 //
 //
     public ArrayList<Integer> getSlaves(int i) {
-        return parser().getSlaves(i);
+        return model().getSlaves(i);
     }
 
 

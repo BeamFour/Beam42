@@ -1,6 +1,5 @@
 package com.stellarsoftware.beam;
 
-import javax.swing.*;      // Graphics2D features
 import java.util.*;        // ArrayList
 
 @SuppressWarnings("serial")
@@ -465,7 +464,7 @@ public class MPlotPanel extends GPanel
           return "Media table is required";    // SNH
         for (int f=1; f<MAXFIELDS; f++)
         {
-            if (frag.equals(MEJIF.mwaves[f]))  // Xlint 8 Oct 2014
+            if (frag.equals(DMF.mejif.model().mwaves(f)))  // Xlint 8 Oct 2014
             {
                 waveField[k] = f;   // found it.
                 return "";  

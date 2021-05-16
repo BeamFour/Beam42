@@ -245,7 +245,7 @@ class RayHost implements B4constants
                 {
                     double d = RT13.raystarts[kray][op]; 
                     //int f = REJIF.rI2F[op];
-                    int f = rayEditor.rI2F()[op];
+                    int f = rayEditor.model().rI2F()[op];
                     rayEditor.putFieldDouble(f, kray+2, d);  
                 }
             }

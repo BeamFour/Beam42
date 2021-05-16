@@ -1546,7 +1546,7 @@ class Options extends JMenu implements B4constants
         if (g==0)                    // ray start
         {
             //f1 = REJIF.rI2F[i1];     // ok for starts; Xlint 8 Oct 2014
-            f1 = DMF.rejif.rI2F()[i1];     // ok for starts; Xlint 8 Oct 2014
+            f1 = DMF.rejif.model().rI2F()[i1];     // ok for starts; Xlint 8 Oct 2014
         }
         else                         // ray goal
         {
@@ -1554,7 +1554,7 @@ class Options extends JMenu implements B4constants
             int i2 = i1 + RTXL;      // or surface frame goal 
             for (int f=0; f<nf; f++)
               //if ((REJIF.rF2I[f]==i1) || (REJIF.rF2I[f]==i2))  // Xlint again
-              if ((DMF.rejif.rI2F()[f]==i1) || (DMF.rejif.rI2F()[f]==i2))  // Xlint again
+              if ((DMF.rejif.model().rI2F()[f]==i1) || (DMF.rejif.model().rI2F()[f]==i2))  // Xlint again
                 f1 = f; 
         }   
           
@@ -1610,8 +1610,8 @@ class Options extends JMenu implements B4constants
         {
 //            f1 = REJIF.rI2F[i1];    // Xlint
 //            f2 = REJIF.rI2F[i2];    // Xlint
-            f1 = DMF.rejif.rI2F()[i1];    // Xlint
-            f2 = DMF.rejif.rI2F()[i2];    // Xlint
+            f1 = DMF.rejif.model().rI2F()[i1];    // Xlint
+            f2 = DMF.rejif.model().rI2F()[i2];    // Xlint
         }
         else                         // ray goal
         {
@@ -1625,9 +1625,9 @@ class Options extends JMenu implements B4constants
 //                  f1 = f;
 //                if ((REJIF.rF2I[f]==i2) || (REJIF.rF2I[f]==i2))
 //                  f2 = f;
-                if ((DMF.rejif.rF2I()[f]==i1) || (DMF.rejif.rF2I()[f]==i3))
+                if ((DMF.rejif.model().rF2I()[f]==i1) || (DMF.rejif.model().rF2I()[f]==i3))
                     f1 = f;
-                if ((DMF.rejif.rF2I()[f]==i2) || (DMF.rejif.rF2I()[f]==i2))
+                if ((DMF.rejif.model().rF2I()[f]==i2) || (DMF.rejif.model().rF2I()[f]==i2))
                     f2 = f;
             }
         }
@@ -1687,8 +1687,8 @@ class Options extends JMenu implements B4constants
         {
 //            f1 = REJIF.rI2F[i1];
 //            f2 = REJIF.rI2F[i2];
-            f1 = redit.rI2F()[i1];
-            f2 = redit.rI2F()[i2];
+            f1 = redit.model().rI2F()[i1];
+            f2 = redit.model().rI2F()[i2];
         }
         else                         // ray goal
         {
@@ -1702,9 +1702,9 @@ class Options extends JMenu implements B4constants
 //                  f1 = f;
 //                if ((REJIF.rF2I[f]==i2) || (REJIF.rF2I[f]==i2))
 //                  f2 = f;
-                if ((redit.rF2I()[f]==i1) || (redit.rF2I()[f]==i3))
+                if ((redit.model().rF2I()[f]==i1) || (redit.model().rF2I()[f]==i3))
                     f1 = f;
-                if ((redit.rF2I()[f]==i2) || (redit.rF2I()[f]==i2))
+                if ((redit.model().rF2I()[f]==i2) || (redit.model().rF2I()[f]==i2))
                     f2 = f;
             }
         }
@@ -1769,8 +1769,8 @@ class Options extends JMenu implements B4constants
         {
 //            f1 = REJIF.rI2F[i1];
 //            f2 = REJIF.rI2F[i2];
-            f1 = redit.rI2F()[i1];
-            f2 = redit.rI2F()[i2];
+            f1 = redit.model().rI2F()[i1];
+            f2 = redit.model().rI2F()[i2];
 
         }
         else                         // ray goal
@@ -1785,9 +1785,9 @@ class Options extends JMenu implements B4constants
 //                  f1 = f;
 //                if ((REJIF.rF2I[f]==i2) || (REJIF.rF2I[f]==i2))
 //                  f2 = f;
-                if ((redit.rF2I()[f]==i1) || (redit.rF2I()[f]==i3))
+                if ((redit.model().rF2I()[f]==i1) || (redit.model().rF2I()[f]==i3))
                     f1 = f;
-                if ((redit.rF2I()[f]==i2) || (redit.rF2I()[f]==i2))
+                if ((redit.model().rF2I()[f]==i2) || (redit.model().rF2I()[f]==i2))
                     f2 = f;
             }
         }

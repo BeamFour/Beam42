@@ -3,14 +3,9 @@ package com.stellarsoftware.beam;
 
 import java.awt.*;              // all Abstract Windows Toolkit methods
 import java.awt.event.*;        // mouse, keystroke etc
-import java.awt.geom.*;         // for printing
-import java.awt.print.*;        // for printing
-import java.beans.*;            // vetoableChangeListenerFMI li
 import java.io.*;               // all files and i/o methods
-import java.util.*;             // Iterator, line 1282.
 import javax.swing.*;           // all UI methods
 import javax.swing.event.*;     // for MenuEvents and InternalFrameAdapter
-import javax.swing.text.*;      // for BadLocationException
 import java.awt.datatransfer.*; // for Drag-n-Drop
 import java.awt.dnd.*;          // for Drag-n-Drop
 import javax.swing.filechooser.FileNameExtensionFilter; 
@@ -1663,7 +1658,7 @@ public class DMF extends JFrame implements B4constants
             {
                 for (int mrec=1; mrec <= giFlags[MNGLASSES]; mrec++)
                   //if (OEJIF.oglasses[jsurf].equals(MEJIF.mglasses[mrec]))
-                  if (DMF.oejif.parser().oglasses()[jsurf].equals(MEJIF.mglasses[mrec]))
+                  if (DMF.oejif.model().oglasses()[jsurf].equals(DMF.mejif.model().mglasses(mrec)))
                   {
                       RT13.gO2M[jsurf] = mrec; // found it! jsurf uses glass number "mrec"
                       break;                   // abandon search. 
@@ -1672,7 +1667,7 @@ public class DMF extends JFrame implements B4constants
                 {
                     unkglassrec = jsurf; 
                     //unkglassname = OEJIF.oglasses[jsurf];
-                    unkglassname = DMF.oejif.parser().oglasses()[jsurf];
+                    unkglassname = DMF.oejif.model().oglasses()[jsurf];
                     trouble = true; 
                     break; // break out of required glass loop
                 }
@@ -1693,10 +1688,10 @@ public class DMF extends JFrame implements B4constants
         trouble = false; 
         for (int kray=1; kray<= giFlags[RNRAYS]; kray++)
         {
-            if (DMF.rejif.wavenames()[kray].length() > 0)  // empty is trouble here.
+            if (DMF.rejif.model().wavenames(kray).length() > 0)  // empty is trouble here.
             //if (REJIF.wavenames[kray].length() > 0)  // empty is trouble here.
               for (int f=1; f <= giFlags[MNWAVES]; f++)
-                if (DMF.rejif.wavenames()[kray].equals(MEJIF.mwaves[f]))
+                if (DMF.rejif.model().wavenames(kray).equals(DMF.mejif.model().mwaves(f)))
                 //if (REJIF.wavenames[kray].equals(MEJIF.mwaves[f]))
                 {
                     RT13.gR2W[kray] = f; // found it! kray uses wavel ID "f"
@@ -1706,7 +1701,7 @@ public class DMF extends JFrame implements B4constants
             {
                 unkwaverec = kray; 
                 //unkwavename = REJIF.wavenames[kray];
-                unkwavename = DMF.rejif.wavenames()[kray];
+                unkwavename = DMF.rejif.model().wavenames(kray);
                 trouble = true; 
                 break; 
             }

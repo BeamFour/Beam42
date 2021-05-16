@@ -7,13 +7,24 @@ import static com.stellarsoftware.beam.B4constants.*;
 public class RayDataParser extends ParserBase {
     // ArrayList goals;
 
-    String wavenames[] = new String[JMAX];
-    int rF2I[] = new int[MAXFIELDS];
-    int rI2F[] = new int[RNSTARTS];  // 10 raystart attributes: B4constants.java
-    int wavefield;
-    String  headers[] = new String[MAXFIELDS];
-    int     nrays, nfields, fwfe;
+    private String wavenames[] = new String[JMAX];
+    private int rF2I[] = new int[MAXFIELDS];
+    private int rI2F[] = new int[RNSTARTS];  // 10 raystart attributes: B4constants.java
+    private int wavefield;
+    private String  headers[] = new String[MAXFIELDS];
+    private int     nrays, nfields, fwfe;
     private ArrayList<Adjustment> adjustables;
+
+    public int[] rF2I() {
+        return rF2I;
+    }
+    public int[] rI2F() {
+        return rI2F;
+    }
+
+    public String wavenames(int i) {
+        return wavenames[i];
+    }
 
     @Override
     public void parse() // replaces the abstract parse() in EJIF

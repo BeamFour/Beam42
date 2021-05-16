@@ -54,24 +54,14 @@ class REJIF extends EJIF
 //    public static int wavefield;
     // public static final long serialVersionUID = 42L;
 
-    RayDataParser rayParser;
-
     public REJIF(int iXY, String gfname)
     {
         super(1, iXY, ".RAY", gfname, MAXRAYS, new RayDataParser()); // call EJIF for preliminary parse()
-        rayParser = (RayDataParser) parser;
-        myFpath = gfname; 
+        myFpath = gfname;
     }
 
-    public int[] rF2I() {
-        return rayParser.rF2I;
-    }
-    public int[] rI2F() {
-        return rayParser.rI2F;
-    }
-
-    public String[] wavenames() {
-        return rayParser.wavenames;
+    public RayDataParser model() {
+        return (RayDataParser) parser;
     }
 
 //    private static String  headers[] = new String[MAXFIELDS];
@@ -377,7 +367,7 @@ class REJIF extends EJIF
 //    }
 
     public double getAdjValue(int i) {
-        return rayParser.getAdjValue(i);
+        return model().getAdjValue(i);
     }
 
 //
@@ -391,7 +381,7 @@ class REJIF extends EJIF
 //
 
     public int getAdjAttrib(int i) {
-        return rayParser.getAdjAttrib(i);
+        return model().getAdjAttrib(i);
     }
 
 //    public int getAdjRay(int i)
@@ -403,7 +393,7 @@ class REJIF extends EJIF
 //    }
 
     public int getAdjRay(int i) {
-        return rayParser.getAdjRay(i);
+        return model().getAdjRay(i);
     }
 
 //
@@ -416,7 +406,7 @@ class REJIF extends EJIF
 //    }
 
     public int getAdjField(int i) {
-        return rayParser.getAdjField(i);
+        return model().getAdjField(i);
     }
 
 //
@@ -430,7 +420,7 @@ class REJIF extends EJIF
 //
 //
     public ArrayList<Integer> getSlaves(int i) {
-        return rayParser.getSlaves(i);
+        return model().getSlaves(i);
     }
 
 

@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * This file has just one class: OEJIF that extends EJIF,
  * supplying EJIF's abstract method parse().
  *
- * @see OptParser
+ * @see OPTDataModel
  *
  * @author M.Lampton (c) 2004-2012 STELLAR SOFTWARE all rights reserved.
  */
@@ -19,12 +19,12 @@ class OEJIF extends EJIF
 
     public OEJIF(int iXY, String gfname)
     {
-        super(0, iXY, ".OPT", gfname, MAXSURFS, new OptParser()); // call EJIF
+        super(0, iXY, ".OPT", gfname, MAXSURFS, new OPTDataModel()); // call EJIF
         myFpath = gfname;                        // field of EJIF.
     }
 
-    public OptParser model() {
-        return (OptParser) parser;
+    public OPTDataModel model() {
+        return (OPTDataModel) dataModel;
     }
 
 

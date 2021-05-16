@@ -120,7 +120,7 @@ import java.io.IOException;
   *
   *  @author M.Lampton (c) 2004 STELLAR SOFTWARE all rights reserved.
   */
-class EJIF extends BJIF implements B4constants, AdjustmentListener
+abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
 {
     // public static final long serialVersionUID = 42L; // Xlint 8 Oct 2014
     
@@ -141,20 +141,17 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
     JScrollBar vsb=null, hsb=null; 
     private Container cPane=null;         // will contain ePanel.
     static private Clipboard clipb=null;  // local or system.
-    protected ParserBase parser;
+    protected B4DataModel dataModel;
 
 
     //---------------public methods and fields-------------------
 
-    //abstract void parse();   // supplied by extensions OEJIF, REJIF, MEJIF.
     public void parse()   // supplied by extensions OEJIF, REJIF, MEJIF.
     {
-        parser.parse();
+        dataModel.parse();
     }
 
-    public ParserBase parser() {
-        return this.parser;
-    }
+    public abstract B4DataModel model();
 
     public boolean bExitOK(Component parent)
     // Called here, or by main DMF window exit.
@@ -163,7 +160,7 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
     // The caller will do the actual closing locally via dispose(),
     // or globally if no cancels via System.exit(0)
     {    
-        if (!parser.isDirty())
+        if (!dataModel.isDirty())
         {
             return true; 
         }
@@ -188,7 +185,7 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
 
 
  
-    public EJIF(int flavor, int iLoc, String gExt, String gFname, int gmaxrec, ParserBase parser)
+    public EJIF(int flavor, int iLoc, String gExt, String gFname, int gmaxrec, B4DataModel dataModel)
     // Do not construct an EJIF unless the file & contents verify okay.
     // This revision A178 August 2015
     // (c) 2004 M.Lampton STELLAR SOFTWARE
@@ -204,7 +201,7 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
           myPathOnly = System.getProperty("user.home"); 
         maxrecords = gmaxrec; 
         myFlavor = flavor;   // 0=opt, 1=ray, 2=med.
-        this.parser = parser;
+        this.dataModel = dataModel;
 
         ePanel = new EPanel(this); 
         cPane = getContentPane();
@@ -212,7 +209,7 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
 
         super.setKeyPanel(ePanel);  ///// what does this do?
         myFile = new File(myFpath); 
-        parser.bLoadFile(myFile);
+        dataModel.bLoadFile(myFile);
         if (getNumLines() > maxrecords+2)
             iCountdown = -10;              // warning.
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);  
@@ -245,8 +242,8 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
             }
         });
        
-        parser.setDirty(false);
-        parser.setNeedsParse(true);
+        dataModel.setDirty(false);
+        dataModel.setNeedsParse(true);
         
     } //-----end of constructor-----
 
@@ -332,7 +329,7 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
 
     public boolean areYouDirty()
     {
-        return parser.isDirty();
+        return dataModel.isDirty();
     }
 
     public void pleaseSaveAs()
@@ -380,8 +377,7 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
             if (iq != JOptionPane.YES_OPTION)
               return; 
         }
-        //if (ePanel.save(myFile))   // successful!
-        if (parser.save(myFile))
+        if (dataModel.save(myFile)) // successful!
         {
             myFpath = myFile.getPath();
             String ext = U.getExtensionToLower(myFpath); 
@@ -619,12 +615,12 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
 
     @Override
     boolean needsParse() {
-        return parser.needsParse();
+        return dataModel.needsParse();
     }
 
     @Override
     void setNeedsParse(boolean value) {
-        parser.setNeedsParse(value);
+        dataModel.setNeedsParse(value);
     }
 
     protected void refreshSizes()

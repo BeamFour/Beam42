@@ -14,7 +14,7 @@ import static com.stellarsoftware.beam.B4constants.*;
  *
  *  @author M.Lampton (c) 2004-2012 STELLAR SOFTWARE all rights reserved.
  */
-public class OptParser extends ParserBase {
+public class OPTDataModel extends B4DataModel {
 
     private char cTags[][] = new char[JMAX][MAXFIELDS];
     private char typetag[] = new char[JMAX];
@@ -330,7 +330,7 @@ public class OptParser extends ParserBase {
         for (int f=0; f<nfields; f++)
         {
             ntries++;
-            int iatt = OptParser.getOptFieldAttrib(headers[f]); // bottom of this file...
+            int iatt = OPTDataModel.getOptFieldAttrib(headers[f]); // bottom of this file...
             oF2I[f] = iatt;
             if ((iatt > ABSENT) && (iatt < ONPARMS))
                 oI2F[iatt] = f;

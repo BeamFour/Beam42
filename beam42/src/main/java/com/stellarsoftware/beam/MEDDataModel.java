@@ -21,7 +21,7 @@ import static com.stellarsoftware.beam.B4constants.*;
  *
  * @author M.Lampton (c) 2004 STELLAR SOFTWARE all rights reserved.
  */
-public class MediaParser extends ParserBase {
+public class MEDDataModel extends B4DataModel {
 
     private String mwaves[] = new String[MAXFIELDS];
     private String mglasses[] = new String[MAXMEDIA + 1];

@@ -1,14 +1,12 @@
 package com.stellarsoftware.beam;
 
-import javax.swing.*; 
-
 @SuppressWarnings("serial")
 
 /**
  * MEJIF is a media editor class concreting the abstract class EJIF.
  * The actual implementation is now in MediaParser.
  *
- * @see MediaParser
+ * @see MEDDataModel
  * @author M.Lampton (c) 2004 STELLAR SOFTWARE all rights reserved.
  */
 class MEJIF extends EJIF
@@ -18,12 +16,12 @@ class MEJIF extends EJIF
     public MEJIF(int iXY, String gfname)
     // constructor creates a media editor using EJIF
     {
-        super(2, iXY, ".MED", gfname, MAXMEDIA, new MediaParser());
+        super(2, iXY, ".MED", gfname, MAXMEDIA, new MEDDataModel());
         myFpath = gfname; 
     }
 
-    public MediaParser model() {
-        return (MediaParser) parser;
+    public MEDDataModel model() {
+        return (MEDDataModel) dataModel;
     }
 }
 

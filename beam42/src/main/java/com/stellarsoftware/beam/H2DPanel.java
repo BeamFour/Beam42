@@ -188,7 +188,7 @@ public class H2DPanel extends GPanel
     {
         String hst = DMF.reg.getuo(UO_2D, 2); 
         //int hop = REJIF.getCombinedRayFieldOp(hst);
-        int hop = RayDataParser.getCombinedRayFieldOp(hst);
+        int hop = RAYDataModel.getCombinedRayFieldOp(hst);
         int hsurf = RT13.getSurfNum(hop); 
         int hattr = RT13.getAttrNum(hop); 
         if ((hsurf<0) || (hattr<0) || (hattr>RNATTRIBS))
@@ -196,7 +196,7 @@ public class H2DPanel extends GPanel
 
         String vst = DMF.reg.getuo(UO_2D, 3); 
         //int vop = REJIF.getCombinedRayFieldOp(vst);
-        int vop = RayDataParser.getCombinedRayFieldOp(vst);
+        int vop = RAYDataModel.getCombinedRayFieldOp(vst);
         int vsurf = RT13.getSurfNum(vop); 
          int vattr = RT13.getAttrNum(vop); 
         if ((vsurf<0) || (vattr<0) || (vattr>RNATTRIBS))
@@ -217,13 +217,13 @@ public class H2DPanel extends GPanel
 
         hst = DMF.reg.getuo(UO_2D, 2); 
         //int hop = REJIF.getCombinedRayFieldOp(hst);
-        int hop = RayDataParser.getCombinedRayFieldOp(hst);
+        int hop = RAYDataModel.getCombinedRayFieldOp(hst);
         hsurf = RT13.getSurfNum(hop); 
         hattr = RT13.getAttrNum(hop); 
 
         vst = DMF.reg.getuo(UO_2D, 3); 
         //int vop = REJIF.getCombinedRayFieldOp(vst);
-        int vop = RayDataParser.getCombinedRayFieldOp(vst);
+        int vop = RAYDataModel.getCombinedRayFieldOp(vst);
         vsurf = RT13.getSurfNum(vop); 
         vattr = RT13.getAttrNum(vop); 
 

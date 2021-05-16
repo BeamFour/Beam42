@@ -5,7 +5,7 @@ import java.io.*;
 import static com.stellarsoftware.beam.B4constants.*;
 
 /* Base class for parsing .OPT, .MED and .RAY files */
-public abstract class ParserBase {
+public abstract class B4DataModel {
 
     protected int nfields = 0;
     protected int iFieldStartCol[]      = new int[MAXFIELDS];
@@ -27,7 +27,7 @@ public abstract class ParserBase {
 
     private char charTable[][] = new char[JMAX+1][IMAX+1];
 
-    protected ParserBase() {
+    protected B4DataModel() {
         //--------set up fieldArray helpers-----------------
 
         nfields = 0;

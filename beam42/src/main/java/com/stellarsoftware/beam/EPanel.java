@@ -113,7 +113,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
         vsbReference = myEJIF.createVSB(); 
         jOff = 0; 
         getAllLineLengths(); 
-        myEJIF.parser.setDirty(false);
+        myEJIF.dataModel.setDirty(false);
     }  //--------end constructor---------------
 
     public void setCaretFlag(boolean b)
@@ -170,7 +170,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
 //                linelen[j] = getOneLineLength(j); // WHY setting linelen ? TODO Check
                 int linelen = getOneLineLength(j);
                 int count = Math.max(0, linelen - iOff);
-                String s = myEJIF.parser().getLine(j, iOff, count);
+                String s = myEJIF.model().getLine(j, iOff, count);
                 g2.drawString(s, 0, (jwin+1)*charheight);
                 // alternative: g2.drawChars(....)
             }
@@ -200,7 +200,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
         int nfields = getFieldInfo(); 
         if ((field>=0) && (field<nfields))
           //iCaret = iFieldStartCol[field];
-            iCaret = myEJIF.parser().getiFieldStartCol(field);
+            iCaret = myEJIF.model().getiFieldStartCol(field);
         if ((row>=0) && (row<JMAX-2))
           jCaret = row; 
     }
@@ -246,11 +246,11 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     }
 
     public int getFieldInfo() {
-        return myEJIF.parser().getFieldInfo();
+        return myEJIF.model().getFieldInfo();
     }
 
     public String getFieldFull(int f, int jrow) {
-        return myEJIF.parser().getFieldFull(f, jrow);
+        return myEJIF.model().getFieldFull(f, jrow);
     }
 
     public String getFieldTrim(int ifield, int jrow)
@@ -267,31 +267,31 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     }
 
     public int getFieldWidth(int f) {
-        return myEJIF.parser.getFieldWidth(f);
+        return myEJIF.dataModel.getFieldWidth(f);
     }
 
     public void putFieldString(int f, int jrow, String s) {
-        myEJIF.parser().putFieldString(f, jrow, s);
+        myEJIF.model().putFieldString(f, jrow, s);
     }
 
     public void forceFieldString(int f, int jrow, String s) {
-        myEJIF.parser().forceFieldString(f, jrow, s);
+        myEJIF.model().forceFieldString(f, jrow, s);
     }
 
     public void putFieldDouble(int f, int jrow, double d) {
-        myEJIF.parser.putFieldDouble(f, jrow, d);
+        myEJIF.dataModel.putFieldDouble(f, jrow, d);
     }
 
     public void forceFieldDouble(int f, int jrow, double d) {
-        myEJIF.parser().forceFieldDouble(f, jrow, d);
+        myEJIF.model().forceFieldDouble(f, jrow, d);
     }
 
     public char getTagChar(int f, int jrow) {
-        return myEJIF.parser().getTagChar(f, jrow);
+        return myEJIF.model().getTagChar(f, jrow);
     }
 
     public void putTagChar(int f, int jrow, char c) {
-        myEJIF.parser().putTagChar(f, jrow, c);
+        myEJIF.model().putTagChar(f, jrow, c);
     }
 
     public boolean hasContent()
@@ -305,7 +305,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     } 
 
     public int getLineLength(int jrow) {
-        return myEJIF.parser().getLineLength(jrow);
+        return myEJIF.model().getLineLength(jrow);
     }
 
     public int getICaret()
@@ -329,7 +329,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     }
    
     public int getGuideNumber() {
-        return myEJIF.parser.getGuideNumber();
+        return myEJIF.dataModel.getGuideNumber();
     }
 
     public boolean isMarked()  // public for edit graying
@@ -347,7 +347,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     {
         getAllLineLengths(); 
         jDown = 0; 
-        jDrag = myEJIF.parser().getNlines()-1;
+        jDrag = myEJIF.model().getNlines()-1;
         repaint(); 
     }
 
@@ -358,13 +358,13 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     // assumes that getAllLineLengths() has been called first
     // to initialize nlines and individual line lengths. 
     {
-        if ((j<0) || (j>=myEJIF.parser().getNlines()))
+        if ((j<0) || (j>=myEJIF.model().getNlines()))
           return ""; 
-        return myEJIF.parser().getLine(j, 0, myEJIF.parser().getLineLen(j));
+        return myEJIF.model().getLine(j, 0, myEJIF.model().getLineLen(j));
     }
 
     public void vLoadSkeleton() {
-        myEJIF.parser().vLoadSkeleton();
+        myEJIF.model().vLoadSkeleton();
         iMouse = jMouse = jDown = iCaret = jCaret = iOff = jOff = 0;
         jDrag = -1;
     }
@@ -372,7 +372,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     public boolean save(File f)
     // Uses println() to generate local platform EOLs.
     {
-        return myEJIF.parser().save(f);
+        return myEJIF.model().save(f);
     }
 
 
@@ -387,7 +387,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
             return "";
         int j0 = Math.min(jDown, jDrag);
         int j1 = Math.max(jDown, jDrag);
-        return myEJIF.parser().getText(j0, j1);
+        return myEJIF.model().getText(j0, j1);
     }
 
 
@@ -409,7 +409,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
           return;
         int j0 = Math.min(jDown, jDrag);
         int j1 = Math.max(jDown, jDrag);
-        myEJIF.parser().doDelete(j0, j1);
+        myEJIF.model().doDelete(j0, j1);
         // any need to rearrange jCaret?
         getAllLineLengths();
         doUnmarkRepaint();
@@ -419,8 +419,8 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     public void paste(String s) {
         iCaret = 0;
         stashForUndo();
-        jCaret = myEJIF.parser().vLoadString(s, false, jCaret);
-        myEJIF.parser().setDirty(true);
+        jCaret = myEJIF.model().vLoadString(s, false, jCaret);
+        myEJIF.model().setDirty(true);
         repaint();
     }
 
@@ -479,11 +479,11 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     //--------------private methods-------------------
 
     private String getTableString() {
-        return myEJIF.parser().getTableString();
+        return myEJIF.model().getTableString();
     }
     
     private void putTableString(String sGiven) {
-        myEJIF.parser().putTableString(sGiven);
+        myEJIF.model().putTableString(sGiven);
         repaint();
     }
 
@@ -499,34 +499,34 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     }
 
     int doBackTab(int i) {
-        return myEJIF.parser().doBackTab(i);
+        return myEJIF.model().doBackTab(i);
     }
 
     private int getWhichField(int icol) {
-        return myEJIF.parser().getWhichField(icol);
+        return myEJIF.model().getWhichField(icol);
     }
 
     private void clearLine(int j) {
-        myEJIF.parser().clearLine(j);
+        myEJIF.model().clearLine(j);
     }
 
     private void pushDownOneLine(int j) {
-        myEJIF.parser().pushDownOneLine(j);
+        myEJIF.model().pushDownOneLine(j);
     }
 
     private void pullUpOneLine(int j) {
-        myEJIF.parser().pullUpOneLine(j);
+        myEJIF.model().pullUpOneLine(j);
     }
 
     private void clearTable() {
         stashForUndo();
-        myEJIF.parser().clearTable();
+        myEJIF.model().clearTable();
         iMouse = jMouse = jDown = iCaret = jCaret = iOff = jOff = 0;
         jDrag = -1;
     }
 
     private int getDelimiterStatus(String s, int jcaret) {
-        return myEJIF.parser().getDelimiterStatus(s, jcaret);
+        return myEJIF.model().getDelimiterStatus(s, jcaret);
     }
 
     private boolean isRowMarked(int j)
@@ -539,25 +539,25 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     private int getAllLineLengths() {
         // Sets local nlines and linelen[] and maxlinelen.
         // Individual linelen[] can be as big as IMAX-1
-        int n = myEJIF.parser().getAllLineLengths();
+        int n = myEJIF.model().getAllLineLengths();
         manageVSB();
         return n;
     }
 
     private void putLineWithColons(int j) {
-        myEJIF.parser().putLineWithColons(j);
+        myEJIF.model().putLineWithColons(j);
     }
 
     private int getOneLineLength(int j) {
-        return myEJIF.parser().getOneLineLength(j);
+        return myEJIF.model().getOneLineLength(j);
     }
 
     StringBuffer fieldToStringBuffer() {
         // converts field or marked segment into a stringBuffer
         getAllLineLengths();
         int jmin = isMarked() ? Math.min(jDown, jDrag) : 0;
-        int jmax = isMarked() ? Math.max(jDown, jDrag) : myEJIF.parser().getNlines()-1;
-        return myEJIF.parser().fieldToStringBuffer(jmin, jmax);
+        int jmax = isMarked() ? Math.max(jDown, jDrag) : myEJIF.model().getNlines()-1;
+        return myEJIF.model().fieldToStringBuffer(jmin, jmax);
     }
 
     private class MyKeyHandler implements KeyListener
@@ -623,7 +623,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
                            stashForUndo(); 
                            pushDownOneLine(jCaret+1);        // clear line below
                            int ncopy = IMAX - iCaret;        // nchars to copy 
-                           myEJIF.parser().move(jCaret, iCaret, ncopy);
+                           myEJIF.model().move(jCaret, iCaret, ncopy);
                            // pushDownOneLine already set dirty = true
                            jCaret++;
                            iCaret = 0; 
@@ -645,7 +645,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
                        {
                            int istart = getOneLineLength(jCaret-1);
                            int iavail = IMAX - istart;   
-                           myEJIF.parser().appendAbove(jCaret, istart, iavail);
+                           myEJIF.model().appendAbove(jCaret, istart, iavail);
                            pullUpOneLine(jCaret);                // raise lines below
                            jCaret--; 
                            iCaret = istart; 
@@ -653,15 +653,15 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
                        else if (iCaret>0)      // pull chars leftward
                        {
                            iCaret--; 
-                           myEJIF.parser().pullLeft(jCaret, iCaret);
+                           myEJIF.model().pullLeft(jCaret, iCaret);
                        }
                    }
                    else if (iCaret > 0)   // table mode
                    {
                        iCaret--; 
-                       myEJIF.parser().replacech(jCaret, iCaret, ' ');
+                       myEJIF.model().replacech(jCaret, iCaret, ' ');
                    }
-                   myEJIF.parser.setDirty(true);
+                   myEJIF.dataModel.setDirty(true);
                    if (jCaret == RULER)
                      getFieldInfo(); 
                    break; 
@@ -670,7 +670,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
                    if (event.isShiftDown()) 
                      iCaret = doBackTab(iCaret);
                    else
-                     iCaret = 1+myEJIF.parser().rulerTagPos(iCaret, myEJIF.parser().getPeriod());
+                     iCaret = 1+myEJIF.model().rulerTagPos(iCaret, myEJIF.model().getPeriod());
                    break;    
 
                case KeyEvent.VK_F7:
@@ -725,14 +725,14 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
                   stashForUndo(); 
                   iCaret = Math.max(0, Math.min(IMAX-2, iCaret)); 
                   jCaret = Math.max(0, Math.min(JMAX-1, jCaret));
-                  myEJIF.parser().setchar(jCaret, iCaret, c);
+                  myEJIF.model().setchar(jCaret, iCaret, c);
                   iCaret = Math.min(IMAX-2, iCaret+1);   // increment iCaret
-                  if ((c>' ') && (jCaret+1>myEJIF.parser().getNlines()))
-                      myEJIF.parser().setNlines(jCaret+1);                   // helps Vscrolling
-                  if ((c>' ') && (iCaret>myEJIF.parser().getMaxlinelen()))
-                      myEJIF.parser().setMaxlinelen(iCaret);                 // helps Hscrolling
+                  if ((c>' ') && (jCaret+1>myEJIF.model().getNlines()))
+                      myEJIF.model().setNlines(jCaret+1);                   // helps Vscrolling
+                  if ((c>' ') && (iCaret>myEJIF.model().getMaxlinelen()))
+                      myEJIF.model().setMaxlinelen(iCaret);                 // helps Hscrolling
 
-                  myEJIF.parser.setDirty(true);
+                  myEJIF.dataModel.setDirty(true);
               }
             if (jCaret == RULER)
               getFieldInfo(); 
@@ -743,24 +743,24 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
 
     void widenTable(int i, boolean bColons) {
         stashForUndo();
-        myEJIF.parser().widenTable(i, bColons);
+        myEJIF.model().widenTable(i, bColons);
     }
 
     void narrowTable(int i) {
         if ((i<0) || (i>IMAX-2))
           return;
         stashForUndo();
-        myEJIF.parser().narrowTable(i);
+        myEJIF.model().narrowTable(i);
     }
 
     void CopyFieldDown() {
-        jCaret = myEJIF.parser().CopyFieldDown(jCaret, iCaret);
+        jCaret = myEJIF.model().CopyFieldDown(jCaret, iCaret);
     }
 
     void CopyFieldBottom()
     /// copies field and tag all the way to the bottom
     {
-        myEJIF.parser().CopyFieldBottom(jCaret, iCaret);
+        myEJIF.model().CopyFieldBottom(jCaret, iCaret);
     }
     
 
@@ -829,7 +829,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
 
     private void manageVSB()  // vertical scrollbar
     {
-        boolean bNeed = (myEJIF.parser().getNlines()>=jHeight) || (jOff>0);
+        boolean bNeed = (myEJIF.model().getNlines()>=jHeight) || (jOff>0);
         if ((myEJIF!=null) && (vsbReference==null) && bNeed)
           vsbReference = myEJIF.createVSB(); 
 
@@ -840,13 +840,13 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
 
         /// added Mar 2012, A135 making VSB track actual nlines
         if ((myEJIF!=null) && (vsbReference!=null) && bNeed)
-          vsbReference.setMaximum(myEJIF.parser().getNlines());
+          vsbReference.setMaximum(myEJIF.model().getNlines());
     }
     
 
     private void manageHSB()  // horizontal scrollbar
     {
-        boolean bNeed = (myEJIF.parser().getMaxlinelen()>=iWidth) || (iOff>0);
+        boolean bNeed = (myEJIF.model().getMaxlinelen()>=iWidth) || (iOff>0);
         if ((myEJIF!=null) && (hsbReference==null) && bNeed)
           hsbReference = myEJIF.createHSB(); 
        

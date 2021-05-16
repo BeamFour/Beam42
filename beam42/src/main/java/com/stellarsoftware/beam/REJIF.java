@@ -16,12 +16,12 @@ class REJIF extends EJIF
 
     public REJIF(int iXY, String gfname)
     {
-        super(1, iXY, ".RAY", gfname, MAXRAYS, new RayDataParser()); // call EJIF for preliminary parse()
+        super(1, iXY, ".RAY", gfname, MAXRAYS, new RAYDataModel()); // call EJIF for preliminary parse()
         myFpath = gfname;
     }
 
-    public RayDataParser model() {
-        return (RayDataParser) parser;
+    public RAYDataModel model() {
+        return (RAYDataModel) dataModel;
     }
 
     //--------- public methods for autoadjust inquiries-----------------

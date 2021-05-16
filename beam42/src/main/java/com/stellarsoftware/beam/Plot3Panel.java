@@ -1,7 +1,5 @@
 package com.stellarsoftware.beam;
 
-import javax.swing.*;      // Graphics2D features
-
 @SuppressWarnings("serial")
 
 /**
@@ -152,7 +150,7 @@ public class Plot3Panel extends GPanel
           
         String ast = DMF.reg.getuo(UO_PLOT3, 0); 
         //int op = REJIF.getCombinedRayFieldOp(ast);
-        int op = RayDataParser.getCombinedRayFieldOp(ast);
+        int op = RAYDataModel.getCombinedRayFieldOp(ast);
         int asurf = RT13.getSurfNum(op); 
         int aattr = RT13.getAttrNum(op); 
         if ((aattr<0) || (aattr>RNATTRIBS))
@@ -162,7 +160,7 @@ public class Plot3Panel extends GPanel
           
         String bst = DMF.reg.getuo(UO_PLOT3, 2); 
         //op = REJIF.getCombinedRayFieldOp(bst);
-        op = RayDataParser.getCombinedRayFieldOp(bst);
+        op = RAYDataModel.getCombinedRayFieldOp(bst);
         int bsurf = RT13.getSurfNum(op); 
         int battr = RT13.getAttrNum(op); 
         if ((battr<0) || (battr>RNATTRIBS))
@@ -172,7 +170,7 @@ public class Plot3Panel extends GPanel
           
         String cst = DMF.reg.getuo(UO_PLOT3, 4); 
         //op = REJIF.getCombinedRayFieldOp(cst);
-        op = RayDataParser.getCombinedRayFieldOp(cst);
+        op = RAYDataModel.getCombinedRayFieldOp(cst);
         int csurf = RT13.getSurfNum(op); 
         int cattr = RT13.getAttrNum(op); 
         if ((cattr<0) || (cattr>RNATTRIBS))
@@ -191,19 +189,19 @@ public class Plot3Panel extends GPanel
 
         ast = DMF.reg.getuo(UO_PLOT3, 0); 
         //int op = REJIF.getCombinedRayFieldOp(ast);
-        int op = RayDataParser.getCombinedRayFieldOp(ast);
+        int op = RAYDataModel.getCombinedRayFieldOp(ast);
         asurf = RT13.getSurfNum(op); 
         aattr = RT13.getAttrNum(op); 
 
         bst = DMF.reg.getuo(UO_PLOT3, 2); 
         //op = REJIF.getCombinedRayFieldOp(bst);
-        op = RayDataParser.getCombinedRayFieldOp(bst);
+        op = RAYDataModel.getCombinedRayFieldOp(bst);
         bsurf = RT13.getSurfNum(op); 
         battr = RT13.getAttrNum(op); 
 
         cst = DMF.reg.getuo(UO_PLOT3, 4); 
         //op = REJIF.getCombinedRayFieldOp(cst);
-        op = RayDataParser.getCombinedRayFieldOp(cst);
+        op = RAYDataModel.getCombinedRayFieldOp(cst);
         csurf = RT13.getSurfNum(op); 
         cattr = RT13.getAttrNum(op); 
 

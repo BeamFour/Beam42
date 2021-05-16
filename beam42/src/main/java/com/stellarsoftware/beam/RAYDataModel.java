@@ -44,7 +44,7 @@ import static com.stellarsoftware.beam.B4constants.*;
  *
  * @author M.Lampton (c) STELLAR SOFTWARE 2004, 2015 all rights reserved.
  */
-public class RayDataParser extends ParserBase {
+public class RAYDataModel extends B4DataModel {
     private String wavenames[] = new String[JMAX];
     private int rF2I[] = new int[MAXFIELDS];
     private int rI2F[] = new int[RNSTARTS];  // 10 raystart attributes: B4constants.java

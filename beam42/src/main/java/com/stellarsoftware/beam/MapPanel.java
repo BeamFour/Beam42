@@ -360,7 +360,7 @@ public class MapPanel extends GPanel // implements Runnable
         {
             ij[1] = 0;   
             //ij[0] = REJIF.getCombinedRayFieldOp(s) % 100;
-            ij[0] = RayDataParser.getCombinedRayFieldOp(s) % 100;
+            ij[0] = RAYDataModel.getCombinedRayFieldOp(s) % 100;
  
             if ((ij[0]<RX) || (ij[0]>RW))  
               ij[1] = -1;                        // declare failure. 
@@ -370,7 +370,7 @@ public class MapPanel extends GPanel // implements Runnable
         }
         if (nums.indexOf(ch1) >= 0)              // optics?
         {
-            ij[0] = OptParser.getOptFieldAttrib(s);
+            ij[0] = OPTDataModel.getOptFieldAttrib(s);
  
             if (ch1 == 'F')
               ij[1] = ngroups;                   // ngroups is valid here. 

@@ -1,7 +1,5 @@
 package com.stellarsoftware.beam;
 
-import javax.swing.*;      // Graphics2D features
-
 @SuppressWarnings("serial")
 
 /**
@@ -133,13 +131,13 @@ public class Plot2Panel extends GPanel
     {
         String hst = DMF.reg.getuo(UO_PLOT2, 0); 
         //int op = REJIF.getCombinedRayFieldOp(hst);
-        int op = RayDataParser.getCombinedRayFieldOp(hst);
+        int op = RAYDataModel.getCombinedRayFieldOp(hst);
         int hsurf = RT13.getSurfNum(op); 
         int hattr = RT13.getAttrNum(op); 
 
         String vst = DMF.reg.getuo(UO_PLOT2, 2); 
         //op = REJIF.getCombinedRayFieldOp(vst);
-        op = RayDataParser.getCombinedRayFieldOp(vst);
+        op = RAYDataModel.getCombinedRayFieldOp(vst);
         int vsurf = RT13.getSurfNum(op); 
         int vattr = RT13.getAttrNum(op); 
 
@@ -176,13 +174,13 @@ public class Plot2Panel extends GPanel
 
         hst = DMF.reg.getuo(UO_PLOT2, 0); 
         //int op = REJIF.getCombinedRayFieldOp(hst);
-        int op = RayDataParser.getCombinedRayFieldOp(hst);
+        int op = RAYDataModel.getCombinedRayFieldOp(hst);
         hsurf = RT13.getSurfNum(op); 
         hattr = RT13.getAttrNum(op); 
 
         vst = DMF.reg.getuo(UO_PLOT2, 2); 
         //op = REJIF.getCombinedRayFieldOp(vst);
-        op = RayDataParser.getCombinedRayFieldOp(vst);
+        op = RAYDataModel.getCombinedRayFieldOp(vst);
         vsurf = RT13.getSurfNum(op); 
         vattr = RT13.getAttrNum(op); 
 

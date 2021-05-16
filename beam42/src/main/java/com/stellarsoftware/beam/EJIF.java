@@ -1,20 +1,19 @@
 package com.stellarsoftware.beam;
 
+import javax.swing.*;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.*;
-import java.awt.AWTEvent.*;      // consume: nope.
-import java.awt.geom.*;          // printing
-import java.awt.print.*;         // printing
-import javax.print.attribute.*;  // printing attributes
-import java.awt.font.*;          // font metric
-import java.io.*;                // files;QuickPNG.
-
-import java.awt.datatransfer.*;  // clipboard
-import java.beans.*;             // vetoableChangeListener
-
-import javax.swing.*;            // everything else
-import javax.swing.event.*;      // for MenuEvents and InternalFrameAdapter
-import javax.swing.filechooser.FileNameExtensionFilter;  
+import java.awt.datatransfer.*;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
+import java.io.File;
+import java.io.IOException;
 
 @SuppressWarnings("serial")
 

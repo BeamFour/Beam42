@@ -244,7 +244,8 @@ class RayHost implements B4constants
                 if (op==op0 || op==op1)
                 {
                     double d = RT13.raystarts[kray][op]; 
-                    int f = REJIF.rI2F[op]; 
+                    //int f = REJIF.rI2F[op];
+                    int f = rayEditor.rI2F()[op];
                     rayEditor.putFieldDouble(f, kray+2, d);  
                 }
             }

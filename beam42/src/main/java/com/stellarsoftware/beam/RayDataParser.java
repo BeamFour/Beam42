@@ -395,7 +395,7 @@ public class RayDataParser extends ParserBase {
                             if (bSameGroup)
                             {
                                 int iSlave = (bUpper0 == bUpperk) ? k : -k;
-                                slaves.add(new Integer(iSlave));
+                                slaves.add(iSlave);
                                 bLookedAt[k] = true;
                             }
                         }

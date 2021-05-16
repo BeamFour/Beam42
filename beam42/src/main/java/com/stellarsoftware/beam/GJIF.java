@@ -41,6 +41,16 @@ public class GJIF extends BJIF implements B4constants
         return true;
     }
 
+    @Override
+    boolean needsParse() {
+        return false;
+    }
+
+    @Override
+    void setNeedsParse(boolean value) {
+
+    }
+
     public GJIF(int gtype, String gname, JMenuItem gjmi)
     // This is called by DMF with the above three data. 
     {

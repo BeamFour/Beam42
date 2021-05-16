@@ -206,7 +206,8 @@ public class H1DPanel extends GPanel
     {
         int nsurfs = DMF.giFlags[ONSURFS];
         String hst = DMF.reg.getuo(UO_1D, 0); 
-        int op = REJIF.getCombinedRayFieldOp(hst); 
+        //int op = REJIF.getCombinedRayFieldOp(hst);
+        int op = RayDataParser.getCombinedRayFieldOp(hst);
         int hsurf = RT13.getSurfNum(op); 
         int hattr = RT13.getAttrNum(op); 
         if ((hsurf<0) || (hattr<0) || (hattr>RNATTRIBS))
@@ -223,7 +224,8 @@ public class H1DPanel extends GPanel
         shmax = new String(""); // value label
 
         hst = DMF.reg.getuo(UO_1D, 0); 
-        int op = REJIF.getCombinedRayFieldOp(hst); 
+        //int op = REJIF.getCombinedRayFieldOp(hst);
+        int op = RayDataParser.getCombinedRayFieldOp(hst);
         // hsurf = RT13.getGroupNum(op); 
         hsurf = RT13.getSurfNum(op); 
         hattr = RT13.getAttrNum(op); 

@@ -121,7 +121,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
   *
   *  @author M.Lampton (c) 2004 STELLAR SOFTWARE all rights reserved.
   */
-abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
+class EJIF extends BJIF implements B4constants, AdjustmentListener
 {
     // public static final long serialVersionUID = 42L; // Xlint 8 Oct 2014
     
@@ -136,18 +136,28 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
 
     private int myFlavor;                 // remember my flavor: 0,1,2=opt,ray,med
     private int maxrecords;               // depends on editor type
-    private boolean bDirty=false;         // avoid exit if unsaved changes
+    //private boolean bDirty=false;         // avoid exit if unsaved changes
     private int iCountdown = 0;           // manage temporary titles
     private File myFile=null; 
     private EPanel ePanel=null; 
     JScrollBar vsb=null, hsb=null; 
     private Container cPane=null;         // will contain ePanel.
-    static private Clipboard clipb=null;  // local or system. 
+    static private Clipboard clipb=null;  // local or system.
+    protected ParserBase parser;
+
 
     //---------------public methods and fields-------------------
 
-    abstract void parse();   // supplied by extensions OEJIF, REJIF, MEJIF.
-            
+    //abstract void parse();   // supplied by extensions OEJIF, REJIF, MEJIF.
+    public void parse()   // supplied by extensions OEJIF, REJIF, MEJIF.
+    {
+        parser.parse();
+    }
+
+    public ParserBase parser() {
+        return this.parser;
+    }
+
     public boolean bExitOK(Component parent)
     // Called here, or by main DMF window exit.
     // Buttons, 0, 1, 2 = save, exit, cancel:
@@ -155,7 +165,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
     // The caller will do the actual closing locally via dispose(),
     // or globally if no cancels via System.exit(0)
     {    
-        if (!bDirty)
+        if (!parser.isDirty())
         {
             return true; 
         }
@@ -180,7 +190,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
 
 
  
-    public EJIF(int flavor, int iLoc, String gExt, String gFname, int gmaxrec)
+    public EJIF(int flavor, int iLoc, String gExt, String gFname, int gmaxrec, ParserBase parser)
     // Do not construct an EJIF unless the file & contents verify okay.
     // This revision A178 August 2015
     // (c) 2004 M.Lampton STELLAR SOFTWARE
@@ -196,6 +206,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
           myPathOnly = System.getProperty("user.home"); 
         maxrecords = gmaxrec; 
         myFlavor = flavor;   // 0=opt, 1=ray, 2=med.
+        this.parser = parser;
 
         ePanel = new EPanel(this); 
         cPane = getContentPane();
@@ -203,7 +214,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
 
         super.setKeyPanel(ePanel);  ///// what does this do?
         myFile = new File(myFpath); 
-        bLoadFile(myFile); 
+        parser.bLoadFile(myFile);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);  
         addInternalFrameListener(new InternalFrameAdapter()  
         {
@@ -234,8 +245,8 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
             }
         });
        
-        bDirty = false; 
-        bNeedsParse = true; 
+//        bDirty = false;
+//        bNeedsParse = true;
         
     } //-----end of constructor-----
 
@@ -266,50 +277,50 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
 
 
 
-    public boolean bLoadFile(File f)  
-    // Extracts string from file; calls ePanel.vLoadString(). 
-    // No internal smarts about EOL or CSV/Tab.
-    // Analogous to doPasteInto(). 
-    {
-        if (f ==null)
-        {
-            return false;
-        }
-        if (!f.exists())
-        {
-            return false;
-        }
-        if (!f.canRead())
-        {
-            return false;
-        }
-        
-        try 
-        {
-           BufferedReader br = new BufferedReader(new FileReader(f)); 
-           String text = null; 
-           StringBuffer sb = new StringBuffer(); 
-           while((text = br.readLine()) != null) 
-           { 
-              sb.append(text);
-              sb.append("\n"); 
-           } 
-           br.close(); 
-           if (sb.length() < 2)
-           {
-               return false; 
-           }
-           String s = new String(sb); 
-           ePanel.vLoadString(s, true);    // preclear=true.
-           if (getNumLines() > maxrecords+2)
-             iCountdown = -10;              // warning.  
-           return true; 
-        } 
-        catch (IOException e) 
-        { 
-            return false; 
-        } 
-    }
+//    public boolean bLoadFile(File f)
+//    // Extracts string from file; calls ePanel.vLoadString().
+//    // No internal smarts about EOL or CSV/Tab.
+//    // Analogous to doPasteInto().
+//    {
+//        if (f ==null)
+//        {
+//            return false;
+//        }
+//        if (!f.exists())
+//        {
+//            return false;
+//        }
+//        if (!f.canRead())
+//        {
+//            return false;
+//        }
+//
+//        try
+//        {
+//           BufferedReader br = new BufferedReader(new FileReader(f));
+//           String text = null;
+//           StringBuffer sb = new StringBuffer();
+//           while((text = br.readLine()) != null)
+//           {
+//              sb.append(text);
+//              sb.append("\n");
+//           }
+//           br.close();
+//           if (sb.length() < 2)
+//           {
+//               return false;
+//           }
+//           String s = new String(sb);
+//           ePanel.vLoadString(s, true);    // preclear=true.
+//           if (getNumLines() > maxrecords+2)
+//             iCountdown = -10;              // warning.
+//           return true;
+//        }
+//        catch (IOException e)
+//        {
+//            return false;
+//        }
+//    }
 
 
 
@@ -370,17 +381,17 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
 
     public boolean areYouDirty()
     {
-        return bDirty; 
+        return parser.isDirty();
     }
 
-    public void setDirty(boolean state)
-    // Called "true" by EPanel when user inputs modify the table.
-    // Called "false by EPanel when Epanel saves the file. 
-    {
-       bDirty = state;
-       if (state)
-         bNeedsParse = true; 
-    } 
+//    public void setDirty(boolean state)
+//    // Called "true" by EPanel when user inputs modify the table.
+//    // Called "false by EPanel when Epanel saves the file.
+//    {
+//       bDirty = state;
+//       if (state)
+//         bNeedsParse = true;
+//    }
 
 
     public void pleaseSaveAs()
@@ -428,10 +439,10 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
             if (iq != JOptionPane.YES_OPTION)
               return; 
         }
-        if (ePanel.save(myFile))   // successful!
+        //if (ePanel.save(myFile))   // successful!
+        if (parser.save(myFile))
         {
-            bDirty = false; 
-            myFpath = myFile.getPath();          
+            myFpath = myFile.getPath();
             String ext = U.getExtensionToLower(myFpath); 
             
             //---update the recent file list----
@@ -465,7 +476,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
         }
         if (ePanel.save(myFile))
         {
-            bDirty = false; 
+            //bDirty = false;
             myFpath = myFile.getPath(); 
             iCountdown = 5;  // posts "Saved" message
             return; 
@@ -505,8 +516,8 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
         StringSelection ss = new StringSelection(s); 
         clipb.setContents(ss, null); 
         ePanel.doDelete(); 
-        bDirty = true; 
-        bNeedsParse = true; 
+//        bDirty = true;
+//        bNeedsParse = true;
     }
 
     public void doCopy()
@@ -549,8 +560,8 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
               ePanel.vLoadString(s, false);     // preclear=false
               if (getNumLines() > maxrecords+2)
                 iCountdown = -10;                // warning.  
-              bDirty = true; 
-              bNeedsParse = true; 
+//              bDirty = true;
+//              bNeedsParse = true;
            }
            catch(UnsupportedFlavorException ufe) {}
            catch (IOException ioe) {}
@@ -561,8 +572,8 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
     {
         DMF.nEdits++; 
         ePanel.doDelete(); 
-        bDirty = true; 
-        bNeedsParse = true; 
+//        bDirty = true;
+//        bNeedsParse = true;
     }
 
     public void doSelectAll()
@@ -577,26 +588,26 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
     
     //-----------protected internal methods for derived classes-----------
 
-    protected void vPreParse(int results[])
-    // Called by extended class to pre-gather table information.
-    {
-        for (int i=0; i<NGENERIC; i++)
-          results[i] = 0; 
-        if (ePanel == null)
-          return; 
-        results[GPRESENT] = 1; 
-        results[GNLINES] = ePanel.getLineCount();
-        int nguide = ePanel.getGuideNumber(); 
-        results[GNRECORDS] = Math.min(nguide, results[GNLINES]-3); 
-        results[GNFIELDS] = ePanel.getFieldInfo(); 
-    }
+//    protected void vPreParse(int results[])
+//    // Called by extended class to pre-gather table information.
+//    {
+//        for (int i=0; i<NGENERIC; i++)
+//          results[i] = 0;
+//        if (ePanel == null)
+//          return;
+//        results[GPRESENT] = 1;
+//        results[GNLINES] = ePanel.getLineCount();
+//        int nguide = ePanel.getGuideNumber();
+//        results[GNRECORDS] = Math.min(nguide, results[GNLINES]-3);
+//        results[GNFIELDS] = ePanel.getFieldInfo();
+//    }
 
     protected int getNumLines()     // extensions need this
     {
         if (ePanel == null)
           return 0; 
-        return ePanel.getLineCount(); 
-    } 
+        return ePanel.getLineCount();
+    }
 
     protected int getNumFields()    // extensions use this.
     {
@@ -637,7 +648,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
     {
         if (ePanel == null)
           return ""; 
-        return ePanel.getFieldTrim(f, r); 
+        return ePanel.getFieldTrim(f, r);
     }
 
     protected double getFieldDouble(int f, int r)
@@ -659,7 +670,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
         if (ePanel == null)
           return; 
         ePanel.putFieldString(f, r, s); 
-        bDirty = true; 
+        //bDirty = true;
         // bNeedsParse = true; // not here this is calculation driven 
     }
 
@@ -668,8 +679,8 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
         if (ePanel == null)
           return; 
         ePanel.putFieldString(f, r, ""); 
-        bDirty = true; 
-        bNeedsParse = true; 
+//        bDirty = true;
+//        bNeedsParse = true;
     }
 
     protected void putFieldDouble(int f, int r, double d)
@@ -681,7 +692,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
             putBlank(f,r);
         else  
             ePanel.putFieldDouble(f, r, d); 
-        bDirty = true; 
+        //bDirty = true;
         // bNeedsParse = true; // not here this is calculation driven
     }
 
@@ -690,7 +701,17 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
         if (ePanel == null)
           return;
         ePanel.forceFieldDouble(f, r, d); 
-        bDirty = true; 
+        //bDirty = true;
+    }
+
+    @Override
+    boolean needsParse() {
+        return parser.needsParse();
+    }
+
+    @Override
+    void setNeedsParse(boolean value) {
+        parser.setNeedsParse(value);
     }
 
     protected void refreshSizes()

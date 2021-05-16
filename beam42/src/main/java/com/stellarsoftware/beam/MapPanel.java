@@ -359,7 +359,8 @@ public class MapPanel extends GPanel // implements Runnable
         if (zeros.indexOf(ch1) >= 0)             // raystart
         {
             ij[1] = 0;   
-            ij[0] = REJIF.getCombinedRayFieldOp(s) % 100; 
+            //ij[0] = REJIF.getCombinedRayFieldOp(s) % 100;
+            ij[0] = RayDataParser.getCombinedRayFieldOp(s) % 100;
  
             if ((ij[0]<RX) || (ij[0]>RW))  
               ij[1] = -1;                        // declare failure. 
@@ -539,7 +540,7 @@ public class MapPanel extends GPanel // implements Runnable
                 sList.add(s); 
             }
         }
-        dList.add(new Double(d)); ////// this is it!
+        dList.add(d); ////// this is it!
         
         //----finally, undo the parameter step-------
 

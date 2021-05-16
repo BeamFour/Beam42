@@ -102,7 +102,8 @@ class InOut implements B4constants
                System.out.println("InOut.vUpdateRayTable has howfarOK, howfarLoop = "+howfarOK+"  "+howfarLoop);  
             for (int f=0; f<rnfields; f++)    // field loop
             {
-                int op = REJIF.rF2I[f]; 
+                //int op = REJIF.rF2I[f];
+                int op = DMF.rejif.rF2I()[f];
                 if (op == RNOTE)  // ray note message here....
                 {
                     int stat = RT13.getStatus(kray); 

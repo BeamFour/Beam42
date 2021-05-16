@@ -151,7 +151,8 @@ public class Plot3Panel extends GPanel
         String word = "Nsurfaces="+nsurfs;
           
         String ast = DMF.reg.getuo(UO_PLOT3, 0); 
-        int op = REJIF.getCombinedRayFieldOp(ast); 
+        //int op = REJIF.getCombinedRayFieldOp(ast);
+        int op = RayDataParser.getCombinedRayFieldOp(ast);
         int asurf = RT13.getSurfNum(op); 
         int aattr = RT13.getAttrNum(op); 
         if ((aattr<0) || (aattr>RNATTRIBS))
@@ -160,7 +161,8 @@ public class Plot3Panel extends GPanel
           return "Bad '"+ast+"'  "+word;
           
         String bst = DMF.reg.getuo(UO_PLOT3, 2); 
-        op = REJIF.getCombinedRayFieldOp(bst); 
+        //op = REJIF.getCombinedRayFieldOp(bst);
+        op = RayDataParser.getCombinedRayFieldOp(bst);
         int bsurf = RT13.getSurfNum(op); 
         int battr = RT13.getAttrNum(op); 
         if ((battr<0) || (battr>RNATTRIBS))
@@ -169,7 +171,8 @@ public class Plot3Panel extends GPanel
           return "Bad '"+bst+"'  "+word; 
           
         String cst = DMF.reg.getuo(UO_PLOT3, 4); 
-        op = REJIF.getCombinedRayFieldOp(cst); 
+        //op = REJIF.getCombinedRayFieldOp(cst);
+        op = RayDataParser.getCombinedRayFieldOp(cst);
         int csurf = RT13.getSurfNum(op); 
         int cattr = RT13.getAttrNum(op); 
         if ((cattr<0) || (cattr>RNATTRIBS))
@@ -187,17 +190,20 @@ public class Plot3Panel extends GPanel
         bPleaseParseUO = false; 
 
         ast = DMF.reg.getuo(UO_PLOT3, 0); 
-        int op = REJIF.getCombinedRayFieldOp(ast); 
+        //int op = REJIF.getCombinedRayFieldOp(ast);
+        int op = RayDataParser.getCombinedRayFieldOp(ast);
         asurf = RT13.getSurfNum(op); 
         aattr = RT13.getAttrNum(op); 
 
         bst = DMF.reg.getuo(UO_PLOT3, 2); 
-        op = REJIF.getCombinedRayFieldOp(bst); 
+        //op = REJIF.getCombinedRayFieldOp(bst);
+        op = RayDataParser.getCombinedRayFieldOp(bst);
         bsurf = RT13.getSurfNum(op); 
         battr = RT13.getAttrNum(op); 
 
         cst = DMF.reg.getuo(UO_PLOT3, 4); 
-        op = REJIF.getCombinedRayFieldOp(cst); 
+        //op = REJIF.getCombinedRayFieldOp(cst);
+        op = RayDataParser.getCombinedRayFieldOp(cst);
         csurf = RT13.getSurfNum(op); 
         cattr = RT13.getAttrNum(op); 
 

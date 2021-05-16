@@ -18,6 +18,10 @@ public class OptParser extends ParserBase {
     ArrayList<Adjustment> adjustables = new ArrayList<Adjustment>();
     double dOsize = 0.0;
 
+    public String[] oglasses() {
+        return oglasses;
+    }
+
     public static int getOptFieldAttrib(String s)
     // Given an optics table column header field, this routine returns a
     // number 0..122 for identified optics table fields, or else returns ABSENT.
@@ -518,7 +522,7 @@ public class OptParser extends ParserBase {
                             if (bSameGroup)
                             {
                                 int iSlave = (bUpper0 == bUpperk) ? k : -k;
-                                slaves.add(new Integer(iSlave));
+                                slaves.add(iSlave);
                                 bLookedAt[k] = true;
                             }
                         }
@@ -845,6 +849,19 @@ public class OptParser extends ParserBase {
 
     @Override
     public void parse() {
+
+        // First, communicate EJIF results to DMF.giFlags[]
+        // vPreParse() takes care of parsing title line.
+
+        int status[] = new int[NGENERIC];
+        vPreParse(status);
+        DMF.giFlags[OPRESENT] = status[GPRESENT];
+        DMF.giFlags[ONLINES]  = status[GNLINES];
+        DMF.giFlags[ONSURFS]  = nsurfs = status[GNRECORDS];
+        DMF.giFlags[ONFIELDS] = nfields = status[GNFIELDS];
+        if (nsurfs < 1)
+          return;
+
         setupDefaults();
         parseHeaders();
         parseHeadingLine();
@@ -861,6 +878,71 @@ public class OptParser extends ParserBase {
         verifyArrayDims();
         classifyProfileSolvers();
         calcDOsize();
+    }
+
+        //-----------public functions for AutoAdjust------------
+    //-----Now that Adjustment is a public class,
+    //-----cannot Auto get its own data?----------------
+    //-----Nope. ArrayList adjustments is private.----------
+    //
+    //---Yikes, sometimes at startup adjustables is all -1 even with good adjustables.
+    //-----What should initialize adjustables??
+
+
+    public double getOsize()
+    // called ONLY by DMF, in support of its static method.
+    {
+        return dOsize;
+    }
+
+    public double getAdjValue(int i)
+    // Fetch appropriate value from RT13.surfs[][].
+    // Adjustables was parsed back in line 318.
+    {
+       if ((adjustables!=null) && (i>=0) && (i<adjustables.size()))
+       {
+           int jsurf = adjustables.get(i).getRecord();
+           int iattr = adjustables.get(i).getAttrib();
+           if ((jsurf>0) && (jsurf<=nsurfs) && (iattr>=0) && (iattr<OFINALADJ))
+             return RT13.surfs[jsurf][iattr];
+       }
+       return 0.0;
+    }
+
+    public int getAdjAttrib(int i)
+    // Adjustables was parsed back in line 318.
+    {
+       if ((adjustables != null) && (i>=0) && (i < adjustables.size()))
+         return adjustables.get(i).getAttrib();
+       else
+         return -1;
+    }
+
+    public int getAdjSurf(int i)
+    // Adjustables was parsed back in line 318.
+    {
+       if ((adjustables != null) && (i>=0) && (i < adjustables.size()))
+         return adjustables.get(i).getRecord();
+       else
+         return -1;
+    }
+
+    public int getAdjField(int i)
+    // Adjustables was parsed back in line 318.
+    {
+       if ((adjustables != null) && (i>=0) && (i < adjustables.size()))
+         return adjustables.get(i).getField();
+       else
+         return -1;
+    }
+
+    public ArrayList<Integer> getSlaves(int i)
+    // Adjustables was parsed back in line 318.
+    {
+       if ((adjustables != null) && (i>=0) && (i < adjustables.size()))
+         return adjustables.get(i).getList();
+       else
+         return null;
     }
 
 }

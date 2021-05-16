@@ -1662,7 +1662,8 @@ public class DMF extends JFrame implements B4constants
             if (Double.isNaN(refr))            // invalid numeric
             {
                 for (int mrec=1; mrec <= giFlags[MNGLASSES]; mrec++)
-                  if (OEJIF.oglasses[jsurf].equals(MEJIF.mglasses[mrec]))
+                  //if (OEJIF.oglasses[jsurf].equals(MEJIF.mglasses[mrec]))
+                  if (DMF.oejif.parser().oglasses()[jsurf].equals(MEJIF.mglasses[mrec]))
                   {
                       RT13.gO2M[jsurf] = mrec; // found it! jsurf uses glass number "mrec"
                       break;                   // abandon search. 
@@ -1670,7 +1671,8 @@ public class DMF extends JFrame implements B4constants
                 if (RT13.gO2M[jsurf] == ABSENT)
                 {
                     unkglassrec = jsurf; 
-                    unkglassname = OEJIF.oglasses[jsurf]; 
+                    //unkglassname = OEJIF.oglasses[jsurf];
+                    unkglassname = DMF.oejif.parser().oglasses()[jsurf];
                     trouble = true; 
                     break; // break out of required glass loop
                 }
@@ -1691,9 +1693,11 @@ public class DMF extends JFrame implements B4constants
         trouble = false; 
         for (int kray=1; kray<= giFlags[RNRAYS]; kray++)
         {
-            if (REJIF.wavenames[kray].length() > 0)  // empty is trouble here.
+            if (DMF.rejif.wavenames()[kray].length() > 0)  // empty is trouble here.
+            //if (REJIF.wavenames[kray].length() > 0)  // empty is trouble here.
               for (int f=1; f <= giFlags[MNWAVES]; f++)
-                if (REJIF.wavenames[kray].equals(MEJIF.mwaves[f]))
+                if (DMF.rejif.wavenames()[kray].equals(MEJIF.mwaves[f]))
+                //if (REJIF.wavenames[kray].equals(MEJIF.mwaves[f]))
                 {
                     RT13.gR2W[kray] = f; // found it! kray uses wavel ID "f"
                     break;               // abandon search.
@@ -1701,7 +1705,8 @@ public class DMF extends JFrame implements B4constants
             if (RT13.gR2W[kray] == ABSENT)
             {
                 unkwaverec = kray; 
-                unkwavename = REJIF.wavenames[kray]; 
+                //unkwavename = REJIF.wavenames[kray];
+                unkwavename = DMF.rejif.wavenames()[kray];
                 trouble = true; 
                 break; 
             }

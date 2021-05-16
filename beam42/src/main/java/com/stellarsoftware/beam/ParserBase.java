@@ -1,9 +1,6 @@
 package com.stellarsoftware.beam;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 import static com.stellarsoftware.beam.B4constants.*;
 
@@ -20,12 +17,44 @@ public abstract class ParserBase {
     protected int nlines = 0;
     protected int maxlinelen = 0;
     protected int linelen[] = new int[JMAX];
-    protected int iCaret, jCaret;   // caret column & row
+
+    //protected int iCaret, jCaret;   // caret column & row
     protected int period = 10;      // fieldwidth+1
+    private boolean bDirty=false;         // avoid exit if unsaved changes
+    protected boolean bNeedsParse=false;    // BJIF timer calls vMasterParse
 
     //-------------here is the char table-----------------
 
     private char charTable[][] = new char[JMAX+1][IMAX+1];
+
+    protected ParserBase() {
+        //--------set up fieldArray helpers-----------------
+
+        nfields = 0;
+
+        for (int f=0; f<MAXFIELDS; f++)
+        {
+            iFieldStartCol[f] = 0;
+            iFieldWidth[f] = 0;
+            iFieldTagCol[f] = 0;
+            iFieldDecimalPlaces[f] = 0;
+            cFieldFormat[f] = '-';
+        }
+        bDirty = false;
+        bNeedsParse = true;
+    }
+
+    public int getiFieldStartCol(int field) {
+        return iFieldStartCol[field];
+    }
+
+    public String getLine(int j, int iOff, int count) {
+        return new String(charTable[j], iOff, count);
+    }
+
+    public int getLineLen(int j) {
+        return linelen[j];
+    }
 
     public boolean bLoadFile(File f)
     // Extracts string from file; calls ePanel.vLoadString().
@@ -61,7 +90,7 @@ public abstract class ParserBase {
                 return false;
             }
             String s = new String(sb);
-            vLoadString(s, true);    // preclear=true.
+            vLoadString(s, true, 0);    // preclear=true.
 //            if (getNumLines() > maxrecords+2)
 //                iCountdown = -10;              // warning.
             return true;
@@ -72,22 +101,198 @@ public abstract class ParserBase {
         }
     }
 
-    void clearLine(int j)
-    // When exactly is this called?
+    public void vLoadSkeleton()
     {
-        for (int i=0; i<IMAX; i++)
-            charTable[j][i] = ' ';
-    }
-
-    private void clearTable()
-    {
-        for (int j=0; j<JMAX; j++)
-            clearLine(j);
-        iCaret = jCaret= 0;
+        int ifw = U.parseInt(DMF.reg.getuo(UO_EDIT, 3));
+        ifw = Math.max(6, Math.min(100, ifw));
+        DMF.nEdits++;
+        clearTable();
+        for (int i=0; i<100; i++)
+            charTable[2][i] = '-';
+        for (int j=2; j<15; j++)
+            for (int i=ifw; i<100; i+=ifw)
+                charTable[j][i] = ':';
+        setDirty(false);
+        getAllLineLengths();
         getFieldInfo();
     }
 
-    private int getOneLineLength(int j)
+    public void move(int jCaret, int iCaret, int ncopy) {
+        System.arraycopy(charTable[jCaret], iCaret, charTable[jCaret+1], 0, ncopy);
+        for (int i=iCaret; i<IMAX; i++)   // blank source chars
+            charTable[jCaret][i] = SPACE;
+    }
+
+    public void setchar(int jCaret, int iCaret, char c) {
+        if("T".equals(DMF.reg.getuo(UO_EDIT, 10)))  // text mode shove right
+            for (int k=IMAX-1; k>iCaret; k--)
+                charTable[jCaret][k] = charTable[jCaret][k-1];
+        charTable[jCaret][iCaret] = c;
+    }
+
+    public void replacech(int jCaret, int iCaret, char ch) {
+        charTable[jCaret][iCaret] = ch;
+    }
+
+    public void pullLeft(int jCaret, int iCaret) {
+        for (int k=iCaret; k<IMAX-2; k++)
+            charTable[jCaret][k] = charTable[jCaret][k+1];
+    }
+
+    public boolean isDirty() {
+        return bDirty;
+    }
+
+    public boolean save(File f)
+    // Uses println() to generate local platform EOLs.
+    {
+        getAllLineLengths();   // sets up linelengths & nlines.
+        try
+        {
+            PrintWriter pw = new PrintWriter(new FileWriter(f), true);
+            for (int j=0; j<nlines; j++)
+            {
+                String s = new String(charTable[j], 0, linelen[j]);
+                pw.println(s);
+            }
+            pw.close();
+            setDirty(false);
+            return true;
+        }
+        catch (IOException ioe)
+        { return false; }
+    }
+
+    public String getMarkedText(int j0, int j1) {
+        StringBuffer sb = new StringBuffer(10000);
+
+        for (int j=j0; j<=j1; j++)
+        {
+            sb.append(charTable[j], 0, linelen[j]);
+            sb.append('\n');
+        }
+
+        //------perform tab substitutions-------------
+        //-------use charTable[2] as ruler------------
+        //------don't clobber any EOLs!---------------
+
+        if (DMF.reg.getuo(UO_EDIT, 5).equals("T"))
+        {
+            int iX=0, j=j0;
+            for (int i=0; i<sb.length(); i++)
+            {
+                if (j>0)
+                    if ((charTable[2][iX]==COLON) && (sb.charAt(i)!='\n'))
+                        sb.setCharAt(i, TAB);
+
+                iX++;
+                if (sb.charAt(i) == '\n')
+                {
+                    iX=0;
+                    j++;
+                }
+            }
+        }
+        return new String(sb);
+    }
+
+    public void setDirty(boolean state)
+    // Called "true" by EPanel when user inputs modify the table.
+    // Called "false by EPanel when Epanel saves the file.
+    {
+        bDirty = state;
+        if (state)
+            bNeedsParse = true;
+    }
+
+    String getTableString()
+    // Multipurpose string sucker.
+    // Called by private swapUndo() and by public stashForUndo().
+    {
+        StringBuffer sb = new StringBuffer(1000);
+        getAllLineLengths();
+        for (int j=0; j<nlines; j++)
+        {
+            sb.append(charTable[j], 0, linelen[j]);
+            sb.append('\n');
+        }
+        return sb.toString();
+    }
+
+    void putTableString(String sGiven)
+    // Clears the charTable and installs a given String.
+    // Also tidies up the diagnostics, and redisplays.
+    // Assumes EOL is '\n' and so is not multiplatform.
+    {
+        DMF.nEdits++;
+        int i=0, j=0, k=0;
+        for (j=0; j<JMAX; j++)    // clear the table
+            for (i=0; i<IMAX; i++)
+                charTable[j][i] = ' ';
+        i=0;
+        j=0;
+        for (k=0; k<sGiven.length(); k++)  // char loop
+        {
+            char c = U.getCharAt(sGiven, k);
+            if (c == '\n')
+            {
+                j++;
+                i=0;
+            }
+            else
+            {
+                charTable[j][i] = c;
+                i++;
+            }
+        }
+        getAllLineLengths();
+        getFieldInfo();
+    }
+
+    public int doBackTab(int i)
+    // Used by myKeyHandler to implement BackTab.
+    // Avoids use of field organizers.
+    {
+        for (int k=i-2; k>0; k--)
+            if (charTable[2][k] == COLON)
+                return k+1;
+        return 0;
+    }
+
+    public int getWhichField(int icol)
+    // Each field must have a ruler colon tag.
+    {
+        if (nfields < 1)
+            return ABSENT;
+        if (icol < iFieldStartCol[0])
+            return ABSENT;
+        if (icol > iFieldTagCol[nfields-1])
+            return ABSENT;  // no such field
+        for (int f=0; f<MAXFIELDS; f++)
+            if (iFieldTagCol[f] >= icol)
+                return f;
+        return 0;
+    }
+
+    void clearLine(int j)
+    // When exactly is this called?
+    {
+        DMF.nEdits++; // TODO
+        for (int i=0; i<IMAX; i++)
+            charTable[j][i] = ' ';
+        setDirty(true); // TODO
+    }
+
+    public void clearTable()
+    {
+        DMF.nEdits++;
+        for (int j=0; j<JMAX; j++)
+            clearLine(j);
+        getFieldInfo();
+        setDirty(false);
+    }
+
+    public int getOneLineLength(int j)
     {
         charTable[j][IMAX-1] = SPACE; // enforce terminal SP
         int len = 0;
@@ -98,6 +303,19 @@ public abstract class ParserBase {
                 break;
             }
         return len;
+    }
+
+    public StringBuffer fieldToStringBuffer(int jmin, int jmax)
+    // converts field or marked segment into a stringBuffer
+    {
+        getAllLineLengths();
+        StringBuffer sb = new StringBuffer((jmax-jmin+2)*IMAX);
+        for (int j=jmin; j<=jmax; j++)
+        {
+            sb.append(charTable[j], 0, linelen[j]);
+            sb.append(LF);
+        }
+        return sb;
     }
 
     public char getTag(int f, int jrow)
@@ -165,7 +383,17 @@ public abstract class ParserBase {
         return nfields;
     }
 
-    private int getAllLineLengths()
+    public void putLineWithColons(int j)
+    // use this only after having run getAllLineLengths()
+    {
+        DMF.nEdits++;
+        if (j > RULER)
+            for (int i=0; i<IMAX; i++)
+                charTable[j][i] = cColons[i];
+        setDirty(true);
+    }
+
+    public int getAllLineLengths()
     // Sets local nlines and linelen[] and maxlinelen.
     // Individual linelen[] can be as big as IMAX-1
     {
@@ -184,7 +412,15 @@ public abstract class ParserBase {
         return nlines;
     }
 
-    private int getDelimiterStatus(String s, int jcaret)
+    public int getNlines() {
+        return nlines;
+    }
+    public void setNlines(int n) { nlines = n; }
+
+    public int getMaxlinelen() { return  maxlinelen; }
+    public void setMaxlinelen(int n) { maxlinelen = n; }
+
+    public int getDelimiterStatus(String s, int jcaret)
     // Examines a prospective data string for its delimiters.
     // if jcaret<3, tests rulerline, else tests lineZero.
     // Returns 0=unknown, 1=colons=native, 2=foreign=CSV/Tab
@@ -216,16 +452,156 @@ public abstract class ParserBase {
         return ftype;
     }
 
-    private void pushDownOneLine(int j)
+    public void widenTable(int i, boolean bColons)
+    {
+        DMF.nEdits++;
+        getAllLineLengths();
+        for (int j=1; j<nlines; j++)
+        {
+            System.arraycopy(charTable[j], i, charTable[j], i+1, IMAX-i-1);
+            charTable[j][i] = SPACE;
+        }
+        if (bColons)
+            for (int j=RULER; j<nlines; j++)
+                charTable[j][i] = ':';
+        else
+            charTable[RULER][i] = '-';
+        setDirty(true);
+        getAllLineLengths();
+        getFieldInfo();
+    }
+
+    public void narrowTable(int i)
+    {
+        DMF.nEdits++;
+        if ((i<0) || (i>IMAX-2))
+            return;
+        getAllLineLengths();
+        for (int j=1; j<nlines; j++)
+            System.arraycopy(charTable[j], i+1, charTable[j], i, IMAX-i-1);
+        getAllLineLengths();
+        getFieldInfo();
+        setDirty(true);
+    }
+
+    public void forceFieldString(int f, int jrow, String s)
+    // Enlarges table if necessary to accommodate jrow
+    {
+        if ((f<0) || (f>=nfields) || (jrow<0) || (jrow>JMAX-5))
+            return;
+        if (jrow >= nlines)
+        {
+            putLineWithColons(jrow);
+            nlines = jrow+1;
+        }
+        int ileft = iFieldStartCol[f];
+        int len = iFieldWidth[f];  // excludes tag.
+        for (int i=0; i<len; i++)
+            charTable[jrow][ileft + i] = U.getCharAt(s, i);
+        setDirty(true);
+        // note: U.getCharAt() returns blanks as needed.
+    }
+
+    public void putFieldString(int f, int jrow, String s)
+    // Puts a field into an existing table with room.
+    {
+        if ((f<0) || (f>=nfields) || (jrow<0) || (jrow>nlines))
+          return;
+        int ileft = iFieldStartCol[f];
+        int len = (jrow==0) ? s.length() : iFieldWidth[f];  // no tag.
+        for (int i=0; i<len; i++)
+          charTable[jrow][ileft + i] = U.getCharAt(s, i);
+        setDirty(true);
+        // note: U.getCharAt() returns blanks as needed.
+    }
+
+    public void putFieldDouble(int f, int jrow, double d)
+    {
+        String s =  U.fmtc(d,
+                iFieldWidth[f],
+                iFieldDecimalPlaces[f],
+                cFieldFormat[f]);
+        putFieldString(f, jrow, s);
+        setDirty(true);
+    }
+
+    public void forceFieldDouble(int f, int jrow, double d)
+    {
+        String s =  U.fmtc(d,
+                iFieldWidth[f],
+                iFieldDecimalPlaces[f],
+                cFieldFormat[f]);
+        forceFieldString(f, jrow, s);
+        setDirty(true);
+    }
+
+    public boolean needsParse() {
+        return bNeedsParse;
+    }
+    public void setNeedsParse(boolean value) {
+        bNeedsParse = value;
+    }
+
+    public char getTagChar(int f, int jrow)
+    {
+        return charTable[jrow][iFieldTagCol[f]];
+    }
+
+    public void putTagChar(int f, int jrow, char c)
+    {
+        charTable[jrow][iFieldTagCol[f]] = c;
+        setDirty(true);
+    }
+
+    public int getLineLength(int jrow)
+    {
+        return linelen[jrow];
+    }
+
+    int CopyFieldDown(int jCaret, int iCaret)
+    /// copies the data field and its tag char.
+    {
+        DMF.nEdits++;
+        if ((jCaret>RULER) && (jCaret<nlines-1))
+        {
+            // stashForUndo(); // yikes! ruins the function.
+            int field = getWhichField(iCaret);
+            String s = getFieldFull(field, jCaret);
+            char c = getTagChar(field, jCaret);
+            jCaret++;
+            putFieldString(field, jCaret, s);
+            putTagChar(field, jCaret, c);
+            setDirty(true);
+        }
+        return jCaret;
+    }
+
+    public void pushDownOneLine(int j)
     // Used by vLoadString() and TextMode ENTER key
     // Inserts one blank line into the table at "j".
     // For multiple line calls, we want only the initial preview saved.
     // so here, no stashForUndo().
     {
+        DMF.nEdits++; // TODO
         j = Math.max(0, j);
         for (int t=JMAX; t>j; t--)
             System.arraycopy(charTable[t-1], 0, charTable[t], 0, IMAX);
         clearLine(j);
+        setDirty(true);
+    }
+
+    public void pullUpOneLine(int j)
+    // line j will vanish, receiving text of j+1, etc.
+    // used by TextMode backspace at jCaret=0
+    {
+        DMF.nEdits++;
+        for (int t=j; t<JMAX; t++)
+            System.arraycopy(charTable[t+1], 0, charTable[t], 0, IMAX);
+    }
+
+    public void appendAbove(int jCaret, int istart, int iavail) {
+        for (int k=0; k<iavail; k++)          // append to above
+            charTable[jCaret-1][k+istart] = charTable[jCaret][k];
     }
 
     private int formulaTagPos(int i, int p)
@@ -235,7 +611,7 @@ public abstract class ParserBase {
         return ((i+p)/p)*p - 1;  // new formula, equal field widths
     }
 
-    private int rulerTagPos(int i,  int p)
+    public int rulerTagPos(int i,  int p)
     // Used by vLoadString to generate tags from a given ruler.
     // Used by myKeyHandler to implement TAB function.
     // If "i" lies beyond final ruler colon, it reverts to the formula.
@@ -248,7 +624,7 @@ public abstract class ParserBase {
         return formulaTagPos(i, p);
     }
 
-    public void vLoadString(String s, boolean preclear)
+    public int vLoadString(String s, boolean preclear, int jCaret)
     // Handles PC, Mac, Unix EOL format strings from file or clipboard.
     // Always inserts, never overwrites.
     // Can receive entire table: decides colons vs CSV/Tab;
@@ -260,7 +636,7 @@ public abstract class ParserBase {
     // So, use preclear to set jCaret = 0.
     {
         if (s.length() < 1)
-            return;
+            return jCaret;
         if (preclear)
             clearTable();  // also zeroes caret, scrollers
 
@@ -313,10 +689,12 @@ public abstract class ParserBase {
             cprev = c;
         }
         getAllLineLengths();
-        iCaret = 0;
+        //iCaret = 0;
         if (preclear)
             jCaret = 0;
         getFieldInfo();
+        setDirty(true);
+        return jCaret;
     }
 
     public String getFieldFull(int f, int jrow)
@@ -376,4 +754,23 @@ public abstract class ParserBase {
         results[GNRECORDS] = Math.min(nguide, results[GNLINES]-3);
         results[GNFIELDS] = getFieldInfo();
     }
+
+    public int doDelete(int j0, int j1) {
+
+        int nmarked = 1 + j1 - j0;
+        for (int j=j0; j<JMAX-nmarked; j++)
+            for (int i=0; i<IMAX; i++)
+                charTable[j][i] = charTable[j+nmarked][i];
+        for (int j=JMAX-nmarked; j<JMAX; j++)
+            clearLine(j);
+        // any need to rearrange jCaret?
+        int j = getAllLineLengths();
+        setDirty(true);
+        return j;
+    }
+
+    public int getPeriod() {
+        return period;
+    }
+
 }

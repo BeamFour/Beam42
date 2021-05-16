@@ -58,7 +58,7 @@ import javax.imageio.*;       // PNG, GIF, JPG
   */
 abstract class BJIF extends JInternalFrame implements B4constants
 {
-    protected boolean bNeedsParse=false;    // BJIF timer calls vMasterParse
+    //protected boolean bNeedsParse=false;    // BJIF timer calls vMasterParse
 
     private java.util.Timer caretTimer;  
     private boolean bActive = false;
@@ -124,6 +124,9 @@ abstract class BJIF extends JInternalFrame implements B4constants
         return bCaret;
     }
 
+    abstract boolean needsParse();
+    abstract void setNeedsParse(boolean value);
+
     //----------------private methods-------------------------
 
     private class BlinkTask extends TimerTask
@@ -148,10 +151,10 @@ abstract class BJIF extends JInternalFrame implements B4constants
                 /// Must not modify working data asynchronously.
                 /// Must never disrupt AutoAdj work in surfs[].
 
-                if (bCaret && bNeedsParse)
+                if (bCaret && needsParse())
                 { 
                     DMF.vMasterParse(true); // parses OEJIF,REJIF,MEJIF when Auto is not busy.
-                    bNeedsParse = false;
+                    setNeedsParse(false);
                 }
             }
             else

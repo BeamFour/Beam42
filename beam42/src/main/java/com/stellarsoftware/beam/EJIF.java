@@ -213,6 +213,8 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
         super.setKeyPanel(ePanel);  ///// what does this do?
         myFile = new File(myFpath); 
         parser.bLoadFile(myFile);
+        if (getNumLines() > maxrecords+2)
+            iCountdown = -10;              // warning.
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);  
         addInternalFrameListener(new InternalFrameAdapter()  
         {
@@ -272,55 +274,6 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
     {
         postEJIFtitle(); 
     }
-
-
-
-//    public boolean bLoadFile(File f)
-//    // Extracts string from file; calls ePanel.vLoadString().
-//    // No internal smarts about EOL or CSV/Tab.
-//    // Analogous to doPasteInto().
-//    {
-//        if (f ==null)
-//        {
-//            return false;
-//        }
-//        if (!f.exists())
-//        {
-//            return false;
-//        }
-//        if (!f.canRead())
-//        {
-//            return false;
-//        }
-//
-//        try
-//        {
-//           BufferedReader br = new BufferedReader(new FileReader(f));
-//           String text = null;
-//           StringBuffer sb = new StringBuffer();
-//           while((text = br.readLine()) != null)
-//           {
-//              sb.append(text);
-//              sb.append("\n");
-//           }
-//           br.close();
-//           if (sb.length() < 2)
-//           {
-//               return false;
-//           }
-//           String s = new String(sb);
-//           ePanel.vLoadString(s, true);    // preclear=true.
-//           if (getNumLines() > maxrecords+2)
-//             iCountdown = -10;              // warning.
-//           return true;
-//        }
-//        catch (IOException e)
-//        {
-//            return false;
-//        }
-//    }
-
-
 
     //-----------public methods, continued-----------
 

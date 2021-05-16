@@ -91,8 +91,6 @@ public abstract class ParserBase {
             }
             String s = new String(sb);
             vLoadString(s, true, 0);    // preclear=true.
-//            if (getNumLines() > maxrecords+2)
-//                iCountdown = -10;              // warning.
             return true;
         }
         catch (IOException e)

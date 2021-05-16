@@ -16,16 +16,16 @@ import static com.stellarsoftware.beam.B4constants.*;
  */
 public class OptParser extends ParserBase {
 
-    char cTags[][] = new char[JMAX][MAXFIELDS];
-    char typetag[] = new char[JMAX];
-    String headers[] = new String[MAXFIELDS];
-    int oF2I[] = new int[MAXFIELDS]; /* Maps field type to column */
-    int oI2F[] = new int[ONPARMS]; /* Maps column to field type */
-    String oglasses[] = new String[JMAX + 1];
+    private char cTags[][] = new char[JMAX][MAXFIELDS];
+    private char typetag[] = new char[JMAX];
+    private String headers[] = new String[MAXFIELDS];
+    private int oF2I[] = new int[MAXFIELDS]; /* Maps field type to column */
+    private int oI2F[] = new int[ONPARMS]; /* Maps column to field type */
+    private String oglasses[] = new String[JMAX + 1];
 
-    int nsurfs;
-    ArrayList<Adjustment> adjustables = new ArrayList<Adjustment>();
-    double dOsize = 0.0;
+    private int nsurfs;
+    private ArrayList<Adjustment> adjustables = new ArrayList<Adjustment>();
+    private double dOsize = 0.0;
 
     public String[] oglasses() {
         return oglasses;

@@ -121,20 +121,25 @@ public abstract class ParserBase {
             charTable[jCaret][i] = SPACE;
     }
 
-    public void setchar(int jCaret, int iCaret, char c) {
-        if("T".equals(DMF.reg.getuo(UO_EDIT, 10)))  // text mode shove right
-            for (int k=IMAX-1; k>iCaret; k--)
-                charTable[jCaret][k] = charTable[jCaret][k-1];
-        charTable[jCaret][iCaret] = c;
+    public void appendAbove(int jCaret, int istart, int iavail) {
+        for (int k=0; k<iavail; k++)          // append to above
+            charTable[jCaret-1][k+istart] = charTable[jCaret][k];
+    }
+
+    public void pullLeft(int jCaret, int iCaret) {
+        for (int k=iCaret; k<IMAX-2; k++)
+            charTable[jCaret][k] = charTable[jCaret][k+1];
     }
 
     public void replacech(int jCaret, int iCaret, char ch) {
         charTable[jCaret][iCaret] = ch;
     }
 
-    public void pullLeft(int jCaret, int iCaret) {
-        for (int k=iCaret; k<IMAX-2; k++)
-            charTable[jCaret][k] = charTable[jCaret][k+1];
+    public void setchar(int jCaret, int iCaret, char c) {
+        if("T".equals(DMF.reg.getuo(UO_EDIT, 10)))  // text mode shove right
+            for (int k=IMAX-1; k>iCaret; k--)
+                charTable[jCaret][k] = charTable[jCaret][k-1];
+        charTable[jCaret][iCaret] = c;
     }
 
     public boolean isDirty() {
@@ -279,10 +284,10 @@ public abstract class ParserBase {
     void clearLine(int j)
     // When exactly is this called?
     {
-        DMF.nEdits++; // TODO
+        DMF.nEdits++;
         for (int i=0; i<IMAX; i++)
             charTable[j][i] = ' ';
-        setDirty(true); // TODO
+        setDirty(true);
     }
 
     public void clearTable()
@@ -310,7 +315,6 @@ public abstract class ParserBase {
     public StringBuffer fieldToStringBuffer(int jmin, int jmax)
     // converts field or marked segment into a stringBuffer
     {
-        getAllLineLengths();
         StringBuffer sb = new StringBuffer((jmax-jmin+2)*IMAX);
         for (int j=jmin; j<=jmax; j++)
         {
@@ -598,11 +602,6 @@ public abstract class ParserBase {
             System.arraycopy(charTable[t+1], 0, charTable[t], 0, IMAX);
     }
 
-    public void appendAbove(int jCaret, int istart, int iavail) {
-        for (int k=0; k<iavail; k++)          // append to above
-            charTable[jCaret-1][k+istart] = charTable[jCaret][k];
-    }
-
     private int formulaTagPos(int i, int p)
     // Used by vLoadString to generate tags when ruler=formula.
     // if p=10: 0...9->9; 10...19->19 etc
@@ -634,6 +633,10 @@ public abstract class ParserBase {
     // What about complete pastes where jStart == 0? Bottom.
     // So, use preclear to set jCaret = 0.
     {
+        // TODO check
+//        stashForUndo();
+
+        DMF.nEdits++;
         if (s.length() < 1)
             return jCaret;
         if (preclear)
@@ -700,9 +703,9 @@ public abstract class ParserBase {
     // For clean string contents, user should apply .trim()
     {
         if ((f<0) || (f >= nfields))
-            return new String("");
+            return "";
         if ((jrow<0) || (jrow>=nlines))
-            return new String("");
+            return "";
         int iLeft = iFieldStartCol[f];
         int width = iFieldWidth[f];
         return new String(charTable[jrow], iLeft, width);
@@ -754,7 +757,8 @@ public abstract class ParserBase {
     }
 
     public int doDelete(int j0, int j1) {
-
+        // deletes lines that are in the marked zone
+        // this might be faster using System.arrayCopy()
         int nmarked = 1 + j1 - j0;
         for (int j=j0; j<JMAX-nmarked; j++)
             for (int i=0; i<IMAX; i++)

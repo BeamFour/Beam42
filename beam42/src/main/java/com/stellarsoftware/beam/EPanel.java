@@ -2,14 +2,10 @@ package com.stellarsoftware.beam;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.*;          // Rectangle2D
-import java.awt.print.*;         // printing
 import java.awt.font.*;          // font metric
-import java.awt.datatransfer.*;  // clipboard
-import java.beans.*;             // vetoableChangeListener
 import java.io.*;                // files
 import javax.swing.*;            // everything else
-import javax.swing.event.*;      // for MenuEvents and InternalFrameAdapter
+
 
 @SuppressWarnings("serial")
 
@@ -645,7 +641,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
             return "";
         int j0 = Math.min(jDown, jDrag);
         int j1 = Math.max(jDown, jDrag);
-        return myEJIF.parser().getMarkedText(j0, j1);
+        return myEJIF.parser().getText(j0, j1);
     }
 
 
@@ -771,8 +767,10 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
 //        getFieldInfo();
 //        repaint();
 //    }
-    public void vLoadString(String s, boolean preclear) {
-        jCaret = myEJIF.parser().vLoadString(s, preclear, jCaret);
+    public void paste(String s) {
+        iCaret = 0;
+        jCaret = myEJIF.parser().vLoadString(s, false, jCaret);
+        myEJIF.parser().setDirty(true);
         repaint();
     }
 
@@ -1219,6 +1217,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
 //                           for (int i=iCaret; i<IMAX; i++)   // blank source chars
 //                             charTable[jCaret][i] = SPACE;
                            myEJIF.parser().move(jCaret, iCaret, ncopy);
+                           // pushDownOneLine already set dirty = true
                            jCaret++;
                            iCaret = 0; 
                        }   

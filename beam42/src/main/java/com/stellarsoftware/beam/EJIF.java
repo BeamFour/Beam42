@@ -135,7 +135,6 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
 
     private int myFlavor;                 // remember my flavor: 0,1,2=opt,ray,med
     private int maxrecords;               // depends on editor type
-    //private boolean bDirty=false;         // avoid exit if unsaved changes
     private int iCountdown = 0;           // manage temporary titles
     private File myFile=null; 
     private EPanel ePanel=null; 
@@ -244,8 +243,8 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
             }
         });
        
-//        bDirty = false;
-//        bNeedsParse = true;
+        parser.setDirty(false);
+        parser.setNeedsParse(true);
         
     } //-----end of constructor-----
 
@@ -383,16 +382,6 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
         return parser.isDirty();
     }
 
-//    public void setDirty(boolean state)
-//    // Called "true" by EPanel when user inputs modify the table.
-//    // Called "false by EPanel when Epanel saves the file.
-//    {
-//       bDirty = state;
-//       if (state)
-//         bNeedsParse = true;
-//    }
-
-
     public void pleaseSaveAs()
     {
         if (ePanel == null)  // should never happen
@@ -475,8 +464,7 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
         }
         if (ePanel.save(myFile))
         {
-            //bDirty = false;
-            myFpath = myFile.getPath(); 
+            myFpath = myFile.getPath();
             iCountdown = 5;  // posts "Saved" message
             return; 
         }
@@ -515,8 +503,6 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
         StringSelection ss = new StringSelection(s); 
         clipb.setContents(ss, null); 
         ePanel.doDelete(); 
-//        bDirty = true;
-//        bNeedsParse = true;
     }
 
     public void doCopy()
@@ -556,11 +542,9 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
            try
            {
               String s = (String) (contents.getTransferData(sf)); 
-              ePanel.vLoadString(s, false);     // preclear=false
+              ePanel.paste(s);     // preclear=false
               if (getNumLines() > maxrecords+2)
-                iCountdown = -10;                // warning.  
-//              bDirty = true;
-//              bNeedsParse = true;
+                iCountdown = -10;                // warning.
            }
            catch(UnsupportedFlavorException ufe) {}
            catch (IOException ioe) {}
@@ -571,8 +555,6 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
     {
         DMF.nEdits++; 
         ePanel.doDelete(); 
-//        bDirty = true;
-//        bNeedsParse = true;
     }
 
     public void doSelectAll()
@@ -669,8 +651,6 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
         if (ePanel == null)
           return; 
         ePanel.putFieldString(f, r, s); 
-        //bDirty = true;
-        // bNeedsParse = true; // not here this is calculation driven 
     }
 
     protected void putBlank(int f, int r)
@@ -678,8 +658,6 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
         if (ePanel == null)
           return; 
         ePanel.putFieldString(f, r, ""); 
-//        bDirty = true;
-//        bNeedsParse = true;
     }
 
     protected void putFieldDouble(int f, int r, double d)
@@ -691,8 +669,6 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
             putBlank(f,r);
         else  
             ePanel.putFieldDouble(f, r, d); 
-        //bDirty = true;
-        // bNeedsParse = true; // not here this is calculation driven
     }
 
     protected void forceFieldDouble(int f, int r, double d)
@@ -700,7 +676,6 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
         if (ePanel == null)
           return;
         ePanel.forceFieldDouble(f, r, d); 
-        //bDirty = true;
     }
 
     @Override

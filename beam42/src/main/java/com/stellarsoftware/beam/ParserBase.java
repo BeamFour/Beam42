@@ -163,7 +163,7 @@ public abstract class ParserBase {
         { return false; }
     }
 
-    public String getMarkedText(int j0, int j1) {
+    public String getText(int j0, int j1) {
         StringBuffer sb = new StringBuffer(10000);
 
         for (int j=j0; j<=j1; j++)
@@ -203,6 +203,10 @@ public abstract class ParserBase {
         bDirty = state;
         if (state)
             bNeedsParse = true;
+    }
+
+    public void setNeedsParse(boolean v) {
+        bNeedsParse = v;
     }
 
     String getTableString()
@@ -538,9 +542,6 @@ public abstract class ParserBase {
     public boolean needsParse() {
         return bNeedsParse;
     }
-    public void setNeedsParse(boolean value) {
-        bNeedsParse = value;
-    }
 
     public char getTagChar(int f, int jrow)
     {
@@ -693,7 +694,6 @@ public abstract class ParserBase {
         if (preclear)
             jCaret = 0;
         getFieldInfo();
-        setDirty(true);
         return jCaret;
     }
 

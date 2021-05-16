@@ -2,6 +2,25 @@ package com.stellarsoftware.beam;
 
 import static com.stellarsoftware.beam.B4constants.*;
 
+/**
+ * Responsible for parsing MED files and creating the Media data model.
+ * Originally part of MEJIF.
+ *
+ * Uses B4Constants.
+ * Fills in two public local namelists:
+ *    mglasses[1...] is record=1...MNRECORDS;
+ *    mwaves[1...] is headers[1, 2, ... MNFIELDS-1]
+ * Also fills in double RT13.media[iglass=1...][jwave=1...].
+ * Checker of names should trim before comparing.
+ *
+ * DMF compares OEJIF.oglasses[] against MEJIF.mglasses[].
+ *
+ * DMF comparse REJIF.wavenames[] against MEJIF.mwaves[].
+ *
+ * MPlotPanel will need to verify its wavenames against mwaves[].
+ *
+ * @author M.Lampton (c) 2004 STELLAR SOFTWARE all rights reserved.
+ */
 public class MediaParser extends ParserBase {
 
     private String mwaves[] = new String[MAXFIELDS];

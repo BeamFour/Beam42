@@ -347,7 +347,6 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     {
         getAllLineLengths(); 
         jDown = 0; 
-        //jDrag = nlines-1;
         jDrag = myEJIF.parser().getNlines()-1;
         repaint(); 
     }
@@ -761,20 +760,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     void CopyFieldBottom()
     /// copies field and tag all the way to the bottom
     {
-        DMF.nEdits++; 
-        if ((jCaret>RULER) && (jCaret<myEJIF.parser().getNlines()-1))
-        {
-            // stashForUndo(); // yikes! ruins the function. 
-            int field = getWhichField(iCaret); 
-            String s = getFieldFull(field, jCaret); 
-            char c = getTagChar(field, jCaret); 
-            for (int j=jCaret+1; j<myEJIF.parser().getNlines(); j++)
-            {
-                putFieldString(field, j, s); 
-                putTagChar(field, j, c);
-            }
-            myEJIF.parser.setDirty(true);
-        }
+        myEJIF.parser().CopyFieldBottom(jCaret, iCaret);
     }
     
 

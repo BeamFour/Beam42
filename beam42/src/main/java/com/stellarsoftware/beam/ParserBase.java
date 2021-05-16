@@ -579,6 +579,25 @@ public abstract class ParserBase {
         return jCaret;
     }
 
+    public void CopyFieldBottom(int jCaret, int iCaret)
+    /// copies field and tag all the way to the bottom
+    {
+        DMF.nEdits++;
+        if ((jCaret>RULER) && (jCaret<nlines-1))
+        {
+            // stashForUndo(); // yikes! ruins the function.
+            int field = getWhichField(iCaret);
+            String s = getFieldFull(field, jCaret);
+            char c = getTagChar(field, jCaret);
+            for (int j=jCaret+1; j<nlines; j++)
+            {
+                putFieldString(field, j, s);
+                putTagChar(field, j, c);
+            }
+            setDirty(true);
+        }
+    }
+
     public void pushDownOneLine(int j)
     // Used by vLoadString() and TextMode ENTER key
     // Inserts one blank line into the table at "j".

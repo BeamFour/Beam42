@@ -4,7 +4,16 @@ import java.util.ArrayList;
 
 import static com.stellarsoftware.beam.B4constants.*;
 
-/* Parses .OPT files */
+/**
+ * Parses .OPT files and builds the data model.
+ * Most of what is here was originally in OEJIF.
+ * The function of parse() is to set values into DMF.giFlags[] and RT13.surfs[][].
+ *
+ * Uses B4 constants.
+ * parse() has no dirty bit worksavers; it always parses.
+ *
+ *  @author M.Lampton (c) 2004-2012 STELLAR SOFTWARE all rights reserved.
+ */
 public class OptParser extends ParserBase {
 
     char cTags[][] = new char[JMAX][MAXFIELDS];
@@ -440,7 +449,7 @@ public class OptParser extends ParserBase {
         //---if refraction LUT is needed, OREFRACT will be NaN.----
 
         for (int jsurf=1; jsurf<=nsurfs; jsurf++)
-            oglasses[jsurf] = new String("");       // default: all numeric
+            oglasses[jsurf] = "";       // default: all numeric
 
         boolean bAllRefractNumeric = true;       // default: true;
 
@@ -458,83 +467,7 @@ public class OptParser extends ParserBase {
         DMF.giFlags[OMEDIANEEDED] = bAllRefractNumeric ? FALSE : TRUE;
     }
 
-    boolean isAdjustable(int jsurf, int iatt)
-    // Tests for range of adjustable attributes & tag chars.
-    // Assumes that oI2F[] and cTags[][] are properly set.
-    // HOWEVER THIS IS DEAF TO THE NEW GANGED PARADIGM.
-    {
-        if ((iatt < 0) || (iatt > OFINALADJ))
-            return false;
-        int field = oI2F[iatt];
-        if ((field < 0) || (field >= nfields))
-            return false;
-        char c = getTag(field, jsurf+2);  // cTags[jsurf][field];
-        return isAdjustableTag(c);
-    }
-
-
-    boolean isAdjustableTag(char c)
-    {
-        return (c=='?') || Character.isLetter(c);
-    }
-
-    int iParseAdjustables(int nsurfs)
-    // fills in private ArrayList of adjustables, with slaves.
-    // Returns how many groups were found based on tags.
-    {
-        boolean bLookedAt[] = new boolean[nsurfs+1];
-        adjustables.clear();
-        for (int field=0; field<nfields; field++)
-        {
-            int attrib = oF2I[field];
-            if ((attrib<0) || (attrib>OFINALADJ))  // or other validity test
-                continue;
-
-            for (int record=1; record<=nsurfs; record++)
-                bLookedAt[record] = false;
-
-            for (int record=1; record<=nsurfs; record++)
-            {
-                char tag0 = getTag(field, record+2);
-                boolean bAdj = isAdjustableTag(tag0);
-                if (!bAdj || bLookedAt[record])
-                {
-                    bLookedAt[record] = true;
-                    continue;
-                }
-
-                //---New adjustable parameter found------------
-                bLookedAt[record] = true;
-                ArrayList<Integer> slaves = new ArrayList<Integer>();
-
-                if (Character.isLetter(tag0))
-                {
-                    boolean bUpper0 = Character.isUpperCase(tag0);
-                    char tag0up = Character.toUpperCase(tag0);
-                    for (int k=record+1; k<=nsurfs; k++)
-                    {
-                        if (!bLookedAt[k])  // find slaves & antislaves
-                        {
-                            char tagk = getTag(field, k+2);
-                            boolean bUpperk = Character.isUpperCase(tagk);
-                            char tagkup = Character.toUpperCase(tagk);
-                            boolean bSameGroup = (tag0up == tagkup);
-                            if (bSameGroup)
-                            {
-                                int iSlave = (bUpper0 == bUpperk) ? k : -k;
-                                slaves.add(iSlave);
-                                bLookedAt[k] = true;
-                            }
-                        }
-                    }
-                }
-                adjustables.add(new Adjustment(attrib, record, field, slaves));
-            } // done with all groups in this field
-        }// done with all fields
-        return adjustables.size();
-    }
-
-    void parseNumericData() {
+    int parseNumericData() {
         //-------Now get numerical data records-------------------
         //---except ABSENT, OFORM, OTYPE, OREFRACT, OGROUP-----
 
@@ -594,8 +527,7 @@ public class OptParser extends ParserBase {
         }
 
         DMF.giFlags[OSYNTAXERR] = osyntaxerr;
-        if (osyntaxerr > 0)
-            throw new IllegalArgumentException("Syntax error");
+        return osyntaxerr;
     }
 
 
@@ -613,6 +545,15 @@ public class OptParser extends ParserBase {
         //-------Perform all the post-parse cleanup here------------
 
         DMF.giFlags[ONADJ] = iParseAdjustables(nsurfs);
+
+        //----force all CoordBreaks to be planar? or not? rev 168----
+        // for (int j=1; j<nsurfs; j++)
+        //   if ((RT13.surfs[j][OTYPE]==OTCBIN) || (RT13.surfs[j][OTYPE]==OTCBOUT))
+        //   {
+        //       RT13.surfs[j][OPROFILE] = OSPLANO;
+        //       for (int iatt=OCURVE; iatt<=OZ35; iatt++)
+        //         RT13.surfs[j][iatt] = 0.0;
+        //   }
     }
 
     void parseDiameters() {
@@ -823,6 +764,9 @@ public class OptParser extends ParserBase {
 
             RT13.surfs[j][OPROFILE] = iProfile;
         }
+        if (badZern)
+            System.err.println("Zernikes without Diameter are ignored.");
+//          JOptionPane.showMessageDialog(this, "Zernikes without Diameter are ignored.");
     }
 
     void calcDOsize() {
@@ -847,8 +791,12 @@ public class OptParser extends ParserBase {
             headers[f] = getFieldTrim(f, 1);
     }
 
+    // replaces the abstract parse() in EJIF.
+    // This is NOT PRIVATE; DMF:vMasterParse calls it, triggered by blinker, etc.
     @Override
     public void parse() {
+
+        adjustables = new ArrayList<Adjustment>();
 
         // First, communicate EJIF results to DMF.giFlags[]
         // vPreParse() takes care of parsing title line.
@@ -869,7 +817,12 @@ public class OptParser extends ParserBase {
         parseOpticType();
         parseOpticFormColumn();
         parseRefractionData();
-        parseNumericData();
+        if (parseNumericData() < 0)
+            // syntax error
+            return;
+
+        //----data are now cleansed stashed & indexed------------
+        //-------Perform all the post-parse cleanup here------------
         parseAdjustables();
         parseDiameters();
         //------------set the Euler angle matrix------------------
@@ -880,7 +833,7 @@ public class OptParser extends ParserBase {
         calcDOsize();
     }
 
-        //-----------public functions for AutoAdjust------------
+    //-----------public functions for AutoAdjust------------
     //-----Now that Adjustment is a public class,
     //-----cannot Auto get its own data?----------------
     //-----Nope. ArrayList adjustments is private.----------
@@ -943,6 +896,85 @@ public class OptParser extends ParserBase {
          return adjustables.get(i).getList();
        else
          return null;
+    }
+
+    //-------------private stuff----------------
+
+
+
+    private int iParseAdjustables(int nsurfs)
+    // fills in private ArrayList of adjustables, with slaves.
+    // Returns how many groups were found based on tags.
+    {
+        boolean bLookedAt[] = new boolean[nsurfs+1];
+        adjustables.clear();
+        for (int field=0; field<nfields; field++)
+        {
+            int attrib = oF2I[field];
+            if ((attrib<0) || (attrib>OFINALADJ))  // or other validity test
+                continue;
+
+            for (int record=1; record<=nsurfs; record++)
+                bLookedAt[record] = false;
+
+            for (int record=1; record<=nsurfs; record++)
+            {
+                char tag0 = getTag(field, record+2);
+                boolean bAdj = isAdjustableTag(tag0);
+                if (!bAdj || bLookedAt[record])
+                {
+                    bLookedAt[record] = true;
+                    continue;
+                }
+
+                //---New adjustable parameter found------------
+                bLookedAt[record] = true;
+                ArrayList<Integer> slaves = new ArrayList<Integer>();
+
+                if (Character.isLetter(tag0))
+                {
+                    boolean bUpper0 = Character.isUpperCase(tag0);
+                    char tag0up = Character.toUpperCase(tag0);
+                    for (int k=record+1; k<=nsurfs; k++)
+                    {
+                        if (!bLookedAt[k])  // find slaves & antislaves
+                        {
+                            char tagk = getTag(field, k+2);
+                            boolean bUpperk = Character.isUpperCase(tagk);
+                            char tagkup = Character.toUpperCase(tagk);
+                            boolean bSameGroup = (tag0up == tagkup);
+                            if (bSameGroup)
+                            {
+                                int iSlave = (bUpper0 == bUpperk) ? k : -k;
+                                slaves.add(iSlave);
+                                bLookedAt[k] = true;
+                            }
+                        }
+                    }
+                }
+                adjustables.add(new Adjustment(attrib, record, field, slaves));
+            } // done with all groups in this field
+        }// done with all fields
+        return adjustables.size();
+    }
+
+    boolean isAdjustable(int jsurf, int iatt)
+    // Tests for range of adjustable attributes & tag chars.
+    // Assumes that oI2F[] and cTags[][] are properly set.
+    // HOWEVER THIS IS DEAF TO THE NEW GANGED PARADIGM.
+    {
+        if ((iatt < 0) || (iatt > OFINALADJ))
+            return false;
+        int field = oI2F[iatt];
+        if ((field < 0) || (field >= nfields))
+            return false;
+        char c = getTag(field, jsurf+2);  // cTags[jsurf][field];
+        return isAdjustableTag(c);
+    }
+
+    boolean isAdjustableTag(char c)
+    {
+        return (c=='?') || Character.isLetter(c);
     }
 
 }

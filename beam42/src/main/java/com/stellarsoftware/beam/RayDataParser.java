@@ -4,9 +4,47 @@ import java.util.ArrayList;
 
 import static com.stellarsoftware.beam.B4constants.*;
 
+/**
+ * Parses and generates the RAY Data model.
+ * Originally part pof REJIF.
+ *
+ *  Output is to RT13.raystarts[nrays][nattribs]; see line 194.
+ *  It supplies EJIF's abstract method parse().
+ *  It implements Consts via EJIF.
+ *  A174: includes ray-intercept normal components {i,j,k}
+ *  A156: allows "wa" to substitute for "@wave"
+ *
+ *  Uses U for suckInt(), suckDouble, getCharAt(), and for debugging.
+ *
+ *  Uses EJIF for getTag(f,r) and getFieldTrim(f,r).
+ *
+ * Writes to external RT13.raystarts[][]
+ * also to RT13.smins[], RT13.spans[] for random <<RORDER??
+ * Writes/reads external DMF.giFlags[] etc
+ *
+ * Caution: irec=1...RNRAYS; record zero is a special ray.
+ * Lookup table rF2I[] is public for raystarts[][], InOut, Auto.
+ * Lookup table rI2F[] exists for raystart attribs 0...8 = RX...RORDER.
+ * Lookup table rI2F[] does not exist for all possible args
+ * because >10000 ray attributes and they are few and sparse.
+ * Better to just search the rF2I[] list.
+ * Table returns RABSENT for unrecognized field.
+ * But remember to reinterpret RFINAL and RGOAL for output usage.
+ *
+ * To support AutoAdjust, need an output list for all goals,
+ * and field numbers for those goals, so that each ray can
+ * have its discrepancy computed. DCRFs are defined in OEJIF.
+ *
+ *  Added RTANGLE attribute into RNATTRIBS, March 2015 MLL.
+ *  Added RTNORMX, RTNORMY, RTNORMZ as new ray attributes.
+ *  Added lower case i, j, k to read out these normal components.
+ *
+ * Although this does all the parsing and initial setup work, the actual results
+ * get posted by InOut grabbing data from RT13's output data tables.
+ *
+ * @author M.Lampton (c) STELLAR SOFTWARE 2004, 2015 all rights reserved.
+ */
 public class RayDataParser extends ParserBase {
-    // ArrayList goals;
-
     private String wavenames[] = new String[JMAX];
     private int rF2I[] = new int[MAXFIELDS];
     private int rI2F[] = new int[RNSTARTS];  // 10 raystart attributes: B4constants.java

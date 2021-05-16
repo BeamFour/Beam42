@@ -522,20 +522,6 @@ class EJIF extends BJIF implements B4constants, AdjustmentListener
     
     //-----------protected internal methods for derived classes-----------
 
-//    protected void vPreParse(int results[])
-//    // Called by extended class to pre-gather table information.
-//    {
-//        for (int i=0; i<NGENERIC; i++)
-//          results[i] = 0;
-//        if (ePanel == null)
-//          return;
-//        results[GPRESENT] = 1;
-//        results[GNLINES] = ePanel.getLineCount();
-//        int nguide = ePanel.getGuideNumber();
-//        results[GNRECORDS] = Math.min(nguide, results[GNLINES]-3);
-//        results[GNFIELDS] = ePanel.getFieldInfo();
-//    }
-
     protected int getNumLines()     // extensions need this
     {
         if (ePanel == null)

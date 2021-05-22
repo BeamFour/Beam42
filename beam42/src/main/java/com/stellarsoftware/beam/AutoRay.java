@@ -52,8 +52,8 @@ class AutoRay
 class RayHost implements B4constants
 {
     //----------parallel with InOut-------------
-    private OEJIF optEditor = null; 
-    private REJIF rayEditor = null; 
+    private OEJIF optEditor = null;
+    private REJIF rayEditor = null;
 
 
     //-------------unique to Auto---------------
@@ -175,11 +175,12 @@ class RayHost implements B4constants
     private void vPostSummary()
     {
         //----prepare the results-------------
-        
-        Comparo.doResiduals();   
-        int nptest = Comparo.iGetNPTS(); 
-        double sos = Comparo.dGetSOS(); 
-        double rms = Comparo.dGetRMS(); 
+
+        Comparo comparo = new Comparo(optEditor.model(), rayEditor.model());
+        comparo.doResiduals();
+        int nptest = comparo.iGetNPTS();
+        double sos = comparo.dGetSOS();
+        double rms = comparo.dGetRMS();
         
         //-----prepare the dialog-------------
         

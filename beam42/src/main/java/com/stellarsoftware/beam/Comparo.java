@@ -21,23 +21,28 @@ package com.stellarsoftware.beam;
   */
 class Comparo implements B4constants
 {
-    public  static double resid[];        // [npts]; densely packed, public for Auto.
-    public  static int goalAttrib[];      // attribute for each goal; 13=RTWFE.
-    public  static int goalField[];       // field Number for each goal 
+    public  double resid[];        // [npts]; densely packed, public for Auto.
+    public  int goalAttrib[];      // attribute for each goal; 13=RTWFE.
+    public  int goalField[];       // field Number for each goal
     
-    private static OEJIF optEditor = null; 
-    private static REJIF rayEditor = null; 
-    private static int nrays=0, nsurfs=0, onfields=0, rnfields=0;
-    private static int ngood=0, ngoals=0, nadj=0; 
-    private static int npts=0; 
-    private static double sos=0.0;
-    private static double goalValue[][];  // [ngoals][nrays]; sparse in rays
-    private static boolean bDone[];
-    private static boolean bHasWFE;
+    private OPTDataModel optEditor = null;
+    private RAYDataModel rayEditor = null;
+    private int nrays=0, nsurfs=0, onfields=0, rnfields=0;
+    private int ngood=0, ngoals=0, nadj=0;
+    private int npts=0;
+    private double sos=0.0;
+    private double goalValue[][];  // [ngoals][nrays]; sparse in rays
+    private boolean bDone[];
+    private boolean bHasWFE;
+
+    public Comparo(OPTDataModel optEditor, RAYDataModel rayEditor) {
+        this.optEditor = optEditor;
+        this.rayEditor = rayEditor;
+    }
 
     //--------------sole public method--------------------
 
-    public static void doResiduals()
+    public void doResiduals()
     // Assumes trace has been run already: RT13.iBuildRays(true).
     // Counts up npts from RT13.bGoodRay[]. 
     // Places residuals into public resid[].
@@ -86,17 +91,17 @@ class Comparo implements B4constants
         }
     }
 
-    public static int iGetNPTS()
+    public int iGetNPTS()
     {
         return npts;
     }
 
-    public static double dGetSOS()
+    public double dGetSOS()
     {
         return sos;
     }
 
-    public static double dGetRMS()
+    public double dGetRMS()
     {
         return (npts > 0) ? Math.sqrt(sos/npts) : -0.0; 
     }
@@ -105,10 +110,8 @@ class Comparo implements B4constants
     
     //--------------private methods---------------------------
 
-    private static boolean bSetup()
+    private boolean bSetup()
     {
-        optEditor = DMF.oejif;
-        rayEditor = DMF.rejif;
         onfields  = DMF.giFlags[ONFIELDS];       // fields per optic.
         nrays     = DMF.giFlags[RNRAYS]; 
         nsurfs    = DMF.giFlags[ONSURFS]; 
@@ -135,7 +138,7 @@ class Comparo implements B4constants
 
 
 
-    private static void vSetupGoals()
+    private void vSetupGoals()
     // The only place to get goal data is from the rayEditor table. 
     // Store goal values locally so that averaging can be performed.
     // Don't forget to update the table, if averaging is done. 
@@ -144,7 +147,7 @@ class Comparo implements B4constants
         for (int f=0; f<rnfields; f++)
         {
             //int op = REJIF.rF2I[f];
-            int op = DMF.rejif.model().rF2I(f);
+            int op = rayEditor.rF2I(f);
             if (op >= RGOAL)                       // allows WFE; RGOAL=10100.
             {
                 if (igoal >=MAXGOALS)
@@ -165,7 +168,7 @@ class Comparo implements B4constants
 
 
 
-    private static double getRay(int kray, int iattrib)  // at final surface
+    private double getRay(int kray, int iattrib)  // at final surface
     {
         if ((iattrib>=RX) && (iattrib<RNATTRIBS))
         {
@@ -177,7 +180,7 @@ class Comparo implements B4constants
 
 
 
-    private static void vGangGoals()
+    private void vGangGoals()
     // Discovers and averages ray data among ganged goals.
     // Assumes nrays, ngoals, goalValue[], goalField[] initialized.
     // Assumes RT13.dRays[][][] has been evaluated.

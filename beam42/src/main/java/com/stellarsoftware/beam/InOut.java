@@ -50,9 +50,10 @@ class InOut implements B4constants
             return; 
         }
 
-        Comparo.doResiduals(); 
-        int npts = Comparo.iGetNPTS(); 
-        double rms = Comparo.dGetRMS(); 
+        Comparo comparo = new Comparo(optEditor.model(), rayEditor.model());
+        comparo.doResiduals();
+        int npts = comparo.iGetNPTS();
+        double rms = comparo.dGetRMS();
         String ss = "RMS 1D Average = "+U.fwe(rms)     + '\n';
         if (ngoals > 1)
         {

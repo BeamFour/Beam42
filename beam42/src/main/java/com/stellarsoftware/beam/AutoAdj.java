@@ -20,8 +20,8 @@ class AutoAdj
 class AdjHost implements B4constants
 {
     //----------parallel with InOut-------------
-    private OEJIF optEditor = null; 
-    private REJIF rayEditor = null; 
+    private OEJIF optEditor = null;
+    private REJIF rayEditor = null;
     private int nsurfs=0, nrays=0, onfields=0, rnfields=0;
     private int npts, nadj=0, onadj=0, rnadj=0, ngood=0, autongoals=0; 
     private boolean bWFE=false; 
@@ -44,7 +44,7 @@ class AdjHost implements B4constants
     private double jac[][];                // [npts][nadj]; dense
     private double wx, wy, wz, wu, wv, ww; // weights for each goal
 
-
+    private Comparo comparo;
 
     public AdjHost() // constructor; performs the entire task. 
     {
@@ -56,7 +56,9 @@ class AdjHost implements B4constants
 
         optEditor.doStashForUndo(); 
         rayEditor.doStashForUndo(); 
-        
+
+        comparo = new Comparo(optEditor.model(), rayEditor.model());
+
         nsurfs = DMF.giFlags[ONSURFS]; 
         onfields = DMF.giFlags[ONFIELDS];  // fields per optic.
         nrays = DMF.giFlags[RNRAYS]; 
@@ -126,16 +128,16 @@ class AdjHost implements B4constants
 
         //-----begin the comparison process-------
 
-        Comparo.doResiduals(); // npts is restricted to initial good rays in RT13. 
+        comparo.doResiduals(); // npts is restricted to initial good rays in RT13.
 
-        int nptest = Comparo.iGetNPTS();
+        int nptest = comparo.iGetNPTS();
         if (nptest != npts)  // SNH. 
         {
             JOptionPane.showMessageDialog(optEditor, "Auto: re-run InOut.");
             return; 
         } 
-        sos = Comparo.dGetSOS(); 
-        rms = Comparo.dGetRMS(); 
+        sos = comparo.dGetSOS();
+        rms = comparo.dGetRMS();
 
         //----set up for iterative improvement---------
 
@@ -464,9 +466,9 @@ class AdjHost implements B4constants
         {
             return BIGVAL; // special error code
         }
-        Comparo.doResiduals(); 
-        sos = Comparo.dGetSOS(); 
-        rms = Comparo.dGetRMS(); 
+        comparo.doResiduals();
+        sos = comparo.dGetSOS();
+        rms = comparo.dGetRMS();
         return sos;
     }
 
@@ -624,7 +626,7 @@ class AdjHost implements B4constants
     double dFetchResid(int i)
     // Returns one element of the array resid[].
     {
-        return Comparo.resid[i]; 
+        return comparo.resid[i];
     }
 }  //------------end of class AdjHost---------------------------
 

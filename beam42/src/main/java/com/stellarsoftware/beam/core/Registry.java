@@ -31,6 +31,9 @@ public class Registry implements B4constants
 
     public Registry(String sInit)  // constructor called once by DMF
     {
+        if (sInit == null) {
+            sInit = System.getProperty("user.dir");
+        }
         //---first, create sUser[][]------------
         nTotal = 0; 
         maxmembers = 0;

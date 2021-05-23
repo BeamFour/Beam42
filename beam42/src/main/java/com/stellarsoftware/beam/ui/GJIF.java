@@ -49,7 +49,7 @@ public class GJIF extends BJIF implements B4constants
 
     }
 
-    public GJIF(int gtype, String gname, JMenuItem gjmi)
+    GJIF(int gtype, String gname, JMenuItem gjmi)
     // This is called by DMF with the above three data. 
     {
         super(gname);            // set up BJIF & post title.
@@ -99,7 +99,7 @@ public class GJIF extends BJIF implements B4constants
 
     //--------titlebar management tools-----------------
 
-    public void postWarning(String warn)
+    void postWarning(String warn)
     // Client panel's getUOWarning() should call this method.
     // Calling with a null string will clear the warning. 
     // GJIF's title is variable; myName is permanent. 
@@ -108,20 +108,20 @@ public class GJIF extends BJIF implements B4constants
         setTitle( (myWarn.length() > 0) ? myWarn : myName); 
     } 
     
-    public void postCoords(String coords)
+    void postCoords(String coords)
     // Client's doCursor() delivers its string here for display.
     {
         if (myWarn.length() < 1)
           setTitle(coords);
     }
 
-    public void cleanupTitle()
+    void cleanupTitle()
     // Client GPanel doCursor() should call this when cursor exits.
     {
         setTitle( (myWarn.length() > 0) ? myWarn : myName); 
     }
     
-    public void cleanupTitle(String s)
+    void cleanupTitle(String s)
     // Allows client doCursor to have several alternative names
     // depending on its state: e.g. Layout (normal) or Layout* (sticky).
     {
@@ -129,45 +129,46 @@ public class GJIF extends BJIF implements B4constants
     }
 
     //--------generic tools serving GPanel client needs--------------    
-    
+
+    @Override
     public String getName()  // needed for Options identification
     {
         return myName; 
     }
     
-    public int getType()
+    int getType()
     {
         return myType; 
     }
 
 
-    public GPanel getGPanel()
+    GPanel getGPanel()
     // allows AutoAdjust to request LayoutPanel:requestNewArtwork()
     {
         return myGPanel; 
     }
 
-    public void doCAD()  // DMF request pass thru to myGPanel
+    void doCAD()  // DMF request pass thru to myGPanel
     {
         myGPanel.doCAD(); 
     }
 
-    public void doUpdateUO()  // Options change => fresh art. 
+    void doUpdateUO()  // Options change => fresh art.
     {
         myGPanel.doUpdateUO(); 
     }
 
-    public void doSaveData()      // Options button => data file.
+    void doSaveData()      // Options button => data file.
     {
         myGPanel.doSaveData();
     }
 
-    public void doWriteHisto()    // DMF same deal. 
+    void doWriteHisto()    // DMF same deal.
     {
         myGPanel.doSaveData(); 
     }
 
-    public void tryPrint()
+    void tryPrint()
     // http://www.javacommerce.com/displaypage.jsp?name=printcode.sql&id=18252
     {
         if (myGPanel == null)

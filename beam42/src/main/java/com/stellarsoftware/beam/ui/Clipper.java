@@ -10,7 +10,7 @@ class Clipper
 {
     private double xLeft, yBot, xRight, yTop; 
 
-    public Clipper(double x1, double y1, double x2, double y2)
+    Clipper(double x1, double y1, double x2, double y2)
     // This constructor sets up edges of clipping rectangle.
     {
         xLeft = Math.min(x1, x2); 
@@ -19,7 +19,7 @@ class Clipper
         yTop = Math.max(y1, y2); 
     }
 
-    public boolean clip(double vec[]) 
+    boolean clip(double vec[])
     // Clips a line segment "vec" with the preset rectangle.
     // vec is {x1,y1,x2,y2}
     // returns true if visible, else false. 

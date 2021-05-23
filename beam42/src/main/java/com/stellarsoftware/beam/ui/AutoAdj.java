@@ -26,7 +26,7 @@ class AutoAdj implements OPTDataModelListener, RAYDataModelListener {
     private OEJIF optEditor;
     private AutoAdjuster myHost;
 
-    public AutoAdj() {
+    AutoAdj() {
         rayEditor = DMF.rejif;
         optEditor = DMF.oejif;
         myHost = new AutoAdjuster(optEditor.model(), rayEditor.model(), this, this); // does everything.
@@ -115,7 +115,7 @@ class AutoAdj implements OPTDataModelListener, RAYDataModelListener {
 
 
     private void vStartTimer() {
-        DMF.bAutoBusy = true;
+        Globals.bAutoBusy = true;
         myTimer = new javax.swing.Timer(500, doTimerTask);
         //hostiter = 0;
         myTimer.start();
@@ -159,7 +159,7 @@ class AutoAdj implements OPTDataModelListener, RAYDataModelListener {
             if (myHost.bComplete) {
                 myTimer.stop();
                 jbDone.setText("Done");
-                DMF.bAutoBusy = false;  // allow future parsings.
+                Globals.bAutoBusy = false;  // allow future parsings.
             }
         }
     };
@@ -176,7 +176,7 @@ class AutoAdj implements OPTDataModelListener, RAYDataModelListener {
         }
         //---with dialog gone, can resync front & selected----
         DMF.bringEJIFtoFront(optEditor);
-        DMF.bAutoBusy = false;  // allow future parsings.
+        Globals.bAutoBusy = false;  // allow future parsings.
     }
 }
 

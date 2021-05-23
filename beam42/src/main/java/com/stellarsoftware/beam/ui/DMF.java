@@ -91,19 +91,18 @@ import javax.swing.filechooser.FileNameExtensionFilter;
   */
 public class DMF extends JFrame implements B4constants
 {
-    public static int iXY = 10;  
+    static int iXY = 10;
 
-    public static JFrame dmf;           // allows messages, e.g. setTitle()
-    public static JDesktopPane jdp;     // for WhichEditorInFront...
+    static JFrame dmf;           // allows messages, e.g. setTitle()
+    static JDesktopPane jdp;     // for WhichEditorInFront...
 
-    public static OEJIF oejif;          // allows messages, e.g. repaint()
-    public static REJIF rejif;
-    public static MEJIF mejif;
+    static OEJIF oejif;          // allows messages, e.g. repaint()
+    static REJIF rejif;
+    static MEJIF mejif;
 
-    public static boolean bHostActive = true;
-    public static boolean bRequestWriteImage = false; // see BJIF
-    public static boolean bRayGenOK = true; 
-    public static boolean bAutoBusy = false;    // forbid parsing when AutoAdj is running
+    static boolean bHostActive = true;
+    static boolean bRequestWriteImage = false; // see BJIF
+    static boolean bRayGenOK = true;
 
     private static int iWindowOffset = 20;      // pixels
     private static int iWindowOffsetMax = 200;  // pixels
@@ -133,7 +132,7 @@ public class DMF extends JFrame implements B4constants
 
     //----run menu setup---------------------
 
-    public static GJIF gjifTypes[] = new GJIF[RM_NITEMS]; // GJIFrame types; #0=unused
+    static GJIF gjifTypes[] = new GJIF[RM_NITEMS]; // GJIFrame types; #0=unused
 
     //---runItemStr[] become menu names (line 331) **and** JIF names (line 826). 
     //---these are numbered via the RM_XXX definitions in Constants.java
@@ -160,16 +159,16 @@ public class DMF extends JFrame implements B4constants
     static JMenuBar menubar; 
 
     static private String sInitialDir;
-    static public  String sCurrentDir; 
+    static String sCurrentDir;
     static private String sWorkingTitle; 
     
-    static public  String sUserHome = "";    // for defaults
+    static String sUserHome = "";    // for defaults
     
     //------about the Java RunTime environment--------------
     
-    static public int    iJRT;   // typically 6, 7, 8...
-    static public String sJRT;   // typically "JRT6", JRT7", ...
-    static public String sLong;  // typically "1.6.0_65"
+    static int    iJRT;   // typically 6, 7, 8...
+    static String sJRT;   // typically "JRT6", JRT7", ...
+    static String sLong;  // typically "1.6.0_65"
     
 
     public DMF() //----constructor--------
@@ -198,7 +197,7 @@ public class DMF extends JFrame implements B4constants
         
         //----------set initial AutoBusy flag-------------------
 
-        bAutoBusy = false; // not busy allows blinker parsing 
+        Globals.bAutoBusy = false; // not busy allows blinker parsing
 
         //-----------build the menus and menubar----------------
         
@@ -1491,7 +1490,7 @@ public class DMF extends JFrame implements B4constants
     // Set bActive=true to allow full parse action. 
     // Potential danger: must not mess up AutoAdjust's surfs[] work.
     {
-        if (bAutoBusy)
+        if (Globals.bAutoBusy)
           return; 
 
         if (!bActive)

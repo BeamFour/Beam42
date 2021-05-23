@@ -72,7 +72,7 @@ import java.util.*;        // ArrayList
   *
   * @author M.Lampton (c) STELLAR SOFTWARE 2007-2015 all rights reserved.
   */
-public class MPlotPanel extends GPanel
+class MPlotPanel extends GPanel
 {
     // public static final long serialVersionUID = 42L;
 
@@ -142,7 +142,7 @@ public class MPlotPanel extends GPanel
 
 
 
-    public MPlotPanel(GJIF gj)
+    MPlotPanel(GJIF gj)
     {
         myGJIF = gj;           // protected; used here & GPanel
         uxspan = 1.0;          // parent GPanel setup

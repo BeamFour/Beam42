@@ -69,7 +69,7 @@ abstract class BJIF extends JInternalFrame implements B4constants
 
     abstract boolean bExitOK(Component c); // must be provided by each subclass
     
-    public BJIF(String s) // constructor
+    BJIF(String s) // constructor
     {
         super(s, true, true, true, true); 
         setName(s); 
@@ -115,13 +115,13 @@ abstract class BJIF extends JInternalFrame implements B4constants
         caretTimer.schedule(new BlinkTask(this), 0, BLINKMILLISEC); // trying "this"
     }
 
-    public void setKeyPanel(Container c)
+    void setKeyPanel(Container c)
     // allows EJIF to override ContentPane with its ePanel.
     {
        myC = c; 
     }
 
-    public boolean getCaretStatus() // called by descendant's client JPanel
+    boolean getCaretStatus() // called by descendant's client JPanel
     {
         return bCaret;
     }

@@ -17,7 +17,7 @@ import javax.swing.*;      // Graphics2D features
   *
   * @author M.Lampton (c) STELLAR SOFTWARE 2004 all rights reserved.
   */
-public class MTFPanel extends GPanel
+class MTFPanel extends GPanel
 {
     // public static final long serialVersionUID = 42L;
 
@@ -39,7 +39,7 @@ public class MTFPanel extends GPanel
     private H1DPanel myH1DPanel = null; 
      
 
-    public MTFPanel(GJIF gj)
+    MTFPanel(GJIF gj)
     {
         myGJIF = gj;     // protected; used here & GPanel
         bClobber = true; // protected; random redo() needs new artwork

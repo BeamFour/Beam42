@@ -19,13 +19,13 @@ class OEJIF extends EJIF
 {
     // public static final long serialVersionUID = 42L;
 
-    public OEJIF(int iXY, String gfname)
+    OEJIF(int iXY, String gfname)
     {
         super(0, iXY, ".OPT", gfname, MAXSURFS, new OPTDataModel()); // call EJIF
         myFpath = gfname;                        // field of EJIF.
     }
 
-    public OPTDataModel model() {
+    OPTDataModel model() {
         return (OPTDataModel) dataModel;
     }
 
@@ -38,27 +38,27 @@ class OEJIF extends EJIF
 //    //---Yikes, sometimes at startup adjustables is all -1 even with good adjustables.
 //    //-----What should initialize adjustables??
 
-    public double getOsize() {
+    double getOsize() {
         return model().getOsize();
     }
 
-    public double getAdjValue(int i) {
+    double getAdjValue(int i) {
         return model().getAdjValue(i);
     }
 
-    public int getAdjAttrib(int i) {
+    int getAdjAttrib(int i) {
         return model().getAdjAttrib(i);
     }
 
-    public int getAdjSurf(int i) {
+    int getAdjSurf(int i) {
         return model().getAdjSurf(i);
     }
 
-    public int getAdjField(int i) {
+    int getAdjField(int i) {
         return model().getAdjField(i);
     }
 
-    public ArrayList<Integer> getSlaves(int i) {
+    ArrayList<Integer> getSlaves(int i) {
         return model().getSlaves(i);
     }
 }

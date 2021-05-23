@@ -1,7 +1,5 @@
 package com.stellarsoftware.beam.core;
 
-import com.stellarsoftware.beam.ui.DMF;
-
 /** AutoAdj.java
   * A207: eliminated groups
   * class LMadj is at the bottom of this file. 
@@ -114,7 +112,7 @@ public class AutoAdjuster implements B4constants
 
         //----turn off blinker parsing of surfs[] raystarts[] etc---------
 
-        DMF.bAutoBusy = true;
+        Globals.bAutoBusy = true;
 
         //-----begin the comparison process-------
 

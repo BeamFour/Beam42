@@ -70,7 +70,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
 { 
     // public static final long serialVersionUID = 42L;  // Xlint 8 Oct 2014
 
-    public EPanel(EJIF ejif) // constructor
+    EPanel(EJIF ejif) // constructor
     { 
         // no need to initialize base class JPanel "super()"
         
@@ -120,13 +120,13 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
         myEJIF.dataModel.setDirty(false);
     }  //--------end constructor---------------
 
-    public void setCaretFlag(boolean b)
+    void setCaretFlag(boolean b)
     // Required support for abstract class EJIF
     {
         bCaret = b;
     } 
 
-    public void refreshSizes()
+    void refreshSizes()
     // After major edits, reestablishes table size & line lengths
     // These are needed internally for further editing. 
     {
@@ -199,7 +199,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
 
     } //----end paintComponent()
 
-    public void setCaretXY(int field, int row)
+    void setCaretXY(int field, int row)
     {
         int nfields = getFieldInfo(); 
         if ((field>=0) && (field<nfields))
@@ -209,7 +209,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
           jCaret = row; 
     }
 
-    public int getCaretY()  // added A106 for AutoRayGen
+    int getCaretY()  // added A106 for AutoRayGen
     {
         return jCaret;
     }
@@ -235,119 +235,119 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
         }
     }
 
-    public void setVerticalPosition(int rowNumber)
+    void setVerticalPosition(int rowNumber)
     // Called by Frame when scrollbar produces a message
     {
         jOff = rowNumber; 
         repaint();   // OS eventually calls paintComponent() below
     }
 
-    public void setHorizontalPosition(int colNumber)
+    void setHorizontalPosition(int colNumber)
     // Called by Frame when scrollbar produces a message
     {
         iOff = colNumber; 
         repaint(); 
     }
 
-    public int getFieldInfo() {
+    int getFieldInfo() {
         return myEJIF.model().getFieldInfo();
     }
 
-    public String getFieldFull(int f, int jrow) {
+    String getFieldFull(int f, int jrow) {
         return myEJIF.model().getFieldFull(f, jrow);
     }
 
-    public String getFieldTrim(int ifield, int jrow)
+    String getFieldTrim(int ifield, int jrow)
     // Returns the trimmed field, no leading or trailing blanks
     {
         return getFieldFull(ifield, jrow).trim(); 
     }
 
-    public double getFieldDouble(int ifield, int jrow)
+    double getFieldDouble(int ifield, int jrow)
     // empty returns -0.0; badnum returns Double.NaN
     // U.suckDouble() includes trimming and -0 for empty.
     {
         return U.suckDouble(getFieldFull(ifield, jrow)); 
     }
 
-    public int getFieldWidth(int f) {
+    int getFieldWidth(int f) {
         return myEJIF.dataModel.getFieldWidth(f);
     }
 
-    public void putFieldString(int f, int jrow, String s) {
+    void putFieldString(int f, int jrow, String s) {
         myEJIF.model().putFieldString(f, jrow, s);
     }
 
-    public void forceFieldString(int f, int jrow, String s) {
+    void forceFieldString(int f, int jrow, String s) {
         myEJIF.model().forceFieldString(f, jrow, s);
     }
 
-    public void putFieldDouble(int f, int jrow, double d) {
+    void putFieldDouble(int f, int jrow, double d) {
         myEJIF.dataModel.putFieldDouble(f, jrow, d);
     }
 
-    public void forceFieldDouble(int f, int jrow, double d) {
+    void forceFieldDouble(int f, int jrow, double d) {
         myEJIF.model().forceFieldDouble(f, jrow, d);
     }
 
-    public char getTagChar(int f, int jrow) {
+    char getTagChar(int f, int jrow) {
         return myEJIF.model().getTagChar(f, jrow);
     }
 
-    public void putTagChar(int f, int jrow, char c) {
+    void putTagChar(int f, int jrow, char c) {
         myEJIF.model().putTagChar(f, jrow, c);
     }
 
-    public boolean hasContent()
+    boolean hasContent()
     {
         return (getAllLineLengths() > 0); 
     }
 
-    public int getLineCount()
+    int getLineCount()
     {
         return getAllLineLengths(); 
     } 
 
-    public int getLineLength(int jrow) {
+    int getLineLength(int jrow) {
         return myEJIF.model().getLineLength(jrow);
     }
 
-    public int getICaret()
+    int getICaret()
     {
         return iCaret;
     }
    
-    public int getJCaret()
+    int getJCaret()
     {
         return jCaret;
     }
 
-    public int getCaretFieldNum()
+    int getCaretFieldNum()
     {
         return getWhichField(iCaret); 
     }
 
-    public int getNumFields()
+    int getNumFields()
     {
         return getFieldInfo(); 
     }
    
-    public int getGuideNumber() {
+    int getGuideNumber() {
         return myEJIF.dataModel.getGuideNumber();
     }
 
-    public boolean isMarked()  // public for edit graying
+    boolean isMarked()  // public for edit graying
     {
         return jDrag >= 0; 
     }
 
-    public void doUnmarkRepaint()
+    void doUnmarkRepaint()
     {
         jDrag = -1;
         repaint(); 
     }
 
-    public void doSelectAll()   // for edit menu
+    void doSelectAll()   // for edit menu
     {
         getAllLineLengths(); 
         jDown = 0; 
@@ -358,7 +358,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
 
     //------------- public i/o methods-------------------------
 
-    public String getLine(int j)
+    String getLine(int j)
     // assumes that getAllLineLengths() has been called first
     // to initialize nlines and individual line lengths. 
     {
@@ -367,20 +367,20 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
         return myEJIF.model().getLine(j, 0, myEJIF.model().getLineLen(j));
     }
 
-    public void vLoadSkeleton() {
+    void vLoadSkeleton() {
         myEJIF.model().vLoadSkeleton();
         iMouse = jMouse = jDown = iCaret = jCaret = iOff = jOff = 0;
         jDrag = -1;
     }
 
-    public boolean save(File f)
+    boolean save(File f)
     // Uses println() to generate local platform EOLs.
     {
         return myEJIF.model().save(f);
     }
 
 
-    public String getMarkedText()
+    String getMarkedText()
     // Reads text in a table.
     // This does not upset jCaret or existing markings,
     // so that "cut" can subsequently doDelete().
@@ -395,14 +395,14 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     }
 
 
-    public void setCaretToMark()
+    void setCaretToMark()
     {
         int jMark = Math.min(jDown, jDrag); 
         if (jMark >= 0)
           jCaret = jMark; 
     }
 
-    public void doDelete()
+    void doDelete()
     // deletes lines that are in the marked zone
     // this might be faster using System.arrayCopy()
     {
@@ -420,7 +420,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     }
 
 
-    public void paste(String s) {
+    void paste(String s) {
         iCaret = 0;
         stashForUndo();
         jCaret = myEJIF.model().vLoadString(s, false, jCaret);
@@ -429,7 +429,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     }
 
 
-    public void stashForUndo()
+    void stashForUndo()
     // called locally for significant changes to the charTable, 
     // or via EJIF at start of AutoAdjust (hence public).
     {

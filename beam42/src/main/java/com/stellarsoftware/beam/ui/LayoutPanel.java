@@ -58,7 +58,7 @@ import java.util.Arrays;   // to list an int array jhit[] below
   *
   * M.Lampton STELLAR SOFTWARE (c) 2004-2012 all rights reserved.
   */
-public class LayoutPanel extends GPanel   // implements B4constants via GPanel
+class LayoutPanel extends GPanel   // implements B4constants via GPanel
 {
     // public static final long serialVersionUID = 42L;
 
@@ -134,7 +134,7 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
     double arcy[] = {+1.0, +1.0, -1.0, -1.0}; // arcs
 
 
-    public LayoutPanel(GJIF gj)
+    LayoutPanel(GJIF gj)
     {
         myGJIF = gj;            // protected; used here & GPanel
         bClobber = false;       // protected; random() keeps old artwork

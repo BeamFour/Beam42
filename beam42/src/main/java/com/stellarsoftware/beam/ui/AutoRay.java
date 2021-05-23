@@ -51,7 +51,7 @@ class AutoRay
 {
     private JDialog jd      = null;       // to post results when done.
 
-    public AutoRay() {
+    AutoRay() {
         REJIF rayEditor = DMF.rejif;
         OEJIF optEditor = DMF.oejif;
         if (rayEditor == null || optEditor == null)

@@ -151,14 +151,14 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
 
     //---------------public methods and fields-------------------
 
-    public void parse()   // supplied by extensions OEJIF, REJIF, MEJIF.
+    void parse()   // supplied by extensions OEJIF, REJIF, MEJIF.
     {
         dataModel.parse();
     }
 
-    public abstract B4DataModel model();
+    abstract B4DataModel model();
 
-    public boolean bExitOK(Component parent)
+    boolean bExitOK(Component parent)
     // Called here, or by main DMF window exit.
     // Buttons, 0, 1, 2 = save, exit, cancel:
     // Mac appearance is 2, 1, 0 = cancel, no, yes.
@@ -190,7 +190,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
 
 
  
-    public EJIF(int flavor, int iLoc, String gExt, String gFname, int gmaxrec, B4DataModel dataModel)
+    EJIF(int flavor, int iLoc, String gExt, String gFname, int gmaxrec, B4DataModel dataModel)
     // Do not construct an EJIF unless the file & contents verify okay.
     // This revision A178 August 2015
     // (c) 2004 M.Lampton STELLAR SOFTWARE
@@ -253,7 +253,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
     } //-----end of constructor-----
 
 
-    public String getFpath()
+    String getFpath()
     // Essential to query myFile.getPath() for fresh information!
     // However, on opening a new table, myFile is null. 
     // A179: Yikes the constructor initializes a temporary file "f" not myFile.
@@ -279,7 +279,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
 
     //-----------public methods, continued-----------
 
-    public void focusPanel()
+    void focusPanel()
     // Sets focus onto this frame's ePanel; called by DMF
     // Fails to receive focus if JFrame has got focus first.
     // Use this and do not try to focus the JFrame container.  
@@ -299,7 +299,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
         });
     }
 
-    public String sGetType()
+    String sGetType()
     {
         switch (myFlavor)
         {
@@ -310,14 +310,14 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
         }
     }
 
-    public void setCaretXY(int field, int row)
+    void setCaretXY(int field, int row)
     // Set caret location for error display
     {
         if (ePanel != null)
           ePanel.setCaretXY(field, row); 
     }
 
-    public int getCaretY()  // added A106 for AutoRayGen
+    int getCaretY()  // added A106 for AutoRayGen
     {
         return ePanel.getCaretY();
     }
@@ -332,12 +332,12 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
     }
 
 
-    public boolean areYouDirty()
+    boolean areYouDirty()
     {
         return dataModel.isDirty();
     }
 
-    public void pleaseSaveAs()
+    void pleaseSaveAs()
     {
         if (ePanel == null)  // should never happen
           return; 
@@ -408,7 +408,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
     }
 
 
-    public void pleaseSave()
+    void pleaseSave()
     {
         if (ePanel == null) 
           return; 
@@ -426,7 +426,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
     }
 
 
-    public void tryPrint()
+    void tryPrint()
     // http://www.javacommerce.com/displaypage.jsp?name=printcode.sql&id=18252
     {
         if (ePanel == null)
@@ -446,7 +446,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
 
     //-------public editing calls from DMF------
 
-    public void doCut()
+    void doCut()
     {
         Globals.nEdits++;
         clipb = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -459,7 +459,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
         ePanel.doDelete(); 
     }
 
-    public void doCopy()
+    void doCopy()
     // Copies marked table text onto the clipboard
     {
         Globals.nEdits++;
@@ -473,7 +473,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
     }
 
 
-    public void doPasteInto()
+    void doPasteInto()
     // Pastes clipboard string into current table.
     // Does not paste over. 
     // Analogous to bLoadFile(). 
@@ -505,18 +505,18 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
         }
     }
 
-    public void doDelete()
+    void doDelete()
     {
         Globals.nEdits++;
         ePanel.doDelete(); 
     }
 
-    public void doSelectAll()
+    void doSelectAll()
     {
         ePanel.doSelectAll(); 
     }
 
-    public void doStashForUndo()
+    void doStashForUndo()
     {
         ePanel.stashForUndo();
     }

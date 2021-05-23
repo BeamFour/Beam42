@@ -50,7 +50,7 @@ import java.io.*;          // Save as file
   * 
   * @author M.Lampton (c) STELLAR SOFTWARE 2004, 2015 all rights reserved.
   */
-public class H1DPanel extends GPanel
+class H1DPanel extends GPanel
 {
     // public static final long serialVersionUID = 42L;
     
@@ -81,7 +81,7 @@ public class H1DPanel extends GPanel
     private boolean bShowAverage = true; 
 
 
-    public H1DPanel(GJIF gj) // the constructor
+    H1DPanel(GJIF gj) // the constructor
     // Called by GJIF to begin a new P1D panel.
     // Sets up parameters, runs table rays, builds initial histogram.
     // No artwork here.

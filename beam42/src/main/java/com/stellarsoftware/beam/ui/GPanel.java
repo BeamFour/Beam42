@@ -159,7 +159,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
     
     //--------Constructor---------------------
 
-    public GPanel()  // host class for artwork generators
+    GPanel()  // host class for artwork generators
     {
         ///// testing suggestion from StackOverflow...
         ///// this.setDoubleBuffered(false); 
@@ -180,7 +180,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
     }
 
 
-    public void requestNewArtwork()  
+    void requestNewArtwork()
     // Allows each AutoAdjust() iteration to request fresh Layout artwork. 
     // Don't re-parse UO or sizes when this is called.
     // Just let drawPage() regenerate its new g2Tech and render it. 
@@ -193,7 +193,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
         repaint();          // call OS, which calls paintComponent() below.
     }
     
-    
+    @Override
     public void paintComponent(Graphics g)
     // Gets called when OS requests repaint() each caret blink.
     // GJIF offers myGJIF.setTitle(), myGJIF.getTitle().
@@ -205,7 +205,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
     }
 
 
-    public void redo()
+    void redo()
     // Called by Random after random rays have augmented batchList.
     // For Layout and Plot, rays atop earlier artwork, bClobber=false:
     //   First it appends batchList to randList, retain for CAD/printing. 
@@ -247,6 +247,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
         repaint(); 
     }
 
+    @Override
     public int print(Graphics g, PageFormat pf, int page) throws PrinterException
     {
         if (page >= 1)
@@ -259,7 +260,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
 
 
 
-    public void doCAD()  // called by DMF >> GJIF >> here
+    void doCAD()  // called by DMF >> GJIF >> here
     // This routine supplies both a buffered screen image, and
     // the three quad lists, to an outboard CAD writer. 
     // Some CAD formats need the image, others need the lists. 
@@ -282,7 +283,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
     }
     
 
-    public void doUpdateUO()  
+    void doUpdateUO()
     // Options calls this via GJIF when options change
     {
         bPleaseParseUO = true; // flag allows client doParse().
@@ -295,7 +296,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
     }
 
 
-    public void doQualifiedRedraw()  
+    void doQualifiedRedraw()
     // GJIF calls this when coming forward: check for table edits.
     // How to implement bSticky, retain previous magnification?
     {
@@ -614,7 +615,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
 
     //----------helpers for pixel rendering---------
 
-    public double getuxPixel(int ipix)
+    double getuxPixel(int ipix)
     // Converts raw pixel coord into user coord ux.
     // Used by clients to show cursor coords in user space.
     {
@@ -622,7 +623,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
     }
 
 
-    public double getuyPixel(int jpix)
+    double getuyPixel(int jpix)
     // Converts raw pixel coord into user coord uy.
     // Used by clients to show cursor coords in user space.
     {

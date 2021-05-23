@@ -25,7 +25,7 @@ import java.io.*;          // Save Data
   *
   * @author M.Lampton (c) STELLAR SOFTWARE 2004-2015 all rights reserved.
   */
-public class H2DPanel extends GPanel
+class H2DPanel extends GPanel
 {
     // public static final long serialVersionUID = 42L;
 
@@ -67,7 +67,7 @@ public class H2DPanel extends GPanel
 
 
 
-    public H2DPanel(GJIF gj)
+    H2DPanel(GJIF gj)
     {
         // implicitly calls super() with no arguments
         myGJIF = gj;            // protected; used here & GPanel

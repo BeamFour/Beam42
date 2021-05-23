@@ -15,14 +15,14 @@ class MEJIF extends EJIF
 {
     // public static final long serialVersionUID = 42L;
 
-    public MEJIF(int iXY, String gfname)
+    MEJIF(int iXY, String gfname)
     // constructor creates a media editor using EJIF
     {
         super(2, iXY, ".MED", gfname, MAXMEDIA, new MEDDataModel());
         myFpath = gfname; 
     }
 
-    public MEDDataModel model() {
+    MEDDataModel model() {
         return (MEDDataModel) dataModel;
     }
 }

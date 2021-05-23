@@ -95,7 +95,7 @@ import java.awt.event.*;   // Events
   *
   * @author M.Lampton (c) STELLAR SOFTWARE 2011 all rights reserved.
   */
-public class MapPanel extends GPanel // implements Runnable
+class MapPanel extends GPanel // implements Runnable
 {
     // public static final long serialVersionUID = 42L;
 
@@ -159,7 +159,7 @@ public class MapPanel extends GPanel // implements Runnable
     double EXTRA = 2.0; 
 
     
-    public MapPanel(GJIF gj) 
+    MapPanel(GJIF gj)
     {
         myGJIF = gj;  
         bClobber = true; 

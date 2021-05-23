@@ -25,7 +25,7 @@ import com.stellarsoftware.beam.core.U;
   *
   * @author M.Lampton (c) STELLAR SOFTWARE 2006 all rights reserved.
   */
-public class Plot3Panel extends GPanel
+class Plot3Panel extends GPanel
 {
     // public static final long serialVersionUID = 42L;
 
@@ -56,7 +56,7 @@ public class Plot3Panel extends GPanel
     private double el=0, cosel=1, sinel=0; 
 
 
-    public Plot3Panel(GJIF gj)
+    Plot3Panel(GJIF gj)
     {
         myGJIF = gj;           // protected; used here & GPanel
         bClobber = false;      // protected; random redo() keeps old artwork

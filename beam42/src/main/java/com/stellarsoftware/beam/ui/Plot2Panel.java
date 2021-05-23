@@ -27,7 +27,7 @@ import com.stellarsoftware.beam.core.U;
   *
   * @author M.Lampton (c) STELLAR SOFTWARE 2004-2015 all rights reserved.
   */
-public class Plot2Panel extends GPanel
+class Plot2Panel extends GPanel
 {
     // public static final long serialVersionUID = 42L;
 
@@ -50,7 +50,7 @@ public class Plot2Panel extends GPanel
 
     //----------------public methods------------------------
 
-    public Plot2Panel(GJIF gj)
+    Plot2Panel(GJIF gj)
     {
         // implicitly calls super() with no arguments
         myGJIF = gj;            // protected; used here & GPanel

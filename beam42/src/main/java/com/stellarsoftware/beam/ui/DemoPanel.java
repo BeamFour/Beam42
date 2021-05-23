@@ -15,7 +15,7 @@ import com.stellarsoftware.beam.core.U;
   *
   * @author M.Lampton (c) STELLAR SOFTWARE 2004-2015 all rights reserved.
 */
-public class DemoPanel extends GPanel // implements Runnable
+class DemoPanel extends GPanel // implements Runnable
 {
     // public static final long serialVersionUID = 42L;
 
@@ -25,7 +25,7 @@ public class DemoPanel extends GPanel // implements Runnable
     int jjj[] = new int[6]; 
     double zzz[] = new double[6]; 
 
-    public DemoPanel(GJIF gj) // constructor
+    DemoPanel(GJIF gj) // constructor
     {
         myGJIF = gj;          // protected; used here & GPanel
         uxcenter = 0.0;       // optional for GPanel's addAffines()

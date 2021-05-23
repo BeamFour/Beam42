@@ -54,7 +54,7 @@ class CAD implements B4constants
     private static int prevFontCode=0;  // serves all CAD flavors
 
 
-    public static boolean doCAD(int style, boolean bPort, ArrayList<XYZO> a,
+    static boolean doCAD(int style, boolean bPort, ArrayList<XYZO> a,
         ArrayList<XYZO> b, ArrayList<XYZO> c, ArrayList<XYZO> d)
     // Called via DMF >> GJIF >> GPanel line 245>> here, like this: 
     // CAD.doCAD(style, bPortrait, baseList, randList, finishList, annoList);

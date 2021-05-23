@@ -2,8 +2,6 @@ package com.stellarsoftware.beam;
 
 import java.util.*;           // Timer; sort()
 import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;       // Rect
 import javax.swing.*;         // JIFrames
 import javax.swing.event.*;   // JIFrame events
 import java.io.*;             // output files
@@ -74,7 +72,7 @@ abstract class BJIF extends JInternalFrame implements B4constants
         setTitle(s); 
         
         LookAndFeel laf = UIManager.getLookAndFeel(); 
-        boolean bMacIconOK = "T".equals(DMF.reg.getuo(UO_START, 9)); 
+        boolean bMacIconOK = "T".equals(Globals.reg.getuo(UO_START, 9));
         boolean bMac = "Mac OS X".equals(laf.getName()); 
         if (bMac)
           super.setIconifiable(bMacIconOK); 

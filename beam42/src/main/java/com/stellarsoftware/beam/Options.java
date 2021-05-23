@@ -3,10 +3,8 @@ package com.stellarsoftware.beam;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;        // layout managers
-import javax.swing.border.*; // borders
 import javax.swing.event.*;  // JSpinner ChangeEvent
-import java.io.*;            // all i/o
-import java.util.*;          // StringTokenizer
+
 
 @SuppressWarnings("serial")
 
@@ -375,9 +373,9 @@ class Options extends JMenu implements B4constants
            null, null, null); 
         if (result == JOptionPane.OK_OPTION)
         {
-            DMF.reg.putuo(UO_NEWFILE, 0, nrecordsBox.getText());
-            DMF.reg.putuo(UO_NEWFILE, 1, nfieldsBox.getText());            
-            DMF.reg.putuo(UO_NEWFILE, 2, nwidthBox.getText());
+            Globals.reg.putuo(UO_NEWFILE, 0, nrecordsBox.getText());
+            Globals.reg.putuo(UO_NEWFILE, 1, nfieldsBox.getText());
+            Globals.reg.putuo(UO_NEWFILE, 2, nwidthBox.getText());
         }
     }   
             
@@ -395,7 +393,7 @@ class Options extends JMenu implements B4constants
 
         if (result == JOptionPane.OK_OPTION)
         {
-           DMF.reg.putuo(UO_IO, 0, rms.isSelected() ? "T" : "F"); 
+           Globals.reg.putuo(UO_IO, 0, rms.isSelected() ? "T" : "F");
         }
     }
 
@@ -439,25 +437,25 @@ class Options extends JMenu implements B4constants
 
         if (result == JOptionPane.OK_OPTION)
         {
-            DMF.reg.putuo(UO_LAYOUT, 0, el.getText()); 
-            DMF.reg.putuo(UO_LAYOUT, 1, az.getText()); 
-            DMF.reg.putuo(UO_LAYOUT, 2, sticky.isSelected() ? "T" : "F"); 
-            DMF.reg.putuo(UO_LAYOUT, 3, ar.getText()); 
-            DMF.reg.putuo(UO_LAYOUT, 39, dx.getText()); 
+            Globals.reg.putuo(UO_LAYOUT, 0, el.getText());
+            Globals.reg.putuo(UO_LAYOUT, 1, az.getText());
+            Globals.reg.putuo(UO_LAYOUT, 2, sticky.isSelected() ? "T" : "F");
+            Globals.reg.putuo(UO_LAYOUT, 3, ar.getText());
+            Globals.reg.putuo(UO_LAYOUT, 39, dx.getText());
             for (int i=0; i<6; i++)
-              DMF.reg.putuo(UO_LAYOUT, 4+i, vert.isSelected(i) ? "T" : "F"); 
+              Globals.reg.putuo(UO_LAYOUT, 4+i, vert.isSelected(i) ? "T" : "F");
             for (int i=0; i<5; i++)
-              DMF.reg.putuo(UO_LAYOUT, 10+i, ax.isSelected(i) ? "T" : "F");
+              Globals.reg.putuo(UO_LAYOUT, 10+i, ax.isSelected(i) ? "T" : "F");
             for (int i=0; i<3; i++)
-              DMF.reg.putuo(UO_LAYOUT, 15+i, bhsb.isSelected(i) ? "T" : "F"); 
-            DMF.reg.putuo(UO_LAYOUT, 18, bhsb.getText()); 
+              Globals.reg.putuo(UO_LAYOUT, 15+i, bhsb.isSelected(i) ? "T" : "F");
+            Globals.reg.putuo(UO_LAYOUT, 18, bhsb.getText());
             for (int i=0; i<8; i++)
-              DMF.reg.putuo(UO_LAYOUT, 19+i, rb.isSelected(i) ? "T" : "F"); 
-            DMF.reg.putuo(UO_LAYOUT, 27, shading.isSelected() ? "T" : "F"); 
-            DMF.reg.putuo(UO_LAYOUT, 37, connect.isSelected() ? "T" : "F"); 
-            DMF.reg.putuo(UO_LAYOUT, 38, retrovis.isSelected() ? "T" : "F"); 
+              Globals.reg.putuo(UO_LAYOUT, 19+i, rb.isSelected(i) ? "T" : "F");
+            Globals.reg.putuo(UO_LAYOUT, 27, shading.isSelected() ? "T" : "F");
+            Globals.reg.putuo(UO_LAYOUT, 37, connect.isSelected() ? "T" : "F");
+            Globals.reg.putuo(UO_LAYOUT, 38, retrovis.isSelected() ? "T" : "F");
             for (int i=0; i<3; i++)
-              DMF.reg.putuo(UO_LAYOUT, 28+i, db.getText(i)); 
+              Globals.reg.putuo(UO_LAYOUT, 28+i, db.getText(i));
 
             updateAllInstances("Layout"); 
         }
@@ -485,9 +483,9 @@ class Options extends JMenu implements B4constants
 
         if (result == JOptionPane.OK_OPTION)
         {
-            DMF.reg.putuo(UO_AUTO, 0, step.getText()); 
-            DMF.reg.putuo(UO_AUTO, 1, maxit.getText()); 
-            DMF.reg.putuo(UO_AUTO, 2, tol.getText()); 
+            Globals.reg.putuo(UO_AUTO, 0, step.getText());
+            Globals.reg.putuo(UO_AUTO, 1, maxit.getText());
+            Globals.reg.putuo(UO_AUTO, 2, tol.getText());
             // DMF.reg.putuo(UO_AUTO, 3, wx.getText()); 
             // DMF.reg.putuo(UO_AUTO, 4, wy.getText()); 
             // DMF.reg.putuo(UO_AUTO, 5, wz.getText()); 
@@ -525,19 +523,19 @@ class Options extends JMenu implements B4constants
 
         if (result == JOptionPane.OK_OPTION)
         {
-            DMF.reg.putuo(UO_PLOT2, 0, hvar.getText()); 
-            DMF.reg.putuo(UO_PLOT2, 1, hran.getText()); 
-            DMF.reg.putuo(UO_PLOT2, 2, vvar.getText()); 
-            DMF.reg.putuo(UO_PLOT2, 3, vran.getText()); 
-            DMF.reg.putuo(UO_PLOT2, 4, wave.getText()); 
+            Globals.reg.putuo(UO_PLOT2, 0, hvar.getText());
+            Globals.reg.putuo(UO_PLOT2, 1, hran.getText());
+            Globals.reg.putuo(UO_PLOT2, 2, vvar.getText());
+            Globals.reg.putuo(UO_PLOT2, 3, vran.getText());
+            Globals.reg.putuo(UO_PLOT2, 4, wave.getText());
 
             for (int i=0; i<4; i++)
-              DMF.reg.putuo(UO_PLOT2, 5+i, spot.isSelected(i) ? "T" : "F"); 
+              Globals.reg.putuo(UO_PLOT2, 5+i, spot.isSelected(i) ? "T" : "F");
 
             for (int i=0; i<2; i++)
-              DMF.reg.putuo(UO_PLOT2, 9+i, rays.isSelected(i) ? "T" : "F"); 
+              Globals.reg.putuo(UO_PLOT2, 9+i, rays.isSelected(i) ? "T" : "F");
 
-            DMF.reg.putuo(UO_PLOT2, 11, black.isSelected() ? "T" : "F"); 
+            Globals.reg.putuo(UO_PLOT2, 11, black.isSelected() ? "T" : "F");
 
             updateAllInstances("Plot2Dim"); 
         }
@@ -580,35 +578,35 @@ class Options extends JMenu implements B4constants
 
         if (result == JOptionPane.OK_OPTION)
         {
-            DMF.reg.putuo(UO_MPLOT, 0,  bmpH.getN()); 
-            DMF.reg.putuo(UO_MPLOT, 1,  bmpH.getVar1()); 
-            DMF.reg.putuo(UO_MPLOT, 2,  bmpH.getStr1()); 
-            DMF.reg.putuo(UO_MPLOT, 3,  bmpH.getVar2()); 
-            DMF.reg.putuo(UO_MPLOT, 4,  bmpH.getStr2()); 
-            DMF.reg.putuo(UO_MPLOT, 5,  bmpH.getVar3()); 
-            DMF.reg.putuo(UO_MPLOT, 6,  bmpH.getStr3()); 
+            Globals.reg.putuo(UO_MPLOT, 0,  bmpH.getN());
+            Globals.reg.putuo(UO_MPLOT, 1,  bmpH.getVar1());
+            Globals.reg.putuo(UO_MPLOT, 2,  bmpH.getStr1());
+            Globals.reg.putuo(UO_MPLOT, 3,  bmpH.getVar2());
+            Globals.reg.putuo(UO_MPLOT, 4,  bmpH.getStr2());
+            Globals.reg.putuo(UO_MPLOT, 5,  bmpH.getVar3());
+            Globals.reg.putuo(UO_MPLOT, 6,  bmpH.getStr3());
 
-            DMF.reg.putuo(UO_MPLOT, 7,  bmpV.getN()); 
-            DMF.reg.putuo(UO_MPLOT, 8,  bmpV.getVar1()); 
-            DMF.reg.putuo(UO_MPLOT, 9,  bmpV.getStr1()); 
-            DMF.reg.putuo(UO_MPLOT, 10, bmpV.getVar2()); 
-            DMF.reg.putuo(UO_MPLOT, 11, bmpV.getStr2()); 
-            DMF.reg.putuo(UO_MPLOT, 12, bmpV.getVar3()); 
-            DMF.reg.putuo(UO_MPLOT, 13, bmpV.getStr3()); 
+            Globals.reg.putuo(UO_MPLOT, 7,  bmpV.getN());
+            Globals.reg.putuo(UO_MPLOT, 8,  bmpV.getVar1());
+            Globals.reg.putuo(UO_MPLOT, 9,  bmpV.getStr1());
+            Globals.reg.putuo(UO_MPLOT, 10, bmpV.getVar2());
+            Globals.reg.putuo(UO_MPLOT, 11, bmpV.getStr2());
+            Globals.reg.putuo(UO_MPLOT, 12, bmpV.getVar3());
+            Globals.reg.putuo(UO_MPLOT, 13, bmpV.getStr3());
 
-            DMF.reg.putuo(UO_MPLOT, 14, hvar.getText()); 
-            DMF.reg.putuo(UO_MPLOT, 15, hspan.getText()); 
-            DMF.reg.putuo(UO_MPLOT, 16, vvar.getText()); 
-            DMF.reg.putuo(UO_MPLOT, 17, vspan.getText()); 
-            DMF.reg.putuo(UO_MPLOT, 18, boxfrac.getText()); 
+            Globals.reg.putuo(UO_MPLOT, 14, hvar.getText());
+            Globals.reg.putuo(UO_MPLOT, 15, hspan.getText());
+            Globals.reg.putuo(UO_MPLOT, 16, vvar.getText());
+            Globals.reg.putuo(UO_MPLOT, 17, vspan.getText());
+            Globals.reg.putuo(UO_MPLOT, 18, boxfrac.getText());
 
             for (int i=0; i<10; i++)
-              DMF.reg.putuo(UO_MPLOT, 19+i, bcbr.isSelected(i) ? "T" : "F"); 
+              Globals.reg.putuo(UO_MPLOT, 19+i, bcbr.isSelected(i) ? "T" : "F");
 
-            DMF.reg.putuo(UO_MPLOT, 29, black.isSelected()    ? "T" : "F"); 
-            DMF.reg.putuo(UO_MPLOT, 30, round.isSelected()    ? "T" : "F"); 
-            DMF.reg.putuo(UO_MPLOT, 31, skip.isSelected()     ? "T" : "F"); 
-            DMF.reg.putuo(UO_MPLOT, 32, restrict.isSelected() ? "T" : "F"); 
+            Globals.reg.putuo(UO_MPLOT, 29, black.isSelected()    ? "T" : "F");
+            Globals.reg.putuo(UO_MPLOT, 30, round.isSelected()    ? "T" : "F");
+            Globals.reg.putuo(UO_MPLOT, 31, skip.isSelected()     ? "T" : "F");
+            Globals.reg.putuo(UO_MPLOT, 32, restrict.isSelected() ? "T" : "F");
             
             updateAllInstances("MultiPlot"); 
         }
@@ -639,27 +637,27 @@ class Options extends JMenu implements B4constants
         if (result == JOptionPane.OK_OPTION)
         {
             for (int i=0; i<4; i++)   // buttons 0, 1, 2
-              DMF.reg.putuo(UO_MAP, i, bhrb.isSelected(i) ? "T" : "F"); 
+              Globals.reg.putuo(UO_MAP, i, bhrb.isSelected(i) ? "T" : "F");
 
-            DMF.reg.putuo(UO_MAP,  4, bmbH.getVar()); 
-            DMF.reg.putuo(UO_MAP,  5, bmbH.getStep()); 
-            DMF.reg.putuo(UO_MAP,  6, bmbH.getNpts()); 
+            Globals.reg.putuo(UO_MAP,  4, bmbH.getVar());
+            Globals.reg.putuo(UO_MAP,  5, bmbH.getStep());
+            Globals.reg.putuo(UO_MAP,  6, bmbH.getNpts());
             // DMF.reg.putuo(UO_MAP,  7, bmbH.getNpix()); 
-            DMF.reg.putuo(UO_MAP,  8, bmbH.getCen()); 
-            DMF.reg.putuo(UO_MAP,  9, bmbH.getPvar()); 
-            DMF.reg.putuo(UO_MAP, 10, bmbH.getPstep()); 
+            Globals.reg.putuo(UO_MAP,  8, bmbH.getCen());
+            Globals.reg.putuo(UO_MAP,  9, bmbH.getPvar());
+            Globals.reg.putuo(UO_MAP, 10, bmbH.getPstep());
 
-            DMF.reg.putuo(UO_MAP, 11, bmbV.getVar()); 
-            DMF.reg.putuo(UO_MAP, 12, bmbV.getStep()); 
-            DMF.reg.putuo(UO_MAP, 13, bmbV.getNpts()); 
+            Globals.reg.putuo(UO_MAP, 11, bmbV.getVar());
+            Globals.reg.putuo(UO_MAP, 12, bmbV.getStep());
+            Globals.reg.putuo(UO_MAP, 13, bmbV.getNpts());
             // DMF.reg.putuo(UO_MAP, 14, bmbV.getNpix()); 
-            DMF.reg.putuo(UO_MAP, 15, bmbV.getCen()); 
-            DMF.reg.putuo(UO_MAP, 16, bmbV.getPvar()); 
-            DMF.reg.putuo(UO_MAP, 17, bmbV.getPstep()); 
+            Globals.reg.putuo(UO_MAP, 15, bmbV.getCen());
+            Globals.reg.putuo(UO_MAP, 16, bmbV.getPvar());
+            Globals.reg.putuo(UO_MAP, 17, bmbV.getPstep());
 
-            DMF.reg.putuo(UO_MAP, 18, percent.getText()); 
-            DMF.reg.putuo(UO_MAP, 19, aspect.getText()); 
-            DMF.reg.putuo(UO_MAP, 20, outbox.getText());  
+            Globals.reg.putuo(UO_MAP, 18, percent.getText());
+            Globals.reg.putuo(UO_MAP, 19, aspect.getText());
+            Globals.reg.putuo(UO_MAP, 20, outbox.getText());
             
             updateAllInstances("Map"); 
         }
@@ -699,25 +697,25 @@ class Options extends JMenu implements B4constants
 
         if (result == JOptionPane.OK_OPTION)
         {
-            DMF.reg.putuo(UO_PLOT3, 0, avar.getText()); 
-            DMF.reg.putuo(UO_PLOT3, 1, aran.getText()); 
-            DMF.reg.putuo(UO_PLOT3, 2, bvar.getText()); 
-            DMF.reg.putuo(UO_PLOT3, 3, bran.getText()); 
-            DMF.reg.putuo(UO_PLOT3, 4, cvar.getText()); 
-            DMF.reg.putuo(UO_PLOT3, 5, cran.getText()); 
-            DMF.reg.putuo(UO_PLOT3, 6, elev.getText()); 
-            DMF.reg.putuo(UO_PLOT3, 7, azim.getText()); 
-            DMF.reg.putuo(UO_PLOT3, 8, wave.getText()); 
+            Globals.reg.putuo(UO_PLOT3, 0, avar.getText());
+            Globals.reg.putuo(UO_PLOT3, 1, aran.getText());
+            Globals.reg.putuo(UO_PLOT3, 2, bvar.getText());
+            Globals.reg.putuo(UO_PLOT3, 3, bran.getText());
+            Globals.reg.putuo(UO_PLOT3, 4, cvar.getText());
+            Globals.reg.putuo(UO_PLOT3, 5, cran.getText());
+            Globals.reg.putuo(UO_PLOT3, 6, elev.getText());
+            Globals.reg.putuo(UO_PLOT3, 7, azim.getText());
+            Globals.reg.putuo(UO_PLOT3, 8, wave.getText());
 
             for (int i=0; i<4; i++)
-              DMF.reg.putuo(UO_PLOT3, 9+i, spot.isSelected(i) ? "T" : "F"); 
+              Globals.reg.putuo(UO_PLOT3, 9+i, spot.isSelected(i) ? "T" : "F");
 
             for (int i=0; i<2; i++)
-              DMF.reg.putuo(UO_PLOT3, 13+i, rays.isSelected(i) ? "T" : "F"); 
+              Globals.reg.putuo(UO_PLOT3, 13+i, rays.isSelected(i) ? "T" : "F");
 
             for (int i=0; i<3; i++)
-              DMF.reg.putuo(UO_PLOT3, 15+i, bhsb.isSelected(i) ? "T" : "F"); 
-            DMF.reg.putuo(UO_PLOT3, 18, bhsb.getText()); 
+              Globals.reg.putuo(UO_PLOT3, 15+i, bhsb.isSelected(i) ? "T" : "F");
+            Globals.reg.putuo(UO_PLOT3, 18, bhsb.getText());
 
             updateAllInstances("Plot3Dim"); 
         }
@@ -745,15 +743,15 @@ class Options extends JMenu implements B4constants
 
         if (result == JOptionPane.OK_OPTION)
         {
-            DMF.reg.putuo(UO_1D, 0, var.getText()); 
-            DMF.reg.putuo(UO_1D, 1, nbins.getText()); 
+            Globals.reg.putuo(UO_1D, 0, var.getText());
+            Globals.reg.putuo(UO_1D, 1, nbins.getText());
 
             for (int i=0; i<3; i++)
-              DMF.reg.putuo(UO_1D, 2+i, bounds.isSelected(i) ? "T" : "F"); 
+              Globals.reg.putuo(UO_1D, 2+i, bounds.isSelected(i) ? "T" : "F");
 
-            DMF.reg.putuo(UO_1D, 5, hmin.getText()); 
-            DMF.reg.putuo(UO_1D, 6, hmax.getText()); 
-            DMF.reg.putuo(UO_1D, 7, average.isSelected() ? "T" : "F"); 
+            Globals.reg.putuo(UO_1D, 5, hmin.getText());
+            Globals.reg.putuo(UO_1D, 6, hmax.getText());
+            Globals.reg.putuo(UO_1D, 7, average.isSelected() ? "T" : "F");
             updateAllInstances("Histo1Dim"); 
         }
     }
@@ -790,26 +788,26 @@ class Options extends JMenu implements B4constants
         if (result == JOptionPane.OK_OPTION)
         {
             for (int i=0; i<2; i++)
-              DMF.reg.putuo(UO_2D, i, display.isSelected(i) ? "T" : "F"); 
+              Globals.reg.putuo(UO_2D, i, display.isSelected(i) ? "T" : "F");
 
-            DMF.reg.putuo(UO_2D, 2, hvar.getText()); 
-            DMF.reg.putuo(UO_2D, 3, vvar.getText()); 
-            DMF.reg.putuo(UO_2D, 4, hbins.getText());
-            DMF.reg.putuo(UO_2D, 5, vbins.getText()); 
-            DMF.reg.putuo(UO_2D, 6,  elev.getText()); 
-            DMF.reg.putuo(UO_2D, 7,  azim.getText());  
-
-            for (int i=0; i<3; i++)
-              DMF.reg.putuo(UO_2D, 8+i, bounds.isSelected(i) ? "T" : "F"); 
-
-            DMF.reg.putuo(UO_2D, 11, hmin.getText()); 
-            DMF.reg.putuo(UO_2D, 12, hmax.getText()); 
-            DMF.reg.putuo(UO_2D, 13, vmin.getText()); 
-            DMF.reg.putuo(UO_2D, 14, vmax.getText()); 
+            Globals.reg.putuo(UO_2D, 2, hvar.getText());
+            Globals.reg.putuo(UO_2D, 3, vvar.getText());
+            Globals.reg.putuo(UO_2D, 4, hbins.getText());
+            Globals.reg.putuo(UO_2D, 5, vbins.getText());
+            Globals.reg.putuo(UO_2D, 6,  elev.getText());
+            Globals.reg.putuo(UO_2D, 7,  azim.getText());
 
             for (int i=0; i<3; i++)
-              DMF.reg.putuo(UO_2D, 15+i, bhsb.isSelected(i) ? "T" : "F"); 
-            DMF.reg.putuo(UO_2D, 18, bhsb.getText()); 
+              Globals.reg.putuo(UO_2D, 8+i, bounds.isSelected(i) ? "T" : "F");
+
+            Globals.reg.putuo(UO_2D, 11, hmin.getText());
+            Globals.reg.putuo(UO_2D, 12, hmax.getText());
+            Globals.reg.putuo(UO_2D, 13, vmin.getText());
+            Globals.reg.putuo(UO_2D, 14, vmax.getText());
+
+            for (int i=0; i<3; i++)
+              Globals.reg.putuo(UO_2D, 15+i, bhsb.isSelected(i) ? "T" : "F");
+            Globals.reg.putuo(UO_2D, 18, bhsb.getText());
 
             updateAllInstances("Histo2Dim"); 
         }
@@ -842,18 +840,18 @@ class Options extends JMenu implements B4constants
         if (result == JOptionPane.OK_OPTION)
         {
             String s = refresh.getText(); 
-            DMF.reg.putuo(UO_RAND, 0, sNumber(s, MAXBUNCH)); 
+            Globals.reg.putuo(UO_RAND, 0, sNumber(s, MAXBUNCH));
             s = tries.getText(); 
-            DMF.reg.putuo(UO_RAND, 1, sNumber(s, 999999999)); 
+            Globals.reg.putuo(UO_RAND, 1, sNumber(s, 999999999));
             s = succ.getText(); 
-            DMF.reg.putuo(UO_RAND, 2, sNumber(s, 999999999)); 
+            Globals.reg.putuo(UO_RAND, 2, sNumber(s, 999999999));
             for (int i=0; i<2; i++)   // two buttons
-              DMF.reg.putuo(UO_RAND, 3+i, xyz.isSelected(i) ? "T" : "F"); 
+              Globals.reg.putuo(UO_RAND, 3+i, xyz.isSelected(i) ? "T" : "F");
             for (int i=0; i<2; i++)   // two buttons
-              DMF.reg.putuo(UO_RAND, 5+i, uvw.isSelected(i) ? "T" : "F");               
+              Globals.reg.putuo(UO_RAND, 5+i, uvw.isSelected(i) ? "T" : "F");
             for (int i=0; i<5; i++)   // five buttons
-              DMF.reg.putuo(UO_RAND, 7+i, brf.isSelected(i) ? "T" : "F"); 
-            DMF.reg.putuo(UO_RAND, 12, brf.getText()); 
+              Globals.reg.putuo(UO_RAND, 7+i, brf.isSelected(i) ? "T" : "F");
+            Globals.reg.putuo(UO_RAND, 12, brf.getText());
         }
     }
     
@@ -888,10 +886,10 @@ class Options extends JMenu implements B4constants
         if (result == JOptionPane.OK_OPTION)
         {
            for (int i=0; i<n; i++)
-             DMF.reg.putuo(UO_CAD, i, format.isSelected(i) ? "T" : "F"); 
+             Globals.reg.putuo(UO_CAD, i, format.isSelected(i) ? "T" : "F");
 
            for (int i=0; i<2; i++)
-             DMF.reg.putuo(UO_CAD, 12+i, orient.isSelected(i) ? "T" : "F"); 
+             Globals.reg.putuo(UO_CAD, 12+i, orient.isSelected(i) ? "T" : "F");
         }
     }
 
@@ -902,7 +900,7 @@ class Options extends JMenu implements B4constants
     // Changing the MacOS icon permission should update all JIFs
     // using DMF's inflateIcons() and permitIcons() methods
     {
-        boolean bPrevIcon       = "T".equals(DMF.reg.getuo(UO_START, 9)); 
+        boolean bPrevIcon       = "T".equals(Globals.reg.getuo(UO_START, 9));
         BorVertRadioBox opt     = new BorVertRadioBox("Optics", UO_START, 0, 2); 
         BorVertRadioBox ray     = new BorVertRadioBox("Rays", UO_START, 2, 2); 
         BorVertRadioBox med     = new BorVertRadioBox("Media", UO_START, 4, 2);   
@@ -918,16 +916,16 @@ class Options extends JMenu implements B4constants
         if (result == JOptionPane.OK_OPTION)
         {
             for (int i=0; i<2; i++)
-              DMF.reg.putuo(UO_START, i, opt.isSelected(i) ? "T" : "F"); 
+              Globals.reg.putuo(UO_START, i, opt.isSelected(i) ? "T" : "F");
             for (int i=0; i<2; i++)
-              DMF.reg.putuo(UO_START, i+2, ray.isSelected(i) ? "T" : "F"); 
+              Globals.reg.putuo(UO_START, i+2, ray.isSelected(i) ? "T" : "F");
             for (int i=0; i<2; i++)
-              DMF.reg.putuo(UO_START, i+4, med.isSelected(i) ? "T" : "F"); 
+              Globals.reg.putuo(UO_START, i+4, med.isSelected(i) ? "T" : "F");
             for (int i=0; i<2; i++)
-              DMF.reg.putuo(UO_START, i+6, fo.isSelected(i) ? "T" : "F"); 
+              Globals.reg.putuo(UO_START, i+6, fo.isSelected(i) ? "T" : "F");
             for (int i=0; i<2; i++)
-              DMF.reg.putuo(UO_START, i+9, icon.isSelected(i) ? "T" : "F"); 
-            boolean bThisIcon = "T".equals(DMF.reg.getuo(UO_START, 9)); 
+              Globals.reg.putuo(UO_START, i+9, icon.isSelected(i) ? "T" : "F");
+            boolean bThisIcon = "T".equals(Globals.reg.getuo(UO_START, 9));
             if (bThisIcon && !bPrevIcon)
               DMF.permitIcons(); 
             if (!bThisIcon && bPrevIcon)
@@ -950,7 +948,7 @@ class Options extends JMenu implements B4constants
 
         if (result == JOptionPane.OK_OPTION)
         {
-            DMF.reg.imposeFactory(); 
+            Globals.reg.imposeFactory();
         }
     }
 
@@ -1003,17 +1001,17 @@ class Options extends JMenu implements B4constants
 
         if (result == JOptionPane.OK_OPTION)
         {
-            DMF.reg.putuo(UO_EDIT, 0, paths.isSelected() ? "T" : "F"); 
-            DMF.reg.putuo(UO_EDIT, 1, rowcol.isSelected() ? "T" : "F"); 
-            DMF.reg.putuo(UO_EDIT, 2, commas.isSelected() ? "T" : "F"); 
-            DMF.reg.putuo(UO_EDIT, 3, fwidth.getText()); 
+            Globals.reg.putuo(UO_EDIT, 0, paths.isSelected() ? "T" : "F");
+            Globals.reg.putuo(UO_EDIT, 1, rowcol.isSelected() ? "T" : "F");
+            Globals.reg.putuo(UO_EDIT, 2, commas.isSelected() ? "T" : "F");
+            Globals.reg.putuo(UO_EDIT, 3, fwidth.getText());
             for (int i=0; i<2; i++)
-              DMF.reg.putuo(UO_EDIT, 4+i, colons.isSelected(i) ? "T" : "F"); 
-            DMF.reg.putuo(UO_EDIT, 6, fontsize.getText()); 
-            DMF.reg.putuo(UO_EDIT, 7, bold.isSelected() ? "T" : "F"); 
-            DMF.reg.putuo(UO_EDIT, 8, smooth.isSelected() ? "T" : "F"); 
+              Globals.reg.putuo(UO_EDIT, 4+i, colons.isSelected(i) ? "T" : "F");
+            Globals.reg.putuo(UO_EDIT, 6, fontsize.getText());
+            Globals.reg.putuo(UO_EDIT, 7, bold.isSelected() ? "T" : "F");
+            Globals.reg.putuo(UO_EDIT, 8, smooth.isSelected() ? "T" : "F");
             for (int i=0; i<2; i++)
-              DMF.reg.putuo(UO_EDIT, 9+i, text.isSelected(i) ? "T" : "F"); 
+              Globals.reg.putuo(UO_EDIT, 9+i, text.isSelected(i) ? "T" : "F");
               
             // now, repaint all editors.
             if (DMF.mejif != null)
@@ -1061,14 +1059,14 @@ class Options extends JMenu implements B4constants
         if (result == JOptionPane.OK_OPTION)
         {
             for (int i=0; i<2; i++)
-              DMF.reg.putuo(UO_GRAPH, i, wheel.isSelected(i) ? "T" : "F");
+              Globals.reg.putuo(UO_GRAPH, i, wheel.isSelected(i) ? "T" : "F");
 
-            DMF.reg.putuo(UO_GRAPH, 2, fsize.getText()); 
-            DMF.reg.putuo(UO_GRAPH, 3, fbold.isSelected()? "T" : "F"); 
-            DMF.reg.putuo(UO_GRAPH, 4, asize.getText()); 
-            DMF.reg.putuo(UO_GRAPH, 5, abold.isSelected()? "T" : "F"); 
-            DMF.reg.putuo(UO_GRAPH, 6, gsize.getText()); 
-            DMF.reg.putuo(UO_GRAPH, 7, smooth.isSelected()? "T" : "F"); 
+            Globals.reg.putuo(UO_GRAPH, 2, fsize.getText());
+            Globals.reg.putuo(UO_GRAPH, 3, fbold.isSelected()? "T" : "F");
+            Globals.reg.putuo(UO_GRAPH, 4, asize.getText());
+            Globals.reg.putuo(UO_GRAPH, 5, abold.isSelected()? "T" : "F");
+            Globals.reg.putuo(UO_GRAPH, 6, gsize.getText());
+            Globals.reg.putuo(UO_GRAPH, 7, smooth.isSelected()? "T" : "F");
             
             //----repaint all GJIFs------------
             updateAllInstances("GJIF"); 
@@ -1111,10 +1109,10 @@ class Options extends JMenu implements B4constants
         if (result == JOptionPane.OK_OPTION)
         {
             for (int i=0; i<2; i++)
-              DMF.reg.putuo(UO_DEF, 3+i, msign.isSelected(i) ? "T" : "F"); 
+              Globals.reg.putuo(UO_DEF, 3+i, msign.isSelected(i) ? "T" : "F");
             for (int i=0; i<4; i++)
-              DMF.reg.putuo(UO_DEF, 5+i, rrand.isSelected(i) ? "T" : "F");
-            DMF.reg.putuo(UO_DEF,  9, radius.getText()); 
+              Globals.reg.putuo(UO_DEF, 5+i, rrand.isSelected(i) ? "T" : "F");
+            Globals.reg.putuo(UO_DEF,  9, radius.getText());
 
             //----now parse REJIF------------
             if (DMF.rejif != null)
@@ -1157,26 +1155,26 @@ class Options extends JMenu implements B4constants
         {
             for (int i=0; i<6; i++)
             {
-                DMF.reg.putuo(UO_1DRAY, i, coord.isSelected(i) ? "T" : "F"); 
+                Globals.reg.putuo(UO_1DRAY, i, coord.isSelected(i) ? "T" : "F");
                 if (coord.isSelected(i))
                   iwhich = i; 
             }   
 
-            DMF.reg.putuo(UO_1DRAY, 6, center.getText()); 
+            Globals.reg.putuo(UO_1DRAY, 6, center.getText());
             dCenter = U.suckDouble(center.getText()); 
 
-            DMF.reg.putuo(UO_1DRAY, 7, span.getText()); 
+            Globals.reg.putuo(UO_1DRAY, 7, span.getText());
             dSpan = U.suckDouble(span.getText()); 
 
-            DMF.reg.putuo(UO_1DRAY, 8, count.getText()); 
+            Globals.reg.putuo(UO_1DRAY, 8, count.getText());
             nCount = (int) U.suckDouble(count.getText()); 
 
-            DMF.reg.putuo(UO_1DRAY, 9, start.getText()); 
+            Globals.reg.putuo(UO_1DRAY, 9, start.getText());
             istartrow = (int) U.suckDouble(start.getText()); 
 
             for (int i=0; i<2; i++)
             {
-                DMF.reg.putuo(UO_1DRAY, i+10, rays.isSelected(i) ? "T" : "F"); 
+                Globals.reg.putuo(UO_1DRAY, i+10, rays.isSelected(i) ? "T" : "F");
                 if (rays.isSelected(i))
                   igoal = i;             // 0=start; 1=goal
             }   
@@ -1248,35 +1246,35 @@ class Options extends JMenu implements B4constants
         {
             for (int i=0; i<6; i++)
             {
-                DMF.reg.putuo(UO_2DRRAY, i, coord.isSelected(i) ? "T" : "F"); 
+                Globals.reg.putuo(UO_2DRRAY, i, coord.isSelected(i) ? "T" : "F");
                 if (coord.isSelected(i))
                   iwhich = i; 
             }   
 
-            DMF.reg.putuo(UO_2DRRAY, 6, center1.getText()); 
+            Globals.reg.putuo(UO_2DRRAY, 6, center1.getText());
             dCenter1 = U.suckDouble(center1.getText()); 
 
-            DMF.reg.putuo(UO_2DRRAY, 7, span1.getText()); 
+            Globals.reg.putuo(UO_2DRRAY, 7, span1.getText());
             dSpan1 = U.suckDouble(span1.getText()); 
 
-            DMF.reg.putuo(UO_2DRRAY, 8, count1.getText()); 
+            Globals.reg.putuo(UO_2DRRAY, 8, count1.getText());
             nCount1 = (int) U.suckDouble(count1.getText()); 
 
-            DMF.reg.putuo(UO_2DRRAY, 9, center2.getText()); 
+            Globals.reg.putuo(UO_2DRRAY, 9, center2.getText());
             dCenter2 = U.suckDouble(center2.getText()); 
 
-            DMF.reg.putuo(UO_2DRRAY, 10, span2.getText()); 
+            Globals.reg.putuo(UO_2DRRAY, 10, span2.getText());
             dSpan2 = U.suckDouble(span2.getText()); 
 
-            DMF.reg.putuo(UO_2DRRAY, 11, count2.getText()); 
+            Globals.reg.putuo(UO_2DRRAY, 11, count2.getText());
             nCount2 = (int) U.suckDouble(count2.getText()); 
 
-            DMF.reg.putuo(UO_2DRRAY, 12, start.getText()); 
+            Globals.reg.putuo(UO_2DRRAY, 12, start.getText());
             istartrow = (int) U.suckDouble(start.getText()); 
 
             for (int i=0; i<2; i++)
             {
-                DMF.reg.putuo(UO_2DRRAY, i+13, rays.isSelected(i) ? "T" : "F"); 
+                Globals.reg.putuo(UO_2DRRAY, i+13, rays.isSelected(i) ? "T" : "F");
                 if (rays.isSelected(i))
                   igoal = i; 
             }   
@@ -1350,29 +1348,29 @@ class Options extends JMenu implements B4constants
         {
             for (int i=0; i<6; i++)
             {
-                DMF.reg.putuo(UO_2DCRAY, i, pair.isSelected(i) ? "T" : "F"); 
+                Globals.reg.putuo(UO_2DCRAY, i, pair.isSelected(i) ? "T" : "F");
                 if (pair.isSelected(i))
                   iwhich = i; 
             }   
 
-            DMF.reg.putuo(UO_2DCRAY, 6, off1.getText()); 
+            Globals.reg.putuo(UO_2DCRAY, 6, off1.getText());
             dOff1 = U.suckDouble(off1.getText()); 
             
-            DMF.reg.putuo(UO_2DCRAY, 7, off2.getText()); 
+            Globals.reg.putuo(UO_2DCRAY, 7, off2.getText());
             dOff2 = U.suckDouble(off2.getText()); 
             
-            DMF.reg.putuo(UO_2DCRAY, 8, radius.getText()); 
+            Globals.reg.putuo(UO_2DCRAY, 8, radius.getText());
             dRadius = U.suckDouble(radius.getText()); 
 
-            DMF.reg.putuo(UO_2DCRAY, 9, bhb.getText()); 
+            Globals.reg.putuo(UO_2DCRAY, 9, bhb.getText());
             ncircles = bhb.getNcircles(); 
 
-            DMF.reg.putuo(UO_2DCRAY, 10, start.getText()); 
+            Globals.reg.putuo(UO_2DCRAY, 10, start.getText());
             istartrow = (int) U.suckDouble(start.getText()); 
 
             for (int i=0; i<2; i++)
             {
-                DMF.reg.putuo(UO_2DCRAY, i+11, rays.isSelected(i) ? "T" : "F"); 
+                Globals.reg.putuo(UO_2DCRAY, i+11, rays.isSelected(i) ? "T" : "F");
                 if (rays.isSelected(i))
                   igoal = i; 
             }   
@@ -1440,29 +1438,29 @@ class Options extends JMenu implements B4constants
         {
             for (int i=0; i<6; i++)
             {
-                DMF.reg.putuo(UO_2DCRAY, i, pair.isSelected(i) ? "T" : "F"); 
+                Globals.reg.putuo(UO_2DCRAY, i, pair.isSelected(i) ? "T" : "F");
                 if (pair.isSelected(i))
                   iwhich = i; 
             }   
 
-            DMF.reg.putuo(UO_2DCGAUS, 6, off1.getText()); 
+            Globals.reg.putuo(UO_2DCGAUS, 6, off1.getText());
             dOff1 = U.suckDouble(off1.getText()); 
             
-            DMF.reg.putuo(UO_2DCGAUS, 7, off2.getText()); 
+            Globals.reg.putuo(UO_2DCGAUS, 7, off2.getText());
             dOff2 = U.suckDouble(off2.getText()); 
             
-            DMF.reg.putuo(UO_2DCGAUS, 8, radius.getText()); 
+            Globals.reg.putuo(UO_2DCGAUS, 8, radius.getText());
             dRadius = U.suckDouble(radius.getText()); 
 
-            DMF.reg.putuo(UO_2DCGAUS, 9, bhb.getText()); 
+            Globals.reg.putuo(UO_2DCGAUS, 9, bhb.getText());
             ncircles = bhb.getNcircles(); 
             
-            DMF.reg.putuo(UO_2DCGAUS, 10, start.getText()); 
+            Globals.reg.putuo(UO_2DCGAUS, 10, start.getText());
             istartrow = (int) U.suckDouble(start.getText()); 
 
             for (int i=0; i<2; i++)
             {
-                DMF.reg.putuo(UO_2DCGAUS, i+11, rays.isSelected(i) ? "T" : "F"); 
+                Globals.reg.putuo(UO_2DCGAUS, i+11, rays.isSelected(i) ? "T" : "F");
                 if (rays.isSelected(i))
                   igoal = i; 
             }   
@@ -1535,7 +1533,7 @@ class Options extends JMenu implements B4constants
           return 1; 
         int i1 = icoord[w]; 
         int f1 = -1;                // initially, absentee field
-        int nf = DMF.giFlags[RNFIELDS]; 
+        int nf = Globals.giFlags[RNFIELDS];
         REJIF redit = DMF.rejif;
         if (redit == null)
           return 2; 
@@ -1595,7 +1593,7 @@ class Options extends JMenu implements B4constants
         int i1 = icoord1[w]; 
         int i2 = icoord2[w]; 
         int f1=-1, f2=-1;        // absentee fields
-        int nf = DMF.giFlags[RNFIELDS]; 
+        int nf = Globals.giFlags[RNFIELDS];
         REJIF redit = DMF.rejif;
         if (redit == null)
           return 2; 
@@ -1675,7 +1673,7 @@ class Options extends JMenu implements B4constants
         int i1 = icoord1[w]; 
         int i2 = icoord2[w]; 
         int f1=-1, f2=-1;        // absentee fields
-        int nf = DMF.giFlags[RNFIELDS]; 
+        int nf = Globals.giFlags[RNFIELDS];
         REJIF redit = DMF.rejif;
         if (redit == null)
           return 2; 
@@ -1757,7 +1755,7 @@ class Options extends JMenu implements B4constants
         int i1 = icoord1[w]; 
         int i2 = icoord2[w]; 
         int f1=-1, f2=-1;        // absentee fields
-        int nf = DMF.giFlags[RNFIELDS]; 
+        int nf = Globals.giFlags[RNFIELDS];
         REJIF redit = DMF.rejif;
         if (redit == null)
           return 2; 
@@ -1890,7 +1888,7 @@ class PlainDataBox extends JPanel implements B4constants
     {
         super(); 
         setPreferredSize(new Dimension(100,20)); 
-        xField = new JTextField(DMF.reg.getuo(ig, im), columns); 
+        xField = new JTextField(Globals.reg.getuo(ig, im), columns);
         int fwidth = 15 * columns; 
         xField.setMaximumSize(new Dimension(fwidth,20)); 
         add(xField); 
@@ -1917,7 +1915,7 @@ class LabelDataBox extends JPanel implements B4constants
         setPreferredSize(new Dimension(100,20));
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS)); 
         JLabel xLabel = new JLabel(UO[ig][im][0]); 
-        xField = new JTextField(DMF.reg.getuo(ig, im), columns); 
+        xField = new JTextField(Globals.reg.getuo(ig, im), columns);
         int fwidth = 15 * columns; 
         xField.setMaximumSize(new Dimension(fwidth,20)); 
         add(Box.createGlue());   // left spring fails. Why????
@@ -1949,7 +1947,7 @@ class LabelNarrowTextBox extends JPanel implements B4constants
         setMinimumSize(getPreferredSize()); 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS)); 
         JLabel xLabel = new JLabel(UO[ig][im][0]); 
-        xField = new JTextField(DMF.reg.getuo(ig, im), columns); 
+        xField = new JTextField(Globals.reg.getuo(ig, im), columns);
         int fwidth = 60;  
         xField.setMaximumSize(new Dimension(fwidth,20)); 
         xField.setMinimumSize(getMaximumSize()); 
@@ -1979,7 +1977,7 @@ class LabelWideTextBox extends JPanel implements B4constants
         setPreferredSize(new Dimension(300,20));
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS)); 
         JLabel xLabel = new JLabel(UO[ig][im][0]); 
-        xField = new JTextField(DMF.reg.getuo(ig, im), columns); 
+        xField = new JTextField(Globals.reg.getuo(ig, im), columns);
         int fwidth = 15 * columns; 
         // xField.setMaximumSize(new Dimension(fwidth,20)); 
         // add(Box.createGlue());   // left spring fails. Why????
@@ -2006,7 +2004,7 @@ class LabelBitBox extends JPanel implements B4constants
         super();     // initialize the JPanel
         setPreferredSize(new Dimension(180, 25)); 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS)); 
-        cBox = new JCheckBox(UO[ig][im][0], "T".equals(DMF.reg.getuo(ig,im)));
+        cBox = new JCheckBox(UO[ig][im][0], "T".equals(Globals.reg.getuo(ig,im)));
         cBox.setHorizontalTextPosition(AbstractButton.LEFT); 
         add(Box.createGlue());   // left spring
         add(cBox); 
@@ -2082,7 +2080,7 @@ class BorVertRadioBox extends JPanel implements B4constants
             jp.setMaximumSize(jp.getPreferredSize()); 
             jp.setLayout(new BoxLayout(jp, BoxLayout.X_AXIS)); 
             jp.add(Box.createGlue()); // horizontal spring
-            boolean chosen = "T".equals(DMF.reg.getuo(igg,imm+i)); 
+            boolean chosen = "T".equals(Globals.reg.getuo(igg,imm+i));
             JRadioButton jrb = new JRadioButton(UO[igg][imm+i][0], chosen);
             jrb.setActionCommand(UO[igg][imm+i][0]); 
             jrb.setHorizontalTextPosition(AbstractButton.LEFT); 
@@ -2137,7 +2135,7 @@ class BorVertRadioField extends JPanel implements B4constants
             jp.setMaximumSize(jp.getPreferredSize()); 
             jp.setLayout(new BoxLayout(jp, BoxLayout.X_AXIS)); 
             jp.add(Box.createGlue()); // horizontal spring
-            boolean chosen = "T".equals(DMF.reg.getuo(igg,imm+i)); 
+            boolean chosen = "T".equals(Globals.reg.getuo(igg,imm+i));
             JRadioButton jrb = new JRadioButton(UO[igg][imm+i][0], chosen);
             jrb.setActionCommand(UO[igg][imm+i][0]); 
             jrb.setHorizontalTextPosition(AbstractButton.LEFT); 
@@ -2156,7 +2154,7 @@ class BorVertRadioField extends JPanel implements B4constants
         jl.setPreferredSize(new Dimension(240, 24)); 
         jl.setMaximumSize(jl.getPreferredSize()); 
 
-        jt = new JTextField(DMF.reg.getuo(igg, imm+nbuttons), 8);
+        jt = new JTextField(Globals.reg.getuo(igg, imm+nbuttons), 8);
         jt.setPreferredSize(new Dimension(20, 24)); 
         jt.setMaximumSize(jt.getPreferredSize());  
         jt.setActionCommand(UO[ig][imm+nbuttons][0]);
@@ -2286,7 +2284,7 @@ class BorHorizRadioBox extends JPanel implements B4constants
         bg = new ButtonGroup(); 
         for (int i=0; i<nbuttons; i++)
         {
-            boolean chosen = "T".equals(DMF.reg.getuo(igg, imm+i)); 
+            boolean chosen = "T".equals(Globals.reg.getuo(igg, imm+i));
             JRadioButton jrb = new JRadioButton(UO[igg][imm+i][0], chosen);
             jrb.setActionCommand(UO[igg][imm+i][0]); 
             // jrb.setVerticalTextPosition(AbstractButton.BOTTOM); // looks bad
@@ -2337,7 +2335,7 @@ class BorHorizStereoBox extends JPanel implements B4constants
             JPanel jp = new JPanel(); 
             jp.setPreferredSize(new Dimension(40, 50)); 
             jp.setMaximumSize(jp.getPreferredSize()); 
-            boolean chosen = "T".equals(DMF.reg.getuo(igg, imm+i)); 
+            boolean chosen = "T".equals(Globals.reg.getuo(igg, imm+i));
             JRadioButton jrb = new JRadioButton(UO[igg][imm+i][0], chosen);
             jrb.setActionCommand(UO[igg][imm+i][0]); 
             jrb.setVerticalTextPosition(AbstractButton.TOP); 
@@ -2353,7 +2351,7 @@ class BorHorizStereoBox extends JPanel implements B4constants
         jp.setPreferredSize(new Dimension(80, 35));
         // jp.setMaximumSize(jp.getPreferredSize()); 
 
-        jt = new JTextField(DMF.reg.getuo(igg, imm+3), NCHARS);
+        jt = new JTextField(Globals.reg.getuo(igg, imm+3), NCHARS);
         jt.setMaximumSize(new Dimension(60, 15));  
         jt.setActionCommand(UO[ig][imm+3][0]);
         JLabel jl = new JLabel("   "+UO[ig][imm+3][0]); 
@@ -2407,7 +2405,7 @@ class BorderedCheckBoxRow extends JPanel implements B4constants
         for (int i=0; i<n; i++)
         { 
             cBox[i] = new JCheckBox(UO[igg][imm+i][0], 
-              "T".equals(DMF.reg.getuo(igg, imm+i)));
+              "T".equals(Globals.reg.getuo(igg, imm+i)));
             cBox[i].setHorizontalTextPosition(AbstractButton.CENTER); 
             cBox[i].setVerticalTextPosition(AbstractButton.TOP);  
             this.add(cBox[i]); 
@@ -2450,7 +2448,7 @@ class BorderedDataBoxRow extends JPanel implements B4constants
             jl[i] = new JLabel(UO[ig][imm+i][0]); 
             jl[i].setMaximumSize(new Dimension(60,15)); 
             
-            jt[i] = new JTextField(DMF.reg.getuo(igg, imm+i), 2); // 2 chars width
+            jt[i] = new JTextField(Globals.reg.getuo(igg, imm+i), 2); // 2 chars width
             jt[i].setMaximumSize(new Dimension(20,15)); 
             jt[i].setActionCommand(UO[ig][imm+i][0]); 
             
@@ -2487,7 +2485,7 @@ class BorderedHexBox extends JPanel
         setPreferredSize(new Dimension(200, 75)); 
         setMinimumSize(getPreferredSize()); 
         // retain this JPanel's default flow layout for even horiz spacing
-        String ss = DMF.reg.getuo(ig, im);
+        String ss = Globals.reg.getuo(ig, im);
         ncirc = U.suckInt(ss); 
         ncirc = Math.max(1, Math.min(nmax, ncirc)); 
         nrays = mydn + 3*ncirc + 3*ncirc*ncirc; 
@@ -2547,12 +2545,12 @@ class BorderedMultiPlotBox extends JPanel implements B4constants
         // setMinimumSize(getPreferredSize()); 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); 
 
-        String ss = DMF.reg.getuo(ig,im);
+        String ss = Globals.reg.getuo(ig,im);
         int nplots = U.suckInt(ss); 
         nplots = Math.max(1, Math.min(maxspin, nplots)); 
 
         // first, get its user preference from  DMF.reg.getuo(ig,im)
-        String sUser = DMF.reg.getuo(ig,im).trim(); 
+        String sUser = Globals.reg.getuo(ig,im).trim();
         nplots = U.minmax(U.suckInt(sUser), 1, maxspin); 
         SpinnerNumberModel numModel = new SpinnerNumberModel(1,1,maxspin,1); 
         try
@@ -2718,11 +2716,11 @@ class RadioRepair
     {
         int count = 0; 
         for (int i=0; i<nbuttons; i++)
-          if ("T".equals(DMF.reg.getuo(ig, im+i)))
+          if ("T".equals(Globals.reg.getuo(ig, im+i)))
             count++; 
         if (count == 1)
           return; 
         for (int i=0; i<nbuttons; i++)
-          DMF.reg.putuo(ig, im+i, (i==0) ? "T" : "F"); 
+          Globals.reg.putuo(ig, im+i, (i==0) ? "T" : "F");
     }
 }       

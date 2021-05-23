@@ -176,8 +176,8 @@ public class MapPanel extends GPanel // implements Runnable
     // It gets called NxM times to make a complete Map.
     // Do not request repaint() here: this is a provider not a requestor. 
     {
-        nsurfs = DMF.giFlags[ONSURFS]; 
-        nrays = DMF.giFlags[RNRAYS];  
+        nsurfs = Globals.giFlags[ONSURFS];
+        nrays = Globals.giFlags[RNRAYS];
         
         if (bPleaseParseUO)
           startMap();
@@ -238,8 +238,8 @@ public class MapPanel extends GPanel // implements Runnable
     // Call this whenever user options change; gives warning or "".
     // First line of defense! must never crash. 
     {
-        nsurfs = DMF.giFlags[ONSURFS]; 
-        nrays = DMF.giFlags[RNRAYS]; 
+        nsurfs = Globals.giFlags[ONSURFS];
+        nrays = Globals.giFlags[RNRAYS];
         if (nsurfs<1) 
           return "No surfaces are defined"; 
         if (nrays<2)
@@ -249,34 +249,34 @@ public class MapPanel extends GPanel // implements Runnable
 
         mapType = -1; 
         for (int i=0; i<4; i++)  // buttons 0, 1, 2, 3
-          if ("T".equals(DMF.reg.getuo(UO_MAP, i)))
+          if ("T".equals(Globals.reg.getuo(UO_MAP, i)))
             mapType = i; 
         if (mapType < 0)
           return "No map type selected"; 
           
 
-        sHvar  = DMF.reg.getuo(UO_MAP, 4).trim(); 
-        dHstep = U.suckDouble(DMF.reg.getuo(UO_MAP,5)); 
-        nH     = U.minmax(U.suckInt(DMF.reg.getuo(UO_MAP,6)), 2, MAXMAP); 
-        dHcen  = U.suckDouble(DMF.reg.getuo(UO_MAP,8));
-        sHpar  = DMF.reg.getuo(UO_MAP,9).trim(); 
-        dHpar  = U.suckDouble(DMF.reg.getuo(UO_MAP,10));  // parallax
+        sHvar  = Globals.reg.getuo(UO_MAP, 4).trim();
+        dHstep = U.suckDouble(Globals.reg.getuo(UO_MAP,5));
+        nH     = U.minmax(U.suckInt(Globals.reg.getuo(UO_MAP,6)), 2, MAXMAP);
+        dHcen  = U.suckDouble(Globals.reg.getuo(UO_MAP,8));
+        sHpar  = Globals.reg.getuo(UO_MAP,9).trim();
+        dHpar  = U.suckDouble(Globals.reg.getuo(UO_MAP,10));  // parallax
         
-        sVvar  = DMF.reg.getuo(UO_MAP, 11).trim(); 
-        dVstep = U.suckDouble(DMF.reg.getuo(UO_MAP,12)); 
-        nV     = U.minmax(U.suckInt(DMF.reg.getuo(UO_MAP,13)), 2, MAXMAP); 
-        dVcen  = U.suckDouble(DMF.reg.getuo(UO_MAP,15));
-        sVpar  = DMF.reg.getuo(UO_MAP,16).trim(); 
-        dVpar  = U.suckDouble(DMF.reg.getuo(UO_MAP,17));  // parallax
-        maxVig = U.suckInt(DMF.reg.getuo(UO_MAP,18)); 
+        sVvar  = Globals.reg.getuo(UO_MAP, 11).trim();
+        dVstep = U.suckDouble(Globals.reg.getuo(UO_MAP,12));
+        nV     = U.minmax(U.suckInt(Globals.reg.getuo(UO_MAP,13)), 2, MAXMAP);
+        dVcen  = U.suckDouble(Globals.reg.getuo(UO_MAP,15));
+        sVpar  = Globals.reg.getuo(UO_MAP,16).trim();
+        dVpar  = U.suckDouble(Globals.reg.getuo(UO_MAP,17));  // parallax
+        maxVig = U.suckInt(Globals.reg.getuo(UO_MAP,18));
         maxVig = U.minmax(maxVig, 0, 99); 
         minGood = (int) Math.round(nrays*(1-0.01*maxVig));
         minGood = U.minmax(minGood, 2, nrays); 
-        aspect = U.suckDouble(DMF.reg.getuo(UO_MAP,19)); // usually 1.0
+        aspect = U.suckDouble(Globals.reg.getuo(UO_MAP,19)); // usually 1.0
         aspect = Math.min(4.0, Math.max(0.5, aspect));   // usually 1.0
 
         maxBunches = nH*nV; 
-        sOutfile = DMF.reg.getuo(UO_MAP, 20).trim(); 
+        sOutfile = Globals.reg.getuo(UO_MAP, 20).trim();
         bOutfile = sOutfile.length() > 0; 
         if (bOutfile)
         {
@@ -950,7 +950,7 @@ public class MapPanel extends GPanel // implements Runnable
 
     private void startBunches()
     {
-        nrays = DMF.giFlags[RNRAYS]; 
+        nrays = Globals.giFlags[RNRAYS];
         goodcount = 0; 
         iBunch = 0; 
         myTimer = new javax.swing.Timer(20, doTick); 

@@ -98,8 +98,8 @@ public class H1DPanel extends GPanel
     protected void doTechList(boolean bFullArt) // replaces abstract method
     // Called by GPanel for artwork: new, pan, zoom, & random ray group.
     {
-        nsurfs = DMF.giFlags[ONSURFS];                 // always needed.
-        nrays = DMF.giFlags[RNRAYS];                   // always needed.
+        nsurfs = Globals.giFlags[ONSURFS];                 // always needed.
+        nrays = Globals.giFlags[RNRAYS];                   // always needed.
         ngood = RT13.iBuildRays(true);
         
         String warn = getUOwarning();   // never crashes.
@@ -204,8 +204,8 @@ public class H1DPanel extends GPanel
     // Local variables shadow H1D fields. 
     // First line of defense, must never crash. 
     {
-        int nsurfs = DMF.giFlags[ONSURFS];
-        String hst = DMF.reg.getuo(UO_1D, 0); 
+        int nsurfs = Globals.giFlags[ONSURFS];
+        String hst = Globals.reg.getuo(UO_1D, 0);
         //int op = REJIF.getCombinedRayFieldOp(hst);
         int op = RAYDataModel.getCombinedRayFieldOp(hst);
         int hsurf = RT13.getSurfNum(op); 
@@ -223,13 +223,13 @@ public class H1DPanel extends GPanel
         shmin = new String(""); // value label
         shmax = new String(""); // value label
 
-        hst = DMF.reg.getuo(UO_1D, 0); 
+        hst = Globals.reg.getuo(UO_1D, 0);
         //int op = REJIF.getCombinedRayFieldOp(hst);
         int op = RAYDataModel.getCombinedRayFieldOp(hst);
         // hsurf = RT13.getGroupNum(op); 
         hsurf = RT13.getSurfNum(op); 
         hattr = RT13.getAttrNum(op); 
-        nbins = U.parseInt(DMF.reg.getuo(UO_1D, 1));  
+        nbins = U.parseInt(Globals.reg.getuo(UO_1D, 1));
         nbins = Math.max(2, Math.min(MAXBINS, nbins)); 
 
         CADstyle = 0;  
@@ -278,7 +278,7 @@ public class H1DPanel extends GPanel
         //----apply diameter limits if requested & local------------
 
         boolean bLocal = ((hattr==RTXL) || (hattr==RTYL));
-        if (bLocal && "T".equals(DMF.reg.getuo(UO_1D, 3)))
+        if (bLocal && "T".equals(Globals.reg.getuo(UO_1D, 3)))
         {
             double dDiam = (hattr==RTXL) 
                              ?  RT13.surfs[hsurf][OODIAX] 
@@ -297,11 +297,11 @@ public class H1DPanel extends GPanel
         //-------apply manual span if requested----------------------
         //--But shouldn't the manual span always come first,---------
         //--so as to suppress the automatic span which might fail?---
-        if ("T".equals(DMF.reg.getuo(UO_1D, 4)))
+        if ("T".equals(Globals.reg.getuo(UO_1D, 4)))
         {
-            String sHmin = DMF.reg.getuo(UO_1D, 5); 
+            String sHmin = Globals.reg.getuo(UO_1D, 5);
             double dHmin = U.suckDouble(sHmin); 
-            String sHmax = DMF.reg.getuo(UO_1D, 6); 
+            String sHmax = Globals.reg.getuo(UO_1D, 6);
             double dHmax = U.suckDouble(sHmax); 
             double dSpan = Math.abs(dHmax - dHmin); 
             if (!U.isNegZero(dHmin) && !U.isNegZero(dHmax) && (dSpan > MINSPAN))
@@ -317,7 +317,7 @@ public class H1DPanel extends GPanel
 
         //---all done scaling data to histogram---------------
 
-        bShowAverage = "T".equals(DMF.reg.getuo(UO_1D, 7)); 
+        bShowAverage = "T".equals(Globals.reg.getuo(UO_1D, 7));
         
         //----set up GPanel affines for scaledItem()----
         //----never in doArt() or pan zoom will fail---
@@ -411,7 +411,7 @@ public class H1DPanel extends GPanel
 
         //---------title for horizontal axis-----------
 
-        String hst = DMF.reg.getuo(UO_1D, 0).trim(); 
+        String hst = Globals.reg.getuo(UO_1D, 0).trim();
         int nchars = hst.length(); 
         for (int k=0; k<nchars; k++)
         {

@@ -294,7 +294,7 @@ public class OPTDataModel extends B4DataModel {
     void setupDefaults() {
         //-------------set up default surface data--------------
 
-        DMF.giFlags[OMEDIANEEDED] = FALSE; // ok=notNeeded; TRUE=needed
+        Globals.giFlags[OMEDIANEEDED] = FALSE; // ok=notNeeded; TRUE=needed
 
         for (int j=1; j<=MAXSURFS; j++)
         {
@@ -464,7 +464,7 @@ public class OPTDataModel extends B4DataModel {
                 if (0.0 == RT13.surfs[jsurf][OREFRACT])
                     RT13.surfs[jsurf][OREFRACT] = 1.0;
             }
-        DMF.giFlags[OMEDIANEEDED] = bAllRefractNumeric ? FALSE : TRUE;
+        Globals.giFlags[OMEDIANEEDED] = bAllRefractNumeric ? FALSE : TRUE;
     }
 
     int parseNumericData() {
@@ -526,7 +526,7 @@ public class OPTDataModel extends B4DataModel {
                 break;
         }
 
-        DMF.giFlags[OSYNTAXERR] = osyntaxerr;
+        Globals.giFlags[OSYNTAXERR] = osyntaxerr;
         return osyntaxerr;
     }
 
@@ -544,7 +544,7 @@ public class OPTDataModel extends B4DataModel {
         //----data are now cleansed stashed & indexed------------
         //-------Perform all the post-parse cleanup here------------
 
-        DMF.giFlags[ONADJ] = iParseAdjustables(nsurfs);
+        Globals.giFlags[ONADJ] = iParseAdjustables(nsurfs);
 
         //----force all CoordBreaks to be planar? or not? rev 168----
         // for (int j=1; j<nsurfs; j++)
@@ -597,7 +597,7 @@ public class OPTDataModel extends B4DataModel {
             if (!bX || !bY)
                 bAllDiamsPresent = false;
         }
-        DMF.giFlags[OALLDIAMSPRESENT] = bAllDiamsPresent ? TRUE : FALSE; // ints!
+        Globals.giFlags[OALLDIAMSPRESENT] = bAllDiamsPresent ? TRUE : FALSE; // ints!
     }
 
     void testGroovyness() {
@@ -803,10 +803,10 @@ public class OPTDataModel extends B4DataModel {
 
         int status[] = new int[NGENERIC];
         vPreParse(status);
-        DMF.giFlags[OPRESENT] = status[GPRESENT];
-        DMF.giFlags[ONLINES]  = status[GNLINES];
-        DMF.giFlags[ONSURFS]  = nsurfs = status[GNRECORDS];
-        DMF.giFlags[ONFIELDS] = nfields = status[GNFIELDS];
+        Globals.giFlags[OPRESENT] = status[GPRESENT];
+        Globals.giFlags[ONLINES]  = status[GNLINES];
+        Globals.giFlags[ONSURFS]  = nsurfs = status[GNRECORDS];
+        Globals.giFlags[ONFIELDS] = nfields = status[GNFIELDS];
         if (nsurfs < 1)
           return;
 

@@ -101,9 +101,9 @@ public abstract class B4DataModel {
 
     public void vLoadSkeleton()
     {
-        int ifw = U.parseInt(DMF.reg.getuo(UO_EDIT, 3));
+        int ifw = U.parseInt(Globals.reg.getuo(UO_EDIT, 3));
         ifw = Math.max(6, Math.min(100, ifw));
-        DMF.nEdits++;
+        Globals.nEdits++;
         clearTable();
         for (int i=0; i<100; i++)
             charTable[2][i] = '-';
@@ -136,7 +136,7 @@ public abstract class B4DataModel {
     }
 
     public void setchar(int jCaret, int iCaret, char c) {
-        if("T".equals(DMF.reg.getuo(UO_EDIT, 10)))  // text mode shove right
+        if("T".equals(Globals.reg.getuo(UO_EDIT, 10)))  // text mode shove right
             for (int k=IMAX-1; k>iCaret; k--)
                 charTable[jCaret][k] = charTable[jCaret][k-1];
         charTable[jCaret][iCaret] = c;
@@ -179,7 +179,7 @@ public abstract class B4DataModel {
         //-------use charTable[2] as ruler------------
         //------don't clobber any EOLs!---------------
 
-        if (DMF.reg.getuo(UO_EDIT, 5).equals("T"))
+        if (Globals.reg.getuo(UO_EDIT, 5).equals("T"))
         {
             int iX=0, j=j0;
             for (int i=0; i<sb.length(); i++)
@@ -231,7 +231,7 @@ public abstract class B4DataModel {
     // Also tidies up the diagnostics, and redisplays.
     // Assumes EOL is '\n' and so is not multiplatform.
     {
-        DMF.nEdits++;
+        Globals.nEdits++;
         int i=0, j=0, k=0;
         for (j=0; j<JMAX; j++)    // clear the table
             for (i=0; i<IMAX; i++)
@@ -284,7 +284,7 @@ public abstract class B4DataModel {
     void clearLine(int j)
     // When exactly is this called?
     {
-        DMF.nEdits++;
+        Globals.nEdits++;
         for (int i=0; i<IMAX; i++)
             charTable[j][i] = ' ';
         setDirty(true);
@@ -292,7 +292,7 @@ public abstract class B4DataModel {
 
     public void clearTable()
     {
-        DMF.nEdits++;
+        Globals.nEdits++;
         for (int j=0; j<JMAX; j++)
             clearLine(j);
         getFieldInfo();
@@ -392,7 +392,7 @@ public abstract class B4DataModel {
     public void putLineWithColons(int j)
     // use this only after having run getAllLineLengths()
     {
-        DMF.nEdits++;
+        Globals.nEdits++;
         if (j > RULER)
             for (int i=0; i<IMAX; i++)
                 charTable[j][i] = cColons[i];
@@ -460,7 +460,7 @@ public abstract class B4DataModel {
 
     public void widenTable(int i, boolean bColons)
     {
-        DMF.nEdits++;
+        Globals.nEdits++;
         getAllLineLengths();
         for (int j=1; j<nlines; j++)
         {
@@ -479,7 +479,7 @@ public abstract class B4DataModel {
 
     public void narrowTable(int i)
     {
-        DMF.nEdits++;
+        Globals.nEdits++;
         if ((i<0) || (i>IMAX-2))
             return;
         getAllLineLengths();
@@ -564,7 +564,7 @@ public abstract class B4DataModel {
     int CopyFieldDown(int jCaret, int iCaret)
     /// copies the data field and its tag char.
     {
-        DMF.nEdits++;
+        Globals.nEdits++;
         if ((jCaret>RULER) && (jCaret<nlines-1))
         {
             // stashForUndo(); // yikes! ruins the function.
@@ -582,7 +582,7 @@ public abstract class B4DataModel {
     public void CopyFieldBottom(int jCaret, int iCaret)
     /// copies field and tag all the way to the bottom
     {
-        DMF.nEdits++;
+        Globals.nEdits++;
         if ((jCaret>RULER) && (jCaret<nlines-1))
         {
             // stashForUndo(); // yikes! ruins the function.
@@ -604,7 +604,7 @@ public abstract class B4DataModel {
     // For multiple line calls, we want only the initial preview saved.
     // so here, no stashForUndo().
     {
-        DMF.nEdits++; // TODO
+        Globals.nEdits++; // TODO
         j = Math.max(0, j);
         for (int t=JMAX; t>j; t--)
             System.arraycopy(charTable[t-1], 0, charTable[t], 0, IMAX);
@@ -616,7 +616,7 @@ public abstract class B4DataModel {
     // line j will vanish, receiving text of j+1, etc.
     // used by TextMode backspace at jCaret=0
     {
-        DMF.nEdits++;
+        Globals.nEdits++;
         for (int t=j; t<JMAX; t++)
             System.arraycopy(charTable[t+1], 0, charTable[t], 0, IMAX);
     }
@@ -655,7 +655,7 @@ public abstract class B4DataModel {
         // TODO check
 //        stashForUndo();
 
-        DMF.nEdits++;
+        Globals.nEdits++;
         if (s.length() < 1)
             return jCaret;
         if (preclear)
@@ -668,7 +668,7 @@ public abstract class B4DataModel {
         boolean bComplete = (jCaret == 0);
         boolean bForeign = (getDelimiterStatus(s, jCaret) == 2);
 
-        period = 1 + U.parseInt(DMF.reg.getuo(UO_EDIT, 3));
+        period = 1 + U.parseInt(Globals.reg.getuo(UO_EDIT, 3));
         period = Math.max(4, Math.min(20, period));
 
         // start loading at line = jCaret...

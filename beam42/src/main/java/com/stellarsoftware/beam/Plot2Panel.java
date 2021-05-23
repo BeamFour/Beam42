@@ -62,8 +62,8 @@ public class Plot2Panel extends GPanel
     protected void doTechList(boolean bFullArt) // replaces abstract method
     // Called by GPanel when fresh Plot2Panel artwork is needed.
     {
-        nsurfs = DMF.giFlags[ONSURFS];    // always needed.
-        nrays = DMF.giFlags[RNRAYS];      // always needed.
+        nsurfs = Globals.giFlags[ONSURFS];    // always needed.
+        nrays = Globals.giFlags[RNRAYS];      // always needed.
         ngood = RT13.iBuildRays(true);  
         
         String warn = getUOwarning();     // never crashes.
@@ -129,13 +129,13 @@ public class Plot2Panel extends GPanel
     // If no errors, returns the empty string. 
     // new idea (Rod Andrew): if no rays, continue with empty plot
     {
-        String hst = DMF.reg.getuo(UO_PLOT2, 0); 
+        String hst = Globals.reg.getuo(UO_PLOT2, 0);
         //int op = REJIF.getCombinedRayFieldOp(hst);
         int op = RAYDataModel.getCombinedRayFieldOp(hst);
         int hsurf = RT13.getSurfNum(op); 
         int hattr = RT13.getAttrNum(op); 
 
-        String vst = DMF.reg.getuo(UO_PLOT2, 2); 
+        String vst = Globals.reg.getuo(UO_PLOT2, 2);
         //op = REJIF.getCombinedRayFieldOp(vst);
         op = RAYDataModel.getCombinedRayFieldOp(vst);
         int vsurf = RT13.getSurfNum(op); 
@@ -172,13 +172,13 @@ public class Plot2Panel extends GPanel
     {
         bPleaseParseUO = false;     // flag in GPanel
 
-        hst = DMF.reg.getuo(UO_PLOT2, 0); 
+        hst = Globals.reg.getuo(UO_PLOT2, 0);
         //int op = REJIF.getCombinedRayFieldOp(hst);
         int op = RAYDataModel.getCombinedRayFieldOp(hst);
         hsurf = RT13.getSurfNum(op); 
         hattr = RT13.getAttrNum(op); 
 
-        vst = DMF.reg.getuo(UO_PLOT2, 2); 
+        vst = Globals.reg.getuo(UO_PLOT2, 2);
         //op = REJIF.getCombinedRayFieldOp(vst);
         op = RAYDataModel.getCombinedRayFieldOp(vst);
         vsurf = RT13.getSurfNum(op); 
@@ -217,13 +217,13 @@ public class Plot2Panel extends GPanel
         /// now impose manual span if present
         /// be sure to use U.suckDouble() for safety!
 
-        double gxspan = U.suckDouble(DMF.reg.getuo(UO_PLOT2, 1)); 
+        double gxspan = U.suckDouble(Globals.reg.getuo(UO_PLOT2, 1));
         if (gxspan > 0.0)
           uxspan = EXTRAROOM*gxspan; 
-        double gyspan = U.suckDouble(DMF.reg.getuo(UO_PLOT2, 3)); 
+        double gyspan = U.suckDouble(Globals.reg.getuo(UO_PLOT2, 3));
         if (gyspan > 0.0)
           uyspan = EXTRAROOM*gyspan; 
-        wavel = U.suckDouble(DMF.reg.getuo(UO_PLOT2, 4)); 
+        wavel = U.suckDouble(Globals.reg.getuo(UO_PLOT2, 4));
         
         //---now fix up spans for case of badUO, no rays, no scalefactors----
         if ((badUO) && (gxspan==0) && (gyspan==0))
@@ -246,13 +246,13 @@ public class Plot2Panel extends GPanel
 
     private void doArt()  
     {
-        blackbkg = "T".equals(DMF.reg.getuo(UO_PLOT2, 11));
+        blackbkg = "T".equals(Globals.reg.getuo(UO_PLOT2, 11));
         iSymbol = DOT; 
-        if ("T".equals(DMF.reg.getuo(UO_PLOT2, 6)))
+        if ("T".equals(Globals.reg.getuo(UO_PLOT2, 6)))
           iSymbol = PLUS; 
-        if ("T".equals(DMF.reg.getuo(UO_PLOT2, 7)))
+        if ("T".equals(Globals.reg.getuo(UO_PLOT2, 7)))
           iSymbol = SQUARE; 
-        if ("T".equals(DMF.reg.getuo(UO_PLOT2, 8)))
+        if ("T".equals(Globals.reg.getuo(UO_PLOT2, 8)))
           iSymbol = DIAMOND; 
         
         //---start the drawing, explicit new way----------
@@ -424,8 +424,8 @@ public class Plot2Panel extends GPanel
         
         boolean bHasEnough = RT13.getHowfarOK(kray) >= Math.max(hsurf, vsurf);        
         boolean bHasComplete = RT13.getHowfarOK(kray) == nsurfs; 
-        boolean bWantEnough  = DMF.reg.getuo(UO_PLOT2, 10).equals("T"); // option 10 is "Sufficient"
-        boolean bWantComplete = DMF.reg.getuo(UO_PLOT2, 9).equals("T");  // option 9 is "Complete"
+        boolean bWantEnough  = Globals.reg.getuo(UO_PLOT2, 10).equals("T"); // option 10 is "Sufficient"
+        boolean bWantComplete = Globals.reg.getuo(UO_PLOT2, 9).equals("T");  // option 9 is "Complete"
 
         int iColor;
         if (kray==0)

@@ -50,9 +50,9 @@ class Random implements B4constants
 
     public Random() // constructor
     {
-        if (DMF.giFlags[STATUS] != GPARSEOK)
+        if (Globals.giFlags[STATUS] != GPARSEOK)
           return; 
-        iEdits = DMF.nEdits; 
+        iEdits = Globals.nEdits;
         setupLocals();
         buildDialog(); 
         startBunches();
@@ -61,14 +61,14 @@ class Random implements B4constants
 
     private void setupLocals()
     {
-        nsurfs = DMF.giFlags[ONSURFS]; 
-        nrays = DMF.giFlags[RNRAYS]; 
-        nfields = DMF.giFlags[RNFIELDS]; 
-        nBunch = U.suckInt(DMF.reg.getuo(UO_RAND, 0)); 
+        nsurfs = Globals.giFlags[ONSURFS];
+        nrays = Globals.giFlags[RNRAYS];
+        nfields = Globals.giFlags[RNFIELDS];
+        nBunch = U.suckInt(Globals.reg.getuo(UO_RAND, 0));
         nBunch = Math.max(1, Math.min(MAXBUNCH, nBunch)); 
-        maxtries = U.suckInt(DMF.reg.getuo(UO_RAND, 1)); 
+        maxtries = U.suckInt(Globals.reg.getuo(UO_RAND, 1));
         maxtries = Math.max(1, maxtries); 
-        maxgood = U.suckInt(DMF.reg.getuo(UO_RAND, 2)); 
+        maxgood = U.suckInt(Globals.reg.getuo(UO_RAND, 2));
         maxgood = Math.max(1, maxgood); 
         GJIF gFront = DMF.getFrontGJIF(); // null SNH.
         targetPanel = gFront.getGPanel(); // null SNH.
@@ -134,7 +134,7 @@ class Random implements B4constants
                     if (targetPanel.doRandomRay())
                       goodcount++;  
                     totalcount++; 
-                    if ((totalcount>=maxtries) || (goodcount>=maxgood) || (DMF.nEdits!=iEdits))
+                    if ((totalcount>=maxtries) || (goodcount>=maxgood) || (Globals.nEdits!=iEdits))
                     {
                         bRunning = false; 
                         break; 

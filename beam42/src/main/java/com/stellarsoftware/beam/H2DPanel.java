@@ -78,8 +78,8 @@ public class H2DPanel extends GPanel
     protected void doTechList(boolean bFullArt) // replaces abstract method
     // Called by GPanel for artwork: new, pan, zoom, & random ray group.
     {
-        nsurfs = DMF.giFlags[ONSURFS];                 // always needed.
-        nrays = DMF.giFlags[RNRAYS];                   // always needed.
+        nsurfs = Globals.giFlags[ONSURFS];                 // always needed.
+        nrays = Globals.giFlags[RNRAYS];                   // always needed.
         ngood = RT13.iBuildRays(true);
                 
 
@@ -129,10 +129,10 @@ public class H2DPanel extends GPanel
     protected double getStereo()    // replaces abstract "get" method
     {
         double d = 0.0; 
-        boolean bS = "T".equals(DMF.reg.getuo(UO_2D, 17));
+        boolean bS = "T".equals(Globals.reg.getuo(UO_2D, 17));
         if (bS)
         {
-            String ss = DMF.reg.getuo(UO_2D, 18); 
+            String ss = Globals.reg.getuo(UO_2D, 18);
             d = U.suckDouble(ss); 
             if (d == Double.NaN)
               d = 0.0; 
@@ -186,7 +186,7 @@ public class H2DPanel extends GPanel
     // Local variables shadow H2D fields.
     // First line of defense, must never crash. 
     {
-        String hst = DMF.reg.getuo(UO_2D, 2); 
+        String hst = Globals.reg.getuo(UO_2D, 2);
         //int hop = REJIF.getCombinedRayFieldOp(hst);
         int hop = RAYDataModel.getCombinedRayFieldOp(hst);
         int hsurf = RT13.getSurfNum(hop); 
@@ -194,7 +194,7 @@ public class H2DPanel extends GPanel
         if ((hsurf<0) || (hattr<0) || (hattr>RNATTRIBS))
           return "H var unknown:  "+hst; 
 
-        String vst = DMF.reg.getuo(UO_2D, 3); 
+        String vst = Globals.reg.getuo(UO_2D, 3);
         //int vop = REJIF.getCombinedRayFieldOp(vst);
         int vop = RAYDataModel.getCombinedRayFieldOp(vst);
         int vsurf = RT13.getSurfNum(vop); 
@@ -215,21 +215,21 @@ public class H2DPanel extends GPanel
         svmin = new String(""); 
         svmax = new String(""); 
 
-        hst = DMF.reg.getuo(UO_2D, 2); 
+        hst = Globals.reg.getuo(UO_2D, 2);
         //int hop = REJIF.getCombinedRayFieldOp(hst);
         int hop = RAYDataModel.getCombinedRayFieldOp(hst);
         hsurf = RT13.getSurfNum(hop); 
         hattr = RT13.getAttrNum(hop); 
 
-        vst = DMF.reg.getuo(UO_2D, 3); 
+        vst = Globals.reg.getuo(UO_2D, 3);
         //int vop = REJIF.getCombinedRayFieldOp(vst);
         int vop = RAYDataModel.getCombinedRayFieldOp(vst);
         vsurf = RT13.getSurfNum(vop); 
         vattr = RT13.getAttrNum(vop); 
 
-        nhbins = U.parseInt(DMF.reg.getuo(UO_2D, 4));  
+        nhbins = U.parseInt(Globals.reg.getuo(UO_2D, 4));
         nhbins = Math.max(2, Math.min(MAX2DBINS, nhbins)); 
-        nvbins = U.parseInt(DMF.reg.getuo(UO_2D, 5)); 
+        nvbins = U.parseInt(Globals.reg.getuo(UO_2D, 5));
         nvbins = Math.max(2, Math.min(MAX2DBINS, nvbins));
 
         CADstyle = 0;  
@@ -241,10 +241,10 @@ public class H2DPanel extends GPanel
         uycenter = 0.0;     // Unit cube
         uyspan = EXTRAROOM; // Unit cube
 
-        el = U.suckDouble(DMF.reg.getuo(UO_2D, 6));
+        el = U.suckDouble(Globals.reg.getuo(UO_2D, 6));
         cosel = U.cosd(el); 
         sinel = U.sind(el); 
-        az = U.suckDouble(DMF.reg.getuo(UO_2D, 7));  
+        az = U.suckDouble(Globals.reg.getuo(UO_2D, 7));
         cosaz = U.cosd(az); 
         sinaz = U.sind(az); 
 
@@ -313,7 +313,7 @@ public class H2DPanel extends GPanel
         boolean bHattr = ((hattr==RTXL) || (hattr==RTYL));
         boolean bVattr = ((vattr==RTXL) || (vattr==RTYL));
         boolean bLocal = bHattr && bVattr; 
-        if (bLocal && "T".equals(DMF.reg.getuo(UO_2D, 9)))
+        if (bLocal && "T".equals(Globals.reg.getuo(UO_2D, 9)))
         {
             double dHDiam = (hattr == RTXL) 
                               ? RT13.surfs[hsurf][OODIAX]
@@ -340,17 +340,17 @@ public class H2DPanel extends GPanel
 
         //-------apply manual span if requested-----------
 
-        if ("T".equals(DMF.reg.getuo(UO_2D, 10)))
+        if ("T".equals(Globals.reg.getuo(UO_2D, 10)))
         {
-            String tHmin = DMF.reg.getuo(UO_2D, 11); 
+            String tHmin = Globals.reg.getuo(UO_2D, 11);
             double dHmin = U.suckDouble(tHmin); 
-            String tHmax = DMF.reg.getuo(UO_2D, 12); 
+            String tHmax = Globals.reg.getuo(UO_2D, 12);
             double dHmax = U.suckDouble(tHmax); 
             double dHspan = Math.abs(dHmax - dHmin); 
 
-            String tVmin = DMF.reg.getuo(UO_2D, 13); 
+            String tVmin = Globals.reg.getuo(UO_2D, 13);
             double dVmin = U.suckDouble(tVmin); 
-            String tVmax = DMF.reg.getuo(UO_2D, 14); 
+            String tVmax = Globals.reg.getuo(UO_2D, 14);
             double dVmax = U.suckDouble(tVmax); 
             double dVspan = Math.abs(dVmax - dVmin); 
 
@@ -429,8 +429,8 @@ public class H2DPanel extends GPanel
 
     private void doArt()
     {
-        nsurfs = DMF.giFlags[ONSURFS];
-        nrays = DMF.giFlags[RNRAYS];
+        nsurfs = Globals.giFlags[ONSURFS];
+        nrays = Globals.giFlags[RNRAYS];
         double xyz[] = new double[3]; 
 
         int iFontcode = getUOGraphicsFontCode();  
@@ -442,7 +442,7 @@ public class H2DPanel extends GPanel
 
         //------------setup artwork------------
         
-        whitebkg = "T".equals(DMF.reg.getuo(UO_2D, 15));
+        whitebkg = "T".equals(Globals.reg.getuo(UO_2D, 15));
         clearList(QBASE);  
         addRaw(0., 0., 0., (whitebkg ? SETWHITEBKG : SETBLACKBKG), QBASE);
         addRaw(0., 0., 0., SETCOLOR+(whitebkg ? BLACK : WHITE), QBASE); 
@@ -505,8 +505,8 @@ public class H2DPanel extends GPanel
         
         //---------plot histo within a unit cube------------
 
-        bOrch = "T".equals(DMF.reg.getuo(UO_2D, 0));
-        bStereo = "T".equals(DMF.reg.getuo(UO_2D, 17));
+        bOrch = "T".equals(Globals.reg.getuo(UO_2D, 0));
+        bStereo = "T".equals(Globals.reg.getuo(UO_2D, 17));
         if (bOrch || bStereo)
         {
             addRaw(1., 0., 0., SETSOLIDLINE, QBASE); 

@@ -82,9 +82,9 @@ public class AutoRayGenerator implements B4constants
         if ((optEditor==null) || (rayEditor==null))
             return false;                         // SNH thanks to graying.
 
-        nsurfs   = DMF.giFlags[ONSURFS];
-        nrays    = DMF.giFlags[RNRAYS];
-        nadj     = DMF.giFlags[RNRAYADJ]; // for AutoAdj: set by REJIF during parse().
+        nsurfs   = Globals.giFlags[ONSURFS];
+        nrays    = Globals.giFlags[RNRAYS];
+        nadj     = Globals.giFlags[RNRAYADJ]; // for AutoAdj: set by REJIF during parse().
         // nadj     = Math.min(nadj, 2);  // unnecessary with new REJIF.
         if (nadj < 1)
         {
@@ -96,16 +96,16 @@ public class AutoRayGenerator implements B4constants
             // JOptionPane.showMessageDialog(rayEditor, "AutoRay: > 2 adjustables");
             return false;
         }
-        ngoals = DMF.giFlags[RNGOALS];
+        ngoals = Globals.giFlags[RNGOALS];
         if (ngoals < 1)
         {
             // JOptionPane.showMessageDialog(rayEditor, "AutoRay: no ray goals");
             return false;
         }
-        igoals[0] = DMF.giFlags[RAYGOALATT0] % 100;
-        igoals[1] = DMF.giFlags[RAYGOALATT1] % 100;   // -1 means absent
-        fgoals[0] = DMF.giFlags[RAYGOALFIELD0];
-        fgoals[1] = DMF.giFlags[RAYGOALFIELD1];
+        igoals[0] = Globals.giFlags[RAYGOALATT0] % 100;
+        igoals[1] = Globals.giFlags[RAYGOALATT1] % 100;   // -1 means absent
+        fgoals[0] = Globals.giFlags[RAYGOALFIELD0];
+        fgoals[1] = Globals.giFlags[RAYGOALFIELD1];
 
         //------Verify starting rays----------
 
@@ -172,8 +172,8 @@ public class AutoRayGenerator implements B4constants
 
     public void vUpdateRayStarts()
     {
-        int op0 = DMF.giFlags[RAYADJ0]; 
-        int op1 = DMF.giFlags[RAYADJ1]; 
+        int op0 = Globals.giFlags[RAYADJ0];
+        int op1 = Globals.giFlags[RAYADJ1];
         for (int kray=1; kray<=nrays; kray++)
         {
             for (int op=0; op<=RTWL; op++)  // tabulated ray starts only

@@ -156,8 +156,8 @@ public class MPlotPanel extends GPanel
     // But this is not called simply for annotation mods;
     // for annotation, host's bitmap is blitted instead.
     {    
-        nsurfs    = DMF.giFlags[ONSURFS];    // input stuff
-        nrays     = DMF.giFlags[RNRAYS]; 
+        nsurfs    = Globals.giFlags[ONSURFS];    // input stuff
+        nrays     = Globals.giFlags[RNRAYS];
         kcolor    = new int[MAXMP][MAXMP][MAXRAYS];  
         steps     = new double[MAXMP][MAXMP][2]; 
 
@@ -263,8 +263,8 @@ public class MPlotPanel extends GPanel
     //     Optical data are:    short strings that all parse numerically
     //
     {
-        nsurfs = DMF.giFlags[ONSURFS];  
-        nrays = DMF.giFlags[RNRAYS]; 
+        nsurfs = Globals.giFlags[ONSURFS];
+        nrays = Globals.giFlags[RNRAYS];
 
         for (int ix=0; ix<MAXMP; ix++)
           for (int iy=0; iy<MAXMP; iy++)
@@ -279,15 +279,15 @@ public class MPlotPanel extends GPanel
             ijV[1][i] = -1;  /// no surface yet
         }
 
-        nHsteps = U.suckInt(DMF.reg.getuo(UO_MPLOT, 0)); 
-        nVsteps = U.suckInt(DMF.reg.getuo(UO_MPLOT, 7)); 
+        nHsteps = U.suckInt(Globals.reg.getuo(UO_MPLOT, 0));
+        nVsteps = U.suckInt(Globals.reg.getuo(UO_MPLOT, 7));
 
         for (int i=0; i<=2; i++)  // unnecessary local copies of major strings
         {
-            sParmH[i] = DMF.reg.getuo(UO_MPLOT, 1+2*i).trim(); 
-            sDataH[i] = DMF.reg.getuo(UO_MPLOT, 2+2*i).trim(); 
-            sParmV[i] = DMF.reg.getuo(UO_MPLOT, 8+2*i).trim(); 
-            sDataV[i] = DMF.reg.getuo(UO_MPLOT, 9+2*i).trim(); 
+            sParmH[i] = Globals.reg.getuo(UO_MPLOT, 1+2*i).trim();
+            sDataH[i] = Globals.reg.getuo(UO_MPLOT, 2+2*i).trim();
+            sParmV[i] = Globals.reg.getuo(UO_MPLOT, 8+2*i).trim();
+            sDataV[i] = Globals.reg.getuo(UO_MPLOT, 9+2*i).trim();
         }
 
         for (int i=0; i<=2; i++)  // extract the string fragments
@@ -333,13 +333,13 @@ public class MPlotPanel extends GPanel
                 {
                     if (ratt == RSWAVEL)
                     {
-                        if (1==DMF.giFlags[OMEDIANEEDED])
+                        if (1== Globals.giFlags[OMEDIANEEDED])
                         {
                             String complaint = findMediaWavelength(sFragH[i][k], k); 
                             if (complaint.length() > 0)
                               return complaint; 
                         }
-                        if (1==DMF.giFlags[GRNEEDNUMERWAVES])
+                        if (1== Globals.giFlags[GRNEEDNUMERWAVES])
                           if (Double.isNaN(dFragH[i][k]))
                             return sFragH[i][k] + " is not numerical."; 
                     }
@@ -387,13 +387,13 @@ public class MPlotPanel extends GPanel
                 {
                     if (ratt == RSWAVEL)
                     {
-                        if (1==DMF.giFlags[OMEDIANEEDED])
+                        if (1== Globals.giFlags[OMEDIANEEDED])
                         {
                             String complaint = findMediaWavelength(sFragV[i][k], k); 
                             if (complaint.length() > 0)
                               return complaint; 
                         }
-                        if (1==DMF.giFlags[GRNEEDNUMERWAVES])
+                        if (1== Globals.giFlags[GRNEEDNUMERWAVES])
                           if (Double.isNaN(dFragV[i][k]))
                             return sFragV[i][k] + " is not numerical."; 
                     }
@@ -423,7 +423,7 @@ public class MPlotPanel extends GPanel
 
         //----- test horizontal output opcode; includes "final"
 
-        sRayH = DMF.reg.getuo(UO_MPLOT, 14).trim(); 
+        sRayH = Globals.reg.getuo(UO_MPLOT, 14).trim();
         if (sRayH.length() < 1)
           return "H plotvar is absent."; 
         opH = getRayCombinedOutputOp(sRayH); 
@@ -431,11 +431,11 @@ public class MPlotPanel extends GPanel
           return "H plotvar "+sRayH+" is unknown."; 
         hattr = opH%100; 
         hsurf = opH/100; 
-        uoHspan = U.suckDouble(DMF.reg.getuo(UO_MPLOT, 15)); 
+        uoHspan = U.suckDouble(Globals.reg.getuo(UO_MPLOT, 15));
 
         //------ test vertical output opcode; includes "final"
 
-        sRayV = DMF.reg.getuo(UO_MPLOT, 16).trim(); 
+        sRayV = Globals.reg.getuo(UO_MPLOT, 16).trim();
         if (sRayV.length() < 1)
           return "V plotvar is absent."; 
         opV = getRayCombinedOutputOp(sRayV); 
@@ -443,7 +443,7 @@ public class MPlotPanel extends GPanel
           return "V plotvar "+sRayV+" is unknown."; 
         vattr = opV%100; 
         vsurf = opV/100; 
-        uoVspan = U.suckDouble(DMF.reg.getuo(UO_MPLOT, 17)); 
+        uoVspan = U.suckDouble(Globals.reg.getuo(UO_MPLOT, 17));
 
         return "";   // no complaint: good parse!
 
@@ -460,7 +460,7 @@ public class MPlotPanel extends GPanel
     {
         if (frag.length()<1)                 
           return "Zero wave length";           // SNH  
-        if ((0==DMF.giFlags[MPRESENT]) || (null==DMF.mejif))
+        if ((0== Globals.giFlags[MPRESENT]) || (null==DMF.mejif))
           return "Media table is required";    // SNH
         for (int f=1; f<MAXFIELDS; f++)
         {
@@ -517,7 +517,7 @@ public class MPlotPanel extends GPanel
         char c1 = Character.toUpperCase(U.getCharAt(s,1)); 
         int surfcode = 0; 
         if (c1 == 'F')
-          surfcode = 100*DMF.giFlags[ONSURFS]; // "final" 
+          surfcode = 100* Globals.giFlags[ONSURFS]; // "final"
         else
           surfcode = 100*U.getTwoDigitCode(s); 
         if (surfcode < 1)
@@ -612,7 +612,7 @@ public class MPlotPanel extends GPanel
     // Warning: this routine sets RT13.gwave to commandeer wavelengths.
     // When done be sure to reset RT13.gwave=0 to restore kray control. 
     {
-        nrays = DMF.giFlags[RNRAYS]; 
+        nrays = Globals.giFlags[RNRAYS];
         
         setTempParms(ix, iy);
 
@@ -746,13 +746,13 @@ public class MPlotPanel extends GPanel
         setVspan(); 
         linkSpans();
 
-        uoBoxfrac = U.suckDouble(DMF.reg.getuo(UO_MPLOT, 18)); 
+        uoBoxfrac = U.suckDouble(Globals.reg.getuo(UO_MPLOT, 18));
         uoBoxfrac = U.minmax(uoBoxfrac, 0.1, 0.99); 
 
-        boolean blackbkg  = "T".equals(DMF.reg.getuo(UO_MPLOT, 29));
-        boolean bRound    = "T".equals(DMF.reg.getuo(UO_MPLOT, 30)); 
-        boolean bSkip     = "T".equals(DMF.reg.getuo(UO_MPLOT, 31)); 
-        boolean bRestrict = "T".equals(DMF.reg.getuo(UO_MPLOT, 32)); 
+        boolean blackbkg  = "T".equals(Globals.reg.getuo(UO_MPLOT, 29));
+        boolean bRound    = "T".equals(Globals.reg.getuo(UO_MPLOT, 30));
+        boolean bSkip     = "T".equals(Globals.reg.getuo(UO_MPLOT, 31));
+        boolean bRestrict = "T".equals(Globals.reg.getuo(UO_MPLOT, 32));
 
         clearList(QBASE); 
         int background = blackbkg ? SETBLACKBKG : SETWHITEBKG; 
@@ -905,16 +905,16 @@ public class MPlotPanel extends GPanel
     
     private String getPlotBoxLabel(int i, int j)
     {
-        boolean bHS   = "T".equals(DMF.reg.getuo(UO_MPLOT, 19));  // "H"
-        boolean bVS   = "T".equals(DMF.reg.getuo(UO_MPLOT, 20));  // "V" 
-        boolean bNum  = "T".equals(DMF.reg.getuo(UO_MPLOT, 21));  // "n"
-        boolean bHbar = "T".equals(DMF.reg.getuo(UO_MPLOT, 22));  // "h"
-        boolean bVbar = "T".equals(DMF.reg.getuo(UO_MPLOT, 23));  // "v"
-        boolean bHH   = "T".equals(DMF.reg.getuo(UO_MPLOT, 24));  // "hh"
-        boolean bVV   = "T".equals(DMF.reg.getuo(UO_MPLOT, 25));  // "vv"
-        boolean bHV   = "T".equals(DMF.reg.getuo(UO_MPLOT, 26));  // "hv"
-        boolean bRSS  = "T".equals(DMF.reg.getuo(UO_MPLOT, 27));  // "s"
-        boolean bRMS  = "T".equals(DMF.reg.getuo(UO_MPLOT, 28));  // "m"
+        boolean bHS   = "T".equals(Globals.reg.getuo(UO_MPLOT, 19));  // "H"
+        boolean bVS   = "T".equals(Globals.reg.getuo(UO_MPLOT, 20));  // "V"
+        boolean bNum  = "T".equals(Globals.reg.getuo(UO_MPLOT, 21));  // "n"
+        boolean bHbar = "T".equals(Globals.reg.getuo(UO_MPLOT, 22));  // "h"
+        boolean bVbar = "T".equals(Globals.reg.getuo(UO_MPLOT, 23));  // "v"
+        boolean bHH   = "T".equals(Globals.reg.getuo(UO_MPLOT, 24));  // "hh"
+        boolean bVV   = "T".equals(Globals.reg.getuo(UO_MPLOT, 25));  // "vv"
+        boolean bHV   = "T".equals(Globals.reg.getuo(UO_MPLOT, 26));  // "hv"
+        boolean bRSS  = "T".equals(Globals.reg.getuo(UO_MPLOT, 27));  // "s"
+        boolean bRMS  = "T".equals(Globals.reg.getuo(UO_MPLOT, 28));  // "m"
 
         String sss = ""; 
         String space = ","; 

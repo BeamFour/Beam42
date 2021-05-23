@@ -1,7 +1,5 @@
 package com.stellarsoftware.beam;
 
-import java.text.DecimalFormat; // for debugging only
-
 /** This file contains public class RT13 and private class MinFit
   *  A207: eliminating groups, using 5x4 ray/surf logic.
   *  A207.11 implementing TASK DIAGRAM in DevelopmentNotes.txt
@@ -241,7 +239,7 @@ class RT13 implements B4constants
     static public double dGetRayFinal(int kray, int iatt)
     // called by MapPanel after iBuildRays() has been run.
     {
-        int jsurf = DMF.giFlags[ONSURFS]; 
+        int jsurf = Globals.giFlags[ONSURFS];
         return dRays[kray][jsurf][iatt]; 
     }
     
@@ -263,7 +261,7 @@ class RT13 implements B4constants
     // This handles the case of "final" by returning nsurfs. 
     // Callers should always test this result for error situation = -1!
     { 
-        int nsurfs = DMF.giFlags[ONSURFS]; 
+        int nsurfs = Globals.giFlags[ONSURFS];
         if (opcode < 0)
           return -1; 
         int attr = opcode % 100;
@@ -347,7 +345,7 @@ class RT13 implements B4constants
         // First: try to get refr from surfs[][] set by OEJIF.
         // If OK, use it; else use media LUT. 
         // System.out.println("-------RT13.getRefraction is starting with jsurf, gkray = "+jsurf+"  "+gkray);
-        int nsurfs = DMF.giFlags[ONSURFS]; 
+        int nsurfs = Globals.giFlags[ONSURFS];
         if (jsurf<1)
           return 1.0;        // error condition
         if (jsurf > nsurfs)
@@ -410,7 +408,7 @@ class RT13 implements B4constants
     // Enlarged to include six Hettrick implicit groove parameters, A192 March 2016
     {
        double ct, st, cp, sp, cr, sr; 
-       for (int j=1; j<=DMF.giFlags[ONSURFS]; j++)
+       for (int j = 1; j<= Globals.giFlags[ONSURFS]; j++)
        {
            ct = U.cosd(surfs[j][OTILT]); 
            st = U.sind(surfs[j][OTILT]); 
@@ -430,7 +428,7 @@ class RT13 implements B4constants
        }
        
        //---Hettrick implicit polynomial coefficients  A192; A193---------
-       for (int j=1; j<DMF.giFlags[ONSURFS]; j++)
+       for (int j = 1; j< Globals.giFlags[ONSURFS]; j++)
        {
            // surfs[j][OVX01] = surfs[j][OVY10]; 
            // surfs[j][OVX02] = surfs[j][OVY11]/2.0;
@@ -470,8 +468,8 @@ class RT13 implements B4constants
     //
     // M.Lampton STELLAR SOFTWARE (C) 2007
     {
-        int gnrays = DMF.giFlags[RNRAYS]; 
-        int gnsurfs = DMF.giFlags[ONSURFS]; 
+        int gnrays = Globals.giFlags[RNRAYS];
+        int gnsurfs = Globals.giFlags[ONSURFS];
         // System.out.println("Starting RT13.iBuildRays()");
 
         for (int k=0; k<=gnrays; k++)
@@ -531,7 +529,7 @@ class RT13 implements B4constants
            kGuideRay = iCreateOneRandomRayStart();  // kGuideRay is for getRefraction(), never zero.
         }
         
-        int nsurfs = DMF.giFlags[ONSURFS]; 
+        int nsurfs = Globals.giFlags[ONSURFS];
         int code = RROK;             // status of this ray, 4 kinds
         int codex = 0;               // status of this ray, 16 kinds
         int prevx = 0;               // previous status, 16 kinds.
@@ -968,12 +966,12 @@ class RT13 implements B4constants
         
         //---Set up user options for this ray trace; used below-------
 
-        bUserOptionPositive = "T".equals(DMF.reg.getuo(UO_DEF, 3)); 
+        bUserOptionPositive = "T".equals(Globals.reg.getuo(UO_DEF, 3));
         for (int i=0; i<4; i++)
-          if ("T".equals(DMF.reg.getuo(UO_DEF, 5+i)))
+          if ("T".equals(Globals.reg.getuo(UO_DEF, 5+i)))
             iUserOptionMethod = i; 
-        dIsoRadius = U.suckDouble(DMF.reg.getuo(UO_DEF,9)); 
-        int nrays = DMF.giFlags[RNRAYS];
+        dIsoRadius = U.suckDouble(Globals.reg.getuo(UO_DEF,9));
+        int nrays = Globals.giFlags[RNRAYS];
 
         //----Clear out entire ray zero from previous run------
         for (int j=0; j<=MAXSURFS; j++)
@@ -982,14 +980,14 @@ class RT13 implements B4constants
 
         //-----set up for distributions--------------
 
-        boolean bXYZcontinuous = "T".equals(DMF.reg.getuo(UO_RAND,3)); 
-        boolean bUVWcontinuous = "T".equals(DMF.reg.getuo(UO_RAND,5)); 
-        boolean bUniform  = "T".equals(DMF.reg.getuo(UO_RAND, 7)); 
-        boolean bCosine   = "T".equals(DMF.reg.getuo(UO_RAND, 8)); 
-        boolean bBell     = "T".equals(DMF.reg.getuo(UO_RAND, 9)); 
-        boolean bGauss    = "T".equals(DMF.reg.getuo(UO_RAND, 10)); 
-        boolean bLorentz  = "T".equals(DMF.reg.getuo(UO_RAND, 11));  
-        double  dConcen   = U.suckDouble(DMF.reg.getuo(UO_RAND, 12)); 
+        boolean bXYZcontinuous = "T".equals(Globals.reg.getuo(UO_RAND,3));
+        boolean bUVWcontinuous = "T".equals(Globals.reg.getuo(UO_RAND,5));
+        boolean bUniform  = "T".equals(Globals.reg.getuo(UO_RAND, 7));
+        boolean bCosine   = "T".equals(Globals.reg.getuo(UO_RAND, 8));
+        boolean bBell     = "T".equals(Globals.reg.getuo(UO_RAND, 9));
+        boolean bGauss    = "T".equals(Globals.reg.getuo(UO_RAND, 10));
+        boolean bLorentz  = "T".equals(Globals.reg.getuo(UO_RAND, 11));
+        double  dConcen   = U.suckDouble(Globals.reg.getuo(UO_RAND, 12));
         dConcen = Math.max(1, dConcen); 
         int which = bCosine ? 1 : bBell ? 2 : bGauss ? 3: bLorentz ? 4 : 0;  
         
@@ -2469,7 +2467,7 @@ class RT13 implements B4constants
     // Apply this only AFTER each ray's loop terminates with bExtend[]=true.
     {
         int j = howfarOK[kray];
-        String fracStr = DMF.reg.getuo(UO_LAYOUT, 39); // factory default: B4constants line 870
+        String fracStr = Globals.reg.getuo(UO_LAYOUT, 39); // factory default: B4constants line 870
         double frac = 0.01* Double.parseDouble(fracStr);  
         double size = DMF.getOsize();
         double dist = frac * size;

@@ -47,17 +47,17 @@ class AutoAdjuster implements B4constants
     public boolean start() {
         if ((optEditor==null) || (rayEditor==null))
           return false;          // SNH thanks to graying.
-        DMF.sAutoErr = "";    // no errors yet
+        Globals.sAutoErr = "";    // no errors yet
 
-        nsurfs = DMF.giFlags[ONSURFS];
-        onfields = DMF.giFlags[ONFIELDS];  // fields per optic.
-        nrays = DMF.giFlags[RNRAYS]; 
-        rnfields = DMF.giFlags[RNFIELDS];  // fields per ray.
+        nsurfs = Globals.giFlags[ONSURFS];
+        onfields = Globals.giFlags[ONFIELDS];  // fields per optic.
+        nrays = Globals.giFlags[RNRAYS];
+        rnfields = Globals.giFlags[RNFIELDS];  // fields per ray.
         if ((onfields<1) || (nrays<1) || (rnfields<1))
           return false;          // SNH graying.
           
-        bWFE = DMF.giFlags[RWFEFIELD] > RABSENT; 
-        autongoals = DMF.giFlags[RNGOALS] + (bWFE ? 1 : 0); 
+        bWFE = Globals.giFlags[RWFEFIELD] > RABSENT;
+        autongoals = Globals.giFlags[RNGOALS] + (bWFE ? 1 : 0);
         
         //-----autongoals includes 1 for WFE if present-----------
         if (autongoals < 1)
@@ -65,8 +65,8 @@ class AutoAdjuster implements B4constants
             //JOptionPane.showMessageDialog(optEditor, "Auto: no ray goals or WFE");
             return false;
         }
-        onadj = DMF.giFlags[ONADJ];  // set by OEJIF during parse().
-        rnadj = DMF.giFlags[RNADJ];  // set by REJIF during parse().
+        onadj = Globals.giFlags[ONADJ];  // set by OEJIF during parse().
+        rnadj = Globals.giFlags[RNADJ];  // set by REJIF during parse().
         nadj = onadj + rnadj;        // total adjustables. 
         if (nadj < 1)
         {
@@ -74,20 +74,20 @@ class AutoAdjuster implements B4constants
             return false;
         }
 
-        dUserStep = U.suckDouble(DMF.reg.getuo(UO_AUTO, 0)); 
+        dUserStep = U.suckDouble(Globals.reg.getuo(UO_AUTO, 0));
         dUserStep = Math.max(1E-12, Math.min(dUserStep, 1.0));
         hostiter = 0; 
-        maxiter = U.suckInt(DMF.reg.getuo(UO_AUTO, 1)); 
+        maxiter = U.suckInt(Globals.reg.getuo(UO_AUTO, 1));
         maxiter = Math.max(1, Math.min(maxiter, 1000)); 
-        tol = U.suckDouble(DMF.reg.getuo(UO_AUTO, 2)); 
+        tol = U.suckDouble(Globals.reg.getuo(UO_AUTO, 2));
         tol = Math.max(1E-20, Math.min(tol, 1.0)); 
         
-        wx = U.suckDouble(DMF.reg.getuo(UO_AUTO, 3)); 
-        wy = U.suckDouble(DMF.reg.getuo(UO_AUTO, 4)); 
-        wz = U.suckDouble(DMF.reg.getuo(UO_AUTO, 5)); 
-        wu = U.suckDouble(DMF.reg.getuo(UO_AUTO, 6)); 
-        wv = U.suckDouble(DMF.reg.getuo(UO_AUTO, 7)); 
-        ww = U.suckDouble(DMF.reg.getuo(UO_AUTO, 8)); 
+        wx = U.suckDouble(Globals.reg.getuo(UO_AUTO, 3));
+        wy = U.suckDouble(Globals.reg.getuo(UO_AUTO, 4));
+        wz = U.suckDouble(Globals.reg.getuo(UO_AUTO, 5));
+        wu = U.suckDouble(Globals.reg.getuo(UO_AUTO, 6));
+        wv = U.suckDouble(Globals.reg.getuo(UO_AUTO, 7));
+        ww = U.suckDouble(Globals.reg.getuo(UO_AUTO, 8));
 
         //------count the initially good rays----------
 

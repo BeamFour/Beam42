@@ -112,12 +112,12 @@ class Comparo implements B4constants
 
     private boolean bSetup()
     {
-        onfields  = DMF.giFlags[ONFIELDS];       // fields per optic.
-        nrays     = DMF.giFlags[RNRAYS]; 
-        nsurfs    = DMF.giFlags[ONSURFS]; 
-        rnfields  = DMF.giFlags[RNFIELDS];       // fields per ray.
-        ngoals    = DMF.giFlags[RNGOALS];        // verified above. 
-        bHasWFE   = DMF.giFlags[RWFEFIELD] > RABSENT; 
+        onfields  = Globals.giFlags[ONFIELDS];       // fields per optic.
+        nrays     = Globals.giFlags[RNRAYS];
+        nsurfs    = Globals.giFlags[ONSURFS];
+        rnfields  = Globals.giFlags[RNFIELDS];       // fields per ray.
+        ngoals    = Globals.giFlags[RNGOALS];        // verified above.
+        bHasWFE   = Globals.giFlags[RWFEFIELD] > RABSENT;
 
         if ((optEditor==null) || (rayEditor==null))
           return false; // SNH graying.

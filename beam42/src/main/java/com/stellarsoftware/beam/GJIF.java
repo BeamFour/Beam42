@@ -1,13 +1,7 @@
 package com.stellarsoftware.beam;
 
-import java.util.*;              // Timer
 import java.awt.*;               // Color, etc
-import java.awt.event.*;         // MouseEvent
 import java.awt.print.*;         // printing
-import javax.print.attribute.*;  // printing attributes
-import java.io.*;                // files;QuickPNG.
-import java.awt.image.*;         // QuickPNG; 
-import javax.imageio.*;          // QuickPNG; 
 import javax.swing.*;
 import javax.swing.event.*;      // MenuEvents, InternalFrameAdapter
 
@@ -193,7 +187,7 @@ public class GJIF extends BJIF implements B4constants
     private int getUOpixels()
     // Returns User Option window size in pixels.
     {
-        int i = U.parseInt(DMF.reg.getuo(UO_GRAPH, 6)); 
+        int i = U.parseInt(Globals.reg.getuo(UO_GRAPH, 6));
         if (i<=100)
           i = 500; 
         return Math.min(3000, Math.max(100, i)); 

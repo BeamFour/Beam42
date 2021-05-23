@@ -225,15 +225,15 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
                     {
                         case 0: 
                            DMF.oejif = null; 
-                           DMF.giFlags[OPRESENT] = 0; 
+                           Globals.giFlags[OPRESENT] = 0;
                            break; 
                         case 1: 
                            DMF.rejif = null; 
-                           DMF.giFlags[RPRESENT] = 0; 
+                           Globals.giFlags[RPRESENT] = 0;
                            break; 
                         case 2: 
                            DMF.mejif = null; 
-                           DMF.giFlags[MPRESENT] = 0; 
+                           Globals.giFlags[MPRESENT] = 0;
                            break; 
                     }
                 }
@@ -262,7 +262,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
           myFpath = "";
         String path = U.getOnlyPath(myFpath); 
         if (path.length() > 1)               // guard against zero length "New" file creation.
-          DMF.reg.putuo(UO_START, 5, path);  // stash it for future use.
+          Globals.reg.putuo(UO_START, 5, path);  // stash it for future use.
         return myFpath;
     } 
 
@@ -443,7 +443,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
 
     public void doCut()
     {
-        DMF.nEdits++; 
+        Globals.nEdits++;
         clipb = Toolkit.getDefaultToolkit().getSystemClipboard();
         if (clipb == null)
           clipb = new Clipboard("local"); 
@@ -457,7 +457,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
     public void doCopy()
     // Copies marked table text onto the clipboard
     {
-        DMF.nEdits++; 
+        Globals.nEdits++;
         clipb = Toolkit.getDefaultToolkit().getSystemClipboard();
         if (clipb == null)
           clipb = new Clipboard("local"); 
@@ -473,7 +473,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
     // Does not paste over. 
     // Analogous to bLoadFile(). 
     {
-        DMF.nEdits++; 
+        Globals.nEdits++;
         clipb = Toolkit.getDefaultToolkit().getSystemClipboard();
         if (clipb == null)
           clipb = new Clipboard("local"); 
@@ -502,7 +502,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
 
     public void doDelete()
     {
-        DMF.nEdits++; 
+        Globals.nEdits++;
         ePanel.doDelete(); 
     }
 
@@ -702,7 +702,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
         if (myFile != null)
           if (myFile.isFile())
           {
-              if ("T".equals(DMF.reg.getuo(UO_EDIT, 0)))
+              if ("T".equals(Globals.reg.getuo(UO_EDIT, 0)))
                 s += myFile.getPath();
               else
                 s += myFile.getName();   // includes extension
@@ -720,7 +720,7 @@ abstract class EJIF extends BJIF implements B4constants, AdjustmentListener
             iCountdown++;
             return;
         }    
-        if ((ePanel != null) && ("T".equals(DMF.reg.getuo(UO_EDIT, 1))))
+        if ((ePanel != null) && ("T".equals(Globals.reg.getuo(UO_EDIT, 1))))
         {
             String ss = "";
             switch (ePanel.getJCaret())
@@ -776,7 +776,7 @@ class PrintText implements Printable, B4constants
         bLandscape = false; 
         ePanel = gPanel;
         nlines = ePanel.getLineCount(); 
-        fontsize = U.parseInt(DMF.reg.getuo(UO_EDIT, 6)); 
+        fontsize = U.parseInt(Globals.reg.getuo(UO_EDIT, 6));
         fontsize = Math.max(5, Math.min(50, fontsize)); 
     }
 
@@ -791,7 +791,7 @@ class PrintText implements Printable, B4constants
 
         linesperpage = bLandscape ? wpts/fontsize-2 : hpts/fontsize-2;
         npages = 1 + nlines/linesperpage; 
-        boolean bBold = "T".equals(DMF.reg.getuo(UO_EDIT, 7)); 
+        boolean bBold = "T".equals(Globals.reg.getuo(UO_EDIT, 7));
         int iBold = bBold ? Font.BOLD : Font.PLAIN; 
         g2.setColor(Color.BLACK); 
         g2.setFont(new Font("Courier New", iBold, fontsize)); 
@@ -819,7 +819,7 @@ class PrintText implements Printable, B4constants
 
     private void setEditSmoothing(Graphics2D g2)
     {
-        if ("T".equals(DMF.reg.getuo(UO_EDIT, 8)))
+        if ("T".equals(Globals.reg.getuo(UO_EDIT, 8)))
         {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                 RenderingHints.VALUE_ANTIALIAS_ON);

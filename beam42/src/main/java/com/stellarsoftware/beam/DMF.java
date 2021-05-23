@@ -93,18 +93,12 @@ public class DMF extends JFrame implements B4constants
 
     public static JFrame dmf;           // allows messages, e.g. setTitle()
     public static JDesktopPane jdp;     // for WhichEditorInFront...
-              
-    public static Registry reg;         // permanent *visible* home for reg
 
     public static OEJIF oejif;          // allows messages, e.g. repaint()
     public static REJIF rejif;
-    public static MEJIF mejif; 
-    public static int nEdits;           // increments for each edit.
-    
-    public static int giFlags[] = new int[NFLAGS];
-    public static String sAutoErr = ""; // RT13 reports to AutoAdj, if necessary
+    public static MEJIF mejif;
 
-    public static boolean bHostActive = true;  
+    public static boolean bHostActive = true;
     public static boolean bRequestWriteImage = false; // see BJIF
     public static boolean bRayGenOK = true; 
     public static boolean bAutoBusy = false;    // forbid parsing when AutoAdj is running
@@ -188,17 +182,17 @@ public class DMF extends JFrame implements B4constants
                 
         sInitialDir = System.getProperty("user.dir");  
         sCurrentDir = sInitialDir;        
-        reg = new Registry(sInitialDir);  // create and load registry 
+        Globals.reg = new Registry(sInitialDir);  // create and load registry
         sUserHome = System.getProperty("user.home"); 
         
         //---fix up an absentee project path----
-        if (reg.getuo(UO_START, 8).length() < 2)
-          reg.putuo(UO_START, 8, sUserHome); 
+        if (Globals.reg.getuo(UO_START, 8).length() < 2)
+          Globals.reg.putuo(UO_START, 8, sUserHome);
         
         sWorkingTitle = PRODUCT;   // defined as BEAM FOUR in B4constants.java
         setTitle(sWorkingTitle);
         setBackground(LBLUE);      // briefly, then jdp takes over.
-        nEdits = 0; 
+        Globals.nEdits = 0;
         
         //----------set initial AutoBusy flag-------------------
 
@@ -271,7 +265,7 @@ public class DMF extends JFrame implements B4constants
     // in MacOS L&F makes all foreign icons vanish.
     // Also (A182) iconization permission is a UserOption. 
     {   
-        boolean bMacIconOK = "T".equals(reg.getuo(UO_START, 9)); 
+        boolean bMacIconOK = "T".equals(Globals.reg.getuo(UO_START, 9));
         JInternalFrame[] jifs = jdp.getAllFrames(); 
         for (int i=0; i<jifs.length; i++)
         {
@@ -299,7 +293,7 @@ public class DMF extends JFrame implements B4constants
     
     private static void setProject(String path)
     {
-        reg.putuo(UO_START, 8, path); 
+        Globals.reg.putuo(UO_START, 8, path);
     }
     
     private static String getFileOpenPath()
@@ -307,11 +301,11 @@ public class DMF extends JFrame implements B4constants
     // Works well for folder lookups
     // Does NOT include a terminal slash
     {
-        if ("T".equals(reg.getuo(UO_START, 7)))  // 7 = most recent path button
+        if ("T".equals(Globals.reg.getuo(UO_START, 7)))  // 7 = most recent path button
         {
-            String s = reg.getuo(UO_START, 8); 
+            String s = Globals.reg.getuo(UO_START, 8);
             // System.out.println("DMF::getFileOpenPath() ok to use most recent folder: "+s); 
-            return reg.getuo(UO_START, 8);         // 8 = invisible recent path stash
+            return Globals.reg.getuo(UO_START, 8);         // 8 = invisible recent path stash
         }
         // System.out.println("DMF::getFileOpenPath() no recent folder, therefore using sUserHome = "+sUserHome); 
         return sUserHome; 
@@ -531,23 +525,23 @@ public class DMF extends JFrame implements B4constants
             {
                 vMasterParse(true); // ferret out the problem
                 int ifield=0, iline=0; 
-                switch (giFlags[STATUS])
+                switch (Globals.giFlags[STATUS])
                 {
                    case GOSYNTAXERR:
-                     iline  = giFlags[OSYNTAXERR]/100;
-                     ifield = giFlags[OSYNTAXERR]%100;
+                     iline  = Globals.giFlags[OSYNTAXERR]/100;
+                     ifield = Globals.giFlags[OSYNTAXERR]%100;
                      if (bringEJIFtoFront(oejif))
                        oejif.setCaretXY(ifield, iline); 
                      break; 
                    case GRSYNTAXERR:
-                     iline  = giFlags[RSYNTAXERR]/100;
-                     ifield = giFlags[RSYNTAXERR]%100;
+                     iline  = Globals.giFlags[RSYNTAXERR]/100;
+                     ifield = Globals.giFlags[RSYNTAXERR]%100;
                      if (bringEJIFtoFront(rejif))
                        rejif.setCaretXY(ifield, iline); 
                      break; 
                    case GMSYNTAXERR:
-                     iline  = giFlags[MSYNTAXERR]/100;
-                     ifield = giFlags[MSYNTAXERR]%100;
+                     iline  = Globals.giFlags[MSYNTAXERR]/100;
+                     ifield = Globals.giFlags[MSYNTAXERR]%100;
                      if (bringEJIFtoFront(mejif))
                        mejif.setCaretXY(ifield, iline); 
                      break; 
@@ -679,9 +673,9 @@ public class DMF extends JFrame implements B4constants
     {
         boolean bAutoLoad = false; // nothing yet to parse
 
-        if ("T".equals(reg.getuo(UO_START, 1)) && (oejif == null))
+        if ("T".equals(Globals.reg.getuo(UO_START, 1)) && (oejif == null))
         {
-            String s = reg.getuo(UO_RECENTO, 0);  // most recent optics file
+            String s = Globals.reg.getuo(UO_RECENTO, 0);  // most recent optics file
             if ((s.length()>MINFILENAME) && bFileNameReadCheck(s))
             {
                 setProject(U.getOnlyPath(s));                 
@@ -694,9 +688,9 @@ public class DMF extends JFrame implements B4constants
                 bAutoLoad = true;   // now something to parse?
             }
         }
-        if ("T".equals(reg.getuo(UO_START, 3)) && (rejif == null))
+        if ("T".equals(Globals.reg.getuo(UO_START, 3)) && (rejif == null))
         {
-            String s = reg.getuo(UO_RECENTR, 0);  // most recent ray file  
+            String s = Globals.reg.getuo(UO_RECENTR, 0);  // most recent ray file
             if ((s.length()>MINFILENAME) && bFileNameReadCheck(s))
             {
                 setProject(U.getOnlyPath(s)); 
@@ -709,9 +703,9 @@ public class DMF extends JFrame implements B4constants
                 bAutoLoad = true; 
             }
         }
-        if ("T".equals(reg.getuo(UO_START, 5)) && (mejif == null))
+        if ("T".equals(Globals.reg.getuo(UO_START, 5)) && (mejif == null))
         {
-            String s = reg.getuo(UO_RECENTM, 0);  // most recent media file
+            String s = Globals.reg.getuo(UO_RECENTM, 0);  // most recent media file
             if ((s.length()>MINFILENAME) && bFileNameReadCheck(s))
             {
                 setProject(U.getOnlyPath(s)); 
@@ -1079,7 +1073,7 @@ public class DMF extends JFrame implements B4constants
             int nOpt = 0;               // count the recent file names
             for (int i=0; i<10; i++)    // count the recent file names
             {
-                String s = reg.getuo(UO_RECENTO, i);
+                String s = Globals.reg.getuo(UO_RECENTO, i);
                 if (s.length() >= MINFILENAME)
                   nOpt++; 
             }
@@ -1093,7 +1087,7 @@ public class DMF extends JFrame implements B4constants
                 JMenuItem ro[] = new JMenuItem[nOpt];
                 for (int i=0; i<nOpt; i++)
                 {
-                    ro[i] = new JMenuItem(reg.getuo(UO_RECENTO, i)); 
+                    ro[i] = new JMenuItem(Globals.reg.getuo(UO_RECENTO, i));
                     ro[i].addActionListener(new RFListener()); 
                     jmRO.add(ro[i]); 
                 }
@@ -1102,7 +1096,7 @@ public class DMF extends JFrame implements B4constants
             int nRay = 0;               // count the recent file names
             for (int i=0; i<10; i++)    // count the recent file names
             {
-                String s = reg.getuo(UO_RECENTR, i);
+                String s = Globals.reg.getuo(UO_RECENTR, i);
                 if (s.length() >= MINFILENAME)
                   nRay++; 
             }
@@ -1116,7 +1110,7 @@ public class DMF extends JFrame implements B4constants
                 JMenuItem rr[] = new JMenuItem[nRay];
                 for (int i=0; i<nRay; i++)
                 {
-                    rr[i] = new JMenuItem(reg.getuo(UO_RECENTR, i)); 
+                    rr[i] = new JMenuItem(Globals.reg.getuo(UO_RECENTR, i));
                     rr[i].addActionListener(new RFListener()); 
                     jmRR.add(rr[i]); 
                 }
@@ -1125,7 +1119,7 @@ public class DMF extends JFrame implements B4constants
             int nMed = 0;               // count the recent file names
             for (int i=0; i<10; i++)    // count the recent file names
             {
-                String s = reg.getuo(UO_RECENTM, i);
+                String s = Globals.reg.getuo(UO_RECENTM, i);
                 if (s.length() >= MINFILENAME)
                   nMed++; 
             }
@@ -1139,7 +1133,7 @@ public class DMF extends JFrame implements B4constants
                 JMenuItem rm[] = new JMenuItem[nMed];
                 for (int i=0; i<nMed; i++)
                 {
-                    rm[i] = new JMenuItem(reg.getuo(UO_RECENTM, i)); 
+                    rm[i] = new JMenuItem(Globals.reg.getuo(UO_RECENTM, i));
                     rm[i].addActionListener(new RFListener()); 
                     jmRM.add(rm[i]); 
                 }
@@ -1321,7 +1315,7 @@ public class DMF extends JFrame implements B4constants
         public void menuSelected(MenuEvent me)
         {
             vMasterParse(true); 
-            boolean ok = (giFlags[STATUS] == GPARSEOK); 
+            boolean ok = (Globals.giFlags[STATUS] == GPARSEOK);
 
             // general case: enable/disable all RunItems depending on "ok"
             for (int i=0; i<RM_NITEMS; i++)
@@ -1331,7 +1325,7 @@ public class DMF extends JFrame implements B4constants
             runMenuItem[RM_DEMO].setEnabled(true); 
 
             // special case: layout without rays....
-            if (giFlags[STATUS] == GLAYOUTONLY)
+            if (Globals.giFlags[STATUS] == GLAYOUTONLY)
               runMenuItem[1].setEnabled(true); 
 
             if (ok)
@@ -1349,17 +1343,17 @@ public class DMF extends JFrame implements B4constants
                 
                 runMenuItem[RM_RANDOM].setEnabled(bRandomOK); 
 
-                boolean bGoals = (giFlags[RNGOALS]>0) || (giFlags[RWFEFIELD]>RABSENT);
-                boolean bAutoAdj = giFlags[ONADJ] + giFlags[RNADJ] > 0; 
+                boolean bGoals = (Globals.giFlags[RNGOALS]>0) || (Globals.giFlags[RWFEFIELD]>RABSENT);
+                boolean bAutoAdj = Globals.giFlags[ONADJ] + Globals.giFlags[RNADJ] > 0;
                 bAutoAdj = bGoals && bAutoAdj; 
                 runMenuItem[RM_AUTOADJ].setEnabled(bAutoAdj); 
 
-                int a0 = giFlags[RAYADJ0]; 
+                int a0 = Globals.giFlags[RAYADJ0];
                 boolean bAutoRay = (a0>=0 && a0<=RW) || (a0>=RTXL && a0<RTWL); 
-                int a1 = giFlags[RAYADJ1]; 
+                int a1 = Globals.giFlags[RAYADJ1];
                 if (a1>=0)
                   bAutoRay = bAutoRay && (a1<RW) || (a1>RTXL && a1<RTWL); 
-                bAutoRay = bAutoRay && giFlags[RNGOALS]>0; 
+                bAutoRay = bAutoRay && Globals.giFlags[RNGOALS]>0;
                 runMenuItem[RM_AUTORAY].setEnabled(bAutoRay); 
             }
         }
@@ -1432,7 +1426,7 @@ public class DMF extends JFrame implements B4constants
         public void menuSelected(MenuEvent me)
         {
             vMasterParse(true); 
-            int ierr = giFlags[STATUS]; 
+            int ierr = Globals.giFlags[STATUS];
             boolean bRay = rejif != null; 
             bRayGenOK = bRay;  //  && !((ierr==GRABSENT) || (ierr==GREMPTY));
         }
@@ -1450,7 +1444,7 @@ public class DMF extends JFrame implements B4constants
         public void menuSelected(MenuEvent me)
         {
             vMasterParse(true); 
-            int i = giFlags[STATUS]; 
+            int i = Globals.giFlags[STATUS];
             boolean bShow = (i==GOSYNTAXERR) 
                          || (i==GRSYNTAXERR) 
                          || (i==GMSYNTAXERR); 
@@ -1500,111 +1494,111 @@ public class DMF extends JFrame implements B4constants
 
         if (!bActive)
         {
-            giFlags[STATUS] = GUNKNOWN; 
+            Globals.giFlags[STATUS] = GUNKNOWN;
             postTitle(""); 
             return; 
         }
 
         if ((oejif==null) && (rejif==null) && (mejif==null))
         {
-            giFlags[STATUS] = GNOFILES; 
+            Globals.giFlags[STATUS] = GNOFILES;
             postTitle(""); // was "No files loaded"
             return; 
         }
            
         if (oejif == null)
-          giFlags[OPRESENT] = 0; 
+          Globals.giFlags[OPRESENT] = 0;
         else
           oejif.parse();
 
         if (rejif == null)
-          giFlags[RPRESENT] = 0; 
+          Globals.giFlags[RPRESENT] = 0;
         else
           rejif.parse();
 
         if (mejif == null)
-          giFlags[MPRESENT] = 0; 
+          Globals.giFlags[MPRESENT] = 0;
         else
           mejif.parse();
 
         //---------now compute and post giFlags[STATUS]---------
 
-        if (giFlags[OPRESENT] == 0)
+        if (Globals.giFlags[OPRESENT] == 0)
         {
-            giFlags[STATUS] = GOABSENT; 
+            Globals.giFlags[STATUS] = GOABSENT;
             postTitle(""); 
             return; 
         }
-        if ((giFlags[ONSURFS] < 1) || (giFlags[ONFIELDS] < 1))
+        if ((Globals.giFlags[ONSURFS] < 1) || (Globals.giFlags[ONFIELDS] < 1))
         {
-            giFlags[STATUS] = GOEMPTY; 
+            Globals.giFlags[STATUS] = GOEMPTY;
             postTitle(""); 
             return; 
         }
-        if (giFlags[OSYNTAXERR] > 0)
+        if (Globals.giFlags[OSYNTAXERR] > 0)
         {
-            giFlags[STATUS] = GOSYNTAXERR; 
+            Globals.giFlags[STATUS] = GOSYNTAXERR;
             postTitle(""); 
             return; 
         } 
 
-        boolean rayOK = (giFlags[RPRESENT] > 0) 
-                     && (giFlags[RNRAYS] > 0) 
-                     && (giFlags[RNFIELDS] > 0);
+        boolean rayOK = (Globals.giFlags[RPRESENT] > 0)
+                     && (Globals.giFlags[RNRAYS] > 0)
+                     && (Globals.giFlags[RNFIELDS] > 0);
 
         // expand rayAbsence to all its metrics for Layout:AllDiams.
         // I hope this does not confuse the ray parser!
         if (!rayOK)
         {
-            giFlags[RNRAYS] = 0; 
-            giFlags[RNFIELDS] = 0; 
+            Globals.giFlags[RNRAYS] = 0;
+            Globals.giFlags[RNFIELDS] = 0;
         }
 
-        if ((!rayOK) && (giFlags[OALLDIAMSPRESENT] > 0))
+        if ((!rayOK) && (Globals.giFlags[OALLDIAMSPRESENT] > 0))
         {
-           giFlags[STATUS] = GLAYOUTONLY; 
+           Globals.giFlags[STATUS] = GLAYOUTONLY;
            postTitle(""); 
            return; 
         }
-        if (giFlags[RPRESENT] == 0)
+        if (Globals.giFlags[RPRESENT] == 0)
         {
-            giFlags[STATUS] = GRABSENT; 
+            Globals.giFlags[STATUS] = GRABSENT;
             postTitle(""); 
             return; 
         }
-        if ((giFlags[RNRAYS] < 1) || (giFlags[RNFIELDS] < 1))
+        if ((Globals.giFlags[RNRAYS] < 1) || (Globals.giFlags[RNFIELDS] < 1))
         {
-            giFlags[STATUS] = GREMPTY; 
+            Globals.giFlags[STATUS] = GREMPTY;
             postTitle(""); 
             return; 
         }
-        if (giFlags[RSYNTAXERR] > 0)
+        if (Globals.giFlags[RSYNTAXERR] > 0)
         {
-            giFlags[STATUS] = GRSYNTAXERR; 
+            Globals.giFlags[STATUS] = GRSYNTAXERR;
             postTitle(""); 
             return; 
         }
 
         //-------past this point we have a good .OPT and .RAY---------
 
-        if ((giFlags[OGRATINGPRESENT]==1) && (giFlags[RALLWAVESNUMERIC]==0))
+        if ((Globals.giFlags[OGRATINGPRESENT]==1) && (Globals.giFlags[RALLWAVESNUMERIC]==0))
         {
-            giFlags[STATUS] = GRNEEDNUMERWAVES; 
+            Globals.giFlags[STATUS] = GRNEEDNUMERWAVES;
             postTitle(""); 
             return; 
         }
 
-        if (giFlags[OMEDIANEEDED] == FALSE)
+        if (Globals.giFlags[OMEDIANEEDED] == FALSE)
         {
             // so refraction=OK, grating=OK
-            giFlags[STATUS] = GPARSEOK; 
+            Globals.giFlags[STATUS] = GPARSEOK;
             postTitle(""); 
             return; 
         }
-        else if (giFlags[RALLWAVESPRESENT] == FALSE)
+        else if (Globals.giFlags[RALLWAVESPRESENT] == FALSE)
         {
             // making media LUT fail
-            giFlags[STATUS] = GRLACKWAVE; 
+            Globals.giFlags[STATUS] = GRLACKWAVE;
             postTitle(""); 
             return; 
         } 
@@ -1615,21 +1609,21 @@ public class DMF extends JFrame implements B4constants
         //  2.  Every wavel named in .RAY appears amont the listed wavels.
         //
 
-        if (giFlags[MPRESENT] == FALSE)
+        if (Globals.giFlags[MPRESENT] == FALSE)
         {
-            giFlags[STATUS] = GMABSENT; 
+            Globals.giFlags[STATUS] = GMABSENT;
             postTitle(""); 
             return; 
         }
-        if ((giFlags[MNGLASSES] < 1) || (giFlags[MNWAVES] < 1))
+        if ((Globals.giFlags[MNGLASSES] < 1) || (Globals.giFlags[MNWAVES] < 1))
         {
-            giFlags[STATUS] = GMEMPTY; 
+            Globals.giFlags[STATUS] = GMEMPTY;
             postTitle(""); 
             return; 
         }
-        if (giFlags[MSYNTAXERR] > 0)
+        if (Globals.giFlags[MSYNTAXERR] > 0)
         {
-            giFlags[STATUS] = GMSYNTAXERR; 
+            Globals.giFlags[STATUS] = GMSYNTAXERR;
             postTitle(""); 
             return; 
         }
@@ -1650,13 +1644,13 @@ public class DMF extends JFrame implements B4constants
         int unkglassrec = ABSENT; 
         String unkglassname = "";
         boolean trouble = false; 
-        for (int jsurf=1; jsurf<=giFlags[ONSURFS]; jsurf++)
+        for (int jsurf = 1; jsurf<= Globals.giFlags[ONSURFS]; jsurf++)
         {
             // if (OEJIF.oglasses[jsurf].length() > 0)
             double refr = RT13.surfs[jsurf][OREFRACT]; 
             if (Double.isNaN(refr))            // invalid numeric
             {
-                for (int mrec=1; mrec <= giFlags[MNGLASSES]; mrec++)
+                for (int mrec = 1; mrec <= Globals.giFlags[MNGLASSES]; mrec++)
                   //if (OEJIF.oglasses[jsurf].equals(MEJIF.mglasses[mrec]))
                   if (DMF.oejif.model().oglasses()[jsurf].equals(DMF.mejif.model().mglasses(mrec)))
                   {
@@ -1675,7 +1669,7 @@ public class DMF extends JFrame implements B4constants
         }
         if (trouble)
         {
-            giFlags[STATUS] = GOGLASSABSENT;
+            Globals.giFlags[STATUS] = GOGLASSABSENT;
             postTitle(unkglassname); 
             return; 
         }
@@ -1686,11 +1680,11 @@ public class DMF extends JFrame implements B4constants
         int unkwaverec = ABSENT; 
         String unkwavename = ""; 
         trouble = false; 
-        for (int kray=1; kray<= giFlags[RNRAYS]; kray++)
+        for (int kray = 1; kray<= Globals.giFlags[RNRAYS]; kray++)
         {
             if (DMF.rejif.model().wavenames(kray).length() > 0)  // empty is trouble here.
             //if (REJIF.wavenames[kray].length() > 0)  // empty is trouble here.
-              for (int f=1; f <= giFlags[MNWAVES]; f++)
+              for (int f = 1; f <= Globals.giFlags[MNWAVES]; f++)
                 if (DMF.rejif.model().wavenames(kray).equals(DMF.mejif.model().mwaves(f)))
                 //if (REJIF.wavenames[kray].equals(MEJIF.mwaves[f]))
                 {
@@ -1708,11 +1702,11 @@ public class DMF extends JFrame implements B4constants
         }
         if (trouble)
         {
-            giFlags[STATUS] = GRWAVEABSENT;
+            Globals.giFlags[STATUS] = GRWAVEABSENT;
             postTitle(unkwavename); 
             return; 
         }
-        giFlags[STATUS] = GPARSEOK; 
+        Globals.giFlags[STATUS] = GPARSEOK;
         postTitle(""); 
     }
 
@@ -1723,7 +1717,7 @@ public class DMF extends JFrame implements B4constants
     // Called by DMF::vMasterParse() to show status.
     // And if DEBUG > 0, called by caret engine with diagnostic.
     {
-        int i = giFlags[STATUS]; 
+        int i = Globals.giFlags[STATUS];
         // String s = ""; 
         if ((i>0) && (i<NEXPLANATIONS))
           s = sExplanations[i] + " " + s;
@@ -1758,12 +1752,12 @@ public class DMF extends JFrame implements B4constants
           return; 
         int g = k+UO_RECENTO;                // UO group number
         for (int i=0; i<10; i++)             // eliminate dupes.
-          if (s.equals(reg.getuo(g,i)))
+          if (s.equals(Globals.reg.getuo(g,i)))
             for (int j=i; j<9; j++)          // pull one up to eliminate dupe.
-              reg.putuo(g,j,reg.getuo(g,j+1));    
+              Globals.reg.putuo(g,j, Globals.reg.getuo(g,j+1));
         for (int i=9; i>0; i--)              // push all down one, making room.
-          reg.putuo(g,i,reg.getuo(g,i-1));
-        reg.putuo(g, 0, s);                  // install new string at top.
+          Globals.reg.putuo(g,i, Globals.reg.getuo(g,i-1));
+        Globals.reg.putuo(g, 0, s);                  // install new string at top.
     }    
     
 
@@ -1799,9 +1793,9 @@ public class DMF extends JFrame implements B4constants
 */
     public static boolean writeSkeleton(String fname)
     {
-        int nrecords = U.suckInt(reg.getuo(UO_NEWFILE, 0)); 
-        int nfields  = U.suckInt(reg.getuo(UO_NEWFILE, 1)); 
-        int fwidth   = U.suckInt(reg.getuo(UO_NEWFILE, 2)); 
+        int nrecords = U.suckInt(Globals.reg.getuo(UO_NEWFILE, 0));
+        int nfields  = U.suckInt(Globals.reg.getuo(UO_NEWFILE, 1));
+        int fwidth   = U.suckInt(Globals.reg.getuo(UO_NEWFILE, 2));
         String s = makeSkeleton(nrecords+3, nfields, fwidth); 
         
         File f = new File(fname); 

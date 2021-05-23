@@ -135,9 +135,9 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     {  
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
-        fontsize = U.parseInt(DMF.reg.getuo(UO_EDIT, 6)); 
+        fontsize = U.parseInt(Globals.reg.getuo(UO_EDIT, 6));
         fontsize = Math.max(3, Math.min(100, fontsize)); 
-        boolean bBold = "T".equals(DMF.reg.getuo(UO_EDIT, 7)); 
+        boolean bBold = "T".equals(Globals.reg.getuo(UO_EDIT, 7));
         int iBold = bBold ? Font.BOLD : Font.PLAIN; 
         Font myFont = new Font("Monospaced", iBold, fontsize); 
         g2.setFont(myFont); 
@@ -186,7 +186,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
             int i = (iCaret-iOff)*charwidth + IOC; 
             int j = (jCaret-jOff)*charheight + JOC; 
             int caretwidth = charwidth; 
-            if("T".equals(DMF.reg.getuo(UO_EDIT, 10)))  // text mode
+            if("T".equals(Globals.reg.getuo(UO_EDIT, 10)))  // text mode
               caretwidth = charwidth/4; 
             g2.setXORMode(Color.YELLOW);
             g2.fillRect(i, j, caretwidth, charheight); 
@@ -215,7 +215,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
 
     private void setEditSmoothing(Graphics2D g2)
     {
-        if ("T".equals(DMF.reg.getuo(UO_EDIT, 8)))
+        if ("T".equals(Globals.reg.getuo(UO_EDIT, 8)))
         {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                 RenderingHints.VALUE_ANTIALIAS_ON);
@@ -402,7 +402,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     // deletes lines that are in the marked zone
     // this might be faster using System.arrayCopy()
     {
-        DMF.nEdits++;
+        Globals.nEdits++;
         getAllLineLengths();
         stashForUndo();
         if (!isMarked())
@@ -490,7 +490,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     private void swapUndo()
     // called by local myKeyHandler() method for Ctl-Z.
     {
-        DMF.nEdits++; 
+        Globals.nEdits++;
         if (sUndo.length() < 1)
           return; 
         String sTemp = getTableString();        
@@ -616,7 +616,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
                    break; 
 
                case KeyEvent.VK_ENTER:
-                   if ("T".equals(DMF.reg.getuo(UO_EDIT, 10)))   // text mode
+                   if ("T".equals(Globals.reg.getuo(UO_EDIT, 10)))   // text mode
                    {
                        if (jCaret < JMAX)
                        {
@@ -639,7 +639,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
                case KeyEvent.VK_BACK_SPACE:
                case KeyEvent.VK_DELETE:
                    stashForUndo(); 
-                   if ("T".equals(DMF.reg.getuo(UO_EDIT, 10)))   // text mode
+                   if ("T".equals(Globals.reg.getuo(UO_EDIT, 10)))   // text mode
                    {
                        if ((iCaret==0) && (jCaret>0))            // pull up OK
                        {
@@ -716,7 +716,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
         // Process typed chars only, lower & upper case. 
         // Accelerator keys are handled elsewhere.
         {  
-            DMF.nEdits++; 
+            Globals.nEdits++;
             char c = event.getKeyChar(); 
             int mod = event.getModifiers(); 
             if ((c>=' ') && (c<='~'))             // avoids BKSP and DEL

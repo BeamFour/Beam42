@@ -4,13 +4,10 @@ import java.awt.*;         // frame, BasicStroke, Color, Font
 import java.awt.event.*;   // KeyEvent MouseEvent etc
 import java.awt.image.*;   // BufferedImage; transparent Blue color
 import java.awt.font.*;    // font metric
-import java.awt.geom.*;    // Rectangle2D
 import java.awt.print.*;   // printing
 import java.util.*;        // ArrayList
 import javax.swing.*;      // Graphics2D features
 
-import java.io.*;          // File 
-import javax.imageio.*;    // PNG, JPEG
 
 @SuppressWarnings("serial")
 
@@ -174,7 +171,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
         this.addMouseListener(new MyMouseHandler());
         this.addMouseMotionListener(new MyMouseMotionHandler());
         this.addMouseWheelListener(new MyMouseZoomer()); 
-        iEdits = DMF.nEdits; 
+        iEdits = Globals.nEdits;
     }
 
 
@@ -265,7 +262,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
     {
         int style = -1; 
         for (int i=0; i<9; i++)
-          if ("T".equals(DMF.reg.getuo(UO_CAD, i)))
+          if ("T".equals(Globals.reg.getuo(UO_CAD, i)))
           {
              style = i;
              break; 
@@ -275,7 +272,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
            U.beep(); 
            return; 
         }
-        boolean bPortrait = "T".equals(DMF.reg.getuo(UO_CAD, 10)); 
+        boolean bPortrait = "T".equals(Globals.reg.getuo(UO_CAD, 10));
         CAD.doCAD(style, bPortrait, baseList, randList, finishList, annoList); 
     }
     
@@ -297,9 +294,9 @@ abstract class GPanel extends JPanel implements B4constants, Printable
     // GJIF calls this when coming forward: check for table edits.
     // How to implement bSticky, retain previous magnification?
     {
-        if (DMF.nEdits == iEdits)
+        if (Globals.nEdits == iEdits)
           return;              // no redraw needed. 
-        iEdits = DMF.nEdits;   // update local edits count
+        iEdits = Globals.nEdits;   // update local edits count
         // bPleaseParseUO = true; // flag allows client doParse().
         bArtStatus = bFULLART; // stash for when OS paints
         annoList.clear();    // discard old artwork
@@ -498,7 +495,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
 
     private void setGraphicSmoothing(Graphics2D g2)
     {
-        if ("T".equals(DMF.reg.getuo(UO_GRAPH, 7)))
+        if ("T".equals(Globals.reg.getuo(UO_GRAPH, 7)))
         {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                 RenderingHints.VALUE_ANTIALIAS_ON);
@@ -519,14 +516,14 @@ abstract class GPanel extends JPanel implements B4constants, Printable
 
     private int getUOAnnoFont()
     {
-        int i = U.parseInt(DMF.reg.getuo(UO_GRAPH, 4)); 
+        int i = U.parseInt(Globals.reg.getuo(UO_GRAPH, 4));
         return Math.max(3, Math.min(100, i)); 
     }
 
     private int getUOAnnoBold()
     // as of Nov 2005, Font.BOLD=1, Font.PLAIN=0
     {
-       return "T".equals(DMF.reg.getuo(UO_GRAPH, 5)) ? Font.BOLD : Font.PLAIN;
+       return "T".equals(Globals.reg.getuo(UO_GRAPH, 5)) ? Font.BOLD : Font.PLAIN;
     }
 
     private int getUOAnnoFontCode()  // adds to ASCII
@@ -544,13 +541,13 @@ abstract class GPanel extends JPanel implements B4constants, Printable
 
     protected int getUOGraphicsFont()
     {
-        return U.parseInt(DMF.reg.getuo(UO_GRAPH, 2)); 
+        return U.parseInt(Globals.reg.getuo(UO_GRAPH, 2));
     }
 
     protected int getUOGraphicsBold()
     // as of Nov 2005, Font.BOLD=1, Font.PLAIN=0
     {
-       return "T".equals(DMF.reg.getuo(UO_GRAPH, 3)) ? Font.BOLD : Font.PLAIN;
+       return "T".equals(Globals.reg.getuo(UO_GRAPH, 3)) ? Font.BOLD : Font.PLAIN;
     }
 
     protected int getUOGraphicsFontCode()  // adds to ASCII
@@ -655,7 +652,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
     private int getUOpixels()
     // Returns User Option window size in pixels.
     {
-        int i = U.parseInt(DMF.reg.getuo(UO_GRAPH, 6)); 
+        int i = U.parseInt(Globals.reg.getuo(UO_GRAPH, 6));
         if (i<=10)
           i = 500; 
         return Math.min(3000, Math.max(100, i)); 
@@ -765,7 +762,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
         getNewMouseArtwork(bSKELETON); 
         
         if (RM_LAYOUT == myGJIF.myType)  // Layout zoom scale factor display
-          if ("T".equals(DMF.reg.getuo(UO_LAYOUT,3)))
+          if ("T".equals(Globals.reg.getuo(UO_LAYOUT,3)))
             myGJIF.setTitle(sScaleFactors());
     }
 
@@ -783,7 +780,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
         getNewMouseArtwork(bSKELETON); 
         
         if (RM_LAYOUT == myGJIF.myType)  // Layout zoom scale factor display
-          if ("T".equals(DMF.reg.getuo(UO_LAYOUT,3)))
+          if ("T".equals(Globals.reg.getuo(UO_LAYOUT,3)))
             myGJIF.setTitle(sScaleFactors());
     }
 
@@ -800,7 +797,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
         getNewMouseArtwork(bSKELETON); 
         
         if (RM_LAYOUT == myGJIF.myType)  // Layout zoom scale factor display
-          if ("T".equals(DMF.reg.getuo(UO_LAYOUT,3)))
+          if ("T".equals(Globals.reg.getuo(UO_LAYOUT,3)))
             myGJIF.setTitle(sScaleFactors());
     }
 
@@ -813,7 +810,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
         getNewMouseArtwork(bSKELETON); 
         
         if (RM_LAYOUT == myGJIF.myType)  // Layout zoom scale factor display
-          if ("T".equals(DMF.reg.getuo(UO_LAYOUT,3)))
+          if ("T".equals(Globals.reg.getuo(UO_LAYOUT,3)))
             myGJIF.setTitle(sScaleFactors());
     }
 
@@ -1111,7 +1108,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
         public void mouseWheelMoved(MouseWheelEvent mwe)
         {
             int i = mwe.getWheelRotation();
-            int j = "T".equals(DMF.reg.getuo(UO_GRAPH, 0)) ? 1 : -1; 
+            int j = "T".equals(Globals.reg.getuo(UO_GRAPH, 0)) ? 1 : -1;
             boolean bShift = mwe.isShiftDown(); 
             if (i*j>0)
               if (bShift)

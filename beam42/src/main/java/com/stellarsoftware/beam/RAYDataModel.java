@@ -73,22 +73,22 @@ public class RAYDataModel extends B4DataModel {
 
         int status[] = new int[NGENERIC];
         vPreParse(status);                          // EJIF generic parser
-        DMF.giFlags[RPRESENT]     = status[GPRESENT];
-        DMF.giFlags[RNLINES]      = status[GNLINES];
-        DMF.giFlags[RNRAYS]       = nrays = status[GNRECORDS];
-        DMF.giFlags[RNFIELDS]     = nfields = status[GNFIELDS];
-        DMF.giFlags[RWFEFIELD]    = fwfe = RABSENT; // -1
-        DMF.giFlags[RNWFEGROUPS]  = 1;              // one group
-        DMF.giFlags[RALLWAVESPRESENT] = 0;          // false
+        Globals.giFlags[RPRESENT]     = status[GPRESENT];
+        Globals.giFlags[RNLINES]      = status[GNLINES];
+        Globals.giFlags[RNRAYS]       = nrays = status[GNRECORDS];
+        Globals.giFlags[RNFIELDS]     = nfields = status[GNFIELDS];
+        Globals.giFlags[RWFEFIELD]    = fwfe = RABSENT; // -1
+        Globals.giFlags[RNWFEGROUPS]  = 1;              // one group
+        Globals.giFlags[RALLWAVESPRESENT] = 0;          // false
 
-        DMF.giFlags[RNRAYADJ]     = 0;        // Nadj in raystart #1; can be up to 6!
-        DMF.giFlags[RAYADJ0]      = RABSENT;  // no autoray attributes yet
-        DMF.giFlags[RAYADJ1]      = RABSENT;
-        DMF.giFlags[RAYGOALATT0]  = RABSENT;  // no autoray goals yet either
-        DMF.giFlags[RAYGOALATT1]  = RABSENT;
-        DMF.giFlags[RAYGOALFIELD0]= RABSENT;
-        DMF.giFlags[RAYGOALFIELD1]= RABSENT;
-        DMF.giFlags[RNGOALS]      = 0;        // no ray table goals yet
+        Globals.giFlags[RNRAYADJ]     = 0;        // Nadj in raystart #1; can be up to 6!
+        Globals.giFlags[RAYADJ0]      = RABSENT;  // no autoray attributes yet
+        Globals.giFlags[RAYADJ1]      = RABSENT;
+        Globals.giFlags[RAYGOALATT0]  = RABSENT;  // no autoray goals yet either
+        Globals.giFlags[RAYGOALATT1]  = RABSENT;
+        Globals.giFlags[RAYGOALFIELD0]= RABSENT;
+        Globals.giFlags[RAYGOALFIELD1]= RABSENT;
+        Globals.giFlags[RNGOALS]      = 0;        // no ray table goals yet
 
         // Blunder here keeps RayGenerator from finding its headers.
         // The detailed field IDs are needed even with nrays = 0.
@@ -121,7 +121,7 @@ public class RAYDataModel extends B4DataModel {
         for (int i=0; i<RNSTARTS; i++)
             rI2F[i] = RABSENT;
 
-        wavefield = DMF.giFlags[RWAVEFIELD] = RABSENT;
+        wavefield = Globals.giFlags[RWAVEFIELD] = RABSENT;
         int ntries=0, nunrecognized=0, ngoals=0;
         int iU=0, iV=0, iW=0;
         for (int field=0; field<nfields; field++)
@@ -142,18 +142,18 @@ public class RAYDataModel extends B4DataModel {
                 iW=1;
             if ((op == RSWAVEL) && (wavefield == ABSENT))
             {
-                wavefield = DMF.giFlags[RWAVEFIELD] = field;
-                DMF.giFlags[RALLWAVESPRESENT] = 1;  // true;
+                wavefield = Globals.giFlags[RWAVEFIELD] = field;
+                Globals.giFlags[RALLWAVESPRESENT] = 1;  // true;
             }
             if ((op>=RGOAL) && (op<RGOAL+13))    // RGOAL=10100=Xg; 10101=YG; ... 10112=wg.
                 ngoals++;
             if (op % 100 == RTWFE)
-                DMF.giFlags[RWFEFIELD] = fwfe = field;
+                Globals.giFlags[RWFEFIELD] = fwfe = field;
         }
-        DMF.giFlags[RNGOALS] = ngoals;  // + ((fwfe>=0) ? 1 : 0);
+        Globals.giFlags[RNGOALS] = ngoals;  // + ((fwfe>=0) ? 1 : 0);
         // System.out.println("Ngoals = "+ ngoals);
 
-        DMF.giFlags[RUVWCODE] = iU + 2*iV + 4*iW;
+        Globals.giFlags[RUVWCODE] = iU + 2*iV + 4*iW;
 
         //--------------get data records, by field----------
 
@@ -161,7 +161,7 @@ public class RAYDataModel extends B4DataModel {
         int badline=0, badfield=0, rsyntaxerr=0;
         double t=0.0;
 
-        for (int field=0; field<DMF.giFlags[RNFIELDS]; field++)
+        for (int field = 0; field< Globals.giFlags[RNFIELDS]; field++)
         {
             int op = rF2I[field];
 
@@ -175,11 +175,11 @@ public class RAYDataModel extends B4DataModel {
 
                 if (getTag(field, 3) == '?')
                 {
-                    if (DMF.giFlags[RNRAYADJ] == 0)
-                        DMF.giFlags[RAYADJ0] = op;
-                    else if (DMF.giFlags[RNRAYADJ] == 1)
-                        DMF.giFlags[RAYADJ1] = op;
-                    DMF.giFlags[RNRAYADJ]++;
+                    if (Globals.giFlags[RNRAYADJ] == 0)
+                        Globals.giFlags[RAYADJ0] = op;
+                    else if (Globals.giFlags[RNRAYADJ] == 1)
+                        Globals.giFlags[RAYADJ1] = op;
+                    Globals.giFlags[RNRAYADJ]++;
                 }
 
                 //------now get all get raystarts----------------------
@@ -203,7 +203,7 @@ public class RAYDataModel extends B4DataModel {
                     {
                         wavenames[kray] = getFieldTrim(field, 2+kray);
                         if (wavenames[kray].length() < 1)
-                            DMF.giFlags[RALLWAVESPRESENT] = 0;  // false
+                            Globals.giFlags[RALLWAVESPRESENT] = 0;  // false
                         RT13.raystarts[kray][RSCOLOR] = U.getColorCode(getTag(field, 2+kray));
                     }
                 }
@@ -217,15 +217,15 @@ public class RAYDataModel extends B4DataModel {
 
             if ((op >= RGOAL) && (op <= RGOAL+RTWL))  // greater than 10100 !!
             {
-                if (DMF.giFlags[RAYGOALATT0] > RABSENT)
+                if (Globals.giFlags[RAYGOALATT0] > RABSENT)
                 {
-                    DMF.giFlags[RAYGOALFIELD1] = field;
-                    DMF.giFlags[RAYGOALATT1] = op;
+                    Globals.giFlags[RAYGOALFIELD1] = field;
+                    Globals.giFlags[RAYGOALATT1] = op;
                 }
                 else
                 {
-                    DMF.giFlags[RAYGOALFIELD0] = field;
-                    DMF.giFlags[RAYGOALATT0] = op;
+                    Globals.giFlags[RAYGOALFIELD0] = field;
+                    Globals.giFlags[RAYGOALATT0] = op;
                 }
                 for (int kray=1; kray<=nrays; kray++)
                 {
@@ -242,9 +242,9 @@ public class RAYDataModel extends B4DataModel {
                 break; // break out of field loop to preserve location.
         } //-------end of field loop; fixupUVW() is done in RT13---------
 
-        DMF.giFlags[RSYNTAXERR] = rsyntaxerr;
-        DMF.giFlags[RALLWAVESNUMERIC] = allWavesNumeric ? 1 : 0;
-        DMF.giFlags[RNADJ] = iParseAdjustables(nrays);
+        Globals.giFlags[RSYNTAXERR] = rsyntaxerr;
+        Globals.giFlags[RALLWAVESNUMERIC] = allWavesNumeric ? 1 : 0;
+        Globals.giFlags[RNADJ] = iParseAdjustables(nrays);
 
         setSminsSpans();
 
@@ -512,7 +512,7 @@ public class RAYDataModel extends B4DataModel {
     // Uses RT13.iWFEgroup[] -- must run iParseWFEgroups() first!!
     // A207: WFEgroups eliminated
     {
-        int nrays = DMF.giFlags[RNRAYS];
+        int nrays = Globals.giFlags[RNRAYS];
         for (int iatt=RX; iatt<=RW; iatt++)
         {
             // System.out.println("REJIF.setSminsSpans() is starting iatt = "+iatt);

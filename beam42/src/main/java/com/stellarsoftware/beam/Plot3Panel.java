@@ -78,8 +78,8 @@ public class Plot3Panel extends GPanel
     // But this is not called for annotation mods.
     // For annotation, host's bitmap is blitted instead.
     {
-        nsurfs = DMF.giFlags[ONSURFS];                  // always needed.
-        nrays = DMF.giFlags[RNRAYS];                    // always needed.
+        nsurfs = Globals.giFlags[ONSURFS];                  // always needed.
+        nrays = Globals.giFlags[RNRAYS];                    // always needed.
         ngood = RT13.iBuildRays(true);
         
         String warn = getUOwarning();  // never crashes.
@@ -123,10 +123,10 @@ public class Plot3Panel extends GPanel
     protected double getStereo()  // replaces abstract "get" method
     {
         double d = 0.0; 
-        boolean bS = "T".equals(DMF.reg.getuo(UO_PLOT3, 17));
+        boolean bS = "T".equals(Globals.reg.getuo(UO_PLOT3, 17));
         if (bS)
         {
-            String ss = DMF.reg.getuo(UO_PLOT3, 18); 
+            String ss = Globals.reg.getuo(UO_PLOT3, 18);
             d = U.suckDouble(ss); 
             if (d == Double.NaN)
               d = 0.0; 
@@ -148,7 +148,7 @@ public class Plot3Panel extends GPanel
     {
         String word = "Nsurfaces="+nsurfs;
           
-        String ast = DMF.reg.getuo(UO_PLOT3, 0); 
+        String ast = Globals.reg.getuo(UO_PLOT3, 0);
         //int op = REJIF.getCombinedRayFieldOp(ast);
         int op = RAYDataModel.getCombinedRayFieldOp(ast);
         int asurf = RT13.getSurfNum(op); 
@@ -158,7 +158,7 @@ public class Plot3Panel extends GPanel
         if (asurf<0)
           return "Bad '"+ast+"'  "+word;
           
-        String bst = DMF.reg.getuo(UO_PLOT3, 2); 
+        String bst = Globals.reg.getuo(UO_PLOT3, 2);
         //op = REJIF.getCombinedRayFieldOp(bst);
         op = RAYDataModel.getCombinedRayFieldOp(bst);
         int bsurf = RT13.getSurfNum(op); 
@@ -168,7 +168,7 @@ public class Plot3Panel extends GPanel
         if (bsurf<0)
           return "Bad '"+bst+"'  "+word; 
           
-        String cst = DMF.reg.getuo(UO_PLOT3, 4); 
+        String cst = Globals.reg.getuo(UO_PLOT3, 4);
         //op = REJIF.getCombinedRayFieldOp(cst);
         op = RAYDataModel.getCombinedRayFieldOp(cst);
         int csurf = RT13.getSurfNum(op); 
@@ -187,19 +187,19 @@ public class Plot3Panel extends GPanel
     {
         bPleaseParseUO = false; 
 
-        ast = DMF.reg.getuo(UO_PLOT3, 0); 
+        ast = Globals.reg.getuo(UO_PLOT3, 0);
         //int op = REJIF.getCombinedRayFieldOp(ast);
         int op = RAYDataModel.getCombinedRayFieldOp(ast);
         asurf = RT13.getSurfNum(op); 
         aattr = RT13.getAttrNum(op); 
 
-        bst = DMF.reg.getuo(UO_PLOT3, 2); 
+        bst = Globals.reg.getuo(UO_PLOT3, 2);
         //op = REJIF.getCombinedRayFieldOp(bst);
         op = RAYDataModel.getCombinedRayFieldOp(bst);
         bsurf = RT13.getSurfNum(op); 
         battr = RT13.getAttrNum(op); 
 
-        cst = DMF.reg.getuo(UO_PLOT3, 4); 
+        cst = Globals.reg.getuo(UO_PLOT3, 4);
         //op = REJIF.getCombinedRayFieldOp(cst);
         op = RAYDataModel.getCombinedRayFieldOp(cst);
         csurf = RT13.getSurfNum(op); 
@@ -207,10 +207,10 @@ public class Plot3Panel extends GPanel
 
         //--------------view angles--------------
         
-        el = U.suckDouble(DMF.reg.getuo(UO_PLOT3, 6));
+        el = U.suckDouble(Globals.reg.getuo(UO_PLOT3, 6));
         cosel = U.cosd(el); 
         sinel = U.sind(el); 
-        az = U.suckDouble(DMF.reg.getuo(UO_PLOT3, 7));  
+        az = U.suckDouble(Globals.reg.getuo(UO_PLOT3, 7));
         cosaz = U.cosd(az); 
         sinaz = U.sind(az); 
 
@@ -256,16 +256,16 @@ public class Plot3Panel extends GPanel
 
         //---------manual scaling---------------
 
-        double gaspan = U.suckDouble(DMF.reg.getuo(UO_PLOT3, 1)); 
+        double gaspan = U.suckDouble(Globals.reg.getuo(UO_PLOT3, 1));
         if (gaspan > 0.0)
           aspan = EXTRAROOMA * aspan; 
-        double gbspan = U.suckDouble(DMF.reg.getuo(UO_PLOT3, 3)); 
+        double gbspan = U.suckDouble(Globals.reg.getuo(UO_PLOT3, 3));
         if (gbspan > 0.0)
           bspan = EXTRAROOMB * gbspan; 
-        double gcspan = U.suckDouble(DMF.reg.getuo(UO_PLOT3, 5));
+        double gcspan = U.suckDouble(Globals.reg.getuo(UO_PLOT3, 5));
         if (gcspan > 0.0)
           cspan = EXTRAROOMC * gcspan;
-        wavel = U.suckDouble(DMF.reg.getuo(UO_PLOT3, 8)); 
+        wavel = U.suckDouble(Globals.reg.getuo(UO_PLOT3, 8));
 
     }  // end of doParse()
 
@@ -300,13 +300,13 @@ public class Plot3Panel extends GPanel
     // Called only by doTechList(). 
     {
         iSymbol = DOT; 
-        if ("T".equals(DMF.reg.getuo(UO_PLOT3, 10)))
+        if ("T".equals(Globals.reg.getuo(UO_PLOT3, 10)))
           iSymbol = PLUS;
-        if ("T".equals(DMF.reg.getuo(UO_PLOT3, 11)))
+        if ("T".equals(Globals.reg.getuo(UO_PLOT3, 11)))
           iSymbol = SQUARE; 
-        if ("T".equals(DMF.reg.getuo(UO_PLOT3, 12)))
+        if ("T".equals(Globals.reg.getuo(UO_PLOT3, 12)))
           iSymbol = DIAMOND; 
-        blackbkg = "T".equals(DMF.reg.getuo(UO_PLOT3, 16));
+        blackbkg = "T".equals(Globals.reg.getuo(UO_PLOT3, 16));
 
         clearList(QBASE); 
         addRaw(0., 0., 0., blackbkg ? SETBLACKBKG : SETWHITEBKG, QBASE);
@@ -407,8 +407,8 @@ public class Plot3Panel extends GPanel
         // Now test the ray   
         boolean bHasEnough = RT13.getHowfarOK(kray) >= U.imax3(asurf, bsurf, csurf);
         boolean bHasComplete = RT13.getHowfarOK(kray) == nsurfs; 
-        boolean bWantEnough  = DMF.reg.getuo(UO_PLOT3, 14).equals("T");  // option 14 is "Sufficient"
-        boolean bWantComplete = DMF.reg.getuo(UO_PLOT3, 13).equals("T");  // option 13 is "Complete"
+        boolean bWantEnough  = Globals.reg.getuo(UO_PLOT3, 14).equals("T");  // option 14 is "Sufficient"
+        boolean bWantComplete = Globals.reg.getuo(UO_PLOT3, 13).equals("T");  // option 13 is "Complete"
  
         int icolor;
         if (kray==0)

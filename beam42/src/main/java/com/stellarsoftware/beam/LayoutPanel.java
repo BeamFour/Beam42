@@ -1,6 +1,5 @@
 package com.stellarsoftware.beam;
 
-import javax.swing.*;      // obtain Graphics2D features
 import java.util.Arrays;   // to list an int array jhit[] below
 
 @SuppressWarnings("serial")
@@ -146,10 +145,10 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
     // then annotation and caret are written atop the bitmap. 
     // Copyright 2006 STELLAR SOFTWARE all rights reserved
     {
-        nsurfs = DMF.giFlags[ONSURFS]; 
-        nrays = DMF.giFlags[RNRAYS];  
+        nsurfs = Globals.giFlags[ONSURFS];
+        nrays = Globals.giFlags[RNRAYS];
         ngood = RT13.iBuildRays(true);
-        int istatus = DMF.giFlags[STATUS];
+        int istatus = Globals.giFlags[STATUS];
         boolean bOK = (GPARSEOK==istatus) || (GLAYOUTONLY==istatus); 
         if (!bOK)
         {
@@ -217,9 +216,9 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
     // Not used locally because local methods are pure monoscopic.
     // Allows GPanel base class to get user's stereo preference. 
     {
-        if ("T".equals(DMF.reg.getuo(UO_LAYOUT, 17)))
+        if ("T".equals(Globals.reg.getuo(UO_LAYOUT, 17)))
         {
-            String ss = DMF.reg.getuo(UO_LAYOUT, 18); 
+            String ss = Globals.reg.getuo(UO_LAYOUT, 18);
             double d = U.suckDouble(ss); 
             if (d == Double.NaN)
               d = 0.0; 
@@ -244,19 +243,19 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
     // Trace was already run as part of doTechList().
     {
         bPleaseParseUO = false; // mandatory to allow pan/zoom/twirl
-        el = U.suckDouble(DMF.reg.getuo(UO_LAYOUT, 0)); 
-        az = U.suckDouble(DMF.reg.getuo(UO_LAYOUT, 1)); 
+        el = U.suckDouble(Globals.reg.getuo(UO_LAYOUT, 0));
+        az = U.suckDouble(Globals.reg.getuo(UO_LAYOUT, 1));
         cosel = U.cosd(el); 
         sinel = U.sind(el); 
         cosaz = U.cosd(az); 
         sinaz = U.sind(az); 
-        bStickyUO = "T".equals(DMF.reg.getuo(UO_LAYOUT, 2)); 
+        bStickyUO = "T".equals(Globals.reg.getuo(UO_LAYOUT, 2));
         myGJIF.setTitle(bStickyUO ? "Layout (sticky)" : "Layout"); 
-        bRetroVis = "T".equals(DMF.reg.getuo(UO_LAYOUT, 38)); 
+        bRetroVis = "T".equals(Globals.reg.getuo(UO_LAYOUT, 38));
         
         //-------set up arcs and segments------------------
 
-        nsegs = U.suckInt(DMF.reg.getuo(UO_LAYOUT, 3));
+        nsegs = U.suckInt(Globals.reg.getuo(UO_LAYOUT, 3));
         nsegs = Math.max(2, Math.min(100, nsegs)); 
         boolean bHasArray = false; 
         for (int j=1; j<=MAXSURFS; j++)
@@ -289,11 +288,11 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
 
         //---------arcs & shadings-----------------
 
-        boolean bShading = "T".equals(DMF.reg.getuo(UO_LAYOUT, 27)); 
-        boolean bConnect = "T".equals(DMF.reg.getuo(UO_LAYOUT, 37)); 
+        boolean bShading = "T".equals(Globals.reg.getuo(UO_LAYOUT, 27));
+        boolean bConnect = "T".equals(Globals.reg.getuo(UO_LAYOUT, 37));
         for (int i=0; i<8; i++)       // 8 curves + 8 shadings, refresh OK
         { 
-             boolean bThisArc = "T".equals(DMF.reg.getuo(UO_LAYOUT, 19+i)); 
+             boolean bThisArc = "T".equals(Globals.reg.getuo(UO_LAYOUT, 19+i));
              bArcs[i] = bThisArc; 
              bShad[i] = bThisArc && bShading;
              bConn[i] = bThisArc && bConnect; 
@@ -311,9 +310,9 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
           
         //-----line widths, pixels------------------
         
-        widthRays  = U.minmax(U.suckDouble(DMF.reg.getuo(UO_LAYOUT, 28)),0,5);
-        widthSurfs = U.minmax(U.suckDouble(DMF.reg.getuo(UO_LAYOUT, 29)),0,5);
-        widthAxes  = U.minmax(U.suckDouble(DMF.reg.getuo(UO_LAYOUT, 30)),0,5);
+        widthRays  = U.minmax(U.suckDouble(Globals.reg.getuo(UO_LAYOUT, 28)),0,5);
+        widthSurfs = U.minmax(U.suckDouble(Globals.reg.getuo(UO_LAYOUT, 29)),0,5);
+        widthAxes  = U.minmax(U.suckDouble(Globals.reg.getuo(UO_LAYOUT, 30)),0,5);
         
     }  // end of doParseUO()
 
@@ -332,7 +331,7 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
         if (bStickyUO)
         {
             for (int i=0; i<6; i++) // xc,yc,zc,xspan,yspan,zspan
-              uo[i] = U.suckDouble(DMF.reg.getuo(UO_LAYOUT, 31+i)); 
+              uo[i] = U.suckDouble(Globals.reg.getuo(UO_LAYOUT, 31+i));
             for (int i=3; i<6; i++)
               if (uo[i] == 0.0)
                 bStickyOK = false; 
@@ -340,8 +339,8 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
             
         if (bStickyOK)
         {
-            el = U.suckDouble(DMF.reg.getuo(UO_LAYOUT, 0)); 
-            az = U.suckDouble(DMF.reg.getuo(UO_LAYOUT, 1)); 
+            el = U.suckDouble(Globals.reg.getuo(UO_LAYOUT, 0));
+            az = U.suckDouble(Globals.reg.getuo(UO_LAYOUT, 1));
             cosel = U.cosd(el); 
             sinel = U.sind(el); 
             cosaz = U.cosd(az); 
@@ -505,14 +504,14 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
     {   
         el = U.put180(el); 
         az = U.put180(az); 
-        DMF.reg.putuo(UO_LAYOUT,  0, U.fwd(el,6,1).trim()); 
-        DMF.reg.putuo(UO_LAYOUT,  1, U.fwd(az,6,1).trim()); 
-        DMF.reg.putuo(UO_LAYOUT, 31, U.fwd(uxcenter,16,8).trim()); 
-        DMF.reg.putuo(UO_LAYOUT, 32, U.fwd(uycenter,16,8).trim()); 
-        DMF.reg.putuo(UO_LAYOUT, 33, U.fwd(uzcenter,16,8).trim()); 
-        DMF.reg.putuo(UO_LAYOUT, 34, U.fwd(uxspan,16,8).trim()); 
-        DMF.reg.putuo(UO_LAYOUT, 35, U.fwd(uyspan,16,8).trim()); 
-        DMF.reg.putuo(UO_LAYOUT, 36, U.fwd(uzspan,16,8).trim()); 
+        Globals.reg.putuo(UO_LAYOUT,  0, U.fwd(el,6,1).trim());
+        Globals.reg.putuo(UO_LAYOUT,  1, U.fwd(az,6,1).trim());
+        Globals.reg.putuo(UO_LAYOUT, 31, U.fwd(uxcenter,16,8).trim());
+        Globals.reg.putuo(UO_LAYOUT, 32, U.fwd(uycenter,16,8).trim());
+        Globals.reg.putuo(UO_LAYOUT, 33, U.fwd(uzcenter,16,8).trim());
+        Globals.reg.putuo(UO_LAYOUT, 34, U.fwd(uxspan,16,8).trim());
+        Globals.reg.putuo(UO_LAYOUT, 35, U.fwd(uyspan,16,8).trim());
+        Globals.reg.putuo(UO_LAYOUT, 36, U.fwd(uzspan,16,8).trim());
     }
 
 
@@ -928,7 +927,7 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
         for (int j=1; j<=nsurfs; j++)
           RT13.refractLayoutShading[j] = RT13.getRefraction(j, 1); 
 
-        whitebkg = "T".equals(DMF.reg.getuo(UO_LAYOUT, 15));
+        whitebkg = "T".equals(Globals.reg.getuo(UO_LAYOUT, 15));
         // QBASE is a global constant, base of artwork; then QBATCH, QRAND, QFINISH, QANNO.
         clearList(QBASE); 
         addRaw(0., 0., 0., whitebkg ? SETWHITEBKG : SETBLACKBKG, QBASE); 
@@ -970,7 +969,7 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
     // Unexplained: doFurniture must precede optics lest the stereo
     //    red-blue color coding become red-red. 
     {   
-        whitebkg = "T".equals(DMF.reg.getuo(UO_LAYOUT, 15));
+        whitebkg = "T".equals(Globals.reg.getuo(UO_LAYOUT, 15));
         
         clearList(QBASE); 
         addRaw(0., 0., 0., whitebkg ? SETWHITEBKG : SETBLACKBKG, QBASE); 
@@ -1084,15 +1083,15 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
         addRaw(widthAxes, 0., 0., SETSOLIDLINE, QBASE); 
         addRaw(0., 0., 0., SETCOLOR + (whitebkg ? BLACK : WHITE), QBASE); 
         
-        if ("T".equals(DMF.reg.getuo(UO_LAYOUT, 10)))
+        if ("T".equals(Globals.reg.getuo(UO_LAYOUT, 10)))
           drawHruler(); 
-        if ("T".equals(DMF.reg.getuo(UO_LAYOUT, 11)))
+        if ("T".equals(Globals.reg.getuo(UO_LAYOUT, 11)))
           drawVruler(); 
-        if ("T".equals(DMF.reg.getuo(UO_LAYOUT, 12)))
+        if ("T".equals(Globals.reg.getuo(UO_LAYOUT, 12)))
           drawXaxis(); 
-        if ("T".equals(DMF.reg.getuo(UO_LAYOUT, 13)))
+        if ("T".equals(Globals.reg.getuo(UO_LAYOUT, 13)))
           drawYaxis(); 
-        if ("T".equals(DMF.reg.getuo(UO_LAYOUT, 14)))
+        if ("T".equals(Globals.reg.getuo(UO_LAYOUT, 14)))
           drawZaxis(); 
     }
 
@@ -1102,7 +1101,7 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
     // Used when artwork is requested but cannot be generated
     {
         clearList(QBASE); 
-        whitebkg = "T".equals(DMF.reg.getuo(UO_LAYOUT, 15));
+        whitebkg = "T".equals(Globals.reg.getuo(UO_LAYOUT, 15));
         addRaw(0., 0., 0., whitebkg ? SETWHITEBKG : SETBLACKBKG, QBASE);
     }
 
@@ -1948,7 +1947,7 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
 
         double ticks[] = new double[10]; 
         int results[] = new int[2]; 
-        boolean whitebkg = "T".equals(DMF.reg.getuo(UO_LAYOUT, 15));
+        boolean whitebkg = "T".equals(Globals.reg.getuo(UO_LAYOUT, 15));
         int color = SETCOLOR + (whitebkg ? BLACK : WHITE);         
         addRaw(0., 0., 0.,  COMMENTRULER, QBASE);            // raw not scaled
         addRaw(widthAxes, 0., 0., SETSOLIDLINE, QBASE);      // raw not scaled
@@ -2019,7 +2018,7 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
 
         double ticks[] = new double[MAXTICKS]; 
         int results[] = new int[2]; 
-        boolean whitebkg = "T".equals(DMF.reg.getuo(UO_LAYOUT, 15));
+        boolean whitebkg = "T".equals(Globals.reg.getuo(UO_LAYOUT, 15));
         int color = SETCOLOR + (whitebkg ? BLACK : WHITE); 
         addRaw(0., 0., 0.,  COMMENTRULER, QBASE); 
         addRaw(widthAxes, 0., 0., SETSOLIDLINE, QBASE);  
@@ -2078,7 +2077,7 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
 
     void drawXaxis() // uses global xmin, xmax
     {
-        boolean whitebkg = "T".equals(DMF.reg.getuo(UO_LAYOUT, 15));
+        boolean whitebkg = "T".equals(Globals.reg.getuo(UO_LAYOUT, 15));
         addRaw(0., 0., 0.,  COMMENTAXIS, QBASE); 
         addRaw(widthAxes, 0., 0., SETDOTTEDLINE, QBASE);
         addRaw(0., 0., 0.,  SETCOLOR + (whitebkg ? BLACK : WHITE), QBASE);
@@ -2099,7 +2098,7 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
 
     void drawYaxis()  // uses global ymin, ymax
     {
-        boolean whitebkg = "T".equals(DMF.reg.getuo(UO_LAYOUT, 15));
+        boolean whitebkg = "T".equals(Globals.reg.getuo(UO_LAYOUT, 15));
         addRaw(0., 0., 0.,  COMMENTAXIS, QBASE); 
         addRaw(widthAxes, 0., 0., SETDOTTEDLINE, QBASE);
         addRaw(0., 0., 0.,  SETCOLOR + (whitebkg ? BLACK : WHITE), QBASE);
@@ -2120,7 +2119,7 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
 
     void drawZaxis()  // uses global zmin, zmax
     {
-        boolean whitebkg = "T".equals(DMF.reg.getuo(UO_LAYOUT, 15));
+        boolean whitebkg = "T".equals(Globals.reg.getuo(UO_LAYOUT, 15));
         addRaw(0., 0., 0.,  COMMENTAXIS, QBASE); 
         addRaw(widthAxes, 0., 0., SETDOTTEDLINE, QBASE);
         addRaw(0., 0., 0.,  SETCOLOR + (whitebkg ? BLACK : WHITE), QBASE);
@@ -2200,7 +2199,7 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
     {
         int VAX=4; // array base index in Constants
         for (int i=0; i<6; i++)
-          if ("T".equals(DMF.reg.getuo(UO_LAYOUT, i+VAX)))
+          if ("T".equals(Globals.reg.getuo(UO_LAYOUT, i+VAX)))
             return i;
         return 0;
     }

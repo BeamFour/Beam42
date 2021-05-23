@@ -1,6 +1,5 @@
 package com.stellarsoftware.beam;
 
-import java.util.*;        // ArrayList
 import javax.swing.*;      // JOptionPane dialog
 
 /** InOut.java
@@ -36,8 +35,8 @@ class InOut implements B4constants
         ngood = RT13.iBuildRays(true);
         vUpdateRayTable(); 
 
-        boolean bWFE = DMF.giFlags[RWFEFIELD] > RABSENT;
-        ngoals = DMF.giFlags[RNGOALS] + (bWFE ? 1 : 0); 
+        boolean bWFE = Globals.giFlags[RWFEFIELD] > RABSENT;
+        ngoals = Globals.giFlags[RNGOALS] + (bWFE ? 1 : 0);
         if (ngoals < 1)
           return;  // return without complaint. 
 
@@ -74,11 +73,11 @@ class InOut implements B4constants
     {
         optEditor = DMF.oejif;
         rayEditor = DMF.rejif;
-        nsurfs = DMF.giFlags[ONSURFS]; 
-        onfields = DMF.giFlags[ONFIELDS];  // fields per optic.
-        nrays = DMF.giFlags[RNRAYS]; 
-        rnfields = DMF.giFlags[RNFIELDS];  // fields per ray.
-        ngoals = DMF.giFlags[RNGOALS]; 
+        nsurfs = Globals.giFlags[ONSURFS];
+        onfields = Globals.giFlags[ONFIELDS];  // fields per optic.
+        nrays = Globals.giFlags[RNRAYS];
+        rnfields = Globals.giFlags[RNFIELDS];  // fields per ray.
+        ngoals = Globals.giFlags[RNGOALS];
         if ((optEditor==null) || (rayEditor==null))
           return false; // SNH graying.
         if ((onfields<1) || (nrays<1) || (rnfields<1))

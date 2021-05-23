@@ -100,10 +100,10 @@ class AutoAdj implements OPTDataModelListener, RAYDataModelListener {
         if (myHost.istatus == DOWNITER)
             jL[7].setText("Running...");
         else if (myHost.istatus == BADITER) {
-            if (DMF.sAutoErr.equals(""))   // no previous message
+            if (Globals.sAutoErr.equals(""))   // no previous message
                 jL[7].setText("Stopping: " + B4constants.sResults[RT13.getFailCode()] + " " + RT13.getFailSurf());
             else                           // retain previous message
-                jL[7].setText(DMF.sAutoErr);
+                jL[7].setText(Globals.sAutoErr);
         } else
             jL[7].setText("");
 

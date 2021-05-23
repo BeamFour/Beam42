@@ -1,5 +1,10 @@
 package com.stellarsoftware.beam;
 
+import com.stellarsoftware.beam.core.B4constants;
+import com.stellarsoftware.beam.core.Globals;
+import com.stellarsoftware.beam.core.U;
+import com.stellarsoftware.beam.core.XYZO;
+
 import java.awt.*;         // frame, BasicStroke, Color, Font
 import java.awt.event.*;   // KeyEvent MouseEvent etc
 import java.awt.image.*;   // BufferedImage; transparent Blue color
@@ -269,7 +274,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
           } 
         if (style < 0)
         {
-           U.beep(); 
+           U.beep();
            return; 
         }
         boolean bPortrait = "T".equals(Globals.reg.getuo(UO_CAD, 10));

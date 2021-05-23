@@ -1,10 +1,12 @@
 package com.stellarsoftware.beam;
 
+import com.stellarsoftware.beam.core.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-import static com.stellarsoftware.beam.B4constants.*;
+import static com.stellarsoftware.beam.core.B4constants.*;
 
 
 /** AutoAdj.java

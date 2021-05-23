@@ -1,5 +1,9 @@
 package com.stellarsoftware.beam;
 
+import com.stellarsoftware.beam.core.B4constants;
+import com.stellarsoftware.beam.core.Globals;
+import com.stellarsoftware.beam.core.U;
+
 import java.util.*;           // Timer; sort()
 import java.awt.*;
 import javax.swing.*;         // JIFrames
@@ -195,7 +199,7 @@ abstract class BJIF extends JInternalFrame implements B4constants
               String fname = files[i].getName().toUpperCase(); 
               if (fname.startsWith("QUICK") && fname.endsWith(".PNG"))
               {  
-                  int j = U.suckInt(fname); 
+                  int j = U.suckInt(fname);
                   aList.add(j); 
               }
           }

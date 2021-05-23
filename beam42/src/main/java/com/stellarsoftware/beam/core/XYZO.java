@@ -1,4 +1,4 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.core;
 
 /** XYZO objects are elements of a QuadList graphic.
   *

@@ -1,4 +1,4 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.core;
 
 
 /** class Z is entirely static methods, never instantiated.
@@ -35,7 +35,7 @@ package com.stellarsoftware.beam;
   *
   * @author M.Lampton (c) STELLAR SOFTWARE 2006 all rights reserved.
   */
-class Z implements B4constants
+public class Z implements B4constants
 {
     static public double dGetZsurf(double x, double y, double surf[])
     // Uses x,y and returns z for general surface.

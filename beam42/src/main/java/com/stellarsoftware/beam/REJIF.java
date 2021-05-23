@@ -1,5 +1,7 @@
 package com.stellarsoftware.beam;
 
+import com.stellarsoftware.beam.core.RAYDataModel;
+
 import java.util.ArrayList;
 
 @SuppressWarnings("serial")

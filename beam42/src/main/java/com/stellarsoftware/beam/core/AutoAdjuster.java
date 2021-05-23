@@ -1,4 +1,6 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.core;
+
+import com.stellarsoftware.beam.DMF;
 
 /** AutoAdj.java
   * A207: eliminated groups
@@ -6,7 +8,7 @@ package com.stellarsoftware.beam;
   * A190, Nov 2015: introducing weights.
   * @author: M.Lampton (c) 2003..2006 STELLAR SOFTWARE all rights reserved.
   */
-class AutoAdjuster implements B4constants
+public class AutoAdjuster implements B4constants
 {
     //----------parallel with InOut-------------
     private OPTDataModel optEditor = null;
@@ -112,7 +114,7 @@ class AutoAdjuster implements B4constants
 
         //----turn off blinker parsing of surfs[] raystarts[] etc---------
 
-        DMF.bAutoBusy = true; 
+        DMF.bAutoBusy = true;
 
         //-----begin the comparison process-------
 

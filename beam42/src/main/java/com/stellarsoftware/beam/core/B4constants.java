@@ -1,4 +1,4 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.core;
 
 import java.awt.*;   // Color
 
@@ -19,7 +19,7 @@ import java.awt.*;   // Color
   *  Added user selectable new file skeleton options  A201
   *  @author M.Lampton STELLAR SOFTWARE (c) 2004-2016 all rights reserved.
   */
-interface B4constants
+public interface B4constants
 {    
     static final String  PRODUCT    = "BEAM FOUR  "; 
     static final String  RELEASE    = "Release 208,  15 Jan 2019";

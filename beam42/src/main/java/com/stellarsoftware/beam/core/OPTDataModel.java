@@ -1,8 +1,10 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.core;
+
+import com.stellarsoftware.beam.core.Adjustment;
 
 import java.util.ArrayList;
 
-import static com.stellarsoftware.beam.B4constants.*;
+import static com.stellarsoftware.beam.core.B4constants.*;
 
 /**
  * Parses .OPT files and builds the data model.

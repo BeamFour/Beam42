@@ -1,5 +1,10 @@
 package com.stellarsoftware.beam;
 
+import com.stellarsoftware.beam.core.Globals;
+import com.stellarsoftware.beam.core.RT13;
+import com.stellarsoftware.beam.core.U;
+import com.stellarsoftware.beam.core.Z;
+
 import java.util.Arrays;   // to list an int array jhit[] below
 
 @SuppressWarnings("serial")
@@ -184,7 +189,7 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
     {
         i = i/3; // integer divide to ignore small mouse motions
         az += i; 
-        cosaz = U.cosd(az); 
+        cosaz = U.cosd(az);
         sinaz = U.sind(az);
         j = j/3; // integer divide to ignore small mouse motions
         el += j; 
@@ -1328,7 +1333,7 @@ public class LayoutPanel extends GPanel   // implements B4constants via GPanel
         double xyz[] = new double[3]; 
         xyz[0] = px*(-0.5*nx + 0.5 + ix); 
         xyz[1] = py*(-0.5*ny + 0.5 + jy); 
-        xyz[2] = Z.dGetZsurf(xyz[0], xyz[1], RT13.surfs[j]); 
+        xyz[2] = Z.dGetZsurf(xyz[0], xyz[1], RT13.surfs[j]);
         vx2lab(xyz, RT13.surfs[j]); 
         viewelaz(xyz); 
         return xyz[2];

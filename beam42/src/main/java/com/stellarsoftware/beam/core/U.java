@@ -1,4 +1,4 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.core;
 
 import java.awt.*; 
 import java.text.NumberFormat; 
@@ -19,7 +19,7 @@ import java.util.*;   // Locale, ArrayList
   *
   * @author M.Lampton (c) STELLAR SOFTWARE 2004 all rights reserved.
   */
-class U implements B4constants  
+public class U implements B4constants
 {
     public static void main(String[] cmd) // testing
     {
@@ -41,7 +41,7 @@ class U implements B4constants
 
     //-------public static methods-----------
 
-    static int getTwoDigitCode(String s)
+    public static int getTwoDigitCode(String s)
     // Ignores the first character and returns the two digit code:  "X34" => 34
     // Returns zero if there is no such code
     {
@@ -88,8 +88,8 @@ class U implements B4constants
         else
           return fullname; 
     }
-    
-    static int getColorCode(char c)
+
+    public static int getColorCode(char c)
     // allows artwork to convert a tag char into a display color
     {
         int icolor = BLACK; // zero; others are 1...9
@@ -112,19 +112,19 @@ class U implements B4constants
         return icolor; 
     }
 
-    static int getColorCode(String s)
+    public static int getColorCode(String s)
     {
         char c = U.getCharAt(s,0); // safe even for empty strings
         return getColorCode(c); 
     }
 
 
-    static int getInt(double x)
+    public static int getInt(double x)
     {
         return (int) Math.round(x); 
     }
 
-    static double grand()
+    public static double grand()
     // Returns a zero-mean unit-variance Gaussian random number
     {
         double sum = -6.0; 
@@ -132,62 +132,62 @@ class U implements B4constants
           sum += Math.random(); 
         return sum;
     }
-    
-    static double put360(double x)
+
+    public static double put360(double x)
     // Puts x into range 0<=x<360
     { 
         double y = x/360 - 0.5;
         return 360*(y-Math.round(y)+0.5); 
     }
-    
-    static double put180(double x)
+
+    public static double put180(double x)
     // Puts x into range -180<x<+180
     {
         double y = x/360; 
         return 360*(y-Math.round(y));
     }
-  
-    static int minmax(int i, int bot, int top)
+
+    public static int minmax(int i, int bot, int top)
     {
         return Math.max(bot, Math.min(top, i)); 
     }
 
-    static double minmax(double d, double bot, double top)
+    public static double minmax(double d, double bot, double top)
     {
         return Math.max(bot, Math.min(top, d));
     }
 
-    static double trapezoid(double x)
+    public static double trapezoid(double x)
     // height=1; center is x=0; shoulders x=+-0.25; base x=+-0.5
     {
         return minmax(2.0-4.0*Math.abs(x), 0.0, 1.0); 
     }
 
-    static double getBlue(double x)
+    public static double getBlue(double x)
     // convert 0<x<1 to RGB thermometer: blue peaks at 0.0
     {
         return trapezoid(x); 
     }
 
-    static double getGreen(double x)
+    public static double getGreen(double x)
     // convert 0<x<1 to RGB thermometer: green peaks at 0.5
     {
         return trapezoid(x-0.5); 
     }
- 
-    static double getRed(double x)
+
+    public static double getRed(double x)
     // convert 0<x<1 to RGB thermometer: red peaks at 1.0
     {
         return trapezoid(x-1); 
     }
 
 
-    static void beep() // sounds more like a bonk.
+    public static void beep() // sounds more like a bonk.
     {
           Toolkit.getDefaultToolkit().beep();
     }
 
-    static String getExtensionToLower(String fname) 
+    public static String getExtensionToLower(String fname)
     {
         String ext = null;
         int i = fname.lastIndexOf('.');
@@ -197,27 +197,27 @@ class U implements B4constants
     }
 
 
-    static double pm1(double x)
+    public static double pm1(double x)
     {
         return Math.min(Math.max(x, -1.0), +1.0); 
     }
 
-    static boolean isNegZero(double x)
+    public static boolean isNegZero(double x)
     {
         return 1.0/x == Double.NEGATIVE_INFINITY;
     }
-    
-    static boolean isNotNegZero(double x)
+
+    public static boolean isNotNegZero(double x)
     {
         return 1.0/x != Double.NEGATIVE_INFINITY; 
     }
 
-    static double sqr(double x) 
+    public static double sqr(double x)
     {
         return x*x;
     }
 
-    static double sawtooth(double x, double p, boolean bOdd)
+    public static double sawtooth(double x, double p, boolean bOdd)
     {
         if (p<TOL)
           return 0.0; 
@@ -226,42 +226,42 @@ class U implements B4constants
         return x - p*Math.round(x/p); 
     }
 
-    static double cosd(double deg)
+    public static double cosd(double deg)
     {
         return Math.cos(Math.toRadians(deg)); 
     }
 
-    static double sind(double deg)
+    public static double sind(double deg)
     {
         return Math.sin(Math.toRadians(deg)); 
     }
 
-    static double tand(double deg)
+    public static double tand(double deg)
     {
         return Math.tan(Math.toRadians(deg)); 
     }
 
-    static int imax3(int a, int b, int c)
+    public static int imax3(int a, int b, int c)
     {
         return Math.max(a, Math.max(b, c)); 
     }
 
-    static int imax5(int a, int b, int c, int d, int e)
+    public static int imax5(int a, int b, int c, int d, int e)
     {
         return Math.max(a, Math.max(b, Math.max(c, Math.max(d, e))));
     }
 
-    static boolean isOdd(int i)
+    public static boolean isOdd(int i)
     {
         return i % 2 != 0;
     }
 
-    static boolean isBit(int word, int whichbit)
+    public static boolean isBit(int word, int whichbit)
     {
         return isOdd(word >>> whichbit);
     }
 
-    static int setBit(int word, int whichbit)
+    public static int setBit(int word, int whichbit)
     // forces a given bit to be "1"
     {
         if (isBit(word, whichbit))
@@ -269,7 +269,7 @@ class U implements B4constants
         return word + (1 << whichbit);
     }
 
-    static int clearBit(int word, int whichbit)
+    public static int clearBit(int word, int whichbit)
     // forces a given bit to be "0"
     {
         if (isBit(word, whichbit))
@@ -277,19 +277,19 @@ class U implements B4constants
         return word;
     }
 
-    static int manageBit(int word, int whichbit, boolean b)
+    public static int manageBit(int word, int whichbit, boolean b)
     // forces a given bit to be "b"
     {
         return b ? setBit(word, whichbit) : clearBit(word, whichbit);
     }
 
 
-    static int SAFEINT(double x)
+    public static int SAFEINT(double x)
     {
         return (int) Math.max(-10000.0, Math.min(10000.0, x)); 
     }
 
-    static String fwi(int n, int w)
+    public static String fwi(int n, int w)
     // converts an int to a string with given width.
     {
         StringBuffer sb = new StringBuffer(); 
@@ -299,15 +299,15 @@ class U implements B4constants
         return sb.toString();
     }
 
-    static String fn6(int dat[], int ndat)
+    public static String fn6(int dat[], int ndat)
     {
         StringBuffer sb = new StringBuffer(100); 
         for (int i=0; i<ndat; i++)
           sb.append(fwi(dat[i], 6)); 
         return sb.toString();
-    } 
+    }
 
-    static String fwd(double x, int w, int d)
+    public static String fwd(double x, int w, int d)
     // converts a double to a string with given width and decimals.
     {
         NumberFormat nf = NumberFormat.getInstance(Locale.US); 
@@ -328,7 +328,7 @@ class U implements B4constants
     }
 
 
-    static String tidy(double x)
+    public static String tidy(double x)
     // Converts double to a tidy string;
     // trims trailing zeros, leading & trailing blanks
     // but fails to tidy 0.99999999999
@@ -348,7 +348,7 @@ class U implements B4constants
 
 
 
-    static String gd(double x)
+    public static String gd(double x)
     // Converts a double into a nicely formatted string.
     // Sacrifices precision to gain shortness.
     // Uses D notation if reasonable size
@@ -374,7 +374,7 @@ class U implements B4constants
 
 
 
-    static String fwe(double x)
+    public static String fwe(double x)
     // Converts a positive double into a 9-char Enotation string
     // But what about negative exponents?
     // Ugly property: shows E-03 not E-3
@@ -389,8 +389,8 @@ class U implements B4constants
           return " "+s;
         return s;            // else negative
     }
-    
-    static String fweshort(double x)
+
+    public static String fweshort(double x)
     // a shorter version of fwe()
     {
         NumberFormat nf = NumberFormat.getInstance(Locale.US); 
@@ -400,14 +400,14 @@ class U implements B4constants
         return s;            // else negative
     }
 
-    static String twoint(int i, int j)
+    public static String twoint(int i, int j)
     // converts two small ints to a string of width 8
     {
        return fwi(i,4) + fwi(j,4); 
     }
 
 
-    static String nd(int n, double[] v)
+    public static String nd(int n, double[] v)
     // converts a vector of n doubles into a fixed point string
     {
        StringBuffer sb = new StringBuffer(100);
@@ -649,14 +649,14 @@ class U implements B4constants
          return s; 
     }
 
-    static double log10(double arg)
+    public static double log10(double arg)
     {
         if (arg>0.0)
           return Math.log(arg)/LN10;
         return -999.9;
     }
 
-    static double dex(double arg)
+    public static double dex(double arg)
     {
         if (arg > 300.0)
            arg = 300.0; 
@@ -666,7 +666,7 @@ class U implements B4constants
     }
 
 
-    static int tokenize(String input, String delimiters, ArrayList<String> tList)
+    public static int tokenize(String input, String delimiters, ArrayList<String> tList)
     {
         tList.clear(); 
         StringTokenizer st = new StringTokenizer(input, delimiters); 
@@ -680,7 +680,7 @@ class U implements B4constants
     }
 
 
-    static void ruler(double a, double b, // the given interval
+    public static void ruler(double a, double b, // the given interval
                       boolean bBeyond,    // overspan? else underspan
                       double[] values,    // list of tick values
                       int[] output)       // [0]=nticks,[1]=fracdigits.
@@ -713,7 +713,7 @@ class U implements B4constants
         output[NFRACDIGITS] = nFracDigits; 
     }
 
-    static double nicenum (double x, boolean bRound)
+    public static double nicenum (double x, boolean bRound)
     // finds a nice number approx equal to |x|.
     // rounds downward if bRound=true, else nice>=|x|.
     // Paul Heckbert in GRAPHICS GEMS 1990.
@@ -947,7 +947,7 @@ class U implements B4constants
     
     //----private static method for nationalization------------
 
-    static String nationalize(String s)
+    public static String nationalize(String s)
     // Nationalizes a numerical string for worldwide input.
     // Eliminates groupings, enforces period as decimal point
     {

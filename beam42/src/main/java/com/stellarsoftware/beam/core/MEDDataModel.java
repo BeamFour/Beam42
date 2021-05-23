@@ -1,6 +1,6 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.core;
 
-import static com.stellarsoftware.beam.B4constants.*;
+import static com.stellarsoftware.beam.core.B4constants.*;
 
 /**
  * Responsible for parsing MED files and creating the Media data model.

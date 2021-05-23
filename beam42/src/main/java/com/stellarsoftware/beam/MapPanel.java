@@ -1,5 +1,7 @@
 package com.stellarsoftware.beam;
 
+import com.stellarsoftware.beam.core.*;
+
 import java.io.*;          // Save as file
 import java.util.*;        // ArrayList
 import java.awt.event.*;   // Events
@@ -414,7 +416,7 @@ public class MapPanel extends GPanel // implements Runnable
         if (nrays < 1)
           return -0.0; 
         // tabulated raystarts begin at 1 not zero:
-        double valmin = RT13.raystarts[1][iatt];  
+        double valmin = RT13.raystarts[1][iatt];
         double valmax = RT13.raystarts[1][iatt]; 
         for (int k=2; k<=nrays; k++)
         {

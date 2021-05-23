@@ -1,5 +1,9 @@
 package com.stellarsoftware.beam;
 
+import com.stellarsoftware.beam.core.AutoRayGenerator;
+import com.stellarsoftware.beam.core.Comparo;
+import com.stellarsoftware.beam.core.U;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -96,7 +100,7 @@ class AutoRay
             jL[i].setAlignmentX(Component.CENTER_ALIGNMENT);
         }
 
-        jL[0].setText("RMS 1D average = "+U.fwe(rms));
+        jL[0].setText("RMS 1D average = "+ U.fwe(rms));
         jL[1].setText("Nrays = "+myhost.nrays);
         jL[2].setText("Ngoals = "+myhost.ngoals);
         jL[4].setText("Nstarts = "+myhost.navail);

@@ -1,4 +1,4 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.core;
 
 /**  Revised 7 Oct 2015 for improved accuracy:
   *  Replaced arccos(dotProduct) with arctan2(crossProduct, dotProduct); 

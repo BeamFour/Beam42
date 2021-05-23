@@ -1,4 +1,6 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.core;
+
+import com.stellarsoftware.beam.DMF;
 
 /** This file contains public class RT13 and private class MinFit
   *  A207: eliminating groups, using 5x4 ray/surf logic.
@@ -175,7 +177,7 @@ package com.stellarsoftware.beam;
   *
   * @author M.Lampton (c) STELLAR SOFTWARE 2004 all rights reserved.
   */
-class RT13 implements B4constants
+public class RT13 implements B4constants
 {
     private static int iFailSurf, iFailCode; // for AutoAdjust line 298
     
@@ -1550,7 +1552,7 @@ class RT13 implements B4constants
         double d2 = ray[RTXL]*ray[RTXL] 
                   + ray[RTYL]*ray[RTYL] 
                   + ray[RTZL]*ray[RTZL]; 
-        return 0.2*DMF.getOsize() + 0.8*Math.sqrt(d2);
+        return 0.2* DMF.getOsize() + 0.8*Math.sqrt(d2);
     }
 
 

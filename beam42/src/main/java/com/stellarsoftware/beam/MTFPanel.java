@@ -1,5 +1,7 @@
 package com.stellarsoftware.beam;
 
+import com.stellarsoftware.beam.core.U;
+
 import java.io.*;          // fileWriter
 import javax.swing.*;      // Graphics2D features
 
@@ -75,7 +77,7 @@ public class MTFPanel extends GPanel
 
         // now do the rulers....
         int results[] = new int[2]; 
-        U.ruler(0, freqspan, true, hticks, results); 
+        U.ruler(0, freqspan, true, hticks, results);
         hnticks = results[0]; 
         hndigits = results[1]; 
 

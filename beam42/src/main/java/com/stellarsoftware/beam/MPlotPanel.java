@@ -1,5 +1,9 @@
 package com.stellarsoftware.beam;
 
+import com.stellarsoftware.beam.core.Globals;
+import com.stellarsoftware.beam.core.RT13;
+import com.stellarsoftware.beam.core.U;
+
 import java.util.*;        // ArrayList
 
 @SuppressWarnings("serial")
@@ -554,7 +558,7 @@ public class MPlotPanel extends GPanel
     {
         stashR = new double[MAXRAYS+1][RNSTARTS];
         for (int j=0; j<MAXRAYS+1; j++)
-          System.arraycopy(RT13.raystarts[j], 0, stashR[j], 0, RNSTARTS);  
+          System.arraycopy(RT13.raystarts[j], 0, stashR[j], 0, RNSTARTS);
         stashS = new double[MAXSURFS+1][ONPARMS]; 
         for (int j=0; j<MAXSURFS+1; j++)
           System.arraycopy(RT13.surfs[j], 0, stashS[j], 0, ONPARMS); 

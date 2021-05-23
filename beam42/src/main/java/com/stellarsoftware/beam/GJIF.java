@@ -1,5 +1,9 @@
 package com.stellarsoftware.beam;
 
+import com.stellarsoftware.beam.core.B4constants;
+import com.stellarsoftware.beam.core.Globals;
+import com.stellarsoftware.beam.core.U;
+
 import java.awt.*;               // Color, etc
 import java.awt.print.*;         // printing
 import javax.swing.*;
@@ -70,7 +74,7 @@ public class GJIF extends BJIF implements B4constants
             case RM_H2D:    myGPanel = new H2DPanel(this); break; 
             case RM_MTF:    myGPanel = new MTFPanel(this); break; 
             case RM_DEMO:   myGPanel = new DemoPanel(this); break; 
-            default:        U.beep(); return; 
+            default:        U.beep(); return;
         } 
         setContentPane(myGPanel); 
         addInternalFrameListener(new InternalFrameAdapter() 

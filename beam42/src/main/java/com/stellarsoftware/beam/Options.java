@@ -1,5 +1,9 @@
 package com.stellarsoftware.beam;
 
+import com.stellarsoftware.beam.core.B4constants;
+import com.stellarsoftware.beam.core.Globals;
+import com.stellarsoftware.beam.core.U;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;        // layout managers
@@ -1161,7 +1165,7 @@ class Options extends JMenu implements B4constants
             }   
 
             Globals.reg.putuo(UO_1DRAY, 6, center.getText());
-            dCenter = U.suckDouble(center.getText()); 
+            dCenter = U.suckDouble(center.getText());
 
             Globals.reg.putuo(UO_1DRAY, 7, span.getText());
             dSpan = U.suckDouble(span.getText()); 

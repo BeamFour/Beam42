@@ -1,5 +1,10 @@
 package com.stellarsoftware.beam;
 
+import com.stellarsoftware.beam.core.B4DataModel;
+import com.stellarsoftware.beam.core.B4constants;
+import com.stellarsoftware.beam.core.Globals;
+import com.stellarsoftware.beam.core.U;
+
 import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;

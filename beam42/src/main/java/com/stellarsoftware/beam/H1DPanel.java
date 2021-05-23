@@ -1,5 +1,10 @@
 package com.stellarsoftware.beam;
 
+import com.stellarsoftware.beam.core.Globals;
+import com.stellarsoftware.beam.core.RAYDataModel;
+import com.stellarsoftware.beam.core.RT13;
+import com.stellarsoftware.beam.core.U;
+
 import javax.swing.*;      // Graphics2D features
 import java.io.*;          // Save as file
 

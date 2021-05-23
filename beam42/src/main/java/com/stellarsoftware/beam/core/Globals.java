@@ -1,4 +1,4 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.core;
 
 public class Globals {
     public static int[] giFlags = new int[B4constants.NFLAGS];

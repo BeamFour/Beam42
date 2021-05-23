@@ -1,5 +1,7 @@
 package com.stellarsoftware.beam;
 
+import com.stellarsoftware.beam.core.*;
+
 import javax.swing.*;      // JOptionPane dialog
 
 /** InOut.java
@@ -53,7 +55,7 @@ class InOut implements B4constants
         comparo.doResiduals();
         int npts = comparo.iGetNPTS();
         double rms = comparo.dGetRMS();
-        String ss = "RMS 1D Average = "+U.fwe(rms)     + '\n';
+        String ss = "RMS 1D Average = "+ U.fwe(rms)     + '\n';
         if (ngoals > 1)
         {
              if (bWFE)

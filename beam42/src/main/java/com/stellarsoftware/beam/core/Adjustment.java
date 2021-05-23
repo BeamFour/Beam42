@@ -1,4 +1,4 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.core;
 
 import java.util.*;         // ArrayList
 
@@ -32,7 +32,7 @@ import java.util.*;         // ArrayList
   *
   *  @author M.Lampton (c) 2004 STELLAR SOFTWARE all rights reserved.
   */
-class Adjustment     // attrib, rec, field, slaveList
+public class Adjustment     // attrib, rec, field, slaveList
 {
     private int iatt, rr, ff;
     private ArrayList<Integer> slaveList; 

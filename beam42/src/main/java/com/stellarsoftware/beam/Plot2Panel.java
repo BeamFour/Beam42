@@ -1,5 +1,10 @@
 package com.stellarsoftware.beam;
 
+import com.stellarsoftware.beam.core.Globals;
+import com.stellarsoftware.beam.core.RAYDataModel;
+import com.stellarsoftware.beam.core.RT13;
+import com.stellarsoftware.beam.core.U;
+
 @SuppressWarnings("serial")
 
 /**
@@ -64,7 +69,7 @@ public class Plot2Panel extends GPanel
     {
         nsurfs = Globals.giFlags[ONSURFS];    // always needed.
         nrays = Globals.giFlags[RNRAYS];      // always needed.
-        ngood = RT13.iBuildRays(true);  
+        ngood = RT13.iBuildRays(true);
         
         String warn = getUOwarning();     // never crashes.
         myGJIF.postWarning(warn); 
@@ -98,7 +103,7 @@ public class Plot2Panel extends GPanel
         if (ix<0)
           myGJIF.cleanupTitle(); // retains any warnings
         else
-          myGJIF.postCoords("Hor=" + U.fwd(getuxPixel(ix),18,6).trim() 
+          myGJIF.postCoords("Hor=" + U.fwd(getuxPixel(ix),18,6).trim()
                        + "  Vert=" + U.fwd(getuyPixel(iy),18,6).trim());
     }
 

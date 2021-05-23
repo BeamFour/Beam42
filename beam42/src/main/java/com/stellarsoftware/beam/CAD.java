@@ -1,6 +1,10 @@
 package com.stellarsoftware.beam;
 
 // import java.awt.image.*;     // BufferedImage
+import com.stellarsoftware.beam.core.B4constants;
+import com.stellarsoftware.beam.core.U;
+import com.stellarsoftware.beam.core.XYZO;
+
 import java.util.*;             // ArrayList
 import java.io.*;               // File 
 import javax.swing.*;           // JFileChooser
@@ -44,13 +48,13 @@ import javax.swing.*;           // JFileChooser
   *
   *  @author M.Lampton (c) 2004 - 2015 STELLAR SOFTWARE all rights reserved.
   */
-class CAD implements B4constants  
+class CAD implements B4constants
 {
 
     private static int prevFontCode=0;  // serves all CAD flavors
 
 
-    public static boolean doCAD(int style, boolean bPort, ArrayList<XYZO> a, 
+    public static boolean doCAD(int style, boolean bPort, ArrayList<XYZO> a,
         ArrayList<XYZO> b, ArrayList<XYZO> c, ArrayList<XYZO> d)
     // Called via DMF >> GJIF >> GPanel line 245>> here, like this: 
     // CAD.doCAD(style, bPortrait, baseList, randList, finishList, annoList);
@@ -232,7 +236,7 @@ class CAD implements B4constants
         if ((pw==null) || (opfull<1))
           return; 
 
-        String sx = U.fwd(x, 9, 2)+" "; 
+        String sx = U.fwd(x, 9, 2)+" ";
         String sy = U.fwd(y, 9, 2)+" "; 
         String sz = U.fwd(z, 9, 2)+" "; 
 

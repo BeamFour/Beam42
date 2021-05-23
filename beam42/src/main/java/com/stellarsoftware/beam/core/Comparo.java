@@ -1,4 +1,4 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.core;
 
 /**
   *  Performs evaluation of residual vector = observed - goal
@@ -19,7 +19,7 @@ package com.stellarsoftware.beam;
   *  Assumes RT13.dRays[k][j][i], RT13.bGoodRay[k] are current.
   *  (c) 2007 M.Lampton STELLAR SOFTWARE
   */
-class Comparo implements B4constants
+public class Comparo implements B4constants
 {
     public  double resid[];        // [npts]; densely packed, public for Auto.
     public  int goalAttrib[];      // attribute for each goal; 13=RTWFE.

@@ -1,6 +1,8 @@
 
 package com.stellarsoftware.beam;
 
+import com.stellarsoftware.beam.core.*;
+
 import java.awt.*;              // all Abstract Windows Toolkit methods
 import java.awt.event.*;        // mouse, keystroke etc
 import java.io.*;               // all files and i/o methods
@@ -176,7 +178,7 @@ public class DMF extends JFrame implements B4constants
         dmf = this;                       // save a reference to this frame
                 
         sLong = java.lang.System.getProperty("java.version"); 
-        char cJRT = U.getCharAt(sLong, 2);  
+        char cJRT = U.getCharAt(sLong, 2);
         iJRT = java.lang.Character.getNumericValue(cJRT); 
         sJRT = "JRT" + cJRT;  
                 

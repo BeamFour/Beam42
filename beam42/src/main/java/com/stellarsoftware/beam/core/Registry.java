@@ -1,8 +1,5 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.core;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
 import java.io.*;    // all i/o
 import java.util.*;  // StringTokenizer
 
@@ -24,7 +21,7 @@ import java.util.*;  // StringTokenizer
   * A179 August 2015: revised to permit some empty user option fields
   *  -- although empty descriptors is still not valid.
   */
-class Registry implements B4constants
+public class Registry implements B4constants
 {
     private static String sUser[][]; 
     private File fReg; 

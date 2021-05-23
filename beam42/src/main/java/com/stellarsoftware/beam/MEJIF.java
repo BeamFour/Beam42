@@ -1,5 +1,7 @@
 package com.stellarsoftware.beam;
 
+import com.stellarsoftware.beam.core.MEDDataModel;
+
 @SuppressWarnings("serial")
 
 /**

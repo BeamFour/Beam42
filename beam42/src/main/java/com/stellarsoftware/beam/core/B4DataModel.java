@@ -1,8 +1,8 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.core;
 
 import java.io.*;
 
-import static com.stellarsoftware.beam.B4constants.*;
+import static com.stellarsoftware.beam.core.B4constants.*;
 
 /* Base class for parsing .OPT, .MED and .RAY files */
 public abstract class B4DataModel {
@@ -212,7 +212,7 @@ public abstract class B4DataModel {
         bNeedsParse = v;
     }
 
-    String getTableString()
+    public String getTableString()
     // Multipurpose string sucker.
     // Called by private swapUndo() and by public stashForUndo().
     {
@@ -226,7 +226,7 @@ public abstract class B4DataModel {
         return sb.toString();
     }
 
-    void putTableString(String sGiven)
+    public void putTableString(String sGiven)
     // Clears the charTable and installs a given String.
     // Also tidies up the diagnostics, and redisplays.
     // Assumes EOL is '\n' and so is not multiplatform.
@@ -281,7 +281,7 @@ public abstract class B4DataModel {
         return 0;
     }
 
-    void clearLine(int j)
+    public void clearLine(int j)
     // When exactly is this called?
     {
         Globals.nEdits++;
@@ -561,7 +561,7 @@ public abstract class B4DataModel {
         return linelen[jrow];
     }
 
-    int CopyFieldDown(int jCaret, int iCaret)
+    public int CopyFieldDown(int jCaret, int iCaret)
     /// copies the data field and its tag char.
     {
         Globals.nEdits++;

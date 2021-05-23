@@ -1,5 +1,10 @@
 package com.stellarsoftware.beam;
 
+import com.stellarsoftware.beam.core.Globals;
+import com.stellarsoftware.beam.core.RAYDataModel;
+import com.stellarsoftware.beam.core.RT13;
+import com.stellarsoftware.beam.core.U;
+
 import javax.swing.*;      // Graphics2D; JFileChooser
 import java.io.*;          // Save Data
 
@@ -102,7 +107,7 @@ public class H2DPanel extends GPanel
     {
         double daz = i/3; 
         az += daz; 
-        cosaz = U.cosd(az); 
+        cosaz = U.cosd(az);
         sinaz = U.sind(az);
         double del = j/3;
         el += del;

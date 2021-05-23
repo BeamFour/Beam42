@@ -1,6 +1,6 @@
 package com.stellarsoftware.beam;
 
-import javax.swing.*;      // Graphics2D features
+import com.stellarsoftware.beam.core.U;
 
 @SuppressWarnings("serial")
 
@@ -34,7 +34,7 @@ public class DemoPanel extends GPanel // implements Runnable
         uyspan = EXTRAROOM;   // optional for GPanel's addAffines()
 
         az = +22; 
-        cosaz = U.cosd(az); 
+        cosaz = U.cosd(az);
         sinaz = U.sind(az);
         el = +33;
         cosel = U.cosd(el); 

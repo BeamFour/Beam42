@@ -1,4 +1,4 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.core;
 
 public interface RAYDataModelListener {
     void rayModelUpdated();

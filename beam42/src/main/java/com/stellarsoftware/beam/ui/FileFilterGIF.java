@@ -1,20 +1,20 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.ui;
 
 import java.io.File; 
 import javax.swing.filechooser.FileFilter;
 
 
-class FileFilterJPG extends FileFilter
+class FileFilterGIF extends FileFilter
 {
    public boolean accept(File f)
    {
       if (f.isDirectory())
         return true; 
-      return f.getName().toLowerCase().endsWith(".jpg");
+      return f.getName().toLowerCase().endsWith(".gif");
    }
 
    public String getDescription()
    {
-      return "JPG image";
+      return "GIF image";
    }
 }

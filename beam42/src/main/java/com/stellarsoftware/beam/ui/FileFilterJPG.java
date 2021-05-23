@@ -1,20 +1,20 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.ui;
 
 import java.io.File; 
 import javax.swing.filechooser.FileFilter;
 
 
-class FileFilterPNG extends FileFilter
+class FileFilterJPG extends FileFilter
 {
    public boolean accept(File f)
    {
       if (f.isDirectory())
         return true; 
-      return f.getName().toLowerCase().endsWith(".png");
+      return f.getName().toLowerCase().endsWith(".jpg");
    }
 
    public String getDescription()
    {
-      return "PNG image";
+      return "JPG image";
    }
 }

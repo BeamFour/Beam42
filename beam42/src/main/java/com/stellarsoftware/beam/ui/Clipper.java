@@ -1,4 +1,4 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.ui;
 
 /**
   *  Performs double precision clipping of line segments

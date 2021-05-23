@@ -1,6 +1,6 @@
 package com.stellarsoftware.beam.core;
 
-import com.stellarsoftware.beam.DMF;
+import com.stellarsoftware.beam.ui.DMF;
 
 /** AutoAdj.java
   * A207: eliminated groups

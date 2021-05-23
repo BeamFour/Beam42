@@ -1,5 +1,7 @@
 package com.stellarsoftware.beam;
 
+import com.stellarsoftware.beam.ui.DMF;
+
 import javax.swing.*;
 
 /** B4.java  --- supplies main() for DeskMenuFrame
@@ -15,7 +17,7 @@ public class B4
         {
             public void run() 
             {
-                DMF dmf = new DMF(); 
+                DMF dmf = new DMF();
                 dmf.setVisible(true);
                 dmf.toFront(); 
             }

@@ -1,6 +1,6 @@
 package com.stellarsoftware.beam.core;
 
-import com.stellarsoftware.beam.DMF;
+import com.stellarsoftware.beam.ui.DMF;
 
 /** This file contains public class RT13 and private class MinFit
   *  A207: eliminating groups, using 5x4 ray/surf logic.

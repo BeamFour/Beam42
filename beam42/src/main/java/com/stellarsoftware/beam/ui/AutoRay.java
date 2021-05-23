@@ -1,4 +1,4 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.ui;
 
 import com.stellarsoftware.beam.core.AutoRayGenerator;
 import com.stellarsoftware.beam.core.Comparo;

@@ -1,4 +1,4 @@
-package com.stellarsoftware.beam;
+package com.stellarsoftware.beam.ui;
 
 import com.stellarsoftware.beam.core.B4DataModel;
 import com.stellarsoftware.beam.core.B4constants;

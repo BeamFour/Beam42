@@ -1,18 +1,19 @@
 package com.stellarsoftware.beam.core;
 
 import static com.stellarsoftware.beam.core.B4constants.*;
-import static com.stellarsoftware.beam.core.Globals.RT13;
 
 public class B4DataParser {
 
     private OPTDataModel optDataModel;
     private RAYDataModel rayDataModel;
     private MEDDataModel medDataModel;
+    private RT13 rt13;
 
-    public B4DataParser(OPTDataModel optDataModel, RAYDataModel rayDataModel, MEDDataModel medDataModel) {
+    public B4DataParser(OPTDataModel optDataModel, RAYDataModel rayDataModel, MEDDataModel medDataModeln, RT13 rt13) {
         this.optDataModel = optDataModel;
         this.rayDataModel = rayDataModel;
         this.medDataModel = medDataModel;
+        this.rt13 = rt13;
     }
 
     public String parse(boolean bActive)
@@ -155,10 +156,10 @@ public class B4DataParser {
         //----------------set up RT13 LUTs----------------------
 
         for (int j=1; j<=MAXSURFS; j++)
-            RT13.gO2M[j] = ABSENT;  // LUT: each jsurf gives glass ID
+            rt13.gO2M[j] = ABSENT;  // LUT: each jsurf gives glass ID
 
         for (int k=1; k<=MAXRAYS; k++)
-            RT13.gR2W[k] = ABSENT;  // LUT: each kray gives wavel ID
+            rt13.gR2W[k] = ABSENT;  // LUT: each kray gives wavel ID
 
         //--------search the glass names in use----------------
         //------But! skip any glass names that are numeric-----
@@ -169,17 +170,17 @@ public class B4DataParser {
         for (int jsurf = 1; jsurf<= Globals.giFlags[ONSURFS]; jsurf++)
         {
             // if (OEJIF.oglasses[jsurf].length() > 0)
-            double refr = RT13.surfs[jsurf][OREFRACT];
+            double refr = rt13.surfs[jsurf][OREFRACT];
             if (Double.isNaN(refr))            // invalid numeric
             {
                 for (int mrec = 1; mrec <= Globals.giFlags[MNGLASSES]; mrec++)
                     //if (OEJIF.oglasses[jsurf].equals(MEJIF.mglasses[mrec]))
                     if (optDataModel.oglasses()[jsurf].equals(medDataModel.mglasses(mrec)))
                     {
-                        RT13.gO2M[jsurf] = mrec; // found it! jsurf uses glass number "mrec"
+                        rt13.gO2M[jsurf] = mrec; // found it! jsurf uses glass number "mrec"
                         break;                   // abandon search.
                     }
-                if (RT13.gO2M[jsurf] == ABSENT)
+                if (rt13.gO2M[jsurf] == ABSENT)
                 {
                     unkglassrec = jsurf;
                     //unkglassname = OEJIF.oglasses[jsurf];
@@ -209,10 +210,10 @@ public class B4DataParser {
                     if (rayDataModel.wavenames(kray).equals(medDataModel.mwaves(f)))
                     //if (REJIF.wavenames[kray].equals(MEJIF.mwaves[f]))
                     {
-                        RT13.gR2W[kray] = f; // found it! kray uses wavel ID "f"
+                        rt13.gR2W[kray] = f; // found it! kray uses wavel ID "f"
                         break;               // abandon search.
                     }
-            if (RT13.gR2W[kray] == ABSENT)
+            if (rt13.gR2W[kray] == ABSENT)
             {
                 unkwaverec = kray;
                 //unkwavename = REJIF.wavenames[kray];

@@ -53,7 +53,7 @@ class InOut implements B4constants
             return; 
         }
 
-        Comparo comparo = new Comparo(optEditor.model(), rayEditor.model());
+        Comparo comparo = new Comparo(optEditor.model(), rayEditor.model(), Globals.RT13);
         comparo.doResiduals();
         int npts = comparo.iGetNPTS();
         double rms = comparo.dGetRMS();

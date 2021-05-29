@@ -15,7 +15,7 @@ public class TestAudoAdj {
         Assert.assertTrue(optDataModel.bLoadFile(new File("../Examples/AUTO1.OPT")));
         RAYDataModel rayDataModel = new RAYDataModel();
         Assert.assertTrue(rayDataModel.bLoadFile(new File("../Examples/AUTO1.RAY")));
-        B4DataParser b4DataParser = new B4DataParser(optDataModel, rayDataModel, null);
+        B4DataParser b4DataParser = new B4DataParser(optDataModel, rayDataModel, null, Globals.RT13);
         b4DataParser.parse(true);
 //        new InOut(optDataModel, rayDataModel);
         AutoAdjuster autoAdjuster = new AutoAdjuster(optDataModel, rayDataModel, null, null, Globals.RT13);

@@ -45,7 +45,7 @@ public class AutoAdjuster implements B4constants
         this.optDataModelListener = optDataModelListener;
         this.rayDataModelListener = rayDataModelListener;
         this.rt13 = rt13;
-        comparo = new Comparo(optEditor, rayEditor);
+        comparo = new Comparo(optEditor, rayEditor, Globals.RT13);
     }
 
     public boolean start() {

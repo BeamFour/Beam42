@@ -1,7 +1,5 @@
 package com.stellarsoftware.beam.core;
 
-import static com.stellarsoftware.beam.core.Globals.RT13;
-
 /**
   *  Performs evaluation of residual vector = observed - goal
   *  or, for WFE, residual vector = WFE since goalValues=0.0
@@ -29,6 +27,7 @@ public class Comparo implements B4constants
     
     private OPTDataModel optEditor = null;
     private RAYDataModel rayEditor = null;
+    private RT13 rt13;
     private int nrays=0, nsurfs=0, onfields=0, rnfields=0;
     private int ngood=0, ngoals=0, nadj=0;
     private int npts=0;
@@ -37,9 +36,10 @@ public class Comparo implements B4constants
     private boolean bDone[];
     private boolean bHasWFE;
 
-    public Comparo(OPTDataModel optEditor, RAYDataModel rayEditor) {
+    public Comparo(OPTDataModel optEditor, RAYDataModel rayEditor, RT13 rt13) {
         this.optEditor = optEditor;
         this.rayEditor = rayEditor;
+        this.rt13 = rt13;
     }
 
     //--------------sole public method--------------------
@@ -69,7 +69,7 @@ public class Comparo implements B4constants
         {
             for (int kray=1; kray<=nrays; kray++)
             {
-                if (RT13.isRayOK[kray])
+                if (rt13.isRayOK[kray])
                   for (int igoal=0; igoal<ngoals; igoal++)
                   {
                       double t1 = getRay(kray, goalAttrib[igoal]); 
@@ -84,7 +84,7 @@ public class Comparo implements B4constants
         if (bHasWFE)  // implicit goal case
         {
             for (int kray=1; kray<=nrays; kray++)
-              if (RT13.isRayOK[kray])
+              if (rt13.isRayOK[kray])
               {
                   resid[npts] = getRay(kray, RTWFE);
                   sos += resid[npts]*resid[npts]; 
@@ -174,7 +174,7 @@ public class Comparo implements B4constants
     {
         if ((iattrib>=RX) && (iattrib<RNATTRIBS))
         {
-            double d = RT13.dGetRay(kray, nsurfs, iattrib); 
+            double d = rt13.dGetRay(kray, nsurfs, iattrib);
             return d; 
         }
         return -0.0;
@@ -193,7 +193,7 @@ public class Comparo implements B4constants
         {
             int f = goalField[igoal]; 
             for (int kray=1; kray<=nrays; kray++)
-              bLookedAt[kray] = !RT13.isRayOK[kray];  
+              bLookedAt[kray] = !rt13.isRayOK[kray];
 
             for (int ktop=1; ktop<=nrays; ktop++) // search for top ray this tag
             {
@@ -213,7 +213,7 @@ public class Comparo implements B4constants
                 double value = 0.0; // average will include ktop itself. 
                 for (int k=ktop; k<=nrays; k++)
                 {
-                    if (RT13.isRayOK[k] 
+                    if (rt13.isRayOK[k]
                     && !bLookedAt[k] 
                     && (tag==rayEditor.getTag(f,k+2)))
                     {

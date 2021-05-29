@@ -1,0 +1,6 @@
+ 3  surfaces    Ellipsoid2.OPT
+ Diam    Zsurface   curve   Shape     Type?
+-------:---------:--------:--------:---------:----
+   4   :   8     :  -1    :  0.25  :   BIM   :
+   4   :   0     :   1    :  0.25  :   BIM   :
+   1   :7.464102 :   0    :        : target  :

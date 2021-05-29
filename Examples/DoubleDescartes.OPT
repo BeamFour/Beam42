@@ -1,0 +1,6 @@
+  3  surfaces DoubleDescartes.OPT
+ index     Z     Curve  Aspher Diam
+-------:----.--:-------:------:------
+       :   1   :   2   : -2.25: 1.4
+  1.5  :   2   : -0.5  : -2.25: 1.4
+       :   6   ?   0   :  0   : 1.4

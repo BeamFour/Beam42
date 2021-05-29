@@ -1,0 +1,14 @@
+ 6 surfaces            LENS3.OPT    for MultiPlot
+  Index     Zvx     Curv      Asph         Type?    Diam
+--------:---.----:---.-------:---.------:--------:-------:----:---
+        :  5.5   :   0       :          :  Lens  :       :    :
+  1.662 :  5.8   : -0.2659582a -0.643216a  Lens  :       :    :
+        :  6.0   :   0       :          :  iris  :  2.3  :    :
+        :  6.2   :  0.2659582A -0.643216a  Lens  :       :    :
+  1.662 :  6.5   :   0       :          :  Lens  :       :    :
+        : 12.0   :   0       :          :  Film  :  2.0  :    :
+        :        :           :          :        :       :    :
+
+
+MultiPlot step size = 0.1
+MultiPlot para size = -0.0164

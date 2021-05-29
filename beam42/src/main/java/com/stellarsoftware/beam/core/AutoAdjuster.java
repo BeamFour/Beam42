@@ -1,6 +1,5 @@
 package com.stellarsoftware.beam.core;
 
-import static com.stellarsoftware.beam.core.Globals.RT13;
 
 /** AutoAdj.java
   * A207: eliminated groups
@@ -34,15 +33,18 @@ public class AutoAdjuster implements B4constants
     private Comparo comparo;
     private OPTDataModelListener optDataModelListener;
     private RAYDataModelListener rayDataModelListener;
+    private RT13 rt13;
 
     public AutoAdjuster(OPTDataModel optEditor, RAYDataModel rayEditor,
                         OPTDataModelListener optDataModelListener,
-                        RAYDataModelListener rayDataModelListener) // constructor; performs the entire task.
+                        RAYDataModelListener rayDataModelListener,
+                        RT13 rt13) // constructor; performs the entire task.
     {
         this.optEditor = optEditor;
         this.rayEditor = rayEditor;
         this.optDataModelListener = optDataModelListener;
         this.rayDataModelListener = rayDataModelListener;
+        this.rt13 = rt13;
         comparo = new Comparo(optEditor, rayEditor);
     }
 
@@ -93,7 +95,7 @@ public class AutoAdjuster implements B4constants
 
         //------count the initially good rays----------
 
-        ngood = RT13.iBuildRays(true);  // try all rays, initially.
+        ngood = rt13.iBuildRays(true);  // try all rays, initially.
         if (ngood < 1) 
         {
             // JOptionPane.showMessageDialog(optEditor, "Auto: no good rays");
@@ -178,10 +180,10 @@ public class AutoAdjuster implements B4constants
             if ((j>0) && (j<=nsurfs))
             {
                 for (int kray=1; kray<=nrays; kray++)
-                  if (RT13.isRayOK[kray])
+                  if (rt13.isRayOK[kray])
                   {
-                      double rx = RT13.dGetRay(kray, j, RTXL); 
-                      double ry = RT13.dGetRay(kray, j, RTYL); 
+                      double rx = rt13.dGetRay(kray, j, RTXL);
+                      double ry = rt13.dGetRay(kray, j, RTYL);
                       r = Math.max(r, Math.sqrt(rx*rx+ry*ry)); 
                   }
             }
@@ -245,7 +247,7 @@ public class AutoAdjuster implements B4constants
             int attr = optEditor.getAdjAttrib(iadj); 
             int field = optEditor.getAdjField(iadj); 
             if ((surf>0) && (attr>=0))
-              optEditor.putFieldDouble(field, row, RT13.surfs[surf][attr]); 
+              optEditor.putFieldDouble(field, row, rt13.surfs[surf][attr]);
         }
 //        optEditor.repaint();
 //        optEditor.toFront();
@@ -270,13 +272,13 @@ public class AutoAdjuster implements B4constants
                 int op = rayEditor.rF2I(f);
                 if (op == RNOTE)  // ray note message here....
                 {
-                    String s = sResults[RT13.getStatus(kray)] 
-                       + U.fwi(RT13.getHowfarLoop(kray),2);
+                    String s = sResults[rt13.getStatus(kray)]
+                       + U.fwi(rt13.getHowfarLoop(kray),2);
                     rayEditor.putFieldString(f, row, s);
                 }
 
                 if (op == RDEBUG) // debugger message here....
-                  rayEditor.putFieldString(f, row, RT13.isRayOK[kray] ? "OK" : "NG");
+                  rayEditor.putFieldString(f, row, rt13.isRayOK[kray] ? "OK" : "NG");
 
 
                 if (op >= RGOAL) // Comparo updates floating goals, not Auto.
@@ -288,9 +290,9 @@ public class AutoAdjuster implements B4constants
                     int iattr = RT13.getAttrNum(op); 
                     if ((iattr>=0) && (iattr<RNATTRIBS) && (jsurf>0))
                     {
-                        if (RT13.isRayOK[kray])
+                        if (rt13.isRayOK[kray])
                         {
-                            double d = RT13.dGetRay(kray, jsurf, iattr); 
+                            double d = rt13.dGetRay(kray, jsurf, iattr);
                             rayEditor.putFieldDouble(f, row, d);  
                         }
                         else
@@ -329,7 +331,7 @@ public class AutoAdjuster implements B4constants
     // Employed by LM and by dBuildJacobian() via dNudge(). 
     // Returns sum-of-squares. 
     {
-        int nrays = RT13.iBuildRays(false);   // run only good rays
+        int nrays = rt13.iBuildRays(false);   // run only good rays
         if (nrays < ngood)
         {
             return BIGVAL; // special error code
@@ -373,9 +375,9 @@ public class AutoAdjuster implements B4constants
 
             //---modify the master adjustable----------------
 
-            RT13.surfs[surf][attr] += dp[iadj]; 
+            rt13.surfs[surf][attr] += dp[iadj];
 
-            optEditor.putFieldDouble(field, surf+2, RT13.surfs[surf][attr]); 
+            optEditor.putFieldDouble(field, surf+2, rt13.surfs[surf][attr]);
 
             //-----modify its slaves and antislaves----------
 
@@ -386,14 +388,14 @@ public class AutoAdjuster implements B4constants
                 int j = jSlave.intValue(); 
                 double dSign = (j > 0) ? +1.0 : -1.0; 
                 j = Math.abs(j); 
-                RT13.surfs[j][attr] += dSign * dp[iadj]; 
-                optEditor.putFieldDouble(field, j+2, RT13.surfs[j][attr]); 
+                rt13.surfs[j][attr] += dSign * dp[iadj];
+                optEditor.putFieldDouble(field, j+2, rt13.surfs[j][attr]);
             }
             if (attr==OSHAPE)
-              RT13.surfs[surf][OASPHER] += dp[iadj];
+              rt13.surfs[surf][OASPHER] += dp[iadj];
         }
         if (bAngle)
-          RT13.setEulers();
+          rt13.setEulers();
         if (optDataModelListener != null)
             optDataModelListener.optModelUpdated();
         //optEditor.repaint();
@@ -409,8 +411,8 @@ public class AutoAdjuster implements B4constants
             int field = rayEditor.getAdjField(iadj); 
 
             //---nudge the master adjustable ray----------------
-            RT13.raystarts[kray][attr] += dp[iadj]; 
-            rayEditor.putFieldDouble(field, kray+2, RT13.raystarts[kray][attr]); 
+            rt13.raystarts[kray][attr] += dp[iadj];
+            rayEditor.putFieldDouble(field, kray+2, rt13.raystarts[kray][attr]);
 
             //-----nudge any slave rays--------------------------
 
@@ -421,8 +423,8 @@ public class AutoAdjuster implements B4constants
                 int k = jSlave.intValue(); 
                 double dSign = (k > 0) ? +1.0 : -1.0; 
                 k = Math.abs(k); 
-                RT13.raystarts[k][attr] += dSign * dp[iadj]; 
-                rayEditor.putFieldDouble(field, k+2, RT13.raystarts[k][attr]); 
+                rt13.raystarts[k][attr] += dSign * dp[iadj];
+                rayEditor.putFieldDouble(field, k+2, rt13.raystarts[k][attr]);
             }
         }
         //rayEditor.repaint();

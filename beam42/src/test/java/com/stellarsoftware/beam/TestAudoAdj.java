@@ -18,7 +18,7 @@ public class TestAudoAdj {
         B4DataParser b4DataParser = new B4DataParser(optDataModel, rayDataModel, null);
         b4DataParser.parse(true);
 //        new InOut(optDataModel, rayDataModel);
-        AutoAdjuster autoAdjuster = new AutoAdjuster(optDataModel, rayDataModel, null, null);
+        AutoAdjuster autoAdjuster = new AutoAdjuster(optDataModel, rayDataModel, null, null, Globals.RT13);
         autoAdjuster.run();
         System.out.println(optDataModel.getTableString());
         System.out.println(rayDataModel.getTableString());

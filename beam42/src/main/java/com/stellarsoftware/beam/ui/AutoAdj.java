@@ -30,7 +30,7 @@ class AutoAdj implements OPTDataModelListener, RAYDataModelListener {
     AutoAdj() {
         rayEditor = DMF.rejif;
         optEditor = DMF.oejif;
-        myHost = new AutoAdjuster(optEditor.model(), rayEditor.model(), this, this); // does everything.
+        myHost = new AutoAdjuster(optEditor.model(), rayEditor.model(), this, this, RT13); // does everything.
 
         optEditor.doStashForUndo();
         rayEditor.doStashForUndo();

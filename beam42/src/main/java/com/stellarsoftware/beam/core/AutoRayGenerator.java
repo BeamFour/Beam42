@@ -1,7 +1,5 @@
 package com.stellarsoftware.beam.core;
 
-import static com.stellarsoftware.beam.core.Globals.RT13;
-
 /** AutoRay.java
   *
   *  A174: improved results dialog. 
@@ -45,7 +43,7 @@ public class AutoRayGenerator implements B4constants
     //----------parallel with InOut-------------
     private OPTDataModel optEditor = null;
     private RAYDataModel rayEditor = null;
-
+    private RT13 rt13;
 
     //-------------unique to Auto---------------
     private LMray  myLM     = null; 
@@ -74,10 +72,11 @@ public class AutoRayGenerator implements B4constants
 
     
 
-    public AutoRayGenerator(OPTDataModel optEditor, RAYDataModel rayEditor)                      // constructor does everything.
+    public AutoRayGenerator(OPTDataModel optEditor, RAYDataModel rayEditor, RT13 rt13)                      // constructor does everything.
     {
         this.optEditor = optEditor;
         this.rayEditor = rayEditor;
+        this.rt13 = rt13;
     }
 
     public boolean generate() {
@@ -111,7 +110,7 @@ public class AutoRayGenerator implements B4constants
 
         //------Verify starting rays----------
 
-        navail = RT13.iBuildRays(true);
+        navail = rt13.iBuildRays(true);
         if (navail < 1)
         {
             // JOptionPane.showMessageDialog(optEditor, "AutoRay: no good rays");
@@ -126,7 +125,7 @@ public class AutoRayGenerator implements B4constants
 
         for (gkray=1; gkray<=nrays; gkray++)
         {
-            if(!RT13.bRunOneRay(gkray))
+            if(!rt13.bRunOneRay(gkray))
                 continue;
             ngoodstarts++;
             badray = false;    // so far, so good.
@@ -136,7 +135,7 @@ public class AutoRayGenerator implements B4constants
             for (int i=0; i<ngoals; i++)
             {
                 dgoals[i] = rayEditor.getFieldDouble(fgoals[i], gkray+2);
-                drays[i] = RT13.dGetRay(gkray, nsurfs, igoals[i]);
+                drays[i] = rt13.dGetRay(gkray, nsurfs, igoals[i]);
                 resid[i] = drays[i] - dgoals[i];
                 sos += U.sqr(resid[i]);
             }
@@ -182,7 +181,7 @@ public class AutoRayGenerator implements B4constants
             {
                 if (op==op0 || op==op1)
                 {
-                    double d = RT13.raystarts[kray][op]; 
+                    double d = rt13.raystarts[kray][op];
                     //int f = REJIF.rI2F[op];
                     int f = rayEditor.rI2F(op);
                     rayEditor.putFieldDouble(f, kray+2, d);  
@@ -200,14 +199,14 @@ public class AutoRayGenerator implements B4constants
     // fills in values of resid[]. 
     // Returns sum-of-squares.  One ray is global gkray.
     {
-        if (RT13.bRunOneRay(gkray))  // includes fixUVW()
+        if (rt13.bRunOneRay(gkray))  // includes fixUVW()
         {   
             double sos = 0; 
             for (int i=0; i<ngoals; i++)
             {
                 // re-goaling here is unnecessary: unchanged from setup.
                 // dgoals[i] = rayEditor.getFieldDouble(fgoals[i], gkray+2); 
-                drays[i] = RT13.dGetRay(gkray, nsurfs, igoals[i]); 
+                drays[i] = rt13.dGetRay(gkray, nsurfs, igoals[i]);
                 resid[i] = drays[i] - dgoals[i]; 
                 sos += U.sqr(resid[i]); 
             }
@@ -230,7 +229,7 @@ public class AutoRayGenerator implements B4constants
         {
             int attr = rayEditor.getAdjAttrib(iadj); 
             int field = rayEditor.getAdjField(iadj); 
-            RT13.raystarts[gkray][attr] += dp[iadj]; 
+            rt13.raystarts[gkray][attr] += dp[iadj];
         }
         return dPerformResid();
     }

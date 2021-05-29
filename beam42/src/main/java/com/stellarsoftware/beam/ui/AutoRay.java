@@ -2,6 +2,7 @@ package com.stellarsoftware.beam.ui;
 
 import com.stellarsoftware.beam.core.AutoRayGenerator;
 import com.stellarsoftware.beam.core.Comparo;
+import com.stellarsoftware.beam.core.Globals;
 import com.stellarsoftware.beam.core.U;
 
 import java.awt.*;
@@ -57,7 +58,7 @@ class AutoRay
         if (rayEditor == null || optEditor == null)
             return;
         rayEditor.doStashForUndo();
-        AutoRayGenerator myhost = new AutoRayGenerator(optEditor.model(), rayEditor.model());       // does everything.
+        AutoRayGenerator myhost = new AutoRayGenerator(optEditor.model(), rayEditor.model(), Globals.RT13);       // does everything.
         if (!myhost.generate()) {
             JOptionPane.showMessageDialog(optEditor, "AutoRay: failed");
             return;

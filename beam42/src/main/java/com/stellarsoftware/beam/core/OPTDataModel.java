@@ -33,6 +33,13 @@ public class OPTDataModel extends B4DataModel {
         return oglasses;
     }
 
+    public int oF2I(int i) {
+        return oF2I[i];
+    }
+    public int oI2F(int i) {
+        return oI2F[i];
+    }
+
     public static int getOptFieldAttrib(String s)
     // Given an optics table column header field, this routine returns a
     // number 0..122 for identified optics table fields, or else returns ABSENT.

@@ -1,5 +1,6 @@
 package com.stellarsoftware.beam.ui;
 
+import com.stellarsoftware.beam.core.Globals;
 import com.stellarsoftware.beam.core.MEDDataModel;
 
 @SuppressWarnings("serial")
@@ -18,7 +19,7 @@ class MEJIF extends EJIF
     MEJIF(int iXY, String gfname)
     // constructor creates a media editor using EJIF
     {
-        super(2, iXY, ".MED", gfname, MAXMEDIA, new MEDDataModel());
+        super(2, iXY, ".MED", gfname, MAXMEDIA, new MEDDataModel(Globals.RT13));
         myFpath = gfname; 
     }
 

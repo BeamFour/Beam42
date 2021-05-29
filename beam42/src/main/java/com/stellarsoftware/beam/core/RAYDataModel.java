@@ -3,7 +3,6 @@ package com.stellarsoftware.beam.core;
 import java.util.ArrayList;
 
 import static com.stellarsoftware.beam.core.B4constants.*;
-import static com.stellarsoftware.beam.core.Globals.RT13;
 
 /**
  * Parses and generates the RAY Data model.
@@ -54,6 +53,10 @@ public class RAYDataModel extends B4DataModel {
     private int     nrays, nfields, fwfe;
     private ArrayList<Adjustment> adjustables;
 
+    public RAYDataModel(RT13 rt13) {
+        super(rt13);
+    }
+
     public int rF2I(int i) {
         return rF2I[i];
     }
@@ -103,7 +106,7 @@ public class RAYDataModel extends B4DataModel {
         {
             wavenames[kray] = "";
             for (int ia=0; ia<RNSTARTS; ia++)
-                RT13.raystarts[kray][ia] = -0.0; // -0.0 means absentee data
+                rt13.raystarts[kray][ia] = -0.0; // -0.0 means absentee data
         }
 
         for (int f=0; f<MAXFIELDS; f++)
@@ -187,7 +190,7 @@ public class RAYDataModel extends B4DataModel {
 
                 for (int kray=1; kray<=nrays; kray++)
                 {
-                    t = RT13.raystarts[kray][op] = getFieldDouble(field, 2+kray);
+                    t = rt13.raystarts[kray][op] = getFieldDouble(field, 2+kray);
                     if (Double.isNaN(t))
                     {
                         if (op == RSWAVEL)
@@ -205,7 +208,7 @@ public class RAYDataModel extends B4DataModel {
                         wavenames[kray] = getFieldTrim(field, 2+kray);
                         if (wavenames[kray].length() < 1)
                             Globals.giFlags[RALLWAVESPRESENT] = 0;  // false
-                        RT13.raystarts[kray][RSCOLOR] = U.getColorCode(getTag(field, 2+kray));
+                        rt13.raystarts[kray][RSCOLOR] = U.getColorCode(getTag(field, 2+kray));
                     }
                 }
             }
@@ -357,7 +360,7 @@ public class RAYDataModel extends B4DataModel {
             int kray = adjustables.get(i).getRecord();
             int iattr = adjustables.get(i).getAttrib();
             if ((kray>0) && (kray<=nrays) && (iattr>=0) && (iattr<OFINALADJ))
-                return RT13.raystarts[kray][iattr];
+                return rt13.raystarts[kray][iattr];
         }
         return 0.0;
     }
@@ -522,7 +525,7 @@ public class RAYDataModel extends B4DataModel {
             int raycount = 0;
             for (int k=1; k<=nrays; k++)   // First, count the available entries
             {
-                x = RT13.raystarts[k][iatt];
+                x = rt13.raystarts[k][iatt];
                 if (!U.isNegZero(x))
                 {
                     raycount++;
@@ -531,25 +534,25 @@ public class RAYDataModel extends B4DataModel {
             }
             if (raycount<=1)
             {
-                RT13.smaxs[iatt] = xsave;
-                RT13.smins[iatt] = xsave;
-                RT13.spans[iatt] = 0.0;
+                rt13.smaxs[iatt] = xsave;
+                rt13.smins[iatt] = xsave;
+                rt13.spans[iatt] = 0.0;
             }
             else  // two or more rays to determine span
             {
                 xmin = xmax = xsave;
                 for (int k=1; k<=nrays; k++)
                 {
-                    x = RT13.raystarts[k][iatt];
+                    x = rt13.raystarts[k][iatt];
                     if (!U.isNegZero(x))
                     {
                         xmin = Math.min(xmin, x);
                         xmax = Math.max(xmax, x);
                     }
                 }
-                RT13.smaxs[iatt] = xmax;
-                RT13.smins[iatt] = xmin;
-                RT13.spans[iatt] = xmax - xmin;
+                rt13.smaxs[iatt] = xmax;
+                rt13.smins[iatt] = xmin;
+                rt13.spans[iatt] = xmax - xmin;
             }
             // System.out.printf("REJIF.setSminsSpans() returning iatt, xmin, span = %3d %8.4f %8.4f \n", iatt, xmin, xmax-xmin);
 

@@ -1,5 +1,6 @@
 package com.stellarsoftware.beam.ui;
 
+import com.stellarsoftware.beam.core.Globals;
 import com.stellarsoftware.beam.core.OPTDataModel;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ class OEJIF extends EJIF
 
     OEJIF(int iXY, String gfname)
     {
-        super(0, iXY, ".OPT", gfname, MAXSURFS, new OPTDataModel()); // call EJIF
+        super(0, iXY, ".OPT", gfname, MAXSURFS, new OPTDataModel(Globals.RT13)); // call EJIF
         myFpath = gfname;                        // field of EJIF.
     }
 

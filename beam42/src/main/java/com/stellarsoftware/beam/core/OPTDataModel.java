@@ -1,7 +1,5 @@
 package com.stellarsoftware.beam.core;
 
-import static com.stellarsoftware.beam.core.Globals.RT13;
-
 import java.util.ArrayList;
 
 import static com.stellarsoftware.beam.core.B4constants.*;
@@ -28,6 +26,10 @@ public class OPTDataModel extends B4DataModel {
     private int nsurfs;
     private ArrayList<Adjustment> adjustables = new ArrayList<Adjustment>();
     private double dOsize = 0.0;
+
+    public OPTDataModel(RT13 rt13) {
+        super(rt13);
+    }
 
     public String[] oglasses() {
         return oglasses;
@@ -309,9 +311,9 @@ public class OPTDataModel extends B4DataModel {
         {
             oglasses[j] = "";
             for (int ia=0; ia<ONPARMS; ia++)
-                RT13.surfs[j][ia] = -0.0; // minus zero means blank entry.
+                rt13.surfs[j][ia] = -0.0; // minus zero means blank entry.
 
-            RT13.surfs[j][OREFRACT] = 1.0;
+            rt13.surfs[j][OREFRACT] = 1.0;
         }
 
         for (int f=0; f<MAXFIELDS; f++)
@@ -363,66 +365,66 @@ public class OPTDataModel extends B4DataModel {
                 {
                     case 'b': // bimodal lens front="bif" "bir" "bib" "bim"
                     case 'B': if (c2 == 'F')
-                        RT13.surfs[jsurf][OTYPE]  = OTBLFRONT;
+                        rt13.surfs[jsurf][OTYPE]  = OTBLFRONT;
                         if ((c2 == 'R') || (c2 == 'B'))
-                            RT13.surfs[jsurf][OTYPE] = OTBLBACK;
+                            rt13.surfs[jsurf][OTYPE] = OTBLBACK;
                         if (c2 == 'M')
-                            RT13.surfs[jsurf][OTYPE] = OTBMIRROR;
+                            rt13.surfs[jsurf][OTYPE] = OTBMIRROR;
                         if (c2 == 'T')
-                            RT13.surfs[jsurf][OTYPE] = OTTERMINATE;
+                            rt13.surfs[jsurf][OTYPE] = OTTERMINATE;
                         break;
 
                     case 'c':     // coordinate breaks
                     case 'C': if (c2 == 'I')
                     {
-                        RT13.surfs[jsurf][OTYPE] = OTCBIN;
+                        rt13.surfs[jsurf][OTYPE] = OTCBIN;
                         break;
                     }
                         if (c2 == 'O')
                         {
-                            RT13.surfs[jsurf][OTYPE] = OTCBOUT;
+                            rt13.surfs[jsurf][OTYPE] = OTCBOUT;
                             break;
                         }
                         break;
 
                     case 'i': // iris
-                    case 'I': RT13.surfs[jsurf][OTYPE]
+                    case 'I': rt13.surfs[jsurf][OTYPE]
                             = (c4=='A') ? OTIRISARRAY : OTIRIS; break;
 
-                    case 'G': RT13.surfs[jsurf][OTYPE]
+                    case 'G': rt13.surfs[jsurf][OTYPE]
                             = (c2=='C') ? OTGSCATTER : OTMIRROR; break;  // A195
 
                     case 'l':
-                    case 'L': RT13.surfs[jsurf][OTYPE]
+                    case 'L': rt13.surfs[jsurf][OTYPE]
                             = (c4=='A') ? OTLENSARRAY : OTLENS; break;
 
                     case 'm':
-                    case 'M': RT13.surfs[jsurf][OTYPE]
+                    case 'M': rt13.surfs[jsurf][OTYPE]
                             = (c4=='A') ? OTMIRRARRAY : OTMIRROR; break;
 
                     // phantom is just a refracting surface with equal indices.
 
                     case 'r':
-                    case 'R': RT13.surfs[jsurf][OTYPE] = OTRETRO; break;
+                    case 'R': rt13.surfs[jsurf][OTYPE] = OTRETRO; break;
 
                     // case 's':  // spider: replaced by iris with legs.
 
                     case 's':
-                    case 'S':  RT13.surfs[jsurf][OTYPE] = OTGSCATTER; break;  // A195 Gaussian scatter
+                    case 'S':  rt13.surfs[jsurf][OTYPE] = OTGSCATTER; break;  // A195 Gaussian scatter
 
                     case 't':
-                    case 'T':  RT13.surfs[jsurf][OTYPE] = OTTERMINATE; break;  // Term is alternate to BiTerm
+                    case 'T':  rt13.surfs[jsurf][OTYPE] = OTTERMINATE; break;  // Term is alternate to BiTerm
 
                     case 'u':
-                    case 'U':  RT13.surfs[jsurf][OTYPE] = OTUSCATTER; break;  // A195 uniform scatter
+                    case 'U':  rt13.surfs[jsurf][OTYPE] = OTUSCATTER; break;  // A195 uniform scatter
 
                     case 'd':     // optical path distorters
                     case 'D':
                     case 'w':
-                    case 'W': RT13.surfs[jsurf][OTYPE] = OTDISTORT; break;
+                    case 'W': rt13.surfs[jsurf][OTYPE] = OTDISTORT; break;
 
 
-                    default: RT13.surfs[jsurf][OTYPE] = OTLENS; break;
+                    default: rt13.surfs[jsurf][OTYPE] = OTLENS; break;
                 }
                 typetag[jsurf] = getTag(ifield, 2+jsurf);
             };
@@ -432,24 +434,24 @@ public class OPTDataModel extends B4DataModel {
         //--------parse the optics forms column----------
 
         for (int jsurf=1; jsurf<=nsurfs; jsurf++)
-            RT13.surfs[jsurf][OFORM] = OFELLIP;  // default
+            rt13.surfs[jsurf][OFORM] = OFELLIP;  // default
 
         int ifield = oI2F[OFORM];
         if (ifield > ABSENT)
             for (int jsurf=1; jsurf<=nsurfs; jsurf++)
             {
                 //---enforce idea of all arrays rectangular-------
-                int i = (int) RT13.surfs[jsurf][OTYPE];
+                int i = (int) rt13.surfs[jsurf][OTYPE];
                 boolean bArray = ((i==OTLENSARRAY) || (i==OTMIRRARRAY) || (i==OTIRISARRAY));
 
                 String s = getFieldTrim(ifield, 2+jsurf);
                 char c0 = U.getCharAt(s, 0);
                 char c1 = U.getCharAt(s, 1);
-                RT13.surfs[jsurf][OFORM] = OFELLIP;
+                rt13.surfs[jsurf][OFORM] = OFELLIP;
                 if ((c0=='s') || (c1=='s'))
-                    RT13.surfs[jsurf][OFORM] += OFIRECT;
+                    rt13.surfs[jsurf][OFORM] += OFIRECT;
                 if ((c0=='S') || (c1=='S') || bArray)
-                    RT13.surfs[jsurf][OFORM] += OFORECT;
+                    rt13.surfs[jsurf][OFORM] += OFORECT;
             }
     }
 
@@ -467,11 +469,11 @@ public class OPTDataModel extends B4DataModel {
             for (int jsurf=1; jsurf<=nsurfs; jsurf++)
             {
                 oglasses[jsurf] = getFieldTrim(ifield, 2+jsurf);
-                RT13.surfs[jsurf][OREFRACT] = U.suckDouble(oglasses[jsurf]);
-                if (Double.isNaN(RT13.surfs[jsurf][OREFRACT]))
+                rt13.surfs[jsurf][OREFRACT] = U.suckDouble(oglasses[jsurf]);
+                if (Double.isNaN(rt13.surfs[jsurf][OREFRACT]))
                     bAllRefractNumeric = false;
-                if (0.0 == RT13.surfs[jsurf][OREFRACT])
-                    RT13.surfs[jsurf][OREFRACT] = 1.0;
+                if (0.0 == rt13.surfs[jsurf][OREFRACT])
+                    rt13.surfs[jsurf][OREFRACT] = 1.0;
             }
         Globals.giFlags[OMEDIANEEDED] = bAllRefractNumeric ? FALSE : TRUE;
     }
@@ -500,11 +502,11 @@ public class OPTDataModel extends B4DataModel {
                 if (ia > ABSENT)    // all numerical fields can overwrite negZero here.
                 {
                     // first, fill in the datum....
-                    d = RT13.surfs[jsurf][ia] = getFieldDouble(f, 2+jsurf);
+                    d = rt13.surfs[jsurf][ia] = getFieldDouble(f, 2+jsurf);
 
                     // then check for trouble and correct it....
                     if (U.isNegZero(d) && isAdjustable(jsurf, ia))
-                        RT13.surfs[jsurf][ia] = +0.0;         // active
+                        rt13.surfs[jsurf][ia] = +0.0;         // active
 
                     // d = value, or NaN, or -0.0=unused, or +0.0=in use.
                     // now, U.NegZero(d) indicates no use whatsoever.
@@ -520,15 +522,15 @@ public class OPTDataModel extends B4DataModel {
 
                     // allow defined shape to determine asphericity...
                     if ((ia == OSHAPE) && !U.isNegZero(d))
-                        RT13.surfs[jsurf][OASPHER] = d - 1.0;
+                        rt13.surfs[jsurf][OASPHER] = d - 1.0;
 
                     // allow defined radii of curvature to determine curvature...
                     if ((ia == ORAD) && (d != 0.0))
-                        RT13.surfs[jsurf][OCURVE] = 1.0/d;
+                        rt13.surfs[jsurf][OCURVE] = 1.0/d;
                     if ((ia == ORADX) && (d != 0.0))
-                        RT13.surfs[jsurf][OCURVX] = 1.0/d;
+                        rt13.surfs[jsurf][OCURVX] = 1.0/d;
                     if ((ia == ORADY) && (d != 0.0))
-                        RT13.surfs[jsurf][OCURVY] = 1.0/d;
+                        rt13.surfs[jsurf][OCURVY] = 1.0/d;
                 }
             }
             if (osyntaxerr > 0)
@@ -545,7 +547,7 @@ public class OPTDataModel extends B4DataModel {
         //----a grating is not a type: it's a groovy mirror or lens----
         for (int jsurf=1; jsurf<=nsurfs; jsurf++)
         {
-            RT13.surfs[jsurf][OTYPE] = OTLENS;  // default
+            rt13.surfs[jsurf][OTYPE] = OTLENS;  // default
         }
     }
 
@@ -568,41 +570,41 @@ public class OPTDataModel extends B4DataModel {
     void parseDiameters() {
         //-------evaluate diameters DIAX, DIAY-------------------
         for (int j = 1; j <= nsurfs; j++) {
-            boolean bM = RT13.surfs[j][OIDIAM] > 0.0;
-            boolean bX = RT13.surfs[j][OIDIAX] > 0.0;
-            boolean bY = RT13.surfs[j][OIDIAY] > 0.0;
+            boolean bM = rt13.surfs[j][OIDIAM] > 0.0;
+            boolean bX = rt13.surfs[j][OIDIAX] > 0.0;
+            boolean bY = rt13.surfs[j][OIDIAY] > 0.0;
             if (!bX) {
                 if (bM)
-                    RT13.surfs[j][OIDIAX] = RT13.surfs[j][OIDIAM];
+                    rt13.surfs[j][OIDIAX] = rt13.surfs[j][OIDIAM];
                 else if (bY)
-                    RT13.surfs[j][OIDIAX] = RT13.surfs[j][OIDIAY];
+                    rt13.surfs[j][OIDIAX] = rt13.surfs[j][OIDIAY];
             }
             if (!bY) {
                 if (bM)
-                    RT13.surfs[j][OIDIAY] = RT13.surfs[j][OIDIAM];
+                    rt13.surfs[j][OIDIAY] = rt13.surfs[j][OIDIAM];
                 else if (bX)
-                    RT13.surfs[j][OIDIAY] = RT13.surfs[j][OIDIAX];
+                    rt13.surfs[j][OIDIAY] = rt13.surfs[j][OIDIAX];
             }
-            bM = RT13.surfs[j][OODIAM] > 0.0;
-            bX = RT13.surfs[j][OODIAX] > 0.0;
-            bY = RT13.surfs[j][OODIAY] > 0.0;
+            bM = rt13.surfs[j][OODIAM] > 0.0;
+            bX = rt13.surfs[j][OODIAX] > 0.0;
+            bY = rt13.surfs[j][OODIAY] > 0.0;
             if (!bX) {
                 if (bM)
-                    RT13.surfs[j][OODIAX] = RT13.surfs[j][OODIAM];
+                    rt13.surfs[j][OODIAX] = rt13.surfs[j][OODIAM];
                 else if (bY)
-                    RT13.surfs[j][OODIAX] = RT13.surfs[j][OODIAY];
+                    rt13.surfs[j][OODIAX] = rt13.surfs[j][OODIAY];
             }
             if (!bY) {
                 if (bM)
-                    RT13.surfs[j][OODIAY] = RT13.surfs[j][OODIAM];
+                    rt13.surfs[j][OODIAY] = rt13.surfs[j][OODIAM];
                 else if (bX)
-                    RT13.surfs[j][OODIAY] = RT13.surfs[j][OODIAX];
+                    rt13.surfs[j][OODIAY] = rt13.surfs[j][OODIAX];
             }
         }
         boolean bAllDiamsPresent = true;
         for (int j = 1; j <= nsurfs; j++) {
-            boolean bX = RT13.surfs[j][OODIAX] > 0.0;
-            boolean bY = RT13.surfs[j][OODIAY] > 0.0;
+            boolean bX = rt13.surfs[j][OODIAX] > 0.0;
+            boolean bY = rt13.surfs[j][OODIAY] > 0.0;
             if (!bX || !bY)
                 bAllDiamsPresent = false;
         }
@@ -615,9 +617,9 @@ public class OPTDataModel extends B4DataModel {
         {
             boolean bGroovy = false;
             for (int kg=OORDER; kg<OGROOVY; kg++)
-                if (RT13.surfs[j][kg] != 0.0)
+                if (rt13.surfs[j][kg] != 0.0)
                     bGroovy = true;
-            RT13.surfs[j][OGROOVY] = bGroovy ? 1.0 : 0.0;
+            rt13.surfs[j][OGROOVY] = bGroovy ? 1.0 : 0.0;
         }
     }
 
@@ -625,30 +627,30 @@ public class OPTDataModel extends B4DataModel {
         //---------verify that array diams are within cells------------
         for (int j=1; j<nsurfs; j++)
         {
-            int i = (int) RT13.surfs[j][OTYPE];
+            int i = (int) rt13.surfs[j][OTYPE];
             boolean bArray = ((i==OTLENSARRAY) || (i==OTMIRRARRAY) || (i==OTIRISARRAY));
             if (bArray)
             {
-                double diax = RT13.surfs[j][OODIAX];
+                double diax = rt13.surfs[j][OODIAX];
                 if (U.isNegZero(diax))
-                    diax = RT13.surfs[j][OODIAM];
-                int nx = (int) RT13.surfs[j][ONARRAYX];
+                    diax = rt13.surfs[j][OODIAM];
+                int nx = (int) rt13.surfs[j][ONARRAYX];
                 if ((diax<=TOL) || (nx<1))
                     continue; // continue, not return!
                 double px = diax/nx;
-                if(RT13.surfs[j][OIDIAX] > diax/nx)
-                    RT13.surfs[j][OIDIAX] = diax/nx;
+                if(rt13.surfs[j][OIDIAX] > diax/nx)
+                    rt13.surfs[j][OIDIAX] = diax/nx;
 
-                double diay = RT13.surfs[j][OODIAM];
-                int ny = (int) RT13.surfs[j][ONARRAYY];
+                double diay = rt13.surfs[j][OODIAM];
+                int ny = (int) rt13.surfs[j][ONARRAYY];
                 if ((diay<=TOL) || (ny<1))
                     continue; // continue, not return!
                 double py = diay/ny;
-                if (RT13.surfs[j][OIDIAM] > diay/ny)
-                    RT13.surfs[j][OIDIAM] = diay/ny;
+                if (rt13.surfs[j][OIDIAM] > diay/ny)
+                    rt13.surfs[j][OIDIAM] = diay/ny;
 
                 if (nx*ny > MAXHOLES)
-                    RT13.surfs[j][ONARRAYY] = (MAXHOLES)/nx;
+                    rt13.surfs[j][ONARRAYY] = (MAXHOLES)/nx;
             }
         }
     }
@@ -673,12 +675,12 @@ public class OPTDataModel extends B4DataModel {
 
         for (int j=1; j<=nsurfs; j++)
         {
-            double  ce = RT13.surfs[j][OCURVE];
-            double  cx = RT13.surfs[j][OCURVX];
-            double  cy = RT13.surfs[j][OCURVY];
-            double  ae = RT13.surfs[j][OASPHER];
-            double  ax = RT13.surfs[j][OASPHX];
-            double  ay = RT13.surfs[j][OASPHY];
+            double  ce = rt13.surfs[j][OCURVE];
+            double  cx = rt13.surfs[j][OCURVX];
+            double  cy = rt13.surfs[j][OCURVY];
+            double  ae = rt13.surfs[j][OASPHER];
+            double  ax = rt13.surfs[j][OASPHX];
+            double  ay = rt13.surfs[j][OASPHY];
 
             //---TERNARY LOGIC EVALUATOR starts here-----
             //---three states: empty field, entry=0, entry is nonzero------
@@ -718,7 +720,7 @@ public class OPTDataModel extends B4DataModel {
 
             boolean bPoly = false;
             for (int i=OA1; i<=OA14; i++)
-                if ((0 != RT13.surfs[j][i]) || isAdjustable(j,i))
+                if ((0 != rt13.surfs[j][i]) || isAdjustable(j,i))
                     bPoly = true;
 
             //----Zernike flag and diameter test  -----------------
@@ -727,10 +729,10 @@ public class OPTDataModel extends B4DataModel {
 
             boolean bZern = false;
             for (int i=OZ00; i<=OZ35; i++)
-                if ((0 != RT13.surfs[j][i]) || isAdjustable(j,i))
+                if ((0 != rt13.surfs[j][i]) || isAdjustable(j,i))
                     bZern = true;
 
-            if (bZern && (RT13.surfs[j][OODIAM] == 0.0))
+            if (bZern && (rt13.surfs[j][OODIAM] == 0.0))
                 badZern = true; // gives warning "Zernikes require Diameters"
 
             //-------upgrade if poly or zern is present--------
@@ -748,7 +750,7 @@ public class OPTDataModel extends B4DataModel {
             if (bZern)
                 iProfile = (iProfile==OSTORIC) ? OSZERNTOR : OSZERNREV;
 
-            if (RT13.surfs[j][ORGAUSS] > 0.)  // found a Gaussian surface profile
+            if (rt13.surfs[j][ORGAUSS] > 0.)  // found a Gaussian surface profile
             {
                 iProfile = OSGAUSS;
             }
@@ -771,7 +773,7 @@ public class OPTDataModel extends B4DataModel {
             }
             // System.out.println("OEJIF parse() surface= "+j+" finds iProfile= "+iProfile+"  "+sProfiles[iProfile]);
 
-            RT13.surfs[j][OPROFILE] = iProfile;
+            rt13.surfs[j][OPROFILE] = iProfile;
         }
         if (badZern)
             System.err.println("Zernikes without Diameter are ignored.");
@@ -784,11 +786,11 @@ public class OPTDataModel extends B4DataModel {
         dOsize = 0.0;
         for (int j=1; j<=nsurfs; j++)
         {
-            dOsize = Math.max(dOsize, Math.abs(RT13.surfs[j][OX]));
-            dOsize = Math.max(dOsize, Math.abs(RT13.surfs[j][OY]));
-            dOsize = Math.max(dOsize, Math.abs(RT13.surfs[j][OZ]));
-            dOsize = Math.max(dOsize, Math.abs(RT13.surfs[j][OODIAM]));
-            dOsize = Math.max(dOsize, Math.abs(RT13.surfs[j][OODIAX]));
+            dOsize = Math.max(dOsize, Math.abs(rt13.surfs[j][OX]));
+            dOsize = Math.max(dOsize, Math.abs(rt13.surfs[j][OY]));
+            dOsize = Math.max(dOsize, Math.abs(rt13.surfs[j][OZ]));
+            dOsize = Math.max(dOsize, Math.abs(rt13.surfs[j][OODIAM]));
+            dOsize = Math.max(dOsize, Math.abs(rt13.surfs[j][OODIAX]));
         }
         if (dOsize < TOL)
             dOsize = 1.0;
@@ -835,7 +837,7 @@ public class OPTDataModel extends B4DataModel {
         parseAdjustables();
         parseDiameters();
         //------------set the Euler angle matrix------------------
-        RT13.setEulers();
+        rt13.setEulers();
         testGroovyness();
         verifyArrayDims();
         classifyProfileSolvers();
@@ -866,7 +868,7 @@ public class OPTDataModel extends B4DataModel {
            int jsurf = adjustables.get(i).getRecord();
            int iattr = adjustables.get(i).getAttrib();
            if ((jsurf>0) && (jsurf<=nsurfs) && (iattr>=0) && (iattr<OFINALADJ))
-             return RT13.surfs[jsurf][iattr];
+             return rt13.surfs[jsurf][iattr];
        }
        return 0.0;
     }

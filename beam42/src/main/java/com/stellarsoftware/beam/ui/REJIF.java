@@ -1,5 +1,6 @@
 package com.stellarsoftware.beam.ui;
 
+import com.stellarsoftware.beam.core.Globals;
 import com.stellarsoftware.beam.core.RAYDataModel;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ class REJIF extends EJIF
 
     REJIF(int iXY, String gfname)
     {
-        super(1, iXY, ".RAY", gfname, MAXRAYS, new RAYDataModel()); // call EJIF for preliminary parse()
+        super(1, iXY, ".RAY", gfname, MAXRAYS, new RAYDataModel(Globals.RT13)); // call EJIF for preliminary parse()
         myFpath = gfname;
     }
 

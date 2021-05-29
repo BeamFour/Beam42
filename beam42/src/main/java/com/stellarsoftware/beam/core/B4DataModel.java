@@ -26,10 +26,11 @@ public abstract class B4DataModel {
     //-------------here is the char table-----------------
 
     private char charTable[][] = new char[JMAX+1][IMAX+1];
+    protected RT13 rt13;
 
-    protected B4DataModel() {
+    protected B4DataModel(RT13 rt13) {
         //--------set up fieldArray helpers-----------------
-
+        this.rt13 = rt13;
         nfields = 0;
 
         for (int f=0; f<MAXFIELDS; f++)

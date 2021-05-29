@@ -1,7 +1,6 @@
 package com.stellarsoftware.beam.core;
 
 import static com.stellarsoftware.beam.core.B4constants.*;
-import static com.stellarsoftware.beam.core.Globals.RT13;
 
 /**
  * Responsible for parsing MED files and creating the Media data model.
@@ -26,6 +25,10 @@ public class MEDDataModel extends B4DataModel {
 
     private String mwaves[] = new String[MAXFIELDS];
     private String mglasses[] = new String[MAXMEDIA + 1];
+
+    public MEDDataModel(RT13 rt13) {
+        super(rt13);
+    }
 
     @Override
     public void parse()  // replaces the abstract parse() in EJIF
@@ -53,7 +56,7 @@ public class MEDDataModel extends B4DataModel {
 
         for (int irec=0; irec<=MAXMEDIA; irec++)
             for (int f=0; f<MAXFIELDS; f++)
-                RT13.media[irec][f] = 1.0;
+                rt13.media[irec][f] = 1.0;
 
         for (int irec=1; irec<=MAXMEDIA; irec++)
             mglasses[irec] = "";
@@ -86,9 +89,9 @@ public class MEDDataModel extends B4DataModel {
         {
             for (int irec = 1; irec<= Globals.giFlags[MNGLASSES]; irec++)
             {
-                double n = RT13.media[irec][f] = getFieldDouble(f, 2+irec);
+                double n = rt13.media[irec][f] = getFieldDouble(f, 2+irec);
                 // System.out.printf("MEJIF refraction at f,g= %3d %3d %8.5f \n", f, irec, n);
-                if (Double.isNaN(RT13.media[irec][f]))
+                if (Double.isNaN(rt13.media[irec][f]))
                 {
                     badline = irec+2;
                     badfield = f;
@@ -96,8 +99,8 @@ public class MEDDataModel extends B4DataModel {
                     // leave NaN in place here to alert Gparse!
                     break;
                 }
-                if (RT13.media[irec][f] == 0.0)  // make blank or zero = 1.0
-                    RT13.media[irec][f] = 1.0;
+                if (rt13.media[irec][f] == 0.0)  // make blank or zero = 1.0
+                    rt13.media[irec][f] = 1.0;
             }
             if (msyntaxerr > 0)
                 break;

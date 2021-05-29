@@ -21,6 +21,7 @@ public class TestAudoAdj {
         AutoAdjuster autoAdjuster = new AutoAdjuster(optDataModel, rayDataModel, null, null, Globals.RT13);
         autoAdjuster.run();
         System.out.println(optDataModel.getTableString());
+        Assert.assertEquals("3.12613", optDataModel.getFieldTrim(optDataModel.oI2F(OPTDataModel.getOptFieldAttrib("Z")), 5));
         System.out.println(rayDataModel.getTableString());
     }
 

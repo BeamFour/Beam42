@@ -1,5 +1,7 @@
 package com.stellarsoftware.beam.core;
 
+import static com.stellarsoftware.beam.core.Globals.RT13;
+
 /** AutoAdj.java
   * A207: eliminated groups
   * class LMadj is at the bottom of this file. 

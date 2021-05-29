@@ -1,6 +1,6 @@
 package com.stellarsoftware.beam.core;
 
-import com.stellarsoftware.beam.core.Adjustment;
+import static com.stellarsoftware.beam.core.Globals.RT13;
 
 import java.util.ArrayList;
 

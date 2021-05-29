@@ -1,5 +1,7 @@
 package com.stellarsoftware.beam.core;
 
+import static com.stellarsoftware.beam.core.Globals.RT13;
+
 /** AutoRay.java
   *
   *  A174: improved results dialog. 

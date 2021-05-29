@@ -1,7 +1,7 @@
 package com.stellarsoftware.beam.ui;
 
 import com.stellarsoftware.beam.core.Globals;
-import com.stellarsoftware.beam.core.RT13;
+import static com.stellarsoftware.beam.core.Globals.RT13;
 import com.stellarsoftware.beam.core.U;
 
 import java.util.*;        // ArrayList

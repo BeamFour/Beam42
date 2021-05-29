@@ -179,31 +179,31 @@ import com.stellarsoftware.beam.ui.DMF;
   */
 public class RT13 implements B4constants
 {
-    private static int iFailSurf, iFailCode; // for AutoAdjust line 298
+    private int iFailSurf, iFailCode; // for AutoAdjust line 298
     
     /*--------public input working arrays for OEJIF and REJIF------*/
     /*-------RNSTARTS = 10, the number of ray start attributes-----*/
 
-    public static double  surfs[][]      = new double[MAXSURFS+1][ONPARMS]; 
-    public static double  raystarts[][]  = new double[MAXRAYS+1][RNSTARTS]; 
-    public static double  spans[]        = new double[RNSTARTS];  // set by REJIF
-    public static double  smins[]        = new double[RNSTARTS];  // set by REJIF
-    public static double  smaxs[]        = new double[RNSTARTS];  // set by REJIF
-    public static double  media[][]      = new double[MAXMEDIA+1][MAXFIELDS]; 
+    public double  surfs[][]      = new double[MAXSURFS+1][ONPARMS];
+    public double  raystarts[][]  = new double[MAXRAYS+1][RNSTARTS];
+    public double  spans[]        = new double[RNSTARTS];  // set by REJIF
+    public double  smins[]        = new double[RNSTARTS];  // set by REJIF
+    public double  smaxs[]        = new double[RNSTARTS];  // set by REJIF
+    public double  media[][]      = new double[MAXMEDIA+1][MAXFIELDS];
 
-    public static int     gO2M[] = new int[MAXSURFS+1]; // from DMF; for jsurf gives glass ID
-    public static int     gR2W[] = new int[MAXRAYS+1];  // from DMF; for kray gives wavel ID
+    public int     gO2M[] = new int[MAXSURFS+1]; // from DMF; for jsurf gives glass ID
+    public int     gR2W[] = new int[MAXRAYS+1];  // from DMF; for kray gives wavel ID
 
     //----gwave allows MPlotPanel to commandeer wavelengths; see getRefraction()---
     //------for all other purposes keep gwave=0 so rays control wavelengths--------
 
-    public static int     gwave = 0;   
+    public int     gwave = 0;
  
     /*----------------public output arrays-------------------*/
 
 
-    public static double  refractLayoutShading[] = new double[MAXSURFS+1]; 
-    public static boolean isRayOK[] = new boolean[MAXRAYS+1]; 
+    public double  refractLayoutShading[] = new double[MAXSURFS+1];
+    public boolean isRayOK[] = new boolean[MAXRAYS+1];
     // public static int     iWFEgroup[] = new int[MAXRAYS+1];  // eliminated A207
     // public static double     dot[] = new double[MAXRAYS+1];  // moved into attribs
     
@@ -212,17 +212,17 @@ public class RT13 implements B4constants
     /*-------------------- public methods-------------------*/
     /*------------------------------------------------------*/
     
-    public static int getFailSurf()  // set in line 664; called by AutoAdjust line 297.
+    public int getFailSurf()  // set in line 664; called by AutoAdjust line 297.
     {
         return iFailSurf;
     }
     
-    public static int getFailCode()  // set in line 665; called by AutoAdjust line 297.
+    public int getFailCode()  // set in line 665; called by AutoAdjust line 297.
     {
         return iFailCode;
     }
 
-    static public double dGetRay(int kray, int j, int iattrib)
+    public double dGetRay(int kray, int j, int iattrib)
     // Accesses any one ray trace result, after iBuildRays() has been run.
     // "j" is the desired surface number.
     {
@@ -238,7 +238,7 @@ public class RT13 implements B4constants
         return -0.0; 
     }
 
-    static public double dGetRayFinal(int kray, int iatt)
+    public double dGetRayFinal(int kray, int iatt)
     // called by MapPanel after iBuildRays() has been run.
     {
         int jsurf = Globals.giFlags[ONSURFS];
@@ -246,7 +246,7 @@ public class RT13 implements B4constants
     }
     
     
-    static public double dGetSurfParm(int iatt, int jsurf)
+    public double dGetSurfParm(int iatt, int jsurf)
     // Returns one of the many surface parameters & attributes. 
     // Needed for Map function when surface is to be deviated for mapping.
     // Called by MapPanel and LayoutPanel. 
@@ -258,7 +258,7 @@ public class RT13 implements B4constants
          return surfs[jsurf][iatt]; 
     }
 
-    static public int getSurfNum(int opcode)
+    public static int getSurfNum(int opcode)
     // Converts a given opcode into its surface number.
     // This handles the case of "final" by returning nsurfs. 
     // Callers should always test this result for error situation = -1!
@@ -278,7 +278,7 @@ public class RT13 implements B4constants
     }
     
     
-    static public int getAttrNum(int opcode)
+    public static int getAttrNum(int opcode)
     // Always test result for situation = -1!
     {
         opcode %= 100; 
@@ -289,7 +289,7 @@ public class RT13 implements B4constants
     }
 
 
-    static public int getStatus(int kray)
+    public int getStatus(int kray)
     // Returns RROK or ray error code for "kray"
     // Decode these with B4constants sResults[] array. 
     {
@@ -297,7 +297,7 @@ public class RT13 implements B4constants
     }
 
 
-    static public int getHowfarLoop(int kray)
+    public int getHowfarLoop(int kray)
     // Returns how far the *loop* went, 1...ngroups
     // even though the ray may have failed or terminated OK.
     // Use this in InOut's explanations. 
@@ -306,7 +306,7 @@ public class RT13 implements B4constants
     } 
 
 
-    static public int getHowfarOK(int kray)
+    public int getHowfarOK(int kray)
     // Returns how far the *ray* went, 0....nsurfs
     // Used by Layout for jsolid, and Plot2D Plot3D for item validation
     {
@@ -315,7 +315,7 @@ public class RT13 implements B4constants
    
 
 
-    static public boolean getExtend(int kray)
+    public boolean getExtend(int kray)
     // Returns true if the ray should be drawn with a dotted extension
     // True for bak, mis, Diam, diam, but not Iris, iris, spider.
     // Called by layout; loaded within local bRunray().
@@ -324,7 +324,7 @@ public class RT13 implements B4constants
     }
 
 
-    static public int getGuideRay()
+    public int getGuideRay()
     // Returns the number 1...nrays of ray whose color, wavel, order is in use.
     // Most useful for random rays, where kray=0. 
     // Yikes in A207 this is always zero!  Must never be zero!
@@ -335,7 +335,7 @@ public class RT13 implements B4constants
     }
 
 
-    static public double getRefraction(int jsurf, int gkray)
+    public double getRefraction(int jsurf, int gkray)
     // if gwave==0: Returns index approaching jsurf, using gkray @wave.
     // if gwave>0: returns index approaching jsurf, using media @gwave.
     // Mostly called by public iBuildRays()
@@ -399,7 +399,7 @@ public class RT13 implements B4constants
     }
 
 
-    static public void setEulers()
+    public void setEulers()
     // fixes up all missing fields in optical surface definition
     // Generate matrix converting local to lab frame. 
     // Use transpose to convert lab frame to local. 
@@ -454,7 +454,7 @@ public class RT13 implements B4constants
 
 
   
-    static public int iBuildRays(boolean bAll)
+    public int iBuildRays(boolean bAll)
     // This runs all table rays or just the previously good table rays. 
     // NOTA BENE this is nsurfs not ngroups!  Because it uses bRunOneRay.
     // Builds dRays[] by calling bRunray() for each ray start.
@@ -502,7 +502,7 @@ public class RT13 implements B4constants
    
     
 
-    static public boolean bRunOneRay(int k) 
+    public boolean bRunOneRay(int k)
     // Runs a single ray. If k==0, random ray; else table ray.
     // Returns TRUE if raystatus == RROK, else FALSE.
     // M.Lampton STELLAR SOFTWARE (c) 2012, 2018 
@@ -718,7 +718,7 @@ public class RT13 implements B4constants
 
 
 
-    static public boolean bRunRandomRay()
+    public boolean bRunRandomRay()
     // This edition has no WFE group support. A207
     {
         return bRunOneRay(0);   // includes iCreateOneRandomRayStart()
@@ -732,17 +732,17 @@ public class RT13 implements B4constants
     /*-------------------------private zone----------------------*/
     /*-----------------------------------------------------------*/
 
-    private static int kGuideRay      = 0; 
-    private static boolean bExtend[]  = new boolean[MAXRAYS+1]; 
-    private static int status[]       = new int[MAXRAYS+1];
-    private static int howfarOK[]     = new int[MAXRAYS+1];
-    private static int howfarLoop[]   = new int[MAXRAYS+1]; 
+    private int kGuideRay      = 0;
+    private boolean bExtend[]  = new boolean[MAXRAYS+1];
+    private int status[]       = new int[MAXRAYS+1];
+    private int howfarOK[]     = new int[MAXRAYS+1];
+    private int howfarLoop[]   = new int[MAXRAYS+1];
     
-    private static double dRays[][][] = new double[MAXRAYS+1][MAXSURFS+1][RNATTRIBS];
+    private double dRays[][][] = new double[MAXRAYS+1][MAXSURFS+1][RNATTRIBS];
 
-    private static boolean   bUserOptionPositive = true; 
-    private static int       iUserOptionMethod = 0; 
-    private static double    dIsoRadius = 0.0; 
+    private boolean   bUserOptionPositive = true;
+    private int       iUserOptionMethod = 0;
+    private double    dIsoRadius = 0.0;
     
     /*--------------for WFE table and random-----------------*/
 
@@ -753,7 +753,7 @@ public class RT13 implements B4constants
     // private static double tiltWFE[][] = new double[MAXWFEGROUPS][3]; 
     // private static int    ijWFE[][]   = new int[MAXWFEGROUPS][2];     // pupil
     
-    private static int ngood = 0; 
+    private int ngood = 0;
     
     
 /* A207 eliminated this task temporarily
@@ -960,7 +960,7 @@ public class RT13 implements B4constants
 
 
 
-    static private int iCreateOneRandomRayStart()
+    private int iCreateOneRandomRayStart()
     {
         // A207: sets up a random ray start as raystarts[0]
         // Called only by bRunOneRay(k) when k==0.
@@ -1186,7 +1186,7 @@ public class RT13 implements B4constants
     }
 
 
-    static private void vPropagate(int kray, int jsurf, double d)
+    private void vPropagate(int kray, int jsurf, double d)
     // Propagates a ray for a distance d in vertex coordinate system.
     // Void because this cannot fail. 
     // Refractive index dI is needed only for RPATH. 
@@ -1215,7 +1215,7 @@ public class RT13 implements B4constants
     /*---------optical methods: interceptors & rootfinders--------*/
     /*---------optical methods: interceptors & rootfinders--------*/
     
-    static private int intercept(int kray, int jsurf)
+    private int intercept(int kray, int jsurf)
     // calls dIntercept, propagates if OK: returns RR code: RROK, RRMIS, RRBAK, RRBRA
     {
         int code = RROK; 
@@ -1668,7 +1668,7 @@ public class RT13 implements B4constants
     /*---A207 eliminating special code for iris-------*/
 
 
-    static private int validate(int kray, int jsurf)
+    private int validate(int kray, int jsurf)
     {
         int code = iDiams(dRays[kray][jsurf], surfs[jsurf]);
         // System.out.println("Validate is returning " + sResults[code]);
@@ -1812,7 +1812,7 @@ public class RT13 implements B4constants
     /*-------------------------redirectors----------------------*/
     /*-------------------------redirectors----------------------*/
     
-    static private int redirect(int kray, int jsurf)
+    private int redirect(int kray, int jsurf)
     // attempts to redirect a ray segment; returns RROK or error code
     {
         // System.out.println("RT13.redirect() is given kray, jsurf = "+kray+"  "+jsurf); 
@@ -1822,7 +1822,7 @@ public class RT13 implements B4constants
     }
 
 
-    static private int iRedirect(double rayseq[][], double surf[], int j)
+    private int iRedirect(double rayseq[][], double surf[], int j)
     // M.Lampton STELLAR SOFTWARE (C) 2013
     //
     // Modifies the local-frame u,v,w to redirect this ray. 
@@ -1944,7 +1944,7 @@ public class RT13 implements B4constants
     }
     
 
-    static private int iSnell(double ray[], double surf[], int jsurf)
+    private int iSnell(double ray[], double surf[], int jsurf)
     // Caution: ray[13] is solved in local frame. 
     // M.Lampton STELLAR SOFTWARE (C) 1989, 2003 
     // Method: S' = mu * Salongsurface + gamma * Normaltosurface,
@@ -2039,7 +2039,7 @@ public class RT13 implements B4constants
         G[1] = gy;                 
     }
 
-    static private int iTG(double ray[], double surf[], int jsurf)
+    private int iTG(double ray[], double surf[], int jsurf)
     // Plane Transmission grating solver: refraction and diffraction combined.
     // Must have numerical wavelength not literal if using diffraction. 
     //
@@ -2171,13 +2171,13 @@ public class RT13 implements B4constants
         return RROK; 
     }
 
-    static private int iRgrating(double ray[], double surf[])
+    private int iRgrating(double ray[], double surf[])
     {
         return iGrating(ray, surf, true); 
     }
 
 
-    static private int iGrating(double ray[], double surf[], boolean bRefl)
+    private int iGrating(double ray[], double surf[], boolean bRefl)
     // Vacuum diffraction grating, transmission or reflection. 
     //   Output: revised ray[] directions in local vertex frame.
     //   Method: Spencer & Murty eqns 49 & 50.
@@ -2338,7 +2338,7 @@ public class RT13 implements B4constants
 
 
     
-    static private void labtovx(int k, int jprev, int j)
+    private void labtovx(int k, int jprev, int j)
     // Coordinate frame changer from lab jprev to vertex frame j.
     // Matrix OE converts local to lab coordinates; so use its transpose here.
     // Also carries RPATH forward from rprev[] to rthis[] ??
@@ -2383,7 +2383,7 @@ public class RT13 implements B4constants
     }
 
 
-    static private void vxtolab(int k, int j)
+    private void vxtolab(int k, int j)
     // Coordinate frame changer, ray="k", single surface "j".
     // Here the OE matrix is used directly, local to lab conversion. 
     // Converts a vertex-frame ray descriptor to lab frame.
@@ -2431,7 +2431,7 @@ public class RT13 implements B4constants
     }
 
     
-    static private void clobberUVW(int k, int j)
+    private void clobberUVW(int k, int j)
     // used only to zero out failed redirections to blank InOut and graphic data points.
     // Assumes that InOut, Plot2D and Plot3D skip minus zero data!
     {
@@ -2443,7 +2443,7 @@ public class RT13 implements B4constants
         dRays[k][j][RW]   = +1.0;
     }
 
-    static private void clobberAll(int k, int j)
+    private void clobberAll(int k, int j)
     // clears out a skipped ray surface combo.
     {
         dRays[k][j][RTXL] = -0.0; 
@@ -2460,7 +2460,7 @@ public class RT13 implements B4constants
         dRays[k][j][RW]   = -0.0;
     }
     
-    static private void vExtendLabs(int kray)
+    private void vExtendLabs(int kray)
     // Extends lab coords of a failed ray for layout dotted indicator.
     // Extends from howfarOK[k] to howfarOK[k]+1.
     // Just like vPropagate() but used only for failed rays. 
@@ -2484,7 +2484,7 @@ public class RT13 implements B4constants
     }
 
 
-    static private void fixupLabUVW(int k)
+    private void fixupLabUVW(int k)
     {
         int j = 0; 
         double sign = dRays[k][j][RW] < 0 ? -1.0 : +1.0;

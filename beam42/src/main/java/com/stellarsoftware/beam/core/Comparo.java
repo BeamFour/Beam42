@@ -1,5 +1,7 @@
 package com.stellarsoftware.beam.core;
 
+import static com.stellarsoftware.beam.core.Globals.RT13;
+
 /**
   *  Performs evaluation of residual vector = observed - goal
   *  or, for WFE, residual vector = WFE since goalValues=0.0

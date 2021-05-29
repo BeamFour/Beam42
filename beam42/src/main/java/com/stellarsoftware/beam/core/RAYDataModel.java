@@ -1,10 +1,9 @@
 package com.stellarsoftware.beam.core;
 
-import com.stellarsoftware.beam.core.Adjustment;
-
 import java.util.ArrayList;
 
 import static com.stellarsoftware.beam.core.B4constants.*;
+import static com.stellarsoftware.beam.core.Globals.RT13;
 
 /**
  * Parses and generates the RAY Data model.

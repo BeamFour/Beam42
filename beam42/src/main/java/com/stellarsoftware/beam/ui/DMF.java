@@ -2,6 +2,7 @@
 package com.stellarsoftware.beam.ui;
 
 import com.stellarsoftware.beam.core.*;
+import static com.stellarsoftware.beam.core.Globals.RT13;
 
 import java.awt.*;              // all Abstract Windows Toolkit methods
 import java.awt.event.*;        // mouse, keystroke etc
@@ -10,7 +11,7 @@ import javax.swing.*;           // all UI methods
 import javax.swing.event.*;     // for MenuEvents and InternalFrameAdapter
 import java.awt.datatransfer.*; // for Drag-n-Drop
 import java.awt.dnd.*;          // for Drag-n-Drop
-import javax.swing.filechooser.FileNameExtensionFilter; 
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 @SuppressWarnings("serial")
 

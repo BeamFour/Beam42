@@ -1,5 +1,7 @@
 package com.stellarsoftware.beam.ui;
 
+import static com.stellarsoftware.beam.core.Globals.RT13;
+
 import com.stellarsoftware.beam.core.*;
 
 import javax.swing.*;      // JOptionPane dialog

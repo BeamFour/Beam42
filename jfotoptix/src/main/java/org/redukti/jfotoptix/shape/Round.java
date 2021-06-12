@@ -28,13 +28,9 @@ package org.redukti.jfotoptix.shape;
 
 import org.redukti.jfotoptix.math.Triangle2;
 import org.redukti.jfotoptix.math.Vector2;
-import org.redukti.jfotoptix.patterns.Distribution;
-import org.redukti.jfotoptix.patterns.Pattern;
 
 import java.util.Random;
 import java.util.function.Consumer;
-
-import static org.redukti.jfotoptix.math.MathUtils.square;
 
 public abstract class Round extends ShapeBase {
 

@@ -12,7 +12,6 @@ import org.redukti.jfotoptix.model.*;
 import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
 import org.redukti.jfotoptix.shape.Round;
-import org.redukti.jfotoptix.shape.Shape;
 import org.redukti.jfotoptix.tracing.*;
 
 import java.text.DecimalFormat;

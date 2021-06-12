@@ -9,3 +9,4 @@
 
 rootProject.name = 'Beam42'
 include('beam42')
+include('jfotoptix')

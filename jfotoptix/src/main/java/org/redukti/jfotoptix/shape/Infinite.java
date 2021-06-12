@@ -29,10 +29,8 @@ package org.redukti.jfotoptix.shape;
 import org.redukti.jfotoptix.math.Triangle2;
 import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector2Pair;
-import org.redukti.jfotoptix.patterns.Distribution;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class Infinite implements Shape {
     public static final Infinite infinite = new Infinite();

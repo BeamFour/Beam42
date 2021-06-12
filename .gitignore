@@ -1,6 +1,6 @@
 .gradle
 **/build/
-!src/**/build/
+!jfotoptix/src/**/build/
 
 # Ignore Gradle GUI config
 gradle-app.setting

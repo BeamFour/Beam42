@@ -28,12 +28,10 @@ package org.redukti.jfotoptix.tracing;
 
 import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
-import org.redukti.jfotoptix.model.Container;
 import org.redukti.jfotoptix.model.Element;
 import org.redukti.jfotoptix.model.OpticalSurface;
 import org.redukti.jfotoptix.model.OpticalSystem;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

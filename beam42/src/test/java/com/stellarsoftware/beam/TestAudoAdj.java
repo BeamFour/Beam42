@@ -14,9 +14,9 @@ public class TestAudoAdj {
         Globals.reg = new Registry(null);  // create and load registry
         RT13 rt13 = Globals.RT13;
         OPTDataModel optDataModel = new OPTDataModel(rt13);
-        Assertions.assertTrue(optDataModel.bLoadFile(new File("../Examples/AUTO1.OPT")));
+        Assertions.assertTrue(optDataModel.bLoadFile(new File("../Examples/BeamFour/AUTO1.OPT")));
         RAYDataModel rayDataModel = new RAYDataModel(rt13);
-        Assertions.assertTrue(rayDataModel.bLoadFile(new File("../Examples/AUTO1.RAY")));
+        Assertions.assertTrue(rayDataModel.bLoadFile(new File("../Examples/BeamFour/AUTO1.RAY")));
         B4DataParser b4DataParser = new B4DataParser(optDataModel, rayDataModel, null, rt13);
         b4DataParser.parse(true);
 //        new InOut(optDataModel, rayDataModel);

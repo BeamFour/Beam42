@@ -14,9 +14,9 @@ public class TestAutoRay {
         Globals.reg = new Registry(null);  // create and load registry
         RT13 rt13 = Globals.RT13;
         OPTDataModel optDataModel = new OPTDataModel(rt13);
-        Assertions.assertTrue(optDataModel.bLoadFile(new File("../Examples/FisheyeB.OPT")));
+        Assertions.assertTrue(optDataModel.bLoadFile(new File("../Examples/BeamFour/FisheyeB.OPT")));
         RAYDataModel rayDataModel = new RAYDataModel(rt13);
-        Assertions.assertTrue(rayDataModel.bLoadFile(new File("../Examples/FisheyeB.RAY")));
+        Assertions.assertTrue(rayDataModel.bLoadFile(new File("../Examples/BeamFour/FisheyeB.RAY")));
         B4DataParser b4DataParser = new B4DataParser(optDataModel, rayDataModel, null, rt13);
         b4DataParser.parse(true);
         AutoRayGenerator autoRayGenerator = new AutoRayGenerator(optDataModel, rayDataModel, rt13);

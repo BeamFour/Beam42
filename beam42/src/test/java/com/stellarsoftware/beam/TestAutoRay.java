@@ -1,8 +1,8 @@
 package com.stellarsoftware.beam;
 
 import com.stellarsoftware.beam.core.*;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
@@ -14,13 +14,13 @@ public class TestAutoRay {
         Globals.reg = new Registry(null);  // create and load registry
         RT13 rt13 = Globals.RT13;
         OPTDataModel optDataModel = new OPTDataModel(rt13);
-        Assert.assertTrue(optDataModel.bLoadFile(new File("../Examples/FisheyeB.OPT")));
+        Assertions.assertTrue(optDataModel.bLoadFile(new File("../Examples/FisheyeB.OPT")));
         RAYDataModel rayDataModel = new RAYDataModel(rt13);
-        Assert.assertTrue(rayDataModel.bLoadFile(new File("../Examples/FisheyeB.RAY")));
+        Assertions.assertTrue(rayDataModel.bLoadFile(new File("../Examples/FisheyeB.RAY")));
         B4DataParser b4DataParser = new B4DataParser(optDataModel, rayDataModel, null, rt13);
         b4DataParser.parse(true);
         AutoRayGenerator autoRayGenerator = new AutoRayGenerator(optDataModel, rayDataModel, rt13);
-        Assert.assertTrue(autoRayGenerator.generate());
+        Assertions.assertTrue(autoRayGenerator.generate());
         autoRayGenerator.vUpdateRayStarts();
         System.out.println(optDataModel.getTableString());
         System.out.println(rayDataModel.getTableString());
@@ -43,10 +43,10 @@ public class TestAutoRay {
         };
 
         int f = rayDataModel.rI2F(RAYDataModel.getCombinedRayFieldOp("X0"));
-        Assert.assertEquals(0, f);
+        Assertions.assertEquals(0, f);
         for (int row = 0; row <expectedX0.length; row++) {
             String value = rayDataModel.getFieldTrim(f, row+3);
-            Assert.assertEquals(expectedX0[row], value);
+            Assertions.assertEquals(expectedX0[row], value);
         }
     }
 

@@ -1,25 +1,7 @@
 plugins {
-    id 'java'
-    id 'idea'
-    id 'application'
-}
-
-group 'org.redukti'
-version '1.0-SNAPSHOT'
-
-repositories {
-    mavenCentral()
+    id 'beam42.java-application-conventions'
 }
 
 application {
     mainClass = 'org.redukti.jfotoptix.tools.LensTool'
-}
-
-dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
-}
-
-test {
-    useJUnitPlatform()
 }

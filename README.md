@@ -49,7 +49,7 @@ The project also includes a port of GNU Optical to Java.
 * For a product developed by Michael Hayford who worked many years at optical software company - see https://github.com/mjhoptics/ray-optics. 
 * Another Python project is https://github.com/quartiq/rayopt
 * An older C project 'ray' originally written by Don Wells at NRAO implements Feder's equations for ray tracing. https://github.com/dibyendumajumdar/ray
-* An attempt to maintain a commercial product KDP is here: https://github.com/dinosauria123/Koko. Lots of sphagetti Fortra code unfortunately. 
+* An attempt to maintain a commercial product KDP is here: https://github.com/dinosauria123/Koko. Lots of sphagetti Fortran code unfortunately. 
 
 Here are some other projects that I have not personally tried out
 

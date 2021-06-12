@@ -44,6 +44,7 @@ The project also includes a port of GNU Optical to Java.
 
 ## Related Projects
 
+* My fork of GNU Optical: https://github.com/dibyendumajumdar/goptical
 * Java port of GNU Optical: https://github.com/dibyendumajumdar/jfotoptix - merged into this project.
 * For a product developed by Michael Hayford who worked many years at optical software company - see https://github.com/mjhoptics/ray-optics. 
 * Another Python project is https://github.com/quartiq/rayopt

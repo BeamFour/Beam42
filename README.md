@@ -44,6 +44,7 @@ The project also includes a port of GNU Optical to Java.
 
 ## Related Projects
 
+* A Java project: https://github.com/StellarSoftwareBerkeley/BeamFour - original project that forms the basis of this one.
 * My fork of GNU Optical: https://github.com/dibyendumajumdar/goptical
 * Java port of GNU Optical: https://github.com/dibyendumajumdar/jfotoptix - merged into this project.
 * For a product developed by Michael Hayford who worked many years at optical software company - see https://github.com/mjhoptics/ray-optics. 
@@ -55,7 +56,6 @@ Here are some other projects that I have not personally tried out
 
 * A new Julia project by Microsoft is https://github.com/microsoft/OpticSim.jl
 * A C++ project: https://github.com/edeforas/Astree
-* A Java project: https://github.com/StellarSoftwareBerkeley/BeamFour
 * Python project OpticsSpy: https://github.com/Sterncat/opticspy 
 * Another Python project https://github.com/mess42/pyrate
 * Geopter (C++,Qt): https://github.com/heterophyllus/Geopter 

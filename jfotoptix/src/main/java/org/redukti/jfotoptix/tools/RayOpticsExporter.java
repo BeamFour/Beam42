@@ -68,17 +68,23 @@ public class RayOpticsExporter {
         }
         fp.append("sm.gaps[0].thi=1e10\n");
 //        double Bf = back_focus.get_value_as_double(scenario);
-        double thickness = 0.0;
         for (int i = 0; i < surfaces.size(); i++) {
+            double thickness = 0.0;
             OpticalBenchDataImporter.LensSurface s = surfaces.get(i);
-            if (s.get_surface_type() == OpticalBenchDataImporter.SurfaceType.field_stop) {
-                thickness += s.get_thickness(scenario);
-                continue;
-            }
 //            if (i + 1 == surfaces.size() && s.is_cover_glass()) {
 //                // Oddity - override the Bf
 //                Bf = s.get_thickness(scenario);
 //            }
+            if (s.get_surface_type() == OpticalBenchDataImporter.SurfaceType.field_stop) {
+                continue;
+            }
+            if (i < surfaces.size()-1 && surfaces.get(i+1).get_surface_type() == OpticalBenchDataImporter.SurfaceType.field_stop) {
+                // Next surface is field stop
+                // we will add the thickess of field stop to the current surface
+                // FS will get 0 thickness as for now we skip it
+                // TODO allow option to retain field stop
+                thickness = surfaces.get(i+1).get_thickness(scenario);
+            }
             double diameter = s.get_diameter();
             if (s.get_surface_type() == OpticalBenchDataImporter.SurfaceType.aperture_stop && aperture_diameters != null) {
                 diameter = aperture_diameters.get_value_as_double(scenario);
@@ -118,7 +124,6 @@ public class RayOpticsExporter {
                         .append("sm.set_stop()\n");
             }
             fp.append("sm.ifcs[sm.cur_surface].max_aperture = ").append(diameter / 2.0).append("\n");
-            thickness = 0.0;
         }
     }
     void generate_rest(StringBuilder fp) {

@@ -11,8 +11,10 @@ import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.model.*;
 import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
+import org.redukti.jfotoptix.patterns.PatternGenerator;
 import org.redukti.jfotoptix.shape.Round;
 import org.redukti.jfotoptix.tracing.*;
+import com.stellarsoftware.beam.core.U;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -73,9 +75,9 @@ public class Beam42Exporter {
 
     static final ColumnDef[] columns = {
             new ColumnDef("Type", 5, null),
-            new ColumnDef("Index", 12, MathUtils.decimal_format(6)),
-            new ColumnDef("Z", 12, MathUtils.decimal_format(4)),
-            new ColumnDef("C", 18, MathUtils.decimal_format(9)),
+            new ColumnDef("Index", 12, MathUtils.decimal_format(8)),
+            new ColumnDef("Z", 12, MathUtils.decimal_format(6)),
+            new ColumnDef("C", 18, MathUtils.decimal_format(12)),
             new ColumnDef("Dia", 12, MathUtils.decimal_format(4)),
             new ColumnDef("S", 16, MathUtils.decimal_format_scientific(10)),
             new ColumnDef("A2", 16, MathUtils.decimal_format_scientific(10)),
@@ -263,6 +265,25 @@ public class Beam42Exporter {
         return sb.toString();
     }
 
+    static List<Vector3> generate_circular_starts(double R, double d1, double d2, int ncircles) {
+        List<Vector3> starts = new ArrayList<>();
+        //----next install the rings-------
+        for (int icirc=1; icirc<=ncircles; icirc++)
+        {
+            double daz = 60.0 / icirc;
+            double offset = (icirc%2 == 0) ? 0.0 : 0.5*daz;
+            double r = icirc * R / ncircles;
+            for (int jaz = 0; jaz<6*icirc; jaz++)
+            {
+                double a = offset + jaz*daz;
+                double x = d1 + r*U.cosd(a);
+                double y = d2 + r*U.sind(a);
+                starts.add(new Vector3(x, y, 0));
+            }
+        }
+        return starts;
+    }
+
     static String generate_rays_table(List<Vector3> rays, Vector3 direction) {
         StringBuilder sb = new StringBuilder();
         double wvln = SpectralLine.d/1000.0;
@@ -311,12 +332,31 @@ public class Beam42Exporter {
         }
     }
 
+    static List<Vector3> generate_hexapolar_points(OpticalSurface surface, int density, double obj_angle) {
+        double tan_angle = Math.tan(obj_angle);
+        Round shape = (Round) surface.get_shape();
+        Distribution d = new Distribution(Pattern.HexaPolarDist, density, 0.999);
+        ArrayList<Vector3> points = new ArrayList<>();
+        Consumer<Vector2> f = (v) -> {
+            double y_ht = -10 * tan_angle - v.y();
+            points.add(new Vector3(v.x(), y_ht, -10));
+        };
+        PatternGenerator.get_pattern(shape, f, d, false);
+        return points;
+    }
+
+
     static String generate_rays_table(OpticalSurface surface, double obj_angle) {
         Vector3 direction = new Vector3(0, Math.sin(obj_angle), Math.cos(obj_angle));
-        List<Vector3> list = new ArrayList<>();
-        get_pattern_meridional(surface, obj_angle, (v) -> {
-            list.add(v);
-        });
+//        List<Vector3> list = new ArrayList<>();
+//        get_pattern_meridional(surface, obj_angle, (v) -> {
+//            list.add(v);
+//        });
+        double R = surface.get_shape().max_radius()*0.999;
+        double d1 = 0;
+        double d2 = 0;
+        //List<Vector3> list = generate_circular_starts(R, d1, d2, 17);
+        List<Vector3> list = generate_hexapolar_points(surface, 10, obj_angle);
         return generate_rays_table(list, direction);
     }
 
@@ -352,25 +392,25 @@ public class Beam42Exporter {
 
         System.out.println("DIRECTION " + direction.toString());
 
-        PointSource.Builder ps = new PointSource.Builder(PointSource.SourceInfinityMode.SourceAtInfinity, direction)
-                .add_spectral_line(SpectralLine.d);
-        if (!arguments.only_d_line) {
-            ps.add_spectral_line(SpectralLine.C)
-                    .add_spectral_line(SpectralLine.F);
-        }
-        systemBuilder.add(ps);
-        system = systemBuilder.build();
-        RayTraceParameters parameters = new RayTraceParameters(system);
-        RayTracer rayTracer = new RayTracer();
-        parameters.set_default_distribution(
-                new Distribution(Pattern.MeridionalDist, arguments.trace_density, 0.999));
-        if (arguments.dumpSystem) {
-            System.out.println(parameters.sequenceToString(new StringBuilder()).toString());
-        }
-        RayTraceResults result = rayTracer.trace(system, parameters);
-
-        Element firstSurface = system.get_sequence().stream().filter(e -> e instanceof OpticalSurface).findFirst().orElse(null);
-        System.out.println(generate_rays_table((OpticalSurface) firstSurface, angleOfView));
+//        PointSource.Builder ps = new PointSource.Builder(PointSource.SourceInfinityMode.SourceAtInfinity, direction)
+//                .add_spectral_line(SpectralLine.d);
+//        if (!arguments.only_d_line) {
+//            ps.add_spectral_line(SpectralLine.C)
+//                    .add_spectral_line(SpectralLine.F);
+//        }
+//        systemBuilder.add(ps);
+//        system = systemBuilder.build();
+//        RayTraceParameters parameters = new RayTraceParameters(system);
+//        RayTracer rayTracer = new RayTracer();
+//        parameters.set_default_distribution(
+//                new Distribution(Pattern.MeridionalDist, arguments.trace_density, 0.999));
+//        if (arguments.dumpSystem) {
+//            System.out.println(parameters.sequenceToString(new StringBuilder()).toString());
+//        }
+//        RayTraceResults result = rayTracer.trace(system, parameters);
+//
+//        Element firstSurface = system.get_sequence().stream().filter(e -> e instanceof OpticalSurface).findFirst().orElse(null);
+//        System.out.println(generate_rays_table((OpticalSurface) firstSurface, angleOfView));
 //        List<TracedRay> rays_at_first_surface = result.get_intercepted(firstSurface);
 
         //Element source = system.get_sequence().stream().filter(e -> e instanceof RaySource).findFirst().orElse(null);
@@ -389,6 +429,10 @@ public class Beam42Exporter {
 //        Vector3 cosines = new Vector3(0, Math.sin(obj_angle), Math.cos(obj_angle));
 //
 //        System.out.println(pt.toString() + " " + cosines.toString());
+
+        Element firstSurface = system.get_sequence().stream().filter(e -> e instanceof OpticalSurface).findFirst().orElse(null);
+        OpticalSurface s1 = (OpticalSurface) firstSurface;
+        System.out.println(generate_rays_table(s1, angleOfView));
     }
 
 }

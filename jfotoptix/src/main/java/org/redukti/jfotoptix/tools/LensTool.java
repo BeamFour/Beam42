@@ -167,6 +167,12 @@ public class LensTool {
     private static void createOutputFile(Args arguments, String string) throws IOException {
         Path path = new File(arguments.specfile).toPath().toAbsolutePath();
         Path outpath = Paths.get(path.getParent().toString(), arguments.outputFile);
-        Files.write(outpath, string.getBytes(StandardCharsets.UTF_8), StandardOpenOption.TRUNCATE_EXISTING);
+        try {
+            Files.write(outpath, string.getBytes(StandardCharsets.UTF_8), StandardOpenOption.TRUNCATE_EXISTING);
+        }
+        catch (Exception e) {
+            System.err.println("Failed to create file " + outpath);
+            e.printStackTrace();
+        }
     }
 }

@@ -28,7 +28,7 @@ There are three kinds of ray tracers out there...
 * The original BeamFour implementation made it difficult to use the ray tracing functions independently of the GUI. I am working on improving the de-coupling of the UI from the ray tracing functions.
 * The original BeamFour implementation assumed that there is a single workspace that a user is working in, and therefore used static data structures - this design is not as friendly to server side use cases where multiple simultaneous workspaces can be in use. I am modifying the system so that all the data structures are encapsulated in objects.
 * My Java port of GNU Optical has been merged into this project. For now there are two parallel implementations of ray tracing - longer term BeamFour implementation will be the main one because it is simpler and easier to understand.
-* I plan to add some features that are more specific to photo lenses - such as paraxial calculations.
+* I plan to add some features that are more specific to photo lenses - such as paraxial calculations, ray fan plots, etc.
 
 ## Literature
 

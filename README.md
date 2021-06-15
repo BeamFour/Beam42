@@ -9,6 +9,8 @@ Copyright (c) M.Lampton, 2003-2020, STELLAR SOFTWARE all rights reserved.
 For any inquiries regarding this version, please raise issues here and do not contact StellarSoftware.com, as this
 version is not maintained by Mike Lampton.
 
+Note: This project now also includes a port of GNU Optical to Java.
+
 ## About Beam42
 
 From  www.StellarSoftware.com:
@@ -20,8 +22,6 @@ There are three kinds of ray tracers out there...
 2. Illumination ray tracers compute the sum of diffuse and discrete light sources and predict the intensity at any point in an enclosed space. These are non-sequential: you do not have to pre-specify your trace sequence. These are crucial for designing lighting systems; for light guides; for interior illumination; essential for stray light calculations in optical systems; but that's not us either.
 
 3. Optical ray tracing runs geometrical rays through lenses, gratings, irises, mirrors, prisms, etc and evaluates the image that a specified optical system delivers. Bingo!
-
-The project also includes a port of GNU Optical to Java.
   
 ## Changes / Development Plan
 

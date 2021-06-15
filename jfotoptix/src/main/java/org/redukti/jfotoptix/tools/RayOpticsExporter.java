@@ -157,29 +157,8 @@ public class RayOpticsExporter {
         return sb.toString();
     }
 
-    static final class Args {
-        int scenario = 0;
-        String filename = null;
-    }
-
-    static LensTool.Args parseArguments(String[] args) {
-        LensTool.Args arguments = new LensTool.Args();
-        for (int i = 0; i < args.length; i++) {
-            String arg1 = args[i];
-            String arg2 = i + 1 < args.length ? args[i + 1] : null;
-            if (arg1.equals("--specfile")) {
-                arguments.specfile = arg2;
-                i++;
-            } else if (arg1.equals("--scenario")) {
-                arguments.scenario = Integer.parseInt(arg2);
-                i++;
-            }
-        }
-        return arguments;
-    }
-
     public static void main(String[] args) throws Exception {
-        LensTool.Args arguments = parseArguments(args);
+        Args arguments = Args.parseArguments(args);
         if (arguments.specfile == null) {
             System.err.println("Usage: --specfile inputfile [--scenario num]");
             System.exit(1);

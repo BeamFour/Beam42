@@ -28,71 +28,9 @@ import java.nio.file.StandardOpenOption;
 
 public class LensTool {
 
-    static final class Args {
-        int scenario = 0;
-        String specfile = null;
-        String outputType = "layout";
-        String outputFile = null;
-        boolean skewRays = false;
-        boolean dumpSystem = false;
-        boolean use_glass_types = true;
-        int trace_density = 10;
-        int spot_density = 20;
-        boolean include_lost_rays = true;
-        boolean only_d_line = false;
-    }
-
-    static Args parseArguments(String[] args) {
-        Args arguments = new Args();
-        for (int i = 0; i < args.length; i++) {
-            String arg1 = args[i];
-            String arg2 = i+1 < args.length ? args[i+1] : null;
-            if (arg1.equals("--specfile")) {
-                arguments.specfile = arg2;
-                i++;
-            }
-            else if (arg1.equals("-o")) {
-                arguments.outputFile = arg2;
-                i++;
-            }
-            else if (arg1.equals("--scenario")) {
-                arguments.scenario = Integer.parseInt(arg2);
-                i++;
-            }
-            else if (arg1.equals("--output")) {
-                arguments.outputType = arg2;
-                i++;
-            }
-            else if (arg1.equals("--skew")) {
-                arguments.skewRays = true;
-            }
-            else if (arg1.equals("--dont-use-glass-types")) {
-                arguments.use_glass_types = false;
-            }
-            else if (arg1.equals("--dump-system")) {
-                arguments.dumpSystem = true;
-            }
-            else if (arg1.equals("--exclude-lost-rays")) {
-                arguments.include_lost_rays = false;
-            }
-            else if (arg1.equals("--trace-density")) {
-                arguments.trace_density = Integer.parseInt(arg2);
-                i++;
-            }
-            else if (arg1.equals("--spot-density")) {
-                arguments.spot_density = Integer.parseInt(arg2);
-                i++;
-            }
-            else if (arg1.equals("--only-d-line")) {
-                arguments.only_d_line = true;
-            }
-        }
-        return arguments;
-    }
-
 
     public static void main(String[] args) throws Exception {
-        Args arguments = parseArguments(args);
+        Args arguments = Args.parseArguments(args);
         if (arguments.specfile == null) {
             System.err.println("Usage: --specfile inputfile [--scenario num] [--skew] [--output layout|spot] [--dump-system] [--exclude-lost-rays] [--spot-density n] [--trace-density n] [--only-d-line] [--output outfilename] [--dont-use-glass-types]");
             System.err.println("       --spot-density defaults to 50");
@@ -142,7 +80,7 @@ public class LensTool {
             RayTraceResults result = rayTracer.trace(system, parameters);
             RayTraceRenderer.draw_2d(renderer, result, !arguments.include_lost_rays, null);
             if (arguments.outputFile != null) {
-                createOutputFile(arguments, renderer.write(new StringBuilder()).toString());
+                Helper.createOutputFile(Helper.getOutputPath(arguments), renderer.write(new StringBuilder()).toString());
             }
             else {
                 System.out.println(renderer.write(new StringBuilder()).toString());
@@ -154,7 +92,7 @@ public class LensTool {
             AnalysisSpot spot = new AnalysisSpot(system, arguments.spot_density);
             spot.draw_diagram(renderer, true);
             if (arguments.outputFile != null) {
-                createOutputFile(arguments, renderer.write(new StringBuilder()).toString());
+                Helper.createOutputFile(Helper.getOutputPath(arguments), renderer.write(new StringBuilder()).toString());
             }
             else {
                 System.out.println(renderer.write(new StringBuilder()).toString());
@@ -162,17 +100,5 @@ public class LensTool {
         }
         ParaxialFirstOrderInfo pfo = ParaxialFirstOrderInfo.compute(system);
         System.out.println(pfo);
-    }
-
-    private static void createOutputFile(Args arguments, String string) throws IOException {
-        Path path = new File(arguments.specfile).toPath().toAbsolutePath();
-        Path outpath = Paths.get(path.getParent().toString(), arguments.outputFile);
-        try {
-            Files.write(outpath, string.getBytes(StandardCharsets.UTF_8), StandardOpenOption.TRUNCATE_EXISTING);
-        }
-        catch (Exception e) {
-            System.err.println("Failed to create file " + outpath);
-            e.printStackTrace();
-        }
     }
 }

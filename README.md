@@ -22,6 +22,10 @@ There are three kinds of ray tracers out there...
 2. Illumination ray tracers compute the sum of diffuse and discrete light sources and predict the intensity at any point in an enclosed space. These are non-sequential: you do not have to pre-specify your trace sequence. These are crucial for designing lighting systems; for light guides; for interior illumination; essential for stray light calculations in optical systems; but that's not us either.
 
 3. Optical ray tracing runs geometrical rays through lenses, gratings, irises, mirrors, prisms, etc and evaluates the image that a specified optical system delivers. Bingo!
+
+## Resources
+
+* [Introduction to BeamFour (YouTube)](https://youtu.be/-buXsCqEnq8)
   
 ## Changes / Development Plan
 

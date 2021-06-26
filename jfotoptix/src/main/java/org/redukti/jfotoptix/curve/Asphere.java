@@ -137,7 +137,9 @@ public class Asphere extends ConicBase {
         }
         /* Feder paper equation (5) */
         double L = e + (S._c * M_1_2 - 2.0 * M_1x) / (direction.z() + xi_1);
-
+        if (Double.isNaN(L)) {
+            return null;
+        }
         /* Get intercept with new (spherical) surface: */
         double[] delta_length = new double[3];
         for (int j = 0; j < 3; j++)

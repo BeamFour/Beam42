@@ -22,13 +22,17 @@ There are three kinds of ray tracers out there...
 2. Illumination ray tracers compute the sum of diffuse and discrete light sources and predict the intensity at any point in an enclosed space. These are non-sequential: you do not have to pre-specify your trace sequence. These are crucial for designing lighting systems; for light guides; for interior illumination; essential for stray light calculations in optical systems; but that's not us either.
 
 3. Optical ray tracing runs geometrical rays through lenses, gratings, irises, mirrors, prisms, etc and evaluates the image that a specified optical system delivers. Bingo!
+
+## Resources
+
+* [Introduction to BeamFour (YouTube)](https://youtu.be/-buXsCqEnq8)
   
 ## Changes / Development Plan
 
 * The original BeamFour implementation made it difficult to use the ray tracing functions independently of the GUI. I am working on improving the de-coupling of the UI from the ray tracing functions.
 * The original BeamFour implementation assumed that there is a single workspace that a user is working in, and therefore used static data structures - this design is not as friendly to server side use cases where multiple simultaneous workspaces can be in use. I am modifying the system so that all the data structures are encapsulated in objects.
 * My Java port of GNU Optical has been merged into this project. For now there are two parallel implementations of ray tracing - longer term BeamFour implementation will be the main one because it is simpler and easier to understand.
-* I plan to add some features that are more specific to photo lenses - such as paraxial calculations.
+* I plan to add some features that are more specific to photo lenses - such as paraxial calculations, ray fan plots, etc.
 
 ## Literature
 

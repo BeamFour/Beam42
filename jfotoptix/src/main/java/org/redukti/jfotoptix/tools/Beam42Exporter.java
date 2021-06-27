@@ -274,17 +274,20 @@ public class Beam42Exporter {
     // But we approximate the target position to be the Z axis value of first surface.
     // Right now we use 0 for this, but this won't work very well for concave surface! FIXME
     static List<Vector3> generate_hexapolar_points(OpticalSurface surface, int density, double obj_angle) {
+        final double z_offset = 10.0;
         Round shape = (Round) surface.get_shape();
         Curve curve = surface.get_curve();
         Distribution d = new Distribution(Pattern.HexaPolarDist, density, 0.999);
         ArrayList<Vector3> points = new ArrayList<>();
-        // tan(distance) gives height adjustment
-        double height_adjustment = obj_angle != 0 ? Math.tan(obj_angle) * 10 : 1.0;
         Consumer<Vector2> f = (v) -> {
-            // Move y to 10 units to left - adjusting height due to angle
             double z = curve.sagitta(v);
+            double distance = z_offset + z;
+            // tan(distance) tells us height of the triangle where tan(angle) = ht/distance.
+            double height_adjustment = obj_angle != 0 ? Math.tan(obj_angle) * distance : 1.0;
+            // Adjust y
             double y_ht = v.y() - height_adjustment;
-            points.add(new Vector3(v.x(), y_ht, z-10));
+            // Adjust z
+            points.add(new Vector3(v.x(), y_ht, z-distance));
         };
         PatternGenerator.get_pattern(shape, f, d, false);
         return points;

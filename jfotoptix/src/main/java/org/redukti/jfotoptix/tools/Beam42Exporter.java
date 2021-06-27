@@ -231,18 +231,60 @@ public class Beam42Exporter {
         return sb.toString();
     }
 
+//    static List<Vector3> generate_circular_starts(double R, double d1, double d2, int ncircles) {
+//        List<Vector3> starts = new ArrayList<>();
+//        //----next install the rings-------
+//        for (int icirc=1; icirc<=ncircles; icirc++)
+//        {
+//            double daz = 60.0 / icirc;
+//            double offset = (icirc%2 == 0) ? 0.0 : 0.5*daz;
+//            double r = icirc * R / ncircles;
+//            for (int jaz = 0; jaz<6*icirc; jaz++)
+//            {
+//                double a = offset + jaz*daz;
+//                double x = d1 + r* U.cosd(a);
+//                double y = d2 + r*U.sind(a);
+//                starts.add(new Vector3(x, y, 0));
+//            }
+//        }
+//        return starts;
+//    }
+//
+//    static List<Vector3> generate_hexapolar_points2(OpticalSurface surface, int density, double obj_angle) {
+//        double tan_angle = obj_angle != 0.0 ? Math.tan(obj_angle) : 1.0;
+//        Round shape = (Round) surface.get_shape();
+//        List<Vector3> points = generate_circular_starts(shape.get_external_xradius(), 0, 0, 17);
+//        List<Vector3> shiftedPoints = new ArrayList<>();
+//        for (Vector3 v: points) {
+//            double y_ht = v.y(); //  -10 * tan_angle - v.y();
+//            shiftedPoints.add(new Vector3(v.x(), y_ht, -10));
+//        }
+////
+////        Consumer<Vector2> f = (v) -> {
+////            // Move y to 10 units to left - adjusting height due to angle
+////            double y_ht = -10 * tan_angle - v.y();
+////            points.add(new Vector3(v.x(), y_ht, -10));
+////        };
+////        PatternGenerator.get_pattern(shape, f, d, false);
+//        return shiftedPoints;
+//    }
+
+
     // We want to generate rays that hit the first surface in a uniform circular pattern
     // But we approximate the target position to be the Z axis value of first surface.
     // Right now we use 0 for this, but this won't work very well for concave surface! FIXME
     static List<Vector3> generate_hexapolar_points(OpticalSurface surface, int density, double obj_angle) {
-        double tan_angle = obj_angle != 0.0 ? Math.tan(obj_angle) : 1.0;
         Round shape = (Round) surface.get_shape();
+        Curve curve = surface.get_curve();
         Distribution d = new Distribution(Pattern.HexaPolarDist, density, 0.999);
         ArrayList<Vector3> points = new ArrayList<>();
+        // tan(distance) gives height adjustment
+        double height_adjustment = obj_angle != 0 ? Math.tan(obj_angle) * 10 : 1.0;
         Consumer<Vector2> f = (v) -> {
             // Move y to 10 units to left - adjusting height due to angle
-            double y_ht = -10 * tan_angle - v.y();
-            points.add(new Vector3(v.x(), y_ht, -10));
+            double z = curve.sagitta(v);
+            double y_ht = v.y() - height_adjustment;
+            points.add(new Vector3(v.x(), y_ht, z-10));
         };
         PatternGenerator.get_pattern(shape, f, d, false);
         return points;
@@ -250,7 +292,8 @@ public class Beam42Exporter {
 
     static String generate_rays_table(OpticalSurface surface, double obj_angle) {
         Vector3 direction = new Vector3(0, Math.sin(obj_angle), Math.cos(obj_angle));
-        List<Vector3> list = generate_hexapolar_points(surface, 10, obj_angle);
+        List<Vector3> list = generate_hexapolar_points(surface, 30, obj_angle);
+        //List<Vector3> list = generate_hexapolar_points2(surface, 10, obj_angle);
         return generate_rays_table(list, direction);
     }
 

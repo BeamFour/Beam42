@@ -1,14 +1,11 @@
-package com.stellarsoftware.beam.ui;
+package com.stellarsoftware.beam.core;
 
-// import java.awt.image.*;     // BufferedImage
 import com.stellarsoftware.beam.core.B4constants;
 import com.stellarsoftware.beam.core.U;
 import com.stellarsoftware.beam.core.XYZO;
 
 import java.util.*;             // ArrayList
 import java.io.*;               // File 
-import javax.swing.*;           // JFileChooser
-// import javax.imageio.*;      // PNG, JPEG
 
 /**  CAD.java
   *  Static output methods, called by AnnoPanel
@@ -48,14 +45,14 @@ import javax.swing.*;           // JFileChooser
   *
   *  @author M.Lampton (c) 2004 - 2015 STELLAR SOFTWARE all rights reserved.
   */
-class CAD implements B4constants
+public class CAD implements B4constants
 {
 
     private static int prevFontCode=0;  // serves all CAD flavors
 
 
-    static boolean doCAD(int style, boolean bPort, ArrayList<XYZO> a,
-        ArrayList<XYZO> b, ArrayList<XYZO> c, ArrayList<XYZO> d)
+    public static boolean doCAD(int style, boolean bPort, ArrayList<XYZO> a,
+        ArrayList<XYZO> b, ArrayList<XYZO> c, ArrayList<XYZO> d, File file)
     // Called via DMF >> GJIF >> GPanel line 245>> here, like this: 
     // CAD.doCAD(style, bPortrait, baseList, randList, finishList, annoList);
     // Vector art only; no bitmap options here; for bitmaps see BJIF:doQuickPng().
@@ -74,27 +71,6 @@ class CAD implements B4constants
         {
             return false;  
         }     
-
-        JFileChooser jfc = new JFileChooser(); 
-        String sDir = DMF.sCurrentDir; 
-        if (sDir != null)
-        {
-            File fDir = new File(sDir); 
-            if (fDir != null)
-              if (fDir.isDirectory())
-                jfc.setCurrentDirectory(fDir);
-        } 
-        
-        int q = jfc.showSaveDialog(null); 
-        if (q == JFileChooser.CANCEL_OPTION)
-          return false; 
-        File file = jfc.getSelectedFile(); 
-        if (file == null)
-        {
-            return false; 
-        }
-        
-        DMF.sCurrentDir = file.getParent();
 
         prevFontCode = 0; 
         boolean ok=false; 

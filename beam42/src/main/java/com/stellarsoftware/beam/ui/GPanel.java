@@ -1,15 +1,13 @@
 package com.stellarsoftware.beam.ui;
 
-import com.stellarsoftware.beam.core.B4constants;
-import com.stellarsoftware.beam.core.Globals;
-import com.stellarsoftware.beam.core.U;
-import com.stellarsoftware.beam.core.XYZO;
+import com.stellarsoftware.beam.core.*;
 
 import java.awt.*;         // frame, BasicStroke, Color, Font
 import java.awt.event.*;   // KeyEvent MouseEvent etc
 import java.awt.image.*;   // BufferedImage; transparent Blue color
 import java.awt.font.*;    // font metric
 import java.awt.print.*;   // printing
+import java.io.File;
 import java.util.*;        // ArrayList
 import javax.swing.*;      // Graphics2D features
 
@@ -279,7 +277,25 @@ abstract class GPanel extends JPanel implements B4constants, Printable
            return; 
         }
         boolean bPortrait = "T".equals(Globals.reg.getuo(UO_CAD, 10));
-        CAD.doCAD(style, bPortrait, baseList, randList, finishList, annoList); 
+        JFileChooser jfc = new JFileChooser();
+        String sDir = DMF.sCurrentDir;
+        if (sDir != null)
+        {
+            File fDir = new File(sDir);
+            if (fDir != null)
+                if (fDir.isDirectory())
+                    jfc.setCurrentDirectory(fDir);
+        }
+        int q = jfc.showSaveDialog(null);
+        if (q == JFileChooser.CANCEL_OPTION)
+            return;
+        File file = jfc.getSelectedFile();
+        if (file == null)
+        {
+            return;
+        }
+        DMF.sCurrentDir = file.getParent();
+        CAD.doCAD(style, bPortrait, baseList, randList, finishList, annoList, file);
     }
     
 

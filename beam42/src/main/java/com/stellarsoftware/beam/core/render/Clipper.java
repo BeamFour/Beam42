@@ -1,4 +1,4 @@
-package com.stellarsoftware.beam.core;
+package com.stellarsoftware.beam.core.render;
 
 /**
   *  Performs double precision clipping of line segments

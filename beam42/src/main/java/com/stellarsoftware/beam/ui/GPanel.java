@@ -1,6 +1,8 @@
 package com.stellarsoftware.beam.ui;
 
 import com.stellarsoftware.beam.core.*;
+import com.stellarsoftware.beam.core.render.CAD;
+import com.stellarsoftware.beam.core.render.Clipper;
 
 import java.awt.*;         // frame, BasicStroke, Color, Font
 import java.awt.event.*;   // KeyEvent MouseEvent etc
@@ -1184,7 +1186,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
         xxList.clear(); 
 
         // now set up a clipper...
-        Clipper myClip = new Clipper(-1000, -1000, 1000, 1000); 
+        Clipper myClip = new Clipper(-1000, -1000, 1000, 1000);
         double vec[] = new double[4]; 
         XYZO myXYZO; 
         for (int t=0; t<sList.size(); t++)

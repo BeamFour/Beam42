@@ -1,4 +1,4 @@
-package com.stellarsoftware.beam.core;
+package com.stellarsoftware.beam.core.render;
 
 import com.stellarsoftware.beam.core.B4constants;
 import com.stellarsoftware.beam.core.U;

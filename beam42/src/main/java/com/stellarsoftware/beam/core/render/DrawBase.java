@@ -114,32 +114,32 @@ import java.util.*;        // ArrayList
  *
  * (c) 2004 - 2015 Stellar Software all rights reserved.
  */
-abstract class DrawBase implements B4constants
+public abstract class DrawBase implements B4constants
 {
     static final int FONT_BOLD = 1;
     static final int FONT_PLAIN = 0;
 
     //-----Each extension must supply values for the following---------
 
-    protected boolean bClobber;              // random = destroy prev art
-    protected boolean bPleaseParseUO;        // set by Options; reset by extension.
+    public boolean bClobber;              // random = destroy prev art
+    public boolean bPleaseParseUO;        // set by Options; reset by extension.
     protected double uxcenter = 0.0;         // set by extension setLocals() horiz
     protected double uycenter = 0.0;         // set by extension setLocals() vert
-    protected double uzcenter = 0.0;         // set by extension setLocals() depth
+    public double uzcenter = 0.0;         // set by extension setLocals() depth
     protected double uxspan = 1.0;           // set by extension setLocals() horiz
     protected double uyspan = 1.0;           // set by extension setLocals() vert
     protected double uzspan = 1.0;           // set by extension setLocals() depth
-    protected double uxanchor = 0.0;         // set by mouse
-    protected double uyanchor = 0.0;         // set by mouse
+    public double uxanchor = 0.0;         // set by mouse
+    public double uyanchor = 0.0;         // set by mouse
     protected double uzanchor = 0.0;         // unused.
     protected double dUOpixels = 500.0;      // window pixel size set by User Options
     protected int    iEdits;                 // to compare with DMF.nEdits
 
     //---Abstract "do" methods; each extension must implement these-----
 
-    abstract void    doTechList(boolean bArtStatus);
+    public abstract void    doTechList(boolean bArtStatus);
     abstract void    doRotate(int i, int j);
-    abstract boolean doRandomRay();
+    public abstract boolean doRandomRay();
 //    abstract void    doCursor(int i, int j);
 //    abstract double  getStereo();
 //    abstract void    doSaveData();
@@ -147,11 +147,11 @@ abstract class DrawBase implements B4constants
     //----QuadLists available internally for assembling artwork----------------
     //---client users will call these using QBASE, QBATCH etc------------------
 
-    private ArrayList<XYZO> baseList;    // vector art for Tech drawing
-    private ArrayList<XYZO> batchList;   // vector art for random batch
-    private ArrayList<XYZO> randList;    // vector art for accumulated random rays
-    private ArrayList<XYZO> finishList;  // vector art finishing Layouts
-    private ArrayList<XYZO> annoList;    // vector art for annotation
+    public ArrayList<XYZO> baseList;    // vector art for Tech drawing
+    public ArrayList<XYZO> batchList;   // vector art for random batch
+    public ArrayList<XYZO> randList;    // vector art for accumulated random rays
+    public ArrayList<XYZO> finishList;  // vector art finishing Layouts
+    public ArrayList<XYZO> annoList;    // vector art for annotation
 
     //--------Constructor---------------------
 
@@ -171,7 +171,7 @@ abstract class DrawBase implements B4constants
     }
 
 
-    void requestNewArtwork()
+    public void requestNewArtwork()
     // Allows each AutoAdjust() iteration to request fresh Layout artwork.
     // Don't re-parse UO or sizes when this is called.
     // Just let drawPage() regenerate its new g2Tech and render it.
@@ -180,7 +180,7 @@ abstract class DrawBase implements B4constants
         annoList.clear();
     }
 
-    void doUpdateUO()
+    public void doUpdateUO()
     // Options calls this via GJIF when options change
     {
         bPleaseParseUO = true; // flag allows client doParse().
@@ -189,7 +189,7 @@ abstract class DrawBase implements B4constants
     }
 
 
-    void doQualifiedRedraw()
+    public void doQualifiedRedraw()
     // GJIF calls this when coming forward: check for table edits.
     // How to implement bSticky, retain previous magnification?
     {
@@ -265,16 +265,19 @@ abstract class DrawBase implements B4constants
     // future time when the OS repaints the artwork. Its value
     // specifies whether a skeleton or a fullart is wanted.
 
-    private boolean bArtStatus = bFULLART;
+    public boolean bArtStatus = bFULLART;
 
     //------caret wheel zoom support for clients-----------
 
-    private int icaret=250, jcaret=250;      // pixels
-    private int imid=250, jmid=250;          // pixels
-    private int imouse=0, jmouse=0;          // pixels
+    public int icaret=250;
+    public int jcaret=250;      // pixels
+    public int imid=250;
+    public int jmid=250;          // pixels
+    public int imouse=0;
+    public int jmouse=0;          // pixels
 
 
-    private String sScaleFactors()
+    public String sScaleFactors()
     //  pixels per user unit scalefactors();
     //  Can be used to substitute myGJIF.setTitle();
     {
@@ -293,7 +296,7 @@ abstract class DrawBase implements B4constants
 
     //----------helpers for this GPanel drawPage() doing annotation----------
 
-    private int getUOAnnoFont()
+    public int getUOAnnoFont()
     {
         int i = U.parseInt(Globals.reg.getuo(UO_GRAPH, 4));
         return Math.max(3, Math.min(100, i));
@@ -305,7 +308,7 @@ abstract class DrawBase implements B4constants
        return "T".equals(Globals.reg.getuo(UO_GRAPH, 5)) ? FONT_BOLD : FONT_PLAIN;
     }
 
-    private int getUOAnnoFontCode()  // adds to ASCII
+    public int getUOAnnoFontCode()  // adds to ASCII
     {
         return 10000*getUOAnnoFont() + 1000*getUOAnnoBold();
     }
@@ -329,7 +332,7 @@ abstract class DrawBase implements B4constants
         return "T".equals(Globals.reg.getuo(UO_GRAPH, 3)) ? FONT_BOLD : FONT_PLAIN;
     }
 
-    protected int getUOGraphicsFontCode()  // adds to ASCII
+    public int getUOGraphicsFontCode()  // adds to ASCII
     {
         return 10000*getUOGraphicsFont() + 1000*getUOGraphicsBold();
     }
@@ -372,14 +375,14 @@ abstract class DrawBase implements B4constants
     }
 
 
-    protected double getux(double ax)
+    public double getux(double ax)
     // converts annoX to userX
     {
         return uxcenter + ax*uxspan/dUOpixels;
     }
 
 
-    protected double getuy(double ay)
+    public double getuy(double ay)
     // converts annoY to userY
     {
         return uycenter + ay*uyspan/dUOpixels;
@@ -388,7 +391,7 @@ abstract class DrawBase implements B4constants
 
     //----------helpers for pixel rendering---------
 
-    double getuxPixel(int ipix)
+    public double getuxPixel(int ipix)
     // Converts raw pixel coord into user coord ux.
     // Used by clients to show cursor coords in user space.
     {
@@ -396,7 +399,7 @@ abstract class DrawBase implements B4constants
     }
 
 
-    double getuyPixel(int jpix)
+    public double getuyPixel(int jpix)
     // Converts raw pixel coord into user coord uy.
     // Used by clients to show cursor coords in user space.
     {
@@ -404,31 +407,31 @@ abstract class DrawBase implements B4constants
     }
 
 
-    private double getAXPIX( int ipix) // pixel->annoPoints
+    public double getAXPIX(int ipix) // pixel->annoPoints
     {
         return (double)(ipix - imid);
     }
 
 
-    private double getAYPIX( int jpix) // pixel->annoPoints
+    public double getAYPIX(int jpix) // pixel->annoPoints
     {
         return (double)(jmid - jpix);
     }
 
 
-    private int getIXPIX(double x)  // annoPoints->pixel
+    public int getIXPIX(double x)  // annoPoints->pixel
     {
         return (int)(imid + x);
     }
 
 
-    private int getIYPIX(double y)  // annoPoints->pixel
+    public int getIYPIX(double y)  // annoPoints->pixel
     {
         return (int)(jmid - y);
     }
 
 
-    private int getUOpixels()
+    public int getUOpixels()
     // Returns User Option window size in pixels.
     {
         int i = U.parseInt(Globals.reg.getuo(UO_GRAPH, 6));
@@ -442,7 +445,7 @@ abstract class DrawBase implements B4constants
 
     //----------annotation charlist management-------------
 
-    char getCurrentChar()
+    public char getCurrentChar()
     {
         int len = annoList.size();
         if (len > 0)
@@ -455,7 +458,7 @@ abstract class DrawBase implements B4constants
     }
 
 
-    void setNextCaretCoords(int igiven)
+    public void setNextCaretCoords(int igiven)
     // Can I eliminate this entirely??
     // and then eliminate getIYPIX().. etc?  Nope.
     {
@@ -472,15 +475,20 @@ abstract class DrawBase implements B4constants
         jcaret = jmouse;
     }
 
+    public void doKeyEnter(int charH) {
+        icaret = imouse;
+        jcaret += charH;
+        addAnno(getAXPIX(icaret), getAYPIX(jcaret), '\n');
+    }
 
-    void addAnno(double x, double y, char c)
+    public void addAnno(double x, double y, char c)
     {
         int i = (int) c + getUOAnnoFontCode();
         annoList.add(new XYZO(x, y, 0.0, i));
     }
 
 
-    void deleteLastAnno()  // for backspace.
+    public void deleteLastAnno()  // for backspace.
     {
         int i = annoList.size();
         if (i>0)
@@ -507,7 +515,7 @@ abstract class DrawBase implements B4constants
 
     //----------support for mouse pan zoom twirl-------------------
 
-    protected void getNewMouseArtwork(boolean bFinal)
+    public void getNewMouseArtwork(boolean bFinal)
     // protected allowing thread update.
     // Don't re-parse UO or sizes when this is called!
     // Called by Zoom, mouseDragTranslate, rotate.
@@ -520,7 +528,7 @@ abstract class DrawBase implements B4constants
     }
 
 
-    private void manageZoomIn()  // called by F7 and Wheel
+    public void manageZoomIn()  // called by F7 and Wheel
     // ZoomIn centered on the current caret location.
     // New artwork will use the new centers & spans.
     {
@@ -535,7 +543,7 @@ abstract class DrawBase implements B4constants
         }
     }
 
-    private void manageVertZoomIn()  // called by F5 and WheelShift
+    public void manageVertZoomIn()  // called by F5 and WheelShift
     // ZoomIn centered on the current caret location.
     // New artwork will use the new centers & spans.
     {
@@ -548,7 +556,7 @@ abstract class DrawBase implements B4constants
     }
 
 
-    private void manageZoomOut()  // called by F8 and Wheel
+    public void manageZoomOut()  // called by F8 and Wheel
     {
         double dzoom = (1.0/ZOOMOUT)-1.0;
         uxcenter -= dzoom * uxspan*(icaret-imid)/dUOpixels;
@@ -558,24 +566,23 @@ abstract class DrawBase implements B4constants
         uzspan /= ZOOMOUT;
     }
 
-    private void manageVertZoomOut()  // called by F6 and WheelShift
+    public void manageVertZoomOut()  // called by F6 and WheelShift
     {
         double dzoom = (1.0/ZOOMOUT)-1.0;
         uycenter -= dzoom * uyspan*(jmid-jcaret)/dUOpixels;
         uyspan /= ZOOMOUT;
     }
 
-    private void manageDragTranslate(int di, int dj)
+    public void manageDragTranslate(int di, int dj)
     // Called by drag.
     // New artwork will use the modified centers.
     {
         uxcenter -= uxspan*(di)/dUOpixels;
         uycenter += uyspan*(dj)/dUOpixels;
-        getNewMouseArtwork(bSKELETON);
     }
 
 
-    private void manageDragRotate(int i, int j)
+    public void manageDragRotate(int i, int j)
     // Called by drag.
     // Relies upon client's doRotate() to create rotated artwork.
     // Uses average outOf zzz of target objects to translate image.
@@ -623,7 +630,6 @@ abstract class DrawBase implements B4constants
             uycenter -= ys * zzz * del;
         }
         doRotate(i, j);                 // Have client modify sinel & cosel.
-        getNewMouseArtwork(bSKELETON);  // Have client do temporary artwork.
     }
 
 
@@ -631,7 +637,7 @@ abstract class DrawBase implements B4constants
     //---------Output routines---------------
 
 
-    private double getRadius(ArrayList<XYZO> xxList)
+    public double getRadius(ArrayList<XYZO> xxList)
     // evaluates the max (x,y) radius of XYZOs in xxList
     {
         double r = 0.0;
@@ -646,7 +652,7 @@ abstract class DrawBase implements B4constants
     }
 
 
-    private void localclip(ArrayList<XYZO> xxList)
+    public void localclip(ArrayList<XYZO> xxList)
     // Clips artwork to a box, double precision.
     // Uses Clipper to do the dirty work.
     // Also unpacks polylines into separate line segments.

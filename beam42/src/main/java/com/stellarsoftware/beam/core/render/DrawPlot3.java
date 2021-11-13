@@ -26,7 +26,7 @@ import static com.stellarsoftware.beam.core.Globals.RT13;
  *
  * @author M.Lampton (c) STELLAR SOFTWARE 2006 all rights reserved.
  */
-class DrawPlot3 extends DrawBase
+public class DrawPlot3 extends DrawBase
 {
     // public static final long serialVersionUID = 42L;
 
@@ -57,7 +57,7 @@ class DrawPlot3 extends DrawBase
     private double el=0, cosel=1, sinel=0;
 
 
-    DrawPlot3()
+    public DrawPlot3()
     {
         bClobber = false;      // protected; random redo() keeps old artwork
         bPleaseParseUO = true; // protected; from GPanel.
@@ -76,8 +76,8 @@ class DrawPlot3 extends DrawBase
 
     //----------protected and methods-------------------
 
-
-    protected void doTechList(boolean bFullArt) // replaces abstract method
+    @Override
+    public void doTechList(boolean bFullArt) // replaces abstract method
     // Called by GPanel when fresh artwork is needed:
     // new, pan, zoom, rotate.
     // But this is not called for annotation mods.
@@ -88,7 +88,7 @@ class DrawPlot3 extends DrawBase
         ngood = RT13.iBuildRays(true);
 
         String warn = getUOwarning();  // never crashes.
-        //myGJIF.postWarning(warn);
+        //FIXME myGJIF.postWarning(warn);
         if (warn.length() > 0)
             return;
 
@@ -113,35 +113,9 @@ class DrawPlot3 extends DrawBase
         sinel = U.sind(el);
     }
 
-    protected boolean doRandomRay() // replaces abstract "do" method
+    public boolean doRandomRay() // replaces abstract "do" method
     {
         return drawOneRay(0);
-    }
-
-
-    protected void doCursor(int ix, int iy)
-    // delivers current cursor coordinates
-    {
-        return;
-    }
-
-    protected double getStereo()  // replaces abstract "get" method
-    {
-        double d = 0.0;
-        boolean bS = "T".equals(Globals.reg.getuo(UO_PLOT3, 17));
-        if (bS)
-        {
-            String ss = Globals.reg.getuo(UO_PLOT3, 18);
-            d = U.suckDouble(ss);
-            if (d == Double.NaN)
-                d = 0.0;
-        }
-        return d;
-    }
-
-    protected void doSaveData()   // replaces abstract "do" method
-    {
-        return;
     }
 
 

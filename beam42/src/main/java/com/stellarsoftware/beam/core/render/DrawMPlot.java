@@ -74,7 +74,7 @@ import java.util.*;        // ArrayList
  *
  * @author M.Lampton (c) STELLAR SOFTWARE 2007-2015 all rights reserved.
  */
-class DrawMPlot extends DrawBase
+public class DrawMPlot extends DrawBase
 {
     // public static final long serialVersionUID = 42L;
 
@@ -144,7 +144,7 @@ class DrawMPlot extends DrawBase
     MEDDataModel medDataModel;
 
 
-    DrawMPlot()
+    public DrawMPlot()
     {
         uxspan = 1.0;          // parent GPanel setup
         uxcenter = 0.0;        // parent GPanel setup
@@ -155,7 +155,7 @@ class DrawMPlot extends DrawBase
 
 
 
-    protected void doTechList(boolean bFullArt) // replaces abstract method
+    public void doTechList(boolean bFullArt) // replaces abstract method
     // bFullArt flag is ignored here; ALWAYS does full art.
     // Called by GPanel when fresh artwork is needed.
     // But this is not called simply for annotation mods;
@@ -186,7 +186,7 @@ class DrawMPlot extends DrawBase
         if (bPleaseParseUO) // actually unnecessary to safeguard twirl here
         {
             String warn = doParseUO();
-            //myGJIF.postWarning(warn);
+            // FIXME myGJIF.postWarning(warn);
             if (warn.length() > 0)
                 return;
         }
@@ -208,26 +208,10 @@ class DrawMPlot extends DrawBase
         return;
     }
 
-    protected boolean doRandomRay() // replaces abstract "do" method
+    public boolean doRandomRay() // replaces abstract "do" method
     {
         // addRandomRays();
         return false;  //true;
-    }
-
-    protected void doCursor(int ix, int iy)  // replaces abstract method
-    // posts current cursor.
-    {
-        //myGJIF.setTitle("MultiPlot");
-    }
-
-    protected double getStereo()    // replaces abstract "get" method
-    {
-        return 0.0;
-    }
-
-    protected void doSaveData()     // replaces abstract "do" method
-    {
-        return;
     }
 
 
@@ -465,6 +449,7 @@ class DrawMPlot extends DrawBase
     {
         if (frag.length()<1)
             return "Zero wave length";           // SNH
+        // FIXME medDataModel must be set
         if ((0== Globals.giFlags[MPRESENT]) || (null==medDataModel))
             return "Media table is required";    // SNH
         for (int f=1; f<MAXFIELDS; f++)

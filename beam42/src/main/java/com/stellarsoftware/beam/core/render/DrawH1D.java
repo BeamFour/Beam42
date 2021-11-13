@@ -47,7 +47,7 @@ import static com.stellarsoftware.beam.core.Globals.RT13;
  *
  * @author M.Lampton (c) STELLAR SOFTWARE 2004, 2015 all rights reserved.
  */
-class DrawH1D extends DrawBase
+public class DrawH1D extends DrawBase
 {
     // public static final long serialVersionUID = 42L;
 
@@ -65,10 +65,10 @@ class DrawH1D extends DrawBase
     private String shmin, shmax;      // used for labelling axis
     private double hmin=0, hmax=0;    // used for digitizing each ray
     private double hmid=0, hspan=1;   // used for drawing scales
-    private int nbins = 0;            // used for digitizing each ray
+    public int nbins = 0;            // used for digitizing each ray
 
     private int CADstyle=0;
-    private int histo[] = new int[MAXBINS];
+    public int[] histo = new int[MAXBINS];
     private int vnticks, vndigits;
     private double vticks[] = new double[10];
     private String hst;
@@ -78,7 +78,7 @@ class DrawH1D extends DrawBase
     private boolean bShowAverage = true;
 
 
-    DrawH1D() // the constructor
+    public DrawH1D() // the constructor
     // Called by GJIF to begin a new P1D panel.
     // Sets up parameters, runs table rays, builds initial histogram.
     // No artwork here.
@@ -95,8 +95,8 @@ class DrawH1D extends DrawBase
 
     //-----------protected methods----------------
 
-
-    protected void doTechList(boolean bFullArt) // replaces abstract method
+    @Override
+    public void doTechList(boolean bFullArt) // replaces abstract method
     // Called by GPanel for artwork: new, pan, zoom, & random ray group.
     {
         nsurfs = Globals.giFlags[ONSURFS];                 // always needed.
@@ -104,7 +104,7 @@ class DrawH1D extends DrawBase
         ngood = RT13.iBuildRays(true);
 
         String warn = getUOwarning();   // never crashes.
-        //myGJIF.postWarning(warn);
+        // FIXME myGJIF.postWarning(warn);
         if (warn.length() > 0)
             return;
 
@@ -118,13 +118,14 @@ class DrawH1D extends DrawBase
         doArt();
     }
 
+    @Override
     protected void doRotate(int i, int j) // replaces abstract "do" method
     {
         return;
     }
 
-
-    protected boolean doRandomRay() // replaces abstract "do" method
+    @Override
+    public boolean doRandomRay() // replaces abstract "do" method
     {
         if (RT13.bRunRandomRay())
         {
@@ -133,22 +134,6 @@ class DrawH1D extends DrawBase
         }
         return false;
     }
-
-    protected void doCursor(int ix, int iy)  // replaces abstract method
-    // delivers current cursor coordinates
-    {
-        return;
-    }
-
-    protected double getStereo()    // replaces abstract "get" method
-    {
-        return 0.0;
-    }
-
-    protected void doSaveData()     // replaces abstract "do" method
-    {
-    }
-
 
     protected void doPlainSaveData()  // stupider version of the above
     {

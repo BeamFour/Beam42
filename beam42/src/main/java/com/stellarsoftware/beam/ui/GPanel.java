@@ -2,7 +2,7 @@ package com.stellarsoftware.beam.ui;
 
 import com.stellarsoftware.beam.core.*;
 import com.stellarsoftware.beam.core.render.CAD;
-import com.stellarsoftware.beam.core.render.Clipper;
+import com.stellarsoftware.beam.core.render.DrawBase;
 
 import java.awt.*;         // frame, BasicStroke, Color, Font
 import java.awt.event.*;   // KeyEvent MouseEvent etc
@@ -125,68 +125,40 @@ abstract class GPanel extends JPanel implements B4constants, Printable
     //-----Each extension must supply values for the following---------
 
     protected GJIF  myGJIF;                  // set by descendant panel
-    protected boolean bClobber;              // random = destroy prev art
-    protected boolean bPleaseParseUO;        // set by Options; reset by extension.
-    protected double uxcenter = 0.0;         // set by extension setLocals() horiz
-    protected double uycenter = 0.0;         // set by extension setLocals() vert
-    protected double uzcenter = 0.0;         // set by extension setLocals() depth
-    protected double uxspan = 1.0;           // set by extension setLocals() horiz
-    protected double uyspan = 1.0;           // set by extension setLocals() vert
-    protected double uzspan = 1.0;           // set by extension setLocals() depth
-    protected double uxanchor = 0.0;         // set by mouse
-    protected double uyanchor = 0.0;         // set by mouse
-    protected double uzanchor = 0.0;         // unused.
-    protected double dUOpixels = 500.0;      // window pixel size set by User Options
-    protected int    iEdits;                 // to compare with DMF.nEdits
-    
-    //---Abstract "do" methods; each extension must implement these-----
-    
-    abstract void    doTechList(boolean bArtStatus); 
-    abstract void    doRotate(int i, int j);
-    abstract boolean doRandomRay(); 
-    abstract void    doCursor(int i, int j); 
+    protected DrawBase drawBase;
+
+    abstract void    buildTechList(boolean bArtStatus);
+    abstract void    doCursor(int i, int j);
     abstract double  getStereo(); 
     abstract void    doSaveData(); 
     
-    //----QuadLists available internally for assembling artwork----------------
-    //---client users will call these using QBASE, QBATCH etc------------------
-    
-    private ArrayList<XYZO> baseList;    // vector art for Tech drawing
-    private ArrayList<XYZO> batchList;   // vector art for random batch
-    private ArrayList<XYZO> randList;    // vector art for accumulated random rays
-    private ArrayList<XYZO> finishList;  // vector art finishing Layouts
-    private ArrayList<XYZO> annoList;    // vector art for annotation
-    
+
     //--------Constructor---------------------
 
-    GPanel()  // host class for artwork generators
+    GPanel(DrawBase drawBase)  // host class for artwork generators
     {
         ///// testing suggestion from StackOverflow...
         ///// this.setDoubleBuffered(false); 
         ///// does it work?  Nope.
         
-        baseList   = new ArrayList<XYZO>(); 
-        batchList  = new ArrayList<XYZO>(); 
-        randList   = new ArrayList<XYZO>(); 
-        finishList = new ArrayList<XYZO>();
-        annoList   = new ArrayList<XYZO>(); 
-        
-        this.setFocusable(true);                   
+        this.setFocusable(true);
         this.addKeyListener(new MyKeyHandler());
         this.addMouseListener(new MyMouseHandler());
         this.addMouseMotionListener(new MyMouseMotionHandler());
-        this.addMouseWheelListener(new MyMouseZoomer()); 
-        iEdits = Globals.nEdits;
+        this.addMouseWheelListener(new MyMouseZoomer());
+        this.drawBase = drawBase;
     }
 
+    public boolean doRandomRay() {
+        return drawBase.doRandomRay();
+    }
 
     void requestNewArtwork()
     // Allows each AutoAdjust() iteration to request fresh Layout artwork. 
     // Don't re-parse UO or sizes when this is called.
     // Just let drawPage() regenerate its new g2Tech and render it. 
     {
-        bArtStatus = true;  // local stash for when OS paints.
-        annoList.clear();
+        drawBase.requestNewArtwork();
         if (g2Tech != null)
           g2Tech.dispose(); 
         g2Tech = null;      // should not spoil baseList
@@ -219,30 +191,30 @@ abstract class GPanel extends JPanel implements B4constants, Printable
         if (g2Tech == null)  // SNH.
           return; 
         
-        int lRand = randList.size();
-        int lBatch = batchList.size(); 
+        int lRand = drawBase.randList.size();
+        int lBatch = drawBase.batchList.size();
 
         boolean bTooBig = (lRand + lBatch > MAXRANDQUADS); 
         if (!bTooBig)
           for (int i=0; i<lBatch; i++)
-            randList.add(batchList.get(i)); 
+            drawBase.randList.add(drawBase.batchList.get(i));
         double dStereo = getStereo(); 
         
-        if (bClobber)
+        if (drawBase.bClobber)
           g2Tech = null;  // let drawPage() create fresh artwork. But what about biTech?
         else
         {
-            renderList(batchList, g2Tech, dStereo, true);
+            renderList(drawBase.batchList, g2Tech, dStereo, true);
             if (dStereo != 0.0)
-              renderList(batchList, g2Tech, -dStereo, false); 
+              renderList(drawBase.batchList, g2Tech, -dStereo, false);
         }
-        batchList.clear(); // all done with batchList.
+        drawBase.batchList.clear(); // all done with batchList.
         
         //--finally superpose finishList if any----
         
-        renderList(finishList, g2Tech, dStereo, true); 
+        renderList(drawBase.finishList, g2Tech, dStereo, true);
         if (dStereo != 0.0)
-          renderList(finishList, g2Tech, -dStereo, false); 
+          renderList(drawBase.finishList, g2Tech, -dStereo, false);
 
         repaint(); 
     }
@@ -297,16 +269,14 @@ abstract class GPanel extends JPanel implements B4constants, Printable
             return;
         }
         DMF.sCurrentDir = file.getParent();
-        CAD.doCAD(style, bPortrait, baseList, randList, finishList, annoList, file);
+        CAD.doCAD(style, bPortrait, drawBase.baseList, drawBase.randList, drawBase.finishList, drawBase.annoList, file);
     }
     
 
     void doUpdateUO()
     // Options calls this via GJIF when options change
     {
-        bPleaseParseUO = true; // flag allows client doParse().
-        bArtStatus = bFULLART; // stash for when OS paints
-        annoList.clear();      // discard old artwork
+        drawBase.doUpdateUO();
         if (g2Tech != null)    // discard old artwork
           g2Tech.dispose();    // discard old artwork
         g2Tech = null;         // discard old artwork
@@ -318,68 +288,12 @@ abstract class GPanel extends JPanel implements B4constants, Printable
     // GJIF calls this when coming forward: check for table edits.
     // How to implement bSticky, retain previous magnification?
     {
-        if (Globals.nEdits == iEdits)
-          return;              // no redraw needed. 
-        iEdits = Globals.nEdits;   // update local edits count
-        // bPleaseParseUO = true; // flag allows client doParse().
-        bArtStatus = bFULLART; // stash for when OS paints
-        annoList.clear();    // discard old artwork
+        drawBase.doQualifiedRedraw();
         if (g2Tech != null)    // discard old artwork
           g2Tech.dispose();    // discard old artwork
         g2Tech = null;         // discard old artwork
         repaint();             // request OS repaint.
     }
-
-    //---------protected methods for client use-----------
-
-    protected void clearList(int which)
-    {
-        switch(which)
-        {
-            case QBASE:   baseList.clear(); break; 
-            case QBATCH:  batchList.clear(); break; 
-            case QRAND:   randList.clear(); break; 
-            case QFINISH: finishList.clear(); break; 
-            case QANNO:   annoList.clear(); break; 
-        }
-    }
-            
-    protected void addRaw(double x, double y, double z, int op, int which)
-    // unscaled; for linewidths, font sizes, colors....
-    {
-        XYZO quad = new XYZO(x, y, z, op); 
-        switch(which)
-        {
-            case QBASE:   baseList.add(quad); break; 
-            case QBATCH:  batchList.add(quad); break; 
-            case QRAND:   randList.add(quad); break; 
-            case QFINISH: finishList.add(quad); break; 
-            case QANNO:   annoList.add(quad); break; 
-        }        
-    }
-    
-    protected void addScaled(double xyz[], int op, int which)
-    // scaled by the getXX() functions converting user to screen coordinates. 
-    {
-        XYZO quad = new XYZO(getax(xyz[0]), getay(xyz[1]), getaz(xyz[2]), op); 
-        switch(which)
-        {
-            case QBASE:   baseList.add(quad); break; 
-            case QBATCH:  batchList.add(quad); break; 
-            case QRAND:   randList.add(quad); break; 
-            case QFINISH: finishList.add(quad); break; 
-            case QANNO:   annoList.add(quad); break; 
-        }            
-    }
-    
-    protected void addScaled(double x, double y, double z, int op, int which)
-    // as above but with explicit coordinates
-    {
-        double xyz[] = {x, y, z}; 
-        addScaled(xyz, op, which); 
-    }
-
-    
 
     //--------------private & client support area-----------
     //--------------private & client support area-----------
@@ -411,9 +325,8 @@ abstract class GPanel extends JPanel implements B4constants, Printable
     // Includes caret blink via host BJIF and paintComponent().
     {
         dim = getSize(); 
-        dUOpixels = getUOpixels(); 
-        imid = dim.width / 2; 
-        jmid = dim.height / 2; 
+        drawBase.imid = dim.width / 2;
+        drawBase.jmid = dim.height / 2;
 
         //----totally new artwork---------
         
@@ -423,11 +336,11 @@ abstract class GPanel extends JPanel implements B4constants, Printable
             if (g2Tech != null)
               g2Tech.dispose(); 
 
-            baseList.clear();  
-            batchList.clear(); 
-            randList.clear(); 
-            finishList.clear(); 
-            annoList.clear(); 
+            drawBase.baseList.clear();
+            drawBase.batchList.clear();
+            drawBase.randList.clear();
+            drawBase.finishList.clear();
+            drawBase.annoList.clear();
             prevwidth = dim.width; 
             prevheight = dim.height; 
             biTech = new BufferedImage(dim.width, dim.height,
@@ -435,18 +348,18 @@ abstract class GPanel extends JPanel implements B4constants, Printable
             g2Tech = (Graphics2D) biTech.getGraphics();
             setGraphicSmoothing(g2Tech);
 
-            doTechList(bArtStatus); // locally stashed bArtStatus             
+            buildTechList(drawBase.bArtStatus); // locally stashed bArtStatus
             double dStereo = getStereo(); 
             
             if (dStereo == 0.0)
             {
-                renderList(baseList, g2Tech, 0.0, true);
-                renderList(finishList, g2Tech, 0.0, true); 
+                renderList(drawBase.baseList, g2Tech, 0.0, true);
+                renderList(drawBase.finishList, g2Tech, 0.0, true);
             }
             else
             {
-                renderListTwice(baseList, biTech, dStereo, true);  
-                renderListTwice(finishList, biTech, dStereo, true); 
+                renderListTwice(drawBase.baseList, biTech, dStereo, true);
+                renderListTwice(drawBase.finishList, biTech, dStereo, true);
             }
         }
 
@@ -454,14 +367,14 @@ abstract class GPanel extends JPanel implements B4constants, Printable
         
         setGraphicSmoothing(g2);                    // prep screen
         g2.drawImage(biTech, 0, 0, null);           // blit biTech
-        if (annoList.size() > 0)
-          renderList(annoList, g2, 0.0, false);     // annotate
+        if (drawBase.annoList.size() > 0)
+          renderList(drawBase.annoList, g2, 0.0, false);     // annotate
 
         if ((myGJIF != null) && myGJIF.getCaretStatus())    
         {
-            int f = getUOAnnoFont();                // fontsize points
-            int i = icaret - f/4;  
-            int j = jcaret - f/3; 
+            int f = drawBase.getUOAnnoFont();                // fontsize points
+            int i = drawBase.icaret - f/4;
+            int j = drawBase.jcaret - f/3;
             int w = f/2;
             int h = (2*f)/3; 
             g2.setXORMode(Color.YELLOW);
@@ -475,39 +388,11 @@ abstract class GPanel extends JPanel implements B4constants, Printable
     //----locally stashed fields---------------------
 
 
-    // bArtStatus is stashed locally because it is set during
-    // each mouse action yet must be made available at an unknown
-    // future time when the OS repaints the artwork. Its value
-    // specifies whether a skeleton or a fullart is wanted. 
-    
-    private boolean bArtStatus = bFULLART; 
-    
     //------caret wheel zoom support for clients-----------
         
     static java.util.Timer wheelTimer; 
     private int wheelTimerCount=0;
     private int wheelTimerMax=2; 
-
-    private int icaret=250, jcaret=250;      // pixels
-    private int imid=250, jmid=250;          // pixels
-    private int imouse=0, jmouse=0;          // pixels
-    
-    
-    private String sScaleFactors()
-    //  pixels per user unit scalefactors();
-    //  Can be used to substitute myGJIF.setTitle();
-    {
-        if (Math.abs(uxspan) < TOL) 
-          return ""; 
-        if (Math.abs(uyspan) < TOL)
-          return ""; 
-        double hscale = dUOpixels / uxspan; 
-        double vscale = dUOpixels / uyspan; 
-        double ratio = uxspan / uyspan; 
-        return "Hor="+U.fwd(hscale,8,2).trim()
-            +"  Vert="+U.fwd(vscale,8,2).trim()
-            +"  Ratio="+U.fwd(ratio,6,2).trim(); 
-    }
 
 
     //-----------mouse action support------------
@@ -536,218 +421,6 @@ abstract class GPanel extends JPanel implements B4constants, Printable
     }
 
 
-   //----------helpers for this GPanel drawPage() doing annotation----------
-
-    private int getUOAnnoFont()
-    {
-        int i = U.parseInt(Globals.reg.getuo(UO_GRAPH, 4));
-        return Math.max(3, Math.min(100, i)); 
-    }
-
-    private int getUOAnnoBold()
-    // as of Nov 2005, Font.BOLD=1, Font.PLAIN=0
-    {
-       return "T".equals(Globals.reg.getuo(UO_GRAPH, 5)) ? Font.BOLD : Font.PLAIN;
-    }
-
-    private int getUOAnnoFontCode()  // adds to ASCII
-    {
-        return 10000*getUOAnnoFont() + 1000*getUOAnnoBold();
-    }
-
-    private int getFixedAnnoFontCode()  // adds to ASCII, no UO
-    {
-        return 120000;   // 12 point plain
-    }
-
-
-    //------helpers for client assembling its quadList-----------
-
-    protected int getUOGraphicsFont()
-    {
-        return U.parseInt(Globals.reg.getuo(UO_GRAPH, 2));
-    }
-
-    protected int getUOGraphicsBold()
-    // as of Nov 2005, Font.BOLD=1, Font.PLAIN=0
-    {
-       return "T".equals(Globals.reg.getuo(UO_GRAPH, 3)) ? Font.BOLD : Font.PLAIN;
-    }
-
-    protected int getUOGraphicsFontCode()  // adds to ASCII
-    {
-        return 10000*getUOGraphicsFont() + 1000*getUOGraphicsBold(); 
-    }
-  
-
-
-    protected void addAffines()
-    // stash user affine consts & slopes for DXF: pix->UserUnits
-    {
-        baseList.add(new XYZO(uxcenter, uycenter, uzcenter, USERCONSTS)); 
-        double d = (dUOpixels > 0) ? dUOpixels : 500.0; 
-        baseList.add(new XYZO(uxspan/d, uyspan/d, uzspan/d, USERSLOPES));
-    }
-
-
-
-    //---------these helpers are general purpose--------------
-
-    protected double getax(double ux)
-    // converts userX to graphic coords: mouse drag, zoom, etc
-    // Used by addScaledItem() here and in client code
-    {
-        return dUOpixels*(ux-uxcenter)/uxspan; 
-    }
-
-
-    protected double getay(double uy)
-    // converts userY to graphic y; mouse drag, zoom, etc
-    // Used by addScaledItem() here and in client code
-    {
-        return dUOpixels*(uy-uycenter)/uyspan; 
-    }
-
-
-    protected double getaz(double uz)
-    // zero offset, and shares scale factor with yaxis.
-    // No mouse drag or zoom in addScaledItem. 
-    {
-        return dUOpixels*uz/uyspan; 
-    }
-
-
-    protected double getux(double ax)
-    // converts annoX to userX
-    {
-        return uxcenter + ax*uxspan/dUOpixels; 
-    }
-
-
-    protected double getuy(double ay)
-    // converts annoY to userY
-    {
-        return uycenter + ay*uyspan/dUOpixels;
-    }
-
-
-    //----------helpers for pixel rendering---------
-
-    double getuxPixel(int ipix)
-    // Converts raw pixel coord into user coord ux.
-    // Used by clients to show cursor coords in user space.
-    {
-        return uxcenter + (ipix-imid)*uxspan/dUOpixels; 
-    }
-
-
-    double getuyPixel(int jpix)
-    // Converts raw pixel coord into user coord uy.
-    // Used by clients to show cursor coords in user space.
-    {
-        return uycenter - (jpix-jmid)*uyspan/dUOpixels;
-    }
-
-
-    private double getAXPIX( int ipix) // pixel->annoPoints
-    {
-        return (double)(ipix - imid); 
-    }
-
-
-    private double getAYPIX( int jpix) // pixel->annoPoints
-    {
-        return (double)(jmid - jpix); 
-    }
-
-
-    private int getIXPIX(double x)  // annoPoints->pixel
-    {
-        return (int)(imid + x); 
-    }
-
-
-    private int getIYPIX(double y)  // annoPoints->pixel
-    {
-        return (int)(jmid - y); 
-    }
-
-
-    private int getUOpixels()
-    // Returns User Option window size in pixels.
-    {
-        int i = U.parseInt(Globals.reg.getuo(UO_GRAPH, 6));
-        if (i<=10)
-          i = 500; 
-        return Math.min(3000, Math.max(100, i)); 
-    }
-
-   
-
-
-    //----------annotation charlist management-------------
-
-    char getCurrentChar()
-    {
-        int len = annoList.size(); 
-        if (len > 0)
-        {
-            int k = annoList.get(len-1).getO(); 
-            if (k<=127)
-              return (char) k; 
-        }
-        return (char) 0;
-    }
-
-
-    void setNextCaretCoords(int igiven)
-    // Can I eliminate this entirely??
-    // and then eliminate getIYPIX().. etc?  Nope.
-    {
-        int len = annoList.size(); 
-        if (len > 0)
-        {
-            icaret = igiven + getIXPIX(annoList.get(len-1).getI()); 
-            jcaret = getIYPIX(annoList.get(len-1).getJ()); 
-            return; 
-        }
-
-        // treat case of empty annoList length....
-        icaret = imouse; 
-        jcaret = jmouse; 
-    }
-
-
-    void addAnno(double x, double y, char c)
-    {
-        int i = (int) c + getUOAnnoFontCode(); 
-        annoList.add(new XYZO(x, y, 0.0, i));
-    }
-
-
-    void deleteLastAnno()  // for backspace.
-    {
-        int i = annoList.size(); 
-        if (i>0)
-          annoList.remove(annoList.get(i-1)); 
-    }
-
-
-    private double getUserSlope()  // ZoomIn limiter
-    {
-        if (baseList==null)
-          return 1.0; 
-        int reach = Math.min(baseList.size(), 5); 
-        for (int i=0; i<reach; i++)
-        {
-            XYZO myXYZO = baseList.get(i); 
-            if (myXYZO.getO() == USERSLOPES)
-              return myXYZO.getX(); 
-        }
-        return 1.0; 
-    }
-
-
 
 
     //----------support for mouse pan zoom twirl-------------------
@@ -760,8 +433,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
     // bFinal=false when mouse is still down and skeleton is wanted.
     // bFinal=true when mouse is released and final artwork is wanted.
     {
-        bArtStatus = bFinal; // local stash for when OS paints.
-        annoList.clear();
+        drawBase.getNewMouseArtwork(bFinal);
         if (g2Tech != null)
           g2Tech.dispose(); 
         g2Tech = null;   
@@ -773,78 +445,57 @@ abstract class GPanel extends JPanel implements B4constants, Printable
     // ZoomIn centered on the current caret location. 
     // New artwork will use the new centers & spans.
     {
-        double dzoom = 1.0 - ZOOMOUT; // here ZOOMOUT=0.7071..
-        uxcenter += dzoom * uxspan*(icaret-imid)/dUOpixels; 
-        uycenter += dzoom * uyspan*(jmid-jcaret)/dUOpixels; 
-        if (getUserSlope() > 1E-14)
-        {
-            uxspan *= ZOOMOUT;
-            uyspan *= ZOOMOUT; 
-            uzspan *= ZOOMOUT; 
-        }
-        startWheelTimer(); 
+        drawBase.manageZoomIn();
+        startWheelTimer();
         getNewMouseArtwork(bSKELETON); 
         
         if (RM_LAYOUT == myGJIF.myType)  // Layout zoom scale factor display
           if ("T".equals(Globals.reg.getuo(UO_LAYOUT,3)))
-            myGJIF.setTitle(sScaleFactors());
+            myGJIF.setTitle(drawBase.sScaleFactors());
     }
 
     private void manageVertZoomIn()  // called by F5 and WheelShift
     // ZoomIn centered on the current caret location. 
     // New artwork will use the new centers & spans.
     {
-        double dzoom = 1.0 - ZOOMOUT; 
-        uycenter += dzoom * uyspan*(jmid-jcaret)/dUOpixels; 
-        if (getUserSlope() > 1E-14)
-        {
-            uyspan *= ZOOMOUT; 
-        }
-        startWheelTimer(); 
+        drawBase.manageVertZoomIn();
+        startWheelTimer();
         getNewMouseArtwork(bSKELETON); 
         
         if (RM_LAYOUT == myGJIF.myType)  // Layout zoom scale factor display
           if ("T".equals(Globals.reg.getuo(UO_LAYOUT,3)))
-            myGJIF.setTitle(sScaleFactors());
+            myGJIF.setTitle(drawBase.sScaleFactors());
     }
 
 
     private void manageZoomOut()  // called by F8 and Wheel
     {
-        double dzoom = (1.0/ZOOMOUT)-1.0; 
-        uxcenter -= dzoom * uxspan*(icaret-imid)/dUOpixels; 
-        uycenter -= dzoom * uyspan*(jmid-jcaret)/dUOpixels; 
-        uxspan /= ZOOMOUT; 
-        uyspan /= ZOOMOUT; 
-        uzspan /= ZOOMOUT; 
-        startWheelTimer(); 
+        drawBase.manageZoomOut();
+        startWheelTimer();
         getNewMouseArtwork(bSKELETON); 
         
         if (RM_LAYOUT == myGJIF.myType)  // Layout zoom scale factor display
           if ("T".equals(Globals.reg.getuo(UO_LAYOUT,3)))
-            myGJIF.setTitle(sScaleFactors());
+            myGJIF.setTitle(drawBase.sScaleFactors());
     }
 
     private void manageVertZoomOut()  // called by F6 and WheelShift
     {
-        double dzoom = (1.0/ZOOMOUT)-1.0; 
-        uycenter -= dzoom * uyspan*(jmid-jcaret)/dUOpixels; 
-        uyspan /= ZOOMOUT; 
-        startWheelTimer(); 
+        drawBase.manageVertZoomOut();
+        startWheelTimer();
         getNewMouseArtwork(bSKELETON); 
         
         if (RM_LAYOUT == myGJIF.myType)  // Layout zoom scale factor display
           if ("T".equals(Globals.reg.getuo(UO_LAYOUT,3)))
-            myGJIF.setTitle(sScaleFactors());
+            myGJIF.setTitle(drawBase.sScaleFactors());
     }
 
     private void manageDragTranslate(int di, int dj) 
     // Called by drag.
     // New artwork will use the modified centers. 
     {
-        uxcenter -= uxspan*(di)/dUOpixels;
-        uycenter += uyspan*(dj)/dUOpixels; 
-        getNewMouseArtwork(bSKELETON); 
+        drawBase.manageDragTranslate(di, dj);
+        getNewMouseArtwork(bSKELETON);
     }
 
 
@@ -854,48 +505,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
     // Uses average outOf zzz of target objects to translate image. 
     // This translation is done here, without client help.
     {
-        double daz = (i/3)/57.3;  // radians azimuth change
-        double del = (j/3)/57.3;  // radians elevation change
-        double zzz=0;             // sum & average zvertex
-        double xs=1, ys=1;        // slopes: userUnits/point
-        int ncount = 0; 
-        if (baseList == null)
-          return; 
-        int npts = Math.min(1000, baseList.size()); 
-        if (npts < 1)
-          return; 
-
-        for (int k=0; k<npts; k++)
-        {
-            XYZO m = baseList.get(k); 
-            int op = m.getO(); 
-            double x = m.getX();
-            double y = m.getY(); 
-            double z = m.getZ(); 
-            if (op==USERSLOPES) // has defined scale factors
-            {
-                xs = m.getX(); 
-                ys = m.getY(); 
-                continue; 
-            }
-            if ((op==MOVETO) || (op==PATHTO) || (op==STROKE))
-            {
-                if ((x>-200) && (x<200) && (y>-200) && (y<200))
-                {
-                   zzz += z;
-                   ncount++; 
-                }
-            }
-            if (op==COMMENTRULER) // exclude furniture from average
-              break;  
-        }
-        if (ncount > 1)
-        {
-            zzz /= ncount;
-            uxcenter += xs * zzz * daz; 
-            uycenter -= ys * zzz * del; 
-        } 
-        doRotate(i, j);                 // Have client modify sinel & cosel.
+        drawBase.manageDragRotate(i, j);
         getNewMouseArtwork(bSKELETON);  // Have client do temporary artwork.
     }
 
@@ -941,7 +551,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
 
         public void keyPressed(KeyEvent ke)
         {
-            int fontcode = getUOAnnoFontCode();  
+            int fontcode = drawBase.getUOAnnoFontCode();
             int charH = fontcode / 10000;  
             int charW = 1 + fontcode / 20000;   
 
@@ -949,41 +559,39 @@ abstract class GPanel extends JPanel implements B4constants, Printable
 
             if ((ic==KeyEvent.VK_DELETE) || (ic==KeyEvent.VK_BACK_SPACE))
             {
-                deleteLastAnno(); 
-                int step = (getCurrentChar()=='\n') ? 0 : charW;
-                setNextCaretCoords(step); 
+                drawBase.deleteLastAnno();
+                int step = (drawBase.getCurrentChar()=='\n') ? 0 : charW;
+                drawBase.setNextCaretCoords(step);
                 repaint();    
             }
 
             if (ic==KeyEvent.VK_ENTER)
             {
-                icaret = imouse;  
-                jcaret += charH; 
-                addAnno(getAXPIX(icaret), getAYPIX(jcaret), '\n'); 
-                repaint();    
+                drawBase.doKeyEnter(charH);
+                repaint();
             }
 
             if (ic==KeyEvent.VK_UP)
             {
-                jcaret -= ke.isControlDown() ? 1 : charH;
+                drawBase.jcaret -= ke.isControlDown() ? 1 : charH;
                 repaint(); // update caret
             }
 
             if (ic==KeyEvent.VK_DOWN)
             {
-                jcaret += ke.isControlDown() ? 1 : charH; 
+                drawBase.jcaret += ke.isControlDown() ? 1 : charH;
                 repaint(); // update caret
             }
 
             if (ic==KeyEvent.VK_LEFT)
             {
-                icaret -= ke.isControlDown() ? 1 : charW; 
+                drawBase.icaret -= ke.isControlDown() ? 1 : charW;
                 repaint(); // update caret
             }
 
             if (ic==KeyEvent.VK_RIGHT)
             {
-                icaret += ke.isControlDown() ? 1 : charW; 
+                drawBase.icaret += ke.isControlDown() ? 1 : charW;
                 repaint(); // update caret
             }
 
@@ -1010,24 +618,24 @@ abstract class GPanel extends JPanel implements B4constants, Printable
 
         public void keyTyped(KeyEvent ke)
         {
-            int fontcode = getUOAnnoFontCode();  
+            int fontcode = drawBase.getUOAnnoFontCode();
             int charH = fontcode / 10000;  
             int charW = 1 + fontcode / 20000;   
 
-            if (annoList.size() < 1)      // startup.
+            if (drawBase.annoList.size() < 1)      // startup.
             {
                int foreground = SETCOLOR + BLACK; 
                if (g2Tech != null)
                  if (g2Tech.getBackground() == Color.BLACK)
                    foreground = SETCOLOR + WHITE; 
-               addAnno(0.0, 0.0, (char) foreground);
+               drawBase.addAnno(0.0, 0.0, (char) foreground);
             }
 
             char c = ke.getKeyChar(); 
-            if ((c>=' ') && (c<='~') && (icaret>0))
+            if ((c>=' ') && (c<='~') && (drawBase.icaret>0))
             {
-                addAnno(getAXPIX(icaret), getAYPIX(jcaret), c); 
-                setNextCaretCoords(charW); 
+                drawBase.addAnno(drawBase.getAXPIX(drawBase.icaret), drawBase.getAYPIX(drawBase.jcaret), c);
+                drawBase.setNextCaretCoords(charW);
                 repaint(); 
             }
         }
@@ -1049,16 +657,16 @@ abstract class GPanel extends JPanel implements B4constants, Printable
 
         public void mousePressed(MouseEvent event)  // mouse down
         {
-            icaret = imouse = event.getX(); 
-            jcaret = jmouse = event.getY(); 
+            drawBase.icaret = drawBase.imouse = event.getX();
+            drawBase.jcaret = drawBase.jmouse = event.getY();
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); 
             if (event.getButton()==MouseEvent.BUTTON1)
               bLeftButton= true; 
             if (event.getButton()==MouseEvent.BUTTON3)
               bRightButton= true; 
 
-            uxanchor = getux(getAXPIX(icaret));
-            uyanchor = getuy(getAYPIX(jcaret)); 
+            drawBase.uxanchor = drawBase.getux(drawBase.getAXPIX(drawBase.icaret));
+            drawBase.uyanchor = drawBase.getuy(drawBase.getAYPIX(drawBase.jcaret));
         }
 
         public void mouseClicked(MouseEvent event) // mouse up
@@ -1069,19 +677,19 @@ abstract class GPanel extends JPanel implements B4constants, Printable
         {
             if (bDragged && bLeftButton)
             {
-                icaret = event.getX(); 
-                jcaret = event.getY();
-                manageDragTranslate(icaret-imouse, jcaret-jmouse); 
-                imouse = icaret; 
-                jmouse = jcaret; 
+                drawBase.icaret = event.getX();
+                drawBase.jcaret = event.getY();
+                manageDragTranslate(drawBase.icaret-drawBase.imouse, drawBase.jcaret-drawBase.jmouse);
+                drawBase.imouse = drawBase.icaret;
+                drawBase.jmouse = drawBase.jcaret;
             }
             if (bDragged && bRightButton)
             {
-                icaret = event.getX(); 
-                jcaret = event.getY();
-                manageDragRotate(icaret-imouse, jcaret-jmouse); 
-                imouse = icaret; 
-                jmouse = jcaret; 
+                drawBase.icaret = event.getX();
+                drawBase.jcaret = event.getY();
+                manageDragRotate(drawBase.icaret-drawBase.imouse, drawBase.jcaret-drawBase.jmouse);
+                drawBase.imouse = drawBase.icaret;
+                drawBase.jmouse = drawBase.jcaret;
             }
             setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
             bLeftButton = false; 
@@ -1109,19 +717,19 @@ abstract class GPanel extends JPanel implements B4constants, Printable
             //--------perform dynamic dragging----------
             if (bDragged && bLeftButton)
             {
-                icaret = event.getX(); 
-                jcaret = event.getY();
-                manageDragTranslate(icaret-imouse, jcaret-jmouse); 
-                imouse = icaret; 
-                jmouse = jcaret; 
+                drawBase.icaret = event.getX();
+                drawBase.jcaret = event.getY();
+                manageDragTranslate(drawBase.icaret-drawBase.imouse, drawBase.jcaret-drawBase.jmouse);
+                drawBase.imouse = drawBase.icaret;
+                drawBase.jmouse = drawBase.jcaret;
             }
             if (bDragged && bRightButton)
             {
-                icaret = event.getX(); 
-                jcaret = event.getY();
-                manageDragRotate(icaret-imouse, jcaret-jmouse); 
-                imouse = icaret; 
-                jmouse = jcaret; 
+                drawBase.icaret = event.getX();
+                drawBase.jcaret = event.getY();
+                manageDragRotate(drawBase.icaret-drawBase.imouse, drawBase.jcaret-drawBase.jmouse);
+                drawBase.imouse = drawBase.icaret;
+                drawBase.jmouse = drawBase.jcaret;
             }
         }
     }
@@ -1150,89 +758,7 @@ abstract class GPanel extends JPanel implements B4constants, Printable
 
     //---------Output routines---------------
 
-
-    private double getRadius(ArrayList<XYZO> xxList)
-    // evaluates the max (x,y) radius of XYZOs in xxList
-    {
-        double r = 0.0; 
-        for (int i=0; i<xxList.size(); i++)
-        {
-            XYZO myXYZO = xxList.get(i); 
-            double x = myXYZO.getX(); 
-            double y = myXYZO.getY(); 
-            r = Math.max(r, Math.max(Math.abs(x), Math.abs(y))); 
-        }
-        return r; 
-    }
-
-
-    private void localclip(ArrayList<XYZO> xxList)
-    // Clips artwork to a box, double precision.
-    // Uses Clipper to do the dirty work. 
-    // Also unpacks polylines into separate line segments.
-    // Discards all invisible parts.
-    // Interprets fills as boundary line segments. 
-    // Clipped segments lose their third dimension, sorry.
-    {
-        ArrayList<XYZO> sList = new ArrayList<XYZO>(); 
-
-        // copy the given xxList over to become our source...
-        for (int i=0; i<xxList.size(); i++)
-        {
-            sList.add(xxList.get(i)); 
-        }
-
-        // now empty the given aList...
-        xxList.clear(); 
-
-        // now set up a clipper...
-        Clipper myClip = new Clipper(-1000, -1000, 1000, 1000);
-        double vec[] = new double[4]; 
-        XYZO myXYZO; 
-        for (int t=0; t<sList.size(); t++)
-        {
-            myXYZO = sList.get(t); // copy preexisting object
-            double x = myXYZO.getX(); 
-            double y = myXYZO.getY(); 
-            int op = myXYZO.getO(); 
-            int opcode = op % 1000; 
-
-            switch(opcode)
-            {
-                case MOVETO:  // start decomposing this polyline...
-                  vec[2] = x; 
-                  vec[3] = y; 
-                  break; 
-
-                case PATHTO:  // these are the same now
-                case STROKE:  // these are the same now
-                case FILL:    // added, eliminating skipto
-                  vec[0] = vec[2]; 
-                  vec[1] = vec[3]; 
-                  vec[2] = x; 
-                  vec[3] = y; 
-                  if (myClip.clip(vec))
-                  {
-                     XYZO tempXYZO = new XYZO(vec[0], vec[1], 0.0, MOVETO); 
-                     xxList.add(tempXYZO); 
-                     tempXYZO = new XYZO(vec[2], vec[3], 0.0, STROKE); 
-                     xxList.add(tempXYZO); 
-                     // xxList.add(new XYZO(vec[0], vec[1], 0.0, MOVETO)); 
-                     // xxList.add(new XYZO(vec[2], vec[3], 0.0, STROKE)); 
-                  }
-                  break; 
-
-                default:   // deal with singletons here...
-                  if( Math.max(Math.abs(x), Math.abs(y)) < 1000) 
-                    xxList.add(new XYZO(x, y, 0.0, op));  
-                  break; 
-            } 
-        }
-    }
-
-
-
-    private void renderList(ArrayList<XYZO> aList, Graphics2D gX, 
+    private void renderList(ArrayList<XYZO> aList, Graphics2D gX,
                             double dStereo, boolean bPreClear)
     // Renders a given List onto a given Graphics2D.
     // Called by redo(), doCAD(), and drawPage(). 
@@ -1261,8 +787,8 @@ abstract class GPanel extends JPanel implements B4constants, Printable
         float fdash[] = {3.0f, 2.0f};      // pixels
         int pxoffset=0, pyoffset=0;        // pixels, for centering chars
 
-        if (getRadius(aList) > DECISIONRADIUS)
-          localclip(aList); 
+        if (drawBase.getRadius(aList) > DECISIONRADIUS)
+          drawBase.localclip(aList);
 
         for (int t=0; t<aList.size(); t++)
         {
@@ -1272,11 +798,11 @@ abstract class GPanel extends JPanel implements B4constants, Printable
             double x = myXYZO.getX();  // rightward
             double y = myXYZO.getY();  // upward
             double z = myXYZO.getZ();  // out of screen 
-            z -= uzcenter;             // for stereo balance
+            z -= drawBase.uzcenter;             // for stereo balance
             float  fline = 0.0f;       // for line widths
 
-            int ipx = getIXPIX( (int) (x - STEREO*dStereo*z)); 
-            int ipy = getIYPIX( (int) y); 
+            int ipx = drawBase.getIXPIX( (int) (x - STEREO*dStereo*z));
+            int ipy = drawBase.getIYPIX( (int) y);
 
             int opint = aList.get(t).getO(); 
             int opcode = opint % 1000;  

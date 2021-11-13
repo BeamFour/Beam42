@@ -28,7 +28,7 @@ import static com.stellarsoftware.beam.core.Globals.RT13;
  *
  * @author M.Lampton (c) STELLAR SOFTWARE 2004-2015 all rights reserved.
  */
-class DrawPlot2 extends DrawBase
+public class DrawPlot2 extends DrawBase
 {
     // public static final long serialVersionUID = 42L;
 
@@ -51,7 +51,7 @@ class DrawPlot2 extends DrawBase
 
     //----------------public methods------------------------
 
-    DrawPlot2()
+    public DrawPlot2()
     {
         // implicitly calls super() with no arguments
         bClobber =false;        // protected; random redo() keeps old artwork
@@ -64,7 +64,8 @@ class DrawPlot2 extends DrawBase
 
     //--------------protected methods, called by GPanel---------------
 
-    protected void doTechList(boolean bFullArt) // replaces abstract method
+    @Override
+    public void doTechList(boolean bFullArt) // replaces abstract method
     // Called by GPanel when fresh Plot2Panel artwork is needed.
     {
         nsurfs = Globals.giFlags[ONSURFS];    // always needed.
@@ -72,7 +73,7 @@ class DrawPlot2 extends DrawBase
         ngood = RT13.iBuildRays(true);
 
         String warn = getUOwarning();     // never crashes.
-        //myGJIF.postWarning(warn);
+        // FIXME myGJIF.postWarning(warn);
 
         if (warn.length() > 0)
             badUO = true;   // use this in setting display scale
@@ -90,34 +91,10 @@ class DrawPlot2 extends DrawBase
         return;
     }
 
-    protected boolean doRandomRay() // replaces abstract "do" method
+    public boolean doRandomRay() // replaces abstract "do" method
     {
         return drawOneRay(0);
     }
-
-    protected void doCursor(int ix, int iy)  // replaces abstract method
-    // Given mouse cursor coordinates in pixels,
-    // delivers current cursor user coordinates
-    // or if outside window it refreshes GJIF title/warning.
-    {
-//        if (ix<0)
-//            myGJIF.cleanupTitle(); // retains any warnings
-//        else
-//            myGJIF.postCoords("Hor=" + U.fwd(getuxPixel(ix),18,6).trim()
-//                    + "  Vert=" + U.fwd(getuyPixel(iy),18,6).trim());
-    }
-
-    protected double getStereo()    // replaces abstract "get" method
-    {
-        return 0.0;
-    }
-
-    protected void doSaveData()     // replaces abstract "do" method
-    {
-        return;
-    }
-
-
 
 
     //-----------------private methods--------------------------

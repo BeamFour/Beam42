@@ -7,6 +7,10 @@ import com.stellarsoftware.beam.core.U;
 
 import static com.stellarsoftware.beam.core.Globals.RT13;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;        // ArrayList
 
 @SuppressWarnings("serial")
@@ -98,7 +102,7 @@ import java.util.*;        // ArrayList
  *
  * @author M.Lampton (c) STELLAR SOFTWARE 2011 all rights reserved.
  */
-class DrawMap extends DrawBase // implements Runnable
+public class DrawMap extends DrawBase // implements Runnable
 {
     // public static final long serialVersionUID = 42L;
 
@@ -162,7 +166,7 @@ class DrawMap extends DrawBase // implements Runnable
     double EXTRA = 2.0;
 
 
-    DrawMap()
+    public DrawMap()
     {
         bClobber = true;
         uxcenter = 0.0;         // unit square; for GPanel's addAffines.
@@ -174,7 +178,8 @@ class DrawMap extends DrawBase // implements Runnable
 
     //-----------protected methods----------------
 
-    protected void doTechList(boolean bFullArt) // replaces abstract method
+    @Override
+    public void doTechList(boolean bFullArt) // replaces abstract method
     // Called by GPanel for artwork: new, pan, zoom, & random ray group.
     // THIS RESPONDS TO THE OS CALL TO GPanel::paintComponent()
     // It gets called NxM times to make a complete Map.
@@ -184,7 +189,8 @@ class DrawMap extends DrawBase // implements Runnable
         nrays = Globals.giFlags[RNRAYS];
 
         if (bPleaseParseUO)
-            startMap();
+            // Handled by caller see MapPanel
+            return;
         else
             doArt();
     }
@@ -195,49 +201,16 @@ class DrawMap extends DrawBase // implements Runnable
         return;
     }
 
-    protected boolean doRandomRay() // replaces abstract "do" method
+    public boolean doRandomRay() // replaces abstract "do" method
     {
         return true;
     }
 
-    protected void doCursor(int ix, int iy)  // replaces abstract method
-    {
-        return;
-    }
-
-    protected double getStereo()    // replaces abstract "get" method
-    {
-        return 0.0;
-    }
-
-    protected void doSaveData()     // replaces abstract "do" method
-    {
-        return;
-    }
-
-
 
 //----------private methods-----------------
 
-    private void startMap()
-    // Called only by doTechList().
-    {
-        String warn = doParseUO();
-        displayMessage(warn);
-        if (warn.length() > 0)
-        {
-//            myGJIF.postWarning(warn);
-//            repaint(); // need to kick off warning artwork?
-            return;
-        }
-        bPleaseParseUO = false;
-        goodBunches = 0;
-        dList = new ArrayList<Double>(); // zero data.
-        startBunches(); // starts the timing loop
-    }
 
-
-    private String doParseUO()
+    public String doParseUO()
     // This is the User Options parser.
     // Call this whenever user options change; gives warning or "".
     // First line of defense! must never crash.
@@ -691,23 +664,23 @@ class DrawMap extends DrawBase // implements Runnable
         }
     }
 
-    private void doFinishFile()
+    public void doFinishFile()
     {
-//        if (bOutfile && (sList != null) && (sList.size() > 0))
-//        {
-//            File file = new File(sOutfile);
-//            try
-//            {
-//                FileWriter fw = new FileWriter(file);
-//                PrintWriter pw = new PrintWriter(fw, true);
-//                for (int i=0; i<sList.size(); i++)
-//                    pw.println(sList.get(i));
-//                pw.flush();
-//                pw.close();
-//            }
-//            catch (IOException e)
-//            { }
-//        }
+        if (bOutfile && (sList != null) && (sList.size() > 0))
+        {
+            File file = new File(sOutfile);
+            try
+            {
+                FileWriter fw = new FileWriter(file);
+                PrintWriter pw = new PrintWriter(fw, true);
+                for (int i=0; i<sList.size(); i++)
+                    pw.println(sList.get(i));
+                pw.flush();
+                pw.close();
+            }
+            catch (IOException e)
+            { }
+        }
     }
 
 
@@ -864,11 +837,13 @@ class DrawMap extends DrawBase // implements Runnable
         if ((goodBunches<2) || (U.isNegZero(mindatum)) || (maxdatum <= mindatum))
         {
             String warn = "Ngood < 2: vignetting?";
+            // FIXME
             //myGJIF.postWarning(warn);
             return;
         }
         else
         {
+            // FIXME
             //myGJIF.postWarning("");
         }
 
@@ -914,7 +889,7 @@ class DrawMap extends DrawBase // implements Runnable
 
 
 
-    private void displayMessage(String s)
+    public void displayMessage(String s)
     // Posts a message on the MapPanel screen
     {
         iFontcode = getUOGraphicsFontCode();
@@ -947,39 +922,28 @@ class DrawMap extends DrawBase // implements Runnable
     //     redo()      in GPanel; with bClobber=true, calls doArt() here.
     //     doFinishFile()  is called at end of timer run here.
 
-    private javax.swing.Timer myTimer;
     private int goodcount=0;
     private int iBunch=0;
-    private boolean bRunning = true;
+    public boolean bRunning = true;
 
-    private void startBunches()
+    public void prepareBunches()
     {
         nrays = Globals.giFlags[RNRAYS];
         goodcount = 0;
         iBunch = 0;
-        //myTimer = new javax.swing.Timer(20, doTick);
+        bPleaseParseUO = false;
+        goodBunches = 0;
+        dList = new ArrayList<Double>(); // zero data.
         bRunning = true;
-        myTimer.start();
     }
 
-//    ActionListener doTick = new ActionListener()
-//    {
-//        public void actionPerformed(ActionEvent ae)
-//        {
-//            if (bRunning)
-//            {
-//                doBunchRays(iBunch);
-//                iBunch++;
-//                if (iBunch >= maxBunches)
-//                    bRunning = false;
-//                redo();  // GPanel: myBatchList -> g2Tech, and blit.
-//            }
-//            else
-//            {
-//                myTimer.stop();
-//                doFinishFile();
-//            }
-//        }
-//    };
+    public void doBunch() {
+        if (bRunning) {
+            doBunchRays(iBunch);
+            iBunch++;
+            if (iBunch >= maxBunches)
+                bRunning = false;
+        }
+    }
 
 }  //----------end of MapPanel--------------------

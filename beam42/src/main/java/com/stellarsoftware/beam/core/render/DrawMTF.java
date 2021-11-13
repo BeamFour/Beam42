@@ -15,7 +15,7 @@ import com.stellarsoftware.beam.core.U;
  *
  * @author M.Lampton (c) STELLAR SOFTWARE 2004 all rights reserved.
  */
-class DrawMTF extends DrawBase
+public class DrawMTF extends DrawBase
 {
     // public static final long serialVersionUID = 42L;
 
@@ -25,11 +25,11 @@ class DrawMTF extends DrawBase
     private double histospan = 1.0;
     private double deltaf = 1.0;
     private double freqspan = 1.0;
-    private int nbins = 1;
+    public int nbins = 1;
     private int ncomplexpairs = 1;
     private int nplotfreqs = 1;
     private double cData[] = new double[2*MAXBINS];  // real, imag, real...
-    private double dPower[] = new double[MAXBINS];
+    public double[] dPower = new double[MAXBINS];
     private int  CADstyle=0;
     private int hnticks, hndigits, vnticks, vndigits;
     private double hticks[] = new double[12];
@@ -37,14 +37,14 @@ class DrawMTF extends DrawBase
     private DrawH1D myH1DPanel = null;
 
 
-    DrawMTF(DrawH1D h1d)
+    public DrawMTF(DrawH1D h1d)
     {
         bClobber = true; // protected; random redo() needs new artwork
 
         // The following will get the most recently constructed g1D
         // but this is not necessarily the g1D that is currently in front.
 
-        myH1DPanel = h1d;
+        myH1DPanel = h1d; // FIXME review this
         nbins = myH1DPanel.getNbins();
         while ((ncomplexpairs < nbins) && (ncomplexpairs < 1024))
             ncomplexpairs *= 2;
@@ -95,7 +95,8 @@ class DrawMTF extends DrawBase
 
 //-----------protected methods concretizing GPanel-------
 
-    protected void doTechList(boolean bFullArt) // replaces abstract method
+    @Override
+    public void doTechList(boolean bFullArt) // replaces abstract method
     // Called by GPanel when fresh artwork is needed:
     // Ignotes bFullArt, always writes complete diagram.
     {
@@ -107,31 +108,11 @@ class DrawMTF extends DrawBase
         // do nothing
     }
 
-    boolean doRandomRay()          // replaces abstract "do" method
+    public boolean doRandomRay()          // replaces abstract "do" method
     {
         // alert myP1DPanel !  NOT YET IMPLEMENTED.
         return false;
     }
-
-    protected void doCursor(int ix, int iy)  // replaces abstract method
-    // delivers current cursor coordinates
-    {
-        return;
-    }
-
-    protected double getStereo()    // replaces abstract "get" method
-    {
-        return 0.0;
-    }
-
-    protected void doSaveData()     // replaces abstract "do" method
-    {
-
-    }
-
-
-
-
 
 
     //--------------ARTWORK-------------------

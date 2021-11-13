@@ -15,7 +15,7 @@ import com.stellarsoftware.beam.core.U;
  *
  * @author M.Lampton (c) STELLAR SOFTWARE 2004-2015 all rights reserved.
  */
-class DrawDemo extends DrawBase // implements Runnable
+public class DrawDemo extends DrawBase // implements Runnable
 {
     // public static final long serialVersionUID = 42L;
 
@@ -25,7 +25,7 @@ class DrawDemo extends DrawBase // implements Runnable
     int jjj[] = new int[6];
     double zzz[] = new double[6];
 
-    DrawDemo() // constructor
+    public DrawDemo() // constructor
     {
         uxcenter = 0.0;       // optional for GPanel's addAffines()
         uxspan = EXTRAROOM;   // optional for GPanel's addAffines()
@@ -43,8 +43,8 @@ class DrawDemo extends DrawBase // implements Runnable
 
 
     //-----protected methods-----------
-
-    protected void doTechList(boolean bFullArt)  // replaces abstract method
+    @Override
+    public void doTechList(boolean bFullArt)  // replaces abstract method
     // Called by GPanel when fresh artwork is needed:
     // new, pan, zoom, rotate.
     // But this is never called simply for annotation mods.
@@ -66,26 +66,9 @@ class DrawDemo extends DrawBase // implements Runnable
         sinel = U.sind(el);
     }
 
-    protected boolean doRandomRay() // replaces abstract "do" method
+    public boolean doRandomRay() // replaces abstract "do" method
     {
         return false;
-    }
-
-    protected void doCursor(int ix, int iy)  // replaces abstract method
-    // delivers current cursor coordinates
-    {
-        return;
-    }
-
-    protected double getStereo()    // replaces abstract "get" method
-    {
-        return 0.0;
-    }
-
-
-    protected void doSaveData()     // replaces abstract "do" method
-    {
-        return;
     }
 
 

@@ -23,7 +23,7 @@ import static com.stellarsoftware.beam.core.Globals.RT13;
  *
  * @author M.Lampton (c) STELLAR SOFTWARE 2004-2015 all rights reserved.
  */
-class DrawH2D extends DrawBase
+public class DrawH2D extends DrawBase
 {
     // public static final long serialVersionUID = 42L;
 
@@ -46,8 +46,9 @@ class DrawH2D extends DrawBase
     private double az, cosaz=1, sinaz=0;
     private double el, cosel=1, sinel=0;
 
-    private int histo[][];
-    private int nhbins, nvbins;
+    public int[][] histo;
+    public int nhbins;
+    public int nvbins;
     private double dhisto[][];
     private int nhticks, nhdigits;
     private int nvticks, nvdigits;
@@ -65,7 +66,7 @@ class DrawH2D extends DrawBase
 
 
 
-    DrawH2D()
+    public DrawH2D()
     {
         // implicitly calls super() with no arguments
         bClobber = true;        // protected; random redo() forces new artwork
@@ -77,7 +78,8 @@ class DrawH2D extends DrawBase
     //---------------protected and private methods-------------------
 
 
-    protected void doTechList(boolean bFullArt) // replaces abstract method
+    @Override
+    public void doTechList(boolean bFullArt) // replaces abstract method
     // Called by GPanel for artwork: new, pan, zoom, & random ray group.
     {
         nsurfs = Globals.giFlags[ONSURFS];                 // always needed.
@@ -86,7 +88,7 @@ class DrawH2D extends DrawBase
 
 
         String warn = getUOwarning(); // private & local
-        //myGJIF.postWarning(warn);
+        // FIXME myGJIF.postWarning(warn);
         if (warn.length() > 0)
             return;
 
@@ -112,7 +114,7 @@ class DrawH2D extends DrawBase
         sinel = U.sind(el);
     }
 
-    boolean doRandomRay() // replaces abstract "doXX" method
+    public boolean doRandomRay() // replaces abstract "doXX" method
     {
         if (RT13.bRunRandomRay())
         {
@@ -121,32 +123,6 @@ class DrawH2D extends DrawBase
         }
         return false;
     }
-
-    protected void doCursor(int ix, int iy)  // replaces abstract method
-    // delivers current cursor coordinates
-    {
-        return;
-    }
-
-    protected double getStereo()    // replaces abstract "get" method
-    {
-        double d = 0.0;
-        boolean bS = "T".equals(Globals.reg.getuo(UO_2D, 17));
-        if (bS)
-        {
-            String ss = Globals.reg.getuo(UO_2D, 18);
-            d = U.suckDouble(ss);
-            if (d == Double.NaN)
-                d = 0.0;
-        }
-        return d;
-    }
-
-    protected void doSaveData()     // replaces abstract "do" method
-    {
-    }
-
-
 
 
     //-----------private methods---------------

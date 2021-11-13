@@ -59,7 +59,7 @@ import java.util.Arrays;   // to list an int array jhit[] below
  *
  * M.Lampton STELLAR SOFTWARE (c) 2004-2012 all rights reserved.
  */
-class DrawLayout extends DrawBase   // implements B4constants via GPanel
+public class DrawLayout extends DrawBase   // implements B4constants via GPanel
 {
     // public static final long serialVersionUID = 42L;
 
@@ -95,7 +95,7 @@ class DrawLayout extends DrawBase   // implements B4constants via GPanel
     private boolean bPosInnerR[] = new boolean[MAXSURFS+1];
     private boolean bGivenOuterRadius[] = new boolean[MAXSURFS+1];
     private boolean whitebkg = true;
-    private boolean bStickyUO = false;
+    public boolean bStickyUO = false;
     private boolean bStickyOK = false;
     private boolean bRetroVis = true;
 
@@ -135,7 +135,7 @@ class DrawLayout extends DrawBase   // implements B4constants via GPanel
     double arcy[] = {+1.0, +1.0, -1.0, -1.0}; // arcs
 
 
-    DrawLayout()
+    public DrawLayout()
     {
         bClobber = false;       // protected; random() keeps old artwork
         bPleaseParseUO = true;  // for initial startup
@@ -143,7 +143,8 @@ class DrawLayout extends DrawBase   // implements B4constants via GPanel
 
     //---protected methods mandated by GPanel--------
 
-    protected void doTechList(boolean bArtStatus) // replaces abstract "do"
+    @Override
+    public void doTechList(boolean bArtStatus) // replaces abstract "do"
     // Called by GPanel when fresh artwork is needed: new pan, zoom, rotate.
     // But this is not called for annotations or caret blinks.
     // For annotation, host's bitmap of TechList is blitted instead,
@@ -180,7 +181,7 @@ class DrawLayout extends DrawBase   // implements B4constants via GPanel
             doSkeleton();    // happily ignorant of stereo
     }
 
-
+    @Override
     protected void doRotate(int i, int j) // replaces abstract "do" method
     // Called by base class GPanel for mouse rotations.
     // Sets up private sinel, cosel for next artwork run.
@@ -197,47 +198,11 @@ class DrawLayout extends DrawBase   // implements B4constants via GPanel
         sinel = U.sind(el);
     }
 
-
-    protected boolean doRandomRay() // replaces abstract "do" method
+    @Override
+    public boolean doRandomRay() // replaces abstract "do" method
     {
         return drawOneRay(0, QBATCH);     // local version
     }
-
-
-    protected void doCursor(int ix, int iy)  // replaces abstract method
-    // Called by cursor motion;
-    // Delivers current cursor coordinates to title bar.
-    // NOTE: SCALEFACTOR DISPLAY DWELLS IN GPANEL NOT HERE.
-    {
-        String title = bStickyUO ? "Layout (sticky)" : "Layout";
-//        if (ix<0)
-//            myGJIF.cleanupTitle(title); // retains any warnings
-//        else
-//            myGJIF.postCoords(title + "Hor=" + U.fwd(getuxPixel(ix),18,6).trim()
-//                    + "  Vert=" + U.fwd(getuyPixel(iy),18,6).trim());
-    }
-
-    protected double getStereo()    // replaces abstract "get" method
-    // Not used locally because local methods are pure monoscopic.
-    // Allows GPanel base class to get user's stereo preference.
-    {
-        if ("T".equals(Globals.reg.getuo(UO_LAYOUT, 17)))
-        {
-            String ss = Globals.reg.getuo(UO_LAYOUT, 18);
-            double d = U.suckDouble(ss);
-            if (d == Double.NaN)
-                d = 0.0;
-            return d;
-        }
-        return 0.0;
-    }
-
-    protected void doSaveData()     // replaces abstract "do" method
-    {
-        return;
-    }
-
-
 
     //---------------private area----------------------
 
@@ -255,7 +220,7 @@ class DrawLayout extends DrawBase   // implements B4constants via GPanel
         cosaz = U.cosd(az);
         sinaz = U.sind(az);
         bStickyUO = "T".equals(Globals.reg.getuo(UO_LAYOUT, 2));
-        //myGJIF.setTitle(bStickyUO ? "Layout (sticky)" : "Layout");
+        // FIXME myGJIF.setTitle(bStickyUO ? "Layout (sticky)" : "Layout");
         bRetroVis = "T".equals(Globals.reg.getuo(UO_LAYOUT, 38));
 
         //-------set up arcs and segments------------------

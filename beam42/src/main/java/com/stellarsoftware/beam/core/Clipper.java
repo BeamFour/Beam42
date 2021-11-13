@@ -1,4 +1,4 @@
-package com.stellarsoftware.beam.ui;
+package com.stellarsoftware.beam.core;
 
 /**
   *  Performs double precision clipping of line segments
@@ -6,11 +6,11 @@ package com.stellarsoftware.beam.ui;
   *
   *  Has no UI, imports nothing. 
   */
-class Clipper
+public class Clipper
 {
     private double xLeft, yBot, xRight, yTop; 
 
-    Clipper(double x1, double y1, double x2, double y2)
+    public Clipper(double x1, double y1, double x2, double y2)
     // This constructor sets up edges of clipping rectangle.
     {
         xLeft = Math.min(x1, x2); 
@@ -19,7 +19,7 @@ class Clipper
         yTop = Math.max(y1, y2); 
     }
 
-    boolean clip(double vec[])
+    public boolean clip(double vec[])
     // Clips a line segment "vec" with the preset rectangle.
     // vec is {x1,y1,x2,y2}
     // returns true if visible, else false. 

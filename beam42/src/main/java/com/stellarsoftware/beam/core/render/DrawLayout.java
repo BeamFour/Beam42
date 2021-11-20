@@ -213,19 +213,19 @@ public class DrawLayout extends DrawBase   // implements B4constants via GPanel
     // Trace was already run as part of doTechList().
     {
         bPleaseParseUO = false; // mandatory to allow pan/zoom/twirl
-        el = U.suckDouble(Globals.reg.getuo(UO_LAYOUT, 0));
-        az = U.suckDouble(Globals.reg.getuo(UO_LAYOUT, 1));
+        el = U.suckDouble(Globals.reg.getuo(UO_LAYOUT, 0)); // View elevation
+        az = U.suckDouble(Globals.reg.getuo(UO_LAYOUT, 1)); // View azimuth
         cosel = U.cosd(el);
         sinel = U.sind(el);
         cosaz = U.cosd(az);
         sinaz = U.sind(az);
-        bStickyUO = "T".equals(Globals.reg.getuo(UO_LAYOUT, 2));
+        bStickyUO = "T".equals(Globals.reg.getuo(UO_LAYOUT, 2)); // Sticky pan/zoom?
         // FIXME myGJIF.setTitle(bStickyUO ? "Layout (sticky)" : "Layout");
-        bRetroVis = "T".equals(Globals.reg.getuo(UO_LAYOUT, 38));
+        bRetroVis = "T".equals(Globals.reg.getuo(UO_LAYOUT, 38)); // Retro visible?
 
         //-------set up arcs and segments------------------
 
-        nsegs = U.suckInt(Globals.reg.getuo(UO_LAYOUT, 3));
+        nsegs = U.suckInt(Globals.reg.getuo(UO_LAYOUT, 3)); // Arc Segments
         nsegs = Math.max(2, Math.min(100, nsegs));
         boolean bHasArray = false;
         for (int j=1; j<=MAXSURFS; j++)

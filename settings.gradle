@@ -8,4 +8,4 @@
  */
 
 rootProject.name = 'Beam42'
-include('beam42', 'jfotoptix')
+include('beam42', 'jfotoptix', 'rayoptics')

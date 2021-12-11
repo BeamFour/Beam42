@@ -43,7 +43,7 @@ public class Vector3 {
         if (M.isZero(lengthsq)) {
             return ZERO;
         } else {
-            double factor = Math.sqrt(lengthsq);
+            double factor = 1.0/Math.sqrt(lengthsq);
             return new Vector3(x * factor, y * factor, z * factor);
         }
     }
@@ -54,6 +54,18 @@ public class Vector3 {
 
     public Vector3 add(Vector3 v) {
         return new Vector3(x+v.x, y+v.y, z+v.z);
+    }
+
+    public boolean isZero() {
+        return M.isZero(x * x + y * y + z * z);
+    }
+
+    public boolean any() {
+        return !isZero();
+    }
+
+    public String toString() {
+        return "[" + x + "," + y + "," + z + "]";
     }
 
 }

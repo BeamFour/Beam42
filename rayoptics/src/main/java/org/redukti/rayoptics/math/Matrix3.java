@@ -99,9 +99,172 @@ public class Matrix3 {
                 n20, n21, m22);
     }
 
+    Vector3 multiply(Vector3 other) {
+        double x = m00 * other.x + m01 * other.y + m02 * other.z;
+        double y = m10 * other.x + m11 * other.y + m12 * other.z;
+        double z = m20 * other.x + m21 * other.y + m22 * other.z;
+        return new Vector3(x, y, z);
+    }
+
+//    /**
+//     * Create rotation matrix
+//     *
+//     * @param zRotation degree in radians
+//     * @param yRotation degree in radians
+//     * @param xRotation degree in radians
+//     * @return Rotation matrix
+//     */
+//    public static Matrix3 rotation(double zRotation, double yRotation, double xRotation) {
+//        double Cx = Math.cos(xRotation);
+//        double Sx = Math.sin(xRotation);
+//
+//        double Cy = Math.cos(yRotation);
+//        double Sy = Math.sin(yRotation);
+//
+//        double Cz = Math.cos(zRotation);
+//        double Sz = Math.sin(zRotation);
+//
+//        double n00 = (Cy * Cz);
+//        double n01 = -(Cy * Sz);
+//        double n02 = Sy;
+//
+//        double n10 = (Sx * Sy * Cz) + (Cx * Sz);
+//        double n11 = -(Sx * Sy * Sz) + (Cx * Cz);
+//        double n12 = -(Sx * Cy);
+//
+//        double n20 = -(Cx * Sy * Cz) + (Sx * Sz);
+//        double n21 = (Cx * Sy * Sz) + (Sx * Cz);
+//        double n22 = (Cx * Cy);
+//
+//        return new Matrix3(
+//                n00, n01, n02,
+//                n10, n11, n12,
+//                n20, n21, n22);
+//    }
+
+    public static Matrix3 euler2mat(double roll_angle, double pitch_angle, double yaw_angle) {
+        double si = Math.sin(roll_angle),
+                sj = Math.sin(pitch_angle),
+                sk = Math.sin(yaw_angle);
+        double ci = Math.cos(roll_angle),
+                cj = Math.cos(pitch_angle),
+                ck = Math.cos(yaw_angle);
+        double cc = ci * ck, cs = ci * sk;
+        double sc = si * ck, ss = si * sk;
+
+        // gamma (roll)
+        // beta (pitch)
+        // alpha (yaw)
+        // see https://en.wikipedia.org/wiki/Rotation_matrix#In_three_dimensions
+        // More formally, it is an intrinsic rotation whose Tait–Bryan angles are α, β, γ, about axes z, y, x, respectively.
+        // The formula below corresponds to yaw.multiply(pitch.multiply(roll))
+        // which means roll followed by pitch followed by yaw
+
+        double n00 = cj * ck;    // Cos(y) * Cos(z)
+        double n01 = sj * sc - cs; // Sin(y) * Sin(x) * Cos(z) - Cos(x) * Sin(z)
+        double n02 = sj * cc + ss; // Sin(y) * Cos(x) * Cos(z) + Sin(x) * Sin(z)
+        double n10 = cj * sk;    // Cos(y) * Sin(z)
+        double n11 = sj * ss + cc; // Sin(y) * Sin(x) * Sin(z) + Cos(x) * Cos(z)
+        double n12 = sj * cs - sc; // Sin(y) * Cos(x) * Sin(z) - Sin(x) * Cos(z)
+        double n20 = -sj;      // -Sin(y)
+        double n21 = cj * si;    // Cos(y) * Sin(x)
+        double n22 = cj * ci;    // Cos(y) * Cos(x)
+
+        return new Matrix3(
+                n00, n01, n02,
+                n10, n11, n12,
+                n20, n21, n22);
+    }
+
+    public static Matrix3 euler2mat(Vector3 euler) {
+        return euler2mat(euler.x, euler.y, euler.z);
+    }
+
+    /**
+     * rotate around vert axis
+     */
+    public static Matrix3 yaw(double angle) {
+        double sine_theta = Math.sin(angle),
+                cos_theta = Math.cos(angle);
+
+        double n00 = cos_theta;
+        double n10 = sine_theta;
+        double n20 = 0.0f;
+        double n01 = -sine_theta;
+        double n11 = cos_theta;
+        double n21 = 0.0f;
+        double n02 = 0.0f;
+        double n12 = 0.0f;
+        double n22 = 1.0f;
+        return new Matrix3(
+                n00, n01, n02,
+                n10, n11, n12,
+                n20, n21, n22);
+    }
+
+    /**
+     * rotate around sideways axis - i.e. tilt
+     */
+    public static Matrix3 pitch(double angle) {
+        double sine_theta = Math.sin(angle),
+                cos_theta = Math.cos(angle);
+
+        double n00 = cos_theta;
+        double n10 = 0.0f;
+        double n20 = -sine_theta;
+        double n01 = 0.0f;
+        double n11 = 1.0f;
+        double n21 = 0.0f;
+        double n02 = sine_theta;
+        double n12 = 0.0f;
+        double n22 = cos_theta;
+        return new Matrix3(
+                n00, n01, n02,
+                n10, n11, n12,
+                n20, n21, n22);
+    }
+
+    /**
+     * Rotate around forward axis, i.e. turn
+     */
+    public static Matrix3 roll(double angle) {
+        double sine_theta = Math.sin(angle),
+                cos_theta = Math.cos(angle);
+
+        double n00 = 1.0f;
+        double n10 = 0.0f;
+        double n20 = 0.0f;
+        double n01 = 0.0f;
+        double n11 = cos_theta;
+        double n21 = sine_theta;
+        double n02 = 0.0f;
+        double n12 = -sine_theta;
+        double n22 = cos_theta;
+        return new Matrix3(
+                n00, n01, n02,
+                n10, n11, n12,
+                n20, n21, n22);
+    }
+
+    public Matrix3 multiply(Matrix3 other) {
+        double n00 = m00 * other.m00 + m01 * other.m10 + m02 * other.m20;
+        double n10 = m10 * other.m00 + m11 * other.m10 + m12 * other.m20;
+        double n20 = m20 * other.m00 + m21 * other.m10 + m22 * other.m20;
+        double n01 = m00 * other.m01 + m01 * other.m11 + m02 * other.m21;
+        double n11 = m10 * other.m01 + m11 * other.m11 + m12 * other.m21;
+        double n21 = m20 * other.m01 + m21 * other.m11 + m22 * other.m21;
+        double n02 = m00 * other.m02 + m01 * other.m12 + m02 * other.m22;
+        double n12 = m10 * other.m02 + m11 * other.m12 + m12 * other.m22;
+        double n22 = m20 * other.m02 + m21 * other.m12 + m22 * other.m22;
+        return new Matrix3(
+                n00, n01, n02,
+                n10, n11, n12,
+                n20, n21, n22);
+    }
+
     public String toString() {
-        return "[[" + m00 + "," + m01 + "," + m02 + "],[" +
-                m10 + "," + m11 + "," + m12 + "],[" +
+        return "[[" + m00 + "," + m01 + "," + m02 + "],\n [" +
+                m10 + "," + m11 + "," + m12 + "],\n [" +
                 m20 + "," + m21 + "," + m22 + "]]";
     }
 

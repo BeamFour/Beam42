@@ -2,6 +2,7 @@ package org.redukti.rayoptics.elem;
 
 import org.redukti.rayoptics.math.Vector2;
 import org.redukti.rayoptics.math.Vector3;
+import org.redukti.rayoptics.util.ZDir;
 
 import java.util.List;
 
@@ -60,7 +61,7 @@ public abstract class SurfaceProfile {
      * @param z_dir +1 if propagation positive direction, -1 if otherwise
      * @return tuple: distance to intersection point *s1*, intersection point *p*
      */
-    public IntersectionResult intersect(Vector3 p0, Vector3 d, double eps, int z_dir) {
+    public IntersectionResult intersect(Vector3 p0, Vector3 d, double eps, ZDir z_dir) {
         return intersect_spencer(p0, d, eps, z_dir);
     }
 
@@ -76,7 +77,7 @@ public abstract class SurfaceProfile {
      * @param z_dir +1 if propagation positive direction, -1 if otherwise
      * @return tuple: distance to intersection point *s1*, intersection point *p*
      */
-    private IntersectionResult intersect_spencer(Vector3 p0, Vector3 d, double eps, int z_dir) {
+    private IntersectionResult intersect_spencer(Vector3 p0, Vector3 d, double eps, ZDir z_dir) {
         Vector3 p = p0;
         double s1 = -f(p) / d.dot(df(p));   // -f(p)/dot(d, df(p))
         double delta = Math.abs(s1);

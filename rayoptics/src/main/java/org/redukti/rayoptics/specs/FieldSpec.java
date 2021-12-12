@@ -39,6 +39,10 @@ public class FieldSpec {
         this(parent, new Pair<>("object", "angle"), 0.0, new double[]{0.0}, false, true);
     }
 
+    public FieldSpec(OpticalSpecs parent, Pair<String, String> key, double[] flds) {
+        this(parent, key, 0.0, flds, false, true);
+    }
+
 
     private Field[] set_from_list(double[] flds) {
         Field[] fields = new Field[flds.length];

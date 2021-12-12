@@ -13,6 +13,9 @@ package org.redukti.rayoptics.math;
  */
 
 public class Matrix3 {
+
+    public static final Matrix3 IDENTITY = Matrix3.identity();
+
     final double m00;
     final double m01;
     final double m02;

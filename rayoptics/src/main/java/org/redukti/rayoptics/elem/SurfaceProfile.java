@@ -11,6 +11,8 @@ import java.util.List;
  */
 public abstract class SurfaceProfile {
 
+    public double cv;
+
     public abstract SurfaceProfile update();
 
     /**

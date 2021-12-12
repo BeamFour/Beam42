@@ -45,9 +45,11 @@ public class FieldSpec {
 
 
     private Field[] set_from_list(double[] flds) {
-        Field[] fields = new Field[flds.length];
-        for (int i = 0; i < flds.length; i++)
+        fields = new Field[flds.length];
+        for (int i = 0; i < flds.length; i++) {
+            fields[i] = new Field();
             fields[i].y = flds[i];
+        }
         value = max_field().first;
         return fields;
     }

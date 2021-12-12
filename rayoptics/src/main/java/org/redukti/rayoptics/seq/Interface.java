@@ -31,13 +31,10 @@ import org.redukti.rayoptics.util.ZDir;
  */
 public class Interface {
 
-    String interact_mode;
-    double delta_n;
-    DecenterData decenter;
-    double max_aperture;
-
-    public Interface() {
-    }
+    public String interact_mode;
+    public double delta_n;
+    public DecenterData decenter;
+    public double max_aperture;
 
     public Interface(String interact_mode, double delta_n,
                      double max_ap, DecenterData decenter) { // TODO phase element

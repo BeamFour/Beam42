@@ -18,6 +18,9 @@ public class Medium {
         this(label, n, "");
     }
 
+    public Medium(double n) {
+        this("", n, "");
+    }
 
     /**
      * returns the interpolated refractive index at wv_nm

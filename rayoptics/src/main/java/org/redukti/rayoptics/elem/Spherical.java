@@ -13,8 +13,6 @@ import java.util.List;
  */
 public class Spherical extends SurfaceProfile {
 
-    double cv;
-
     public Spherical(double c) {
         this.cv = c;
     }

@@ -17,12 +17,16 @@ package org.redukti.rayoptics.seq;
  *         medium: a :class:`~optical.medium.Medium` or a catalog glass instance
  */
 public class Gap {
-    double thi;
-    Medium medium;
+    public double thi;
+    public Medium medium;
 
     public Gap(double thi, Medium medium) {
         this.thi = thi;
         this.medium = medium;
+    }
+
+    public Gap() {
+        this(1.0, Air.INSTANCE);
     }
 
     public void apply_scale_factor(double scale_factor) {

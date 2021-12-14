@@ -21,20 +21,6 @@ public class Spherical extends SurfaceProfile {
         this(0.0);
     }
 
-    public double r() {
-        if (!M.isZero(cv))
-            return 1.0 / cv;
-        else
-            return 0.0;
-    }
-
-    public Spherical r(double radius) {
-        if (!M.isZero(radius))
-            cv = 1.0 / radius;
-        else
-            cv = 0.0;
-        return this;
-    }
 
     @Override
     public SurfaceProfile update() {

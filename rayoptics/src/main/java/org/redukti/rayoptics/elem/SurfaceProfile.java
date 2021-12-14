@@ -1,5 +1,6 @@
 package org.redukti.rayoptics.elem;
 
+import org.redukti.rayoptics.math.M;
 import org.redukti.rayoptics.math.Vector2;
 import org.redukti.rayoptics.math.Vector3;
 import org.redukti.rayoptics.util.ZDir;
@@ -14,6 +15,21 @@ public abstract class SurfaceProfile {
     public double cv;
 
     public abstract SurfaceProfile update();
+
+    public double r() {
+        if (!M.isZero(cv))
+            return 1.0 / cv;
+        else
+            return 0.0;
+    }
+
+    public SurfaceProfile r(double radius) {
+        if (!M.isZero(radius))
+            cv = 1.0 / radius;
+        else
+            cv = 0.0;
+        return this;
+    }
 
     /**
      * Returns the value of the profile surface function at point *p*.

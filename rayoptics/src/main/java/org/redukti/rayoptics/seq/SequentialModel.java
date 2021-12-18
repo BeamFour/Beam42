@@ -347,7 +347,7 @@ public class SequentialModel {
     public List<Transform3> compute_local_transforms(List<Pair<Interface, Gap>> seq, int step) {
         List<Transform3> tfrms = new ArrayList<>();
         if (seq == null) {
-            zip_longest(
+            seq = zip_longest(
                     Lists.slice(ifcs, null, null, step),
                     Lists.slice(gaps, null, null, step));
         }

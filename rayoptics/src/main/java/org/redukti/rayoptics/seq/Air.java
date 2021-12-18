@@ -7,4 +7,10 @@ public class Air extends Medium {
     public Air() {
         super("air", 1.0);
     }
+
+    @Override
+    public StringBuilder toString(StringBuilder sb) {
+        sb.append("Air()");
+        return sb;
+    }
 }

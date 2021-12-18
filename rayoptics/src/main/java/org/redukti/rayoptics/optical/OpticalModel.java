@@ -23,4 +23,7 @@ public class OpticalModel {
         system_spec = new SystemSpec();
     }
 
+    public void update_model() {
+        sequential_model.update_model();
+    }
 }

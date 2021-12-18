@@ -10,4 +10,11 @@ public enum ZDir {
     ZDir(double value) {
         this.value = value;
     }
+
+    public ZDir opposite() {
+        if (this == PROPAGATE_LEFT)
+            return PROPAGATE_RIGHT;
+        else
+            return PROPAGATE_LEFT;
+    }
 }

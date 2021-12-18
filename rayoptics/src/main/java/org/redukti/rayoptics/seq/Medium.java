@@ -30,4 +30,16 @@ public class Medium {
     public double rindex(double wv_nm) {
         return n;
     }
+
+    public StringBuilder toString(StringBuilder sb) {
+        if (catalog_name != null && !catalog_name.isEmpty() &&
+                label != null && !label.isEmpty()) {
+            sb.append(catalog_name).append("(")
+                    .append(label).append(")");
+        }
+        else {
+            sb.append("Medium(n=").append(n).append(")");
+        }
+        return sb;
+    }
 }

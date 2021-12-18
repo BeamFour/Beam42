@@ -150,7 +150,13 @@ public class EvenPolynomial extends SurfaceProfile {
         sb.append(getClass().getSimpleName()).append("(");
         sb.append("c=").append(cv).append(", ");
         sb.append("cc=").append(cc).append(", ");
-        sb.append("coefs=[").append(coefs.toString()).append("]");
+        sb.append("coefs=[");
+        for (int i = 0; i < coefs.length; i++) {
+            if (i > 0)
+                sb.append(", ");
+            sb.append(coefs[i]);
+        }
+        sb.append("]");
         sb.append(")");
         return sb;
     }

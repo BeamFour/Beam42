@@ -102,13 +102,6 @@ public class Matrix3 {
                 n20, n21, m22);
     }
 
-    Vector3 multiply(Vector3 other) {
-        double x = m00 * other.x + m01 * other.y + m02 * other.z;
-        double y = m10 * other.x + m11 * other.y + m12 * other.z;
-        double z = m20 * other.x + m21 * other.y + m22 * other.z;
-        return new Vector3(x, y, z);
-    }
-
 //    /**
 //     * Create rotation matrix
 //     *
@@ -263,6 +256,13 @@ public class Matrix3 {
                 n00, n01, n02,
                 n10, n11, n12,
                 n20, n21, n22);
+    }
+
+    public Vector3 multiply(Vector3 other) {
+        double x = m00 * other.x + m01 * other.y + m02 * other.z;
+        double y = m10 * other.x + m11 * other.y + m12 * other.z;
+        double z = m20 * other.x + m21 * other.y + m22 * other.z;
+        return new Vector3(x,y,z);
     }
 
     public String toString() {

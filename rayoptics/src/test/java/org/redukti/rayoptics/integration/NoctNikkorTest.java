@@ -101,6 +101,9 @@ public class NoctNikkorTest {
                 .max_aperture(19.73));
         sm.add_surface(new SurfaceData(46.943, 0.8)
                 .max_aperture(19.73));
+        sm.add_surface(new SurfaceData(55.281,9.11)
+                .rindex(1.883,40.69) //,'J-LASF08A', 'Hikari'])    #
+                .max_aperture(19.47));
         sm.add_surface(new SurfaceData(-144.041, 3)
                 .rindex(1.76554, 46.76) // ,'J-LASFH2','Hikari'])      # 1.76554,46.76])    46.78
                 .max_aperture(19.14));
@@ -116,5 +119,8 @@ public class NoctNikkorTest {
         sm.add_surface(new SurfaceData(0, 1)
                 .max_aperture(22.15));
         System.out.println(sm.list_surfaces(new StringBuilder()).toString());
+        System.out.println(sm.list_gaps(new StringBuilder()).toString());
+        sm.do_apertures = false;
+        opm.update_model();
     }
 }

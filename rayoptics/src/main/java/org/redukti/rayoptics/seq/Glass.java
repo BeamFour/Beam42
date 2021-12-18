@@ -18,5 +18,11 @@ public class Glass extends Medium {
         this(nd, vd, "", "");
     }
 
-
+    @Override
+    public StringBuilder toString(StringBuilder sb) {
+        sb.append("Glass(").append("nd=").append(n)
+                .append(", vd=").append(v)
+                .append(", mat=''").append(", cat=''").append(")");
+        return sb;
+    }
 }

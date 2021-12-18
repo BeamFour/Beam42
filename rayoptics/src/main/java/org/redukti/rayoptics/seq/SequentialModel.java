@@ -1,16 +1,17 @@
 package org.redukti.rayoptics.seq;
 
 import org.redukti.rayoptics.elem.Surface;
+import org.redukti.rayoptics.elem.Transform;
 import org.redukti.rayoptics.math.Matrix3;
 import org.redukti.rayoptics.math.Transform3;
 import org.redukti.rayoptics.math.Vector3;
 import org.redukti.rayoptics.optical.OpticalModel;
-import org.redukti.rayoptics.specs.SystemSpec;
+import org.redukti.rayoptics.specs.OpticalSpecs;
+import org.redukti.rayoptics.util.Lists;
+import org.redukti.rayoptics.util.Pair;
 import org.redukti.rayoptics.util.ZDir;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Manager class for a sequential optical model
@@ -268,4 +269,223 @@ public class SequentialModel {
         return sb;
     }
 
+    public StringBuilder list_gaps(StringBuilder sb) {
+        for (int i = 0; i < gaps.size(); i++) {
+            sb.append(i).append(" ");
+            gaps.get(i).toString(sb);
+            sb.append(System.lineSeparator());
+        }
+        return sb;
+    }
+
+    public static List<Pair<Interface, Gap>> zip_longest(List<Interface> ifcs, List<Gap> gaps) {
+        List<Pair<Interface, Gap>> list = new ArrayList<>();
+        for (int i = 0; i < Math.max(ifcs.size(), gaps.size()); i++) {
+            Interface ifc = i < ifcs.size() ? ifcs.get(i) : null;
+            Gap g = i < gaps.size() ? gaps.get(i) : null;
+            list.add(new Pair<>(ifc, g));
+        }
+        return list;
+    }
+
+    public void update_model() {
+        // delta n across each surface interface must be set to some
+        // reasonable default value. use the index at the central wavelength
+        OpticalSpecs osp = opt_model.optical_spec;
+        int ref_wl = osp.spectral_region.reference_wvl;
+
+        this.wvlns = osp.spectral_region.wavelengths;
+        this.rndx = calc_ref_indices_for_spectrum(wvlns);
+        double n_before = rndx.get(0)[ref_wl];
+
+        this.z_dir = new ArrayList<>();
+        ZDir z_dir_before = ZDir.PROPAGATE_RIGHT;
+
+        List<Pair<Interface, Gap>> seq = zip_longest(this.ifcs, this.gaps);
+
+        for (int i = 0; i < seq.size(); i++) {
+            Interface ifc = seq.get(i).first;
+            Gap g = seq.get(i).second;
+            ZDir z_dir_after = z_dir_before;
+            if (ifc.interact_mode.equals("reflect"))
+                z_dir_after = z_dir_after.opposite();
+
+            // leave rndx data unsigned, track change of sign using z_dir
+            if (g != null) {
+                double n_after = this.rndx.get(i)[ref_wl];
+                if (z_dir_after.value < 0)
+                    n_after = -n_after;
+                ifc.delta_n = n_after - n_before;
+                n_before = n_after;
+
+                z_dir_after = z_dir_after;
+                this.z_dir.add(z_dir_after);
+            }
+
+            // call update() on the surface interface
+            ifc.update();
+        }
+
+        this.gbl_tfrms = this.compute_global_coords(1);
+        this.lcl_tfrms = this.compute_local_transforms(null, 1);
+
+        /*
+         if self.do_apertures:
+            if len(self.ifcs) > 2:
+                osp.update_model(**kwargs)
+
+                self.set_clear_apertures()
+         */
+    }
+
+    /**
+     * Return forward surface coordinates (r.T, t) for each interface.
+     * @param seq
+     * @param step
+     * @return
+     */
+    public List<Transform3> compute_local_transforms(List<Pair<Interface, Gap>> seq, int step) {
+        List<Transform3> tfrms = new ArrayList<>();
+        if (seq == null) {
+            zip_longest(
+                    Lists.slice(ifcs, null, null, step),
+                    Lists.slice(gaps, null, null, step));
+        }
+        Iterator<Pair<Interface, Gap>> iter = seq.iterator();
+        Pair<Interface, Gap> before = iter.next();
+        Interface b4_ifc = before.first;
+        Gap b4_gap = before.second;
+        while (true) {
+            Pair<Interface, Gap> after;
+            Interface ifc;
+            Gap gap;
+            if (iter.hasNext()) {
+                after = iter.next();
+                ifc = after.first;
+                gap = after.second;
+            }
+            else {
+                tfrms.add(new Transform3());
+                break;
+            }
+            double zdist = step * b4_gap.thi;
+            Transform3 tr3 = Transform.forward_transform(b4_ifc, zdist, ifc);
+            Matrix3 r = tr3.rot_mat;
+            Vector3 t = tr3.vec;
+            Matrix3 rt = r.transpose();
+            tfrms.add(new Transform3(rt, t));
+            before = after;
+            b4_ifc = ifc;
+            b4_gap = gap;
+        }
+        return tfrms;
+    }
+
+    /**
+     * Return global surface coordinates (rot, t) wrt surface glo.
+     *
+     * @param glo
+     * @return
+     */
+    public List<Transform3> compute_global_coords(int glo) {
+        List<Transform3> tfrms = new ArrayList<>();
+        Transform3 prev = new Transform3();
+        tfrms.add(prev);
+        List<Pair<Interface, Gap>> seq;
+        Interface b4_ifc;
+        Gap b4_gap;
+        if (glo > 0) {
+            // iterate in reverse over the segments before the
+            // global reference surface
+            int step = -1;
+            seq = zip_longest(
+                    Lists.slice(ifcs, glo, null, step),
+                    Lists.slice(gaps, glo - 1, null, step));
+            Iterator<Pair<Interface, Gap>> iter = seq.iterator();
+            Pair<Interface, Gap> after = iter.next();
+            Interface ifc = after.first;
+            Gap gap = after.second;
+            // loop of remaining surfaces in path
+            while (iter.hasNext()) {
+                Pair<Interface, Gap> before = iter.next();
+                b4_ifc = before.first;
+                b4_gap = before.second;
+                double zdist = gap.thi;
+                Transform3 tr3 = Transform.reverse_transform(ifc, zdist, b4_ifc);
+                Matrix3 r = tr3.rot_mat;
+                Vector3 t = tr3.vec;
+                t = prev.rot_mat.multiply(t).add(prev.vec); //  t = prev[0].dot(t) + prev[1]
+                r = prev.rot_mat.multiply(r);
+                prev = new Transform3(r, t);
+                tfrms.add(prev);
+                after = before;
+                ifc = b4_ifc;
+                gap = b4_gap;
+            }
+            tfrms = Lists.slice(tfrms, null, null, -1); // reverse
+        }
+
+        seq = zip_longest(Lists.from(ifcs, glo), Lists.from(gaps, glo));
+        Iterator<Pair<Interface, Gap>> iter = seq.iterator();
+        Pair<Interface, Gap> before = iter.next();
+        b4_ifc = before.first;
+        b4_gap = before.second;
+        prev = new Transform3(Matrix3.IDENTITY, Vector3.ZERO);
+        // loop forward over the remaining surfaces in path
+        while (iter.hasNext()) {
+            Pair<Interface, Gap> after = iter.next();
+            Interface ifc = after.first;
+            Gap gap = after.second;
+            double zdist = b4_gap.thi;
+            Transform3 tr3 = Transform.forward_transform(b4_ifc, zdist, ifc);
+            Matrix3 r = tr3.rot_mat;
+            Vector3 t = tr3.vec;
+            t = prev.rot_mat.multiply(t).add(prev.vec); //  t = prev[0].dot(t) + prev[1]
+            r = prev.rot_mat.multiply(r);
+            prev = new Transform3(r, t);
+            tfrms.add(prev);
+            before = after;
+            b4_ifc = ifc;
+            b4_gap = gap;
+        }
+        return tfrms;
+    }
+
+    /**
+     * returns a list with refractive indices for all **wvls**
+     *
+     * @param wvls list of wavelengths in nm
+     */
+    public List<double[]> calc_ref_indices_for_spectrum(double[] wvls) {
+        List<double[]> indices = new ArrayList<>();
+        for (Gap g : gaps) {
+            double[] ri = new double[wvlns.length];
+            Medium mat = g.medium;
+            for (int i = 0; i < wvls.length; i++) {
+                double rndx = mat.rindex(wvls[i]);
+                ri[i] = rndx;
+            }
+            indices.add(ri);
+        }
+        return indices;
+    }
+
+    /*
+        def calc_ref_indices_for_spectrum(self, wvls: List[float]):
+        """ returns a list with refractive indices for all **wvls**
+
+        Args:
+            wvls: list of wavelengths in nm
+        """
+        indices = []
+        for g in self.gaps:
+            ri = []
+            mat = g.medium
+            for w in wvls:
+                rndx = mat.rindex(w)
+                ri.append(rndx)
+            indices.append(ri)
+
+        return indices
+     */
 }

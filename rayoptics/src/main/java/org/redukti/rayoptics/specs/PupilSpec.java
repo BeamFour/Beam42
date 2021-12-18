@@ -15,10 +15,24 @@ public class PupilSpec {
     OpticalSpecs parent;
     SpecKey key;
     double value;
+    double[][] pupil_rays;
+    String[] ray_labels;
+
+    static final double [][] default_pupil_rays = {{0., 0.}, {1., 0.}, {-1., 0.}, {0., 1.}, {0., -1.}};
+    static final String[] default_ray_labels = {"00", "+X", "-X", "+Y", "-Y"};
 
     public PupilSpec(OpticalSpecs parent, Pair<String, String> k, double value) {
         this.parent = parent;
         this.key = new SpecKey("aperture", k.first, k.second);
         this.value = value;
+        this.pupil_rays = default_pupil_rays;
+        this.ray_labels = default_ray_labels;
+    }
+
+    public void update_model() {
+        if (pupil_rays == null) {
+            pupil_rays = default_pupil_rays;
+            ray_labels = default_ray_labels;
+        }
     }
 }

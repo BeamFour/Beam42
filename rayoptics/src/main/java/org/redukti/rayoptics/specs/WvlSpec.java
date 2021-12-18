@@ -74,4 +74,8 @@ public class WvlSpec {
     public static double get_wavelength(String key) {
         return spectra_uc.get(key.toUpperCase());
     }
+
+    public void update_model() {
+        // TODO self.calc_colors()
+    }
 }

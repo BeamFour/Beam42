@@ -6,4 +6,8 @@ public class OpticalSpecs {
     public FieldSpec field_of_view;
     public WvlSpec spectral_region;
 
+    public void update_model() {
+        spectral_region.update_model();
+        pupil.update_model();
+    }
 }

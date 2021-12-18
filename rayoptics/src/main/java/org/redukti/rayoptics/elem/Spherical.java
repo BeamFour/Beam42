@@ -21,7 +21,6 @@ public class Spherical extends SurfaceProfile {
         this(0.0);
     }
 
-
     @Override
     public SurfaceProfile update() {
         return null;
@@ -91,5 +90,14 @@ public class Spherical extends SurfaceProfile {
         }
         Vector3 p1 = p.add(d.times(s));
         return new IntersectionResult(s, p1);
+    }
+
+    @Override
+    public StringBuilder toString(StringBuilder sb) {
+        sb.append(getClass().getSimpleName()).append("(")
+                .append("c=")
+                .append(cv)
+                .append(")");
+        return sb;
     }
 }

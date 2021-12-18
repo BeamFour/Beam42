@@ -11,7 +11,6 @@ import java.util.List;
 public class Surface extends Interface {
 
     public String label;
-    public SurfaceProfile profile;
     public List<Aperture> clear_apertures = new ArrayList<>();
     public List<Aperture> edge_apertures = new ArrayList<>();
 
@@ -40,4 +39,16 @@ public class Surface extends Interface {
         profile.update();
     }
 
+    @Override
+    public StringBuilder toString(StringBuilder sb) {
+        sb.append(getClass().getSimpleName()).append("(");
+        if (label != null && !label.isEmpty())
+            sb.append("lbl=").append(label).append(", ");
+        sb.append("profile=");
+        profile.toString(sb);
+        sb.append(", ").append("interact_mode='")
+                .append(interact_mode).append("'");
+        sb.append(")");
+        return sb;
+    }
 }

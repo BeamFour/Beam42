@@ -5,7 +5,7 @@ public class SurfaceData {
     Double v_number;
     double curvature;
     double thickness;
-    Double semi_diameter;
+    Double max_aperture;
     String catalog_name;
     String glass_name;
     String interact_mode;
@@ -29,6 +29,11 @@ public class SurfaceData {
         this.catalog_name = null;
         this.refractive_index = null;
         this.v_number = null;
+        return this;
+    }
+
+    public SurfaceData max_aperture(double map) {
+        this.max_aperture = map;
         return this;
     }
 

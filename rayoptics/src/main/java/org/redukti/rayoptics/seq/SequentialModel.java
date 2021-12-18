@@ -5,6 +5,7 @@ import org.redukti.rayoptics.math.Matrix3;
 import org.redukti.rayoptics.math.Transform3;
 import org.redukti.rayoptics.math.Vector3;
 import org.redukti.rayoptics.optical.OpticalModel;
+import org.redukti.rayoptics.specs.SystemSpec;
 import org.redukti.rayoptics.util.ZDir;
 
 import java.util.ArrayList;
@@ -153,6 +154,7 @@ public class SequentialModel {
             }
         }
         int idx = cur_surface == null ? 0 : cur_surface + 1;
+        cur_surface = idx;
         ifcs.add(idx, ifc);
         if (gap != null) {
             int idx_g = prev ? idx - 1 : idx;
@@ -237,8 +239,8 @@ public class SequentialModel {
         } else {
             mat = new Air();
         }
-        if (surf_data.semi_diameter != null) {
-            s.set_max_aperture(surf_data.semi_diameter);
+        if (surf_data.max_aperture != null) {
+            s.set_max_aperture(surf_data.max_aperture);
         }
 
         double thi = surf_data.thickness;
@@ -248,4 +250,22 @@ public class SequentialModel {
 
         return new NewSurfaceSpec(s, g, rndx, tfrm);
     }
+
+    /**
+     * sets the stop surface to the current surface
+     */
+    public int set_stop() {
+        stop_surface = cur_surface;
+        return stop_surface;
+    }
+
+    public StringBuilder list_surfaces(StringBuilder sb) {
+        for (int i = 0; i < ifcs.size(); i++) {
+            sb.append(i).append(" ");
+            ifcs.get(i).toString(sb);
+            sb.append(System.lineSeparator());
+        }
+        return sb;
+    }
+
 }

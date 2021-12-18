@@ -2,6 +2,7 @@ package org.redukti.rayoptics.seq;
 
 import org.redukti.rayoptics.elem.DecenterData;
 import org.redukti.rayoptics.elem.IntersectionResult;
+import org.redukti.rayoptics.elem.SurfaceProfile;
 import org.redukti.rayoptics.math.Vector3;
 import org.redukti.rayoptics.util.ZDir;
 
@@ -35,6 +36,7 @@ public class Interface {
     public double delta_n;
     public DecenterData decenter;
     public double max_aperture;
+    public SurfaceProfile profile;
 
     public Interface(String interact_mode, double delta_n,
                      double max_ap, DecenterData decenter) { // TODO phase element
@@ -94,5 +96,9 @@ public class Interface {
         this.max_aperture *= scale_factor;
         if (decenter != null)
             decenter.apply_scale_factor(scale_factor);
+    }
+
+    public StringBuilder toString(StringBuilder sb) {
+        return sb;
     }
 }

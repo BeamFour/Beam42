@@ -113,5 +113,8 @@ public abstract class SurfaceProfile {
         return new IntersectionResult(s1, p);
     }
 
+    public StringBuilder toString(StringBuilder sb) {
+        return sb;
+    }
 
 }

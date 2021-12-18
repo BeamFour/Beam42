@@ -42,12 +42,37 @@ public class EvenPolynomial extends SurfaceProfile {
         max_nonzero_coef = 0;
     }
 
+    public EvenPolynomial() {
+        this.coefs = new double[0];
+    }
+
+    public EvenPolynomial c(double _c) {
+        cv = _c;
+        return this;
+    }
+
+    @Override
+    public EvenPolynomial r(double radius) {
+        super.r(radius);
+        return this;
+    }
+
+    public EvenPolynomial coefs(double[] _coefs) {
+        this.coefs = _coefs;
+        return this;
+    }
+
     public double ec() {
         return cc + 1.0;
     }
 
     public void ec(double ec) {
         cc = ec - 1.0;
+    }
+
+    public EvenPolynomial cc(double _cc) {
+        this.cc = _cc;
+        return this;
     }
 
     @Override
@@ -118,5 +143,15 @@ public class EvenPolynomial extends SurfaceProfile {
                 max_nonzero_coef = i;
         }
         max_nonzero_coef++;
+    }
+
+    @Override
+    public StringBuilder toString(StringBuilder sb) {
+        sb.append(getClass().getSimpleName()).append("(");
+        sb.append("c=").append(cv).append(", ");
+        sb.append("cc=").append(cc).append(", ");
+        sb.append("coefs=[").append(coefs.toString()).append("]");
+        sb.append(")");
+        return sb;
     }
 }

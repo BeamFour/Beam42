@@ -82,4 +82,9 @@ public class ParaxialModel {
         }
         return sys;
     }
+
+    public void first_order_data() {
+        // List out the first order imaging properties of the model.
+        System.out.println(opt_model.optical_spec.parax_data.fod.toString(new StringBuilder()).toString());
+    }
 }

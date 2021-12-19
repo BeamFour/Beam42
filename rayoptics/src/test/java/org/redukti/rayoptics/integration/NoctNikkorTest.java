@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.redukti.rayoptics.elem.EvenPolynomial;
 import org.redukti.rayoptics.math.Vector2;
 import org.redukti.rayoptics.optical.OpticalModel;
+import org.redukti.rayoptics.parax.ParaxialModel;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.seq.SurfaceData;
 import org.redukti.rayoptics.specs.*;
@@ -16,6 +17,7 @@ public class NoctNikkorTest {
         OpticalModel opm = new OpticalModel();
         SequentialModel sm = opm.seq_model;
         OpticalSpecs osp = opm.optical_spec;
+        ParaxialModel pm = opm.parax_model;
         osp.pupil = new PupilSpec(osp, new Pair<>("image", "f/#"), 0.98);
         osp.field_of_view = new FieldSpec(osp, new Pair<>("object", "angle"), new double[]{0., 19.98});
         osp.spectral_region = new WvlSpec(new Vector2[]{new Vector2(486.1327, 0.5),
@@ -122,5 +124,6 @@ public class NoctNikkorTest {
         System.out.println(sm.list_gaps(new StringBuilder()).toString());
         sm.do_apertures = false;
         opm.update_model();
+        pm.first_order_data();
     }
 }

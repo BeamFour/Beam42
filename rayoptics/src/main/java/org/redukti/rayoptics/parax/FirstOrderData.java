@@ -111,4 +111,31 @@ public class FirstOrderData {
      * numerical aperture in image space
      */
     public double img_na;
+
+
+    public StringBuilder toString(StringBuilder sb) {
+        // list the first order properties
+        sb.append(String.format("efl        %12.4g", efl)).append(System.lineSeparator());
+        sb.append(String.format("ffl        %12.4g", ffl)).append(System.lineSeparator());
+        sb.append(String.format("pp1        %12.4g", pp1)).append(System.lineSeparator());
+        sb.append(String.format("bfl        %12.4g", bfl)).append(System.lineSeparator());
+        sb.append(String.format("ppk        %12.4g", ppk)).append(System.lineSeparator());
+        sb.append(String.format("f/#        %12.4g", fno)).append(System.lineSeparator());
+        sb.append(String.format("m          %12.4g", m)).append(System.lineSeparator());
+        sb.append(String.format("red        %12.4g", red)).append(System.lineSeparator());
+        sb.append(String.format("obj_dist   %12.4g", obj_dist)).append(System.lineSeparator());
+        sb.append(String.format("obj_ang    %12.4g", obj_ang)).append(System.lineSeparator());
+        sb.append(String.format("enp_dist   %12.4g", enp_dist)).append(System.lineSeparator());
+        sb.append(String.format("enp_radius %12.4g", enp_radius)).append(System.lineSeparator());
+        sb.append(String.format("na obj     %12.4g", obj_na)).append(System.lineSeparator());
+        sb.append(String.format("n obj      %12.4g", n_obj)).append(System.lineSeparator());
+        sb.append(String.format("img_dist   %12.4g", img_dist)).append(System.lineSeparator());
+        sb.append(String.format("img_ht     %12.4g", img_ht)).append(System.lineSeparator());
+        sb.append(String.format("exp_dist   %12.4g", exp_dist)).append(System.lineSeparator());
+        sb.append(String.format("exp_radius %12.4g", exp_radius)).append(System.lineSeparator());
+        sb.append(String.format("na img     %12.4g", img_na)).append(System.lineSeparator());
+        sb.append(String.format("n img      %12.4g", n_img)).append(System.lineSeparator());
+        sb.append(String.format("optical invariant %12.4g", opt_inv)).append(System.lineSeparator());
+        return sb;
+    }
 }

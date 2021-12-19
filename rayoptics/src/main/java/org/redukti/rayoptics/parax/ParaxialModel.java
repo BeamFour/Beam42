@@ -67,7 +67,7 @@ public class ParaxialModel {
             SeqPathComponent sg = path.get(i);
             Interface ifc = sg.ifc;
             Gap gap = sg.gap;
-            double rndx = sg.rndx;
+            Double rndx = sg.rndx;
             ZDir z_dir = sg.z_dir;
             String imode = ifc.interact_mode;
             double power = ifc.optical_power();

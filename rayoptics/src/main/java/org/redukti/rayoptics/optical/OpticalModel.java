@@ -26,5 +26,6 @@ public class OpticalModel {
     public void update_model() {
         seq_model.update_model();
         optical_spec.update_model();
+        parax_model.update_model();
     }
 }

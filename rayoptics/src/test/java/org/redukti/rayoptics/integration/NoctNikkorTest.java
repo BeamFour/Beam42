@@ -1,9 +1,11 @@
 package org.redukti.rayoptics.integration;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.redukti.rayoptics.elem.EvenPolynomial;
 import org.redukti.rayoptics.math.Vector2;
 import org.redukti.rayoptics.optical.OpticalModel;
+import org.redukti.rayoptics.parax.FirstOrderData;
 import org.redukti.rayoptics.parax.ParaxialModel;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.seq.SurfaceData;
@@ -125,5 +127,10 @@ public class NoctNikkorTest {
         sm.do_apertures = false;
         opm.update_model();
         pm.first_order_data();
+        FirstOrderData fod = pm.parax_data.fod;
+        Assertions.assertEquals(59.62, fod.efl, 0.001);
+        Assertions.assertEquals(1.660, fod.ffl, 0.001);
+        Assertions.assertEquals(61.28, fod.pp1, 0.001);
+        Assertions.assertEquals(11.06, fod.opt_inv, 0.001);
     }
 }

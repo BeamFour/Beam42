@@ -12,11 +12,11 @@ import org.redukti.rayoptics.util.Pair;
  *         ray_labels: list of string labels for pupil_rays
  */
 public class PupilSpec {
-    OpticalSpecs parent;
-    SpecKey key;
-    double value;
-    double[][] pupil_rays;
-    String[] ray_labels;
+    public OpticalSpecs parent;
+    public SpecKey key;
+    public double value;
+    public double[][] pupil_rays;
+    public String[] ray_labels;
 
     static final double [][] default_pupil_rays = {{0., 0.}, {1., 0.}, {-1., 0.}, {0., 1.}, {0., -1.}};
     static final String[] default_ray_labels = {"00", "+X", "-X", "+Y", "-Y"};

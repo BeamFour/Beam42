@@ -1,5 +1,7 @@
 package org.redukti.rayoptics.parax;
 
+import java.util.List;
+
 /**
  * tuple grouping together paraxial rays and first order properties
  *
@@ -9,4 +11,14 @@ package org.redukti.rayoptics.parax;
  *         fod: instance of :class:`~.FirstOrderData`
  */
 public class ParaxData {
+
+    public List<ParaxComponent> ax_ray;
+    public List<ParaxComponent> pr_ray;
+    public FirstOrderData fod;
+
+    public ParaxData(List<ParaxComponent> ax_ray, List<ParaxComponent> pr_ray, FirstOrderData fod) {
+        this.ax_ray = ax_ray;
+        this.pr_ray = pr_ray;
+        this.fod = fod;
+    }
 }

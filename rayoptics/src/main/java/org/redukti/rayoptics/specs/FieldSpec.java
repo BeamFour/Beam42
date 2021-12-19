@@ -8,23 +8,23 @@ import org.redukti.rayoptics.util.Pair;
  */
 public class FieldSpec {
 
-    OpticalSpecs optical_spec;
+    public OpticalSpecs optical_spec;
     /**
      * 'field', 'object'|'image', 'height'|'angle'
      */
-    SpecKey key;
+    public SpecKey key;
     /**
      * maximum field, per the key
      */
-    double value;
+    public double value;
     /**
      * if True, `fields` are relative to max field
      */
-    boolean is_relative;
+    public boolean is_relative;
     /**
      * list of Field instances
      */
-    Field[] fields;
+    public Field[] fields;
 
     public FieldSpec(OpticalSpecs parent, Pair<String, String> key, double value, double[] flds,
                      boolean is_relative, boolean do_init) {

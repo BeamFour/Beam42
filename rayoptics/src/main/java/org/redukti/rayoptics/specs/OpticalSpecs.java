@@ -30,7 +30,10 @@ public class OpticalSpecs {
         if (opt_model.seq_model.get_num_surfaces() > 2) {
             parax_data = FirstOrder.compute_first_order(opt_model, stop, wvl);
             if (do_aiming) {
+                for (int i = 0; i < field_of_view.fields.length; i++) {
+                    Field fld = field_of_view.fields[i];
 
+                }
             }
         }
     }

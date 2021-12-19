@@ -64,6 +64,14 @@ public class Vector3 {
         return !isZero();
     }
 
+    public Vector3 plus(Vector3 v) {
+        return new Vector3(x+v.x, y+v.y, z+v.z);
+    }
+
+    public Vector3 minus(Vector3 v) {
+        return new Vector3(x-v.x, y-v.y, z-v.z);
+    }
+
     public String toString() {
         return "[" + x + "," + y + "," + z + "]";
     }

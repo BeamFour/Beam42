@@ -51,4 +51,9 @@ public class Surface extends Interface {
         sb.append(")");
         return sb;
     }
+
+    @Override
+    public double optical_power() {
+        return delta_n * profile.cv;
+    }
 }

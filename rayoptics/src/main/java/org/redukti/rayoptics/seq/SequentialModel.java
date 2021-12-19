@@ -481,6 +481,8 @@ public class SequentialModel {
      */
     public double central_rndx(int i) {
         int central_wvl = opt_model.optical_spec.spectral_region.reference_wvl;
+        if (i < 0)
+            i += rndx.size();
         return rndx.get(i)[central_wvl];
     }
 

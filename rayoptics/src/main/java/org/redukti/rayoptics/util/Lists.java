@@ -49,4 +49,10 @@ public class Lists {
     public static <E> List<E> step(List<E> inputList, int step) {
         return slice(inputList, null, null, step);
     }
+
+    public static <E> E get(List<E> inputList, int i) {
+        if (i < 0)
+            i += inputList.size();
+        return inputList.get(i);
+    }
 }

@@ -101,4 +101,8 @@ public class Interface {
     public StringBuilder toString(StringBuilder sb) {
         return sb;
     }
+
+    public double optical_power() {
+        return 0.0;
+    }
 }

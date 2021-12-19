@@ -78,4 +78,8 @@ public class WvlSpec {
     public void update_model() {
         // TODO self.calc_colors()
     }
+
+    public double central_wvl() {
+        return wavelengths[reference_wvl];
+    }
 }

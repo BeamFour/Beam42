@@ -14,7 +14,7 @@ public class NoctNikkorTest {
     @Test
     public void test() {
         OpticalModel opm = new OpticalModel();
-        SequentialModel sm = opm.sequential_model;
+        SequentialModel sm = opm.seq_model;
         OpticalSpecs osp = opm.optical_spec;
         osp.pupil = new PupilSpec(osp, new Pair<>("image", "f/#"), 0.98);
         osp.field_of_view = new FieldSpec(osp, new Pair<>("object", "angle"), new double[]{0., 19.98});

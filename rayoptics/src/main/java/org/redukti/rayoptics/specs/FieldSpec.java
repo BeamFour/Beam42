@@ -112,4 +112,11 @@ public class FieldSpec {
         return obj_pt;
     }
 
+    public void update_model() {
+        for (Field f: fields) {
+            f.update();
+        }
+        // TODO there is a bunch here that needs porting
+    }
+
 }

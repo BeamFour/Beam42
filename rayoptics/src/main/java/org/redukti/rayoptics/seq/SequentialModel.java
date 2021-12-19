@@ -470,6 +470,90 @@ public class SequentialModel {
         return indices;
     }
 
+    public int get_num_surfaces() {
+        return ifcs.size();
+    }
+
+    /**
+     * returns the central refractive index of the model's WvlSpec
+     * @param i
+     * @return
+     */
+    public double central_rndx(int i) {
+        int central_wvl = opt_model.optical_spec.spectral_region.reference_wvl;
+        return rndx.get(i)[central_wvl];
+    }
+
+    public static List<SeqPathComponent> zip_longest(List<Interface> ifcs,
+                                                     List<Gap> gaps,
+                                                     List<Transform3> lcl_tfrms,
+                                                     List<Double> rndx,
+                                                     List<ZDir> z_dir) {
+        List<SeqPathComponent> list = new ArrayList<>();
+        List<Integer> sizes = List.of(ifcs.size(), gaps.size(), lcl_tfrms.size(), rndx.size(), z_dir.size());
+        int maxSize = sizes.stream().max(Comparator.naturalOrder()).orElse(0);
+        for (int i = 0; i < maxSize; i++) {
+            Interface ifc = i < ifcs.size() ? ifcs.get(i) : null;
+            Gap gap = i < gaps.size() ? gaps.get(i) : null;
+            Transform3 tr3 = i < lcl_tfrms.size() ? lcl_tfrms.get(i) : null;
+            Double n = i < rndx.size() ? rndx.get(i) : null;
+            ZDir dir = i < z_dir.size() ? z_dir.get(i) : null;
+            list.add(new SeqPathComponent(ifc, gap, tr3, n, dir));
+        }
+        return list;
+    }
+
+    /**
+     * returns an iterable path tuple for a range in the sequential model
+     *
+     * @param wl wavelength in nm for path, defaults to central wavelength
+     * @param start start of range
+     * @param stop first value beyond the end of the range
+     * @param step increment or stride of range
+     * @return (**ifcs, gaps, lcl_tfrms, rndx, z_dir**)
+     */
+    public List<SeqPathComponent> path(Double wl, Integer start, Integer stop, int step) {
+        if (wl == null)
+            wl = central_wavelength();
+        Integer gap_start;
+        if (step < 0)
+            gap_start = start != null ? start - 1 : null;
+        else
+            gap_start = start;
+        int wl_idx = index_for_wavelength(wl);
+        /* extract the refractive index for given wavelength and list of surfaces */
+        List<double[]> rndx_list = Lists.slice(rndx, start, stop, step);
+        List<Double> rndx = new ArrayList<>();
+        for (double[] narr: rndx_list) {
+            rndx.add(narr[wl_idx]);
+        }
+        return zip_longest(
+                Lists.slice(ifcs, start, stop, step),
+                Lists.slice(gaps, gap_start, stop, step),
+                Lists.slice(lcl_tfrms, start, stop, step),
+                rndx,
+                Lists.slice(z_dir, start, stop, step)
+        );
+    }
+
+    public Double central_wavelength() {
+        return opt_model.optical_spec.spectral_region.central_wvl();
+    }
+
+    /**
+     * returns index into rndx array for wavelength `wvl` in nm
+     * @param wvl
+     * @return
+     */
+    public int index_for_wavelength(double wvl) {
+        this.wvlns = opt_model.optical_spec.spectral_region.wavelengths;
+        for (int i = 0; i < wvlns.length; i++) {
+            if (wvlns[i] == wvl)
+                return i;
+        }
+        throw new IllegalArgumentException();
+    }
+
     /*
         def calc_ref_indices_for_spectrum(self, wvls: List[float]):
         """ returns a list with refractive indices for all **wvls**

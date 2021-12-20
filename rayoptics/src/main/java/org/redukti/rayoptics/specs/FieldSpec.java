@@ -1,6 +1,7 @@
 package org.redukti.rayoptics.specs;
 
 import org.redukti.rayoptics.math.Vector3;
+import org.redukti.rayoptics.parax.FirstOrderData;
 import org.redukti.rayoptics.util.Pair;
 
 /**
@@ -80,12 +81,9 @@ public class FieldSpec {
      * calculates object coordinates
      *
      * @param fld Field
-     * @param obj_dist object distance
-     * @param enp_dist entrance pupil distance from 1st interface
-     * @param red reduction ratio
      * @return Vector3
      */
-    public Vector3 obj_coords(Field fld, double obj_dist, double enp_dist, double red) {
+    public Vector3 obj_coords(Field fld) {
         Vector3 fld_coord = new Vector3(fld.x, fld.y, 0.0);
         if (is_relative)
             fld_coord = fld_coord.times(value);
@@ -96,17 +94,18 @@ public class FieldSpec {
 
         Vector3 obj_pt = null;
 
+        FirstOrderData fod = optical_spec.parax_data.fod;
         if (obj_img_key.equals("object")) {
             if (value_key.equals("angle")) {
                 Vector3 dir_tan = fld_coord.deg2rad().tan();
-                obj_pt = dir_tan.times(obj_dist + enp_dist).negate();
+                obj_pt = dir_tan.times(fod.obj_dist + fod.enp_dist).negate();
             } else if (value_key.equals("height")) {
                 obj_pt = fld_coord;
             }
         } else if (obj_img_key.equals("image")) {
             if (value_key.equals("height")) {
                 Vector3 img_pt = fld_coord;
-                obj_pt = img_pt.times(red);
+                obj_pt = img_pt.times(fod.red);
             }
         }
         return obj_pt;

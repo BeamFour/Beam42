@@ -1,6 +1,8 @@
 package org.redukti.rayoptics.elem;
 
+import org.redukti.rayoptics.math.Vector3;
 import org.redukti.rayoptics.seq.Interface;
+import org.redukti.rayoptics.util.ZDir;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +19,6 @@ public class Surface extends Interface {
     public Surface() {
         this("", "transmit");
     }
-
 
     public Surface(String label, String interact_mode) {
         this(interact_mode, 0.0, 1.0, null, label, null);
@@ -37,6 +38,16 @@ public class Surface extends Interface {
     public void update() {
         super.update();
         profile.update();
+    }
+
+    @Override
+    public IntersectionResult intersect(Vector3 p0, Vector3 d, double eps, ZDir z_dir) {
+        return profile.intersect(p0, d, eps, z_dir);
+    }
+
+    @Override
+    public Vector3 normal(Vector3 p) {
+        return profile.normal(p);
     }
 
     @Override

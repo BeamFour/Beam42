@@ -1,8 +1,10 @@
 package org.redukti.rayoptics.specs;
 
+import org.redukti.rayoptics.math.Vector3;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrder;
 import org.redukti.rayoptics.parax.ParaxData;
+import org.redukti.rayoptics.raytr.Trace;
 
 public class OpticalSpecs {
 
@@ -32,9 +34,14 @@ public class OpticalSpecs {
             if (do_aiming) {
                 for (int i = 0; i < field_of_view.fields.length; i++) {
                     Field fld = field_of_view.fields[i];
-
+                    double[] aim_pt = Trace.aim_chief_ray(opt_model, fld, wvl);
+                    fld.aim_pt = aim_pt;
                 }
             }
         }
+    }
+
+    public Vector3 obj_coords(Field fld) {
+        return field_of_view.obj_coords(fld);
     }
 }

@@ -1,6 +1,10 @@
 package org.redukti.rayoptics.specs;
 
 public class Field {
+    /**
+     * x, y chief ray coords on the paraxial entrance pupil plane
+     */
+    public double[] aim_pt;
     double x; // x field component
     double y; // y field component
     double vux; // +x vignetting factor

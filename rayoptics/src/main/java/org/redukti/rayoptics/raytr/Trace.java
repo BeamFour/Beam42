@@ -159,7 +159,7 @@ public class Trace {
 
         if (ifcx != null) {
             ObjectiveFunction fn = new ObjectiveFunction(seq_model, ifcx, pt0, dist, wvl, new double[]{0.0, 0.0});
-            LMLSolver lm = new LMLSolver(fn, 1e-5, 2, 2);
+            LMLSolver lm = new LMLSolver(fn, 1e-12, 2, 2);
             int istatus = 0;
             while (istatus != LMLSolver.BADITER &&
                     istatus != LMLSolver.LEVELITER &&

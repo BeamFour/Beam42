@@ -3,6 +3,7 @@ package org.redukti.rayoptics.elem;
 import org.redukti.rayoptics.math.Matrix3;
 import org.redukti.rayoptics.math.Transform3;
 import org.redukti.rayoptics.math.Vector3;
+import org.redukti.rayoptics.raytr.Ray;
 import org.redukti.rayoptics.seq.Interface;
 import org.redukti.rayoptics.util.Pair;
 
@@ -96,5 +97,43 @@ public class Transform {
         return new Transform3(r_cascade, t_orig);
     }
 
-
+    /**
+     * Transform ray_seg from interface to following seg.
+     *
+     *     Args:
+     *         interface: the :class:'~seq.interface.Interface' for the path sequence
+     *         ray_seg: ray segment exiting from **interface**
+     *
+     *     Returns:
+     *         (**b4_pt**, **b4_dir**)
+     *
+     *         - **b4_pt** - ray intersection pt wrt following seg
+     *         - **b4_dir** - ray direction cosine wrt following seg
+     * @param ifc
+     * @param ray_seg
+     */
+    public static Ray transform_after_surface(Interface ifc, Ray ray_seg) {
+        Vector3 b4_pt;
+        Vector3 b4_dir;
+        if (ifc.decenter != null) {
+            // get transformation info after surf
+            Pair<Matrix3, Vector3> xform = ifc.decenter.tform_after_surf();
+            Matrix3 r = xform.first;
+            Vector3 t = xform.second;
+            if (r == null) {
+                b4_pt = ray_seg.p.minus(t);
+                b4_dir = ray_seg.d;
+            }
+            else {
+                Matrix3 rt = r.transpose();
+                b4_pt = rt.multiply(ray_seg.p.minus((t)));
+                b4_dir = rt.multiply(ray_seg.d);
+            }
+        }
+        else {
+            b4_pt = ray_seg.p;
+            b4_dir = ray_seg.d;
+        }
+        return new Ray(b4_pt, b4_dir);
+    }
 }

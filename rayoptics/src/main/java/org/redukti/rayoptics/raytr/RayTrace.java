@@ -1,6 +1,7 @@
 package org.redukti.rayoptics.raytr;
 
 import org.redukti.rayoptics.elem.IntersectionResult;
+import org.redukti.rayoptics.elem.Transform;
 import org.redukti.rayoptics.exceptions.TraceMissedSurfaceException;
 import org.redukti.rayoptics.exceptions.TraceTIRException;
 import org.redukti.rayoptics.math.Matrix3;
@@ -48,7 +49,7 @@ public class RayTrace {
      * @param dir0
      * @param wvl
      */
-    public static RayTraceResults trace(SequentialModel seq_model, Vector3 pt0, Vector3 dir0, double wvl) {
+    public static RayPkg trace(SequentialModel seq_model, Vector3 pt0, Vector3 dir0, double wvl) {
         List<SeqPathComponent> path = seq_model.path(wvl, null, null, 1);
         RayTraceOptions options = new RayTraceOptions();
         options.first_surf = 1;
@@ -123,11 +124,11 @@ public class RayTrace {
      * @param options
      * @return
      */
-    private static RayTraceResults trace_raw(List<SeqPathComponent> path, Vector3 pt0, Vector3 dir0, double wvl, RayTraceOptions options) {
+    private static RayPkg trace_raw(List<SeqPathComponent> path, Vector3 pt0, Vector3 dir0, double wvl, RayTraceOptions options) {
         int first_surf = options.first_surf != null ? options.first_surf : 0;
         Integer last_surf = options.last_surf;
 
-        List<RayTraceElement> ray = new ArrayList<>();
+        List<RaySeg> ray = new ArrayList<>();
         List<double[]> eic = new ArrayList<>();
 
         // trace object surface
@@ -174,7 +175,7 @@ public class RayTrace {
                 double pp_dst_intrsct = intersection.distance;
                 inc_pt = intersection.intersection_point;
                 dst_b4 = pp_dst + pp_dst_intrsct;
-                ray.add(new RayTraceElement(before_pt, before_dir, dst_b4, before_normal));
+                ray.add(new RaySeg(before_pt, before_dir, dst_b4, before_normal));
 
                 if (in_surface_range(first_surf, last_surf, surf, false))
                     opl += before.rndx * dst_b4;
@@ -253,12 +254,12 @@ public class RayTrace {
                 throw ray_tir;
             }
             catch (NoSuchElementException e) {
-                ray.add(new RayTraceElement(inc_pt, after_dir, 0.0, normal));
+                ray.add(new RaySeg(inc_pt, after_dir, 0.0, normal));
                 op_delta += opl;
                 break;
             }
         }
-        return new RayTraceResults(ray, op_delta, wvl);
+        return new RayPkg(ray, op_delta, wvl);
     }
 
     /**
@@ -294,5 +295,66 @@ public class RayTrace {
         double cosI = d_in.dot(normal) / normal_len;
         Vector3 d_out = d_in.minus(normal.times(2.0 * cosI));
         return d_out;
+    }
+
+    public static final class TransferResults {
+        public Vector3 exp_pt;
+        public Vector3 exp_dir;
+        public double exp_dst;
+        public Interface ifc;
+        public Vector3 b4_pt;
+        public Vector3 b4_dir;
+
+        public TransferResults(Vector3 exp_pt, Vector3 exp_dir, double exp_dst, Interface ifc, Vector3 b4_pt, Vector3 b4_dir) {
+            this.exp_pt = exp_pt;
+            this.exp_dir = exp_dir;
+            this.exp_dst = exp_dst;
+            this.ifc = ifc;
+            this.b4_pt = b4_pt;
+            this.b4_dir = b4_dir;
+        }
+    }
+
+    /**
+     * Given the exiting interface and chief ray data, return exit pupil ray coords.
+     *
+     *     Args:
+     *         interface: the exiting :class:'~.Interface' for the path sequence
+     *         ray_seg: ray segment exiting from **interface**
+     *         exp_dst_parax: z distance to the paraxial exit pupil
+     *
+     *     Returns:
+     *         (**exp_pt**, **exp_dir**, **exp_dst**)
+     *
+     *         - **exp_pt** - ray intersection with exit pupil plane
+     *         - **exp_dir** - direction cosine of the ray in exit pupil space
+     *         - **exp_dst** - distance from interface to exit pupil pt
+     * @param ifc
+     * @param ray_seg
+     * @param exp_dst_parax
+     */
+    public static TransferResults transfer_to_exit_pupil(Interface ifc, Ray ray_seg, double exp_dst_parax) {
+        Ray b4_ray = Transform.transform_after_surface(ifc, ray_seg);
+        Vector3 b4_pt = b4_ray.p;
+        Vector3 b4_dir = b4_ray.d;
+
+        // h = b4_pt[0]**2 + b4_pt[1]**2
+        // u = b4_dir[0]**2 + b4_dir[1]**2
+        // handle field points in the YZ plane
+
+        double h = b4_pt.y;
+        double u = b4_dir.y;
+        double exp_dst;
+        if (Math.abs(u) < 1e-14) {
+            exp_dst = exp_dst_parax;
+        }
+        else {
+            // exp_dst = -np.sign(b4_dir[2])*sqrt(h/u)
+            exp_dst = -h/u;
+        }
+        Vector3 exp_pt = b4_pt.plus(b4_dir.times(exp_dst));
+        Vector3 exp_dir = b4_dir;
+
+        return new TransferResults(exp_pt, exp_dir, exp_dst, ifc, b4_pt, b4_dir);
     }
 }

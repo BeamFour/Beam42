@@ -2,7 +2,10 @@ package org.redukti.rayoptics.raytr;
 
 import org.redukti.rayoptics.math.Vector3;
 
-public class RayTraceElement {
+/**
+ * ray intersection and transfer data
+ */
+public class RaySeg {
     /**
      * intersection point with interface
      */
@@ -23,7 +26,7 @@ public class RayTraceElement {
     // TODO phase
 
 
-    public RayTraceElement(Vector3 p, Vector3 d, double dst, Vector3 nrml) {
+    public RaySeg(Vector3 p, Vector3 d, double dst, Vector3 nrml) {
         this.p = p;
         this.d = d;
         this.dst = dst;

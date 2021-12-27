@@ -297,43 +297,14 @@ public class RayTrace {
         return d_out;
     }
 
-    public static final class TransferResults {
-        public Vector3 exp_pt;
-        public Vector3 exp_dir;
-        public double exp_dst;
-        public Interface ifc;
-        public Vector3 b4_pt;
-        public Vector3 b4_dir;
-
-        public TransferResults(Vector3 exp_pt, Vector3 exp_dir, double exp_dst, Interface ifc, Vector3 b4_pt, Vector3 b4_dir) {
-            this.exp_pt = exp_pt;
-            this.exp_dir = exp_dir;
-            this.exp_dst = exp_dst;
-            this.ifc = ifc;
-            this.b4_pt = b4_pt;
-            this.b4_dir = b4_dir;
-        }
-    }
-
     /**
      * Given the exiting interface and chief ray data, return exit pupil ray coords.
      *
-     *     Args:
-     *         interface: the exiting :class:'~.Interface' for the path sequence
-     *         ray_seg: ray segment exiting from **interface**
-     *         exp_dst_parax: z distance to the paraxial exit pupil
-     *
-     *     Returns:
-     *         (**exp_pt**, **exp_dir**, **exp_dst**)
-     *
-     *         - **exp_pt** - ray intersection with exit pupil plane
-     *         - **exp_dir** - direction cosine of the ray in exit pupil space
-     *         - **exp_dst** - distance from interface to exit pupil pt
-     * @param ifc
-     * @param ray_seg
-     * @param exp_dst_parax
+     * @param ifc the exiting :class:'~.Interface' for the path sequence
+     * @param ray_seg ray segment exiting from **interface**
+     * @param exp_dst_parax z distance to the paraxial exit pupil
      */
-    public static TransferResults transfer_to_exit_pupil(Interface ifc, Ray ray_seg, double exp_dst_parax) {
+    public static ChiefRayExitPupilSegment transfer_to_exit_pupil(Interface ifc, Ray ray_seg, double exp_dst_parax) {
         Ray b4_ray = Transform.transform_after_surface(ifc, ray_seg);
         Vector3 b4_pt = b4_ray.p;
         Vector3 b4_dir = b4_ray.d;
@@ -355,6 +326,6 @@ public class RayTrace {
         Vector3 exp_pt = b4_pt.plus(b4_dir.times(exp_dst));
         Vector3 exp_dir = b4_dir;
 
-        return new TransferResults(exp_pt, exp_dir, exp_dst, ifc, b4_pt, b4_dir);
+        return new ChiefRayExitPupilSegment(exp_pt, exp_dir, exp_dst, ifc, b4_pt, b4_dir);
     }
 }

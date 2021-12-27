@@ -1,6 +1,6 @@
 package org.redukti.rayoptics.specs;
 
-import org.redukti.rayoptics.raytr.RayPkg;
+import org.redukti.rayoptics.raytr.ChiefRayPkg;
 import org.redukti.rayoptics.raytr.RefSpherePkg;
 
 import java.util.Arrays;
@@ -21,7 +21,7 @@ public class Field {
      * ray package for the ray from the field point through the
      * center of the aperture stop, traced in the central wavelength
      */
-    public RayPkg chief_ray;
+    public ChiefRayPkg chief_ray;
     /**
      * a tuple containing (image_pt, ref_dir, ref_sphere_radius)
      */

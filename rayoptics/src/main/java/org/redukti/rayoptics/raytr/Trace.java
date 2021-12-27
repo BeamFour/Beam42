@@ -260,6 +260,7 @@ public class Trace {
         return RayTrace.trace(seq_model, pt0, dir0, wvl);
     }
 
+    /*
     public static Pair<RefSpherePkg, RayPkg> setup_canonical_coords(OpticalModel opt_model, Field fld, double wvl, Vector3 image_pt) {
         OpticalSpecs osp = opt_model.optical_spec;
         SequentialModel seq_model = opt_model.seq_model;
@@ -274,7 +275,7 @@ public class Trace {
 
         // cr_exp_pt: E upper bar prime: pupil center for pencils from Q
         // cr_exp_pt, cr_b4_dir, cr_dst
-        RayTrace.TransferResults cr_exp_seg = RayTrace.transfer_to_exit_pupil(Lists.get(seq_model.ifcs, -2),
+        ChiefRayExitPupilSegment cr_exp_seg = RayTrace.transfer_to_exit_pupil(Lists.get(seq_model.ifcs, -2),
                 new Ray(Lists.get(cr.ray, -2).p,
                         Lists.get(cr.ray, -2).d),
                 fod.exp_dist);
@@ -300,6 +301,7 @@ public class Trace {
         fld.ref_sphere = ref_sphere_pkg;
         return new Pair<>(ref_sphere_pkg, cr);
     }
+    */
 
     /**
      * Trace a chief ray for fld and wvl, returning the ray_pkg and exit pupil segment.
@@ -309,7 +311,7 @@ public class Trace {
      * @param foc
      * @return
      */
-    public static Pair<RayPkg, RayTrace.TransferResults> trace_chief_ray(OpticalModel opt_model, Field fld, double wvl, double foc) {
+    public static ChiefRayPkg trace_chief_ray(OpticalModel opt_model, Field fld, double wvl, double foc) {
         OpticalSpecs osp = opt_model.optical_spec;
         FirstOrderData fod = osp.parax_data.fod;
 
@@ -318,11 +320,11 @@ public class Trace {
 
         // cr_exp_pt: E upper bar prime: pupil center for pencils from Q
         // cr_exp_pt, cr_b4_dir, cr_exp_dist
-        RayTrace.TransferResults cr_exp_seg = RayTrace.transfer_to_exit_pupil(
+        ChiefRayExitPupilSegment cr_exp_seg = RayTrace.transfer_to_exit_pupil(
                 Lists.get(opt_model.seq_model.ifcs, -2),
                 new Ray(Lists.get(cr.ray, -2).p,
                         Lists.get(cr.ray, -2).d), fod.exp_dist);
 
-        return new Pair<>(cr, cr_exp_seg);
+        return new ChiefRayPkg(cr, cr_exp_seg);
     }
 }

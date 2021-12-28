@@ -4,6 +4,9 @@ import org.redukti.rayoptics.math.Vector2;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.specs.OpticalSpecs;
+import org.redukti.rayoptics.util.Pair;
+
+import java.util.List;
 
 /**
  * A fan of rays across the pupil at the given field and wavelength.
@@ -26,6 +29,9 @@ public class RayFan {
     public Vector2 image_pt_2d;
     public int num_rays;
     public int xyfan;
+    String output_filter;
+    String rayerr_filter;
+    Pair<List<RayFanItem>, List<WaveAbrPreCalc>> fan_pkg;
 
     public RayFan(OpticalModel opt_model, Field f, Double wl, Double foc, Vector2 image_pt_2d,
                   int num_rays, String xyfan) {
@@ -53,7 +59,12 @@ public class RayFan {
 
     void update_data(String build) {
         if ("rebuild".equals(build)) {
-
+            this.fan_pkg = Analysis.trace_fan(
+                    opt_model, fld, wvl, foc, xyfan,
+                    image_pt_2d, num_rays, output_filter,
+                    rayerr_filter);
         }
+        Analysis.focus_fan(opt_model, fan_pkg, fld, wvl, foc,
+                image_pt_2d);
     }
 }

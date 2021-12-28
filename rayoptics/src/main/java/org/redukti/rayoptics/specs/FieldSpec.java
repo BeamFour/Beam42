@@ -5,7 +5,8 @@ import org.redukti.rayoptics.parax.FirstOrderData;
 import org.redukti.rayoptics.util.Pair;
 
 /**
- * Field of view specification
+ * Field of view specification. The FieldSpec can be defined in object or image space.
+ * The defining parameters can be height or angle, where angle is given in degrees.
  */
 public class FieldSpec {
 

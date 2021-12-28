@@ -300,12 +300,12 @@ public class RayTrace {
     /**
      * Given the exiting interface and chief ray data, return exit pupil ray coords.
      *
-     * @param ifc the exiting :class:'~.Interface' for the path sequence
-     * @param ray_seg ray segment exiting from **interface**
+     * @param ifc           the exiting :class:'~.Interface' for the path sequence
+     * @param ray_seg       ray segment exiting from **interface**
      * @param exp_dst_parax z distance to the paraxial exit pupil
      */
-    public static ChiefRayExitPupilSegment transfer_to_exit_pupil(Interface ifc, Ray ray_seg, double exp_dst_parax) {
-        Ray b4_ray = Transform.transform_after_surface(ifc, ray_seg);
+    public static ChiefRayExitPupilSegment transfer_to_exit_pupil(Interface ifc, RayData ray_seg, double exp_dst_parax) {
+        RayData b4_ray = Transform.transform_after_surface(ifc, ray_seg);
         Vector3 b4_pt = b4_ray.p;
         Vector3 b4_dir = b4_ray.d;
 

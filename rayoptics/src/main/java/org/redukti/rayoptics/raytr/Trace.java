@@ -7,12 +7,14 @@ import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrderData;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.specs.Field;
+import org.redukti.rayoptics.specs.FieldSpec;
 import org.redukti.rayoptics.specs.OpticalSpecs;
 import org.redukti.rayoptics.util.Lists;
-import org.redukti.rayoptics.util.Pair;
-import org.redukti.rayoptics.util.ZDir;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Trace {
 
@@ -322,9 +324,54 @@ public class Trace {
         // cr_exp_pt, cr_b4_dir, cr_exp_dist
         ChiefRayExitPupilSegment cr_exp_seg = RayTrace.transfer_to_exit_pupil(
                 Lists.get(opt_model.seq_model.ifcs, -2),
-                new Ray(Lists.get(cr.ray, -2).p,
+                new RayData(Lists.get(cr.ray, -2).p,
                         Lists.get(cr.ray, -2).d), fod.exp_dist);
 
         return new ChiefRayPkg(cr, cr_exp_seg);
     }
+
+    /**
+     * returns a list of RayPkgs for the boundary rays for field fld
+     *
+     * @param opt_model
+     * @param fld
+     * @param wvl
+     * @return
+     */
+    public static List<RayPkg> trace_boundary_rays_at_field(OpticalModel opt_model, Field fld, double wvl) {
+        List<RayPkg> rim_rays = new ArrayList<>();
+        OpticalSpecs osp = opt_model.optical_spec;
+        for (double[] p : osp.pupil.pupil_rays) {
+            RayPkg ray_pkg = trace_base(opt_model, p, fld, wvl);
+            // TODO exception handling
+            rim_rays.add(ray_pkg);
+        }
+        return rim_rays;
+    }
+
+    public static Map<String, RayPkg> boundary_ray_dict(OpticalModel opt_model, List<RayPkg> rim_rays) {
+        Map<String, RayPkg> pupil_rays = new HashMap<>();
+        String[] ray_labels = opt_model.optical_spec.pupil.ray_labels;
+        for (int i = 0; i < rim_rays.size(); i++) {
+            if (i >= ray_labels.length)
+                break;
+            pupil_rays.put(ray_labels[i], rim_rays.get(i));
+        }
+        return pupil_rays;
+    }
+
+    public static List<RayPkg> trace_boundary_rays(OpticalModel opt_model) {
+        List<RayPkg> rayset = new ArrayList<>();
+        double wvl = opt_model.seq_model.central_wavelength();
+        FieldSpec fov = opt_model.optical_spec.field_of_view;
+        for (int fi = 0; fi < fov.fields.length; fi++) {
+            Field fld = fov.fields[fi];
+            List<RayPkg> rim_rays = trace_boundary_rays_at_field(opt_model, fld, wvl);
+            fld.pupil_rays = boundary_ray_dict(opt_model, rim_rays);
+            rayset.addAll(rim_rays);
+        }
+        return rayset;
+    }
+
+
 }

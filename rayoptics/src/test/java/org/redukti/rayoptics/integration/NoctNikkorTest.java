@@ -3,7 +3,6 @@ package org.redukti.rayoptics.integration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.redukti.rayoptics.elem.EvenPolynomial;
-import org.redukti.rayoptics.math.Vector2;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrderData;
 import org.redukti.rayoptics.parax.ParaxialModel;
@@ -22,9 +21,9 @@ public class NoctNikkorTest {
         ParaxialModel pm = opm.parax_model;
         osp.pupil = new PupilSpec(osp, new Pair<>("image", "f/#"), 0.98);
         osp.field_of_view = new FieldSpec(osp, new Pair<>("object", "angle"), new double[]{0., 19.98});
-        osp.spectral_region = new WvlSpec(new Vector2[]{new Vector2(486.1327, 0.5),
-                new Vector2(587.5618, 1.0),
-                new Vector2(656.2725, 0.5)}, 1);
+        osp.spectral_region = new WvlSpec(new WvlWt[]{new WvlWt(486.1327, 0.5),
+                new WvlWt(587.5618, 1.0),
+                new WvlWt(656.2725, 0.5)}, 1);
         opm.system_spec.title = "WO2019-229849 Example 1 (Nikkor Z 58mm f/0.95 S)";
         opm.system_spec.dimensions = "MM";
         opm.radius_mode = true;

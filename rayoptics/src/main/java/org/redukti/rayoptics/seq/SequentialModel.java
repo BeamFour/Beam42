@@ -538,7 +538,7 @@ public class SequentialModel {
         );
     }
 
-    public Double central_wavelength() {
+    public double central_wavelength() {
         return opt_model.optical_spec.spectral_region.central_wvl();
     }
 

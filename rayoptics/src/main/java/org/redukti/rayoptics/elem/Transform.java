@@ -3,7 +3,7 @@ package org.redukti.rayoptics.elem;
 import org.redukti.rayoptics.math.Matrix3;
 import org.redukti.rayoptics.math.Transform3;
 import org.redukti.rayoptics.math.Vector3;
-import org.redukti.rayoptics.raytr.Ray;
+import org.redukti.rayoptics.raytr.RayData;
 import org.redukti.rayoptics.seq.Interface;
 import org.redukti.rayoptics.util.Pair;
 
@@ -112,7 +112,7 @@ public class Transform {
      * @param ifc
      * @param ray_seg
      */
-    public static Ray transform_after_surface(Interface ifc, Ray ray_seg) {
+    public static RayData transform_after_surface(Interface ifc, RayData ray_seg) {
         Vector3 b4_pt;
         Vector3 b4_dir;
         if (ifc.decenter != null) {
@@ -134,6 +134,6 @@ public class Transform {
             b4_pt = ray_seg.p;
             b4_dir = ray_seg.d;
         }
-        return new Ray(b4_pt, b4_dir);
+        return new RayData(b4_pt, b4_dir);
     }
 }

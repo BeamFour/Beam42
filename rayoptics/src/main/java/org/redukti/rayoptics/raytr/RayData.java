@@ -2,7 +2,7 @@ package org.redukti.rayoptics.raytr;
 
 import org.redukti.rayoptics.math.Vector3;
 
-public class Ray {
+public class RayData {
     /**
      * intersection point with interface
      */
@@ -12,7 +12,7 @@ public class Ray {
      */
     public Vector3 d;
 
-    public Ray(Vector3 p, Vector3 d) {
+    public RayData(Vector3 p, Vector3 d) {
         this.p = p;
         this.d = d;
     }

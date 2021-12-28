@@ -1,7 +1,5 @@
 package org.redukti.rayoptics.specs;
 
-import org.redukti.rayoptics.math.Vector2;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,11 +38,10 @@ public class WvlSpec {
     public double[] wavelengths;
     public double[] spectral_wts;
 
-    public WvlSpec(Vector2[] wlwts, int ref_wl, boolean do_init) {
+    public WvlSpec(WvlWt[] wlwts, int ref_wl, boolean do_init) {
         if (do_init) {
             set_from_list(wlwts);
-        }
-        else {
+        } else {
             wavelengths = new double[0];
             spectral_wts = new double[0];
         }
@@ -52,16 +49,16 @@ public class WvlSpec {
         coating_wvl = 550.0;
     }
 
-    public WvlSpec(Vector2[] wlwts, int ref_wl) {
+    public WvlSpec(WvlWt[] wlwts, int ref_wl) {
         this(wlwts, ref_wl, true);
     }
 
-    void set_from_list(Vector2[] wlwts) {
+    void set_from_list(WvlWt[] wlwts) {
         wavelengths = new double[wlwts.length];
         spectral_wts = new double[wlwts.length];
         for (int i = 0; i < wlwts.length; i++) {
-            wavelengths[i] = wlwts[i].x;
-            spectral_wts[i] = wlwts[i].y;
+            wavelengths[i] = wlwts[i].wvl;
+            spectral_wts[i] = wlwts[i].wt;
         }
     }
 
@@ -72,7 +69,10 @@ public class WvlSpec {
      * @return float: the wavelength in nm
      */
     public static double get_wavelength(String key) {
-        return spectra_uc.get(key.toUpperCase());
+        Double d = spectra_uc.get(key.toUpperCase());
+        if (d == null)
+            throw new IllegalArgumentException("Unknown wavelength '" + key + "'");
+        return d;
     }
 
     public void update_model() {

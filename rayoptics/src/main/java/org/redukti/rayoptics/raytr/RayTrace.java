@@ -236,24 +236,21 @@ public class RayTrace {
                 z_dir_before = z_dir_after;
                 before = after;
                 tfrm_from_before = before.transform3;
-            }
-            catch (TraceMissedSurfaceException ray_miss) {
+            } catch (TraceMissedSurfaceException ray_miss) {
                 //ray.add([before_pt, before_dir, pp_dst, before_normal])
 //                ray_miss.surf = surf+1
 //                ray_miss.ifc = ifc
 //                ray_miss.prev_tfrm = before[Tfrm]
 //                ray_miss.ray_pkg = ray, opl, wvl
                 throw ray_miss;
-            }
-            catch (TraceTIRException ray_tir) {
+            } catch (TraceTIRException ray_tir) {
 //                ray.append([inc_pt, before_dir, 0.0, normal])
 //                ray_tir.surf = surf+1
 //                ray_tir.ifc = ifc
 //                ray_tir.int_pt = inc_pt
 //                ray_tir.ray_pkg = ray, opl, wvl
                 throw ray_tir;
-            }
-            catch (NoSuchElementException e) {
+            } catch (NoSuchElementException e) {
                 ray.add(new RaySeg(inc_pt, after_dir, 0.0, normal));
                 op_delta += opl;
                 break;
@@ -318,14 +315,36 @@ public class RayTrace {
         double exp_dst;
         if (Math.abs(u) < 1e-14) {
             exp_dst = exp_dst_parax;
-        }
-        else {
+        } else {
             // exp_dst = -np.sign(b4_dir[2])*sqrt(h/u)
-            exp_dst = -h/u;
+            exp_dst = -h / u;
         }
         Vector3 exp_pt = b4_pt.plus(b4_dir.times(exp_dst));
         Vector3 exp_dir = b4_dir;
 
         return new ChiefRayExitPupilSegment(exp_pt, exp_dir, exp_dst, ifc, b4_pt, b4_dir);
+    }
+
+    /**
+     * calculate equally inclined chord distance between 2 rays
+     * <p>
+     * Args:
+     * r: (p, d), where p is a point on the ray r and d is the direction
+     * cosine of r
+     * r0: (p0, d0), where p0 is a point on the ray r0 and d0 is the direction
+     * cosine of r0
+     * <p>
+     * Returns:
+     * float: distance along r from equally inclined chord point to p
+     *
+     * @param r
+     * @param r0
+     * @return
+     */
+    public static double eic_distance(RayData r, RayData r0) {
+        // eq 3.9 Hopkins paper
+        double e = (r.d.plus(r0.d).dot(r.p.minus(r0.p))) /
+                (1. + r.d.dot(r0.d));
+        return e;
     }
 }

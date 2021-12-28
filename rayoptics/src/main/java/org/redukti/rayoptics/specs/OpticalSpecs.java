@@ -74,4 +74,8 @@ public class OpticalSpecs {
     public Vector3 obj_coords(Field fld) {
         return field_of_view.obj_coords(fld);
     }
+
+    public FocusRange defocus() {
+        return focus;
+    }
 }

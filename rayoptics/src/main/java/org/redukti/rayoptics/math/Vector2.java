@@ -13,11 +13,18 @@ public class Vector2 {
     }
 
     public Vector2 add(Vector2 v) {
-        return new Vector2(x+v.x, y+v.y);
+        return new Vector2(x + v.x, y + v.y);
     }
 
     public Vector2 subtract(Vector2 v) {
-        return new Vector2(x-v.x, y-v.y);
+        return new Vector2(x - v.x, y - v.y);
     }
 
+    public Vector2 div(double scalar) {
+        return new Vector2(x / scalar, y / scalar);
+    }
+
+    public double[] as_array() {
+        return new double[]{x, y};
+    }
 }

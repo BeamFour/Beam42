@@ -7,11 +7,11 @@ public class FocusRange {
     /**
      * focus shift (z displacement) from nominal image interface
      */
-    double focus_shift;
+    public double focus_shift;
     /**
      * +/- half the total focal range, from the focus_shift position
      */
-    double defocus_range;
+    public double defocus_range;
 
     public FocusRange(double focus_shift, double defocus_range) {
         this.focus_shift = focus_shift;

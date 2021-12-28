@@ -2,7 +2,7 @@ package org.redukti.rayoptics.specs;
 
 import org.redukti.rayoptics.raytr.ChiefRayPkg;
 import org.redukti.rayoptics.raytr.RayPkg;
-import org.redukti.rayoptics.raytr.RefSpherePkg;
+import org.redukti.rayoptics.raytr.RefSphere;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class Field {
     /**
      * a tuple containing (image_pt, ref_dir, ref_sphere_radius)
      */
-    public RefSpherePkg ref_sphere;
+    public RefSphere ref_sphere;
     public Map<String, RayPkg> pupil_rays;
 
     public void update() {

@@ -11,7 +11,7 @@ public class TestAsphere {
     public void test1() {
 
         Asphere surface = new Asphere(1.0 / 0.25284872, 1.0, -0.005,
-                0.00001, -0.0000005, 0, 0, 0, false);
+                0.00001, -0.0000005, 0, 0, 0, 0, false);
 
         //  auto surface = std::make_shared<goptical::curve::Sphere> (1.0 /
         //  0.25284872);

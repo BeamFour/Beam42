@@ -40,11 +40,12 @@ public class Asphere extends ConicBase {
     protected final double _A10;      /* deformation polynomial coefficient */
     protected final double _A12;      /* deformation polynomial coefficient */
     protected final double _A14;      /* deformation polynomial coefficient */
+    protected final double _A16;      /* deformation polynomial coefficient */
     boolean _feder_algo = true; /* Use the algorithms by Feder */
 
     public Asphere(double r, double k, double A4, double A6, double A8, double A10,
-                   double A12, double A14) {
-        super(r, k-1);
+                   double A12, double A14, double A16) {
+        super(r, k - 1);
         _r = r;
         _c = 1.0 / r;
         _k = k;
@@ -54,11 +55,12 @@ public class Asphere extends ConicBase {
         _A10 = A10;
         _A12 = A12;
         _A14 = A14;
+        _A16 = A16;
     }
 
     public Asphere(double r, double k, double A4, double A6, double A8, double A10,
-                   double A12, double A14, boolean feder_algo) {
-        this(r, k, A4, A6, A8, A10, A12, A14);
+                   double A12, double A14, double A16, boolean feder_algo) {
+        this(r, k, A4, A6, A8, A10, A12, A14, A16);
         this._feder_algo = feder_algo;
     }
 
@@ -96,6 +98,10 @@ public class Asphere extends ConicBase {
 
     public double get_A14() {
         return _A14;
+    }
+
+    public double get_A16() {
+        return _A16;
     }
 
     /* computes intersection using Feder's equations - code is taken from
@@ -236,9 +242,10 @@ public class Asphere extends ConicBase {
         double s10 = s8 * s2;
         double s12 = s10 * s2;
         double s14 = s12 * s2;
+        double s16 = s14 * s2;
 
         return S._A4 * s4 + S._A6 * s6 + S._A8 * s8 + S._A10 * s10
-                + S._A12 * s12 + S._A14 * s14;
+                + S._A12 * s12 + S._A14 * s14 + S._A16 * s16;
     }
 
     /**
@@ -251,9 +258,11 @@ public class Asphere extends ConicBase {
         double s8 = s6 * s2;
         double s10 = s8 * s2;
         double s12 = s10 * s2;
+        double s14 = s12 * s2;
 
         return 4 * S._A4 * s2 + 6 * S._A6 * s4 + 8 * S._A8 * s6
-                + 10 * S._A10 * s8 + 12 * S._A12 * s10 + 14 * S._A14 * s12;
+                + 10 * S._A10 * s8 + 12 * S._A12 * s10 + 14 * S._A14 * s12
+                + 16 * S._A16 * s14;
     }
 
     /**
@@ -268,9 +277,11 @@ public class Asphere extends ConicBase {
         double s9 = s7 * s2;
         double s11 = s9 * s2;
         double s13 = s11 * s2;
+        double s15 = s13 * s2;
 
         return 4 * S._A4 * s3 + 6 * S._A6 * s5 + 8 * S._A8 * s7
-                + 10 * S._A10 * s9 + 12 * S._A12 * s11 + 14 * S._A14 * s13;
+                + 10 * S._A10 * s9 + 12 * S._A12 * s11 + 14 * S._A14 * s13
+                + 16 * S._A16 * s15;
     }
 
     /**

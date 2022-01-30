@@ -18,21 +18,13 @@ import org.redukti.jfotoptix.tracing.RayTraceRenderer;
 import org.redukti.jfotoptix.tracing.RayTraceResults;
 import org.redukti.jfotoptix.tracing.RayTracer;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-
 public class LensTool {
 
 
     public static void main(String[] args) throws Exception {
         Args arguments = Args.parseArguments(args);
         if (arguments.specfile == null) {
-            System.err.println("Usage: --specfile inputfile [--scenario num] [--skew] [--output layout|spot] [--dump-system] [--exclude-lost-rays] [--spot-density n] [--trace-density n] [--only-d-line] [--output outfilename] [--dont-use-glass-types]");
+            System.err.println("Usage: --specfile inputfile [--scenario num] [--skew] [--output layout|spot] [--dump-system] [--exclude-lost-rays] [--spot-density n] [--trace-density n] [--only-d-line] [-o outfilename] [--dont-use-glass-types]");
             System.err.println("       --spot-density defaults to 50");
             System.err.println("       --trace-density defaults to 20");
             System.err.println("       --scenario defaults to 0");

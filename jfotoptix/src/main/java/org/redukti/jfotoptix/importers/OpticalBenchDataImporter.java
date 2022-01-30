@@ -6,16 +6,16 @@ package org.redukti.jfotoptix.importers;
 
 import org.redukti.jfotoptix.curve.Asphere;
 import org.redukti.jfotoptix.curve.Flat;
+import org.redukti.jfotoptix.math.Vector3;
+import org.redukti.jfotoptix.math.Vector3Pair;
 import org.redukti.jfotoptix.medium.Abbe;
 import org.redukti.jfotoptix.medium.Air;
 import org.redukti.jfotoptix.medium.GlassMap;
-import org.redukti.jfotoptix.math.Vector3;
-import org.redukti.jfotoptix.math.Vector3Pair;
-import org.redukti.jfotoptix.shape.Disk;
-import org.redukti.jfotoptix.shape.Rectangle;
 import org.redukti.jfotoptix.model.Image;
 import org.redukti.jfotoptix.model.Lens;
 import org.redukti.jfotoptix.model.OpticalSystem;
+import org.redukti.jfotoptix.shape.Disk;
+import org.redukti.jfotoptix.shape.Rectangle;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -489,23 +489,24 @@ public class OpticalBenchDataImporter {
         double a10 = aspherical_data.data(5);
         double a12 = aspherical_data.data(6);
         double a14 = aspherical_data.data(7);
+        double a16 = aspherical_data.data(8);
 
         if (use_glass_types && glass_name != null && GlassMap.glassByName(glass_name) != null) {
             lens.add_surface(
                     new Asphere(radius, k, a4, a6, a8, a10, a12,
-                            a14),
+                            a14, a16),
                     new Disk(aperture_radius), thickness,
                     GlassMap.glassByName(glass_name));
         }
         else if (refractive_index > 0.0) {
             lens.add_surface(
                     new Asphere(radius, k, a4, a6, a8, a10, a12,
-                            a14),
+                            a14, a16),
                     new Disk(aperture_radius), thickness,
                     new Abbe(Abbe.AbbeFormula.AbbeVd, refractive_index, abbe_vd, 0.0));
         } else {
             lens.add_surface(new Asphere(radius, k, a4, a6,
-                            a8, a10, a12, a14),
+                            a8, a10, a12, a14, a16),
                     new Disk(aperture_radius),
                     thickness, Air.air);
         }

@@ -679,15 +679,17 @@ public class GlassMap extends Solid {
         glasses.put("S-NBH53V",new GlassMap("Ohara", "S-NBH53V",1.738,1.73132,1.75415));
         glasses.put("S-NBH55",new GlassMap("Ohara", "S-NBH55",1.8,1.79224,1.81904));
         glasses.put("S-NBH56",new GlassMap("Ohara", "S-NBH56",1.85478,1.84488,1.87935));
-        glasses.put("S-NBH57",new GlassMap("Ohara", "S-NBH57",1.85025,1.84204,1.87034));
-        glasses.put("S-NBH58",new GlassMap("Ohara", "S-NBH58",1.7888,1.78076,1.8085));
-        glasses.put("S-NPH 1",new GlassMap("Ohara", "S-NPH 1",1.80809,1.79801,1.83351));
-        glasses.put("S-NPH 1W",new GlassMap("Ohara", "S-NPH 1W",1.80809,1.79801,1.83351));
-        glasses.put("S-NPH 2",new GlassMap("Ohara", "S-NPH 2",1.92286,1.90916,1.958));
-        glasses.put("S-NPH 3",new GlassMap("Ohara", "S-NPH 3",1.95906,1.94376,1.99866));
-        glasses.put("S-NPH 4",new GlassMap("Ohara", "S-NPH 4",1.89286,1.88048,1.92433));
-        glasses.put("S-NPH 5",new GlassMap("Ohara", "S-NPH 5",1.85896,1.84821,1.886));
-        glasses.put("S-NPH 7",new GlassMap("Ohara", "S-NPH 7",1.7783,1.76902,1.80157));
+        glasses.put("S-NBH57", new GlassMap("Ohara", "S-NBH57", 1.85025, 1.84204, 1.87034));
+        glasses.put("S-NBH58", new GlassMap("Ohara", "S-NBH58", 1.7888, 1.78076, 1.8085));
+        glasses.put("S-NPH 1", new GlassMap("Ohara", "S-NPH 1", 1.80809, 1.79801, 1.83351));
+        glasses.put("S-NPH 1W", new GlassMap("Ohara", "S-NPH 1W", 1.80809, 1.79801, 1.83351));
+        glasses.put("S-NPH 2", new GlassMap("Ohara", "S-NPH 2", 1.92286, 1.90916, 1.958));
+        glasses.put("S-NPH 3", new GlassMap("Ohara", "S-NPH 3", 1.95906, 1.94376, 1.99866));
+        glasses.put("S-NPH 4", new GlassMap("Ohara", "S-NPH 4", 1.89286, 1.88048, 1.92433));
+        glasses.put("S-NPH 5", new GlassMap("Ohara", "S-NPH 5", 1.85896, 1.84821, 1.886));
+        glasses.put("S-NPH 7", new GlassMap("Ohara", "S-NPH 7", 1.7783, 1.76902, 1.80157));
+
+        glasses.put("L-LAH91", new GlassMap("Ohara", "L-LAH91", 1.76450, 1.75981, 1.77538));
 
     }
 }

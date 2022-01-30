@@ -39,3 +39,4 @@ originX	10.64
 originY	225.55
 ppmm	9.181
 [notes]
+--specfile Cosina-35mm-f1.2.txt --output spot --skew -o spot-skew.svg

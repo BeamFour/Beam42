@@ -44,7 +44,8 @@ public class RayOpticsExporter {
                 .append(asphere.data(4)).append(",")
                 .append(asphere.data(5)).append(",")
                 .append(asphere.data(6)).append(",")
-                .append(asphere.data(7)).append("])\n");
+                .append(asphere.data(7)).append(",")
+                .append(asphere.data(8)).append("])\n");
     }
 
     /* handling of Field Stop surface is problematic because it messes up the

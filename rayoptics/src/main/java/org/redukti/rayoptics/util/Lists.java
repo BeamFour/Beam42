@@ -55,4 +55,11 @@ public class Lists {
             i += inputList.size();
         return inputList.get(i);
     }
+
+    public static <E> void set(List<E> inputList, int i, E e) {
+        if (i < 0)
+            i += inputList.size();
+        inputList.set(i, e);
+    }
+
 }

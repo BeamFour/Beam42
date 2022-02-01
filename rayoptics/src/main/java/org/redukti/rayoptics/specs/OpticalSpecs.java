@@ -6,6 +6,7 @@ import org.redukti.rayoptics.parax.FirstOrder;
 import org.redukti.rayoptics.parax.ParaxData;
 import org.redukti.rayoptics.raytr.Trace;
 import org.redukti.rayoptics.util.Pair;
+import org.redukti.rayoptics.util.Triple;
 
 /**
  * The OpticalSpecs class holds the optical usage definition of the model.
@@ -77,5 +78,34 @@ public class OpticalSpecs {
 
     public FocusRange defocus() {
         return focus;
+    }
+
+    /* returns field, wavelength and defocus data
+    Args:
+        fi (int): index into the field_of_view list of Fields
+        wl (int): index into the spectral_region list of wavelengths
+        fr (float): focus range parameter, -1.0 to 1.0
+    Returns:
+        (**fld**, **wvl**, **foc**)
+
+        - **fld** - :class:`Field` instance for field_of_view[fi]
+        - **wvl** - wavelength in nm
+        - **foc** - focus shift from image interface
+    */
+    public Triple<Field, Double, Double> lookup_fld_wvl_focus(int fi, Integer wl, Double fr) {
+        double wvl;
+        if (fr == null)
+            fr = 0.0;
+        if (wl == null)
+            wvl = spectral_region.central_wvl();
+        else
+            wvl = spectral_region.wavelengths[wl];
+        Field fld = field_of_view.fields[fi];
+        double foc = defocus().get_focus(fr);
+        return new Triple<>(fld, wvl, foc);
+    }
+
+    public Triple<Field, Double, Double> lookup_fld_wvl_focus(int fi) {
+        return lookup_fld_wvl_focus(fi, null, 0.0);
     }
 }

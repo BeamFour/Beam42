@@ -2,7 +2,11 @@ package org.redukti.rayoptics.specs;
 
 import org.redukti.rayoptics.math.Vector3;
 import org.redukti.rayoptics.parax.FirstOrderData;
+import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.Pair;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Field of view specification. The FieldSpec can be defined in object or image space.
@@ -27,6 +31,7 @@ public class FieldSpec {
      * list of Field instances
      */
     public Field[] fields;
+    public String[] index_labels;
 
     public FieldSpec(OpticalSpecs parent, Pair<String, String> key, double value, double[] flds,
                      boolean is_relative, boolean do_init) {
@@ -113,10 +118,35 @@ public class FieldSpec {
     }
 
     public void update_model() {
-        for (Field f: fields) {
+        for (Field f : fields) {
             f.update();
         }
-        // TODO there is a bunch here that needs porting
+        // recalculate max_field and relabel fields.
+        //  relabeling really assumes the fields are radial, specifically,
+        //  y axis only
+        double field_norm;
+        if (is_relative)
+            field_norm = 1.0;
+        else
+            field_norm = (value == 0.0) ? 1.0 : 1.0 / value;
+
+        List<String> index_labels = new ArrayList<>();
+        for (Field f : fields) {
+            String fldx, fldy;
+            if (f.x != 0.0)
+                fldx = String.format("%5.2fx", field_norm * f.x);
+            else
+                fldx = "";
+            if (f.y != 0.0)
+                fldy = String.format("%5.2fy", field_norm * f.y);
+            else
+                fldy = "";
+            index_labels.add(fldx + fldy);
+        }
+        index_labels.set(0, "axis");
+        if (index_labels.size() > 1)
+            Lists.set(index_labels, -1, "edge");
+        this.index_labels = index_labels.toArray(new String[0]);
     }
 
 }

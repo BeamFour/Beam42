@@ -373,5 +373,14 @@ public class Trace {
         return rayset;
     }
 
+    /* returns a list of ray |DataFrame| for the ray_list at field fld */
+    public static List<RayDataFrame> trace_ray_list_at_field(OpticalModel opt_model, double[][] ray_list, Field fld, double wvl, double foc) {
+        ArrayList<RayDataFrame> rayset = new ArrayList<>();
+        for (double[] p : ray_list) {
+            RayPkg ray = trace_base(opt_model, p, fld, wvl);
+            rayset.add(new RayDataFrame(ray.ray));
+        }
+        return rayset;
+    }
 
 }

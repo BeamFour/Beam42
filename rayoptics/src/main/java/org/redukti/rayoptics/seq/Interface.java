@@ -59,7 +59,8 @@ public class Interface {
     public void set_optical_power(double pwr, double n_before, double n_after) {
     }
 
-    public void surface_od() {
+    public double surface_od() {
+        throw new UnsupportedOperationException();
     }
 
     public void set_max_aperture(double max_ap) {

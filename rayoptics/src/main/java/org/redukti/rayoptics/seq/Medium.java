@@ -36,10 +36,13 @@ public class Medium {
                 label != null && !label.isEmpty()) {
             sb.append(catalog_name).append("(")
                     .append(label).append(")");
-        }
-        else {
+        } else {
             sb.append("Medium(n=").append(n).append(")");
         }
         return sb;
+    }
+
+    public String name() {
+        return label;
     }
 }

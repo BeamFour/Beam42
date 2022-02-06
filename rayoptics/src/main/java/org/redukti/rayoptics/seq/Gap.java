@@ -40,4 +40,9 @@ public class Gap {
         sb.append(")");
         return sb;
     }
+
+    @Override
+    public String toString() {
+        return toString(new StringBuilder()).toString();
+    }
 }

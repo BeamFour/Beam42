@@ -1,5 +1,6 @@
 package org.redukti.rayoptics.seq;
 
+import org.redukti.rayoptics.elem.Node;
 import org.redukti.rayoptics.elem.Surface;
 import org.redukti.rayoptics.elem.Transform;
 import org.redukti.rayoptics.math.Matrix3;
@@ -134,6 +135,12 @@ public class SequentialModel {
         }
         NewSurfaceSpec newSurfaceSpec = create_surface_and_gap(surf_data, radius_mode, mat, 550.0);
         insert(newSurfaceSpec.surface, newSurfaceSpec.gap, false);
+
+        Node root_node = opt_model.part_tree.root_node;
+        int idx = cur_surface;
+        new Node("i" + idx, newSurfaceSpec.surface, "#ifc", root_node);
+        if (newSurfaceSpec.gap != null)
+            new Node("g" + idx, new Pair<>(newSurfaceSpec.gap, z_dir.get(idx)), "#gap", root_node);
     }
 
     /**
@@ -505,14 +512,30 @@ public class SequentialModel {
         return list;
     }
 
+    public static List<SeqPathComponent> zip_longest(List<Interface> ifcs,
+                                                     List<Gap> gaps,
+                                                     List<ZDir> z_dir) {
+        List<SeqPathComponent> list = new ArrayList<>();
+        List<Integer> sizes = List.of(ifcs.size(), gaps.size(), z_dir.size());
+        int maxSize = sizes.stream().max(Comparator.naturalOrder()).orElse(0);
+        for (int i = 0; i < maxSize; i++) {
+            Interface ifc = i < ifcs.size() ? ifcs.get(i) : null;
+            Gap gap = i < gaps.size() ? gaps.get(i) : null;
+            ZDir dir = i < z_dir.size() ? z_dir.get(i) : null;
+            list.add(new SeqPathComponent(ifc, gap, null, null, dir));
+        }
+        return list;
+    }
+
+
     /**
      * returns an iterable path tuple for a range in the sequential model
      *
-     * @param wl wavelength in nm for path, defaults to central wavelength
+     * @param wl    wavelength in nm for path, defaults to central wavelength
      * @param start start of range
-     * @param stop first value beyond the end of the range
-     * @param step increment or stride of range
-     * @return (**ifcs, gaps, lcl_tfrms, rndx, z_dir**)
+     * @param stop  first value beyond the end of the range
+     * @param step  increment or stride of range
+     * @return (* * ifcs, gaps, lcl_tfrms, rndx, z_dir * *)
      */
     public List<SeqPathComponent> path(Double wl, Integer start, Integer stop, int step) {
         if (wl == null)

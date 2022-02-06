@@ -64,6 +64,11 @@ public class Surface extends Interface {
     }
 
     @Override
+    public String toString() {
+        return toString(new StringBuilder()).toString();
+    }
+
+    @Override
     public double optical_power() {
         return delta_n * profile.cv;
     }

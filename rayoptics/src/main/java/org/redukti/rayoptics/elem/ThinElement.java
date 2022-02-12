@@ -3,8 +3,12 @@ package org.redukti.rayoptics.elem;
 import org.redukti.rayoptics.math.Matrix3;
 import org.redukti.rayoptics.math.Transform3;
 import org.redukti.rayoptics.math.Vector3;
+import org.redukti.rayoptics.seq.Gap;
 import org.redukti.rayoptics.seq.Interface;
 import org.redukti.rayoptics.util.KWArgs;
+
+import java.util.Collections;
+import java.util.List;
 
 public class ThinElement implements IElement {
 
@@ -16,6 +20,8 @@ public class ThinElement implements IElement {
     int intrfc_indx;
     String medium_name;
     double sd;
+
+    public ElementModel parent = null;
 
     public ThinElement(Interface ifc, Transform3 tfrm, int idx, Double sd, String label) {
         if (label == null) {
@@ -49,4 +55,18 @@ public class ThinElement implements IElement {
     public String get_label() {
         return label;
     }
+
+    public List<Interface> interface_list() {
+        return List.of(intrfc);
+    }
+
+    public List<Gap> gap_list() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void set_parent(ElementModel ele_model) {
+        this.parent = ele_model;
+    }
+
 }

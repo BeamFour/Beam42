@@ -9,6 +9,8 @@ import org.redukti.rayoptics.util.KWArgs;
 import org.redukti.rayoptics.util.Pair;
 import org.redukti.rayoptics.util.ZDir;
 
+import java.util.List;
+
 /**
  * Lens element domain model. Manage rendering and selection/editing.
  * <p>
@@ -103,5 +105,18 @@ public class Element implements IElement {
     @Override
     public String get_label() {
         return label;
+    }
+
+    public List<Interface> interface_list() {
+        return List.of(s1, s2);
+    }
+
+    public List<Gap> gap_list() {
+        return List.of(gap);
+    }
+
+    @Override
+    public void set_parent(ElementModel ele_model) {
+        this.parent = ele_model;
     }
 }

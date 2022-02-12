@@ -26,7 +26,7 @@ public class Gap {
     }
 
     public Gap() {
-        this(1.0, Air.INSTANCE);
+        this(0.0, Air.INSTANCE);
     }
 
     public void apply_scale_factor(double scale_factor) {

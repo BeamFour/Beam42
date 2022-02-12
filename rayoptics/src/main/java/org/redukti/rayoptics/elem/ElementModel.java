@@ -5,7 +5,9 @@ import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.seq.SequentialModel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Maintain the element based representation of the optical model
@@ -35,5 +37,15 @@ public class ElementModel {
 
     public void add_element(IElement e) {
         elements.add(e);
+    }
+
+    public static String get_key(IElement e) {
+        return e.get_label();
+    }
+
+    public Map<String, IElement> as_dict() {
+        Map<String, IElement> result = new HashMap<>();
+        elements.stream().forEach(e -> result.put(e.get_label(), e));
+        return result;
     }
 }

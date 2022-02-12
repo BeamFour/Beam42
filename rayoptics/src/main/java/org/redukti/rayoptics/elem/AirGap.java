@@ -4,9 +4,13 @@ import org.redukti.rayoptics.math.Matrix3;
 import org.redukti.rayoptics.math.Transform3;
 import org.redukti.rayoptics.math.Vector3;
 import org.redukti.rayoptics.seq.Gap;
+import org.redukti.rayoptics.seq.Interface;
 import org.redukti.rayoptics.util.KWArgs;
 import org.redukti.rayoptics.util.Pair;
 import org.redukti.rayoptics.util.ZDir;
+
+import java.util.Collections;
+import java.util.List;
 
 public class AirGap implements IElement {
 
@@ -51,4 +55,18 @@ public class AirGap implements IElement {
     public String get_label() {
         return label;
     }
+
+    public List<Interface> interface_list() {
+        return Collections.emptyList();
+    }
+
+    public List<Gap> gap_list() {
+        return List.of(gap);
+    }
+
+    @Override
+    public void set_parent(ElementModel ele_model) {
+        this.parent = ele_model;
+    }
+
 }

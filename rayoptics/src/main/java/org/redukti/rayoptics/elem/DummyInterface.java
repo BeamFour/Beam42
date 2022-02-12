@@ -3,8 +3,12 @@ package org.redukti.rayoptics.elem;
 import org.redukti.rayoptics.math.Matrix3;
 import org.redukti.rayoptics.math.Transform3;
 import org.redukti.rayoptics.math.Vector3;
+import org.redukti.rayoptics.seq.Gap;
 import org.redukti.rayoptics.seq.Interface;
 import org.redukti.rayoptics.util.KWArgs;
+
+import java.util.Collections;
+import java.util.List;
 
 public class DummyInterface implements IElement {
     static int serial_number = 0;
@@ -15,6 +19,8 @@ public class DummyInterface implements IElement {
     int idx;
     String medium_name;
     double sd;
+
+    public ElementModel parent = null;
 
     public DummyInterface(Interface ifc, Double sd, Transform3 tfrm, int idx, String label) {
         if (label == null) {
@@ -54,4 +60,18 @@ public class DummyInterface implements IElement {
     public String get_label() {
         return label;
     }
+
+    public List<Interface> interface_list() {
+        return List.of(ref_ifc);
+    }
+
+    public List<Gap> gap_list() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void set_parent(ElementModel ele_model) {
+        this.parent = ele_model;
+    }
+
 }

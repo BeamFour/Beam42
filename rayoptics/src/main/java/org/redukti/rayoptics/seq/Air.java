@@ -13,4 +13,5 @@ public class Air extends Medium {
         sb.append("Air()");
         return sb;
     }
+
 }

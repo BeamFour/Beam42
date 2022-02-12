@@ -67,10 +67,11 @@ public class CementedElement implements IElement {
                     this.medium_name += ", ";
                 this.medium_name += g.medium.name();
             }
-            if (this.gaps.size() == this.ifcs.size()) {
-                gaps.remove(gaps.size() - 1);
-                //self.medium_name = self.medium_name.rpartition(',')[0]
-            }
+        }
+        if (this.gaps.size() == this.ifcs.size()) {
+            gaps.remove(gaps.size() - 1);
+            if (this.medium_name.contains(","))
+                this.medium_name = this.medium_name.substring(0, this.medium_name.lastIndexOf(','));
         }
     }
 
@@ -81,17 +82,18 @@ public class CementedElement implements IElement {
         ZDir zdir = args.get("z_dir", ZDir.PROPAGATE_RIGHT);
         Node ce = new Node("CE", this, tag);
         List<Pair<Interface, Gap>> list = Lists.zip_longest(ifcs, gaps);
-        for (int i = 1; i < list.size(); i++) {
-            Pair<Interface, Gap> sg = list.get(i);
+        for (int j = 0; j < list.size(); j++) {
+            Pair<Interface, Gap> sg = list.get(j);
             Interface ifc = sg.first;
             Gap gap = sg.second;
+            int i = j + 1;
             String pid = "p" + i;
             Node p = new Node(pid, ifc.profile, "#profile", ce);
-            new Node("i" + idxs.get(i - 1), ifc, "#ifc", p);
+            new Node("i" + idxs.get(j), ifc, "#ifc", p);
             // Gap branch
             if (gap != null) {
                 Node t = new Node("t" + i, gap, "#thic", ce);
-                new Node("g" + idxs.get(i - 1), new Pair<>(gap, zdir),
+                new Node("g" + idxs.get(j), new Pair<>(gap, zdir),
                         "#gap", t);
             }
         }
@@ -101,5 +103,18 @@ public class CementedElement implements IElement {
     @Override
     public String get_label() {
         return label;
+    }
+
+    public List<Interface> interface_list() {
+        return ifcs;
+    }
+
+    public List<Gap> gap_list() {
+        return gaps;
+    }
+
+    @Override
+    public void set_parent(ElementModel ele_model) {
+        this.parent = ele_model;
     }
 }

@@ -72,4 +72,25 @@ public class Surface extends Interface {
     public double optical_power() {
         return delta_n * profile.cv;
     }
+
+    @Override
+    public double surface_od() {
+        double od = 0.0;
+        if (!edge_apertures.isEmpty()) {
+            for (Aperture e : edge_apertures) {
+                double edg = e.max_dimension();
+                if (edg > od)
+                    od = edg;
+            }
+        } else if (!clear_apertures.isEmpty()) {
+            for (Aperture ca : clear_apertures) {
+                double ap = ca.max_dimension();
+                if (ap > od)
+                    od = ap;
+            }
+        } else {
+            od = max_aperture;
+        }
+        return od;
+    }
 }

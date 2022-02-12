@@ -9,8 +9,8 @@ public final class Node {
     public String name;
     public Object id;
     public String tag;
-    Node parent;
-    public List<Node> children = new ArrayList<>();
+    private Node parent;
+    private List<Node> children = new ArrayList<>();
 
     public Node(String name, Object id, String tag) {
         this(name, id, tag, null);
@@ -25,6 +25,9 @@ public final class Node {
     }
 
     public Node(String name, Object id, String tag, Node parent) {
+        if ("root".equals(name) && parent != null) {
+            throw new IllegalArgumentException("root cannot have a parent");
+        }
         this.name = name;
         this.id = id;
         this.tag = tag;
@@ -33,6 +36,9 @@ public final class Node {
             parent.children.add(this);
     }
 
+    /**
+     * depth first scan
+     */
     public void dfsScan(Consumer<Node> f) {
         f.accept(this);
         for (Node c : children) {
@@ -40,6 +46,17 @@ public final class Node {
         }
     }
 
+    public List<Node> all() {
+        List<Node> result = new ArrayList<>();
+        dfsScan((n) -> {
+            result.add(n);
+        });
+        return result;
+    }
+
+    /**
+     * String representing the node hierarchy
+     */
     public String path() {
         StringBuilder sb = new StringBuilder();
         if (!is_root())
@@ -76,5 +93,54 @@ public final class Node {
                 result.add(n);
         });
         return result;
+    }
+
+
+    public void set_parent(Node p) {
+        if (parent != p) {
+            checkLoop(p);
+            detach();
+            attach(p);
+        }
+    }
+
+    private void attach(Node p) {
+        this.parent = p;
+        if (p != null) {
+            p.children.add(this);
+        }
+    }
+
+    private void detach() {
+        if (parent != null) {
+            parent.children.remove(this);
+            parent = null;
+        }
+    }
+
+    private void checkLoop(Node p) {
+        if (p != null) {
+            if (children.contains(p)) {
+                throw new IllegalArgumentException();
+            }
+        }
+    }
+
+    public Node parent() {
+        return this.parent;
+    }
+
+    public void set_children(List<Node> newChildren) {
+        Node[] todetach = children.toArray(new Node[children.size()]);
+        for (Node c : todetach) {
+            c.detach();
+        }
+        for (Node c : newChildren) {
+            c.attach(this);
+        }
+    }
+
+    public List<Node> children() {
+        return children;
     }
 }

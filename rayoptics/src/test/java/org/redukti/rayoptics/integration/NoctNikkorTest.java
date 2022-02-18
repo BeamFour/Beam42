@@ -137,6 +137,13 @@ public class NoctNikkorTest {
         Assertions.assertEquals(11.06, fod.opt_inv, 0.001);
 
         LensLayout layout = new LensLayout(opm);
+
+        System.out.println("---- elements ----");
+        System.out.println(opm.ele_model.list_elements());
+
+        System.out.println("---- ele model ----");
+        System.out.println(opm.ele_model.list_model());
+
         List<RayBundle> rays = layout.create_ray_entities(0.0);
         for (RayBundle ray : rays)
             ray.update_shape();

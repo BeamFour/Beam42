@@ -10,6 +10,7 @@ import org.redukti.rayoptics.util.Pair;
 import org.redukti.rayoptics.util.ZDir;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Lens element domain model. Manage rendering and selection/editing.
@@ -118,5 +119,14 @@ public class Element implements IElement {
     @Override
     public void set_parent(ElementModel ele_model) {
         this.parent = ele_model;
+    }
+
+    @Override
+    public String toString() {
+        return "Element: " + s1.profile
+                + ", " + s2.profile
+                + ", t=" + Objects.toString(gap.thi)
+                + ", sd=" + Objects.toString(sd)
+                + ", glass: " + gap.medium.name();
     }
 }

@@ -69,4 +69,9 @@ public class AirGap implements IElement {
         this.parent = ele_model;
     }
 
+    @Override
+    public String toString() {
+        return gap.toString();
+    }
+
 }

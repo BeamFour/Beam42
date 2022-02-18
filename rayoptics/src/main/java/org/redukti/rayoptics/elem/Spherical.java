@@ -100,4 +100,9 @@ public class Spherical extends SurfaceProfile {
                 .append(")");
         return sb;
     }
+
+    @Override
+    public String toString() {
+        return toString(new StringBuilder()).toString();
+    }
 }

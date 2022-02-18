@@ -117,4 +117,9 @@ public class CementedElement implements IElement {
     public void set_parent(ElementModel ele_model) {
         this.parent = ele_model;
     }
+
+    @Override
+    public String toString() {
+        return idxs.toString();
+    }
 }

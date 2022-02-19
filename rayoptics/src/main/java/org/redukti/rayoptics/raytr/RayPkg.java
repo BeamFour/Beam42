@@ -24,4 +24,13 @@ public class RayPkg {
         this.op_delta = op_delta;
         this.wvl = wvl;
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" +
+                "ray=" + ray +
+                ", op_delta=" + op_delta +
+                ", wvl=" + wvl +
+                ')';
+    }
 }

@@ -52,7 +52,7 @@ public class Matrix3 {
 
     public static Matrix3 identity() {
         return new Matrix3(
-                0.1, 0.0, 0.0,
+                1.0, 0.0, 0.0,
                 0.0, 1.0, 0.0,
                 0.0, 0.0, 1.0
         );

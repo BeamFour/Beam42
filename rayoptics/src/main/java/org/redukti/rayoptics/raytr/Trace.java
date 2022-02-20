@@ -3,7 +3,10 @@ package org.redukti.rayoptics.raytr;
 import org.redukti.rayoptics.exceptions.TraceException;
 import org.redukti.rayoptics.exceptions.TraceMissedSurfaceException;
 import org.redukti.rayoptics.exceptions.TraceTIRException;
-import org.redukti.rayoptics.math.*;
+import org.redukti.rayoptics.math.LMLFunction;
+import org.redukti.rayoptics.math.LMLSolver;
+import org.redukti.rayoptics.math.SecantSolver;
+import org.redukti.rayoptics.math.Vector3;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrderData;
 import org.redukti.rayoptics.seq.SequentialModel;
@@ -12,10 +15,7 @@ import org.redukti.rayoptics.specs.FieldSpec;
 import org.redukti.rayoptics.specs.OpticalSpecs;
 import org.redukti.rayoptics.util.Lists;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Trace {
 
@@ -26,7 +26,7 @@ public class Trace {
         final double dist;
         final double wvl;
 
-        public BaseObjectiveFunction(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double y_target) {
+        public BaseObjectiveFunction(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl) {
             this.seq_model = seq_model;
             this.ifcx = ifcx;
             this.pt0 = pt0;
@@ -34,7 +34,7 @@ public class Trace {
             this.wvl = wvl;
         }
 
-        public Vector3 eval(double x1, double y1) {
+        public RaySeg eval(double x1, double y1) {
             Vector3 pt1 = new Vector3(x1, y1, dist);
             Vector3 dir0 = pt1.minus(pt0);
             dir0 = dir0.normalize();
@@ -50,92 +50,47 @@ public class Trace {
                 if (ray_tir.surf < ifcx)
                     throw ray_tir;
             }
-            return pkg.ray.get(ifcx).p;
+            return pkg.ray.get(ifcx);
         }
-
-
     }
 
-    static class SecantFunction implements SecantSolver.ObjectiveFunction {
+    /* 1D solver */
+    static class SecantFunction extends BaseObjectiveFunction implements SecantSolver.ObjectiveFunction {
 
-        final SequentialModel seq_model;
-        final Integer ifcx;
-        final Vector3 pt0;
-        final double dist;
-        final double wvl;
         final double y_target;
 
         public SecantFunction(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double y_target) {
-            this.seq_model = seq_model;
-            this.ifcx = ifcx;
-            this.pt0 = pt0;
-            this.dist = dist;
-            this.wvl = wvl;
+            super(seq_model, ifcx, pt0, dist, wvl);
             this.y_target = y_target;
         }
 
         @Override
         public double eval(double y1) {
-            Vector3 pt1 = new Vector3(0., y1, dist);
-            Vector3 dir0 = pt1.minus(pt0);
-            dir0 = dir0.normalize();
-            RayPkg pkg = null;
-            try {
-                pkg = RayTrace.trace(seq_model, pt0, dir0, wvl);
-            } catch (TraceMissedSurfaceException ray_miss) {
-                pkg = ray_miss.ray_pkg;
-                if (ray_miss.surf <= ifcx)
-                    throw ray_miss;
-            } catch (TraceTIRException ray_tir) {
-                pkg = ray_tir.ray_pkg;
-                if (ray_tir.surf < ifcx)
-                    throw ray_tir;
-            }
-            double y_ray = pkg.ray.get(ifcx).p.y;
+            RaySeg seg = eval(0., y1);
+            double y_ray = seg.p.y;
             return y_ray - y_target;
         }
     }
 
-    static class LmObjectiveFunction implements MinPack.Hybrd_Function, MinPack.Lmder_function {
-        final SequentialModel seq_model;
-        final Integer ifcx;
-        final Vector3 pt0;
-        final double dist;
-        final double wvl;
+    /* Solver for use in Minpack algos */
+    static class LmObjectiveFunction extends BaseObjectiveFunction implements MinPack.Hybrd_Function, MinPack.Lmder_function {
         final double[] xy_target; // target x,y values
 
         public LmObjectiveFunction(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target) {
-            this.seq_model = seq_model;
-            this.ifcx = ifcx;
-            this.pt0 = pt0;
-            this.dist = dist;
-            this.wvl = wvl;
+            super(seq_model, ifcx, pt0, dist, wvl);
             this.xy_target = xy_target;
         }
 
         @Override
         public void apply(int n, double[] x, double[] fvec, int[] iflag) {
-            Vector3 pt1 = new Vector3(x[0], x[1], dist);
-            Vector3 dir0 = pt1.minus(pt0);
-            dir0 = dir0.normalize();
-            RayPkg rayPkg;
-            try {
-                rayPkg = RayTrace.trace(seq_model, pt0, dir0, wvl);
-            } catch (TraceMissedSurfaceException ray_miss) {
-                rayPkg = ray_miss.ray_pkg;
-                if (ray_miss.surf <= ifcx)
-                    throw ray_miss;
-            } catch (TraceTIRException ray_tir) {
-                rayPkg = ray_tir.ray_pkg;
-                if (ray_tir.surf < ifcx)
-                    throw ray_tir;
-            }
-            List<RaySeg> ray = rayPkg.ray;
-            double residual = Lists.get(ray, ifcx).p.x - xy_target[0];
+            RaySeg seg = eval(x[0], x[1]);
+            // TODO following is only applicable when solving for y alone
+            // we need a way to not do this when solving x and y.
+            double residual = seg.p.x - xy_target[0];
             if (Math.abs(residual) > 2.2204460492503131e-16)
                 residual = 9.876543e+99;
             fvec[0] = residual;
-            fvec[1] = Lists.get(ray, ifcx).p.y - xy_target[1];
+            fvec[1] = seg.p.y - xy_target[1];
         }
 
         @Override
@@ -151,48 +106,25 @@ public class Trace {
         }
     }
 
-    static class ObjectiveFunction implements LMLFunction {
+    /* Solver for use in LMLSolver */
+    static class ObjectiveFunction extends BaseObjectiveFunction implements LMLFunction {
 
         private final double[][] jac = new double[2][2];
         private final double[] resid = {0, 0};
         private final double[] dDelta = {1E-6, 1E-6};
         private final double[] point = {0, 0}; // Actual x,y values
 
-        final SequentialModel seq_model;
-        final Integer ifcx;
-        final Vector3 pt0;
-        final double dist;
-        final double wvl;
         final double[] xy_target; // target x,y values
 
         public ObjectiveFunction(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target) {
-            this.seq_model = seq_model;
-            this.ifcx = ifcx;
-            this.pt0 = pt0;
-            this.dist = dist;
-            this.wvl = wvl;
+            super(seq_model, ifcx, pt0, dist, wvl);
             this.xy_target = xy_target;
         }
 
         @Override
         public double computeResiduals() {
-            Vector3 pt1 = new Vector3(point[0], point[1], dist);
-            Vector3 dir0 = pt1.minus(pt0);
-            dir0 = dir0.normalize();
-            RayPkg rayPkg;
-            try {
-                rayPkg = RayTrace.trace(seq_model, pt0, dir0, wvl);
-            } catch (TraceMissedSurfaceException ray_miss) {
-                rayPkg = ray_miss.ray_pkg;
-                if (ray_miss.surf <= ifcx)
-                    throw ray_miss;
-            } catch (TraceTIRException ray_tir) {
-                rayPkg = ray_tir.ray_pkg;
-                if (ray_tir.surf < ifcx)
-                    throw ray_tir;
-            }
-            List<RaySeg> ray = rayPkg.ray;
-            double[] p = {Lists.get(ray, ifcx).p.x, Lists.get(ray, ifcx).p.y};
+            RaySeg seg = eval(point[0], point[1]);
+            double[] p = {seg.p.x, seg.p.y};
             double sos = 0.0;
             for (int i = 0; i < p.length; i++) {
                 resid[i] = xy_target[i] - p[i];
@@ -283,6 +215,44 @@ public class Trace {
         return aim_pt;
     }
 
+    public static double[] get_1d_solution(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double y_target) {
+        SecantFunction fn = new SecantFunction(seq_model, ifcx, pt0, dist, wvl, y_target);
+        double start_y = SecantSolver.find_root(fn, 0., 50, 1.48e-8);
+        return new double[]{0, start_y};
+    }
+
+    public static double[] get_2d_mike_lampton_lavenberg_marquardt_solution(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target) {
+        ObjectiveFunction fn = new ObjectiveFunction(seq_model, ifcx, pt0, dist, wvl, Arrays.copyOf(xy_target, xy_target.length));
+        LMLSolver lm = new LMLSolver(fn, 1e-12, 2, 2);
+        int istatus = 0;
+        while (istatus != LMLSolver.BADITER &&
+                istatus != LMLSolver.LEVELITER &&
+                istatus != LMLSolver.MAXITER) {
+            istatus = lm.iLMiter();
+        }
+        if (istatus == LMLSolver.LEVELITER)
+            return fn.point;
+        return new double[]{0.0, 0.0};
+    }
+
+//    public static double[] get_2d_minpack_lavenberg_marquardt_solution(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target, FirstOrderData fod) {
+//
+//        LmObjectiveFunction f = new LmObjectiveFunction(seq_model, ifcx, pt0, dist, wvl, xy_target);
+//        double[] x = new double[2];
+//        double[] fvec = new double[2];
+//        double[] fjac = new double[4];
+//        int lwa = (2 * (3 * 2 + 13)) / 2;
+//        double[] wa = new double[lwa];
+//        int info[] = new int[1];
+//        int[] ipvt = new int[2];
+//        double epsfcn = 0.0001 * fod.enp_radius;
+//        //info[0] = MinPack.hybrd1(f, 2, x, fvec, 1e-15, wa, lwa, epsfcn);
+//        info[0] = MinPack.lmder1(f, 2, 2, x, fvec, fjac, 2, 1e-15, ipvt, wa, lwa, epsfcn);
+//        if (info[0] == 2)
+//            return x;
+//        return new double[]{0.0, 0.0};
+//    }
+
     /**
      * iterates a ray to xy_target on interface ifcx, returns aim points on
      * the paraxial entrance pupil plane
@@ -309,49 +279,16 @@ public class Trace {
         // 0.3171081317490797 (lm)
         // 0.3171081737822994 (expected)
         if (ifcx != null) {
-//            if (pt0.x == 0.0 && xy_target[0] == 0.0) {
-//                double y_target = xy_target[1];
-//                SecantFunction fn = new SecantFunction(seq_model, ifcx, pt0, dist, wvl, y_target);
-//                double start_y = SecantSolver.find_root(fn, 0., 50, 1.48e-8);
-//                return new double[]{0, start_y};
-//            } else {
-            ObjectiveFunction fn = new ObjectiveFunction(seq_model, ifcx, pt0, dist, wvl, new double[]{0.0, 0.0});
-            LMLSolver lm = new LMLSolver(fn, 1e-12, 2, 2);
-            int istatus = 0;
-            while (istatus != LMLSolver.BADITER &&
-                    istatus != LMLSolver.LEVELITER &&
-                    istatus != LMLSolver.MAXITER) {
-                istatus = lm.iLMiter();
+            if (pt0.x == 0.0 && xy_target[0] == 0.0) {
+                return get_1d_solution(seq_model, ifcx, pt0, dist, wvl, xy_target[1]);
+            } else {
+                return get_2d_mike_lampton_lavenberg_marquardt_solution(seq_model, ifcx, pt0, dist, wvl, xy_target);
+                //return get_2d_minpack_lavenberg_marquardt_solution(seq_model, ifcx, pt0, dist, wvl, xy_target, fod);
             }
-//                if (istatus == LMLSolver.LEVELITER)
-//                    return fn.point;
-
-            LmObjectiveFunction f = new LmObjectiveFunction(seq_model, ifcx, pt0, dist, wvl, xy_target);
-            double[] x = new double[2];
-            double[] fvec = new double[2];
-            double[] fjac = new double[4];
-            int lwa = (2 * (3 * 2 + 13)) / 2;
-            double[] wa = new double[lwa];
-            int info[] = new int[1];
-            int[] ipvt = new int[2];
-            double epsfcn = 0.0001 * fod.enp_radius;
-            info[0] = MinPack.hybrd1(f, 2, x, fvec, 1e-15, wa, lwa, epsfcn);
-            //info[0] = MinPack.lmder1(f, 2, 2, x, fvec, fjac, 2, 1e-15, ipvt, wa, lwa, epsfcn);
-
-            System.out.println("LMSolver gave x=" + fn.point[0] + " y=" + fn.point[1]);
-            System.out.println("Hybrd gave info=" + info[0] + " x=" + x[0] + " y=" + x[1]);
-
-//            if (istatus == LMLSolver.LEVELITER)
-//                return fn.point;
-            if (info[0] == 2)
-                return x;
-
-//            }
         } else {
             // floating stop surface - use entrance pupil for aiming
             return xy_target;
         }
-        return new double[]{0.0, 0.0};
     }
 
     /**

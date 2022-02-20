@@ -91,38 +91,25 @@ public class RayTrace {
     }
 
     /**
-     * fundamental raytrace function
+     * Fundamental raytrace function
      *
-     *     Args:
-     *         path: an iterator containing interfaces and gaps to be traced.
-     *               for each iteration, the sequence or generator should return a
-     *               list containing: **Intfc, Gap, Trfm, Index, Z_Dir**
-     *         pt0: starting point in coords of first interface
-     *         dir0: starting direction cosines in coords of first interface
-     *         wvl: wavelength in nm
-     *         eps: accuracy tolerance for surface intersection calculation
-     *
-     *     Returns:
-     *         (**ray**, **op_delta**, **wvl**)
-     *
-     *         - **ray** is a list for each interface in **path** of these
-     *           elements: [pt, after_dir, after_dst, normal]
-     *
-     *             - pt: the intersection point of the ray
-     *             - after_dir: the ray direction cosine following the interface
-     *             - after_dst: the geometric distance to the next interface
-     *             - normal: the surface normal at the intersection point
-     *
-     *         - **op_delta** - optical path wrt equally inclined chords to the
-     *           optical axis
-     *         - **wvl** - wavelength (in nm) that the ray was traced in
-     *
-     * @param path
-     * @param pt0
-     * @param dir0
-     * @param wvl
-     * @param options
-     * @return
+     * @param path    a list containing interfaces and gaps to be traced.
+     *                each component contains: Intfc, Gap, Trfm, Index, Z_Dir
+     * @param pt0     starting point in coords of first interface
+     * @param dir0    starting direction cosines in coords of first interface
+     * @param wvl     wavelength in nm
+     * @param options Options
+     * @return RayPkg containing
+     * - **ray** is a list for each interface in **path** of these
+     * elements: [pt, after_dir, after_dst, normal]
+     * <p>
+     * - pt: the intersection point of the ray
+     * - after_dir: the ray direction cosine following the interface
+     * - after_dst: the geometric distance to the next interface
+     * - normal: the surface normal at the intersection point
+     * <p>
+     * - **op_delta** - optical path wrt equally inclined chords to the optical axis
+     * - **wvl** - wavelength (in nm) that the ray was traced in
      */
     public static RayPkg trace_raw(List<SeqPathComponent> path, Vector3 pt0, Vector3 dir0, double wvl, RayTraceOptions options) {
         int first_surf = options.first_surf != null ? options.first_surf : 0;

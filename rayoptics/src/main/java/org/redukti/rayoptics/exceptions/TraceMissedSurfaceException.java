@@ -1,6 +1,6 @@
 package org.redukti.rayoptics.exceptions;
 
-public class TraceMissedSurfaceException extends RuntimeException {
+public class TraceMissedSurfaceException extends TraceException {
     public TraceMissedSurfaceException() {
     }
 

@@ -72,39 +72,39 @@ public class Trace {
         }
     }
 
-    /* Solver for use in Minpack algos */
-    static class LmObjectiveFunction extends BaseObjectiveFunction implements MinPack.Hybrd_Function, MinPack.Lmder_function {
-        final double[] xy_target; // target x,y values
-
-        public LmObjectiveFunction(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target) {
-            super(seq_model, ifcx, pt0, dist, wvl);
-            this.xy_target = xy_target;
-        }
-
-        @Override
-        public void apply(int n, double[] x, double[] fvec, int[] iflag) {
-            RaySeg seg = eval(x[0], x[1]);
-            // TODO following is only applicable when solving for y alone
-            // we need a way to not do this when solving x and y.
-            double residual = seg.p.x - xy_target[0];
-            if (Math.abs(residual) > 2.2204460492503131e-16)
-                residual = 9.876543e+99;
-            fvec[0] = residual;
-            fvec[1] = seg.p.y - xy_target[1];
-        }
-
-        @Override
-        public int apply(int m, int n, double[] x, double[] fvec, int iflag) {
-            int[] iflags = new int[1];
-            apply(n, x, fvec, iflags);
-            return iflags[0];
-        }
-
-        @Override
-        public boolean hasJacobian() {
-            return false;
-        }
-    }
+//    /* Solver for use in Minpack algos */
+//    static class LmObjectiveFunction extends BaseObjectiveFunction implements MinPack.Hybrd_Function, MinPack.Lmder_function {
+//        final double[] xy_target; // target x,y values
+//
+//        public LmObjectiveFunction(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target) {
+//            super(seq_model, ifcx, pt0, dist, wvl);
+//            this.xy_target = xy_target;
+//        }
+//
+//        @Override
+//        public void apply(int n, double[] x, double[] fvec, int[] iflag) {
+//            RaySeg seg = eval(x[0], x[1]);
+//            // TODO following is only applicable when solving for y alone
+//            // we need a way to not do this when solving x and y.
+//            double residual = seg.p.x - xy_target[0];
+//            if (Math.abs(residual) > 2.2204460492503131e-16)
+//                residual = 9.876543e+99;
+//            fvec[0] = residual;
+//            fvec[1] = seg.p.y - xy_target[1];
+//        }
+//
+//        @Override
+//        public int apply(int m, int n, double[] x, double[] fvec, int iflag) {
+//            int[] iflags = new int[1];
+//            apply(n, x, fvec, iflags);
+//            return iflags[0];
+//        }
+//
+//        @Override
+//        public boolean hasJacobian() {
+//            return false;
+//        }
+//    }
 
     /* Solver for use in LMLSolver */
     static class ObjectiveFunction extends BaseObjectiveFunction implements LMLFunction {

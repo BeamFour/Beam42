@@ -1,5 +1,7 @@
 package org.redukti.rayoptics.math;
 
+import java.util.Objects;
+
 public class Vector3 {
 
     public static Vector3 ZERO = new Vector3(0, 0, 0);
@@ -69,11 +71,29 @@ public class Vector3 {
     }
 
     public Vector3 minus(Vector3 v) {
-        return new Vector3(x-v.x, y-v.y, z-v.z);
+        return new Vector3(x - v.x, y - v.y, z - v.z);
     }
 
     public String toString() {
         return "[" + x + "," + y + "," + z + "]";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Vector3 vector3 = (Vector3) o;
+        return Double.compare(vector3.x, x) == 0 && Double.compare(vector3.y, y) == 0 && Double.compare(vector3.z, z) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, z);
+    }
+
+    public boolean effectivelyEqual(Vector3 o) {
+        return Math.abs(x - o.x) < 1e-13
+                && Math.abs(y - o.y) < 1e-13
+                && Math.abs(z - o.z) < 1e-13;
+    }
 }

@@ -32,4 +32,16 @@ public class TestAsphere {
         Assertions.assertEquals(point.z(), point2.z(), 1e-10);
 
     }
+
+    @Test
+    public void test2() {
+        Asphere surface = new Asphere(108.488, 1.0, -3.82177e-07,
+                -6.06486e-11, -3.80172e-15, -1.32266e-18, 0, 0, 0, true);
+        Vector3 pos_dir = new Vector3(0.0, 0.34169210791780597, 0.9398119510767493);
+        Vector3 origin = new Vector3(0.0, -3.6357497887098503E9, -1.0E10);
+        Vector3Pair ray = new Vector3Pair(origin, pos_dir);
+        Vector3 point = surface.intersect(ray);
+
+        System.out.println(point);
+    }
 }

@@ -124,7 +124,7 @@ public class RayTrace {
      * @param options
      * @return
      */
-    private static RayPkg trace_raw(List<SeqPathComponent> path, Vector3 pt0, Vector3 dir0, double wvl, RayTraceOptions options) {
+    public static RayPkg trace_raw(List<SeqPathComponent> path, Vector3 pt0, Vector3 dir0, double wvl, RayTraceOptions options) {
         int first_surf = options.first_surf != null ? options.first_surf : 0;
         Integer last_surf = options.last_surf;
 

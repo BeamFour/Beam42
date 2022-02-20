@@ -158,16 +158,18 @@ public class RayTrace {
         // loop of remaining surfaces in path
         while (true) {
 
+            double pp_dst = 0.0;
+            Interface ifc = null;
             try {
                 SeqPathComponent after = iter.next();
                 Matrix3 rt = tfrm_from_before.rot_mat;
                 Vector3 t = tfrm_from_before.vec;
                 Vector3 b4_pt = rt.multiply(before_pt.minus(t));
                 Vector3 b4_dir = rt.multiply(before_dir);
-                double pp_dst = -b4_pt.dot(b4_dir);
+                pp_dst = -b4_pt.dot(b4_dir);
                 Vector3 pp_pt_before = b4_pt.plus(b4_dir.times(pp_dst));
 
-                Interface ifc = after.ifc;
+                ifc = after.ifc;
                 ZDir z_dir_after = after.z_dir;
 
                 // intersect ray with profile
@@ -237,18 +239,18 @@ public class RayTrace {
                 before = after;
                 tfrm_from_before = before.transform3;
             } catch (TraceMissedSurfaceException ray_miss) {
-                //ray.add([before_pt, before_dir, pp_dst, before_normal])
-//                ray_miss.surf = surf+1
-//                ray_miss.ifc = ifc
-//                ray_miss.prev_tfrm = before[Tfrm]
-//                ray_miss.ray_pkg = ray, opl, wvl
+                ray.add(new RaySeg(before_pt, before_dir, pp_dst, before_normal));
+                ray_miss.surf = surf + 1;
+                ray_miss.ifc = ifc;
+                ray_miss.prev_tfrm = before.transform3;
+                ray_miss.ray_pkg = new RayPkg(ray, opl, wvl);
                 throw ray_miss;
             } catch (TraceTIRException ray_tir) {
-//                ray.append([inc_pt, before_dir, 0.0, normal])
-//                ray_tir.surf = surf+1
-//                ray_tir.ifc = ifc
-//                ray_tir.int_pt = inc_pt
-//                ray_tir.ray_pkg = ray, opl, wvl
+                ray.add(new RaySeg(inc_pt, before_dir, 0.0, normal));
+                ray_tir.surf = surf + 1;
+                ray_tir.ifc = ifc;
+                ray_tir.int_pt = inc_pt;
+                ray_tir.ray_pkg = new RayPkg(ray, opl, wvl);
                 throw ray_tir;
             } catch (NoSuchElementException e) {
                 ray.add(new RaySeg(inc_pt, after_dir, 0.0, normal));

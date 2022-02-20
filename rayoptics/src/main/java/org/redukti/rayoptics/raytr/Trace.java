@@ -1,7 +1,11 @@
 package org.redukti.rayoptics.raytr;
 
+import org.redukti.rayoptics.exceptions.TraceException;
+import org.redukti.rayoptics.exceptions.TraceMissedSurfaceException;
+import org.redukti.rayoptics.exceptions.TraceTIRException;
 import org.redukti.rayoptics.math.LMLFunction;
 import org.redukti.rayoptics.math.LMLSolver;
+import org.redukti.rayoptics.math.SecantSolver;
 import org.redukti.rayoptics.math.Vector3;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrderData;
@@ -17,6 +21,46 @@ import java.util.List;
 import java.util.Map;
 
 public class Trace {
+
+    static class SecantFunction implements SecantSolver.ObjectiveFunction {
+
+        final SequentialModel seq_model;
+        final Integer ifcx;
+        final Vector3 pt0;
+        final double dist;
+        final double wvl;
+        final double y_target;
+
+        public SecantFunction(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double y_target) {
+            this.seq_model = seq_model;
+            this.ifcx = ifcx;
+            this.pt0 = pt0;
+            this.dist = dist;
+            this.wvl = wvl;
+            this.y_target = y_target;
+        }
+
+        @Override
+        public double eval(double y1) {
+            Vector3 pt1 = new Vector3(0., y1, dist);
+            Vector3 dir0 = pt1.minus(pt0);
+            dir0 = dir0.normalize();
+            RayPkg pkg = null;
+            try {
+                pkg = RayTrace.trace(seq_model, pt0, dir0, wvl);
+            } catch (TraceMissedSurfaceException ray_miss) {
+                pkg = ray_miss.ray_pkg;
+                if (ray_miss.surf <= ifcx)
+                    throw ray_miss;
+            } catch (TraceTIRException ray_tir) {
+                pkg = ray_tir.ray_pkg;
+                if (ray_tir.surf < ifcx)
+                    throw ray_tir;
+            }
+            double y_ray = pkg.ray.get(ifcx).p.y;
+            return y_ray - y_target;
+        }
+    }
 
     static class ObjectiveFunction implements LMLFunction {
 
@@ -47,6 +91,17 @@ public class Trace {
             Vector3 dir0 = pt1.minus(pt0);
             dir0 = dir0.normalize();
             RayPkg rayPkg = RayTrace.trace(seq_model, pt0, dir0, wvl);
+            try {
+                rayPkg = RayTrace.trace(seq_model, pt0, dir0, wvl);
+            } catch (TraceMissedSurfaceException ray_miss) {
+                rayPkg = ray_miss.ray_pkg;
+                if (ray_miss.surf <= ifcx)
+                    throw ray_miss;
+            } catch (TraceTIRException ray_tir) {
+                rayPkg = ray_tir.ray_pkg;
+                if (ray_tir.surf < ifcx)
+                    throw ray_tir;
+            }
             List<RaySeg> ray = rayPkg.ray;
             double[] p = {Lists.get(ray, ifcx).p.x, Lists.get(ray, ifcx).p.y};
             double sos = 0.0;
@@ -161,17 +216,27 @@ public class Trace {
         double dist = fod.obj_dist + fod.enp_dist;
         Vector3 pt0 = osp.obj_coords(fld);
 
+        // 0.3171082641317441 (secant)
+        // 0.3171081317490797 (lm)
+        // 0.3171081737822994 (expected)
         if (ifcx != null) {
-            ObjectiveFunction fn = new ObjectiveFunction(seq_model, ifcx, pt0, dist, wvl, new double[]{0.0, 0.0});
-            LMLSolver lm = new LMLSolver(fn, 1e-12, 2, 2);
-            int istatus = 0;
-            while (istatus != LMLSolver.BADITER &&
-                    istatus != LMLSolver.LEVELITER &&
-                    istatus != LMLSolver.MAXITER) {
-                istatus = lm.iLMiter();
+            if (pt0.x == 0.0 && xy_target[0] == 0.0) {
+                double y_target = xy_target[1];
+                SecantFunction fn = new SecantFunction(seq_model, ifcx, pt0, dist, wvl, y_target);
+                double start_y = SecantSolver.find_root(fn, 0., 50, 1.48e-8);
+                return new double[]{0, start_y};
+            } else {
+                ObjectiveFunction fn = new ObjectiveFunction(seq_model, ifcx, pt0, dist, wvl, new double[]{0.0, 0.0});
+                LMLSolver lm = new LMLSolver(fn, 1e-12, 2, 2);
+                int istatus = 0;
+                while (istatus != LMLSolver.BADITER &&
+                        istatus != LMLSolver.LEVELITER &&
+                        istatus != LMLSolver.MAXITER) {
+                    istatus = lm.iLMiter();
+                }
+                if (istatus == LMLSolver.LEVELITER)
+                    return fn.point;
             }
-            if (istatus == LMLSolver.LEVELITER)
-                return fn.point;
         } else {
             // floating stop surface - use entrance pupil for aiming
             return xy_target;
@@ -218,8 +283,8 @@ public class Trace {
         if (fld.aim_pt != null) {
             aim_pt = fld.aim_pt;
         }
-        Vector3 pt1 = new Vector3(eprad * vig_pupil[0] * aim_pt[0],
-                eprad * vig_pupil[1] * aim_pt[1],
+        Vector3 pt1 = new Vector3(eprad * vig_pupil[0] + aim_pt[0],
+                eprad * vig_pupil[1] + aim_pt[1],
                 fod.obj_dist + fod.enp_dist);
         Vector3 pt0 = osp.obj_coords(fld);
         Vector3 dir0 = pt1.minus(pt0);
@@ -342,8 +407,12 @@ public class Trace {
         List<RayPkg> rim_rays = new ArrayList<>();
         OpticalSpecs osp = opt_model.optical_spec;
         for (double[] p : osp.pupil.pupil_rays) {
-            RayPkg ray_pkg = trace_base(opt_model, p, fld, wvl);
-            // TODO exception handling
+            RayPkg ray_pkg;
+            try {
+                ray_pkg = trace_base(opt_model, p, fld, wvl);
+            } catch (TraceException ray_error) {
+                ray_pkg = ray_error.ray_pkg;
+            }
             rim_rays.add(ray_pkg);
         }
         return rim_rays;

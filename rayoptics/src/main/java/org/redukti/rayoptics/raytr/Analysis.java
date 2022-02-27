@@ -148,13 +148,13 @@ public class Analysis {
         Vector2 start = new Vector2(fan_rng.fan_start[0], fan_rng.fan_start[1]);
         Vector2 stop = new Vector2(fan_rng.fan_stop[0], fan_rng.fan_stop[1]);
         int num = fan_rng.num_rays;
-        Vector2 step = start.subtract(stop).div(num - 1);
+        Vector2 step = start.minus(stop).divide(num - 1);
         List<RayFanItem> fan = new ArrayList<>();
         for (int r = 0; r < num; r++) {
             Vector2 pupil = start;
             trace_safe(opt_model, pupil, fld, wvl, fan,
                     output_filter, rayerr_filter);
-            start = start.add(step);
+            start = start.plus(step);
         }
         return fan;
     }

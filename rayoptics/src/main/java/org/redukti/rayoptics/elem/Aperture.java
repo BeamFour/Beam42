@@ -30,7 +30,7 @@ public abstract class Aperture {
     public Pair<Vector2, Vector2> bounding_box() {
         Vector2 center = new Vector2(x_offset, y_offset);
         Vector2 extent = dimension();
-        return new Pair<>(center.subtract(extent), center.add(extent));
+        return new Pair<>(center.minus(extent), center.plus(extent));
     }
 
     public void apply_scale_factor(double scale_factor) {

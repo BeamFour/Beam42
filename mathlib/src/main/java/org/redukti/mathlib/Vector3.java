@@ -5,12 +5,21 @@ import java.util.Objects;
 public class Vector3 {
 
     public static Vector3 ZERO = new Vector3(0, 0, 0);
+    public static final Vector3 vector3_0 = new Vector3(0.0, 0.0, 0.0);
+    public static final Vector3 vector3_1 = new Vector3(1.0, 1.0, 1.0);
+
+    public static final Vector3 vector3_001 = new Vector3(0.0, 0.0, 1.0);
+    public static final Vector3 vector3_010 = new Vector3(0.0, 1.0, 0.0);
+    public static final Vector3 vector3_100 = new Vector3(1.0, 0.0, 0.0);
 
     public final double x;
     public final double y;
     public final double z;
 
     public Vector3(double x, double y, double z) {
+        if (Double.isNaN(x) || Double.isNaN(y) || Double.isNaN(z)) {
+            throw new IllegalArgumentException("NaN");
+        }
         this.x = x;
         this.y = y;
         this.z = z;
@@ -45,7 +54,7 @@ public class Vector3 {
         if (M.isZero(lengthsq)) {
             return ZERO;
         } else {
-            double factor = 1.0/Math.sqrt(lengthsq);
+            double factor = 1.0 / Math.sqrt(lengthsq);
             return new Vector3(x * factor, y * factor, z * factor);
         }
     }
@@ -54,8 +63,21 @@ public class Vector3 {
         return x * vector.x + y * vector.y + z * vector.z;
     }
 
+    /**
+     * The cross product a × b is defined as a vector c that is
+     * perpendicular (orthogonal) to both a and b, with a direction given by the right-hand rule
+     * and a magnitude equal to the area of the parallelogram that the vectors span.
+     * <p>
+     * https://en.wikipedia.org/wiki/Cross_product
+     */
+    public Vector3 cross(Vector3 b) {
+        return new Vector3(y() * b.z() - z() * b.y(),
+                z() * b.x() - x() * b.z(),
+                x() * b.y() - y() * b.x());
+    }
+
     public Vector3 add(Vector3 v) {
-        return new Vector3(x+v.x, y+v.y, z+v.z);
+        return new Vector3(x + v.x, y + v.y, z + v.z);
     }
 
     public boolean isZero() {
@@ -78,6 +100,77 @@ public class Vector3 {
         return "[" + x + "," + y + "," + z + "]";
     }
 
+    public final double x() {
+        return this.x;
+    }
+
+    public final double y() {
+        return this.y;
+    }
+
+    public final double z() {
+        return this.z;
+    }
+
+    public final Vector3 x(double v) {
+        return new Vector3(v, y(), z());
+    }
+
+    public final Vector3 y(double v) {
+        return new Vector3(x(), v, z());
+    }
+
+    public final Vector3 z(double v) {
+        return new Vector3(x(), y(), v);
+    }
+
+    public Vector2 project_xy() {
+        return new Vector2(x(), y());
+    }
+
+    public Vector2 project_zy() {
+        return new Vector2(z(), y());
+    }
+
+    public double v(int i) {
+        switch (i) {
+            case 0:
+                return x;
+            case 1:
+                return y;
+            case 2:
+                return z;
+            default:
+                throw new IllegalArgumentException("Invalid offset " + i);
+        }
+    }
+
+    public Vector3 v(int i, double v) {
+        double x1 = this.x;
+        double y1 = this.y;
+        double z1 = this.z;
+        switch (i) {
+            case 0:
+                x1 = v;
+                break;
+            case 1:
+                y1 = v;
+                break;
+            case 2:
+                z1 = v;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid offset " + i);
+        }
+        return new Vector3(x1, y1, z1);
+    }
+
+    public final boolean isEqual(Vector3 other, double tolerance) {
+        return Math.abs(this.x() - other.x()) < tolerance &&
+                Math.abs(this.y() - other.y()) < tolerance &&
+                Math.abs(this.z() - other.z()) < tolerance;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -92,8 +185,6 @@ public class Vector3 {
     }
 
     public boolean effectivelyEqual(Vector3 o) {
-        return Math.abs(x - o.x) < 1e-13
-                && Math.abs(y - o.y) < 1e-13
-                && Math.abs(z - o.z) < 1e-13;
+        return isEqual(o, 1e-13);
     }
 }

@@ -1,7 +1,7 @@
 package org.redukti.rayoptics.elem;
 
-import org.redukti.rayoptics.math.Matrix3;
-import org.redukti.rayoptics.math.Vector3;
+import org.redukti.mathlib.Matrix3;
+import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.util.Pair;
 
 import java.util.Objects;

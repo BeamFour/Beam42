@@ -1,12 +1,12 @@
 package org.redukti.rayoptics.raytr;
 
+import org.redukti.mathlib.Matrix3;
+import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.elem.IntersectionResult;
 import org.redukti.rayoptics.elem.Transform;
 import org.redukti.rayoptics.exceptions.TraceMissedSurfaceException;
 import org.redukti.rayoptics.exceptions.TraceTIRException;
-import org.redukti.rayoptics.math.Matrix3;
 import org.redukti.rayoptics.math.Transform3;
-import org.redukti.rayoptics.math.Vector3;
 import org.redukti.rayoptics.seq.Interface;
 import org.redukti.rayoptics.seq.SeqPathComponent;
 import org.redukti.rayoptics.seq.SequentialModel;

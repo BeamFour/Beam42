@@ -1,6 +1,6 @@
 package org.redukti.rayoptics.parax;
 
-import org.redukti.rayoptics.math.M;
+import org.redukti.mathlib.M;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.seq.Gap;
 import org.redukti.rayoptics.seq.Interface;

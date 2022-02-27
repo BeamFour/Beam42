@@ -1,8 +1,6 @@
-package org.redukti.rayoptics.math;
+package org.redukti.mathlib;
 
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class Matrix3Test {
 

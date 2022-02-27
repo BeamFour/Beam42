@@ -1,0 +1,3 @@
+plugins {
+    id 'beam42.java-library-conventions'
+}

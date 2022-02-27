@@ -1,6 +1,6 @@
 package org.redukti.rayoptics.raytr;
 
-import org.redukti.rayoptics.math.Vector3;
+import org.redukti.mathlib.Vector3;
 
 final class WaveAbrPreCalc {
     double pre_opd;

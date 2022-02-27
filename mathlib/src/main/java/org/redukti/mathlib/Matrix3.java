@@ -1,6 +1,6 @@
 /* Code derived from https://github.com/jvanverth/essentialmath */
 
-package org.redukti.rayoptics.math;
+package org.redukti.mathlib;
 
 /**
  * Column major 3d matrix where

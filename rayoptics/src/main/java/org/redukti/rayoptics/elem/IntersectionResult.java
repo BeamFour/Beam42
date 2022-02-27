@@ -1,6 +1,6 @@
 package org.redukti.rayoptics.elem;
 
-import org.redukti.rayoptics.math.Vector3;
+import org.redukti.mathlib.Vector3;
 
 public class IntersectionResult {
     /**

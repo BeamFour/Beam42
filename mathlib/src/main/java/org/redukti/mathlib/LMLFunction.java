@@ -1,4 +1,4 @@
-package org.redukti.rayoptics.math;
+package org.redukti.mathlib;
 
 /**
  *  @author: M.Lampton (c) 2005 Stellar Software

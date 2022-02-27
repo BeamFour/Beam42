@@ -1,8 +1,8 @@
 package org.redukti.rayoptics.raytr;
 
+import org.redukti.mathlib.Vector2;
+import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.elem.Transform;
-import org.redukti.rayoptics.math.Vector2;
-import org.redukti.rayoptics.math.Vector3;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrderData;
 import org.redukti.rayoptics.seq.Interface;

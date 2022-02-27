@@ -2,10 +2,10 @@ package org.redukti.rayoptics.integration;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.elem.EvenPolynomial;
 import org.redukti.rayoptics.elem.LensLayout;
 import org.redukti.rayoptics.elem.RayBundle;
-import org.redukti.rayoptics.math.Vector3;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrderData;
 import org.redukti.rayoptics.parax.ParaxialModel;

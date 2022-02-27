@@ -1,6 +1,6 @@
 package org.redukti.rayoptics.elem;
 
-import org.redukti.rayoptics.math.Vector2;
+import org.redukti.mathlib.Vector2;
 import org.redukti.rayoptics.util.Pair;
 
 public abstract class Aperture {

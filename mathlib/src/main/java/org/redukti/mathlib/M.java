@@ -1,4 +1,4 @@
-package org.redukti.rayoptics.math;
+package org.redukti.mathlib;
 
 public class M {
 

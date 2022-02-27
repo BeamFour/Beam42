@@ -1,8 +1,8 @@
 package org.redukti.rayoptics.elem;
 
-import org.redukti.rayoptics.math.M;
-import org.redukti.rayoptics.math.Vector2;
-import org.redukti.rayoptics.math.Vector3;
+import org.redukti.mathlib.M;
+import org.redukti.mathlib.Vector2;
+import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.util.ZDir;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 package org.redukti.rayoptics.exceptions;
 
+import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.math.Transform3;
-import org.redukti.rayoptics.math.Vector3;
 import org.redukti.rayoptics.raytr.RayPkg;
 import org.redukti.rayoptics.seq.Interface;
 

@@ -1,6 +1,6 @@
 package org.redukti.rayoptics.specs;
 
-import org.redukti.rayoptics.math.Vector3;
+import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrder;
 import org.redukti.rayoptics.parax.ParaxData;

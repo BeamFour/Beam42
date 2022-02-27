@@ -1,9 +1,9 @@
 package org.redukti.rayoptics.seq;
 
+import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.elem.DecenterData;
 import org.redukti.rayoptics.elem.IntersectionResult;
 import org.redukti.rayoptics.elem.SurfaceProfile;
-import org.redukti.rayoptics.math.Vector3;
 import org.redukti.rayoptics.util.ZDir;
 
 /**

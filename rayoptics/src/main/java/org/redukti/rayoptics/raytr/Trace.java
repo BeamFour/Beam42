@@ -1,12 +1,12 @@
 package org.redukti.rayoptics.raytr;
 
+import org.redukti.mathlib.LMLFunction;
+import org.redukti.mathlib.LMLSolver;
+import org.redukti.mathlib.SecantSolver;
+import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.exceptions.TraceException;
 import org.redukti.rayoptics.exceptions.TraceMissedSurfaceException;
 import org.redukti.rayoptics.exceptions.TraceTIRException;
-import org.redukti.rayoptics.math.LMLFunction;
-import org.redukti.rayoptics.math.LMLSolver;
-import org.redukti.rayoptics.math.SecantSolver;
-import org.redukti.rayoptics.math.Vector3;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrderData;
 import org.redukti.rayoptics.seq.SequentialModel;

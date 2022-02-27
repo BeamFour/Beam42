@@ -1,7 +1,7 @@
 package org.redukti.rayoptics.raytr;
 
 
-import org.redukti.rayoptics.math.Vector3;
+import org.redukti.mathlib.Vector3;
 
 import java.util.List;
 

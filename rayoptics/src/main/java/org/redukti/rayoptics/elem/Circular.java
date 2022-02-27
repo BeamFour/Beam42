@@ -1,6 +1,6 @@
 package org.redukti.rayoptics.elem;
 
-import org.redukti.rayoptics.math.Vector2;
+import org.redukti.mathlib.Vector2;
 
 public class Circular extends Aperture {
     public double radius = 1.0;

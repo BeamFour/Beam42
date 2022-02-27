@@ -1,5 +1,8 @@
 package org.redukti.rayoptics.math;
 
+import org.redukti.mathlib.Matrix3;
+import org.redukti.mathlib.Vector3;
+
 public class Transform3 {
     public final Matrix3 rot_mat;
     public final Vector3 vec;

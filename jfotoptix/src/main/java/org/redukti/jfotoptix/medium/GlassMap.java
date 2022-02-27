@@ -217,26 +217,140 @@ public class GlassMap extends Solid {
         glasses.put("Q-LAF010S",new GlassMap("Hikari", "Q-LAF010S",1.743,1.738458,1.753545));
         glasses.put("Q-LAFPH1S",new GlassMap("Hikari", "Q-LAFPH1S",1.743104,1.738575,1.753606));
         glasses.put("Q-LASF03S",new GlassMap("Hikari", "Q-LASF03S",1.80604,1.800166,1.819952));
-        glasses.put("Q-LASFH11S",new GlassMap("Hikari", "Q-LASFH11S",1.77387,1.768949,1.785326));
-        glasses.put("Q-LASFH12S",new GlassMap("Hikari", "Q-LASFH12S",1.79063,1.78537,1.802946));
-        glasses.put("Q-LASFH58S",new GlassMap("Hikari", "Q-LASFH58S",1.85108,1.844781,1.865992));
-        glasses.put("Q-LASFH59S",new GlassMap("Hikari", "Q-LASFH59S",1.82098,1.815228,1.834544));
-        glasses.put("Q-LASFPH2S",new GlassMap("Hikari", "Q-LASFPH2S",1.765437,1.760519,1.776892));
-        glasses.put("Q-LASFPH3S",new GlassMap("Hikari", "Q-LASFPH3S",1.795256,1.789992,1.807566));
+        glasses.put("Q-LASFH11S", new GlassMap("Hikari", "Q-LASFH11S", 1.77387, 1.768949, 1.785326));
+        glasses.put("Q-LASFH12S", new GlassMap("Hikari", "Q-LASFH12S", 1.79063, 1.78537, 1.802946));
+        glasses.put("Q-LASFH58S", new GlassMap("Hikari", "Q-LASFH58S", 1.85108, 1.844781, 1.865992));
+        glasses.put("Q-LASFH59S", new GlassMap("Hikari", "Q-LASFH59S", 1.82098, 1.815228, 1.834544));
+        glasses.put("Q-LASFPH2S", new GlassMap("Hikari", "Q-LASFPH2S", 1.765437, 1.760519, 1.776892));
+        glasses.put("Q-LASFPH3S", new GlassMap("Hikari", "Q-LASFPH3S", 1.795256, 1.789992, 1.807566));
 
         // CaF2
-        glasses.put("CaF2",new GlassMap("CaF2",1.43384,1.43245,1.437));
+        glasses.put("CaF2", new GlassMap("CaF2", 1.43384, 1.43245, 1.437));
 
+        glasses.put("E-FK5", new GlassMap("Hikari", "E-FK5", 1.48749, 1.48535, 1.49227));//487704
+        glasses.put("E-FK01", new GlassMap("Hikari", "E-FK01", 1.497, 1.49514, 1.50123));//497816
+        glasses.put("E-FKH1", new GlassMap("Hikari", "E-FKH1", 1.49782, 1.49598, 1.50201));//498825
+        glasses.put("E-PKH1", new GlassMap("Hikari", "E-PKH1", 1.5186, 1.51631, 1.52373));//519700
+        glasses.put("E-PSK02", new GlassMap("Hikari", "E-PSK02", 1.618, 1.61504, 1.62479));//618634
+        glasses.put("E-PSK03", new GlassMap("Hikari", "E-PSK03", 1.603, 1.60019, 1.6094));//603655
+        glasses.put("E-BK7", new GlassMap("Hikari", "E-BK7", 1.5168, 1.51432, 1.52238));//517641
+        glasses.put("E-BAK1", new GlassMap("Hikari", "E-BAK1", 1.5725, 1.5695, 1.57941));//572577
+        glasses.put("E-BAK2", new GlassMap("Hikari", "E-BAK2", 1.53996, 1.53719, 1.54628));//540595
+        glasses.put("E-BAK4", new GlassMap("Hikari", "E-BAK4", 1.56883, 1.56577, 1.57587));//569563
+        glasses.put("E-K3", new GlassMap("Hikari", "E-K3", 1.51823, 1.51555, 1.52435));//518589
+        glasses.put("E-K5", new GlassMap("Hikari", "E-K5", 1.52249, 1.51982, 1.52857));//522597
+        glasses.put("E-KF6", new GlassMap("Hikari", "E-KF6", 1.51742, 1.51444, 1.52433));//517523
+        glasses.put("E-BALF4", new GlassMap("Hikari", "E-BALF4", 1.57957, 1.57632, 1.58711));//580537
+        glasses.put("E-BAF3", new GlassMap("Hikari", "E-BAF3", 1.58267, 1.57893, 1.59146));//583465
+        glasses.put("E-BAF4", new GlassMap("Hikari", "E-BAF4", 1.60562, 1.60151, 1.61535));//606438
+        glasses.put("E-BAF8", new GlassMap("Hikari", "E-BAF8", 1.62374, 1.61978, 1.63304));//624470
+        glasses.put("E-BAF10", new GlassMap("Hikari", "E-BAF10", 1.67003, 1.66579, 1.67997));//670472
+        glasses.put("E-BAF11", new GlassMap("Hikari", "E-BAF11", 1.66672, 1.66259, 1.67639));//667483
+        glasses.put("E-BAF12", new GlassMap("Hikari", "E-BAF12", 1.6393, 1.63506, 1.6493));//639449
+        glasses.put("E-BASF2", new GlassMap("Hikari", "E-BASF2", 1.66446, 1.65904, 1.67754));//664359
+        glasses.put("E-BASF6", new GlassMap("Hikari", "E-BASF6", 1.66755, 1.66285, 1.67875));//668420
+        glasses.put("E-BASF7", new GlassMap("Hikari", "E-BASF7", 1.70154, 1.6965, 1.71354));//702412
+        glasses.put("E-BASF8", new GlassMap("Hikari", "E-BASF8", 1.72342, 1.71781, 1.73688));//723379
+        glasses.put("E-SK2", new GlassMap("Hikari", "E-SK2", 1.60738, 1.60414, 1.61485));//607567
+        glasses.put("E-SK4", new GlassMap("Hikari", "E-SK4", 1.61272, 1.60955, 1.61998));//613587
+        glasses.put("E-SK5", new GlassMap("Hikari", "E-SK5", 1.58913, 1.58619, 1.59582));//589612
+        glasses.put("E-SK10", new GlassMap("Hikari", "E-SK10", 1.6228, 1.61949, 1.63041));//623570
+        glasses.put("E-SK11", new GlassMap("Hikari", "E-SK11", 1.56384, 1.561, 1.57029));//564607
+        glasses.put("E-SK14", new GlassMap("Hikari", "E-SK14", 1.60311, 1.60008, 1.61002));//603607
+        glasses.put("E-SK15", new GlassMap("Hikari", "E-SK15", 1.62299, 1.61974, 1.63044));//623582
+        glasses.put("E-SK16", new GlassMap("Hikari", "E-SK16", 1.62041, 1.61728, 1.62757));//620603
+        glasses.put("E-SK18", new GlassMap("Hikari", "E-SK18", 1.63854, 1.63506, 1.64657));//639555
+        glasses.put("E-SSK2", new GlassMap("Hikari", "E-SSK2", 1.6223, 1.61877, 1.6305));//622531
+        glasses.put("E-SSK5", new GlassMap("Hikari", "E-SSK5", 1.65844, 1.65455, 1.66749));//658509
+        glasses.put("E-SSK8", new GlassMap("Hikari", "E-SSK8", 1.61772, 1.614, 1.62641));//618498
+        glasses.put("E-LLF1", new GlassMap("Hikari", "E-LLF1", 1.54814, 1.54457, 1.55654));//548458
+        glasses.put("E-LLF2", new GlassMap("Hikari", "E-LLF2", 1.54072, 1.53729, 1.54874));//541472
+        glasses.put("E-LLF6", new GlassMap("Hikari", "E-LLF6", 1.53172, 1.52846, 1.53934));//532489
+        glasses.put("E-LF5", new GlassMap("Hikari", "E-LF5", 1.58144, 1.57722, 1.59149));//581407
+        glasses.put("E-LF6", new GlassMap("Hikari", "E-LF6", 1.56732, 1.56339, 1.57667));//567427
+        glasses.put("E-LF7", new GlassMap("Hikari", "E-LF7", 1.57501, 1.5709, 1.58476));//575415
+        glasses.put("F2", new GlassMap("Hikari", "F2", 1.62004, 1.61503, 1.6321));//620363
+        glasses.put("F5", new GlassMap("Hikari", "F5", 1.60342, 1.59875, 1.61459));//603381
+        glasses.put("E-F1", new GlassMap("Hikari", "E-F1", 1.62588, 1.62073, 1.63828));//626356
+        glasses.put("E-F2", new GlassMap("Hikari", "E-F2", 1.62004, 1.61502, 1.63213));//620363
+        glasses.put("E-F3", new GlassMap("Hikari", "E-F3", 1.61293, 1.60805, 1.62462));//613370
+        glasses.put("E-F5", new GlassMap("Hikari", "E-F5", 1.60342, 1.59875, 1.61462));//603380
+        glasses.put("E-F8", new GlassMap("Hikari", "E-F8", 1.59551, 1.59102, 1.6062));//596392
+        glasses.put("SF5", new GlassMap("Hikari", "SF5", 1.6727, 1.66661, 1.68753));//673322
+        glasses.put("SF8", new GlassMap("Hikari", "SF8", 1.68893, 1.6825, 1.70462));//689311
+        glasses.put("SF13", new GlassMap("Hikari", "SF13", 1.74077, 1.73307, 1.75986));//741276
+        glasses.put("SF03", new GlassMap("Hikari", "SF03", 1.84666, 1.83653, 1.87198));//847239
+        glasses.put("E-SF1", new GlassMap("Hikari", "E-SF1", 1.71736, 1.71033, 1.73463));//717295
+        glasses.put("E-SF2", new GlassMap("Hikari", "E-SF2", 1.64769, 1.64209, 1.66126));//648338
+        glasses.put("E-SF4", new GlassMap("Hikari", "E-SF4", 1.7552, 1.7473, 1.77475));//755275
+        glasses.put("E-SF5", new GlassMap("Hikari", "E-SF5", 1.6727, 1.66661, 1.68756));//673321
+        glasses.put("E-SF6", new GlassMap("Hikari", "E-SF6", 1.80518, 1.79611, 1.82777));//805254
+        glasses.put("E-SF7", new GlassMap("Hikari", "E-SF7", 1.6398, 1.63439, 1.6529));//640346
+        glasses.put("E-SF8", new GlassMap("Hikari", "E-SF8", 1.68893, 1.68249, 1.70467));//689311
+        glasses.put("E-SF10", new GlassMap("Hikari", "E-SF10", 1.72825, 1.72086, 1.74645));//728285
+        glasses.put("E-SF11", new GlassMap("Hikari", "E-SF11", 1.78472, 1.77596, 1.80652));//785257
+        glasses.put("E-SF13", new GlassMap("Hikari", "E-SF13", 1.74077, 1.73309, 1.75975));//741278
+        glasses.put("E-SF14", new GlassMap("Hikari", "E-SF14", 1.76182, 1.75358, 1.78226));//762266
+        glasses.put("E-SF15", new GlassMap("Hikari", "E-SF15", 1.69895, 1.69222, 1.71542));//699301
+        glasses.put("E-SF03", new GlassMap("Hikari", "E-SF03", 1.84666, 1.83649, 1.8721));//847238
+        glasses.put("E-SFS3", new GlassMap("Hikari", "E-SFS3", 1.7847, 1.77613, 1.80597));//785263
+        glasses.put("E-LAK7", new GlassMap("Hikari", "E-LAK7", 1.6516, 1.64821, 1.65934));//652585
+        glasses.put("E-LAK8", new GlassMap("Hikari", "E-LAK8", 1.713, 1.70898, 1.72221));//713539
+        glasses.put("E-LAK9", new GlassMap("Hikari", "E-LAK9", 1.691, 1.68716, 1.69976));//691548
+        glasses.put("E-LAK10", new GlassMap("Hikari", "E-LAK10", 1.71999, 1.71568, 1.73001));//720502
+        glasses.put("E-LAK12", new GlassMap("Hikari", "E-LAK12", 1.6779, 1.67419, 1.68642));//678554
+        glasses.put("E-LAK13", new GlassMap("Hikari", "E-LAK13", 1.6935, 1.68955, 1.70258));//694532
+        glasses.put("E-LAK14", new GlassMap("Hikari", "E-LAK14", 1.6968, 1.69297, 1.70552));//697555
+        glasses.put("E-LAK18", new GlassMap("Hikari", "E-LAK18", 1.72916, 1.7251, 1.73844));//729547
+        glasses.put("E-LAK01", new GlassMap("Hikari", "E-LAK01", 1.64, 1.63673, 1.64738));//640601
+        glasses.put("E-LAK02", new GlassMap("Hikari", "E-LAK02", 1.67, 1.66645, 1.67813));//670573
+        glasses.put("E-LAK04", new GlassMap("Hikari", "E-LAK04", 1.651, 1.64749, 1.65908));//651562
+        glasses.put("E-LAK06", new GlassMap("Hikari", "E-LAK06", 1.6779, 1.67389, 1.68726));//678507
+        glasses.put("E-LAK09", new GlassMap("Hikari", "E-LAK09", 1.734, 1.72969, 1.74394));//734515
+        glasses.put("E-LAK011", new GlassMap("Hikari", "E-LAK011", 1.741, 1.73673, 1.7508));//741527
+        glasses.put("E-LAKH1", new GlassMap("Hikari", "E-LAKH1", 1.7481, 1.74376, 1.75807));//748523
+        glasses.put("E-LASKH2", new GlassMap("Hikari", "E-LASKH2", 1.755, 1.75062, 1.76506));//755523
+        glasses.put("LAF7", new GlassMap("Hikari", "LAF7", 1.7495, 1.74323, 1.76453));//750352
+        glasses.put("LAF9", new GlassMap("Hikari", "LAF9", 1.79504, 1.78698, 1.81482));//795286
+        glasses.put("LAF11", new GlassMap("Hikari", "LAF11", 1.75692, 1.74996, 1.77383));//757317
+        glasses.put("E-LAF2", new GlassMap("Hikari", "E-LAF2", 1.744, 1.73905, 1.75566));//744448
+        glasses.put("E-LAF3", new GlassMap("Hikari", "E-LAF3", 1.717, 1.71253, 1.72749));//717479
+        glasses.put("E-LAF7", new GlassMap("Hikari", "E-LAF7", 1.7495, 1.74327, 1.76452));//749353
+        glasses.put("E-LAF9", new GlassMap("Hikari", "E-LAF9", 1.79504, 1.787, 1.81485));//795285
+        glasses.put("E-LAF11", new GlassMap("Hikari", "E-LAF11", 1.75692, 1.74995, 1.77391));//757316
+        glasses.put("E-LAF01", new GlassMap("Hikari", "E-LAF01", 1.7, 1.69564, 1.7102));//700481
+        glasses.put("E-LAF02", new GlassMap("Hikari", "E-LAF02", 1.72, 1.71511, 1.73159));//720437
+        glasses.put("E-LAF04", new GlassMap("Hikari", "E-LAF04", 1.757, 1.75223, 1.76806));//757478
+        glasses.put("E-LAF05", new GlassMap("Hikari", "E-LAF05", 1.762, 1.75639, 1.77539));//762401
+        glasses.put("E-LAF09", new GlassMap("Hikari", "E-LAF09", 1.697, 1.69271, 1.70707));//697485
+        glasses.put("E-LAF010", new GlassMap("Hikari", "E-LAF010", 1.7432, 1.73865, 1.75372));//743493
+        glasses.put("E-LAF016", new GlassMap("Hikari", "E-LAF016", 1.801, 1.79427, 1.81718));//801350
+        glasses.put("E-LAFH2", new GlassMap("Hikari", "E-LAFH2", 1.80384, 1.7969, 1.82062));//804339
+        glasses.put("E-LASF01", new GlassMap("Hikari", "E-LASF01", 1.7859, 1.78058, 1.79837));//786442
+        glasses.put("E-LASF02", new GlassMap("Hikari", "E-LASF02", 1.79952, 1.79388, 1.8128));//800422
+        glasses.put("E-LASF03", new GlassMap("Hikari", "E-LASF03", 1.8061, 1.80025, 1.81994));//806409
+        glasses.put("E-LASF04", new GlassMap("Hikari", "E-LASF04", 1.81554, 1.81004, 1.82843));//816443
+        glasses.put("E-LASF05", new GlassMap("Hikari", "E-LASF05", 1.83481, 1.82897, 1.84851));//835427
+        glasses.put("E-LASF08", new GlassMap("Hikari", "E-LASF08", 1.883, 1.87656, 1.89822));//883408
+        glasses.put("E-LASF09", new GlassMap("Hikari", "E-LASF09", 1.816, 1.81075, 1.82825));//816466
+        glasses.put("E-LASF010", new GlassMap("Hikari", "E-LASF010", 1.834, 1.82738, 1.84982));//834372
+        glasses.put("E-LASF013", new GlassMap("Hikari", "E-LASF013", 1.8044, 1.79837, 1.8187));//804396
+        glasses.put("E-LASF014", new GlassMap("Hikari", "E-LASF014", 1.788, 1.783, 1.79963));//788474
+        glasses.put("E-LASF015", new GlassMap("Hikari", "E-LASF015", 1.804, 1.79882, 1.81608));//804466
+        glasses.put("E-LASF016", new GlassMap("Hikari", "E-LASF016", 1.7725, 1.7678, 1.78337));//772496
+        glasses.put("E-LASF017", new GlassMap("Hikari", "E-LASF017", 1.795, 1.78974, 1.80729));//795453
+        glasses.put("E-LASFH2", new GlassMap("Hikari", "E-LASFH2", 1.76684, 1.76192, 1.77831));//767468
+        glasses.put("E-LASFH9", new GlassMap("Hikari", "E-LASFH9", 1.90265, 1.89522, 1.9205));//903357
 
         // Hoya
-        glasses.put("FC5",new GlassMap("Hoya", "FC5",1.48749,1.48535,1.49227));
-        glasses.put("FCD1",new GlassMap("Hoya", "FCD1",1.497,1.49514,1.50123));
-        glasses.put("FCD1B",new GlassMap("Hoya", "FCD1B",1.4971,1.49524,1.50134));
-        glasses.put("FCD10A",new GlassMap("Hoya", "FCD10A",1.4586,1.45704,1.46212));
-        glasses.put("FCD100",new GlassMap("Hoya", "FCD100",1.437,1.43559,1.44019));
-        glasses.put("FCD515",new GlassMap("Hoya", "FCD515",1.59282,1.59021,1.59884));
-        glasses.put("FCD600",new GlassMap("Hoya", "FCD600",1.5941,1.59115,1.60097));
-        glasses.put("FCD705",new GlassMap("Hoya", "FCD705",1.55032,1.5481,1.55539));
+        glasses.put("FC5", new GlassMap("Hoya", "FC5", 1.48749, 1.48535, 1.49227));
+        glasses.put("FCD1", new GlassMap("Hoya", "FCD1", 1.497, 1.49514, 1.50123));
+        glasses.put("FCD1B", new GlassMap("Hoya", "FCD1B", 1.4971, 1.49524, 1.50134));
+        glasses.put("FCD10A", new GlassMap("Hoya", "FCD10A", 1.4586, 1.45704, 1.46212));
+        glasses.put("FCD100", new GlassMap("Hoya", "FCD100", 1.437, 1.43559, 1.44019));
+        glasses.put("FCD515", new GlassMap("Hoya", "FCD515", 1.59282, 1.59021, 1.59884));
+        glasses.put("FCD600", new GlassMap("Hoya", "FCD600", 1.5941, 1.59115, 1.60097));
+        glasses.put("FCD705", new GlassMap("Hoya", "FCD705", 1.55032, 1.5481, 1.55539));
         glasses.put("PCD4",new GlassMap("Hoya", "PCD4",1.618,1.61503,1.62478));
         glasses.put("PCD40",new GlassMap("Hoya", "PCD40",1.61997,1.61701,1.62672));
         glasses.put("PCD51",new GlassMap("Hoya", "PCD51",1.59349,1.59078,1.59964));

@@ -1,0 +1,70 @@
+[descriptive data]
+title	WO 2019/097669 Example 1 (Nikon AF-S Nikkor 70-200mm f/2.8 E FL ED VR)
+[constants]
+[variable distances]
+Focal Length	71.5	135.0	196.0	undefined	undefined	undefined
+Angle of View	33.64	17.74	12.20	undefined	undefined	undefined
+F-Number	2.85	2.90	2.88	undefined	undefined	undefined
+NA	undefined	undefined	undefined	0.17	0.15	0.14
+HO	Infinity	Infinity	Infinity	250.21	134.69	90.61
+Image Height	43.2	43.2	43.2	43.2	43.2	43.2
+Total Length	246.0	246.0	246.0	246.0	246.0	246.0
+Magnification	0	0	0	-0.0868	-0.1583	-0.2332
+d0	Infinity	Infinity	Infinity	753.20	750.55	753.400
+d5	3.014	34.034	50.952	3.014	34.034	50.952
+d13	50.598	19.577	2.660	50.598	19.577	2.660
+d25	16.922	14.105	16.921	14.966	7.506	2.928
+d30	1.903	4.720	1.903	3.858	11.318	15.890
+Bf	54.0	54.0	54.0	54.0	54.0	54.0
+Aperture Diameter	38.970	38.868	38.523	38.970	38.868	38.523
+[lens data]
+1	127.304	2.800	1.950000	72.98	29.37	J-LASFH15
+2	89.338	9.900	1.497820	70.86	82.57	J-FKH1
+3	-998.249	0.100		70.86	
+4	92.013	7.700	1.433852	68.06	95.25	CaF2
+5	696.987	d5		68.06	
+6	67.306	2.400	1.719990	44.32	50.27	J-LAK10
+7	33.224	10.250		39.56	
+8	-131.888	2.000	1.618000	38.24	63.34	J-PSK02
+9	100.859	2.000		38.24	
+10	53.850	4.400	1.846660	39.72	23.83	J-SF03
+11	193.868	3.550		38.42
+12	-73.371	2.200	1.603000	38.42	65.44	J-PSK03
+13	288.683	d13		40.06	
+14	AS	2.500		38.970
+15	581.555	3.700	1.834810	41.60	42.73	J-LASF05
+16	-130.482	0.200		41.60	
+17	90.329	3.850	1.593190	41.60	67.90	J-PSKH1
+18	Infinity	0.200		41.60	
+19	52.765	4.900	1.497820	39.96	82.57	J-FKH1
+20	448.658	2.043		39.96	
+21	-118.745	2.200	2.001000	38.80	29.12	J-LASFH16
+22	173.228	4.550		39.48	
+23	114.635	5.750	1.902650	38.50	35.73	J-LASFH9A
+24	-66.799	2.200	1.581440	38.50	40.98	J-LF5
+25	41.996	d25		38.50	
+26	57.835	4.800	1.497820	34.72	82.57	J-FKH1
+27	-190.076	0.100		34.72	
+28	44.190	2.000	1.950000	32.60	29.37	J-LASFH15
+29	28.478	5.550	1.593190	32.60	67.90	J-PSKH1
+30	166.406	d30		32.60	
+31	52.698	1.800	1.804000	31.62	46.60	J-LASF015
+32	31.187	5.150		29.48	
+33	102.833	3.350	1.846660	28.82	23.83	J-SF03
+34	-102.758	1.600	1.719990	28.82	50.27	J-LAK10
+35	42.059	2.583		28.82	
+36	Infinity	1.600	1.953750	31.78	32.33	J-LASFH21
+37	68.581	3.750		31.78	
+38	101.229	3.850	1.593190	34.40	67.90	J-PSKH1
+39	-172.177	0.150		34.40	
+40	47.985	3.900	1.719990	36.52	50.27	J-LAK10
+41	137.994	Bf		36.52	
+[figure]
+source	Data/WO2019-097669_Figure01P.png
+originX	41
+originY	336
+ppmm	7.101
+[notes]
+-o f200-layout.svg --trace-density 10 --scenario 2 --output layout --specfile  Examples/jfotoptix/nikkor-70-200mm-f2.8/WO2019-097669_Example01P.txt
+-o f200-spot.svg --trace-density 10 --scenario 2 --output spot --specfile Examples/jfotoptix/nikkor-70-200mm-f2.8/WO2019-097669_Example01P.txt
+--skew -o f200-spot-skew.svg --trace-density 10 --scenario 2 --output spot --specfile Examples/jfotoptix/nikkor-70-200mm-f2.8/WO2019-097669_Example01P.txt

@@ -63,6 +63,18 @@ public class Interface {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Returns True if the point (x, y) is inside the clear aperture.
+     *
+     * @param x    x coordinate of the test point
+     * @param y    y coordinate of the test point
+     * @param fuzz tolerance on test pt/aperture comparison,
+     *             i.e. pt fuzzy <= surface_od
+     */
+    public boolean point_inside(double x, double y, double fuzz) {
+        return Math.sqrt(x * x + y * y) <= max_aperture + fuzz;
+    }
+
     public void set_max_aperture(double max_ap) {
         this.max_aperture = max_ap;
     }

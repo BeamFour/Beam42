@@ -61,14 +61,24 @@ public class SequentialModel {
     public OpticalModel opt_model;
     public List<Interface> ifcs = new ArrayList<>();
     public List<Gap> gaps = new ArrayList<>();
-    public List<Transform3> gbl_tfrms = new ArrayList<>();
-    public List<Transform3> lcl_tfrms = new ArrayList<>();
     public List<ZDir> z_dir = new ArrayList<>();
     public Integer stop_surface;
     public Integer cur_surface;
-    public double[] wvlns;
-    public List<double[]> rndx = new ArrayList<>();
     public boolean do_apertures = true;
+
+    // derived attributes
+    public List<Transform3> gbl_tfrms = new ArrayList<>();
+    public List<Transform3> lcl_tfrms = new ArrayList<>();
+
+    //  data for a wavelength vs index vs gap data arrays
+    /**
+     * sampling wavelengths in nm
+     */
+    public double[] wvlns;
+    /**
+     * refractive index vs wv and gap
+     */
+    public List<double[]> rndx = new ArrayList<>();
 
     public SequentialModel(OpticalModel opm, boolean do_init) {
         this.opt_model = opm;
@@ -134,7 +144,7 @@ public class SequentialModel {
             mat = gaps.get(cur_surface).medium;
         }
         NewSurfaceSpec newSurfaceSpec = create_surface_and_gap(surf_data, radius_mode, mat, 550.0);
-        insert(newSurfaceSpec.surface, newSurfaceSpec.gap, false);
+        insert(newSurfaceSpec.surface, newSurfaceSpec.gap, false, newSurfaceSpec.z_dir);
 
         Node root_node = opt_model.part_tree.root_node;
         int idx = cur_surface;
@@ -150,8 +160,9 @@ public class SequentialModel {
      * @param ifc
      * @param gap
      * @param prev
+     * @param z_dir
      */
-    void insert(Interface ifc, Gap gap, boolean prev) {
+    void insert(Interface ifc, Gap gap, boolean prev, ZDir z_dir) {
         if (stop_surface != null) {
             Objects.requireNonNull(cur_surface);
             int num_ifcs = ifcs.size();
@@ -167,6 +178,9 @@ public class SequentialModel {
         if (gap != null) {
             int idx_g = prev ? idx - 1 : idx;
             gaps.add(idx_g, gap);
+            z_dir = z_dir == null ? ZDir.PROPAGATE_RIGHT : z_dir;
+            ZDir new_z_dir = (idx > 1) ? ZDir.from(z_dir.value * this.z_dir.get(idx - 1).value) : z_dir;
+            this.z_dir.add(idx, new_z_dir);
         } else {
             gap = gaps.get(idx);
         }
@@ -174,8 +188,6 @@ public class SequentialModel {
         gbl_tfrms.add(tfrm);
         lcl_tfrms.add(tfrm);
 
-        ZDir new_z_dir = (idx > 1) ? z_dir.get(idx - 1) : ZDir.PROPAGATE_RIGHT;
-        z_dir.add(idx, new_z_dir);
 
         double[] wvls = opt_model.optical_spec.spectral_region.wavelengths;
         double[] rindex = new double[wvls.length];
@@ -226,6 +238,7 @@ public class SequentialModel {
         }
 
         Medium mat = null;
+        ZDir z_dir = ZDir.PROPAGATE_RIGHT;
 
         if (surf_data.refractive_index != null) {
             if (surf_data.v_number == null) {
@@ -242,6 +255,7 @@ public class SequentialModel {
         } else if (surf_data.interact_mode != null && surf_data.interact_mode.toUpperCase().equals("REFL")) {
             s.interact_mode = "reflect";
             mat = prev_medium;
+            z_dir = ZDir.PROPAGATE_LEFT;
         } else if (surf_data.glass_name != null && surf_data.catalog_name != null) {
             throw new UnsupportedOperationException(); // Not implemented yet
         } else {
@@ -256,7 +270,7 @@ public class SequentialModel {
         double rndx = mat.rindex(wvl);
         Transform3 tfrm = new Transform3(Matrix3.IDENTITY, new Vector3(0., 0., thi));
 
-        return new NewSurfaceSpec(s, g, rndx, tfrm);
+        return new NewSurfaceSpec(s, g, rndx, tfrm, z_dir);
     }
 
     /**

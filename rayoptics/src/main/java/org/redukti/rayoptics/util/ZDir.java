@@ -17,4 +17,10 @@ public enum ZDir {
         else
             return PROPAGATE_LEFT;
     }
+
+    public static ZDir from(double v) {
+        if (v >= 0.0)
+            return PROPAGATE_RIGHT;
+        return PROPAGATE_LEFT;
+    }
 }

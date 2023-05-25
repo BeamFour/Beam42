@@ -805,6 +805,7 @@ public class GlassMap extends Solid {
         glasses.put("S-NPH 7", new GlassMap("Ohara", "S-NPH 7", 1.7783, 1.76902, 1.80157));
 
         glasses.put("L-LAH91", new GlassMap("Ohara", "L-LAH91", 1.76450, 1.75981, 1.77538));
+        glasses.put("L-LAH84", new GlassMap("Ohara", "L-LAH84", 1.80835, 1.80243, 1.82237));
 
     }
 }

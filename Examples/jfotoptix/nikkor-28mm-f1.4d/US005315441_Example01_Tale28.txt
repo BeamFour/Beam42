@@ -1,0 +1,45 @@
+[descriptive data]
+title	US 5,315,441 Example 1 (Nikon AI Nikkor 28mm f/1.4D)
+[constants]
+[variable distances]
+Focal Length	28.6208	undefined
+Angle of View	75.37	undefined
+F-Number	1.41	undefined
+Image Height	43.2	43.2
+Total Length	undefined	undefined
+Magnification	0	-0.1
+d0	Infinity	276
+d2	13.9000	10.3752
+d11	5.0000	4.6475
+d16	0.5000	0.8525
+Bf	38.1031	41.6279
+[lens data]
+1	66.230	2.0	1.516800	50.72	64.1
+2	25.126	d2		40.88	
+3	89.207	4.7	1.77279	37.62	49.4
+4	-164.124	0.1		37.62	
+5	87.119	1.5	1.48749	32.50	70.4
+6	23.125	7.9		27.77	
+7	-49.577	9.0	1.51860	26.43	69.9
+8	-15.690	1.5	1.51454	26.43	54.6
+9	462.539	0.2		30.61	
+10	33.228	9.0	1.80411	34.24	46.5
+11	-85.405	d11		34.24	
+12	AS	7.55		29.0	
+13	-23.276	3.6	1.74810	26.80	52.3
+14	-19.731	1.0	1.75520	27.39	27.6
+15	-568.331	1.0		29.07	
+16	-122.249	3.5	1.77279	30.73	49.4
+17	-46.473	d16		30.73	
+18	722.991	9.3	1.80411	31.91	46.5
+19	-21.000	1.5	1.86074	31.91	23.0
+20	-28.251	Bf		33.08	
+[aspherical data]
+17	-46.473	0.1974	1.644E-05	1.610E-08	1.721E-11	-6.229E-14
+[figure]
+source	Data/US005315441_Example01_Tale28-Fig1.png
+ppmm	11.51552056
+originX	6
+originY	313.5
+[notes]
+Bill: CLD wasn't specified. Production lens.

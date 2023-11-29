@@ -66,13 +66,13 @@ public class GlassMap extends Solid {
         glasses.put("J-FK01A", new GlassMap("Hikari", "J-FK01A", 1.497, 1.495139, 1.501226)); //81.65
         glasses.put("J-FKH1", new GlassMap("Hikari", "J-FKH1", 1.49782, 1.49598, 1.502009)); // 82.57
         glasses.put("J-FKH2", new GlassMap("Hikari", "J-FKH2", 1.456, 1.454469, 1.45946)); // 91.36
-        glasses.put("J-PKH1", new GlassMap("Hikari", "J-PKH1", 1.5186, 1.516311, 1.523731));
+        glasses.put("J-PKH1", new GlassMap("Hikari", "J-PKH1", 1.5186, 1.516311, 1.523731)); // 69.89
         glasses.put("J-PSK02", new GlassMap("Hikari", "J-PSK02", 1.618, 1.615024, 1.624781)); // 63.34
         glasses.put("J-PSK03", new GlassMap("Hikari", "J-PSK03", 1.603, 1.600183, 1.609398)); // 65.44
         glasses.put("J-PSKH1", new GlassMap("Hikari", "J-PSKH1", 1.59319, 1.59054, 1.599276)); // 67.9
         glasses.put("J-PSKH4", new GlassMap("Hikari", "J-PSKH4", 1.59349, 1.590771, 1.599629)); // 67.00
         glasses.put("J-PSKH8", new GlassMap("Hikari", "J-PSKH8", 1.62846, 1.625268, 1.635889)); // 59.17
-        glasses.put("J-BK7A", new GlassMap("Hikari", "J-BK7A", 1.5168, 1.514324, 1.522382));
+        glasses.put("J-BK7A", new GlassMap("Hikari", "J-BK7A", 1.5168, 1.514324, 1.522382)); // 64.13
         glasses.put("J-BAK1", new GlassMap("Hikari", "J-BAK1", 1.5725, 1.569472, 1.579464));
         glasses.put("J-BAK2", new GlassMap("Hikari", "J-BAK2", 1.53996, 1.537199, 1.546271));
         glasses.put("J-BAK4", new GlassMap("Hikari", "J-BAK4", 1.56883, 1.565751, 1.575909));
@@ -686,6 +686,7 @@ public class GlassMap extends Solid {
         glasses.put("S-BSM81",new GlassMap("Ohara", "S-BSM81",1.64,1.63673,1.64738));
         glasses.put("S-NSL 3",new GlassMap("Ohara", "S-NSL 3",1.51823,1.51556,1.52435));
         glasses.put("S-NSL36",new GlassMap("Ohara", "S-NSL36",1.51742,1.51444,1.52431));
+        glasses.put("S-NSL33", new GlassMap("Ohara", "S-NSL33", 1.5145364, 1.5116932, 1.5210974)); // 54.71
         glasses.put("S-BAL 2",new GlassMap("Ohara", "S-BAL 2",1.57099,1.56762,1.57886));
         glasses.put("S-BAL 3",new GlassMap("Ohara", "S-BAL 3",1.57135,1.5681,1.57889));
         glasses.put("S-BAL12",new GlassMap("Ohara", "S-BAL12",1.53996,1.53719,1.54627));

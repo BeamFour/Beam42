@@ -1,0 +1,62 @@
+[descriptive data]
+title	US 2016/0070086 Example 1 (Leica Summilux-M 28mm F1.4 Asph)
+[constants]
+[variable distances]
+Focal Length	28	undefined
+Angle of View	75	undefined
+F-Number	1.4	undefined
+Image Height	43.8	43.8
+Total Length	undefined	undefined
+Magnification	0	-0.04330
+S	Infinity	700
+d0	Infinity	653.68
+d10	9.20	8.15	-1.05
+d13	0.60	1.65	+1.05
+d18	15.16	15.43	+0.27
+Bf	0	0
+[lens data]
+1	115.00	3.0	1.51633	38.74	64.21	S-BSL7
+2	133.19	0.2		35.52
+3	77.41	1.8	1.43875	34.57	94.49	S-FPL53
+4	17.744	7.5		26.69
+5	41.30	2.8	1.88299	24.74	40.52	S-LAH58
+6	144.15	4.2		22.75
+7	-33.74	1.6	1.6727	22.85	31.92	S-TIM25
+8	30.76	7.0	1.88299	25.58	40.52	S-LAH58
+9	-55.29	2.4		25.58
+10	AS	d10		25.292
+11	51.27	6.0	1.816	24.96	46.37	S-LAH59
+12	-28.68	1.8	1.78472	24.49	25.69	S-TIH11
+13	-156.61	d13		23.61
+14	31.08	5.2	1.88299	21.86	40.52	S-LAH58
+15	-64.84	1.6	1.6727	21.86	31.92	S-TIM25
+16	21.177	5.6		20.42
+17	-131.44	2.5	1.834	21.47	36.87	S-LAH60
+18	-107.22	d18		23.69
+19	CG	0.75	1.51633	51.34	40.00	S-BSL7
+20	CG	0.85		51.34
+[aspherical data]
+17	-131.44	0	-2.46E-05	-6.10E-08	2.63E-10	-2.10E-12
+[figure]
+source	Data/US20160070086_Figure01P.png
+originX	28.29
+originY	466.50
+ppmm	14.929
+[notes]
+Bill: nd and vd for s1 totally unknown; all others known. r and d from diagram. Aspherical unknown. Lens Focal Lengths known.
+L	f(p)	f(m)	f(m)
+1	1538.46	1573.03	1544.07
+2	-52.83	-52.89	-52.82
+3	64.35	64.24	64.35
+4	-23.51	-23.27	-23.51
+5	23.14	23.33	23.14
+6	23.21	23.54	23.21
+7	-44.60	-44.52	-44.61
+8	24.28	24.58	24.27
+9	-23.38	-23.01	-23.38
+10	662.25	654.24	666.17
+
+2022-01-31: Adjusted all radii so all 10 lenses have the correct focal lengths.
+For lens 1 chose a real glass after determining that the index of refraction must be near 1.51
+Hand adjusted first aspherical term for reasonable convergence.
+2022-11-21: Zemax improvements from Larry. Adjusted CG thickness slightly to match Figure. Set AD etc.

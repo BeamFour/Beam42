@@ -3,8 +3,10 @@ package com.stellarsoftware.beam.ui;
 import com.stellarsoftware.beam.core.U;
 import com.stellarsoftware.beam.core.render.DrawMTF;
 
-import java.io.*;          // fileWriter
-import javax.swing.*;      // Graphics2D features
+import javax.swing.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 
 @SuppressWarnings("serial")
 
@@ -40,8 +42,7 @@ class MTFPanel extends GPanel
             return; 
         }
         myH1DPanel = (H1DPanel) g1D.getGPanel();
-        drawMTF = new DrawMTF(myH1DPanel.drawH1D);
-
+        drawBase = drawMTF = new DrawMTF(myH1DPanel.drawH1D);
     }
 
 //-----------protected methods concretizing GPanel-------

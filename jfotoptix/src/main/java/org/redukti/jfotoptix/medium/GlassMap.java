@@ -206,7 +206,7 @@ public class GlassMap extends Solid {
         glasses.put("Q-FK01AS", new GlassMap("Hikari", "Q-FK01AS", 1.49653, 1.49467, 1.500755));
         glasses.put("Q-FKH1S", new GlassMap("Hikari", "Q-FKH1S", 1.49731, 1.495471, 1.501498));
         glasses.put("Q-FKH2S", new GlassMap("Hikari", "Q-FKH2S", 1.45562, 1.454089, 1.459079));
-        glasses.put("Q-PSKH1S", new GlassMap("Hikari", "Q-PSKH1S", 1.59255, 1.589901, 1.598633));
+        glasses.put("Q-PSKH1S", new GlassMap("Hikari", "Q-PSKH1S", 1.59255, 1.589901, 1.598633));   // 67.89
         glasses.put("Q-PSKH4S", new GlassMap("Hikari", "Q-PSKH4S", 1.59245, 1.589733, 1.598586));
         glasses.put("Q-PSKH52S", new GlassMap("Hikari", "Q-PSKH52S", 1.61875, 1.61579, 1.625499));
         glasses.put("Q-SK15S", new GlassMap("Hikari", "Q-SK15S", 1.62291, 1.619659, 1.630343));

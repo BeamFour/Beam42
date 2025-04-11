@@ -393,9 +393,9 @@ public class GlassMap extends Solid {
         glasses.put("E-FDS3",new GlassMap("Hoya", "E-FDS3",2.1042,2.08618,2.15106));
         glasses.put("FDS16-W",new GlassMap("Hoya", "FDS16-W",1.98612,1.96949,2.02931));
         glasses.put("FDS18-W",new GlassMap("Hoya", "FDS18-W",1.94595,1.93123,1.98383));
-        glasses.put("FDS18",new GlassMap("Hoya", "FDS18",1.94595,1.93123,1.98383));
+        glasses.put("FDS18", new GlassMap("Hoya", "FDS18", 1.94595, 1.93123, 1.98383));     // 17.98
         glasses.put("FDS20-W ",new GlassMap("Hoya", "FDS20-W ",1.86966,1.85742,1.90086));
-        glasses.put("FDS24",new GlassMap("Hoya", "FDS24",1.92119,1.9102,1.94865));
+        glasses.put("FDS24", new GlassMap("Hoya", "FDS24", 1.92119, 1.9102, 1.94865));      // 23.96
         glasses.put("FDS90-SG",new GlassMap("Hoya", "FDS90-SG",1.84666,1.83649,1.87209));
         glasses.put("FDS90",new GlassMap("Hoya", "FDS90",1.84666,1.83649,1.87209));
         glasses.put("FDS90(P)",new GlassMap("Hoya", "FDS90(P)",1.84666,1.83653,1.87199));
@@ -796,7 +796,7 @@ public class GlassMap extends Solid {
         glasses.put("S-NBH55", new GlassMap("Ohara", "S-NBH55", 1.8, 1.79224, 1.81904));
         glasses.put("S-NBH56",new GlassMap("Ohara", "S-NBH56",1.85478,1.84488,1.87935));
         glasses.put("S-NBH57", new GlassMap("Ohara", "S-NBH57", 1.85025, 1.84204, 1.87034));
-        glasses.put("S-NBH58", new GlassMap("Ohara", "S-NBH58", 1.7888, 1.78076, 1.8085));
+        glasses.put("S-NBH58", new GlassMap("Ohara", "S-NBH58", 1.7888, 1.78076, 1.8085));      // 28.43
         glasses.put("S-NPH1", new GlassMap("Ohara", "S-NPH1", 1.80809, 1.79801, 1.83351));
         glasses.put("S-NPH1W", new GlassMap("Ohara", "S-NPH1W", 1.80809, 1.79801, 1.83351));
         glasses.put("S-NPH2", new GlassMap("Ohara", "S-NPH2", 1.92286, 1.90916, 1.958));

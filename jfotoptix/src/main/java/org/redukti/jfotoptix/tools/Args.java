@@ -9,8 +9,8 @@ public final class Args {
     boolean skewRays = false;
     boolean dumpSystem = false;
     boolean use_glass_types = true;
-    int trace_density = 10;
-    int spot_density = 20;
+    int trace_density = 20;
+    int spot_density = 50;
     boolean include_lost_rays = true;
     boolean only_d_line = false;
 

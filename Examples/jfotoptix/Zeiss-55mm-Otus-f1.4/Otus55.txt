@@ -3,7 +3,7 @@ title	Zeiss Otus 55mm f1.4
 [constants]
 [variable distances]						
 Focal Length	55.00					
-Angle of View	36.7					
+Angle of View	43.7					
 F-Number	1.43857					
 Image Height	43.2					
 Total Length	95.29638					

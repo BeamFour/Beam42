@@ -65,7 +65,7 @@ public class OpticalBenchDataImporter {
             return _values.size();
         }
 
-        String get_value(int scenario) {
+        public String get_value(int scenario) {
             return _values.get(scenario);
         }
 

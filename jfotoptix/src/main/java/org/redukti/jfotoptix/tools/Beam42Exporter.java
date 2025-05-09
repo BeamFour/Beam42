@@ -303,7 +303,7 @@ public class Beam42Exporter {
     public static void main(String[] args) throws Exception {
         Args arguments = Args.parseArguments(args);
         if (arguments.specfile == null) {
-            System.err.println("Usage: --specfile inputfile [--scenario num]");
+            System.err.println("Usage: --specfile inputfile [--scenario num] --outdir path -o filename");
             System.exit(1);
         }
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();

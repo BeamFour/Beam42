@@ -16,13 +16,13 @@ public class ZemaxExporter {
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(arguments.specfile);
         ZemaxExporter exporter = new ZemaxExporter();
-        System.out.println(exporter.generate(specs, arguments.scenario));
+        System.out.println(exporter.generate(specs, arguments.scenario, arguments.only_d_line));
     }
 
-    private String generate(OpticalBenchDataImporter.LensSpecifications specs, int scenario) {
+    private String generate(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean dlineOnly) {
         StringBuilder sb = new StringBuilder();
 
-        outputHeading(specs, scenario, sb);
+        outputHeading(specs, scenario, dlineOnly, sb);
         outputObject(specs, scenario, sb);
         outputSurfaces(specs, scenario, sb);
         outputImagePlane(specs, scenario, sb);
@@ -125,7 +125,7 @@ public class ZemaxExporter {
                 """);
     }
 
-    private void outputHeading(OpticalBenchDataImporter.LensSpecifications specs, int scenario, StringBuilder sb) {
+    private void outputHeading(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean dLineOnly, StringBuilder sb) {
         sb.append("VERS 161019 507 33785\n");
         sb.append("MODE SEQ\n");
         sb.append("NAME ").append(specs.get_descriptive_data().get_title()).append("\n");
@@ -149,30 +149,43 @@ public class ZemaxExporter {
                 VCXN 0 0 0 0 0 0 0 0 0 0 0 0
                 VCYN 0 0 0 0 0 0 0 0 0 0 0 0
                 VANN 0 0 0 0 0 0 0 0 0 0 0 0
+                """);
+        if (dLineOnly) {
+            sb.append("""
+                    WAVM 1 0.5875618 1
+                    WAVM 2 0.550 0
+                    WAVM 3 0.550 0
+                    """);
+        } else {
+            sb.append("""
                 WAVM 1 0.4861327 1
                 WAVM 2 0.5875618 1
                 WAVM 3 0.6562725 1
-                WAVM 4 0.550 1
-                WAVM 5 0.550 1
-                WAVM 6 0.550 1
-                WAVM 7 0.550 1
-                WAVM 8 0.550 1
-                WAVM 9 0.550 1
-                WAVM 10 0.550 1
-                WAVM 11 0.550 1
-                WAVM 12 0.550 1
-                WAVM 13 0.550 1
-                WAVM 14 0.550 1
-                WAVM 15 0.550 1
-                WAVM 16 0.550 1
-                WAVM 17 0.550 1
-                WAVM 18 0.550 1
-                WAVM 19 0.550 1
-                WAVM 20 0.550 1
-                WAVM 21 0.550 1
-                WAVM 22 0.550 1
-                WAVM 23 0.550 1
-                WAVM 24 0.550 1
+                    """);
+        }
+
+        sb.append("""
+                WAVM 4 0.550 0
+                WAVM 5 0.550 0
+                WAVM 6 0.550 0
+                WAVM 7 0.550 0
+                WAVM 8 0.550 0
+                WAVM 9 0.550 0
+                WAVM 10 0.550 0
+                WAVM 11 0.550 0
+                WAVM 12 0.550 0
+                WAVM 13 0.550 0
+                WAVM 14 0.550 0
+                WAVM 15 0.550 0
+                WAVM 16 0.550 0
+                WAVM 17 0.550 0
+                WAVM 18 0.550 0
+                WAVM 19 0.550 0
+                WAVM 20 0.550 0
+                WAVM 21 0.550 0
+                WAVM 22 0.550 0
+                WAVM 23 0.550 0
+                WAVM 24 0.550 0
                 PWAV 2
                 POLS 1 0 1 0 0 1 0
                 GSTD 0 100 100 100 100 100 100 0 1 1 0 0 1 1 1 1 1 1

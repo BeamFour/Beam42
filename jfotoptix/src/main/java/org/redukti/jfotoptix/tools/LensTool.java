@@ -24,7 +24,7 @@ public class LensTool {
     public static void main(String[] args) throws Exception {
         Args arguments = Args.parseArguments(args);
         if (arguments.specfile == null) {
-            System.err.println("Usage: --specfile inputfile [--scenario num] [--skew] [--output layout|spot] [--dump-system] [--exclude-lost-rays] [--spot-density n] [--trace-density n] [--only-d-line] [-o outfilename] [--dont-use-glass-types]");
+            System.err.println("Usage: --specfile inputfile [--scenario num] [--skew] [--output layoutonly|layout|spot] [--dump-system] [--exclude-lost-rays] [--spot-density n] [--trace-density n] [--only-d-line] [-o outfilename] [--dont-use-glass-types]");
             System.err.println("       --spot-density defaults to 50");
             System.err.println("       --trace-density defaults to 20");
             System.err.println("       --scenario defaults to 0");
@@ -57,7 +57,17 @@ public class LensTool {
             if (arguments.dumpSystem) {
                 System.out.println(system);
             }
-            if (arguments.outputType.equals("layout")) {
+            if (arguments.outputType.equals("layoutonly")) {
+                // draw 2d system layout
+                RendererSvg renderer = new RendererSvg(2400, 1400);
+                SystemLayout2D systemLayout2D = new SystemLayout2D();
+                systemLayout2D.layout2d(renderer, system);
+                if (arguments.outputFile != null) {
+                    Helper.createOutputFile(Helper.getOutputPath(arguments), renderer.write(new StringBuilder()).toString());
+                } else {
+                    System.out.println(renderer.write(new StringBuilder()).toString());
+                }
+            } else if (arguments.outputType.equals("layout")) {
                 // draw 2d system layout
                 RendererSvg renderer = new RendererSvg(800, 400);
                 SystemLayout2D systemLayout2D = new SystemLayout2D();

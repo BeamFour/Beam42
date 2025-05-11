@@ -1,0 +1,35 @@
+[descriptive data]				
+title	US 4,448,497 Example 1 (Nikon Nikkor 50mm f/1.4)
+[constants]	
+Scaled	51.6	100
+[variable distances]				
+Focal Length	51.6
+Angle of View	46			
+F-Number	1.4			
+Image Height	43.2
+Total Length	42.2		
+Magnification	0			
+d0	Infinity			
+Bf	38.24			
+Aperture Diameter	25.523
+[lens data]				
+1	40.43	5.10	1.79668	36.95	45.5
+2	242.25	0.10		36.95
+3	25.95	4.70	1.77279	32.76	49.4
+4	38.38	1.52		30.59
+5	71.28	1.20	1.67270	30.59	32.2
+6	17.71	7.9		26.00
+6AS	AS	7.1		25.523
+7	-17.75	1.00	1.74000	25.19	28.3
+8	-1500.00	6.40	1.77279	29.41	49.4
+9	-30.47	0.20		30.96	
+10	-77.41	4.30	1.78797	32.25	47.5
+11	-29.87	0.10		32.25
+12	146.87	2.60	1.78797	30.24	47.5
+13	-130.66	Bf		30.24
+[figure]
+source	Data/US004448497_Figure02P.png
+originX	88
+originY	552
+ppmm	4.678
+[notes]

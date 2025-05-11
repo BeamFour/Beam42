@@ -1,0 +1,35 @@
+[descriptive data]
+title	JP1972-019386 Example 1
+[constants]
+Scaled	55	1
+[variable distances]
+Focal Length	55
+Angle of View	44
+F-Number	1.2
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf(p)	undefined
+Bf	36.32
+[lens data]
+1	43.5259	6.501	1.8061	45.88	40.7
+2	142.4533	0.149		45.88	
+3	28.4999	8.767	1.72342	40.27	38
+4	169.9924	1.496	1.74	40.27	28.2
+5	17.5764	8.915		29.12	
+5AS	AS	8.916		28.747
+6	-18.8524	1.496	1.7552	28.24	27.5
+7	232.4894	7.799	1.713	35.32	53.9
+8	-30.7417	0.149		35.32	
+9	-218.1300	5.599	1.8061	37.32	40.7
+10	-36.8616	0.149		37.32	
+11	144.1237	2.800	1.6779	34.27	50.6
+12	-131.9538	Bf		31.15	
+[aspherical data]
+1	43.5259	0	-2.4360631E-07	4.0549640E-10	-8.6353099E-13	6.9506519E-16
+[figure]
+source	Data/JP1972-019386_Figure01.png
+originX	79.64
+originY	542.67
+ppmm	21.061
+[notes]

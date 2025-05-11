@@ -1,0 +1,43 @@
+[descriptive data]
+title	JP 1981-075613 Example 1 (Canon FD50mm f/1.2L)
+[constants]
+Scaled	50	100
+[variable distances]
+Focal Length	50
+Angle of View	46
+F-Number	1.2
+Image Height	43.2
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf(p)	undefined
+Bf	35.63
+Aperture Diameter	28.280
+[lens data]
+1	54.33650	4.3410	1.80400	43.37	46.6
+2	208.10850	0.1455		43.37	
+3	39.16335	11.4350	1.74400	40.91	44.7
+4	192.18100	1.9960	1.63636	40.91	35.4
+5	20.84425	7.5615		29.95	
+5AS	AS	7.8640		28.280
+6	-18.91385	1.1630	1.80518	28.44	25.4
+7	360.40500	8.6640	1.81600	34.15	46.6
+8	-32.00150	0.1455		36.67	
+9	-158.21400	3.8760	1.88300	38.43	40.8
+10	-42.94290	0.0970		38.43
+11	609.52650	3.2960	1.77250	36.62	49.6
+12	-79.45200	0.1940		36.62	
+13	372.92700	1.7440	1.62299	36.11	58.2
+14	-610.82400	Bf		36.11	
+[aspherical data]
+3	39.16335	-0.7	9.378696E-07	2.017257E-09	-8.475334E-12	1.070054E-14
+[figure]
+source	Data/JP1981-075613_Figure01P.png
+originX	2
+originY	57
+ppmm	1.788
+[notes]
+Bill: Non-standard asphere; tried to hack.
+See:
+https://global.canon/en/c-museum/product/nfd208.html
+http://www.fou-du-canon-f-1.net/wp-content/uploads/2015/07/50mmf12-L-lensoptic.jpg

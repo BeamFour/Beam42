@@ -1,0 +1,35 @@
+[descriptive data]
+title	JP 1995-151965 Example ML (Canon New FD50mm f1.4)
+[constants]
+Scaled	50	1
+[variable distances]
+Focal Length	50
+Angle of View	46
+F-Number	1.4
+Image Height	43.2
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf(p)	undefined
+Bf	37.04
+[lens data]
+1	48.65	6.0	1.81600	38.92	46.6
+2	212.25	0.0		38.92
+3	24.20	4.5	1.69680	34.62	55.5
+4	42.00	1.5		32.86	
+5	56.20	2.5	1.66446	33.83	35.8
+6	16.60	8.7		24.85
+6AS	AS	7.3		24.255
+7	-17.75	2.0	1.71736	25.18	29.5
+8	144.95	6.5	1.75500	30.15	52.3
+9	-31.25	0.0		30.15
+10	-99.95	4.0	1.78800	31.95	47.4
+11	-31.80	0.0		31.95
+12	164.55	3.0	1.77250	32.84	49.6
+13	-109.15	Bf		32.84
+[figure]
+source	Data/JP1995-151965_Figure09P.png
+originX	29.57
+originY	88.54
+ppmm	2.614
+[notes]

@@ -1,0 +1,34 @@
+[descriptive data]
+title	US 3,560,079 Example 1 (Nikon Nikkor-S Auto 50mm f/1.4)
+[constants]
+Scaled	50	1
+[variable distances]
+Focal Length	50
+Angle of View	46
+F-Number	1.4
+Image Height	42
+Total Length	50.5	// 1.01 * 50
+Magnification	0
+d0	Infinity
+Bf	37.50	// 0.75 * 50
+[lens data]
+1	38.275	6.300	1.66446	38.48	35.9
+2	125.265	0.095		38.48
+3	28.680	8.430	1.69350	34.52	53.4
+4	620.205	1.645	1.64831	34.52	33.8
+5	16.200	7.820		23.94
+5AS	AS	8.460		23.379
+6	-14.460	2.035	1.69895	22.95	30.1
+7	-193.800	8.235	1.71300	30.72	53.9
+8	-22.675	0.195		30.72
+9	-116.280	4.165	1.67790	32.75	55.5
+10	-31.785	0.095		32.75
+11	77.520	3.100	1.71300	34.52	53.9
+12	-843.870	Bf		34.52
+[figure]
+source	Data/US003560079_Example01_Tale44-Fig1.png
+ppmm	10.19247041
+originX	4
+originY	202
+[notes]
+Bill: This is the production lens.

@@ -1,0 +1,35 @@
+[descriptive data]
+title	JP 1994-242370 Example 2 (Canon EF50mm F1.4 USM)
+[constants]
+Scaled	52.7	1
+[variable distances]
+Focal Length	52.7
+Angle of View	45.4
+F-Number	1.4
+Image Height	43.2
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf(p)	undefined
+Bf	39.60
+[lens data]
+1	53.71131	5.60465	1.77250	39.56	49.6
+2	385.50999	1.06981		39.56	
+3	26.89913	5.22731	1.83481	33.60	42.7
+4	42.47831	1.17679		31.62	
+5	65.66894	1.89562	1.64769	31.62	33.8
+6	18.26635	8.83859		26.78
+6AS	AS	7.1		25.867
+7	-19.08320	1.97678	1.80518	27.10	25.4
+8	536.24727	6.46576	1.75700	32.12	47.8
+9	-34.42048	0.16284		32.12	
+10	-84.89759	4.36145	1.88300	33.20	40.8
+11	-31.49984	0.15283		33.20	
+12	131.10811	3.05713	1.80400	32.24	46.6
+13	-131.11022	Bf		32.24	
+[figure]
+source	Data/JP1994-242370_Figure02P.png
+originX	152.02
+originY	323.48
+ppmm	7.448
+[notes]

@@ -96,6 +96,7 @@ public class LensTool {
                 } else {
                     System.out.println(renderer.write(new StringBuilder()).toString());
                 }
+                System.out.println(spot);
             }
             ParaxialFirstOrderInfo pfo = ParaxialFirstOrderInfo.compute(system);
             System.out.println(pfo);

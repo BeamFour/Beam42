@@ -31,12 +31,12 @@ import org.redukti.jfotoptix.math.MathUtils;
 import org.redukti.jfotoptix.math.Vector2;
 import org.redukti.jfotoptix.math.Vector2Pair;
 import org.redukti.jfotoptix.math.Vector3;
+import org.redukti.jfotoptix.model.OpticalSystem;
+import org.redukti.jfotoptix.model.Surface;
 import org.redukti.jfotoptix.plotting.PlotAxes;
 import org.redukti.jfotoptix.plotting.PlotRenderer;
 import org.redukti.jfotoptix.rendering.Renderer;
 import org.redukti.jfotoptix.rendering.RendererViewport;
-import org.redukti.jfotoptix.model.OpticalSystem;
-import org.redukti.jfotoptix.model.Surface;
 import org.redukti.jfotoptix.tracing.TracedRay;
 
 /**
@@ -136,5 +136,11 @@ public class AnalysisSpot extends AnalysisPointImage {
         PlotRenderer plotRenderer = new PlotRenderer();
         plotRenderer.draw_axes_2d (renderer, _axes);
         draw_intercepts (renderer, _image);
+    }
+
+    @Override
+    public String toString() {
+        // Convert to mm (diff is um but squared?)
+        return "Spot Result: RMS Radius " + _rms_radius * 1000.0 + " max radius " + _max_radius * 1000.0;
     }
 }

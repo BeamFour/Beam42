@@ -134,7 +134,7 @@ public class ZemaxExporter {
         sb.append("""
                 ENVD 20 1 0
                 GFAC 0 0
-                GCAT SCHOTT LACROIX HOYA HIKARI OHARA
+                GCAT SCHOTT LACROIX HOYA HIKARI OHARA NIKON-HIKARI NIKON
                 RAIM 0 2 1 1 0 1 0 0 0
                 SDMA 0 1 0
                 FTYP 3 0 3 3 0 0 0

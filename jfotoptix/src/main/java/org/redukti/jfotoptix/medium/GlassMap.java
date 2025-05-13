@@ -412,7 +412,9 @@ public class GlassMap extends Solid {
         glasses.put("NBFD13",new GlassMap("Hoya", "NBFD13",1.8061,1.80022,1.82001));
         glasses.put("NBFD15-W",new GlassMap("Hoya", "NBFD15-W",1.8061,1.79902,1.82325));
         glasses.put("NBFD15",new GlassMap("Hoya", "NBFD15",1.8061,1.79902,1.82325));
-        glasses.put("NBFD30",new GlassMap("Hoya", "NBFD30",1.85883,1.85052,1.87915));
+        glasses.put("NBFD25", new GlassMap("Hoya", "NBFD25", 1.85451, 1.84473, 1.87870));   // 25.15
+        glasses.put("NBFD29", new GlassMap("Hoya", "NBFD29", 1.77047, 1.76293, 1.78884));   // 29.74
+        glasses.put("NBFD30", new GlassMap("Hoya", "NBFD30", 1.85883, 1.85052, 1.87915));   // 30.0
         glasses.put("TAF1", new GlassMap("Hoya", "TAF1", 1.7725, 1.7678, 1.78336)); // 49.62
         glasses.put("TAF3D", new GlassMap("Hoya", "TAF3D", 1.8042, 1.799, 1.8163)); // 46.52
         glasses.put("TAF3", new GlassMap("Hoya", "TAF3", 1.8042, 1.799, 1.8163));
@@ -512,7 +514,8 @@ public class GlassMap extends Solid {
         glasses.put("MC-TAF101-100",new GlassMap("Hoya", "MC-TAF101-100",1.76902,1.76431,1.77991));
         glasses.put("M-TAF105",new GlassMap("Hoya", "M-TAF105",1.7725,1.76779,1.7834));
         glasses.put("MP-TAF105",new GlassMap("Hoya", "MP-TAF105",1.7725,1.76779,1.7834));
-        glasses.put("MC-TAF105",new GlassMap("Hoya", "MC-TAF105",1.7725,1.76779,1.7834));
+        glasses.put("MC-TAF105", new GlassMap("Hoya", "MC-TAF105", 1.7725, 1.76779, 1.7834));   // 49.5
+        glasses.put("MC-TAF115", new GlassMap("Hoya", "MC-TAF115", 1.77047, 1.76577, 1.78135));  // 49.46
         glasses.put("M-TAF401",new GlassMap("Hoya", "M-TAF401",1.77377,1.76884,1.78524));
         glasses.put("MP-TAF401",new GlassMap("Hoya", "MP-TAF401",1.77377,1.76884,1.78524));
         glasses.put("MC-TAF401",new GlassMap("Hoya", "MC-TAF401",1.77377,1.76884,1.78524));

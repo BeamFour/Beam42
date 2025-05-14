@@ -3,7 +3,7 @@ title	Noct Nikkor
 [constants]
 [variable distances]
 Focal Length	58.00
-Angle of View	40.5
+Angle of View	40.9
 F-Number	1.29
 Image Height	43.28
 Total Length	95.287
@@ -15,7 +15,7 @@ Bf	37.78
 4	65.439	1.552		44.67		
 5	119.835	3.49	1.7847	44	26.29	S-TIH23
 6	24.5	8.5		32.47
-7	AS	6.775		31.04
+7	AS	7.089		31.04
 8	-24.844	1.95	1.673	32.47	38.15	S-NBH52
 9	550.0	8.049	1.691	39.97	54.7	N-LAK9
 10	-39.5	0.388		39.98		
@@ -24,6 +24,6 @@ Bf	37.78
 13	165.646	3.9	1.58913	37.25	61.23	BAL35Y
 14	-93.913	37.780		37.25
 [aspherical data]
-1	70.0	-0.017	0	0	0	0
+1	70.0	0	0	0	0	0
 [figure]
 [notes]

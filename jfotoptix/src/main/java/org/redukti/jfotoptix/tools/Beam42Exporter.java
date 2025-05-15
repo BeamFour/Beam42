@@ -123,8 +123,7 @@ public class Beam42Exporter {
         generate_heading_line(sb, columns);
 
         for (Element e : seq) {
-            if (e instanceof Stop) {
-                Stop stop = (Stop) e;
+            if (e instanceof Stop stop) {
                 sb.append(columns[Type_col].pad("iris")).append(":")
                         .append(columns[Index_col].pad(stop.get_material(0).get_refractive_index(wvln))).append(":")
                         .append(columns[Z_col].pad(stop.get_position().z())).append(":")

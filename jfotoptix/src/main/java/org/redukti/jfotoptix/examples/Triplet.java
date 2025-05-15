@@ -36,7 +36,7 @@ public class Triplet {
                 .add_surface(-83.46, 10.2, 1.038,
                         new Abbe(Abbe.AbbeFormula.AbbeVd, 1.648, 33.8, 0.0))
                 .add_surface(25.67,  10.2, 4.0)
-                .add_stop(9.2, 6.925)
+                .add_stop(9.2, 6.925,true)
                 .add_surface(302.61,              10.3, 2.567,
                         new Abbe(Abbe.AbbeFormula.AbbeVd, 1.651, 55.9, 0.0))
                 .add_surface(-54.79, 10.3, 81.433);

@@ -36,7 +36,7 @@ public class Stop extends OpticalSurface {
 
     protected double _external_radius;
 
-    public Stop(int id, Vector3Pair p, Transform3 transform, Curve curve, Shape shape, double thickness) {
+    Stop(int id, Vector3Pair p, Transform3 transform, Curve curve, Shape shape, double thickness) {
         super(id, p, transform, curve, shape, Air.air, Air.air, thickness);
         _external_radius = shape.max_radius () * 2.0;
     }
@@ -53,7 +53,19 @@ public class Stop extends OpticalSurface {
         return _external_radius;
     }
 
+    public static class ApertureStop extends Stop {
+        public ApertureStop(int id, Vector3Pair p, Transform3 transform, Curve curve, Shape shape, double thickness) {
+            super(id, p, transform, curve, shape, thickness);
+        }
+    }
+    public static class FlareStop extends Stop {
+        public FlareStop(int id, Vector3Pair p, Transform3 transform, Curve curve, Shape shape, double thickness) {
+            super(id, p, transform, curve, shape, thickness);
+        }
+    }
+
     public static class Builder extends Surface.Builder {
+        private boolean _as;
         @Override
         public Stop.Builder position(Vector3Pair position) {
             return (Stop.Builder) super.position(position);
@@ -71,9 +83,13 @@ public class Stop extends OpticalSurface {
             super.thickness(t);
             return this;
         }
-
+        public Stop.Builder as(boolean as) {
+            this._as = as;
+            return this;
+        }
         public Stop build() {
-            return new Stop(_id, _position, _transform, curve, shape, _thickness);
+            return _as ?  new ApertureStop(_id, _position, _transform, curve, shape, _thickness)
+                    : new FlareStop(_id, _position, _transform, curve, shape, _thickness);
         }
     }
 }

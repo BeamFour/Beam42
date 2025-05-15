@@ -49,16 +49,18 @@ public class Lens extends Group {
     }
 
     protected List<OpticalSurface> _surfaces;
-    protected final Stop _stop;
+    // There can be more than stop, but one of them must be an
+    // ApertureStop, rest FlareStops
+    protected final List<Stop> _stops;
 
-    public Lens(int id, Vector3Pair position, Transform3 transform, List<OpticalSurface> surfaces, List<Element> elementList, Stop stop) {
+    public Lens(int id, Vector3Pair position, Transform3 transform, List<OpticalSurface> surfaces, List<Element> elementList, List<Stop> stops) {
         super(id, position, transform, elementList);
-        this._stop = stop;
+        this._stops = stops;
         this._surfaces = surfaces;
     }
 
-    public Stop stop() {
-        return _stop;
+    public List<Stop> stops() {
+        return _stops;
     }
 
     public List<OpticalSurface> surfaces() {
@@ -68,8 +70,8 @@ public class Lens extends Group {
     @Override
     void set_system(OpticalSystem system) {
         super.set_system(system);
-        if (_stop != null)
-            _stop.set_system(system);
+        for (Stop stop: _stops)
+            stop.set_system(system);
     }
 
     @Override
@@ -80,16 +82,17 @@ public class Lens extends Group {
     public static class Builder extends Group.Builder {
         double _last_pos = 0;
         Medium _next_mat = Air.air;
-        Stop.Builder _stop = null;
 
         @Override
         public Element build() {
             ArrayList<Element> elements = getElements();
-            Stop stop = (Stop) elements.stream().filter(e -> e instanceof Stop).findFirst().orElse(null);
+            List<Stop> stops = elements.stream().filter(e -> e instanceof Stop)
+                    .map(e->(Stop)e)
+                    .collect(Collectors.toList());
             List<OpticalSurface> surfaces = elements.stream().filter(e -> e instanceof OpticalSurface)
                     .map (e -> (OpticalSurface)e)
                     .collect(Collectors.toList());
-            return new Lens(_id, _position, _transform, surfaces, elements, stop);
+            return new Lens(_id, _position, _transform, surfaces, elements, stops);
         }
 
         /**
@@ -132,20 +135,18 @@ public class Lens extends Group {
             return this;
         }
 
-        public Lens.Builder add_stop(double radius, double thickness) {
-            return add_stop(new Disk(radius), thickness);
+        public Lens.Builder add_stop(double radius, double thickness, boolean is_aperturestop) {
+            return add_stop(new Disk(radius), thickness, is_aperturestop);
         }
-
-        public Lens.Builder add_stop(Shape shape, double thickness) {
-            if (_stop != null)
-                throw new IllegalArgumentException("Can not add more than one stop per Lens");
-            _stop = new Stop.Builder()
+        public Lens.Builder add_stop(Shape shape, double thickness, boolean is_aperturestop) {
+            Stop.Builder stop = new Stop.Builder()
                     .position(new Vector3Pair(new Vector3(0, 0, _last_pos), Vector3.vector3_001))
                     .curve(Flat.flat)
                     .shape(shape)
-                    .thickness(thickness);
+                    .thickness(thickness)
+                    .as(is_aperturestop);
             _last_pos += thickness;
-            add(_stop);
+            add(stop);
             return this;
         }
 

@@ -26,7 +26,7 @@ public class ChiefRayFinder {
         private OpticalSystem system;
         private RayTraceParameters parameters;
         private Distribution d = new Distribution(Pattern.UserDefined, 10, 0.999);
-        private Stop stop;
+        private Stop.ApertureStop stop;
         private RayTraceResults results;
 
         public ObjectiveFunction(OpticalSystem system) {
@@ -35,8 +35,8 @@ public class ChiefRayFinder {
             this.parameters.set_default_distribution(d);
             this.stop = this.system.get_sequence()
                     .stream()
-                    .filter(e -> e instanceof Stop)
-                    .map(e -> (Stop)e)
+                    .filter(e -> e instanceof Stop.ApertureStop)
+                    .map(e -> (Stop.ApertureStop)e)
                     .findFirst()
                     .orElse(null);
             if (this.stop == null) {

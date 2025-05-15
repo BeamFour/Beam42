@@ -58,7 +58,7 @@ public class Tessar {
                 .add_surface(1/-0.014065441, 12.766446, 3.728230979,
                         new Abbe(Abbe.AbbeFormula.AbbeVd, 1.575960, 41.2999, 0.0))
                 .add_surface(1/0.034678487,  11.918098, 4.417903733)
-                .add_stop(12.066273, 2.288913925)
+                .add_stop(12.066273, 2.288913925,true)
                 .add_surface(0,              12.372318, 1.499288597,
                         new Abbe(Abbe.AbbeFormula.AbbeVd, 1.526480, 51.4000, 0.0))
                 .add_surface(1/0.035104369,  14.642815, 7.996205852,

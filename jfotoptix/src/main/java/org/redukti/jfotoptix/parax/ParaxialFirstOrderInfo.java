@@ -66,7 +66,7 @@ public class ParaxialFirstOrderInfo {
         double ck1 = n_k * p_ray.get(last).slope;
         double dk1 = n_k * q_ray.get(last).slope;
 
-        Stop stop = seq.stream().filter(e-> e instanceof Stop).map(e -> (Stop)e).findFirst().orElse(null);
+        Stop stop = seq.stream().filter(e-> e instanceof Stop.ApertureStop).map(e -> (Stop)e).findFirst().orElse(null);
         double n_s = 1.0*stop.get_material(0).get_refractive_index(SpectralLine.d); // FIXME 1.0 is z_dir
         double as1 = p_ray.get(stop.id()).height;
         double bs1 = q_ray.get(stop.id()).height;

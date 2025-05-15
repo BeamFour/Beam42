@@ -160,11 +160,9 @@ public class RayTracer {
     }
 
     private List<TracedRay> process_rays_simple(Element e, RayTraceResults result, List<TracedRay> input) {
-        if (e instanceof Stop) {
-            Stop surface = (Stop) e;
-            return process_rays(surface, TraceIntensityMode.Simpletrace, result, input);
-        } else if (e instanceof Surface) {
-            Surface surface = (Surface) e;
+        if (e instanceof Stop stop) {
+            return process_rays(stop, TraceIntensityMode.Simpletrace, result, input);
+        } else if (e instanceof Surface surface) {
             return process_rays(surface, TraceIntensityMode.Simpletrace, result, input);
         } else {
             throw new UnsupportedOperationException();
@@ -182,8 +180,8 @@ public class RayTracer {
                     = ray.get_creator().get_transform_to(surface);
             Vector3Pair local = t.transform_line(ray.get_ray());
 
-            Vector3Pair pt = surface instanceof Stop ?
-                    intersect((Stop)surface, params, local) :
+            Vector3Pair pt = surface instanceof Stop stop ?
+                    intersect(stop, params, local) :
                     intersect(surface, params, local);
             if (pt != null) {
                 result.add_intercepted(surface, ray);
@@ -228,11 +226,11 @@ public class RayTracer {
     }
 
     private TracedRay trace_ray_simple(Surface surface, RayTraceResults result, TracedRay incident, Vector3Pair local, Vector3Pair pt) {
-        if (surface instanceof Stop) {
-            return trace_ray_simple((Stop) surface, result, incident, local, pt);
+        if (surface instanceof Stop stop) {
+            return trace_ray_simple(stop, result, incident, local, pt);
         }
-        else if (surface instanceof OpticalSurface) {
-            return trace_ray_simple((OpticalSurface) surface, result, incident, local, pt);
+        else if (surface instanceof OpticalSurface opticalSurface) {
+            return trace_ray_simple(opticalSurface, result, incident, local, pt);
         } else {
             return null;
         }

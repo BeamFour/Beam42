@@ -449,16 +449,19 @@ public class OpticalBenchDataImporter {
     }
 
     private static double add_surface(Lens.Builder lens, LensSurface surface,
-                       int scenario, boolean use_glass_types, double thickness_adjustment) {
-        double thickness = surface.get_thickness(scenario) + thickness_adjustment;
+                       int scenario, boolean use_glass_types) {
+        double thickness = surface.get_thickness(scenario);
         double radius = surface.get_radius();
         double aperture_radius = surface.get_diameter() / 2.0;
         double refractive_index = surface.get_refractive_index();
         double abbe_vd = surface.get_abbe_vd();
         String glass_name = surface.get_glass_name();
         if (surface.get_surface_type() == SurfaceType.aperture_stop) {
-            // TODO also handle field stop this way but need to mark as field stop
-            lens.add_stop(aperture_radius, thickness);
+            lens.add_stop(aperture_radius, thickness, true);
+            return thickness;
+        }
+        else if (surface.get_surface_type() == SurfaceType.field_stop) {
+            lens.add_stop(aperture_radius, thickness, false);
             return thickness;
         }
         AsphericalData aspherical_data = surface.get_aspherical_data();
@@ -470,8 +473,6 @@ public class OpticalBenchDataImporter {
             }
             else if (refractive_index != 0.0) {
                 if (abbe_vd == 0.0) {
-                    //fprintf (stderr, "Abbe vd not specified for surface %d\n",
-                    //        surface.get_id ());
                     return -1.0;
                 }
                 lens.add_surface(
@@ -521,18 +522,7 @@ public class OpticalBenchDataImporter {
         double image_pos = 0.0;
         List<LensSurface> surfaces = specs.get_surfaces();
         for (int i = 0; i < surfaces.size(); i++) {
-            double thickness_adjustment = 0.0, thickness = 0.0;
-            if (i < surfaces.size()-1 && surfaces.get(i+1).get_surface_type() == SurfaceType.field_stop) {
-                // Next surface is field stop
-                // we will add the thickess of field stop to the current surface
-                // FS will get 0 thickness as for now we skip it
-                // TODO allow option to retain field stop
-                thickness_adjustment = surfaces.get(i+1).get_thickness(scenario);
-            }
-            if (surfaces.get(i).get_surface_type() == SurfaceType.field_stop)
-                thickness = 0.0; // surfaces.get(i).get_thickness(scenario);
-            else
-                thickness = add_surface(lens, surfaces.get(i), scenario, use_glass_types, thickness_adjustment);
+            double thickness = add_surface(lens, surfaces.get(i), scenario, use_glass_types);
             image_pos += thickness;
         }
         sys.add(lens);

@@ -32,6 +32,17 @@ public class Helper {
         return Paths.get(path.getParent().toString(), arguments.outputFile + extension);
     }
 
+    public static Path getOutputPath(String specfile, String outputFile, String outdir) {
+        if (outputFile == null) {
+            throw new IllegalArgumentException("Output file name not specified");
+        }
+        if (outdir != null) {
+            return Paths.get(outdir, outputFile);
+        }
+        Path path = new File(specfile).toPath().toAbsolutePath();
+        return Paths.get(path.getParent().toString(), outputFile);
+    }
+
     public static void createOutputFile(Path outpath, String string) throws IOException {
         try {
             Files.write(outpath, string.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);

@@ -202,29 +202,28 @@ public class ParaxialFirstOrderInfo {
 
     @Override
     public String toString() {
-        return "ParaxFirstOrder{" +
-                "effective_focal_length=" + effective_focal_length +
-                ", back_focal_length=" + back_focal_length +
-                ", optical_invariant=" + optical_invariant +
-                ", object_distance=" + object_distance +
-                ", image_distance=" + image_distance +
-                ", power=" + power +
-                ", pp1=" + pp1 +
-                ", ppk=" + ppk +
-                ", ffl=" + ffl +
-                ", fno=" + fno +
-                ", enp_dist=" + enp_dist +
-                ", enp_radius=" + enp_radius +
-                ", exp_dist=" + exp_dist +
-                ", exp_radius=" + exp_radius +
-                ", m=" + m +
-                ", red=" + red +
-                ", n_obj=" + n_obj +
-                ", n_img=" + n_img +
-                ", img_ht=" + img_ht +
-                ", obj_ang=" + obj_ang +
-                ", obj_na=" + obj_na +
-                ", img_na=" + img_na +
-                '}';
+        return    "effective_focal_length " + effective_focal_length +
+                "\nback_focal_length      " + back_focal_length +
+                "\noptical_invariant      " + optical_invariant +
+                "\nobject_distance        " + object_distance +
+                "\nimage_distance         " + image_distance +
+                "\npower                  " + power +
+                "\npp1_H                  " + pp1 +
+                "\nppk_H'                 " + ppk +
+                "\nffl_F                  " + ffl +
+                "\nfno                    " + fno +
+                "\nenp_dist_P             " + enp_dist +
+                "\nenp_radius             " + enp_radius +
+                "\nexp_dist_P'            " + exp_dist +
+                "\nexp_radius             " + exp_radius +
+                "\nm                      " + m +
+                "\nred                    " + red +
+                "\nn_obj                  " + n_obj +
+                "\nn_img                  " + n_img +
+                "\nimg_ht                 " + img_ht +
+                "\nobj_ang                " + obj_ang +
+                "\nobj_na                 " + obj_na +
+                "\nimg_na                 " + img_na +
+                "\n";
     }
 }

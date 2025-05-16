@@ -1,0 +1,32 @@
+[descriptive data]
+title	US 4,123,144 Example 8 (Leica Summicron R 50mm f/2)
+[constants]
+Scaled	52	100
+[variable distances]
+Focal Length	52
+Angle of View	45.0
+F-Number	2
+Image Height	43.2
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf	37.32
+Aperture Diameter	18.059
+[lens data]
+1	42.71	3.99	1.73430	28.94	28.19
+2	195.38	0.20		27.06	
+3	20.50	7.18	1.67133	24.02	41.64
+4	Infinity	1.29	1.79190	21.49	25.55
+5	14.94	5.35		18.39
+6	AS	7.61		18.059
+7	-14.94	1.00	1.65222	17.50	33.60
+8	Infinity	5.22	1.79227	19.27	47.15
+9	-20.50	0.20		20.38	
+10	Infinity	3.69	1.79227	22.96	47.15
+11	-42.71	Bf		23.97	
+[figure]
+source	Data/US004123144_Figure02P.png
+originX	29
+originY	186.2
+ppmm	8.412
+[notes]

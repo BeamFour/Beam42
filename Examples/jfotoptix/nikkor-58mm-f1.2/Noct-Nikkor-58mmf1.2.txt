@@ -6,7 +6,7 @@ Focal Length	58.00
 Angle of View	40.9
 F-Number	1.29
 Image Height	43.28
-Total Length	95.287
+Total Length	95.674
 Bf	37.78
 [lens data]
 1	74.2272	7.175639	1.8485	49.93	43.8	J-LASFH22

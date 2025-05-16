@@ -1,0 +1,42 @@
+[descriptive data]
+title	US 3,552,829 Example 1
+[constants]
+Scaled	50	1
+[variable distances]
+Focal Length	50
+Angle of View(p)	40
+Angle of View	46.7
+F-Number	1.4
+Image Height	43.2
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf(p)	undefined
+Bf	36.5
+[lens data]
+1	56.6550	5.2400	1.81500	38.50	45.2
+2	600.0000	0.5650		38.50	
+3	25.6800	6.5600	1.69400	33.50	54.6
+4	51.8750	0.8000		28.716
+5	84.6000	2.2550	1.63003	34.00	35.4
+6	17.2950	5.865		24.50	
+6AS	AS	5.565		24.100	
+7	-19.4750	2.8550	1.79180	24.00	25.9
+8	246.0200	6.1850	1.80040	31.00	42.7
+9	-35.9650	0.0950		31.00	
+10	-125.8950	4.0500	1.80040	31.50	42.7
+11	-37.6250	0.0950		31.50	
+12	198.1300	4.0500	1.71615	31.50	53.7
+13	-63.0250	Bf		31.50	
+[figure]
+source	Data/US003552829_Figure.png
+originX	144.44
+originY	552.40
+ppmm	20.391
+[!figure]
+source	Data/US003552829_FigureP.png
+originX	144.44
+originY	552.40
+ppmm	20.391
+[notes]
+Bill: s4 constrains F-Number. Angle in patent very rough; adjusted. Close to but not really Leica Summilux-R 50mm f/1.4 (I)

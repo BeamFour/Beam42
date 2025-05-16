@@ -4,7 +4,7 @@ title	Noct Nikkor
 [variable distances]
 Focal Length	58.00
 Angle of View	40.9
-F-Number	1.29
+F-Number	1.2
 Image Height	43.28
 Total Length	95.674
 Bf	37.78

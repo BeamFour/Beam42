@@ -19,7 +19,7 @@ public class ZemaxExporter {
         System.out.println(exporter.generate(specs, arguments.scenario, arguments.only_d_line));
     }
 
-    private String generate(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean dlineOnly) {
+    public String generate(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean dlineOnly) {
         StringBuilder sb = new StringBuilder();
 
         outputHeading(specs, scenario, dlineOnly, sb);

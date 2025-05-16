@@ -43,6 +43,17 @@ public class Helper {
         return Paths.get(path.getParent().toString(), outputFile);
     }
 
+    public static Path getOutputPathChangeExt(String specfile, String extension) {
+        Path path = new File(specfile).toPath().toAbsolutePath();
+        String fileName = path.getFileName().toString();
+        // Remove extension
+        int dotIndex = fileName.lastIndexOf('.');
+        if (dotIndex > 0 && dotIndex < fileName.length() - 1) {
+            fileName = fileName.substring(0, dotIndex);
+        }
+        return Paths.get(path.getParent().toString(), fileName + extension);
+    }
+
     public static void createOutputFile(Path outpath, String string) throws IOException {
         try {
             Files.write(outpath, string.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);

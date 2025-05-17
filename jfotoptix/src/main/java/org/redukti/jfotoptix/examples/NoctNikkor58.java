@@ -14,6 +14,7 @@ import org.redukti.jfotoptix.shape.Rectangle;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 public class NoctNikkor58 {
@@ -114,46 +115,64 @@ public class NoctNikkor58 {
         return GlassMap.glasses.values().stream().map(e -> e.get_refractive_index(SpectralLine.d)).filter(e -> e > 1.7 && e < 1.91).sorted().distinct().collect(Collectors.toList());
     }
 
+    static GlassType[] nikonGlasses() {
+        return new GlassType[]{new GlassType(1.6727, 32.2), new GlassType(1.68893, 31.16), new GlassType(1.69895, 30.1), new GlassType(1.71300, 53.9),   // canon
+                new GlassType(1.71736, 29.5), new GlassType(1.72825, 28.46), new GlassType(1.72, 0), new GlassType(1.74, 28.3), new GlassType(1.74077, 27.6), new GlassType(1.74430, 49.5),   // US 4,621,909
+                new GlassType(1.74443, 49.53), new GlassType(1.75520, 27.6), // also in canon
+                new GlassType(1.76684, 46.81), new GlassType(1.77279, 49.4), new GlassType(1.78470, 0), new GlassType(1.78797, 47.5), new GlassType(1.79631, 40.8), new GlassType(1.79713, 45.62), new GlassType(1.79668, 45.5), new GlassType(1.80218, 44.7), new GlassType(1.80411, 46.4), new GlassType(1.84042, 43.3), new GlassType(1.87739, 38.1), new GlassType(1.90265, 35.8)};
+    }
+
     static List<Double> getGlassTypes() {
         Double[] glasses = new Double[]{1.6727, 1.68893, 1.69895, 1.71300, 1.71736, 1.72825, 1.72, 1.74, 1.74077, 1.74430, 1.74443, 1.75520, 1.76684, 1.77279, 1.78470, 1.78797, 1.79631, 1.79668, 1.80218, 1.80411, 1.84042, 1.87739};
         return List.of(glasses);
     }
 
-    public static void main(String[] args) throws Exception {
+    static final class ProcessSystems implements Runnable {
 
-        var glassTypes = getGlassTypes();
-        System.out.println("Trying " + glassTypes.size() + " glass types");
-        var glasses = new double[7];
-        long count = 0;
-        for (int a = 0; a < glassTypes.size(); a++) {
-            glasses[0] = glassTypes.get(a);
-            for (int b = 0; b < glassTypes.size(); b++) {
-                glasses[1] = glassTypes.get(b);
-                for (int c = 0; c < glassTypes.size(); c++) {
-                    glasses[2] = glassTypes.get(c);
-                    for (int d = 0; d < glassTypes.size(); d++) {
-                        glasses[3] = glassTypes.get(d);
-                        for (int e = 0; e < glassTypes.size(); e++) {
-                            glasses[4] = glassTypes.get(e);
-                            for (int f = 0; f < glassTypes.size(); f++) {
-                                glasses[5] = glassTypes.get(f);
-                                for (int g = 0; g < glassTypes.size(); g++) {
-                                    glasses[6] = glassTypes.get(g);
-                                    var system = buildSystem(glasses).build();
-                                    //System.out.println(system);
-                                    count++;
-                                    try {
-                                        var parax = ParaxialFirstOrderInfo.compute(system);
-                                        var h_diff = parax.pp1 - parax.ppk;  // H - H'
-                                        if (parax.effective_focal_length > 57.0 && parax.effective_focal_length < 58.1 && parax.ppk > 37.85 && parax.ppk < 39.7 && h_diff > 14.1 && h_diff < 14.5) {
-                                            StringBuilder sb = new StringBuilder();
-                                            sb.append(parax.effective_focal_length).append("\t").append(parax.ppk).append("\t").append(parax.pp1).append("\t").append(parax.ppk - parax.pp1).append("\t");
-                                            for (int i = 0; i < glasses.length; i++)
-                                                sb.append(glasses[i]).append("\t");
-                                            System.out.println(sb.toString());
+        int start;
+        int end;
+        List<Double> glassTypes;
+        AtomicLong count;
+
+        public ProcessSystems(int start, int end, List<Double> glassTypes, AtomicLong count) {
+            this.start = start;
+            this.end = end;
+            this.glassTypes = glassTypes;
+            this.count = count;
+        }
+
+        public void run() {
+            var glasses = new double[7];
+            for (int a = start; a < end; a++) {
+                glasses[0] = glassTypes.get(a);
+                for (int b = 0; b < glassTypes.size(); b++) {
+                    glasses[1] = glassTypes.get(b);
+                    for (int c = 0; c < glassTypes.size(); c++) {
+                        glasses[2] = glassTypes.get(c);
+                        for (int d = 0; d < glassTypes.size(); d++) {
+                            glasses[3] = glassTypes.get(d);
+                            for (int e = 0; e < glassTypes.size(); e++) {
+                                glasses[4] = glassTypes.get(e);
+                                for (int f = 0; f < glassTypes.size(); f++) {
+                                    glasses[5] = glassTypes.get(f);
+                                    for (int g = 0; g < glassTypes.size(); g++) {
+                                        glasses[6] = glassTypes.get(g);
+                                        var system = buildSystem(glasses).build();
+                                        //System.out.println(system);
+                                        count.incrementAndGet();
+                                        try {
+                                            var parax = ParaxialFirstOrderInfo.compute(system);
+                                            var h_diff = parax.pp1 - parax.ppk;  // H - H'
+                                            if (parax.effective_focal_length > 57.0 && parax.effective_focal_length < 58.5 && parax.ppk > 37 && parax.ppk < 40 && h_diff > 14 && h_diff < 14.6) {
+                                                StringBuilder sb = new StringBuilder();
+                                                sb.append(parax.effective_focal_length).append("\t").append(parax.ppk).append("\t").append(parax.pp1).append("\t").append(parax.ppk - parax.pp1).append("\t");
+                                                for (int i = 0; i < glasses.length; i++)
+                                                    sb.append(glasses[i]).append("\t");
+                                                System.out.println(sb.toString());
+                                            }
+                                        } catch (Exception ex) {
+                                            ex.printStackTrace();
                                         }
-                                    } catch (Exception ex) {
-                                        ex.printStackTrace();
                                     }
                                 }
                             }
@@ -161,6 +180,34 @@ public class NoctNikkor58 {
                     }
                 }
             }
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        var glassTypes = getGlassTypes();
+        System.out.println("Trying " + glassTypes.size() + " glass types");
+
+        AtomicLong count = new AtomicLong();
+        int numThreads = 8;
+        Thread[] threads = new Thread[numThreads];
+        int perThreadGlassCount = (int) Math.round((double) glassTypes.size() / (double) numThreads);
+        int start = 0;
+        for (int g = 0; g < numThreads; g++) {
+            int end;
+            if (g == numThreads - 1) {
+                end = glassTypes.size();
+            } else {
+                end = start + perThreadGlassCount;
+            }
+            System.out.println("Allocating " + start + " to " + end);
+            threads[g] = new Thread(new ProcessSystems(start, end, glassTypes, count));
+            start += perThreadGlassCount;
+            threads[g].start();
+        }
+
+        for (Thread thread : threads) {
+            thread.join();
         }
         System.out.println("Processed " + count + " systems");
     }

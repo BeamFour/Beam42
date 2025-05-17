@@ -1,0 +1,31 @@
+[descriptive data]
+title	US 4,514,051 Example ML 2 (Nikon AI Nikkor 50mm f/1.8)
+[constants]
+[variable distances]
+Focal Length	51.6
+Angle of View	46
+F-Number	1.8
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf	37.60538
+[lens data]
+1	41.000	4.6	1.79631	33.64	40.8
+2	197.900	0.1		33.64	
+3	21.400	4.7	1.78797	27.76	47.5
+4	32.600	1.0		25.24	
+5	51.000	1.1	1.74000	25.24	28.2
+6	16.200	7.9		20.91
+6AS	AS	5.2		20.077
+7	-16.500	1.3	1.74000	19.83	28.2
+8	-100.000	5.4	1.74443	23.34	49.5
+9	-20.640	0.1		24.90	
+10	204.300	3.45	1.79631	24.30	40.8
+11	-49.650	Bf		24.30	
+[figure]
+source	Data/US004514051_Figure05MLP.png
+originX	173.72
+originY	727.97
+ppmm	5.663
+[notes]
+Bill: Repair sign r10.

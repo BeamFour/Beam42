@@ -1,0 +1,33 @@
+[descriptive data]
+title	US 4,234,242 Example 3 (Nikon AI Nikkor 50mm f/1.8S)
+[constants]
+Scaled	50	100
+[variable distances]
+Focal Length	50
+Angle of View	46
+F-Number	1.8
+Image Height	43.2
+Total Length	66.6
+Magnification	0
+d0	Infinity
+Bf	37.1
+[lens data]
+1	48.984	3.395	1.76682	29.55	46.81
+2	1676.347	0.095		29.55
+3	19.388	4.025	1.79713	26.69	45.62
+4	33.290	1.260		24.75
+5	67.471	0.970	1.71714	26.69	29.49
+6	15.627	5.790		21.12
+6AS	AS	5.310		20.481
+7	-16.267	0.970	1.64831	20.85	33.77	SF12?
+8	-211.893	4.800	1.76682	24.30	46.81
+9	-20.232	0.095		24.30
+10	380.201	2.765	1.71313	24.55	53.94
+11	-52.203	Bf		24.55
+[figure]
+source	Data/US004234242_Example03-Tale60-Fig1.png
+originX	5
+originY	289
+ppmm	19.005
+[notes]
+Bill: s7 1.64841/1.6733 (!) -> 1.64831/33.8

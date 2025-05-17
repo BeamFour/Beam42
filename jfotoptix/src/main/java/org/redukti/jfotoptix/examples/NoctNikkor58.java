@@ -162,10 +162,16 @@ public class NoctNikkor58 {
                                         count.incrementAndGet();
                                         try {
                                             var parax = ParaxialFirstOrderInfo.compute(system);
+                                            // Expected H' ppk = 37.5
+                                            // Expected H pp1 = 51.8
+                                            // expected H - H1 = 14.3
+
                                             var h_diff = parax.pp1 - parax.ppk;  // H - H'
-                                            if (parax.effective_focal_length > 57.0 && parax.effective_focal_length < 58.5 && parax.ppk > 37 && parax.ppk < 40 && h_diff > 14 && h_diff < 14.6) {
+                                            if (parax.effective_focal_length > 57.9 && parax.effective_focal_length < 58.1 && parax.back_focal_length > 37.7 && parax.back_focal_length < 38.2 && h_diff > 14 && h_diff < 20
+                                                //&& parax.ppk > 37 && parax.ppk < 40
+                                            ) {
                                                 StringBuilder sb = new StringBuilder();
-                                                sb.append(parax.effective_focal_length).append("\t").append(parax.ppk).append("\t").append(parax.pp1).append("\t").append(parax.ppk - parax.pp1).append("\t");
+                                                sb.append(parax.effective_focal_length).append("\t").append(parax.back_focal_length).append("\t").append(parax.fno).append("\t").append(parax.ppk).append("\t").append(parax.pp1).append("\t").append(h_diff).append("\t");
                                                 for (int i = 0; i < glasses.length; i++)
                                                     sb.append(glasses[i]).append("\t");
                                                 System.out.println(sb.toString());

@@ -19,27 +19,27 @@ import java.util.stream.Collectors;
 public class ParaxialFirstOrderInfo {
 
     public double effective_focal_length;
-    double back_focal_length;
-    double optical_invariant;
-    double object_distance;
-    double image_distance;
-    double power;
+    public double back_focal_length;
+    public double optical_invariant;
+    public double object_distance;
+    public double image_distance;
+    public double power;
     public double pp1;
     public double ppk;
-    double ffl;
-    double fno;
-    double enp_dist;
-    double enp_radius;
-    double exp_dist;
-    double exp_radius;
-    double m;
-    double red;
-    double n_obj;
-    double n_img;
-    double img_ht;
-    double obj_ang;
-    double obj_na;
-    double img_na;
+    public double ffl;
+    public double fno;
+    public double enp_dist;
+    public double enp_radius;
+    public double exp_dist;
+    public double exp_radius;
+    public double m;
+    public double red;
+    public double n_obj;
+    public double n_img;
+    public double img_ht;
+    public double obj_ang;
+    public double obj_na;
+    public double img_na;
 
     static final double DISTANCE = 1e10;
 

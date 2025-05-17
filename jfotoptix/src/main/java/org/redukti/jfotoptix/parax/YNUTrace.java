@@ -54,7 +54,7 @@ public class YNUTrace {
                 aoi = u1 + y1 * C1; // Eq 1.51 in handbook of Optical Dsign
                 //double power = surface.power(SpectralLine.d);
                 YNUTraceData data = new YNUTraceData(y1, u1, aoi);
-                System.out.println("id="+ e.id() + data);
+                //System.out.println("id="+ e.id() + data);
                 tracedata.put(e.id(), data);
             }
             else {
@@ -66,7 +66,7 @@ public class YNUTrace {
         //double l = -y1/u1;
         //System.out.println(l);
         //System.out.println(-1.0/u1);
-        System.out.println("Image id=0,"+tracedata.get(0));
+        //System.out.println("Image id=0,"+tracedata.get(0));
         return tracedata;
     }
 

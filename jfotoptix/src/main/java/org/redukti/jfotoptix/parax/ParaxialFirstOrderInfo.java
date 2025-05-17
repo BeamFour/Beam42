@@ -18,14 +18,14 @@ import java.util.stream.Collectors;
 
 public class ParaxialFirstOrderInfo {
 
-    double effective_focal_length;
+    public double effective_focal_length;
     double back_focal_length;
     double optical_invariant;
     double object_distance;
     double image_distance;
     double power;
-    double pp1;
-    double ppk;
+    public double pp1;
+    public double ppk;
     double ffl;
     double fno;
     double enp_dist;

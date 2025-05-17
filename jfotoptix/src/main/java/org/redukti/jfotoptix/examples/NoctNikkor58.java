@@ -1,9 +1,11 @@
 package org.redukti.jfotoptix.examples;
 
 import org.redukti.jfotoptix.curve.Flat;
+import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 import org.redukti.jfotoptix.medium.Abbe;
+import org.redukti.jfotoptix.medium.GlassMap;
 import org.redukti.jfotoptix.model.Image;
 import org.redukti.jfotoptix.model.Lens;
 import org.redukti.jfotoptix.model.OpticalSystem;
@@ -12,6 +14,7 @@ import org.redukti.jfotoptix.shape.Rectangle;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class NoctNikkor58 {
 
@@ -42,7 +45,6 @@ public class NoctNikkor58 {
             this.vd = vd;
         }
     }
-
 
     private static double add_surface(Lens.Builder lens, double radius, double thickness, double diameter, double nd, double vd, boolean stop) {
         double apertureRadius = diameter / 2.0;
@@ -78,7 +80,7 @@ public class NoctNikkor58 {
         return list;
     }
 
-    private static OpticalSystem.Builder buildSystem(GlassType[] glassTypes) {
+    private static OpticalSystem.Builder buildSystem(double[] glassTypes) {
         OpticalSystem.Builder sys = new OpticalSystem.Builder();
         double imageHeight = 43.28;
         double angleOfView = 40.9 / 2.0;
@@ -87,9 +89,15 @@ public class NoctNikkor58 {
         Lens.Builder lens = new Lens.Builder().position(Vector3Pair.position_000_001);
         double image_pos = 0.0;
         List<SurfaceType> surfaces = getSurfaces();
+        int index = 0;
         for (int i = 0; i < surfaces.size(); i++) {
             SurfaceType s = surfaces.get(i);
-            double thickness = add_surface(lens, s.radius, s.thickness, s.apertureRadius, s.nd, s.vd, s.isStop);
+            double nd = s.nd;
+            double vd = s.vd;
+            if (nd != 0) {
+                nd = glassTypes[index++];
+            }
+            double thickness = add_surface(lens, s.radius, s.thickness, s.apertureRadius, nd, vd, s.isStop);
             image_pos += thickness;
         }
         sys.add(lens);
@@ -100,11 +108,60 @@ public class NoctNikkor58 {
         return sys;
     }
 
+    // Facts H' - H = 14.3
+    // F' = 58
+    static List<Double> getGlassTypes1() {
+        return GlassMap.glasses.values().stream().map(e -> e.get_refractive_index(SpectralLine.d)).filter(e -> e > 1.7 && e < 1.91).sorted().distinct().collect(Collectors.toList());
+    }
+
+    static List<Double> getGlassTypes() {
+        Double[] glasses = new Double[]{1.6727, 1.68893, 1.69895, 1.71300, 1.71736, 1.72825, 1.72, 1.74, 1.74077, 1.74430, 1.74443, 1.75520, 1.76684, 1.77279, 1.78470, 1.78797, 1.79631, 1.79668, 1.80218, 1.80411, 1.84042, 1.87739};
+        return List.of(glasses);
+    }
+
     public static void main(String[] args) throws Exception {
 
-        var system = buildSystem(new GlassType[]{}).build();
-        System.out.println(system);
-        var parax = ParaxialFirstOrderInfo.compute(system);
-        System.out.println(parax);
+        var glassTypes = getGlassTypes();
+        System.out.println("Trying " + glassTypes.size() + " glass types");
+        var glasses = new double[7];
+        long count = 0;
+        for (int a = 0; a < glassTypes.size(); a++) {
+            glasses[0] = glassTypes.get(a);
+            for (int b = 0; b < glassTypes.size(); b++) {
+                glasses[1] = glassTypes.get(b);
+                for (int c = 0; c < glassTypes.size(); c++) {
+                    glasses[2] = glassTypes.get(c);
+                    for (int d = 0; d < glassTypes.size(); d++) {
+                        glasses[3] = glassTypes.get(d);
+                        for (int e = 0; e < glassTypes.size(); e++) {
+                            glasses[4] = glassTypes.get(e);
+                            for (int f = 0; f < glassTypes.size(); f++) {
+                                glasses[5] = glassTypes.get(f);
+                                for (int g = 0; g < glassTypes.size(); g++) {
+                                    glasses[6] = glassTypes.get(g);
+                                    var system = buildSystem(glasses).build();
+                                    //System.out.println(system);
+                                    count++;
+                                    try {
+                                        var parax = ParaxialFirstOrderInfo.compute(system);
+                                        var h_diff = parax.pp1 - parax.ppk;  // H - H'
+                                        if (parax.effective_focal_length > 57.0 && parax.effective_focal_length < 58.1 && parax.ppk > 37.85 && parax.ppk < 39.7 && h_diff > 14.1 && h_diff < 14.5) {
+                                            StringBuilder sb = new StringBuilder();
+                                            sb.append(parax.effective_focal_length).append("\t").append(parax.ppk).append("\t").append(parax.pp1).append("\t").append(parax.ppk - parax.pp1).append("\t");
+                                            for (int i = 0; i < glasses.length; i++)
+                                                sb.append(glasses[i]).append("\t");
+                                            System.out.println(sb.toString());
+                                        }
+                                    } catch (Exception ex) {
+                                        ex.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        System.out.println("Processed " + count + " systems");
     }
 }

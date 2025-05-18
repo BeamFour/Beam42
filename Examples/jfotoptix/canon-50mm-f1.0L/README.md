@@ -1,0 +1,1 @@
+The spec fails ray tracing - so there is an error somewhere.

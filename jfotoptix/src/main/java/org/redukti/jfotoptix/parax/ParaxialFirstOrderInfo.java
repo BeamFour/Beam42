@@ -18,27 +18,47 @@ import java.util.stream.Collectors;
 
 public class ParaxialFirstOrderInfo {
 
+    // efl: effective focal length
     public double effective_focal_length;
+    // bfl: back focal length
     public double back_focal_length;
+    // opt_inv: optical invariant
     public double optical_invariant;
+    // obj_dist: object distance
     public double object_distance;
+    // img_dist: paraxial image distance
     public double image_distance;
     public double power;
+    // pp1: distance of front principle plane from 1st surface
     public double pp1;
+    // ppk: distance of rear principle plane from last surface
     public double ppk;
+    // ffl: front focal length
     public double ffl;
+    // fno: focal ratio at working conjugates, f/#
     public double fno;
+    // enp_dist: entrance pupil distance from 1st surface
     public double enp_dist;
+    // enp_radius: entrance pupil radius
     public double enp_radius;
+    // exp_dist: exit pupil distance from last interface
     public double exp_dist;
+    // exp_radius: exit pupil radius
     public double exp_radius;
     public double m;
+    // red: reduction ratio
     public double red;
+    // n_obj: refractive index at central wavelength in object space
     public double n_obj;
+    // n_img: refractive index at central wavelength in image space
     public double n_img;
+    // img_ht: image height
     public double img_ht;
+    // obj_ang: maximum object angle (degrees)
     public double obj_ang;
+    // obj_na: numerical aperture in object space
     public double obj_na;
+    // img_na: numerical aperture in image space
     public double img_na;
 
     static final double DISTANCE = 1e10;

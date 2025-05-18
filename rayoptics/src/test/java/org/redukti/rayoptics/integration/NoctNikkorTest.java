@@ -192,11 +192,11 @@ public class NoctNikkorTest {
 
         LensLayout layout = new LensLayout(opm);
 
-        System.out.println("---- elements ----");
-        System.out.println(opm.ele_model.list_elements());
+        //System.out.println("---- elements ----");
+        //System.out.println(opm.ele_model.list_elements());
 
-        System.out.println("---- ele model ----");
-        System.out.println(opm.ele_model.list_model());
+        //System.out.println("---- ele model ----");
+        //System.out.println(opm.ele_model.list_model());
 
         List<RayBundle> rays = layout.create_ray_entities(0.0);
         for (RayBundle ray : rays)

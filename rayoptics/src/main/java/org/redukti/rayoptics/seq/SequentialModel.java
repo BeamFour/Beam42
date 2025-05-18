@@ -2,7 +2,6 @@ package org.redukti.rayoptics.seq;
 
 import org.redukti.mathlib.Matrix3;
 import org.redukti.mathlib.Vector3;
-import org.redukti.rayoptics.elem.Node;
 import org.redukti.rayoptics.elem.Surface;
 import org.redukti.rayoptics.elem.Transform;
 import org.redukti.rayoptics.math.Transform3;
@@ -145,12 +144,6 @@ public class SequentialModel {
         }
         NewSurfaceSpec newSurfaceSpec = create_surface_and_gap(surf_data, radius_mode, mat, 550.0);
         insert(newSurfaceSpec.surface, newSurfaceSpec.gap, false, newSurfaceSpec.z_dir);
-
-        Node root_node = opt_model.part_tree.root_node;
-        int idx = cur_surface;
-        new Node("i" + idx, newSurfaceSpec.surface, "#ifc", root_node);
-        if (newSurfaceSpec.gap != null)
-            new Node("g" + idx, new Pair<>(newSurfaceSpec.gap, z_dir.get(idx)), "#gap", root_node);
     }
 
     /**

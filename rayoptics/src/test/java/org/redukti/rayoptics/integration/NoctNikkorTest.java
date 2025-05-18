@@ -139,10 +139,24 @@ public class NoctNikkorTest {
         Assertions.assertEquals(59.62, fod.efl, 0.001);
         Assertions.assertEquals(1.660, fod.ffl, 0.001);
         Assertions.assertEquals(61.28, fod.pp1, 0.001);
+        Assertions.assertEquals(58.63, fod.ppk, 0.01);
+        Assertions.assertEquals(0.9925, fod.bfl, 0.001);
+        Assertions.assertEquals(0.9800, fod.fno, 0.001);
+        Assertions.assertEquals(-5.962e-09, fod.m, 1e-9);
+        Assertions.assertEquals(-1.6772757151780143E8, fod.red, 1e-6);
+        Assertions.assertEquals(19.98, fod.obj_ang, 0.01);
+        Assertions.assertEquals(69.29, fod.enp_dist, 0.01);
+        Assertions.assertEquals(30.42, fod.enp_radius, 0.01);
+        Assertions.assertEquals(3.042e-09, fod.obj_na, 1e-9);
+        Assertions.assertEquals(1.000, fod.n_obj, 1e-9);
+        Assertions.assertEquals(0.9925, fod.img_dist, 0.00001);
+        Assertions.assertEquals(21.68, fod.img_ht, 0.01);
+        Assertions.assertEquals(-51.58, fod.exp_dist, 0.01);
+        Assertions.assertEquals(26.82, fod.exp_radius, 0.01);
+        Assertions.assertEquals(1.000, fod.n_img, 0.001);
         Assertions.assertEquals(11.06, fod.opt_inv, 0.001);
 
         // Test a ray trace
-
         RayTraceOptions options = new RayTraceOptions();
         options.first_surf = 1;
         options.last_surf = sm.get_num_surfaces() - 2;

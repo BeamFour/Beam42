@@ -46,8 +46,8 @@ public class OpticalSpecs {
     public OpticalSpecs(OpticalModel opt_model) {
         this.opt_model = opt_model;
         this.spectral_region = new WvlSpec(new WvlWt[]{new WvlWt("d", 1.)}, 0);
-        this.pupil = new PupilSpec(this, new Pair<>("object", "pupil"), 1.0);
-        this.field_of_view = new FieldSpec(this, new Pair<>("object", "angle"), new double[]{0.});
+        this.pupil = new PupilSpec(this, new Pair<>(ImageKey.Object, ValueKey.Pupil), 1.0);
+        this.field_of_view = new FieldSpec(this, new Pair<>(ImageKey.Object, ValueKey.Angle), new double[]{0.});
         this.focus = new FocusRange();
         this.parax_data = null;
         this.do_aiming = OpticalSpecs.do_aiming_default;

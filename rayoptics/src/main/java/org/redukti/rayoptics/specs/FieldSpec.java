@@ -33,20 +33,20 @@ public class FieldSpec {
     public Field[] fields;
     public String[] index_labels;
 
-    public FieldSpec(OpticalSpecs parent, Pair<String, String> key, double value, double[] flds,
+    public FieldSpec(OpticalSpecs parent, Pair<ImageKey, ValueKey> key, double value, double[] flds,
                      boolean is_relative, boolean do_init) {
         optical_spec = parent;
-        this.key = new SpecKey("field", key.first, key.second);
+        this.key = new SpecKey(SpecType.Field, key.first, key.second);
         this.value = value;
         this.is_relative = is_relative;
         this.fields = do_init ? set_from_list(flds) : new Field[0];
     }
 
     public FieldSpec(OpticalSpecs parent) {
-        this(parent, new Pair<>("object", "angle"), 0.0, new double[]{0.0}, false, true);
+        this(parent, new Pair<>(ImageKey.Object, ValueKey.Angle), 0.0, new double[]{0.0}, false, true);
     }
 
-    public FieldSpec(OpticalSpecs parent, Pair<String, String> key, double[] flds) {
+    public FieldSpec(OpticalSpecs parent, Pair<ImageKey, ValueKey> key, double[] flds) {
         this(parent, key, 0.0, flds, false, true);
     }
 
@@ -94,22 +94,22 @@ public class FieldSpec {
         if (is_relative)
             fld_coord = fld_coord.times(value);
 
-        String field = key.type;
-        String obj_img_key = key.imageKey;
-        String value_key = key.valueKey;
+        SpecType field = key.type;
+        ImageKey obj_img_key = key.imageKey;
+        ValueKey value_key = key.valueKey;
 
         Vector3 obj_pt = null;
 
         FirstOrderData fod = optical_spec.parax_data.fod;
-        if (obj_img_key.equals("object")) {
-            if (value_key.equals("angle")) {
+        if (obj_img_key == ImageKey.Object) {
+            if (value_key == ValueKey.Angle) {
                 Vector3 dir_tan = fld_coord.deg2rad().tan();
                 obj_pt = dir_tan.times(fod.obj_dist + fod.enp_dist).negate();
-            } else if (value_key.equals("height")) {
+            } else if (value_key == ValueKey.Height) {
                 obj_pt = fld_coord;
             }
-        } else if (obj_img_key.equals("image")) {
-            if (value_key.equals("height")) {
+        } else if (obj_img_key == ImageKey.Image) {
+            if (value_key == ValueKey.Height) {
                 Vector3 img_pt = fld_coord;
                 obj_pt = img_pt.times(fod.red);
             }

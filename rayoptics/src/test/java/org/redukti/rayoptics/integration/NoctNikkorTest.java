@@ -28,8 +28,8 @@ public class NoctNikkorTest {
         SequentialModel sm = opm.seq_model;
         OpticalSpecs osp = opm.optical_spec;
         ParaxialModel pm = opm.parax_model;
-        osp.pupil = new PupilSpec(osp, new Pair<>("image", "f/#"), 0.98);
-        osp.field_of_view = new FieldSpec(osp, new Pair<>("object", "angle"), new double[]{0., 19.98});
+        osp.pupil = new PupilSpec(osp, new Pair<>(ImageKey.Image, ValueKey.Fnum), 0.98);
+        osp.field_of_view = new FieldSpec(osp, new Pair<>(ImageKey.Object, ValueKey.Angle), new double[]{0., 19.98});
         osp.spectral_region = new WvlSpec(new WvlWt[]{new WvlWt(486.1327, 0.5),
                 new WvlWt(587.5618, 1.0),
                 new WvlWt(656.2725, 0.5)}, 1);

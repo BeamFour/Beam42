@@ -31,9 +31,9 @@ public class PupilSpec {
     static final double[][] default_pupil_rays = {{0., 0.}, {1., 0.}, {-1., 0.}, {0., 1.}, {0., -1.}};
     static final String[] default_ray_labels = {"00", "+X", "-X", "+Y", "-Y"};
 
-    public PupilSpec(OpticalSpecs parent, Pair<String, String> k, double value) {
+    public PupilSpec(OpticalSpecs parent, Pair<ImageKey, ValueKey> k, double value) {
         this.parent = parent;
-        this.key = new SpecKey("aperture", k.first, k.second);
+        this.key = new SpecKey(SpecType.Aperture, k.first, k.second);
         this.value = value;
         this.pupil_rays = default_pupil_rays;
         this.ray_labels = default_ray_labels;

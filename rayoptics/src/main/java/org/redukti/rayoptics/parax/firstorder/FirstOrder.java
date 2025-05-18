@@ -6,9 +6,7 @@ import org.redukti.rayoptics.seq.Gap;
 import org.redukti.rayoptics.seq.Interface;
 import org.redukti.rayoptics.seq.SeqPathComponent;
 import org.redukti.rayoptics.seq.SequentialModel;
-import org.redukti.rayoptics.specs.FieldSpec;
-import org.redukti.rayoptics.specs.PupilSpec;
-import org.redukti.rayoptics.specs.SpecKey;
+import org.redukti.rayoptics.specs.*;
 import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.Pair;
 import org.redukti.rayoptics.util.ZDir;
@@ -83,21 +81,21 @@ public class FirstOrder {
             PupilSpec pupil = opt_model.optical_spec.pupil;
             double slp0;
             SpecKey key = pupil.key;
-            if (key.imageKey.equals("object")) {
-                if (key.valueKey.equals("pupil")) {
+            if (key.imageKey == ImageKey.Object) {
+                if (key.valueKey == ValueKey.Pupil) {
                     slp0 = 0.5 * pupil.value / obj2enp_dist;
-                } else if (key.valueKey.equals("f/#")) {
+                } else if (key.valueKey == ValueKey.Fnum) {
                     slp0 = -1. / (2.0 * pupil.value);
-                } else if (key.valueKey.equals("NA")) {
+                } else if (key.valueKey == ValueKey.NA) {
                     slp0 = n_0 * Math.tan(Math.asin(pupil.value / n_0));
                 } else {
                     throw new IllegalArgumentException();
                 }
-            } else if (key.imageKey.equals("image")) {
-                if (key.valueKey.equals("f/#")) {
+            } else if (key.imageKey == ImageKey.Image) {
+                if (key.valueKey == ValueKey.Fnum) {
                     double slpk = -1. / (2.0 * pupil.value);
                     slp0 = slpk / red;
-                } else if (key.valueKey.equals("NA")) {
+                } else if (key.valueKey == ValueKey.NA) {
                     double slpk = n_k * Math.tan(Math.asin(pupil.value / n_k));
                     slp0 = slpk / red;
                 } else {
@@ -117,19 +115,19 @@ public class FirstOrder {
                 max_fld = 1.0;
             double slpbar0;
             double ybar0;
-            if (key.imageKey.equals("object")) {
-                if (key.valueKey.equals("angle")) {
+            if (key.imageKey == ImageKey.Object) {
+                if (key.valueKey == ValueKey.Angle) {
                     double ang = Math.toRadians(max_fld);
                     slpbar0 = Math.tan(ang);
                     ybar0 = -slpbar0 * obj2enp_dist;
-                } else if (key.valueKey.equals("height")) {
+                } else if (key.valueKey == ValueKey.Height) {
                     ybar0 = -max_fld;
                     slpbar0 = -ybar0 / obj2enp_dist;
                 } else {
                     throw new IllegalArgumentException();
                 }
-            } else if (key.imageKey.equals("image")) {
-                if (key.valueKey.equals("height")) {
+            } else if (key.imageKey == ImageKey.Image) {
+                if (key.valueKey == ValueKey.Height) {
                     ybar0 = red * max_fld;
                     slpbar0 = -ybar0 / obj2enp_dist;
                 } else {
@@ -201,6 +199,9 @@ public class FirstOrder {
         return new ParaxData(ax_ray, pr_ray, fod);
     }
 
+    /**
+     * Perform a paraxial raytrace of 2 linearly independent rays
+     */
     public static Pair<List<ParaxComponent>, List<ParaxComponent>> paraxial_trace(List<SeqPathComponent> path, int start, ParaxComponent start_yu, ParaxComponent start_yu_bar) {
 
         List<ParaxComponent> p_ray = new ArrayList<>();
@@ -222,6 +223,9 @@ public class FirstOrder {
         if (start == 1) {
             // compute object coords from 1st surface data
             double t0 = b4_gap.thi;
+            // FIXME
+            // if t0 is inf
+            // then obj_ht = 0, obj_htb = -inf
             double obj_ht = start_yu.ht - t0 * start_yu.slp;
             double obj_htb = start_yu_bar.ht - t0 * start_yu_bar.slp;
             b4_yui = new ParaxComponent(obj_ht, start_yu.slp, 0);

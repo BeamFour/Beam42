@@ -128,9 +128,9 @@ public class Trace {
             double sos = 0.0;
             for (int i = 0; i < p.length; i++) {
                 resid[i] = xy_target[i] - p[i];
-                sos = resid[i] * resid[i];
+                sos += (resid[i] * resid[i]);
             }
-            return sos;
+            return Math.sqrt(sos / p.length);
         }
 
         @Override

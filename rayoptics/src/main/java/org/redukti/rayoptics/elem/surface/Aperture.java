@@ -1,4 +1,4 @@
-package org.redukti.rayoptics.elem;
+package org.redukti.rayoptics.elem.surface;
 
 import org.redukti.mathlib.Vector2;
 import org.redukti.rayoptics.util.Pair;

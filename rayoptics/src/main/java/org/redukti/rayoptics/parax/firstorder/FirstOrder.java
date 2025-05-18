@@ -1,4 +1,4 @@
-package org.redukti.rayoptics.parax;
+package org.redukti.rayoptics.parax.firstorder;
 
 import org.redukti.mathlib.M;
 import org.redukti.rayoptics.optical.OpticalModel;

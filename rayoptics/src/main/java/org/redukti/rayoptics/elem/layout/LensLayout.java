@@ -1,4 +1,4 @@
-package org.redukti.rayoptics.elem;
+package org.redukti.rayoptics.elem.layout;
 
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.specs.Field;

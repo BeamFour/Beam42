@@ -1,6 +1,8 @@
-package org.redukti.rayoptics.elem;
+package org.redukti.rayoptics.elem.surface;
 
 import org.redukti.mathlib.Vector3;
+import org.redukti.rayoptics.elem.profiles.Spherical;
+import org.redukti.rayoptics.elem.profiles.SurfaceProfile;
 import org.redukti.rayoptics.seq.Interface;
 import org.redukti.rayoptics.util.ZDir;
 

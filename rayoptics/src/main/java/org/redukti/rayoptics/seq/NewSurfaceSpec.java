@@ -1,6 +1,6 @@
 package org.redukti.rayoptics.seq;
 
-import org.redukti.rayoptics.elem.Surface;
+import org.redukti.rayoptics.elem.surface.Surface;
 import org.redukti.rayoptics.math.Transform3;
 import org.redukti.rayoptics.util.ZDir;
 

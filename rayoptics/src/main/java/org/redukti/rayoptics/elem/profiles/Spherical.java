@@ -1,8 +1,9 @@
-package org.redukti.rayoptics.elem;
+package org.redukti.rayoptics.elem.profiles;
 
 import org.redukti.mathlib.M;
 import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
+import org.redukti.rayoptics.elem.surface.IntersectionResult;
 import org.redukti.rayoptics.exceptions.TraceMissedSurfaceException;
 import org.redukti.rayoptics.util.ZDir;
 

@@ -1,6 +1,6 @@
 package org.redukti.rayoptics.optical;
 
-import org.redukti.rayoptics.parax.ParaxialModel;
+import org.redukti.rayoptics.parax.firstorder.ParaxialModel;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.specs.OpticalSpecs;
 import org.redukti.rayoptics.specs.SystemSpec;

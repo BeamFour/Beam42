@@ -1,7 +1,8 @@
-package org.redukti.rayoptics.elem;
+package org.redukti.rayoptics.elem.layout;
 
 import org.redukti.mathlib.Matrix3;
 import org.redukti.mathlib.Vector3;
+import org.redukti.rayoptics.elem.transform.Transform;
 import org.redukti.rayoptics.math.Transform3;
 import org.redukti.rayoptics.raytr.RayPkg;
 import org.redukti.rayoptics.raytr.RaySeg;

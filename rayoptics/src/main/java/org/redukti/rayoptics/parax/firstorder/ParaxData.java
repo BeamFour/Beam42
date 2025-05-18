@@ -1,4 +1,4 @@
-package org.redukti.rayoptics.parax;
+package org.redukti.rayoptics.parax.firstorder;
 
 import java.util.List;
 

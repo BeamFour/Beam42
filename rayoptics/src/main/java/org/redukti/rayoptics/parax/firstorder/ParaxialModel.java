@@ -1,4 +1,4 @@
-package org.redukti.rayoptics.parax;
+package org.redukti.rayoptics.parax.firstorder;
 
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.seq.Gap;

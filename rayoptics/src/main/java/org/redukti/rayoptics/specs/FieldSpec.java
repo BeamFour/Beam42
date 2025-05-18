@@ -1,7 +1,7 @@
 package org.redukti.rayoptics.specs;
 
 import org.redukti.mathlib.Vector3;
-import org.redukti.rayoptics.parax.FirstOrderData;
+import org.redukti.rayoptics.parax.firstorder.FirstOrderData;
 import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.Pair;
 

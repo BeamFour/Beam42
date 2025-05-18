@@ -1,6 +1,6 @@
 package org.redukti.rayoptics.raytr;
 
-import org.redukti.rayoptics.parax.ParaxData;
+import org.redukti.rayoptics.parax.firstorder.ParaxData;
 import org.redukti.rayoptics.util.ZDir;
 
 public class RefSpherePkg {

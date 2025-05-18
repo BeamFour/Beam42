@@ -8,7 +8,7 @@ import org.redukti.rayoptics.exceptions.TraceException;
 import org.redukti.rayoptics.exceptions.TraceMissedSurfaceException;
 import org.redukti.rayoptics.exceptions.TraceTIRException;
 import org.redukti.rayoptics.optical.OpticalModel;
-import org.redukti.rayoptics.parax.FirstOrderData;
+import org.redukti.rayoptics.parax.firstorder.FirstOrderData;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.specs.FieldSpec;

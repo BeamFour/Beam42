@@ -2,8 +2,8 @@ package org.redukti.rayoptics.raytr;
 
 import org.redukti.mathlib.Matrix3;
 import org.redukti.mathlib.Vector3;
-import org.redukti.rayoptics.elem.IntersectionResult;
-import org.redukti.rayoptics.elem.Transform;
+import org.redukti.rayoptics.elem.surface.IntersectionResult;
+import org.redukti.rayoptics.elem.transform.Transform;
 import org.redukti.rayoptics.exceptions.TraceMissedSurfaceException;
 import org.redukti.rayoptics.exceptions.TraceTIRException;
 import org.redukti.rayoptics.math.Transform3;

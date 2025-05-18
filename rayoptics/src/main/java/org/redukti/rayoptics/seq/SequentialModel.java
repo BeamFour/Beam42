@@ -2,8 +2,8 @@ package org.redukti.rayoptics.seq;
 
 import org.redukti.mathlib.Matrix3;
 import org.redukti.mathlib.Vector3;
-import org.redukti.rayoptics.elem.Surface;
-import org.redukti.rayoptics.elem.Transform;
+import org.redukti.rayoptics.elem.surface.Surface;
+import org.redukti.rayoptics.elem.transform.Transform;
 import org.redukti.rayoptics.math.Transform3;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.specs.OpticalSpecs;

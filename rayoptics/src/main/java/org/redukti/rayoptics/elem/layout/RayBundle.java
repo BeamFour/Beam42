@@ -1,4 +1,4 @@
-package org.redukti.rayoptics.elem;
+package org.redukti.rayoptics.elem.layout;
 
 import org.redukti.rayoptics.math.Transform3;
 import org.redukti.rayoptics.optical.OpticalModel;

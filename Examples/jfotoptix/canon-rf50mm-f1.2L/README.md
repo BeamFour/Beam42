@@ -1,0 +1,1 @@
+Setting some of the glass types causes the quality to degrade - see comments in the spec

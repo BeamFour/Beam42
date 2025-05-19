@@ -1,0 +1,49 @@
+[descriptive data]
+title	US 2007/0236805 Example 4 (Arri Zeiss Master Prime T1.3 100mm)
+[constants]
+[variable distances]
+Focal Length	99.80	undefined
+Angle of View	17.81	undefined
+F-Number	1.24	undefined
+Image Height	31.14	31.14
+Magnification	0	-0.112
+d0	Infinity	803.34
+d9	14.959	1.10
+d13	16.343	10.843
+d22	1.00	20.359
+Bf	40.123	40.123
+[lens data]
+2	-1883.6	4.7	1.54075	89.06	47.23
+3	101.45	3.14		83.94	
+4	127.72	15.68	1.61803	88.56	63.33
+5	-281.84	0.2		88.56	
+6	66.355	14.78	1.43876	84.46	94.99
+7	202.42	0.1		77.98
+8	113.83	4.85	1.80527	79.16	25.42
+9	89.125	d9		72.83
+10	52.33	14.19	1.75704	65.12	47.82
+11	381.29	7.54		61.13
+12	-230.02127	2.8	1.61344	53.56	44.29
+13	29.64	d13		42.30	
+14	AS	18.938		41.035
+15	-27.582	2.97	1.61344	39.42	44.29
+16	285.92	12.52	1.69104	48.44	54.82
+17	-41.867	0.55		50.48	
+18	188.36	8.18	1.69104	50.48	54.82
+19	-76.076	0.1		50.48	
+20	110.6	10.69	1.60303	46.52	65.44
+21	-46.305	2.8	1.65416	45.30	39.63
+22	153.99	d22		48.74	
+23	73.918	4.22	1.49702	39.96	81.54
+24	158.49	Bf		39.96	
+[aspherical data]
+12	-230.02127	0	8.669E-07	9.230E-11	2.783E-14	-9.209E-16	1.576E-18	-8.587E-22
+[figure]
+source	Data/US20070236805_Figure04A.png
+originX	79.30
+originY	400.42
+ppmm	7.491
+[notes]
+Bill: No patent F-Number, no apherical conic, no Image Height.
+Zeiss web site: horizontal Angle of View 14.25 for 24.9x18.7mm for 17.81 diagonal and 31.14mm
+Estimated scenario#2 but Entrace Pupil is not where the diagram indicates.

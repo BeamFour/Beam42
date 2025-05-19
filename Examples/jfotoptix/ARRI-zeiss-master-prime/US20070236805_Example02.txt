@@ -1,0 +1,51 @@
+[descriptive data]
+title	US 2007/0236805 Example 2[NG](~Arri Zeiss Master Prime T1.3 65mm)
+[constants]
+NG	Aspericals
+[variable distances]
+Focal Length	65.00
+Angle of View	26.99
+F-Number	1.24
+Image Height	31.14
+Magnification	0
+d0	Infinity
+Bf	39.804
+Bf(WX)	39.014
+[lens data]
+2	554.31	4.31	1.69901	75.90	30.13
+3	82.937	7.67		71.41
+4	1539.9	8.05	1.80527	71.41	25.42
+5	-185.67	4.67	1.81605	72.62	46.62
+6	-188.36	7.281		72.62	
+7	52.33	16.11	1.61803	65.84	63.33
+8	11548	0.11		65.84	
+9	70.795	4.2	1.71743	57.64	29.62
+10	55.033	2.534		49.34	
+11	42.474	4.27	1.80527	50.90	25.42
+12	35.481	7.82	1.81605	46.72	46.62
+13	46.639	4.79		40.34	
+14	183.02	4.2	1.55839	40.78	54.01
+15	25.119	9.8		32.20	
+16	AS	9.71		31.224
+17	-23.041	4.2	1.65416	32.46	39.63
+18	39.525	16.23	1.61803	42.22	63.33
+19	-44.668	0.35		44.96	
+20	66.473	10.02	1.60303	49.42	65.44
+21	-240.57	0.21		49.42	
+22	466.39	7.51	1.60303	48.18	65.44
+23	-88.45271	0.1		48.18	
+24	91.728	4.2	1.81605	45.22	46.62
+25	27.982	16.46	1.61803	42.54	63.33
+26	-128.64	Bf		42.54	
+[aspherical data]
+23	-88.45271	0	2.316E-06	-1.036E-09	-7.878E-13	1.079E-15
+23(WX)	-88.45271	6.1	2.302912221381E-06	7.580466249249E-10	-3.565833466427E-13	9.863844350211E-16
+[figure]
+source	Data/US20070236805_Figure02A.png
+originX	67.15
+originY	378.04
+ppmm	7.504
+[notes]
+Bill: No patent F-Number, no apherical conic, no Image Height. Repair of a23 A6 sign not quite enough.
+Zeiss web site: horizontal Angle of View 21.59 for 24.9x18.7mm for 17.81 diagonal and 31.14mm
+Alternate asphericals from Zemax solve. Also required tweaked Bf. Marked as (WX)

@@ -1,0 +1,44 @@
+[descriptive data]
+title	US 2007/0236805 Example 3(~Arri Zeiss Master Prime T1.3 75mm)
+[constants]
+[variable distances]
+Focal Length	74.98
+Angle of View	23.53
+F-Number	1.24
+Image Height	31.14
+Magnification	0
+d0	Infinity
+Bf	36.153
+[lens data]
+2	-755.31	7.8	1.51635	67.90	64.14
+3	74.452	11		62.84	
+4	-446.68	4.5	1.51682	72.28	64.17
+5	68.786	15.1	1.62017	72.28	63.48
+6	-403.88	5.76		73.06	
+7	103.66	14	1.43876	77.16	94.99
+8	-233.75	5.41		77.16	
+9	67.803	12.9	1.49702	73.74	81.54
+10	453.16	16.753		73.74	
+11	70.795	11.85	1.71705	59.94	47.93
+12	-202.42	11.5	1.65416	57.08	39.63
+13	81.752	6.413		42.06	
+14	AS	2.67		37.186
+15	-260.53296	3.6	1.71743	36.94	29.51
+16	37.047	8.9		31.88	
+17	-35.227	3.6	1.61664	31.78	36.63
+18	52.708	10.2	1.78805	37.52	47.37
+19	-53.088	0.2		38.58	
+20	-202.42	5.7	1.81605	39.44	46.62
+21	-63.096	0.2		39.44	
+22	50.119	7	1.49702	38.74	81.54
+23	1295.7	Bf		38.74	
+[aspherical data]
+15	-260.53296	0	-3.750E-06	3.704E-10	-5.545E-13
+[figure]
+source	Data/US20070236805_Figure03A.png
+originX	137.90
+originY	347.12
+ppmm	7.132
+[notes]
+Bill: No patent F-Number, no apherical conic, no Image Height. Repaired sign a15 A4
+Zeiss web site: horizontal Angle of View 18.82 for 24.9x18.7mm for 17.81 diagonal and 31.14mm

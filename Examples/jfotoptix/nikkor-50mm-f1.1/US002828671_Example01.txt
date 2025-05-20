@@ -1,0 +1,38 @@
+[descriptive data]
+title	US 2,828,671 Example 1 (Nikon Nikkor-N 5cm f/1.1)
+[constants]
+Scaled	50	100
+[variable distances]
+Focal Length	50
+Angle of View	46
+F-Number	1.1
+Image Height	42
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf(p)	undefined
+Bf	23.05
+[lens data]
+1	83.80	4.35	1.6073	52.62	59.5
+2	214.15	0.30		52.62	
+3	46.50	4.25	1.6073	45.39	59.5
+4	81.90	0.70		45.39	
+5	26.75	9.70	1.7170	39.75	47.9
+6	435.90	2.05	1.5927	39.75	35.4
+7	16.65	7.50		27.512	
+7AS	AS	5.10		27.367	
+8	-21.30	2.70	1.6483	27.304	33.8
+9	67.85	10.25	1.7170	31.89	47.9
+10	-29.05	0.30		31.89
+11	58.15	5.50	1.7170	32.14	47.9
+12	Infinity	0.30		32.14	
+13	71.15	1.45	1.6259	32.70	35.6
+14	48.45	3.90	1.6385	32.70	55.5
+15	258.95	Bf		32.70	
+[figure]
+source	Data/US002828671_Figure.png
+originX	34.48
+originY	534.12
+ppmm	18.030
+[notes]
+Bill: Doesn't quite match diagram.

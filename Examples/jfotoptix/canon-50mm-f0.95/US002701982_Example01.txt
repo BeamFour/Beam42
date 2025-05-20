@@ -1,0 +1,36 @@
+[descriptive data]
+title	US 2,701,982 Example 1
+[constants]
+Scaled	55	10
+[variable distances]
+Focal Length	55
+Angle of View	undefined
+F-Number	1
+Image Height	43.2
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf	30.800
+[lens data]
+1	90.272	6.045	1.6751	62.92	32.3
+2	307.560	0.127		62.92	
+3	55.066	6.298	1.6689	57.99	46.7
+4	117.447	0.127		57.99	
+5	31.922	12.623	1.6913	46.93	53.8
+6	1238.105	1.419	1.6751	46.93	32.3
+7	17.815	11.063		30.64
+7AS	AS	5.800		29.814
+8	-22.231	1.507	1.6992	29.85	30.2
+9	106.139	15.356	1.6204	40.57	60.2
+10	-30.542	0.127		40.57	
+11	106.139	4.389	1.6913	39.12	53.8
+12	-123.915	0.127		39.12	
+13	96.300	4.664	1.6913	38.76	53.8
+14	-111.953	Bf		38.76	
+[figure]
+source	Data/US002701982_Figure01.png
+originX	79.77
+originY	476.99
+ppmm	10.784
+[notes]
+Bill: Mentioned in Lens and Camera Arrays for Sky Surveys and Space Surveillance

@@ -1,7 +1,9 @@
 package org.redukti.jfotoptix.examples;
 
+import org.redukti.jfotoptix.analysis.AnalysisSpot;
 import org.redukti.jfotoptix.curve.Flat;
 import org.redukti.jfotoptix.light.SpectralLine;
+import org.redukti.jfotoptix.math.Matrix3;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 import org.redukti.jfotoptix.medium.Abbe;
@@ -9,6 +11,7 @@ import org.redukti.jfotoptix.medium.GlassMap;
 import org.redukti.jfotoptix.model.Image;
 import org.redukti.jfotoptix.model.Lens;
 import org.redukti.jfotoptix.model.OpticalSystem;
+import org.redukti.jfotoptix.model.PointSource;
 import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.jfotoptix.shape.Rectangle;
 
@@ -83,11 +86,25 @@ public class NoctNikkor58 {
         return list;
     }
 
-    private static OpticalSystem.Builder buildSystem(double[] glassTypes) {
+    private static OpticalSystem.Builder buildSystem(double[] glassTypes, boolean addPointSource, boolean skew) {
         OpticalSystem.Builder sys = new OpticalSystem.Builder();
         double imageHeight = 43.28;
         double angleOfView = 40.9 / 2.0;
         double fNum = 1.2;
+        if (addPointSource) {
+            Vector3 direction = Vector3.vector3_001;
+            if (skew) {
+                // Construct unit vector at an angle
+                //      double z1 = cos (angleOfView);
+                //      double y1 = sin (angleOfView);
+                //      unit_vector = math::Vector3 (0, y1, z1);
+
+                Matrix3 r = Matrix3.get_rotation_matrix(0, angleOfView);
+                direction = r.times(direction);
+            }
+            PointSource.Builder ps = new PointSource.Builder(PointSource.SourceInfinityMode.SourceAtInfinity, direction).add_spectral_line(SpectralLine.d).add_spectral_line(SpectralLine.C).add_spectral_line(SpectralLine.F);
+            sys.add(ps);
+        }
         /* anchor lens */
         Lens.Builder lens = new Lens.Builder().position(Vector3Pair.position_000_001);
         double image_pos = 0.0;
@@ -146,6 +163,8 @@ public class NoctNikkor58 {
 
         public void run() {
             var glasses = new double[7];
+            double bestRMS = 999.00;
+            String bestData = null;
             for (int a = start; a < end; a++) {
                 glasses[0] = glassTypes.get(a);
                 for (int b = 0; b < glassTypes.size(); b++) {
@@ -160,7 +179,7 @@ public class NoctNikkor58 {
                                     glasses[5] = glassTypes.get(f);
                                     for (int g = 0; g < glassTypes.size(); g++) {
                                         glasses[6] = glassTypes.get(g);
-                                        var system = buildSystem(glasses).build();
+                                        var system = buildSystem(glasses, false, false).build();
                                         //System.out.println(system);
                                         count.incrementAndGet();
                                         try {
@@ -174,11 +193,26 @@ public class NoctNikkor58 {
                                                     //&& h_diff > 14 && h_diff < 15
                                                     && parax.pp1 > 51.75 && parax.pp1 < 51.85 // 51.8 from first surface
                                                     && parax.ppk > 20.15 && parax.ppk < 20.25) {  // 20.2 from last surface
-                                                StringBuilder sb = new StringBuilder();
-                                                sb.append(parax.effective_focal_length).append("\t").append(parax.back_focal_length).append("\t").append(parax.fno).append("\t").append(parax.ppk).append("\t").append(parax.pp1).append("\t").append(h_diff).append("\t");
-                                                for (int i = 0; i < glasses.length; i++)
-                                                    sb.append(glasses[i]).append("\t");
-                                                System.out.println(sb.toString());
+
+                                                var system2 = buildSystem(glasses, true, false).build();
+                                                var spotAnalysis = new AnalysisSpot(system2, 20);
+                                                spotAnalysis.process_analysis();
+
+                                                if (spotAnalysis.get_rms_radius() < bestRMS) {
+                                                    bestRMS = spotAnalysis.get_rms_radius();
+                                                    StringBuilder sb = new StringBuilder();
+                                                    sb.append(spotAnalysis.get_rms_radius()).append("\t");
+                                                    sb.append(parax.effective_focal_length).append("\t").append(parax.back_focal_length).append("\t").append(parax.fno).append("\t").append(parax.ppk).append("\t").append(parax.pp1).append("\t").append(h_diff).append("\t");
+                                                    for (int i = 0; i < glasses.length; i++)
+                                                        sb.append(glasses[i]).append("\t");
+                                                    bestData = sb.toString();
+                                                }
+                                                //                                                StringBuilder sb = new StringBuilder();
+                                                //                                                sb.append(spotAnalysis.get_rms_radius()).append("\t");
+                                                //                                                sb.append(parax.effective_focal_length).append("\t").append(parax.back_focal_length).append("\t").append(parax.fno).append("\t").append(parax.ppk).append("\t").append(parax.pp1).append("\t").append(h_diff).append("\t");
+                                                //                                                for (int i = 0; i < glasses.length; i++)
+                                                //                                                    sb.append(glasses[i]).append("\t");
+                                                //                                                System.out.println(sb.toString());
                                             }
                                         } catch (Exception ex) {
                                             ex.printStackTrace();
@@ -190,6 +224,7 @@ public class NoctNikkor58 {
                     }
                 }
             }
+            System.out.println(bestData);
         }
     }
 

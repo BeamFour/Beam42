@@ -78,7 +78,7 @@ public class AnalysisSpot extends AnalysisPointImage {
         _centroid = _results.get_intercepted_centroid (_image);
     }
 
-    void process_analysis ()
+    public void process_analysis()
     {
         if (_processed_analysis)
             return;
@@ -136,6 +136,14 @@ public class AnalysisSpot extends AnalysisPointImage {
         PlotRenderer plotRenderer = new PlotRenderer();
         plotRenderer.draw_axes_2d (renderer, _axes);
         draw_intercepts (renderer, _image);
+    }
+
+    public double get_rms_radius() {
+        return _rms_radius * 1000.0;
+    }
+
+    public double get_max_radius() {
+        return _max_radius * 1000.0;
     }
 
     @Override

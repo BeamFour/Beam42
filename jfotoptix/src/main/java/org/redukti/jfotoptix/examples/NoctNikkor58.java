@@ -125,8 +125,8 @@ public class NoctNikkor58 {
     }
 
     static List<Double> getGlassTypes() {
-        //Double[] glasses = new Double[]{1.6727, 1.68893, 1.69895, 1.71300, 1.71736, 1.72825, 1.72, 1.74, 1.74077, 1.74430, 1.74443, 1.75520, 1.76684, 1.77279, 1.78470, 1.78797, 1.79631, 1.79668, 1.80218, 1.80411, 1.84042, 1.87739};
-        Double[] glasses = new Double[]{1.64769, 1.651, 1.65844, 1.66446, 1.67, 1.6779, 1.68893, 1.6935, 1.6968, 1.69895, 1.7, 1.713, 1.717, 1.72, 1.734, 1.738, 1.741, 1.744, 1.755, 1.757, 1.762, 1.7725, 1.7847, 1.788, 1.795, 1.801, 1.804, 1.816, 1.834, 1.8485, 1.85};
+        Double[] glasses = new Double[]{1.6727, 1.68893, 1.69895, 1.71300, 1.71736, 1.72825, 1.72, 1.74, 1.74077, 1.74430, 1.74443, 1.75520, 1.76684, 1.77279, 1.78470, 1.78797, 1.79631, 1.79668, 1.80218, 1.80411, 1.84042, 1.87739};
+        //Double[] glasses = new Double[]{1.64769, 1.651, 1.65844, 1.66446, 1.67, 1.6779, 1.68893, 1.6935, 1.6968, 1.69895, 1.7, 1.713, 1.717, 1.72, 1.734, 1.738, 1.741, 1.744, 1.755, 1.757, 1.762, 1.7725, 1.7847, 1.788, 1.795, 1.801, 1.804, 1.816, 1.834, 1.8485, 1.85};
         return List.of(glasses);
     }
 
@@ -165,13 +165,15 @@ public class NoctNikkor58 {
                                         count.incrementAndGet();
                                         try {
                                             var parax = ParaxialFirstOrderInfo.compute(system);
-                                            // Expected H' ppk = 37.5
+                                            // Expected H' ppk = 37.5 from front-surface, 20.2 from last surface
                                             // Expected H pp1 = 51.8
                                             // expected H - H1 = 14.3
 
                                             var h_diff = parax.pp1 - parax.ppk;  // H - H'
-                                            if (parax.effective_focal_length > 57.9 && parax.effective_focal_length < 58.1 && parax.back_focal_length > 37.6 && parax.back_focal_length < 38.2 && h_diff > 14 && h_diff < 15 && parax.ppk > 37 && parax.ppk < 38
-                                            ) {
+                                            if (parax.effective_focal_length > 57.99 && parax.effective_focal_length < 58.01 && parax.back_focal_length > 37.77 && parax.back_focal_length < 37.79
+                                                    //&& h_diff > 14 && h_diff < 15
+                                                    && parax.pp1 > 51.75 && parax.pp1 < 51.85 // 51.8 from first surface
+                                                    && parax.ppk > 20.15 && parax.ppk < 20.25) {  // 20.2 from last surface
                                                 StringBuilder sb = new StringBuilder();
                                                 sb.append(parax.effective_focal_length).append("\t").append(parax.back_focal_length).append("\t").append(parax.fno).append("\t").append(parax.ppk).append("\t").append(parax.pp1).append("\t").append(h_diff).append("\t");
                                                 for (int i = 0; i < glasses.length; i++)

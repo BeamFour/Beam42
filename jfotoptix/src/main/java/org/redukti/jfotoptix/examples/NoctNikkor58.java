@@ -20,17 +20,23 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-//Takes too long to run for more than about 22 glasses (that takes 2 hrs as well)
-// Failed to come up with a solution
+// Takes too long to run for more than about 22 glasses (that takes 2 hrs as well)
 public class NoctNikkor58 {
 
     static final class GlassType {
+        final String name;
         final double nd;
         final double vd;
 
-        public GlassType(double nd, double vd) {
+        public GlassType(String name, double nd, double vd) {
+            this.name = name;
             this.nd = nd;
             this.vd = vd;
+        }
+
+        @Override
+        public String toString() {
+            return "(" + name + "," + nd + "," + vd + ')';
         }
     }
 
@@ -86,7 +92,7 @@ public class NoctNikkor58 {
         return list;
     }
 
-    private static OpticalSystem.Builder buildSystem(double[] glassTypes, boolean addPointSource, boolean skew) {
+    private static OpticalSystem.Builder buildSystem(GlassType[] glassTypes, boolean addPointSource, boolean skew) {
         OpticalSystem.Builder sys = new OpticalSystem.Builder();
         double imageHeight = 43.28;
         double angleOfView = 40.9 / 2.0;
@@ -102,7 +108,10 @@ public class NoctNikkor58 {
                 Matrix3 r = Matrix3.get_rotation_matrix(0, angleOfView);
                 direction = r.times(direction);
             }
-            PointSource.Builder ps = new PointSource.Builder(PointSource.SourceInfinityMode.SourceAtInfinity, direction).add_spectral_line(SpectralLine.d).add_spectral_line(SpectralLine.C).add_spectral_line(SpectralLine.F);
+            PointSource.Builder ps = new PointSource.Builder(PointSource.SourceInfinityMode.SourceAtInfinity, direction)
+                    .add_spectral_line(SpectralLine.d)
+                    .add_spectral_line(SpectralLine.C)
+                    .add_spectral_line(SpectralLine.F);
             sys.add(ps);
         }
         /* anchor lens */
@@ -115,7 +124,9 @@ public class NoctNikkor58 {
             double nd = s.nd;
             double vd = s.vd;
             if (nd != 0) {
-                nd = glassTypes[index++];
+                nd = glassTypes[index].nd;
+                vd = glassTypes[index].vd;
+                index++;
             }
             double thickness = add_surface(lens, s.radius, s.thickness, s.apertureRadius, nd, vd, s.isStop);
             image_pos += thickness;
@@ -134,14 +145,33 @@ public class NoctNikkor58 {
         return GlassMap.glasses.values().stream().map(e -> e.get_refractive_index(SpectralLine.d)).filter(e -> e > 1.7 && e < 1.91).sorted().distinct().collect(Collectors.toList());
     }
 
-    static GlassType[] nikonGlasses() {
-        return new GlassType[]{new GlassType(1.6727, 32.2), new GlassType(1.68893, 31.16), new GlassType(1.69895, 30.1), new GlassType(1.71300, 53.9),   // canon
-                new GlassType(1.71736, 29.5), new GlassType(1.72825, 28.46), new GlassType(1.72, 0), new GlassType(1.74, 28.3), new GlassType(1.74077, 27.6), new GlassType(1.74430, 49.5),   // US 4,621,909
-                new GlassType(1.74443, 49.53), new GlassType(1.75520, 27.6), // also in canon
-                new GlassType(1.76684, 46.81), new GlassType(1.77279, 49.4), new GlassType(1.78470, 0), new GlassType(1.78797, 47.5), new GlassType(1.79631, 40.8), new GlassType(1.79713, 45.62), new GlassType(1.79668, 45.5), new GlassType(1.80218, 44.7), new GlassType(1.80411, 46.4), new GlassType(1.84042, 43.3), new GlassType(1.87739, 38.1), new GlassType(1.90265, 35.8)};
+    static GlassType[] getGlassTypes() {
+        return new GlassType[]{
+                new GlassType("J-SF5", 1.6727, 32.19),    // wakamiya J-SF5
+                new GlassType("S-TIM22", 1.64769, 33.79),   // US 4,234,242 50mm f1.8   S-TIM22
+                new GlassType("S-TIM28", 1.68893, 31.07),  // shimuzu - f1.2 US 3,738,736 S-TIM28
+                new GlassType("S-TIM35", 1.69895, 30.13),   // wakamiya S-TIM35
+                new GlassType("S-LAL8", 1.713, 53.87),     // shimuzu - f1.2 US 3,738,736 S-LAL8
+                new GlassType("J-SF1", 1.71736, 29.57),   // wakamiya J-SF1
+                new GlassType("J-SF10", 1.72825, 28.38),   // shimuzu - f1.2 US 3,738,736 J-SF10
+                new GlassType("LAC10", 1.72, 50.4),      // shimuzu - f1.2 US 3,738,736  LAC10
+                new GlassType("S-TIH3", 1.74, 28.3),      // wakamiya S-TIH3
+                new GlassType("S-TIH13", 1.74077, 27.79),   // wakamiya S-TIH13
+                new GlassType("S-LAM2", 1.744, 44.78),     // shimuzu - f1.2 US 3,738,736 S-LAM2
+                new GlassType("J-SF4", 1.75520, 27.57),   // shimuzu - f1.2 US 3,738,736  J-SF4
+                new GlassType("J-LASFH2", 1.76684, 46.78),   // shimuzu - f1.2 US 3,738,736, US 4,234,242 J-LASFH2
+                new GlassType("J-LASF016", 1.7725, 46.62),   // wakamiya J-LASF016
+                new GlassType("J-SFS3", 1.78470, 26.27),   // shimuzu - f1.2 US 3,738,736 J-SFS3
+                new GlassType("TAF4", 1.788, 47.37),   // wakamiya  S-LAH64 TAF4
+                new GlassType("J-LASF017", 1.795, 45.31),   // shimuzu - f1.2 US 3,738,736 J-LASF017?
+                new GlassType("TAF2", 1.7945, 45.4),  // 50mm f1.8s US 4234242 TAF2
+                new GlassType("J-LASF015", 1.8042, 46.52),   // wakamiya TAF3D    LASF015
+                new GlassType("J-LASFH22", 1.8485, 43.79),   // wakamiya  J-LASFH22
+                new GlassType("J-LASF08A", 1.883, 40.69)
+                };
     }
 
-    static List<Double> getGlassTypes() {
+    static List<Double> getGlassTypes2() {
         Double[] glasses = new Double[]{1.6727, 1.68893, 1.69895, 1.71300, 1.71736, 1.72825, 1.72, 1.74, 1.74077, 1.74430, 1.74443, 1.75520, 1.76684, 1.77279, 1.78470, 1.78797, 1.79631, 1.79668, 1.80218, 1.80411, 1.84042, 1.87739};
         //Double[] glasses = new Double[]{1.64769, 1.651, 1.65844, 1.66446, 1.67, 1.6779, 1.68893, 1.6935, 1.6968, 1.69895, 1.7, 1.713, 1.717, 1.72, 1.734, 1.738, 1.741, 1.744, 1.755, 1.757, 1.762, 1.7725, 1.7847, 1.788, 1.795, 1.801, 1.804, 1.816, 1.834, 1.8485, 1.85};
         return List.of(glasses);
@@ -151,10 +181,10 @@ public class NoctNikkor58 {
 
         int start;
         int end;
-        List<Double> glassTypes;
+        GlassType[] glassTypes;
         AtomicLong count;
 
-        public ProcessSystems(int start, int end, List<Double> glassTypes, AtomicLong count) {
+        public ProcessSystems(int start, int end, GlassType[] glassTypes, AtomicLong count) {
             this.start = start;
             this.end = end;
             this.glassTypes = glassTypes;
@@ -162,23 +192,23 @@ public class NoctNikkor58 {
         }
 
         public void run() {
-            var glasses = new double[7];
+            var glasses = new GlassType[7];
             double bestRMS = 999.00;
             String bestData = null;
             for (int a = start; a < end; a++) {
-                glasses[0] = glassTypes.get(a);
-                for (int b = 0; b < glassTypes.size(); b++) {
-                    glasses[1] = glassTypes.get(b);
-                    for (int c = 0; c < glassTypes.size(); c++) {
-                        glasses[2] = glassTypes.get(c);
-                        for (int d = 0; d < glassTypes.size(); d++) {
-                            glasses[3] = glassTypes.get(d);
-                            for (int e = 0; e < glassTypes.size(); e++) {
-                                glasses[4] = glassTypes.get(e);
-                                for (int f = 0; f < glassTypes.size(); f++) {
-                                    glasses[5] = glassTypes.get(f);
-                                    for (int g = 0; g < glassTypes.size(); g++) {
-                                        glasses[6] = glassTypes.get(g);
+                glasses[0] = glassTypes[a];
+                for (int b = 0; b < glassTypes.length; b++) {
+                    glasses[1] = glassTypes[b];
+                    for (int c = 0; c < glassTypes.length; c++) {
+                        glasses[2] = glassTypes[c];
+                        for (int d = 0; d < glassTypes.length; d++) {
+                            glasses[3] = glassTypes[d];
+                            for (int e = 0; e < glassTypes.length; e++) {
+                                glasses[4] = glassTypes[e];
+                                for (int f = 0; f < glassTypes.length; f++) {
+                                    glasses[5] = glassTypes[f];
+                                    for (int g = 0; g < glassTypes.length; g++) {
+                                        glasses[6] = glassTypes[g];
                                         var system = buildSystem(glasses, false, false).build();
                                         //System.out.println(system);
                                         count.incrementAndGet();
@@ -188,31 +218,30 @@ public class NoctNikkor58 {
                                             // Expected H pp1 = 51.8
                                             // expected H - H1 = 14.3
 
-                                            var h_diff = parax.pp1 - parax.ppk;  // H - H'
-                                            if (parax.effective_focal_length > 57.99 && parax.effective_focal_length < 58.01 && parax.back_focal_length > 37.77 && parax.back_focal_length < 37.79
-                                                    //&& h_diff > 14 && h_diff < 15
+                                            if (parax.effective_focal_length > 57.99 && parax.effective_focal_length < 58.01
+                                                    && parax.back_focal_length > 37.77 && parax.back_focal_length < 37.79
                                                     && parax.pp1 > 51.75 && parax.pp1 < 51.85 // 51.8 from first surface
                                                     && parax.ppk > 20.15 && parax.ppk < 20.25) {  // 20.2 from last surface
 
                                                 var system2 = buildSystem(glasses, true, false).build();
                                                 var spotAnalysis = new AnalysisSpot(system2, 20);
                                                 spotAnalysis.process_analysis();
-
-                                                if (spotAnalysis.get_rms_radius() < bestRMS) {
-                                                    bestRMS = spotAnalysis.get_rms_radius();
+                                                if (spotAnalysis.get_rms_radius() < 125.0) {
                                                     StringBuilder sb = new StringBuilder();
                                                     sb.append(spotAnalysis.get_rms_radius()).append("\t");
-                                                    sb.append(parax.effective_focal_length).append("\t").append(parax.back_focal_length).append("\t").append(parax.fno).append("\t").append(parax.ppk).append("\t").append(parax.pp1).append("\t").append(h_diff).append("\t");
+                                                    sb.append(parax.effective_focal_length).append("\t")
+                                                        .append(parax.back_focal_length).append("\t")
+                                                        .append(parax.fno).append("\t")
+                                                        .append(parax.ppk).append("\t")
+                                                        .append(parax.pp1).append("\t");
                                                     for (int i = 0; i < glasses.length; i++)
                                                         sb.append(glasses[i]).append("\t");
-                                                    bestData = sb.toString();
+                                                    System.out.println(sb.toString());
+                                                    if (spotAnalysis.get_rms_radius() < bestRMS) {
+                                                        bestRMS = spotAnalysis.get_rms_radius();
+                                                        bestData = sb.toString();
+                                                    }
                                                 }
-                                                //                                                StringBuilder sb = new StringBuilder();
-                                                //                                                sb.append(spotAnalysis.get_rms_radius()).append("\t");
-                                                //                                                sb.append(parax.effective_focal_length).append("\t").append(parax.back_focal_length).append("\t").append(parax.fno).append("\t").append(parax.ppk).append("\t").append(parax.pp1).append("\t").append(h_diff).append("\t");
-                                                //                                                for (int i = 0; i < glasses.length; i++)
-                                                //                                                    sb.append(glasses[i]).append("\t");
-                                                //                                                System.out.println(sb.toString());
                                             }
                                         } catch (Exception ex) {
                                             ex.printStackTrace();
@@ -224,6 +253,7 @@ public class NoctNikkor58 {
                     }
                 }
             }
+            System.out.println("Best Data");
             System.out.println(bestData);
         }
     }
@@ -231,19 +261,20 @@ public class NoctNikkor58 {
     public static void main(String[] args) throws Exception {
 
         var glassTypes = getGlassTypes();
-        System.out.println("Trying " + glassTypes.size() + " glass types");
+        System.out.println("Trying " + glassTypes.length + " glass types");
 
         AtomicLong count = new AtomicLong();
         int numThreads = 8;
         Thread[] threads = new Thread[numThreads];
-        int perThreadGlassCount = (int) Math.round((double) glassTypes.size() / (double) numThreads);
+        int perThreadGlassCount = (int) Math.round((double) glassTypes.length / (double) numThreads);
         int start = 0;
         for (int g = 0; g < numThreads; g++) {
-            int end;
-            if (g == numThreads - 1) {
-                end = glassTypes.size();
-            } else {
-                end = start + perThreadGlassCount;
+            int end = start + perThreadGlassCount;
+            if (start >= glassTypes.length) {
+                break;
+            }
+            if (end >= glassTypes.length) {
+                end = glassTypes.length;
             }
             System.out.println("Allocating " + start + " to " + end);
             threads[g] = new Thread(new ProcessSystems(start, end, glassTypes, count));
@@ -252,7 +283,8 @@ public class NoctNikkor58 {
         }
 
         for (Thread thread : threads) {
-            thread.join();
+            if (thread != null)
+                thread.join();
         }
         System.out.println("Processed " + count + " systems");
     }

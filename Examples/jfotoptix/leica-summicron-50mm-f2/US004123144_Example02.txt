@@ -1,0 +1,32 @@
+[descriptive data]
+title	US 4,123,144 Example 2
+[constants]
+Scaled	52	100
+[variable distances]
+Focal Length	52
+Angle of View	45.0
+F-Number	2
+Image Height	43.2
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf	31.05
+Aperture Diameter	16.035
+[lens data]
+1	30.85	9.65	1.79227	29.57	47.15
+2	76.93	0.20		23.12
+3	20.12	5.86	1.67133	21.74	41.64
+4	Infinity	1.20	1.73430	19.71	28.19
+5	13.54	5.24		16.80
+6	AS	6.82		16.035
+7	-13.54	0.99	1.62408	15.00	36.11
+8	Infinity	4.40	1.72055	17.09	47.69
+9	-20.12	0.20		19.38
+10	-4953.03	3.32	1.72055	22.97	47.69
+11	-30.85	Bf		23.58	
+[figure]
+source	Data/US004123144_Figure01.png
+originX	98
+originY	421
+ppmm	26.625
+[notes]

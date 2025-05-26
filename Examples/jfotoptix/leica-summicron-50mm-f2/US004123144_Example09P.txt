@@ -1,0 +1,32 @@
+[descriptive data]
+title	US 4,123,144 Example 9 (Leica Summicron-M 50mm F2 v5)
+[constants]
+Scaled	52	100
+[variable distances]
+Focal Length	52
+Angle of View	45.0
+F-Number	2
+Image Height	43.2
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf	30.62
+Aperture Diameter	16.208
+[lens data]
+1	31.17	4.98	1.79227	29.88	47.15
+2	87.00	0.20		27.80
+3	20.96	7.46	1.67133	23.54	41.64
+4	Infinity	1.49	1.73430	20.29	28.19
+5	13.35	5.62		16.85
+6	AS	6.96		16.208
+7	-14.40	0.99	1.63003	15.11	35.45
+8	Infinity	3.98	1.72055	17.94	47.69
+9	-20.96	0.20		19.70
+10	Infinity	4.48	1.72055	23.12	47.69
+11	-31.17	Bf		24.38
+[figure]
+source	Data/US004123144_Figure02P2.png
+originX	87.55
+originY	349.41
+ppmm	15.456
+[notes]

@@ -75,20 +75,20 @@ public class NoctNikkor58 {
     private static List<SurfaceType> getSurfaces() {
         List<SurfaceType> list = new ArrayList<>();
 
-        list.add(new SurfaceType(false, 74.2272, 7.175639, 1.8485, 49.93, 43.8));
-        list.add(new SurfaceType(false, 0, 0.393186, 0, 49.93, 0));
-        list.add(new SurfaceType(false, 33.25766, 9.6305, 1.69, 44.528, 54.7));
-        list.add(new SurfaceType(false, 60.92781, 1.671039, 0, 44.528, 0));
-        list.add(new SurfaceType(false, 137.839, 3.538761, 1.7783, 42.169, 23.9));
-        list.add(new SurfaceType(false, 25.38526, 7.568825, 0, 32.54, 0));
-        list.add(new SurfaceType(true, 0, 7.863714, 0, 29.98, 0));
-        list.add(new SurfaceType(false, -23.9188, 1.867632, 1.58148, 31.45, 40.9));
-        list.add(new SurfaceType(false, 293.9713, 7.863714, 1.6934, 40.2, 53.3));
-        list.add(new SurfaceType(false, -39.4556, 0.491482, 0, 40.2, 0));
-        list.add(new SurfaceType(false, -274.4783, 5.701193, 1.6516, 39.13, 58.4));
-        list.add(new SurfaceType(false, -53.08654, 0.000, 0, 39.13, 0));
-        list.add(new SurfaceType(false, 124.1071, 4.12845, 1.6217, 36.86, 58.54));
-        list.add(new SurfaceType(false, -96.87727, 37.780, 0, 36.86, 0));
+        list.add(new SurfaceType(false, 79.9975, 6.885, 1.8485, 50.4875, 43.8));
+        list.add(new SurfaceType(false, 0, 0.1, 0, 50.4875, 0));
+        list.add(new SurfaceType(false, 33.737, 9.75, 1.69, 44.832, 54.7));
+        list.add(new SurfaceType(false, 70.18675, 1.56, 0, 44.832, 0));
+        list.add(new SurfaceType(false, 134.505, 2.87, 1.7783, 42.169, 23.9));
+        list.add(new SurfaceType(false, 22.3687, 8.44, 0, 32.128, 0));
+        list.add(new SurfaceType(true, 0, 7.95, 0, 31.227, 0));
+        list.add(new SurfaceType(false, -23.02418, 1.64, 1.58148, 31.45, 40.9));
+        list.add(new SurfaceType(false, 306.553, 8.196, 1.6934, 40.2, 53.3));
+        list.add(new SurfaceType(false, -37.555, 0.15, 0, 40.2, 0));
+        list.add(new SurfaceType(false, -396.94, 6.147, 1.6516, 39.5, 58.4));
+        list.add(new SurfaceType(false, -52.56789, 0.000, 0, 39.5, 0));
+        list.add(new SurfaceType(false, 223.8426, 4.016, 1.6217, 38.275, 58.54));
+        list.add(new SurfaceType(false, -94.08052, 37.780, 0, 38.275, 0));
         return list;
     }
 

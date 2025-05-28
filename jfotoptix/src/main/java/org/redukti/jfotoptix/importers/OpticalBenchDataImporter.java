@@ -20,7 +20,9 @@ import org.redukti.jfotoptix.shape.Rectangle;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class OpticalBenchDataImporter {
 
@@ -240,8 +242,9 @@ public class OpticalBenchDataImporter {
         public boolean parse_file(String file_name) throws Exception {
             List<String> lines = Files.readAllLines(new File(file_name).toPath());
             Section current_section = null;         // Current section
-            int surface_id = 1; // We used to read the id from the OptBench data but
-            // this doesn't always work
+            int surface_id = 1; // We use numeric ids
+            // OptBen uses string ids, so we need to map from string id to our id
+            Map<String,Integer> surfaceIdMap = new HashMap<>();
 
             for (String line : lines) {
                 String[] words = splitLine(line);
@@ -280,6 +283,7 @@ public class OpticalBenchDataImporter {
                         if (words.length < 2)
                             break;
                         int id = surface_id++;
+                        surfaceIdMap.put(words[0], id); // Map OptBench ID to our ID
                         LensSurface surface_data = new LensSurface(id);
                         SurfaceType type = SurfaceType.surface;
                         /* radius */
@@ -322,7 +326,8 @@ public class OpticalBenchDataImporter {
                     }
                     break;
                     case ASPHERICAL_DATA: {
-                        int id = Integer.parseInt(words[0]);
+                        String optBenchID = words[0];
+                        int id = surfaceIdMap.get(optBenchID);
                         AsphericalData aspherical_data = new AsphericalData(id);
                         for (int i = 1; i < words.length; i++) {
                             aspherical_data.add_data(parseDouble(words[i]));
@@ -330,10 +335,7 @@ public class OpticalBenchDataImporter {
                         aspherical_data_.add(aspherical_data);
                         LensSurface surface_builder = find_surface(id);
                         if (surface_builder == null) {
-//                            fprintf (
-//                                    stderr,
-//                                    "Ignoring aspherical data as no surface numbered %d\n",
-//                                    id);
+                            throw new RuntimeException("Unknown surface " + optBenchID);
                         } else {
                             surface_builder.set_aspherical_data(aspherical_data);
                         }

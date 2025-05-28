@@ -88,7 +88,7 @@ public class ZemaxExporter {
             sb.append("  MIRR 2 0\n");
             if (aspherics != null) {
                 sb.append("  PARM 1 0\n");
-                for (int a = 2; a < 9; a++) {
+                for (int a = 2; a < 11; a++) {
                     sb.append("  PARM ").append(a).append(" ");
                     sb.append(aspherics.data(a)).append("\n");
                 }

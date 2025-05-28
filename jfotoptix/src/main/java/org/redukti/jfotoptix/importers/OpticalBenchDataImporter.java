@@ -493,23 +493,25 @@ public class OpticalBenchDataImporter {
         double a12 = aspherical_data.data(6);
         double a14 = aspherical_data.data(7);
         double a16 = aspherical_data.data(8);
+        double a18 = aspherical_data.data(9);
+        double a20 = aspherical_data.data(10);
 
         if (use_glass_types && glass_name != null && GlassMap.glassByName(glass_name) != null) {
             lens.add_surface(
                     new Asphere(radius, k, a4, a6, a8, a10, a12,
-                            a14, a16),
+                            a14, a16, a18, a20),
                     new Disk(aperture_radius), thickness,
                     GlassMap.glassByName(glass_name));
         }
         else if (refractive_index > 0.0) {
             lens.add_surface(
                     new Asphere(radius, k, a4, a6, a8, a10, a12,
-                            a14, a16),
+                            a14, a16, a18, a20),
                     new Disk(aperture_radius), thickness,
                     new Abbe(Abbe.AbbeFormula.AbbeVd, refractive_index, abbe_vd, 0.0));
         } else {
             lens.add_surface(new Asphere(radius, k, a4, a6,
-                            a8, a10, a12, a14, a16),
+                            a8, a10, a12, a14, a16, a18, a20),
                     new Disk(aperture_radius),
                     thickness, Air.air);
         }

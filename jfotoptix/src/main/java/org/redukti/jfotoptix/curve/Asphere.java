@@ -41,10 +41,12 @@ public class Asphere extends ConicBase {
     protected final double _A12;      /* deformation polynomial coefficient */
     protected final double _A14;      /* deformation polynomial coefficient */
     protected final double _A16;      /* deformation polynomial coefficient */
+    protected final double _A18;
+    protected final double _A20;
     boolean _feder_algo = true; /* Use the algorithms by Feder */
 
     public Asphere(double r, double k, double A4, double A6, double A8, double A10,
-                   double A12, double A14, double A16) {
+                   double A12, double A14, double A16, double A18, double A20) {
         super(r, k - 1);
         _r = r;
         _c = 1.0 / r;
@@ -56,11 +58,13 @@ public class Asphere extends ConicBase {
         _A12 = A12;
         _A14 = A14;
         _A16 = A16;
+        _A18 = A18;
+        _A20 = A20;
     }
 
     public Asphere(double r, double k, double A4, double A6, double A8, double A10,
-                   double A12, double A14, double A16, boolean feder_algo) {
-        this(r, k, A4, A6, A8, A10, A12, A14, A16);
+                   double A12, double A14, double A16, double A18, double A20, boolean feder_algo) {
+        this(r, k, A4, A6, A8, A10, A12, A14, A16, A18, A20);
         this._feder_algo = feder_algo;
     }
 
@@ -102,6 +106,14 @@ public class Asphere extends ConicBase {
 
     public double get_A16() {
         return _A16;
+    }
+
+    public double get_A18() {
+        return _A18;
+    }
+
+    public double get_A20() {
+        return _A20;
     }
 
     /* computes intersection using Feder's equations - code is taken from
@@ -204,6 +216,10 @@ public class Asphere extends ConicBase {
             /* But using c*s^2/[1 + (1 - k*c^2*s^2)^(1/2)] + aspheric A_2*s^2 +
              * A_4*s^4 + ... */
             double x_bar_0 = (S._c * s_2) / (1.0 + temp) + deform_sagitta(S, s_2);
+            if (Double.isNaN(x_bar_0)) {
+                // deform sagitta can return Inf
+                return null;
+            }
             delta = Math.abs(result.z() - x_bar_0);
 
             /* Get the direction numbers for the normal to the
@@ -243,9 +259,12 @@ public class Asphere extends ConicBase {
         double s12 = s10 * s2;
         double s14 = s12 * s2;
         double s16 = s14 * s2;
+        double s18 = s16 * s2;
+        double s20 = s18 * s2;
 
         return S._A4 * s4 + S._A6 * s6 + S._A8 * s8 + S._A10 * s10
-                + S._A12 * s12 + S._A14 * s14 + S._A16 * s16;
+                + S._A12 * s12 + S._A14 * s14 + S._A16 * s16
+                + S._A18 * s18 + S._A20 * s20;
     }
 
     /**
@@ -259,10 +278,12 @@ public class Asphere extends ConicBase {
         double s10 = s8 * s2;
         double s12 = s10 * s2;
         double s14 = s12 * s2;
+        double s16 = s14 * s2;
+        double s18 = s16 * s2;
 
         return 4 * S._A4 * s2 + 6 * S._A6 * s4 + 8 * S._A8 * s6
                 + 10 * S._A10 * s8 + 12 * S._A12 * s10 + 14 * S._A14 * s12
-                + 16 * S._A16 * s14;
+                + 16 * S._A16 * s14 + 18 * S._A18 * s16 + 20 * S._A20 * s18;
     }
 
     /**
@@ -278,10 +299,12 @@ public class Asphere extends ConicBase {
         double s11 = s9 * s2;
         double s13 = s11 * s2;
         double s15 = s13 * s2;
+        double s17 = s15 * s2;
+        double s19 = s17 * s2;
 
         return 4 * S._A4 * s3 + 6 * S._A6 * s5 + 8 * S._A8 * s7
                 + 10 * S._A10 * s9 + 12 * S._A12 * s11 + 14 * S._A14 * s13
-                + 16 * S._A16 * s15;
+                + 16 * S._A16 * s15 + 18 * S._A18 * s17 + 20 * S._A20 * s19;
     }
 
     /**

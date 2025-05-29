@@ -4,7 +4,7 @@ title	US 2,701,982 Example 1
 Scaled	55	10
 [variable distances]
 Focal Length	55
-Angle of View	undefined
+Angle of View	43.6
 F-Number	1
 Image Height	43.2
 Total Length	undefined

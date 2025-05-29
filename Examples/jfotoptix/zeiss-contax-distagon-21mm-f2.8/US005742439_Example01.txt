@@ -5,7 +5,7 @@ title	US 5,742,439 Example 1 (Zeiss Distagon T 21mm F2.8 Contax)
 Focal Length	25			
 Angle of View	102.99			
 F-Number	3.65			
-Image Height	60
+Image Height	61.4
 Total Length	undefined			
 Magnification	0			
 d0	Infinity			
@@ -40,7 +40,7 @@ Bf	46.43
 26	-11.5430	0.00		17.02		Cement
 27	-11.5430	0.74	1.71850	16.92	33.51	BPH45
 28	-29.6646	0.06		16.76		
-29	26.5153	3.84	1.65052	16.76	29.1	ATF2
+29	26.5153	3.84	1.65052	16.76	38.04	ATF2
 30	-25.9265	0.18		16.16		
 31	-56.0023	0.96	1.87400	16.16	35.26	LAH75
 32	29.9968	3.25		16.16		

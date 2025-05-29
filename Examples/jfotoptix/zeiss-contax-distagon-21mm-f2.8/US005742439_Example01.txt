@@ -1,0 +1,66 @@
+[descriptive data]				
+title	US 5,742,439 Example 1 (Zeiss Distagon T 21mm F2.8 Contax)
+[constants]
+[variable distances]				
+Focal Length	25			
+Angle of View	102.99			
+F-Number	3.65			
+Image Height	60
+Total Length	undefined			
+Magnification	0			
+d0	Infinity			
+Bf(p)	47.791
+Bf	46.43
+[lens data]				
+1	50.2529	8.70	1.62000	69.88	62.19	ADC1
+2	92.0163	0.05		67.50		
+3	32.0126	1.00	1.87400	47.04	35.26	LAH75
+4	18.6988	10.51		35.58		
+5	54.5994	1.50	1.92286	35.00	21.28	PBH71
+6	21.9437	4.85		30.22		
+7	62.7726	1.50	1.88300	29.62	40.81	TAFD30
+8	23.1902	5.38		27.04	
+9	-176.8511	4.15	1.75700	26.98	47.82	S-LAM54
+10	35.9626	1.92		26.98		
+11	97.3607	4.00	1.92286	27.24	21.28	PBH71
+12	-77.8342	1.18		27.24		
+13	Infinity	1.50		27.86		Filter
+14	Infinity	1.18		27.86		
+15	42.2118	17.87	1.65016	27.86	39.39	BAH30
+16	-23.5400	0.01		24.92		Cement
+17	-23.5300	2.15	1.92286	24.92	21.28	PBH71
+18	-32.4246	2.51		24.92		
+19	FS	1.49		19.60		
+20	78.2780	9.49	1.88300	20.00	40.81	TAFD30
+21	12.2811	0.00		17.44		Cement
+22	12.2811	7.404	1.64450	17.44	40.81	BPH35
+23	-40.1660	0.50		17.44		
+24	AS	2.56		16.666
+25	-45.2866	4.50	1.62000	17.02	62.19	ADC1
+26	-11.5430	0.00		17.02		Cement
+27	-11.5430	0.74	1.71850	16.92	33.51	BPH45
+28	-29.6646	0.06		16.76		
+29	26.5153	3.84	1.65052	16.76	29.1	ATF2
+30	-25.9265	0.18		16.16		
+31	-56.0023	0.96	1.87400	16.16	35.26	LAH75
+32	29.9968	3.25		16.16		
+33	-21.5144	0.69	1.88300	15.94	40.81	TAFD30
+34	28.9861	0.01		19.16		Cement
+35	29.0109	6.89	1.49700	19.16	81.6	FPL51
+36	-18.0911	0.25		21.68		
+37	-95.1794	3.00	1.49700	24.50	81.6	FPL51
+38	-31.5296	Bf		25.84		
+[figure]				
+source	Data/US005742439_Figure01.png
+ppmm	31.42649878			
+originX	30			
+originY	1164			
+[notes]
+Bill: No IH; from figure. Cement interferes; adjusted. Bf computes as 46.45 not 47.791
+21	12.2789	0.01		17.44		Cement
+22	12.2811	7.404	1.64450	17.44	32.1	Ohara BPH35
+26	-11.5460	0.01		17.02		Cement
+27	-11.5430	0.74	1.71850	16.92	25.9	Ohara BPH45
+The patent states "An objective of this kind was presented at the "Photokina 1992"
+in Cologne under the designation Carl Zeiss Distagon 2,8/21 mm No. 104926"
+So this is the Carl Zeiss Distagon T 21mm F/2.8 - Contax/Yashica Mount

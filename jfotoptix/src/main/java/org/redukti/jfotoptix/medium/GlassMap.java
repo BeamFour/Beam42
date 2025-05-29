@@ -826,7 +826,7 @@ public class GlassMap extends Solid {
         glasses.put("S-LAM2", new GlassMap("Ohara","S-LAM2",1.743997,1.739048,1.755661)); // 44.8 744448 -0.0035
         glasses.put("S-LAM3", new GlassMap("Ohara","S-LAM3",1.717004,1.712528,1.727489)); // 47.9 717479 -0.0034
         glasses.put("S-LAM7", new GlassMap("Ohara","S-LAM7",1.749497,1.743275,1.764518)); // 35.3 750353 0.0025
-        glasses.put("S-LAM54",new GlassMap("Ohara", "S-LAM54",1.757,1.75223,1.76806));
+        glasses.put("S-LAM54",new GlassMap("Ohara", "S-LAM54",1.757,1.75223,1.76806)); // 47.82 757478 -0.0076
         glasses.put("S-LAM55", new GlassMap("Ohara","S-LAM55",1.762001,1.756385,1.775388)); // 40.1 762401 -0.0001
         glasses.put("S-LAM60", new GlassMap("Ohara","S-LAM60",1.743198,1.738653,1.753716)); // 49.3 743493 -0.0085
         glasses.put("S-LAM61",new GlassMap("Ohara", "S-LAM61",1.72,1.71533,1.73097));

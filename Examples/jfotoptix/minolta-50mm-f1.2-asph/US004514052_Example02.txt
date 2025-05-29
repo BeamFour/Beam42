@@ -1,0 +1,42 @@
+[descriptive data]
+title	US 4,514,052 Example 2
+[constants]
+Scaled	50	100
+[variable distances]
+Focal Length	50
+Angle of View	46
+F-Number	1.2
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf(p)	undefined
+Bf	36.13
+[lens data]
+1	36.904	6.798	1.78850	41.89	45.68
+2	194.760	0.155		41.89
+3	36.892	4.458	1.77250	37.60	49.77
+4	66.468	1.186		35.54
+5	109.441	2.042	1.65446	35.51	33.86
+6	19.625	8.804		29.20
+6AS	AS	8.44		28.210
+7	-18.977	1.695	1.76182	28.13	26.55
+8	111.280	9.203	1.77250	33.42	49.77
+9	-31.330	0.144		35.88
+10	-173.138	4.696	1.85000	37.02	40.51
+11	-41.513	0.145		37.02
+12	104.107	3.109	1.77250	33.94	49.77
+13	-212.338	Bf		33.94
+[aspherical data]
+3	36.892	0	-9.361384E-07	-2.898185E-10	-5.632241E-13
+[figure]
+source	Data/US004514052_Figure02.png
+originX	157.83
+originY	517.42
+ppmm	14.688
+[!figure]
+source	Data/US004514052_Figure02P.png
+originX	77.77
+originY	469.74
+ppmm	20.416
+[notes]
+Bill: Not Konica Minolta 50mm F1.2 MD.

@@ -1,0 +1,35 @@
+[descriptive data]
+title	US 4,514,052 Example 1
+[constants]
+Scaled	50	100
+[variable distances]
+Focal Length	50
+Angle of View	46
+F-Number	1.2
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf(p)	undefined
+Bf	36.12
+[lens data]
+1	41.579	5.991	1.78850	41.68	45.68
+2	140.999	0.199		41.68
+3	39.533	7.610	1.74400	38.52	44.93
+4	168.115	2.834	1.63980	35.57	34.55
+5	19.683	8.521		28.64
+5AS	AS	8.23		27.918
+6	-18.128	1.890	1.73300	27.56	28.24
+7	129.066	8.864	1.77250	34.66	49.77
+8	-28.987	0.145		35.78
+9	-178.149	4.854	1.77250	37.18	49.77
+10	-42.157	0.145		37.18
+11	120.067	3.107	1.77250	34.66	49.77
+12	-161.512	Bf		34.66
+[aspherical data]
+3	39.533	0	-9.037448E-07	-5.817043E-10	7.802894E-13
+[figure]
+source	Data/US004514052_Figure01.png
+originX	174.17
+originY	496.13
+ppmm	14.731
+[notes]

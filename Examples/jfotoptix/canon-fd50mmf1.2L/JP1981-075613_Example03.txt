@@ -1,0 +1,40 @@
+[descriptive data]
+title	JP 1985-040604 Example 3
+[constants]
+Scaled	50	100
+[variable distances]
+Focal Length	50
+Angle of View	46
+F-Number	1.2
+Image Height	43.2
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf(p)	undefined
+Bf	35.64
+Aperture Diameter	29.089
+[lens data]
+1	54.3590	4.34100	1.81600	43.30	46.6
+2	181.02400	0.1455		43.30	
+3	40.1660	11.01450	1.80610	40.90	40.9
+4	268.76850	1.9960	1.63980	40.90	34.5
+5	21.25360	8.0195		29.80	
+5AS	AS	7.4240		29.089
+6	-19.54555	1.1630	1.80518	29.13	25.4
+7	157.26100	9.1380	1.78800	36.21	47.4
+8	-33.56180	0.1455		38.00
+9	-156.52300	3.8760	1.88300	40.38	40.8
+10	-43.71260	0.0970		40.38
+11	578.33100	3.2460	1.81600	39.28	46.6
+12	-81.00500	0.1940		39.28
+13	469.96100	1.7440	1.67000	36.95	57.4
+14	-469.96100	Bf		36.95
+[!aspherical data]
+3	40.166	-1	-8.819120E-07	2.063209E-09	-8.306244E-12	1.070054E-14
+[figure]
+source	Data/JP1985-040604_Figure01.png
+originX	93
+originY	495.5
+ppmm	17.058
+[notes]
+Bill: Non-standard asphere.

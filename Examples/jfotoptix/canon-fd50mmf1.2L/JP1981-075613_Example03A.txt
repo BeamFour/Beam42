@@ -1,0 +1,36 @@
+[descriptive data]
+title	JP 1985-040604/US4364644 Example 3
+[constants]
+Scaled	50	100
+[variable distances]
+Focal Length	51
+Angle of View	46
+F-Number	1.22
+Image Height	43.2
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf(p)	undefined
+Bf	36.3585
+Aperture Diameter	29.089
+[lens data]
+1	55.44618	4.247820	1.81600	41.8	46.6	S-LAH59
+2	184.64446	0.148410		41.23728	
+3	40.96932	11.23479	1.80610	39.37839	40.9	S-LAH53
+4	274.14388	2.03592	1.63980	34.43213	34.5	PBM27
+5	21.67867	7.592370		28.88556	
+5AS	AS	8.15867		27.9
+6	-19.93646	1.18626	1.80518	27.9	25.4	PBH6
+7	160.40621	9.32076	1.78800	32.82924	47.4	S-LAH64
+8	-34.23304	0.14841		35.27635
+9	-159.65345	3.95352	1.88300	36.51612	40.8	S-LAH58
+10	-44.58685	0.09894		36.79632
+11	589.89749	3.31092	1.81600	35.64182	46.6	S-LAH59
+12	-82.62508	0.19788		35.508
+13	479.36025	1.77888	1.67000	33.95686	57.4	S-LAL52
+14	-479.36025	Bf		33.6
+[aspherical data]
+3	40.96932	0	-0.830984E-6	0.186871E-8	-0.723109E-11	0.895373E-14
+[figure]
+[notes]
+Obtained from https://www.nocsensei.com/camera/tecnica/marco-cavina/marcocavina/vintage-meter-09-canon-fd-50mm-12-l-1980/

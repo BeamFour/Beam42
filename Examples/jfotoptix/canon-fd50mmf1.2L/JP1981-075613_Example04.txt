@@ -1,5 +1,5 @@
 [descriptive data]
-title	JP 1985-040604 Example 4
+title	JP 1985-040604/US4364644 Example 4
 [constants]
 Scaled	50	100
 [variable distances]

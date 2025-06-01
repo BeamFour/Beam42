@@ -24,9 +24,9 @@ public class ParaxialTrace {
         Lens.Builder lensBuilder = new Lens.Builder()
                 .position(Vector3Pair.position_000_001)
                 .add_surface(50.0,  10.0, 10,
-                        new GlassMap("Glass1.5", 1.5, 1.5, 1.5))
+                        new GlassMap("Glass1.5", 1.5, 1.5, 1.5, 0, 0))
                 .add_surface(-50.0, 10.0, 2.0,
-                        new GlassMap("Glass1.6", 1.6, 1.6, 1.6))
+                        new GlassMap("Glass1.6", 1.6, 1.6, 1.6, 0, 0))
                 .add_surface(0.0,  10.0, 30.0);
         systemBuilder.add(lensBuilder);
         OpticalSystem system = systemBuilder.build();

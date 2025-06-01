@@ -58,20 +58,27 @@ public class NoctNikkor58 {
         }
     }
 
-    private static double add_surface(Lens.Builder lens, double radius, double thickness, double diameter, double nd, double vd, boolean stop) {
+    private static double add_surface(Lens.Builder lens, double radius, double thickness, double diameter, double nd, double vd, String glassName, boolean stop) {
         double apertureRadius = diameter / 2.0;
         if (stop) {
             lens.add_stop(apertureRadius, thickness, true);
             return thickness;
         }
         if (nd != 0.0) {
-            lens.add_surface(radius, apertureRadius, thickness, new Abbe(Abbe.AbbeFormula.AbbeVd, nd, vd, 0.0));
+            var glass = GlassMap.glassByName(glassName);
+            if (glass == null) {
+                lens.add_surface(radius, apertureRadius, thickness, new Abbe(Abbe.AbbeFormula.AbbeVd, nd, vd, 0.0));
+            }
+            else {
+                lens.add_surface(radius, apertureRadius, thickness, glass);
+            }
         } else {
             lens.add_surface(radius, apertureRadius, thickness);
         }
         return thickness;
     }
 
+    // Measured by DM - off 1001 tale 16
     private static List<SurfaceType> getSurfaces() {
         List<SurfaceType> list = new ArrayList<>();
 
@@ -91,6 +98,71 @@ public class NoctNikkor58 {
         list.add(new SurfaceType(false, -94.08052, 37.780, 0, 38.275, 0));
         return list;
     }
+
+    // Latest contrib 01 June
+    private static List<SurfaceType> getSurfaces3() {
+        List<SurfaceType> list = new ArrayList<>();
+
+        list.add(new SurfaceType(false, 80.344, 7.042, 1.8485, 50.4875, 43.8));
+        list.add(new SurfaceType(false, 0, 0.189, 0, 50.4875, 0));
+        list.add(new SurfaceType(false, 33.61, 9.715, 1.69, 44.832, 54.7));
+        list.add(new SurfaceType(false, 69.686, 1.476, 0, 44.832, 0));
+        list.add(new SurfaceType(false, 129.534, 3.02, 1.7783, 42.169, 23.9));
+        list.add(new SurfaceType(false, 22.55, 8.47, 0, 32.128, 0));
+        list.add(new SurfaceType(true, 0, 7.9, 0, 31.227, 0));
+        list.add(new SurfaceType(false, -23.365, 1.71, 1.58148, 31.45, 40.9));
+        list.add(new SurfaceType(false, 311.537, 8.141, 1.6934, 40.2, 53.3));
+        list.add(new SurfaceType(false, -38.532, 0.074, 0, 40.2, 0));
+        list.add(new SurfaceType(false, -483.703, 6.009, 1.6516, 39.5, 58.4));
+        list.add(new SurfaceType(false, -55.749, 0.1, 0, 39.5, 0));
+        list.add(new SurfaceType(false, 200.86, 3.894, 1.6217, 38.275, 58.54));
+        list.add(new SurfaceType(false, -106.579, 37.780, 0, 38.275, 0));
+        return list;
+    }
+
+
+    // Contrib - service manual based
+    private static List<SurfaceType> getSurfaces2() {
+        List<SurfaceType> list = new ArrayList<>();
+
+        list.add(new SurfaceType(false, 73.77, 7.17, 1.8485, 50.4875, 43.8));
+        list.add(new SurfaceType(false, -20000, 0.34, 0, 50.4875, 0));
+        list.add(new SurfaceType(false, 33.44, 9.63, 1.69, 44.832, 54.7));
+        list.add(new SurfaceType(false, 68.854, 1.6, 0, 44.832, 0));
+        list.add(new SurfaceType(false, 137.71, 3.43, 1.7783, 42.169, 23.9));
+        list.add(new SurfaceType(false, 25.57, 7.702, 0, 32.128, 0));
+        list.add(new SurfaceType(true, 0, 7.771, 0, 31.227, 0));
+        list.add(new SurfaceType(false, -24.59, 1.87, 1.58148, 31.45, 40.9));
+        list.add(new SurfaceType(false, 304.93, 7.95, 1.6934, 40.2, 53.3));
+        list.add(new SurfaceType(false, -39.345, 0.4, 0, 40.2, 0));
+        list.add(new SurfaceType(false, -295.1, 5.63, 1.6516, 39.5, 58.4));
+        list.add(new SurfaceType(false, -56.6, 0.1, 0, 39.5, 0));
+        list.add(new SurfaceType(false, 125.91, 4.09, 1.6217, 38.275, 58.54));
+        list.add(new SurfaceType(false, -98.36, 37.78, 0, 38.275, 0));
+        return list;
+    }
+
+    // modified manually based on Zemax sliders
+    private static List<SurfaceType> getSurfaces1() {
+        List<SurfaceType> list = new ArrayList<>();
+
+        list.add(new SurfaceType(false, 79.946, 6.885, 1.8485, 50.4875, 43.8));
+        list.add(new SurfaceType(false, 0, 0.1, 0, 50.4875, 0));
+        list.add(new SurfaceType(false, 33.792, 9.75, 1.69, 44.832, 54.7));
+        list.add(new SurfaceType(false, 70.187, 1.56, 0, 44.832, 0));
+        list.add(new SurfaceType(false, 134.614, 2.87, 1.7783, 42.169, 23.9));
+        list.add(new SurfaceType(false, 22.369, 8.5, 0, 32.128, 0));
+        list.add(new SurfaceType(true, 0, 7.9, 0, 31.227, 0));
+        list.add(new SurfaceType(false, -23.035, 1.64, 1.58148, 31.45, 40.9));
+        list.add(new SurfaceType(false, 306.553, 8.196, 1.6934, 40.2, 53.3));
+        list.add(new SurfaceType(false, -37.566, 0.15, 0, 40.2, 0));
+        list.add(new SurfaceType(false, -396.814, 6.147, 1.6516, 39.5, 58.4));
+        list.add(new SurfaceType(false, -52.568, 0.000, 0, 39.5, 0));
+        list.add(new SurfaceType(false, 223.843, 4.016, 1.6217, 38.275, 58.54));
+        list.add(new SurfaceType(false, -94.081, 37.780, 0, 38.275, 0));
+        return list;
+    }
+
 
     private static OpticalSystem.Builder buildSystem(GlassType[] glassTypes, boolean addPointSource, boolean skew) {
         OpticalSystem.Builder sys = new OpticalSystem.Builder();
@@ -123,12 +195,14 @@ public class NoctNikkor58 {
             SurfaceType s = surfaces.get(i);
             double nd = s.nd;
             double vd = s.vd;
+            String glassName = null;
             if (nd != 0) {
                 nd = glassTypes[index].nd;
                 vd = glassTypes[index].vd;
+                glassName = glassTypes[index].name;
                 index++;
             }
-            double thickness = add_surface(lens, s.radius, s.thickness, s.apertureRadius, nd, vd, s.isStop);
+            double thickness = add_surface(lens, s.radius, s.thickness, s.apertureRadius, nd, vd, glassName, s.isStop);
             image_pos += thickness;
         }
         sys.add(lens);
@@ -137,12 +211,6 @@ public class NoctNikkor58 {
         sys.angle_of_view(angleOfView);
         sys.f_number(fNum);
         return sys;
-    }
-
-    // Facts H' - H = 14.3
-    // F' = 58
-    static List<Double> getGlassTypes1() {
-        return GlassMap.glasses.values().stream().map(e -> e.get_refractive_index(SpectralLine.d)).filter(e -> e > 1.7 && e < 1.91).sorted().distinct().collect(Collectors.toList());
     }
 
     static GlassType[] getGlassTypes() {
@@ -171,10 +239,15 @@ public class NoctNikkor58 {
                 };
     }
 
-    static List<Double> getGlassTypes2() {
-        Double[] glasses = new Double[]{1.6727, 1.68893, 1.69895, 1.71300, 1.71736, 1.72825, 1.72, 1.74, 1.74077, 1.74430, 1.74443, 1.75520, 1.76684, 1.77279, 1.78470, 1.78797, 1.79631, 1.79668, 1.80218, 1.80411, 1.84042, 1.87739};
-        //Double[] glasses = new Double[]{1.64769, 1.651, 1.65844, 1.66446, 1.67, 1.6779, 1.68893, 1.6935, 1.6968, 1.69895, 1.7, 1.713, 1.717, 1.72, 1.734, 1.738, 1.741, 1.744, 1.755, 1.757, 1.762, 1.7725, 1.7847, 1.788, 1.795, 1.801, 1.804, 1.816, 1.834, 1.8485, 1.85};
-        return List.of(glasses);
+    static GlassType[] getGlassTypes2() {
+        var glasses = GlassMap.glasses.values().stream()
+                .filter(e ->e.get_manufacturer().equals("Hikari"))
+                .filter(e -> e.get_name().startsWith("E-"))
+                .filter(e->e.get_refractive_index(SpectralLine.d) >= 1.64 && e.get_refractive_index(SpectralLine.d) < 1.91)
+                .map(e->new GlassType(e.get_name(), e.nd, e.vd))
+                .collect(Collectors.toList())
+                .toArray(new GlassType[0]);
+        return glasses;
     }
 
     static final class ProcessSystems implements Runnable {
@@ -223,8 +296,15 @@ public class NoctNikkor58 {
                                                     && parax.pp1 > 51.75 && parax.pp1 < 51.85 // 51.8 from first surface
                                                     && parax.ppk > 20.15 && parax.ppk < 20.25) {  // 20.2 from last surface
 
+                                                var sb1 = new StringBuilder();
+                                                sb1.append(parax.effective_focal_length).append("\t")
+                                                        .append(parax.back_focal_length).append("\t")
+                                                        .append(parax.fno).append("\t")
+                                                        .append(parax.ppk).append("\t")
+                                                        .append(parax.pp1).append("\t");
+                                                System.out.println(sb1);
                                                 var system2 = buildSystem(glasses, true, false).build();
-                                                var spotAnalysis = new AnalysisSpot(system2, 20);
+                                                var spotAnalysis = new AnalysisSpot(system2, 10);
                                                 spotAnalysis.process_analysis();
                                                 if (spotAnalysis.get_rms_radius() < 125.0) {
                                                     StringBuilder sb = new StringBuilder();
@@ -264,9 +344,9 @@ public class NoctNikkor58 {
         System.out.println("Trying " + glassTypes.length + " glass types");
 
         AtomicLong count = new AtomicLong();
-        int numThreads = 8;
+        int numThreads = glassTypes.length;
         Thread[] threads = new Thread[numThreads];
-        int perThreadGlassCount = (int) Math.round((double) glassTypes.length / (double) numThreads);
+        int perThreadGlassCount = 1; //  (int) Math.round((double) glassTypes.length / (double) numThreads);
         int start = 0;
         for (int g = 0; g < numThreads; g++) {
             int end = start + perThreadGlassCount;

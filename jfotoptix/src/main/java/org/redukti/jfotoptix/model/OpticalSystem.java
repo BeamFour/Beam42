@@ -26,12 +26,12 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.model;
 
+import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.math.Transform3;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class OpticalSystem implements Container {
@@ -134,6 +134,60 @@ public class OpticalSystem implements Container {
                 "elements=" + _elements +
                 ", transform3Cache=" + _transform3Cache +
                 '}';
+    }
+
+    static final class GlassType {
+        final String name;
+        final double nd;
+
+        public GlassType(String name, double nd) {
+            this.name = name;
+            this.nd = nd;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+            GlassType glassType = (GlassType) o;
+            return Double.compare(nd, glassType.nd) == 0 && Objects.equals(name, glassType.name);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, nd);
+        }
+
+        @Override
+        public String toString() {
+            return "(" + name + "," + nd + ')';
+        }
+    }
+
+    static GlassType[] extractGlasses(OpticalSystem system) {
+        var elements = system.get_sequence()
+                .stream()
+                .filter(e->e instanceof OpticalSurface)
+                .map(e->(OpticalSurface)e)
+                .toList();
+        Set<GlassType> glassTypes = new HashSet<>();
+        for (int i = 0; i < elements.size(); i++) {
+            OpticalSurface opticalSurface = elements.get(i);
+            var glass1 = opticalSurface.get_material(0);
+            glassTypes.add(new GlassType(glass1.get_name(), glass1.get_refractive_index(SpectralLine.d)));
+            var glass2 = opticalSurface.get_material(1);
+            glassTypes.add(new GlassType(glass2.get_name(), glass2.get_refractive_index(SpectralLine.d)));
+        }
+        return glassTypes.toArray(new GlassType[0]);
+    }
+
+    public String[] glassNames() {
+        var glassTypes = extractGlasses(this);
+        return Arrays.stream(glassTypes).map(e->e.name).toList().toArray(new String[0]);
+    }
+
+    public double[] glassIndices() {
+        var glassTypes = extractGlasses(this);
+        return Arrays.stream(glassTypes).map(e->e.nd).mapToDouble(e->e.doubleValue()).toArray();
     }
 
     public static class Builder {

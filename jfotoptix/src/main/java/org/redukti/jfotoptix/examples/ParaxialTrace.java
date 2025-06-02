@@ -1,5 +1,6 @@
 package org.redukti.jfotoptix.examples;
 
+import org.redukti.jfotoptix.fastparax.YNUTracer;
 import org.redukti.jfotoptix.math.Vector3Pair;
 import org.redukti.jfotoptix.medium.GlassMap;
 import org.redukti.jfotoptix.model.Lens;
@@ -35,5 +36,10 @@ public class ParaxialTrace {
         List<OpticalSurface> seq = system.get_sequence().stream().filter(e -> e instanceof OpticalSurface).map(e -> (OpticalSurface)e).collect(Collectors.toList());
         Map<Integer, YNUTraceData> data = ynuTrace.trace(seq, 10.0, 0.0333, 0);
         System.out.println(-data.get(seq.get(seq.size()-1).id()).height/data.get(seq.get(seq.size()-1).id()).slope);
+        YNUTracer newTracer = new YNUTracer(system, new String[] {"air", "Glass1.5", "Glass1.6"});
+        newTracer.setGlasses(new String[] {"air", "Glass1.5", "Glass1.6"}, new double[] {1.0, 1.5, 1.6});
+        var rays = new YNUTracer.Rays(4);
+        newTracer.trace(10.0, 0.0333, 0, rays);
+        System.out.println(-rays.heights[2]/rays.slopes[2]);
     }
 }

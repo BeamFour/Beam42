@@ -32,17 +32,18 @@ public class TestDiscreteSet {
 
     @BeforeEach
     public void setupInput() throws Exception {
-        lines = parseDataPoints("/test_discrete_set-in.txt");
+        lines = parseDataPoints("test_discrete_set-in.txt");
         Assertions.assertTrue(lines.size() > 0);
     }
 
     private List<DataPoint> parseDataPoints(String name) throws IOException, URISyntaxException {
-        return Files.readAllLines(Paths.get(this.getClass().getResource(name).toURI()))
-                .stream().map(e -> new DataPoint(e)).collect(Collectors.toList());
+        var uri = getClass().getClassLoader().getResource(name).toURI();
+        var lines = Files.readAllLines(Paths.get(uri));
+        return lines.stream().map(e -> new DataPoint(e)).collect(Collectors.toList());
     }
 
     private void doTest(Interpolation method) throws Exception {
-        String expected = "/test_discrete_set-" + method.name() + ".txt";
+        String expected = "test_discrete_set-" + method.name() + ".txt";
         List<DataPoint> results = parseDataPoints(expected);
         Assertions.assertTrue(results.size() > 0);
 

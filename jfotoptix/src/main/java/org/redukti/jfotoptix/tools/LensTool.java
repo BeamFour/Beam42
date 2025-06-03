@@ -125,6 +125,8 @@ public class LensTool {
             Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"spot-report.txt",arguments.outdir), spotReport.toString());
             ParaxialFirstOrderInfo pfo = ParaxialFirstOrderInfo.compute(system);
             Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"paraxial.txt",arguments.outdir), pfo.toString());
+//            pfo = ParaxialFirstOrderInfo.computeFast(system);
+//            Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"paraxial2.txt",arguments.outdir), pfo.toString());
             ZemaxExporter zemaxExporter = new ZemaxExporter();
             Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), zemaxExporter.generate(specs, arguments.scenario, arguments.only_d_line));
         }

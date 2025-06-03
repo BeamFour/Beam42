@@ -1,7 +1,0 @@
-plugins {
-    id 'beam42.java-application-conventions'
-}
-
-application {
-    mainClass = 'org.redukti.jfotoptix.tools.LensTool'
-}

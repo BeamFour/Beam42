@@ -1,8 +1,0 @@
-plugins {
-    id 'beam42.java-application-conventions'
-}
-
-application {
-    // Define the main class for the application.
-    mainClass = 'com.stellarsoftware.beam.B4'
-}

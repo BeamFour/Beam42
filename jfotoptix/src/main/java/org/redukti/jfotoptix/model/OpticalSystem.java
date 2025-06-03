@@ -136,7 +136,7 @@ public class OpticalSystem implements Container {
                 '}';
     }
 
-    static final class GlassType {
+    static final class GlassType implements Comparable<GlassType> {
         final String name;
         final double nd;
 
@@ -161,6 +161,19 @@ public class OpticalSystem implements Container {
         public String toString() {
             return "(" + name + "," + nd + ')';
         }
+
+        @Override
+        public int compareTo(GlassType o) {
+            if (this.name.equals(o.name)) {
+                return Double.compare(this.nd, o.nd);
+            }
+            else if (this.name.equals("air"))
+                return -1;
+            else if (o.name.equals("air"))
+                return 1;
+            else
+                return this.name.compareTo(o.name);
+        }
     }
 
     static GlassType[] extractGlasses(OpticalSystem system) {
@@ -169,7 +182,7 @@ public class OpticalSystem implements Container {
                 .filter(e->e instanceof OpticalSurface)
                 .map(e->(OpticalSurface)e)
                 .toList();
-        Set<GlassType> glassTypes = new HashSet<>();
+        Set<GlassType> glassTypes = new TreeSet<>();
         for (int i = 0; i < elements.size(); i++) {
             OpticalSurface opticalSurface = elements.get(i);
             var glass1 = opticalSurface.get_material(0);

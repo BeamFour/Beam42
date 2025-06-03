@@ -2,9 +2,6 @@ plugins {
     id 'beam42.java-application-conventions'
 }
 
-dependencies {
-    implementation project(':beam42')
-}
 application {
     mainClass = 'org.redukti.jfotoptix.tools.LensTool'
 }

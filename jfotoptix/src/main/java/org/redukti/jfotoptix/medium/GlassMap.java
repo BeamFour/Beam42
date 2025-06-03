@@ -350,7 +350,7 @@ public class GlassMap extends Solid {
         glasses.put("Q-LASFPH3S", new GlassMap("Hikari","Q-LASFPH3S",1.795256,1.789992,1.807566,45.25,-0.0095)); // 45.25 795453 -0.0095
 
         // CaF2
-        glasses.put("CaF2", new GlassMap("CaF2", 1.43384, 1.43245, 1.437, 95.26, 0.0553));
+        glasses.put("CaF2", new GlassMap("Nikon", "CaF2", 1.43384, 1.43245, 1.437, 95.26, 0.0553));
         glasses.put("NICF-V", new GlassMap("Nikon", "NICF-V", 1.43384, 1.43245, 1.437, 95.26, 0.0553)); // 95.26 434952 0.0553
 
 

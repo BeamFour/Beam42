@@ -5,6 +5,12 @@ import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 
 import java.util.*;
 
+/**
+ * A Paraxial Tracer / First Order calculator that is designed
+ * to be efficient - it does not allocate memory during calculation.
+ * It is designed to allow substituting glass types and performing repeated
+ * calculations.
+ */
 public class YNUTracer {
 
     private final double f_number;
@@ -70,6 +76,8 @@ public class YNUTracer {
         int max_id = elements.stream().map(e->e.id()).max(Comparator.naturalOrder()).orElseThrow();
         surface_id_positions = new int[max_id+1];
         first_surface_position = -1;
+        image_position = -1;
+        stop_position = -1;
         for (int i = 0; i < elements.size(); i++) {
             Element e = elements.get(i);
             surface_id_positions[e.id()] = i;
@@ -112,6 +120,9 @@ public class YNUTracer {
        Also see section 5.9 in MIL-HDBK-141
      */
     public void trace(double object_height, double initial_slope_angle, double object_distance, Rays rays) {
+        if (image_position < 0)
+            throw new RuntimeException("Image plane is required");
+
         double y1 = object_distance != 0.0 ?
                 object_height + object_distance*initial_slope_angle: // Note object_distance will usually be negative
                 object_height; // y = height
@@ -121,22 +132,15 @@ public class YNUTracer {
         for (int i = 0; i < elements.length; i++) {
             if (elements[i] instanceof OpticalSurface surface) {
                 y1 = y2; // height on this surface
-                //Medium leftMedium = surface.get_material(0);
-                //double t1 = surface.get_thickness();
                 double t1 = thickness[i];
-                //Medium rightMedium = surface.get_material(1);
-                //double C1 = surface.get_curve().get_curvature();
                 double C1 = curvatures[i];
-                //double n1 = leftMedium.get_refractive_index(SpectralLine.d);
                 double n1 = glass_nd[left_medium[i]];
-                //double n1_ = rightMedium.get_refractive_index(SpectralLine.d);
                 double n1_ = glass_nd[right_medium[i]];
                 double n1_u1_ = -y1 * C1 * (n1_-n1)  + n1*u1; // Eq 57 in MIL-HDBK-141,, Eq 2.31 in MOE
                 // Calculate y for next surface
                 y2 = y1 + t1 * (n1_u1_)/n1_;    // Eq 56 in MIL-HDBK-141, Eq 2.32 in MOE
                 u1 = n1_u1_/n1_; // ray angle
                 aoi = u1 + y1 * C1; // Eq 1.51 in handbook of Optical Dsign
-                //double power = surface.power(SpectralLine.d);
                 rays.heights[i] = y1;
                 rays.slopes[i] = u1;
                 rays.angles[i] = aoi;
@@ -148,6 +152,9 @@ public class YNUTracer {
     }
 
     public ParaxialFirstOrderInfo compute() {
+
+        if (stop_position < 0)
+            throw new RuntimeException("An aperture stop is required");
 
         // Trace a ray parallel to axis at height 1.0 from infinity
         trace(1.0, 0.0, -DISTANCE, p_ray);
@@ -297,5 +304,4 @@ public class YNUTracer {
 
         return pfo;
     }
-
 }

@@ -178,8 +178,8 @@ public class NoctNikkor58Select {
                 //      double z1 = cos (angleOfView);
                 //      double y1 = sin (angleOfView);
                 //      unit_vector = math::Vector3 (0, y1, z1);
-
-                Matrix3 r = Matrix3.get_rotation_matrix(0, angleOfView);
+                double aov = Math.toRadians(40.9) / 2.0;
+                Matrix3 r = Matrix3.get_rotation_matrix(0, aov);
                 direction = r.times(direction);
             }
             PointSource.Builder ps = new PointSource.Builder(PointSource.SourceInfinityMode.SourceAtInfinity, direction)
@@ -277,18 +277,24 @@ public class NoctNikkor58Select {
             }
         }
 
-        OpticalSystem system() {
-            return buildSystem(glasses, true, false).build();
+        OpticalSystem system(boolean skew) {
+            return buildSystem(glasses, true, skew).build();
         }
 
         void analyse() {
-            var sys = system();
+            var sys = system(false);
             //System.out.println(sys);
-            var spotAnalysis = new AnalysisSpot(sys, 50);
+            var spotAnalysis = new AnalysisSpot(sys, 10);
             spotAnalysis.process_analysis();
-            if (spotAnalysis.get_rms_radius() < 125.0) {
+            var nonskew = spotAnalysis.get_rms_radius();
+            sys = system(true);
+            spotAnalysis = new AnalysisSpot(sys, 10);
+            spotAnalysis.process_analysis();
+            var skewed = spotAnalysis.get_rms_radius();
+            if (nonskew < 125.0 || skewed < 125.0) {
                 StringBuilder sb = new StringBuilder();
-                sb.append(spotAnalysis.get_rms_radius()).append("\t");
+                sb.append(nonskew).append("\t");
+                sb.append(skewed).append("\t");
                 sb.append(eff).append("\t")
                         .append(bf).append("\t")
                         .append(fno).append("\t")

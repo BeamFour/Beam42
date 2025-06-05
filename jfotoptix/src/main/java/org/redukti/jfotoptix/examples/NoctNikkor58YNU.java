@@ -37,7 +37,7 @@ public class NoctNikkor58YNU {
 
         @Override
         public String toString() {
-            return "(" + name + "," + nd + "," + vd + ')';
+            return "\t" + name + "\t" + nd + "\t" + vd;
         }
     }
 
@@ -76,7 +76,7 @@ public class NoctNikkor58YNU {
     }
 
     // Measured by DM - off 1001 tale 16
-    private static List<SurfaceType> getSurfaces() {
+    private static List<SurfaceType> getSurfacesDM() {
         List<SurfaceType> list = new ArrayList<>();
 
         list.add(new SurfaceType(false, 79.9975, 6.885, 1.8485, 50.4875, 43.8, "G1"));
@@ -97,7 +97,7 @@ public class NoctNikkor58YNU {
     }
 
     // Latest contrib 01 June
-    private static List<SurfaceType> getSurfaces3() {
+    private static List<SurfaceType> getSurfaces() {
         List<SurfaceType> list = new ArrayList<>();
 
         list.add(new SurfaceType(false, 80.344, 7.042, 1.8485, 50.4875, 43.8, "G1"));
@@ -203,7 +203,7 @@ public class NoctNikkor58YNU {
         return sys;
     }
 
-    static GlassType[] getGlassTypes() {
+    static GlassType[] getGlassTypes0() {
         return new GlassType[]{
                 new GlassType("J-SF5", 1.6727, 32.19),    // wakamiya J-SF5
                 new GlassType("S-TIM22", 1.64769, 33.79),   // US 4,234,242 50mm f1.8   S-TIM22
@@ -229,7 +229,7 @@ public class NoctNikkor58YNU {
                 };
     }
 
-    static GlassType[] getGlassTypes2() {
+    static GlassType[] getGlassTypes() {
         var glasses = GlassMap.glasses.values().stream()
                 .filter(e ->e.get_manufacturer().equals("Hikari"))
                 .filter(e -> e.get_name().startsWith("E-"))
@@ -288,13 +288,15 @@ public class NoctNikkor58YNU {
                                                     && parax.pp1 > 51.75 && parax.pp1 < 51.85 // 51.8 from first surface
                                                     && parax.ppk > 20.15 && parax.ppk < 20.25) {  // 20.2 from last surface
 
-                                                var sb1 = new StringBuilder();
-                                                sb1.append(parax.effective_focal_length).append("\t")
+                                                var sb = new StringBuilder();
+                                                sb.append(parax.effective_focal_length).append("\t")
                                                         .append(parax.back_focal_length).append("\t")
                                                         .append(parax.fno).append("\t")
                                                         .append(parax.ppk).append("\t")
                                                         .append(parax.pp1).append("\t");
-                                                System.out.println(sb1);
+                                                for (int i = 0; i < glasses.length; i++)
+                                                    sb.append(glasses[i]).append("\t");
+                                                System.out.println(sb);
                                             }
                                         } catch (Exception ex) {
                                             ex.printStackTrace();
@@ -314,7 +316,7 @@ public class NoctNikkor58YNU {
         System.out.println("Trying " + glassTypes.length + " glass types");
 
         AtomicLong count = new AtomicLong();
-        int numThreads = 8; //  glassTypes.length;
+        int numThreads = 12; //  glassTypes.length;
         Thread[] threads = new Thread[numThreads];
         int perThreadGlassCount = (int) Math.round((double) glassTypes.length / (double) numThreads);
         int start = 0;

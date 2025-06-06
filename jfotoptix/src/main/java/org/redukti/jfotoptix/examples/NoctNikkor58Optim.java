@@ -12,18 +12,16 @@ import org.redukti.jfotoptix.model.Image;
 import org.redukti.jfotoptix.model.Lens;
 import org.redukti.jfotoptix.model.OpticalSystem;
 import org.redukti.jfotoptix.model.PointSource;
+import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.jfotoptix.shape.Rectangle;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 // Takes too long to run for more than about 22 glasses (that takes 2 hrs as well)
-public class NoctNikkor58Select {
+public class NoctNikkor58Optim {
 
     static final class GlassType {
         final String name;
@@ -81,7 +79,7 @@ public class NoctNikkor58Select {
     }
 
     // Measured by DM - off 1001 tale 16
-    private static List<SurfaceType> getSurfacesDM() {
+    private static List<SurfaceType> getSurfaces() {
         List<SurfaceType> list = new ArrayList<>();
 
         list.add(new SurfaceType(false, 79.9975, 6.885, 1.8485, 50.4875, 43.8));
@@ -102,7 +100,7 @@ public class NoctNikkor58Select {
     }
 
     // Latest contrib 01 June
-    private static List<SurfaceType> getSurfaces() {
+    private static List<SurfaceType> getSurfacesContrib() {
         List<SurfaceType> list = new ArrayList<>();
 
         list.add(new SurfaceType(false, 80.344, 7.042, 1.8485, 50.4875, 43.8));
@@ -166,7 +164,7 @@ public class NoctNikkor58Select {
     }
 
 
-    private static OpticalSystem.Builder buildSystem(GlassType[] glassTypes, boolean addPointSource, boolean skew) {
+    private static OpticalSystem.Builder buildSystem(List<SurfaceType> surfaces, GlassType[] glassTypes, boolean addPointSource, boolean skew) {
         OpticalSystem.Builder sys = new OpticalSystem.Builder();
         double imageHeight = 43.28;
         double angleOfView = 40.9 / 2.0;
@@ -191,7 +189,6 @@ public class NoctNikkor58Select {
         /* anchor lens */
         Lens.Builder lens = new Lens.Builder().position(Vector3Pair.position_000_001);
         double image_pos = 0.0;
-        List<SurfaceType> surfaces = getSurfaces();
         int index = 0;
         for (int i = 0; i < surfaces.size(); i++) {
             SurfaceType s = surfaces.get(i);
@@ -215,7 +212,7 @@ public class NoctNikkor58Select {
         return sys;
     }
 
-    static GlassType[] getGlassTypesOld() {
+    static GlassType[] getGlassTypes() {
         return new GlassType[]{
                 new GlassType("J-SF5", 1.6727, 32.19),    // wakamiya J-SF5
                 new GlassType("S-TIM22", 1.64769, 33.79),   // US 4,234,242 50mm f1.8   S-TIM22
@@ -241,7 +238,7 @@ public class NoctNikkor58Select {
                 };
     }
 
-    static GlassType[] getGlassTypes() {
+    static GlassType[] getGlassTypesNew() {
         var glasses = GlassMap.glasses.values().stream()
                 .filter(e ->e.get_manufacturer().equals("Hikari"))
                 .filter(e -> e.get_name().startsWith("E-"))
@@ -276,60 +273,80 @@ public class NoctNikkor58Select {
                     throw new RuntimeException("No definition found for " + nd);
             }
         }
+    }
 
-        OpticalSystem system(boolean skew) {
-            return buildSystem(glasses, true, skew).build();
+    private static void setup(GlassType[] glassTypes, int surface, double[] radii) {
+        if (surface == radii.length)
+            return;
+        double[] example = Arrays.copyOf(radii,radii.length);
+        if (radii[surface] != 0.0) {
+            double unit = radii[surface] * 0.01;
+            example[surface] += unit;
+            analyse(glassTypes, example);
+            setup(glassTypes, surface + 1, example);
+            example = Arrays.copyOf(radii, radii.length);
+            example[surface] -= unit;
+            analyse(glassTypes, example);
+            setup(glassTypes, surface + 1, example);
         }
-
-        void analyse(int line) {
-            var sys = system(false);
-            //System.out.println(sys);
-            var spotAnalysis = new AnalysisSpot(sys, 10);
-            spotAnalysis.process_analysis();
-            var nonskew = spotAnalysis.get_rms_radius();
-            sys = system(true);
-            spotAnalysis = new AnalysisSpot(sys, 10);
-            spotAnalysis.process_analysis();
-            var skewed = spotAnalysis.get_rms_radius();
-            if (nonskew < 125.0 || skewed < 125.0) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(line).append("\t");
-                sb.append(nonskew).append("\t");
-                sb.append(skewed).append("\t");
-                sb.append(eff).append("\t")
-                        .append(bf).append("\t")
-                        .append(fno).append("\t")
-                        .append(ppk).append("\t")
-                        .append(pp1).append("\t");
-                for (int i = 0; i < glasses.length; i++)
-                    sb.append(glasses[i]).append("\t");
-                System.out.println(sb.toString());
-            }
+        else {
+            setup(glassTypes, surface + 1, example);
         }
     }
 
     public static void main(String[] args) throws Exception {
-
-        if (args.length == 0)
-            System.exit(1);
-
-        try {
-            var glasses = getGlassTypes();
-            var glassmap = new HashMap<Double,GlassType>();
-            for (var g: glasses) {
-                glassmap.put(g.nd,g);
-            }
-            var file = new File(args[0]);
-            var lines = Files.readAllLines(file.toPath());
-            int lineNum = 0;
-            for (String line: lines) {
-                lineNum++;
-                SampleData sampleData = new SampleData(line,glassmap);
-                sampleData.analyse(lineNum);
-            }
+        var glasses = getGlassTypes();
+        var glassmap = new HashMap<Double, GlassType>();
+        for (var g: glasses) {
+            glassmap.put(g.nd,g);
         }
-        catch (Exception e) {
-            e.printStackTrace();
+
+        SampleData data = new SampleData("57.99113525147889\t37.77299281169799\t1.2000000000000002\t20.218142439780898\t51.784538421968996\t1.0\t1.795\t1.8485\t1.74\t1.74077\t1.788\t1.7725\t1.795\t",glassmap);
+        GlassType[] glassTypes = data.glasses;
+        var surfaces = getSurfaces();
+        double[] radii = new double[surfaces.size()];
+        for (int i = 0; i < radii.length; i++)
+            radii[i] = surfaces.get(i).radius;
+        // Now try a combination
+        setup(glassTypes,0,radii);
+    }
+
+    private static void analyse(GlassType[] glassTypes, double[] radii) {
+        var surfaces = getSurfaces();
+        assert surfaces.size() == radii.length;
+        for (int i = 0; i < radii.length; i++) {
+            surfaces.get(i).radius = radii[i];
         }
+        var sys = buildSystem(surfaces, glassTypes, true, false).build();
+        var parax = ParaxialFirstOrderInfo.compute(sys);
+        var spotAnalysis = new AnalysisSpot(sys, 10);
+        spotAnalysis.process_analysis();
+        var nonskew = spotAnalysis.get_rms_radius();
+        if (nonskew > 25)
+            return;
+        sys = buildSystem(surfaces, glassTypes, true, true).build();
+        spotAnalysis = new AnalysisSpot(sys, 10);
+        spotAnalysis.process_analysis();
+        var skewed = spotAnalysis.get_rms_radius();
+        if (skewed > 125)
+            return;
+//        if (parax.effective_focal_length > 57.7 && parax.effective_focal_length < 58.2
+//                && parax.back_focal_length > 37.77 && parax.back_focal_length < 37.79
+//                && parax.pp1 > 51.75 && parax.pp1 < 51.85 // 51.8 from first surface
+//                && parax.ppk > 20.15 && parax.ppk < 20.25) {  // 20.2 from last surface
+            StringBuilder sb = new StringBuilder();
+            sb.append(nonskew).append("\t");
+            sb.append(skewed).append("\t");
+            sb.append(parax.effective_focal_length).append("\t")
+                    .append(parax.back_focal_length).append("\t")
+                    .append(parax.fno).append("\t")
+                    .append(parax.ppk).append("\t")
+                    .append(parax.pp1).append("\t");
+            for (int i = 0; i < glassTypes.length; i++)
+                sb.append(glassTypes[i]).append("\t");
+            for (int i = 0; i < radii.length; i++)
+                sb.append(radii[i]).append("\t");
+            System.out.println(sb.toString());
+//        }
     }
 }

@@ -291,7 +291,7 @@ public class NoctNikkor58Select {
             spotAnalysis = new AnalysisSpot(sys, 10);
             spotAnalysis.process_analysis();
             var skewed = spotAnalysis.get_rms_radius();
-            if (nonskew < 125.0 || skewed < 125.0) {
+            if (nonskew < 30.0 && skewed < 125.0) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(line).append("\t");
                 sb.append(nonskew).append("\t");
@@ -324,6 +324,8 @@ public class NoctNikkor58Select {
             int lineNum = 0;
             for (String line: lines) {
                 lineNum++;
+                if (Character.isAlphabetic(line.charAt(0)))
+                    continue;
                 SampleData sampleData = new SampleData(line,glassmap);
                 sampleData.analyse(lineNum);
             }

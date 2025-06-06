@@ -76,7 +76,7 @@ public class NoctNikkor58YNU {
     }
 
     // Measured by DM - off 1001 tale 16
-    private static List<SurfaceType> getSurfacesDM() {
+    private static List<SurfaceType> getSurfaces() {
         List<SurfaceType> list = new ArrayList<>();
 
         list.add(new SurfaceType(false, 79.9975, 6.885, 1.8485, 50.4875, 43.8, "G1"));
@@ -97,7 +97,7 @@ public class NoctNikkor58YNU {
     }
 
     // Latest contrib 01 June
-    private static List<SurfaceType> getSurfaces() {
+    private static List<SurfaceType> getSurfacesContrib() {
         List<SurfaceType> list = new ArrayList<>();
 
         list.add(new SurfaceType(false, 80.344, 7.042, 1.8485, 50.4875, 43.8, "G1"));

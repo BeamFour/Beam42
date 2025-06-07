@@ -80,51 +80,29 @@ public class NoctNikkor58Select {
         return thickness;
     }
 
-    // Measured by DM - off 1001 tale 16
-    private static List<SurfaceType> getSurfacesDM() {
+    // Based on service manual - computed by DM
+    private static List<SurfaceType> getSurfacesSM() {
         List<SurfaceType> list = new ArrayList<>();
 
-        list.add(new SurfaceType(false, 79.9975, 6.885, 1.8485, 50.4875, 43.8));
-        list.add(new SurfaceType(false, 0, 0.1, 0, 50.4875, 0));
-        list.add(new SurfaceType(false, 33.737, 9.75, 1.69, 44.832, 54.7));
-        list.add(new SurfaceType(false, 70.18675, 1.56, 0, 44.832, 0));
-        list.add(new SurfaceType(false, 134.505, 2.87, 1.7783, 42.169, 23.9));
-        list.add(new SurfaceType(false, 22.3687, 8.44, 0, 32.128, 0));
-        list.add(new SurfaceType(true, 0, 7.95, 0, 31.227, 0));
-        list.add(new SurfaceType(false, -23.02418, 1.64, 1.58148, 31.45, 40.9));
-        list.add(new SurfaceType(false, 306.553, 8.196, 1.6934, 40.2, 53.3));
-        list.add(new SurfaceType(false, -37.555, 0.15, 0, 40.2, 0));
-        list.add(new SurfaceType(false, -396.94, 6.147, 1.6516, 39.5, 58.4));
-        list.add(new SurfaceType(false, -52.56789, 0.000, 0, 39.5, 0));
-        list.add(new SurfaceType(false, 223.8426, 4.016, 1.6217, 38.275, 58.54));
-        list.add(new SurfaceType(false, -94.08052, 37.780, 0, 38.275, 0));
+        list.add(new SurfaceType(false, 74.2272, 7.175639, 1.8485, 49.93, 43.8));
+        list.add(new SurfaceType(false, 0, 0.393186, 0, 49.93, 0));
+        list.add(new SurfaceType(false, 33.25766, 9.6305, 1.69, 44.528, 54.7));
+        list.add(new SurfaceType(false, 60.92781, 1.671039, 0, 44.528, 0));
+        list.add(new SurfaceType(false, 137.839, 3.538761, 1.7783, 42.169, 23.9));
+        list.add(new SurfaceType(false, 25.38526, 7.568825, 0, 32.54, 0));
+        list.add(new SurfaceType(true, 0, 7.863714, 0, 29.98, 0));
+        list.add(new SurfaceType(false, -23.9188, 1.867632, 1.58148, 31.45, 40.9));
+        list.add(new SurfaceType(false, 293.9713, 7.863714, 1.6934, 40.2, 53.3));
+        list.add(new SurfaceType(false, -39.4556, 0.491482, 0, 40.2, 0));
+        list.add(new SurfaceType(false, -274.4783, 5.701193, 1.6516, 39.13, 58.4));
+        list.add(new SurfaceType(false, -53.08654, 0.000, 0, 39.13, 0));
+        list.add(new SurfaceType(false, 124.1071, 4.12845, 1.6217, 36.86, 58.54));
+        list.add(new SurfaceType(false, -96.87727, 37.780, 0, 36.86, 0));
         return list;
     }
-
-    // Latest contrib 01 June
-    private static List<SurfaceType> getSurfaces() {
-        List<SurfaceType> list = new ArrayList<>();
-
-        list.add(new SurfaceType(false, 80.344, 7.042, 1.8485, 50.4875, 43.8));
-        list.add(new SurfaceType(false, 0, 0.189, 0, 50.4875, 0));
-        list.add(new SurfaceType(false, 33.61, 9.715, 1.69, 44.832, 54.7));
-        list.add(new SurfaceType(false, 69.686, 1.476, 0, 44.832, 0));
-        list.add(new SurfaceType(false, 129.534, 3.02, 1.7783, 42.169, 23.9));
-        list.add(new SurfaceType(false, 22.55, 8.47, 0, 32.128, 0));
-        list.add(new SurfaceType(true, 0, 7.9, 0, 31.227, 0));
-        list.add(new SurfaceType(false, -23.365, 1.71, 1.58148, 31.45, 40.9));
-        list.add(new SurfaceType(false, 311.537, 8.141, 1.6934, 40.2, 53.3));
-        list.add(new SurfaceType(false, -38.532, 0.074, 0, 40.2, 0));
-        list.add(new SurfaceType(false, -483.703, 6.009, 1.6516, 39.5, 58.4));
-        list.add(new SurfaceType(false, -55.749, 0.1, 0, 39.5, 0));
-        list.add(new SurfaceType(false, 200.86, 3.894, 1.6217, 38.275, 58.54));
-        list.add(new SurfaceType(false, -106.579, 37.780, 0, 38.275, 0));
-        return list;
-    }
-
 
     // Contrib - service manual based
-    private static List<SurfaceType> getSurfaces2() {
+    private static List<SurfaceType> getSurfacesSMContrib() {
         List<SurfaceType> list = new ArrayList<>();
 
         list.add(new SurfaceType(false, 73.77, 7.17, 1.8485, 50.4875, 43.8));
@@ -144,8 +122,29 @@ public class NoctNikkor58Select {
         return list;
     }
 
+    // Measured by DM - off 1001 tale 16
+    private static List<SurfaceType> getSurfacesTale16() {
+        List<SurfaceType> list = new ArrayList<>();
+
+        list.add(new SurfaceType(false, 79.9975, 6.885, 1.8485, 50.4875, 43.8));
+        list.add(new SurfaceType(false, 0, 0.1, 0, 50.4875, 0));
+        list.add(new SurfaceType(false, 33.737, 9.75, 1.69, 44.832, 54.7));
+        list.add(new SurfaceType(false, 70.18675, 1.56, 0, 44.832, 0));
+        list.add(new SurfaceType(false, 134.505, 2.87, 1.7783, 42.169, 23.9));
+        list.add(new SurfaceType(false, 22.3687, 8.44, 0, 32.128, 0));
+        list.add(new SurfaceType(true, 0, 7.95, 0, 31.227, 0));
+        list.add(new SurfaceType(false, -23.02418, 1.64, 1.58148, 31.45, 40.9));
+        list.add(new SurfaceType(false, 306.553, 8.196, 1.6934, 40.2, 53.3));
+        list.add(new SurfaceType(false, -37.555, 0.15, 0, 40.2, 0));
+        list.add(new SurfaceType(false, -396.94, 6.147, 1.6516, 39.5, 58.4));
+        list.add(new SurfaceType(false, -52.56789, 0.000, 0, 39.5, 0));
+        list.add(new SurfaceType(false, 223.8426, 4.016, 1.6217, 38.275, 58.54));
+        list.add(new SurfaceType(false, -94.08052, 37.780, 0, 38.275, 0));
+        return list;
+    }
+
     // modified manually based on Zemax sliders
-    private static List<SurfaceType> getSurfaces1() {
+    private static List<SurfaceType> getSurfacesTale16b() {
         List<SurfaceType> list = new ArrayList<>();
 
         list.add(new SurfaceType(false, 79.946, 6.885, 1.8485, 50.4875, 43.8));
@@ -163,6 +162,31 @@ public class NoctNikkor58Select {
         list.add(new SurfaceType(false, 223.843, 4.016, 1.6217, 38.275, 58.54));
         list.add(new SurfaceType(false, -94.081, 37.780, 0, 38.275, 0));
         return list;
+    }
+
+    // Latest contrib 01 June - using 1001
+    private static List<SurfaceType> getSurfacesContribTale16() {
+        List<SurfaceType> list = new ArrayList<>();
+
+        list.add(new SurfaceType(false, 80.344, 7.042, 1.8485, 50.4875, 43.8));
+        list.add(new SurfaceType(false, 0, 0.189, 0, 50.4875, 0));
+        list.add(new SurfaceType(false, 33.61, 9.715, 1.69, 44.832, 54.7));
+        list.add(new SurfaceType(false, 69.686, 1.476, 0, 44.832, 0));
+        list.add(new SurfaceType(false, 129.534, 3.02, 1.7783, 42.169, 23.9));
+        list.add(new SurfaceType(false, 22.55, 8.47, 0, 32.128, 0));
+        list.add(new SurfaceType(true, 0, 7.9, 0, 31.227, 0));
+        list.add(new SurfaceType(false, -23.365, 1.71, 1.58148, 31.45, 40.9));
+        list.add(new SurfaceType(false, 311.537, 8.141, 1.6934, 40.2, 53.3));
+        list.add(new SurfaceType(false, -38.532, 0.074, 0, 40.2, 0));
+        list.add(new SurfaceType(false, -483.703, 6.009, 1.6516, 39.5, 58.4));
+        list.add(new SurfaceType(false, -55.749, 0.1, 0, 39.5, 0));
+        list.add(new SurfaceType(false, 200.86, 3.894, 1.6217, 38.275, 58.54));
+        list.add(new SurfaceType(false, -106.579, 37.780, 0, 38.275, 0));
+        return list;
+    }
+
+    private static List<SurfaceType> getSurfaces() {
+        return getSurfacesSM();
     }
 
 
@@ -291,7 +315,7 @@ public class NoctNikkor58Select {
             spotAnalysis = new AnalysisSpot(sys, 10);
             spotAnalysis.process_analysis();
             var skewed = spotAnalysis.get_rms_radius();
-            if (nonskew < 30.0 && skewed < 125.0) {
+            if (nonskew < 30.0 /*&& skewed < 125.0*/) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(line).append("\t");
                 sb.append(nonskew).append("\t");

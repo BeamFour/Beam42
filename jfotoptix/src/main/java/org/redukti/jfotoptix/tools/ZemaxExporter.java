@@ -15,8 +15,8 @@ public class ZemaxExporter {
         }
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(arguments.specfile);
-        ZemaxExporter exporter = new ZemaxExporter();
-        System.out.println(exporter.generate(specs, arguments.scenario, arguments.only_d_line));
+        ZemaxExporter zemaxExporter = new ZemaxExporter();
+        Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), zemaxExporter.generate(specs, arguments.scenario, arguments.only_d_line));
     }
 
     public String generate(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean dlineOnly) {
@@ -49,6 +49,7 @@ public class ZemaxExporter {
         OpticalBenchDataImporter.Variable view_angles = system.find_variable("Angle of View");
         OpticalBenchDataImporter.Variable image_heights = system.find_variable("Image Height");
         OpticalBenchDataImporter.Variable back_focus = system.find_variable("Bf");
+        boolean A2aspherical = system.has_constant("AsphericalA2");
         if (back_focus == null) back_focus = system.find_variable("Bf(m)");
         OpticalBenchDataImporter.Variable aperture_diameters = system.find_variable("Aperture Diameter");
         if (scenario >= view_angles.num_scenarios() || scenario >= image_heights.num_scenarios() || scenario >= back_focus.num_scenarios() || (aperture_diameters != null && scenario >= aperture_diameters.num_scenarios())) {
@@ -87,10 +88,18 @@ public class ZemaxExporter {
             sb.append("  HIDE 0 0 0 0 0 0 0 0 0 0\n");
             sb.append("  MIRR 2 0\n");
             if (aspherics != null) {
-                sb.append("  PARM 1 0\n");
-                for (int a = 2; a < 11; a++) {
-                    sb.append("  PARM ").append(a).append(" ");
-                    sb.append(aspherics.data(a)).append("\n");
+                if (!A2aspherical) {
+                    sb.append("  PARM 1 0\n");
+                    for (int a = 2; a < 11; a++) {
+                        sb.append("  PARM ").append(a).append(" ");
+                        sb.append(aspherics.data(a)).append("\n");
+                    }
+                }
+                else {
+                    for (int a = 1; a < 11; a++) {
+                        sb.append("  PARM ").append(a).append(" ");
+                        sb.append(aspherics.data(a+1)).append("\n");
+                    }
                 }
             }
             sb.append("  DISZ ").append(thickness).append("\n");

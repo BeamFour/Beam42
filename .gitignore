@@ -54,3 +54,6 @@ fabric.properties
 
 # Ignore Gradle build output directory
 build
+**/target/
+.run
+

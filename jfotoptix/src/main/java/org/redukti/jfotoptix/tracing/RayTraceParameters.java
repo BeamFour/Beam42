@@ -54,7 +54,6 @@ public class RayTraceParameters {
     Distribution _default_distribution;
     Map<OpticalSurface, Distribution> _s_distribution = new HashMap<>();
     int _max_bounce;
-    RayTracer.TraceIntensityMode _intensity_mode;
     boolean _sequential_mode;
     PropagationMode _propagation_mode;
     boolean _unobstructed;
@@ -62,7 +61,6 @@ public class RayTraceParameters {
 
     public RayTraceParameters(OpticalSystem system) {
         _sequential_mode = true;
-        _intensity_mode = RayTracer.TraceIntensityMode.Simpletrace;
         _propagation_mode = PropagationMode.RayPropagation;
         _max_bounce = 50;
         _unobstructed = false;

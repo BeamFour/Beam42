@@ -20,7 +20,7 @@ public class SequentialRayTracer extends RayTracer {
         List<TracedRay> rays = generateSourceRays(parameters, result, seq);
         seq = seq.stream().filter(e -> !(e instanceof RaySource)).collect(Collectors.toList());
         for (Element e: seq) {
-            rays = process_rays(e, TraceIntensityMode.Simpletrace, result, rays);
+            rays = process_rays(e, result, rays);
             result.get_generated(e).addAll(rays); // Record rays generated
         }
         return result;

@@ -60,16 +60,6 @@ public class ZemaxExporter {
         for (int i = 0; i < surfaces.size(); i++) {
             OpticalBenchDataImporter.LensSurface s = surfaces.get(i);
             double thickness = 0.0;
-            if (s.get_surface_type() == OpticalBenchDataImporter.SurfaceType.field_stop) {
-                continue;
-            }
-            if (i < surfaces.size() - 1 && surfaces.get(i + 1).get_surface_type() == OpticalBenchDataImporter.SurfaceType.field_stop) {
-                // Next surface is field stop
-                // we will add the thickess of field stop to the current surface
-                // FS will get 0 thickness as for now we skip it
-                // TODO allow option to retain field stop
-                thickness = surfaces.get(i + 1).get_thickness(scenario);
-            }
             double diameter = s.get_diameter();
             if (s.get_surface_type() == OpticalBenchDataImporter.SurfaceType.aperture_stop && aperture_diameters != null) {
                 diameter = aperture_diameters.get_value_as_double(scenario);
@@ -117,6 +107,9 @@ public class ZemaxExporter {
                 sb.append(s.get_refractive_index()).append(" ").append(s.get_abbe_vd()).append(" 0 0 0 0 0 0\n");
             }
             sb.append("  DIAM ").append(diameter).append(" 1 0 0 1 \"\"\n");
+            if (s.get_surface_type() == OpticalBenchDataImporter.SurfaceType.field_stop) {
+                sb.append("  CLAP 0 ").append(diameter).append(" 0\n");
+            }
             sb.append("  POPS 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0\n");
         }
     }

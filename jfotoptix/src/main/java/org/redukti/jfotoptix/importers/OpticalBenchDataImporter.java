@@ -19,10 +19,7 @@ import org.redukti.jfotoptix.shape.Rectangle;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class OpticalBenchDataImporter {
 
@@ -270,6 +267,14 @@ public class OpticalBenchDataImporter {
                             descriptive_data_.set_title(words[1]);
                         }
                         break;
+                    case CONSTANTS: {
+                            Variable var = new Variable(words[0]);
+                            for (int i = 1; i < words.length; i++) {
+                                var.add_value(words[i]);
+                            }
+                            constants_.add(var);
+                        }
+                        break;
                     case VARIABLE_DISTANCES:
                         if (words.length >= 2) {
                             Variable var = new Variable(words[0]);
@@ -365,6 +370,15 @@ public class OpticalBenchDataImporter {
             return null;
         }
 
+        public boolean has_constant(String c) {
+            for (int i = 0; i < constants_.size(); i++) {
+                if (c.equals(constants_.get(i).name())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         double get_image_height() {
             Variable var = find_variable("Image Height");
             if (var != null)
@@ -411,6 +425,7 @@ public class OpticalBenchDataImporter {
         private List<Variable> variables_ = new ArrayList<>();
         private List<LensSurface> surfaces_ = new ArrayList<>();
         private List<AsphericalData> aspherical_data_ = new ArrayList<>();
+        private List<Variable> constants_ = new ArrayList<>();
     }
 
     enum Section {

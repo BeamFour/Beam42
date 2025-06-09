@@ -1,0 +1,2 @@
+Spot Result: RMS Radius 48.71732579858335 max radius 163.0577917441544
+Spot Result: RMS Radius 79.10623283686479 max radius 377.3908983349863

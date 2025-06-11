@@ -771,6 +771,7 @@ public class GlassMap extends Solid {
         glasses.put("P-SF8",new GlassMap("Schott", "P-SF8",1.68893,1.68252,1.70457,31.25,0.0079));
         glasses.put("P-SK57Q1",new GlassMap("Schott", "P-SK57Q1",1.586,1.58299,1.59284,59.5,-0.0024));
         glasses.put("P-SK58A",new GlassMap("Schott", "P-SK58A",1.58913,1.58618,1.59581,61.15,-0.0023));
+        glasses.put("N-LAK9",new GlassMap("Schott","N-LAK9",1.691,1.68716,1.69979,54.71,-0.0071)); // nE=1.69401 ve=54.48 691547
 
         // current
         glasses.put("BK7G18", new GlassMap("Schott","BK7G18",1.51975,1.51724,1.52541,63.58,0.0007)); // 63.58 520636.252 0.0007

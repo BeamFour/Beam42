@@ -116,6 +116,10 @@ public class LensTool {
             if (arguments.dumpSystem) {
                 System.out.println(skewedSystem);
             }
+            ParaxialFirstOrderInfo pfo = ParaxialFirstOrderInfo.compute(system);
+            Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"paraxial.txt",arguments.outdir), pfo.toString());
+//            pfo = ParaxialFirstOrderInfo.computeFast(system);
+//            Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"paraxial2.txt",arguments.outdir), pfo.toString());
             outputLayout(system,Helper.getOutputPath(arguments.specfile,"layoutonly.svg",arguments.outdir));
             outputLayoutWithRays(system,Helper.getOutputPath(arguments.specfile,"layout.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
             outputLayoutWithRays(skewedSystem,Helper.getOutputPath(arguments.specfile,"layout-skew.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
@@ -123,10 +127,6 @@ public class LensTool {
             spotReport.append(outputSpotAnalysis(system,Helper.getOutputPath(arguments.specfile,"spot.svg",arguments.outdir),arguments.spot_density)).append("\n");
             spotReport.append(outputSpotAnalysis(skewedSystem,Helper.getOutputPath(arguments.specfile,"spot-skew.svg",arguments.outdir),arguments.spot_density)).append("\n");
             Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"spot-report.txt",arguments.outdir), spotReport.toString());
-            ParaxialFirstOrderInfo pfo = ParaxialFirstOrderInfo.compute(system);
-            Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"paraxial.txt",arguments.outdir), pfo.toString());
-//            pfo = ParaxialFirstOrderInfo.computeFast(system);
-//            Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"paraxial2.txt",arguments.outdir), pfo.toString());
             ZemaxExporter zemaxExporter = new ZemaxExporter();
             Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), zemaxExporter.generate(specs, arguments.scenario, arguments.only_d_line));
         }

@@ -81,11 +81,11 @@ public class Noctilux50Optim {
     // Baseline
     private static List<SurfaceType> getSurfaces() {
         List<SurfaceType> list = new ArrayList<>();
-        list.add(new SurfaceType(false, 61.11765, 8.071, 1.6779, 54.57, 55.2,	"N-LAK12"));
-        list.add(new SurfaceType(false, 1754.67098,	0.1,	0,	54.57, 0, null));
-        list.add(new SurfaceType(false, 30.0805876,	8.0,	1.883,	46.571,	40.8,	"S-LAH58"));
-        list.add(new SurfaceType(false, 68.6907059, 1.7857, 0,44.644, 0, null));
-        list.add(new SurfaceType(false, 121.527341,	4.0714,	1.7847,	45.214,	26.08,	"SF56A"));
+        list.add(new SurfaceType(false, 61.05653235, 8.071, 1.6779, 54.57, 55.2,	"N-LAK12"));
+        list.add(new SurfaceType(false, 1756.42565098,	0.1,	0,	54.57, 0, null));
+        list.add(new SurfaceType(false, 30.1106681876,	8.0,	1.883,	46.571,	40.8,	"S-LAH58"));
+        list.add(new SurfaceType(false, 68.7593966059, 1.7857, 0,44.644, 0, null));
+        list.add(new SurfaceType(false, 121.405813659,	4.0714,	1.7847,	45.214,	26.08,	"SF56A"));
         list.add(new SurfaceType(false, 19.51522, 9.35, 0,31.6,0,null));
         list.add(new SurfaceType(true, 0, 7.1,	0,	30.6,0,null	));
         list.add(new SurfaceType(false, -23.83196,	1.357,	1.72825,	31.0,	28.41,	"SF10"));
@@ -175,19 +175,19 @@ public class Noctilux50Optim {
         }
         var sys = buildSystem(surfaces, true, false).build();
         var parax = ParaxialFirstOrderInfo.compute(sys);
-        if (parax.effective_focal_length > 52.36 && parax.effective_focal_length < 52.41
+        if (parax.effective_focal_length > 52.39 && parax.effective_focal_length < 52.41
                 && parax.enp_dist > 42.88 && parax.enp_dist < 42.91
             ) {
             var spotAnalysis = new AnalysisSpot(sys, 10);
             spotAnalysis.process_analysis();
             var nonskew = spotAnalysis.get_rms_radius();
-            if (nonskew > 17)
+            if (nonskew > 16)
                return;
             sys = buildSystem(surfaces,  true, true).build();
             spotAnalysis = new AnalysisSpot(sys, 10);
             spotAnalysis.process_analysis();
             var skewed = spotAnalysis.get_rms_radius();
-            if (skewed > 100)
+            if (skewed > 98)
                 return;
             StringBuilder sb = new StringBuilder();
             sb.append(nonskew).append("\t");

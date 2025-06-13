@@ -81,19 +81,19 @@ public class Noctilux50Optim {
     // Baseline
     private static List<SurfaceType> getSurfaces() {
         List<SurfaceType> list = new ArrayList<>();
-        list.add(new SurfaceType(false, 61.05653235, 8.071, 1.6779, 54.57, 55.2,	"N-LAK12"));
-        list.add(new SurfaceType(false, 1756.42565098,	0.1,	0,	54.57, 0, null));
-        list.add(new SurfaceType(false, 30.1106681876,	8.0,	1.883,	46.571,	40.8,	"S-LAH58"));
-        list.add(new SurfaceType(false, 68.7593966059, 1.7857, 0,44.644, 0, null));
-        list.add(new SurfaceType(false, 121.405813659,	4.0714,	1.7847,	45.214,	26.08,	"SF56A"));
-        list.add(new SurfaceType(false, 19.51522, 9.35, 0,31.6,0,null));
+        list.add(new SurfaceType(false, 60.99547581765, 8.071, 1.6779, 54.57, 55.2,	"N-LAK12"));
+        list.add(new SurfaceType(false, 1758.18207663098,	0.1,	0,	54.57, 0, null));
+        list.add(new SurfaceType(false, 30.1407788557876,	8.0,	1.883,	46.571,	40.8,	"S-LAH58"));
+        list.add(new SurfaceType(false, 68.82815600250589, 1.7857, 0,44.644, 0, null));
+        list.add(new SurfaceType(false, 121.28440784534101,	4.0714,	1.7847,	45.214,	26.08,	"SF56A"));
+        list.add(new SurfaceType(false, 19.534735219, 9.35, 0,31.6,0,null));
         list.add(new SurfaceType(true, 0, 7.1,	0,	30.6,0,null	));
-        list.add(new SurfaceType(false, -23.83196,	1.357,	1.72825,	31.0,	28.41,	"SF10"));
-        list.add(new SurfaceType(false, 91.8778311,	8.7143,	1.883,	37.643,	40.8,	"S-LAH58"));
-        list.add(new SurfaceType(false, -32.0351598,	0.1,		0, 37.714, 0, null));
-        list.add(new SurfaceType(false, 92.56044,	4.0,	1.788,	35.286,	47.49,	"N-LAF21"));
-        list.add(new SurfaceType(false, 549.3174389,	0.1, 0,		35.286, 0, null	));
-        list.add(new SurfaceType(false, 83.1626829,	4,	1.788,	33.429,	47.49,	"N-LAF21"));
+        list.add(new SurfaceType(false, -23.80812804,	1.357,	1.72825,	31.0,	28.41,	"SF10"));
+        list.add(new SurfaceType(false, 91.78595326889,	8.7143,	1.883,	37.643,	40.8,	"S-LAH58"));
+        list.add(new SurfaceType(false, -32.0671949598,	0.1,		0, 37.714, 0, null));
+        list.add(new SurfaceType(false, 92.46787956,	4.0,	1.788,	35.286,	47.49,	"N-LAF21"));
+        list.add(new SurfaceType(false, 549.86675633889,	0.1, 0,		35.286, 0, null	));
+        list.add(new SurfaceType(false, 83.0795202171,	4,	1.788,	33.429,	47.49,	"N-LAF21"));
         list.add(new SurfaceType(false, -197.873443,	27.365, 0,		33.429, 0, null));
         return list;
     }
@@ -187,7 +187,7 @@ public class Noctilux50Optim {
             spotAnalysis = new AnalysisSpot(sys, 10);
             spotAnalysis.process_analysis();
             var skewed = spotAnalysis.get_rms_radius();
-            if (skewed > 98)
+            if (skewed > 93)
                 return;
             StringBuilder sb = new StringBuilder();
             sb.append(nonskew).append("\t");

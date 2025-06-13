@@ -28,7 +28,7 @@ public class LensTool {
         return specs;
     }
 
-    public static OpticalSystem createSystem(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean use_glass_types, boolean skew_rays, boolean d_line) {
+    public static OpticalSystem createSystem(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean use_glass_types, boolean skew_rays, double percent_skew,  boolean d_line) {
         OpticalSystem.Builder systemBuilder = OpticalBenchDataImporter.build_system(specs, scenario, use_glass_types);
         double angleOfView = OpticalBenchDataImporter.get_angle_of_view_in_radians(specs, scenario);
         Vector3 direction = Vector3.vector3_001;
@@ -37,6 +37,7 @@ public class LensTool {
             //      double z1 = cos (angleOfView);
             //      double y1 = sin (angleOfView);
             //      unit_vector = math::Vector3 (0, y1, z1);
+            angleOfView *= percent_skew;
             Matrix3 r = Matrix3.get_rotation_matrix(0, angleOfView);
             direction = r.times(direction);
         }
@@ -108,23 +109,26 @@ public class LensTool {
         }
         try {
             OpticalBenchDataImporter.LensSpecifications specs = getSpecsFromFile(arguments.specfile);
-            OpticalSystem system = createSystem(specs,arguments.scenario,arguments.use_glass_types,false,arguments.only_d_line);
+            OpticalSystem system = createSystem(specs,arguments.scenario,arguments.use_glass_types,false,0,arguments.only_d_line);
             if (arguments.dumpSystem) {
                 System.out.println(system);
             }
-            OpticalSystem skewedSystem = createSystem(specs,arguments.scenario,arguments.use_glass_types,true,arguments.only_d_line);
+            OpticalSystem skewedSystem = createSystem(specs,arguments.scenario,arguments.use_glass_types,true,1.0,arguments.only_d_line);
             if (arguments.dumpSystem) {
                 System.out.println(skewedSystem);
             }
+            OpticalSystem semiSkewedSystem = createSystem(specs,arguments.scenario,arguments.use_glass_types,true,0.7,arguments.only_d_line);
             ParaxialFirstOrderInfo pfo = ParaxialFirstOrderInfo.compute(system);
             Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"paraxial.txt",arguments.outdir), pfo.toString());
 //            pfo = ParaxialFirstOrderInfo.computeFast(system);
 //            Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"paraxial2.txt",arguments.outdir), pfo.toString());
             outputLayout(system,Helper.getOutputPath(arguments.specfile,"layoutonly.svg",arguments.outdir));
             outputLayoutWithRays(system,Helper.getOutputPath(arguments.specfile,"layout.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
+            outputLayoutWithRays(semiSkewedSystem,Helper.getOutputPath(arguments.specfile,"layout-semi-skew.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
             outputLayoutWithRays(skewedSystem,Helper.getOutputPath(arguments.specfile,"layout-skew.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
             StringBuilder spotReport = new StringBuilder();
             spotReport.append(outputSpotAnalysis(system,Helper.getOutputPath(arguments.specfile,"spot.svg",arguments.outdir),arguments.spot_density)).append("\n");
+            spotReport.append(outputSpotAnalysis(semiSkewedSystem,Helper.getOutputPath(arguments.specfile,"spot-semi-skew.svg",arguments.outdir),arguments.spot_density)).append("\n");
             spotReport.append(outputSpotAnalysis(skewedSystem,Helper.getOutputPath(arguments.specfile,"spot-skew.svg",arguments.outdir),arguments.spot_density)).append("\n");
             Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"spot-report.txt",arguments.outdir), spotReport.toString());
             ZemaxExporter zemaxExporter = new ZemaxExporter();

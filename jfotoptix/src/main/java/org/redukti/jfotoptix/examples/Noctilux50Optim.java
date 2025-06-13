@@ -81,20 +81,20 @@ public class Noctilux50Optim {
     // Baseline
     private static List<SurfaceType> getSurfaces() {
         List<SurfaceType> list = new ArrayList<>();
-        list.add(new SurfaceType(false, 61.735, 8.071, 1.6779, 54.57, 55.2,	"N-LAK12"));
-        list.add(new SurfaceType(false, 1737.298,	0.1,	0,	54.57, 0, null));
-        list.add(new SurfaceType(false, 29.78276,	8.0,	1.883,	46.571,	40.8,	"S-LAH58"));
-        list.add(new SurfaceType(false, 68.0106, 1.7857, 0,44.644, 0, null));
-        list.add(new SurfaceType(false, 120.3241,	4.0714,	1.7847,	45.214,	26.08,	"SF56A"));
-        list.add(new SurfaceType(false, 19.322, 9.35, 0,31.6,0,null));
+        list.add(new SurfaceType(false, 61.11765, 8.071, 1.6779, 54.57, 55.2,	"N-LAK12"));
+        list.add(new SurfaceType(false, 1754.67098,	0.1,	0,	54.57, 0, null));
+        list.add(new SurfaceType(false, 30.0805876,	8.0,	1.883,	46.571,	40.8,	"S-LAH58"));
+        list.add(new SurfaceType(false, 68.6907059, 1.7857, 0,44.644, 0, null));
+        list.add(new SurfaceType(false, 121.527341,	4.0714,	1.7847,	45.214,	26.08,	"SF56A"));
+        list.add(new SurfaceType(false, 19.51522, 9.35, 0,31.6,0,null));
         list.add(new SurfaceType(true, 0, 7.1,	0,	30.6,0,null	));
-        list.add(new SurfaceType(false, -23.596,	1.357,	1.72825,	31.0,	28.41,	"SF10"));
-        list.add(new SurfaceType(false, 92.80589,	8.7143,	1.883,	37.643,	40.8,	"S-LAH58"));
-        list.add(new SurfaceType(false, -31.71798,	0.1,		0, 37.714, 0, null));
-        list.add(new SurfaceType(false, 91.644,	4.0,	1.788,	35.286,	47.49,	"N-LAF21"));
-        list.add(new SurfaceType(false, 554.8661,	0.1, 0,		35.286, 0, null	));
-        list.add(new SurfaceType(false, 82.33929,	4,	1.788,	33.429,	47.49,	"N-LAF21"));
-        list.add(new SurfaceType(false, -195.9143,	27.365, 0,		33.429, 0, null));
+        list.add(new SurfaceType(false, -23.83196,	1.357,	1.72825,	31.0,	28.41,	"SF10"));
+        list.add(new SurfaceType(false, 91.8778311,	8.7143,	1.883,	37.643,	40.8,	"S-LAH58"));
+        list.add(new SurfaceType(false, -32.0351598,	0.1,		0, 37.714, 0, null));
+        list.add(new SurfaceType(false, 92.56044,	4.0,	1.788,	35.286,	47.49,	"N-LAF21"));
+        list.add(new SurfaceType(false, 549.3174389,	0.1, 0,		35.286, 0, null	));
+        list.add(new SurfaceType(false, 83.1626829,	4,	1.788,	33.429,	47.49,	"N-LAF21"));
+        list.add(new SurfaceType(false, -197.873443,	27.365, 0,		33.429, 0, null));
         return list;
     }
 
@@ -144,7 +144,7 @@ public class Noctilux50Optim {
             return;
         double[] example = Arrays.copyOf(radii,radii.length);
         if (radii[surface] != 0.0) {
-            double unit = radii[surface] * 0.01;
+            double unit = radii[surface] * 0.001;
             example[surface] += unit;
             analyse( example);
             setup( surface + 1, example);
@@ -175,20 +175,20 @@ public class Noctilux50Optim {
         }
         var sys = buildSystem(surfaces, true, false).build();
         var parax = ParaxialFirstOrderInfo.compute(sys);
-        if (parax.effective_focal_length > 52.0 && parax.effective_focal_length < 52.41
+        if (parax.effective_focal_length > 52.36 && parax.effective_focal_length < 52.41
                 && parax.enp_dist > 42.88 && parax.enp_dist < 42.91
             ) {
             var spotAnalysis = new AnalysisSpot(sys, 10);
             spotAnalysis.process_analysis();
             var nonskew = spotAnalysis.get_rms_radius();
-            //if (nonskew > 25)
-            //    return;
+            if (nonskew > 17)
+               return;
             sys = buildSystem(surfaces,  true, true).build();
             spotAnalysis = new AnalysisSpot(sys, 10);
             spotAnalysis.process_analysis();
             var skewed = spotAnalysis.get_rms_radius();
-            //if (skewed > 125)
-            //    return;
+            if (skewed > 100)
+                return;
             StringBuilder sb = new StringBuilder();
             sb.append(nonskew).append("\t");
             sb.append(skewed).append("\t");

@@ -1,0 +1,22 @@
+    // Baseline
+    private static List<SurfaceType> getSurfaces() {
+        List<SurfaceType> list = new ArrayList<>();
+        list.add(new SurfaceType(false, 61.11765, 8.071, 1.6779, 54.57, 55.2,	"N-LAK12"));
+        list.add(new SurfaceType(false, 1754.67098,	0.1,	0,	54.57, 0, null));
+        list.add(new SurfaceType(false, 30.0805876,	8.0,	1.883,	46.571,	40.8,	"S-LAH58"));
+        list.add(new SurfaceType(false, 68.6907059, 1.7857, 0,44.644, 0, null));
+        list.add(new SurfaceType(false, 121.527341,	4.0714,	1.7847,	45.214,	26.08,	"SF56A"));
+        list.add(new SurfaceType(false, 19.51522, 9.35, 0,31.6,0,null));
+        list.add(new SurfaceType(true, 0, 7.1,	0,	30.6,0,null	));
+        list.add(new SurfaceType(false, -23.83196,	1.357,	1.72825,	31.0,	28.41,	"SF10"));
+        list.add(new SurfaceType(false, 91.8778311,	8.7143,	1.883,	37.643,	40.8,	"S-LAH58"));
+        list.add(new SurfaceType(false, -32.0351598,	0.1,		0, 37.714, 0, null));
+        list.add(new SurfaceType(false, 92.56044,	4.0,	1.788,	35.286,	47.49,	"N-LAF21"));
+        list.add(new SurfaceType(false, 549.3174389,	0.1, 0,		35.286, 0, null	));
+        list.add(new SurfaceType(false, 83.1626829,	4,	1.788,	33.429,	47.49,	"N-LAF21"));
+        list.add(new SurfaceType(false, -197.873443,	27.365, 0,		33.429, 0, null));
+        return list;
+    }
+
+
+16.142659096119065	99.86021511129843	52.366790023629825	27.508557011709456	1.0	42.89063040323368	61.05653235	1756.42565098	30.1106681876	68.7593966059	121.405813659	19.51522	0.0	-23.83196	91.8778311	-32.0351598	92.56044	549.3174389	83.1626829	-197.873443

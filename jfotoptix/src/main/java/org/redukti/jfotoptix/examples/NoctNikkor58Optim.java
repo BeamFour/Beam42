@@ -79,7 +79,7 @@ public class NoctNikkor58Optim {
     }
 
     // Measured by DM - off 1001 tale 16
-    private static List<SurfaceType> getSurfaces() {
+    private static List<SurfaceType> getSurfacesTale16() {
         List<SurfaceType> list = new ArrayList<>();
 
         list.add(new SurfaceType(false, 79.9975, 6.885, 1.8485, 50.4875, 43.8));
@@ -143,7 +143,7 @@ public class NoctNikkor58Optim {
     }
 
     // modified manually based on Zemax sliders
-    private static List<SurfaceType> getSurfaces1() {
+    private static List<SurfaceType> getSurfacesTale16Modified() {
         List<SurfaceType> list = new ArrayList<>();
 
         list.add(new SurfaceType(false, 79.946, 6.885, 1.8485, 50.4875, 43.8));
@@ -163,6 +163,30 @@ public class NoctNikkor58Optim {
         return list;
     }
 
+    // Latest contrib 01 June
+    private static List<SurfaceType> getSurfacesMerge() {
+        List<SurfaceType> list = new ArrayList<>();
+
+        list.add(new SurfaceType(false, 80.166, 7.042, 1.8485, 50.4875, 43.8));
+        list.add(new SurfaceType(false, 0, 0.189, 0, 50.4875, 0));
+        list.add(new SurfaceType(false, 33.674, 9.715, 1.69, 44.832, 54.7));
+        list.add(new SurfaceType(false, 69.936, 1.476, 0, 44.832, 0));
+        list.add(new SurfaceType(false, 132.0195, 3.02, 1.7783, 42.169, 23.9));
+        list.add(new SurfaceType(false, 22.46, 8.47, 0, 32.128, 0));
+        list.add(new SurfaceType(true, 0, 7.9, 0, 31.227, 0));
+        list.add(new SurfaceType(false, -23.195, 1.71, 1.58148, 31.45, 40.9));
+        list.add(new SurfaceType(false, 309.045, 8.141, 1.6934, 40.2, 53.3));
+        list.add(new SurfaceType(false, -38.0435, 0.074, 0, 40.2, 0));
+        list.add(new SurfaceType(false, -440.322, 6.009, 1.6516, 39.5, 58.4));
+        list.add(new SurfaceType(false, -54.1584, 0.1, 0, 39.5, 0));
+        list.add(new SurfaceType(false, 212.35, 3.894, 1.6217, 38.275, 58.54));
+        list.add(new SurfaceType(false, -100.33, 37.780, 0, 38.275, 0));
+        return list;
+    }
+
+    private static List<SurfaceType> getSurfaces() {
+        return getSurfacesMerge();
+    }
 
     private static OpticalSystem.Builder buildSystem(List<SurfaceType> surfaces, GlassType[] glassTypes, boolean addPointSource, boolean skew) {
         OpticalSystem.Builder sys = new OpticalSystem.Builder();
@@ -212,7 +236,7 @@ public class NoctNikkor58Optim {
         return sys;
     }
 
-    static GlassType[] getGlassTypes() {
+    static GlassType[] getGlassTypesFew() {
         return new GlassType[]{
                 new GlassType("J-SF5", 1.6727, 32.19),    // wakamiya J-SF5
                 new GlassType("S-TIM22", 1.64769, 33.79),   // US 4,234,242 50mm f1.8   S-TIM22
@@ -238,11 +262,11 @@ public class NoctNikkor58Optim {
                 };
     }
 
-    static GlassType[] getGlassTypesNew() {
+    static GlassType[] getGlassTypes() {
         var glasses = GlassMap.glasses.values().stream()
                 .filter(e ->e.get_manufacturer().equals("Hikari"))
                 .filter(e -> e.get_name().startsWith("E-"))
-                .filter(e->e.get_refractive_index(SpectralLine.d) >= 1.64 && e.get_refractive_index(SpectralLine.d) < 1.91)
+                .filter(e->e.get_refractive_index(SpectralLine.d) >= 1.71 && e.get_refractive_index(SpectralLine.d) < 1.91)
                 .map(e->new GlassType(e.get_name(), e.nd, e.vd))
                 .collect(Collectors.toList())
                 .toArray(new GlassType[0]);
@@ -280,13 +304,13 @@ public class NoctNikkor58Optim {
             return;
         double[] example = Arrays.copyOf(radii,radii.length);
         if (radii[surface] != 0.0) {
-            double unit = radii[surface] * 0.01;
+            double unit = radii[surface] * 0.01;  // 0.0125 12.69 123
             example[surface] += unit;
-            analyse(glassTypes, example);
+            analyse(glassTypes, example, false);
             setup(glassTypes, surface + 1, example);
             example = Arrays.copyOf(radii, radii.length);
             example[surface] -= unit;
-            analyse(glassTypes, example);
+            analyse(glassTypes, example, false);
             setup(glassTypes, surface + 1, example);
         }
         else {
@@ -301,17 +325,18 @@ public class NoctNikkor58Optim {
             glassmap.put(g.nd,g);
         }
 
-        SampleData data = new SampleData("57.99113525147889\t37.77299281169799\t1.2000000000000002\t20.218142439780898\t51.784538421968996\t1.0\t1.795\t1.8485\t1.74\t1.74077\t1.788\t1.7725\t1.795\t",glassmap);
+        SampleData data = new SampleData("57.9937534430754\t37.77716759916056\t1.1999999999999997\t20.21658584391484\t51.80655317013602\t1.0\t1.83481\t1.816\t1.7552\t1.71736\t1.755\t1.834\t1.795\t",glassmap);
         GlassType[] glassTypes = data.glasses;
         var surfaces = getSurfaces();
         double[] radii = new double[surfaces.size()];
         for (int i = 0; i < radii.length; i++)
             radii[i] = surfaces.get(i).radius;
+        analyse(glassTypes, radii, true);
         // Now try a combination
         setup(glassTypes,0,radii);
     }
 
-    private static void analyse(GlassType[] glassTypes, double[] radii) {
+    private static void analyse(GlassType[] glassTypes, double[] radii, boolean baseline) {
         var surfaces = getSurfaces();
         assert surfaces.size() == radii.length;
         for (int i = 0; i < radii.length; i++) {
@@ -322,13 +347,13 @@ public class NoctNikkor58Optim {
         var spotAnalysis = new AnalysisSpot(sys, 10);
         spotAnalysis.process_analysis();
         var nonskew = spotAnalysis.get_rms_radius();
-        if (nonskew > 25)
+        if (! baseline && nonskew > 62)
             return;
         sys = buildSystem(surfaces, glassTypes, true, true).build();
         spotAnalysis = new AnalysisSpot(sys, 10);
         spotAnalysis.process_analysis();
         var skewed = spotAnalysis.get_rms_radius();
-        if (skewed > 125)
+        if (!baseline && skewed > 100)
             return;
 //        if (parax.effective_focal_length > 57.7 && parax.effective_focal_length < 58.2
 //                && parax.back_focal_length > 37.77 && parax.back_focal_length < 37.79

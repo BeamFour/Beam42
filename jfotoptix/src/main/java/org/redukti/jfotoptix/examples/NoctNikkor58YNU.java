@@ -181,8 +181,29 @@ public class NoctNikkor58YNU {
         return list;
     }
 
+    // Latest contrib 01 June
+    private static List<SurfaceType> getSurfacesMerge() {
+        List<SurfaceType> list = new ArrayList<>();
+
+        list.add(new SurfaceType(false, 80.166, 7.042, 1.8485, 50.4875, 43.8, "G1"));
+        list.add(new SurfaceType(false, 0, 0.189, 0, 50.4875, 0, null));
+        list.add(new SurfaceType(false, 33.674, 9.715, 1.69, 44.832, 54.7, "G2"));
+        list.add(new SurfaceType(false, 69.936, 1.476, 0, 44.832, 0, null));
+        list.add(new SurfaceType(false, 132.0195, 3.02, 1.7783, 42.169, 23.9, "G3"));
+        list.add(new SurfaceType(false, 22.46, 8.47, 0, 32.128, 0, null));
+        list.add(new SurfaceType(true, 0, 7.9, 0, 31.227, 0, null));
+        list.add(new SurfaceType(false, -23.195, 1.71, 1.58148, 31.45, 40.9, "G4"));
+        list.add(new SurfaceType(false, 309.045, 8.141, 1.6934, 40.2, 53.3, "G5"));
+        list.add(new SurfaceType(false, -38.0435, 0.074, 0, 40.2, 0, null));
+        list.add(new SurfaceType(false, -440.322, 6.009, 1.6516, 39.5, 58.4, "G6"));
+        list.add(new SurfaceType(false, -54.1584, 0.1, 0, 39.5, 0, null));
+        list.add(new SurfaceType(false, 212.35, 3.894, 1.6217, 38.275, 58.54, "G7"));
+        list.add(new SurfaceType(false, -100.33, 37.780, 0, 38.275, 0, null));
+        return list;
+    }
+
     private static List<SurfaceType> getSurfaces() {
-        return getSurfacesSM();
+        return getSurfacesMerge();
     }
 
     private static OpticalSystem.Builder buildSystem(boolean addPointSource, boolean skew) {
@@ -227,7 +248,7 @@ public class NoctNikkor58YNU {
         return sys;
     }
 
-    static GlassType[] getGlassTypes0() {
+    static GlassType[] getGlassTypesFew() {
         return new GlassType[]{
                 new GlassType("J-SF5", 1.6727, 32.19),    // wakamiya J-SF5
                 new GlassType("S-TIM22", 1.64769, 33.79),   // US 4,234,242 50mm f1.8   S-TIM22
@@ -257,7 +278,7 @@ public class NoctNikkor58YNU {
         var glasses = GlassMap.glasses.values().stream()
                 .filter(e ->e.get_manufacturer().equals("Hikari"))
                 .filter(e -> e.get_name().startsWith("E-"))
-                .filter(e->e.get_refractive_index(SpectralLine.d) >= 1.64 && e.get_refractive_index(SpectralLine.d) < 1.91)
+                .filter(e->e.get_refractive_index(SpectralLine.d) >= 1.647 && e.get_refractive_index(SpectralLine.d) < 1.91)
                 .map(e->new GlassType(e.get_name(), e.nd, e.vd))
                 .collect(Collectors.toList())
                 .toArray(new GlassType[0]);

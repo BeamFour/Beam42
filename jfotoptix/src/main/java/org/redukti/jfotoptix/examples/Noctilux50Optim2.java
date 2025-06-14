@@ -43,13 +43,16 @@ public class Noctilux50Optim2 {
                      new VarRadius(prescription,10),
                      new VarRadius(prescription,11),
                      new VarRadius(prescription,12),
-                     new VarRadius(prescription,13)
+                     new VarRadius(prescription,13),
+                     new VarThickness(prescription,13)
                 },
                 new Out[] {
-                      new SpotRMS(prescription, 1, 0.13, 2.0),
-                      new SpotRMS(prescription, 2, 0.25, 1.0),
-                      new Parax(prescription, ParaxialFirstOrderInfo.Effective_focal_length,52.4, 10.0),
-                      new Parax(prescription, ParaxialFirstOrderInfo.Enp_dist, 42.9, 10.0)
+                      new SpotRMS(prescription, 1, 13.0, 5.0),
+                      new SpotRMS(prescription, 2, 20.0, 2.0),
+                      new SpotMaxRadius(prescription, 1, 25.0, 5.0),
+                      new SpotMaxRadius(prescription, 2, 50.0, 2.0),
+                      new Parax(prescription, ParaxialFirstOrderInfo.Effective_focal_length,52.4, 1.0),
+                      new Parax(prescription, ParaxialFirstOrderInfo.Enp_dist, 42.9, 1.0)
                 });
         var lm = f.getSolver();
         int istatus = 0;

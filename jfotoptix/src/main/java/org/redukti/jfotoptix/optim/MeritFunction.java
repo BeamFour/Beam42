@@ -7,6 +7,8 @@ import org.redukti.jfotoptix.spec.Prescription;
 
 import java.util.Arrays;
 
+import static org.redukti.jfotoptix.math.LMLSolver.BIGVAL;
+
 public class MeritFunction implements LMLFunction {
 
         private double jac[][];
@@ -34,7 +36,12 @@ public class MeritFunction implements LMLFunction {
             for (int i = 0; i < point.length; i++) {
                 vars[i].shift(point[i]);
             }
-            prescription.compute();
+            try {
+                prescription.compute();
+            }
+            catch (Exception e) {
+                return BIGVAL;
+            }
             double sos = 0.0;
             for (int i = 0; i < outs.length; i++) {
                 resid[i] = (outs[i].target - outs[i].value())*outs[i].weight;
@@ -64,7 +71,7 @@ public class MeritFunction implements LMLFunction {
                         delta[k] = (k==j) ? dDelta[j] : 0.0;
 
                     d = nudge(delta); // resid at pplus
-                    if (d== LMLSolver.BIGVAL)
+                    if (d== BIGVAL)
                     {
                         //badray = true;
                         return false;
@@ -76,7 +83,7 @@ public class MeritFunction implements LMLFunction {
                         delta[k] = (k==j) ? -2.0*dDelta[j] : 0.0;
 
                     d = nudge(delta); // resid at pminus
-                    if (d== LMLSolver.BIGVAL)
+                    if (d== BIGVAL)
                     {
                         //badray = true;
                         return false;
@@ -93,7 +100,7 @@ public class MeritFunction implements LMLFunction {
 
                     d = nudge(delta);  // back to starting value.
 
-                    if (d== LMLSolver.BIGVAL)
+                    if (d== BIGVAL)
                     {
                         //badray = true;
                         return false;

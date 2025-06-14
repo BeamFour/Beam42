@@ -37,6 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class OpticalSystem implements Container {
     protected final List<Element> _elements;
     protected final Transform3Cache _transform3Cache;
+    // full angle of view in degrees
     protected double _angle_of_view;
     protected double _f_number;
 
@@ -206,6 +207,7 @@ public class OpticalSystem implements Container {
     public static class Builder {
         private final ArrayList<Element.Builder> elements = new ArrayList<>();
         private Transform3Cache transform3Cache;
+        // full angle of view in degrees
         private double _angle_of_view;
         private double _f_number;
 

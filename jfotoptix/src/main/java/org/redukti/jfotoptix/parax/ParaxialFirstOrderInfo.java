@@ -17,6 +17,74 @@ import java.util.stream.Collectors;
 public class ParaxialFirstOrderInfo {
 
     // efl: effective focal length
+    public static final int Effective_focal_length = 0;
+    // bfl: back focal length
+    public static final int Back_focal_length = 1;
+    // opt_inv: optical invariant
+    public static final int Optical_invariant = 2;
+    // obj_dist: object distance
+    public static final int Object_distance = 3;
+    // img_dist: paraxial image distance
+    public static final int Image_distance = 4;
+    public static final int Power = 5;
+    // pp1: distance of front principle plane from 1st surface
+    public static final int Pp1 = 6;
+    // ppk: distance of rear principle plane from last surface
+    public static final int Ppk = 7;
+    // ffl: front focal length
+    public static final int Ffl = 8;
+    // fno: focal ratio at working conjugates, f/#
+    public static final int Fno = 9;
+    // enp_dist: entrance pupil distance from 1st surface
+    public static final int Enp_dist = 10;
+    // enp_radius: entrance pupil radius
+    public static final int Enp_radius = 11;
+    // exp_dist: exit pupil distance from last interface
+    public static final int Exp_dist = 12;
+    // exp_radius: exit pupil radius
+    public static final int Exp_radius = 13;
+    public static final int M = 14;
+    // red: reduction ratio
+    public static final int Red = 15;
+    // n_obj: refractive index at central wavelength in object space
+    public static final int N_obj = 16;
+    // n_img: refractive index at central wavelength in image space
+    public static final int N_img = 17;
+    // img_ht: image height
+    public static final int Img_ht = 18;
+    // obj_ang: maximum object angle (degrees)
+    public static final int Obj_ang = 19;
+    // obj_na: numerical aperture in object space
+    public static final int Obj_na = 20;
+    // img_na: numerical aperture in image space
+    public static final int Img_na = 21;
+
+    public static String[] Names = {
+    "Effective_focal_length",
+    "Back_focal_length",
+    "Optical_invariant",
+    "Object_distance",
+    "Image_distance",
+    "Power",
+    "Pp1",
+    "Ppk",
+    "Ffl",
+    "Fno",
+    "Enp_dist",
+    "Enp_radius",
+    "Exp_dist",
+    "Exp_radius",
+    "M",
+    "Red",
+    "N_obj",
+    "N_img",
+    "Img_ht",
+    "Obj_ang",
+    "Obj_na",
+    "Img_na"
+    };
+
+    // efl: effective focal length
     public double effective_focal_length;
     // bfl: back focal length
     public double back_focal_length;
@@ -216,6 +284,33 @@ public class ParaxialFirstOrderInfo {
         pfo.img_na = n_k*Math.sin(Math.atan(1.0*ax_ray.get(0).slope)); // FIXME 1.0 is z_dir
 
         return pfo;
+    }
+
+    public double[] asArray() {
+        var v = new double[22];
+        v[Effective_focal_length] = effective_focal_length;
+        v[Back_focal_length] = back_focal_length;
+        v[Optical_invariant] = optical_invariant;
+        v[Object_distance] = object_distance;
+        v[Image_distance] = image_distance;
+        v[Power] = power;
+        v[Pp1] = pp1;
+        v[Ppk] = ppk;
+        v[Ffl] = ffl;
+        v[Fno] = fno;
+        v[Enp_dist] = enp_dist;
+        v[Enp_radius] = enp_radius;
+        v[Exp_dist] = exp_dist;
+        v[Exp_radius] = exp_radius;
+        v[M] = m;
+        v[Red] = red;
+        v[N_obj] = n_obj;
+        v[N_img] = n_img;
+        v[Img_ht] = img_ht;
+        v[Obj_ang] = obj_ang;
+        v[Obj_na] = obj_na;
+        v[Img_na] = img_na;
+        return v;
     }
 
     static final class GlassType {

@@ -78,10 +78,10 @@ public class AnalysisSpot extends AnalysisPointImage {
         _centroid = _results.get_intercepted_centroid (_image);
     }
 
-    public void process_analysis()
+    public AnalysisSpot process_analysis()
     {
         if (_processed_analysis)
-            return;
+            return this;
 
         process_trace ();
 
@@ -105,6 +105,7 @@ public class AnalysisSpot extends AnalysisPointImage {
         _tot_intensity = intensity;
 
         _processed_analysis = true;
+        return this;
     }
 
     void draw_intercepts (RendererViewport renderer, Surface s)

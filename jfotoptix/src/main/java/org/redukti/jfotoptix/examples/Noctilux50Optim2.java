@@ -7,8 +7,8 @@ import org.redukti.jfotoptix.spec.Prescription;
 
 public class Noctilux50Optim2 {
 
-   private static Prescription getPrescriptionX() {
-        Prescription prescription = new Prescription(50.2,1.0,47.0,43.2,false)
+   private static Prescription getPrescription() {
+        Prescription prescription = new Prescription(52.4,1.0,45.0,43.2,false)
                 .surf(60.93448034183235, 8.071, 54.57, 1.6779, 55.2,	"N-LAK12")
                 .surf(1756.423894554349,	0.1,	54.57)
                 .surf(30.17091963464339,	8.0,	46.571,1.883,	40.8,	"S-LAH58")
@@ -23,11 +23,13 @@ public class Noctilux50Optim2 {
                 .surf(549.3168895825511,	0.1, 35.286)
                 .surf(83.0795202171,	4,		33.429,1.788,	47.49,	"N-LAF21")
                 .surf(-197.873443,	27.365, 	33.429)
+                //.field2(0.2)
+                //.field3(0.5)
                 .build();
         return prescription;
     }
 
-    private static Prescription getPrescription() {
+    private static Prescription getPrescriptionXX() {
         Prescription prescription = new Prescription(52.4,1.0,45.0,43.2,false)
                 .surf(61.735, 8.071, 54.57, 1.6779, 55.2,	"N-LAK12")
                 .surf(1737.298,	0.1,	54.57)
@@ -43,6 +45,8 @@ public class Noctilux50Optim2 {
                 .surf(554.8661,	0.1, 35.286)
                 .surf(82.33929,	4,		33.429,1.788,	47.49,	"N-LAF21")
                 .surf(-195.9143,	27.43, 	33.429)
+                //.field2(0.2)
+                //.field2(0.5)
                 .build();
         return prescription;
     }
@@ -51,7 +55,7 @@ public class Noctilux50Optim2 {
         var prescription = getPrescription();
         var f = new MeritFunction(prescription,
                 new Var[] {
-                     new VarRadius(prescription, 0),
+                     new VarRadius(prescription,0),
                      new VarRadius(prescription,1),
                      new VarRadius(prescription,2),
                      new VarRadius(prescription,3),
@@ -81,6 +85,7 @@ public class Noctilux50Optim2 {
                 istatus!= LMLSolver.MAXITER) {
             istatus = lm.iLMiter();
         }
+        System.out.println("Status = " + istatus);
         System.out.println(f.toString());
     }
 

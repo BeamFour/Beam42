@@ -1,0 +1,30 @@
+[descriptive data]
+title	Leica 50mm Noctilux f/1.0
+[constants]
+[variable distances]
+Focal Length	52.4
+Angle of View	45
+F-Number	1.0
+Image Height	43.16
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf	27.43
+[lens data]
+1	61.735	8.071	1.6779	54.57	55.2	N-LAK12
+2	1737.298	0.1		54.57
+3	29.78276	8.0	1.883	46.571	40.8	S-LAH58
+4	68.0106	1.7857		44.644
+5	120.3241	4.0714	1.7847	45.214	26.08	SF56A
+6	19.322	9.0		31.6
+7	AS	6.214		30.6
+8	-23.596	1.357	1.72825	31.0	28.41	SF10
+9	92.80589	8.7143	1.883	37.643	40.8	S-LAH58
+10	-31.71798	0.1		37.714
+11	91.644	4.0	1.788	35.286	47.49	N-LAF21
+12	554.8661	0.1		35.286
+13	82.33929	4	1.788	33.429	47.49	N-LAF21
+14	-195.9143	27.43		33.429
+[aspherical data]
+[figure]
+[notes]

@@ -45,6 +45,8 @@ public class Prescription {
     public AnalysisSpot sys2Spot;
     public OpticalSystem sys3;
     public AnalysisSpot sys3Spot;
+    public double field2 = 0.7;
+    public double field3 = 1.0;
 
     public Prescription(double focalLength, double fno, double angleOfViewDegrees, double imageHeight, boolean d_line) {
         this.focalLength = focalLength;
@@ -79,14 +81,28 @@ public class Prescription {
         lastSurface.coeffs = coeffs;
         return this;
     }
+    public Prescription field2(double value) {
+        if (value > 0.0 && value <= 1.0)
+            field2 = value;
+        else
+            throw new IllegalArgumentException();
+        return this;
+    }
+    public Prescription field3(double value) {
+        if (value > 0.0 && value <= 1.0)
+            field3 = value;
+        else
+            throw new IllegalArgumentException();
+        return this;
+    }
     public Prescription build() {
         this.surfaces = surfaceList.toArray(new SurfaceType[surfaceList.size()]);
         return this;
     }
     public void compute() {
         sys1 = buildSystem(true,0.0).build();
-        sys2 = buildSystem(true,0.7).build();
-        sys3 = buildSystem(true,1.0).build();
+        sys2 = buildSystem(true,field2).build();
+        sys3 = buildSystem(true,field3).build();
         sys1Spot = new AnalysisSpot(sys1,10).process_analysis();
         sys2Spot = new AnalysisSpot(sys2,10).process_analysis();
         sys3Spot = new AnalysisSpot(sys3,10).process_analysis();

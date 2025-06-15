@@ -28,10 +28,7 @@ public class Prescription {
     public double focalLength;
     public double fno;
     public double angleOfViewDegrees;
-    public double halfAngleOfViewDegrees;
     public double imageHeight;
-    public double aovSkewRadians;
-    public double aovSemiSkewRadians;
     public boolean d_line;
 
     // Used to build
@@ -54,9 +51,6 @@ public class Prescription {
         this.angleOfViewDegrees = angleOfViewDegrees;
         this.imageHeight = imageHeight;
         this.d_line = d_line;
-        this.halfAngleOfViewDegrees = angleOfViewDegrees/2.0;
-        this.aovSkewRadians = Math.toRadians(angleOfViewDegrees)/2.0;
-        this.aovSemiSkewRadians = Math.toRadians(angleOfViewDegrees*0.7)/2.0;
     }
 
     public Prescription surf(double radius, double thickness, double diameter, double nd, double vd, String glassName) {

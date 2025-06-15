@@ -1,18 +1,21 @@
 package org.redukti.jfotoptix.spec;
 
 import org.redukti.jfotoptix.analysis.AnalysisSpot;
+import org.redukti.jfotoptix.curve.Asphere;
 import org.redukti.jfotoptix.curve.Flat;
 import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.math.Matrix3;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
 import org.redukti.jfotoptix.medium.Abbe;
+import org.redukti.jfotoptix.medium.Air;
 import org.redukti.jfotoptix.medium.GlassMap;
 import org.redukti.jfotoptix.model.Image;
 import org.redukti.jfotoptix.model.Lens;
 import org.redukti.jfotoptix.model.OpticalSystem;
 import org.redukti.jfotoptix.model.PointSource;
 import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
+import org.redukti.jfotoptix.shape.Disk;
 import org.redukti.jfotoptix.shape.Rectangle;
 
 import java.util.ArrayList;
@@ -114,7 +117,7 @@ public class Prescription {
         double image_pos = 0.0;
         for (int i = 0; i < surfaces.length; i++) {
             var s = surfaces[i];
-            double thickness = add_surface(lens, s.radius, s.thickness, s.diameter, s.nd, s.vd, s.glassName, s.isStop);
+            double thickness = add_surface(lens, s);
             image_pos += thickness;
         }
         sys.add(lens);
@@ -124,25 +127,56 @@ public class Prescription {
         sys.f_number(this.fno);
         return sys;
     }
-    private static double add_surface(Lens.Builder lens, double radius, double thickness, double diameter, double nd, double vd, String glassName, boolean stop) {
-        double apertureRadius = diameter / 2.0;
-        if (stop) {
-            lens.add_stop(apertureRadius, thickness, true);
-            return thickness;
+    private static double add_surface(Lens.Builder lens, SurfaceType s) {
+        double apertureRadius = s.diameter / 2.0;
+        if (s.isStop) {
+            lens.add_stop(apertureRadius, s.thickness, true);
+            return s.thickness;
         }
-        if (nd != 0.0) {
-            var glass = GlassMap.glassByName(glassName);
-            if (glass == null) {
-                lens.add_surface(radius, apertureRadius, thickness, new Abbe(Abbe.AbbeFormula.AbbeVd, nd, vd, 0.0));
+        if (s.k != 0 || (s.coeffs != null && s.coeffs.length > 0)) {
+            var curve = getAsphere(s);
+            var shape = new Disk(apertureRadius);
+            if (s.nd != 0.0) {
+                var glass = GlassMap.glassByName(s.glassName);
+                if (glass != null) {
+                    lens.add_surface(curve, shape, s.thickness, glass);
+                } else {
+                    lens.add_surface(curve, shape, s.thickness, new Abbe(Abbe.AbbeFormula.AbbeVd, s.nd, s.vd, 0.0));
+                }
+            } else {
+                lens.add_surface(curve, shape, s.thickness, Air.air);
             }
-            else {
-                lens.add_surface(radius, apertureRadius, thickness, glass);
-            }
-        } else {
-            lens.add_surface(radius, apertureRadius, thickness);
         }
-        return thickness;
+        else {
+            // Non aspherical
+            if (s.nd != 0.0) {
+                var glass = GlassMap.glassByName(s.glassName);
+                if (glass == null) {
+                    lens.add_surface(s.radius, apertureRadius, s.thickness, new Abbe(Abbe.AbbeFormula.AbbeVd, s.nd, s.vd, 0.0));
+                } else {
+                    lens.add_surface(s.radius, apertureRadius, s.thickness, glass);
+                }
+            } else {
+                lens.add_surface(s.radius, apertureRadius, s.thickness);
+            }
+        }
+        return s.thickness;
     }
+
+    private static Asphere getAsphere(SurfaceType s) {
+        double k = s.k + 1.0;
+        double a4 = s.coeffs.length > 0 ? s.coeffs[0] : 0.0;
+        double a6 = s.coeffs.length > 1 ? s.coeffs[1] : 0.0;
+        double a8 = s.coeffs.length > 2 ? s.coeffs[2] : 0.0;
+        double a10 = s.coeffs.length > 3 ? s.coeffs[3] : 0.0;
+        double a12 = s.coeffs.length > 4 ? s.coeffs[4] : 0.0;
+        double a14 = s.coeffs.length > 5 ? s.coeffs[5] : 0.0;
+        double a16 = s.coeffs.length > 6 ? s.coeffs[6] : 0.0;
+        double a18 = s.coeffs.length > 7 ? s.coeffs[7] : 0.0;
+        double a20 = s.coeffs.length > 8 ? s.coeffs[8] : 0.0;
+        return new Asphere(s.radius, k, a4, a6, a8, a10, a12, a14, a16, a18, a20);
+    }
+
     public StringBuilder toOptBenchStr(StringBuilder sb) {
         for (SurfaceType surface : surfaceList) {
             surface.toOptBenchStr(sb);

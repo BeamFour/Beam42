@@ -1,0 +1,76 @@
+[descriptive data]
+title	Leica 50mm Noctilux f/1.0
+[constants]
+[variable distances]
+Focal Length	52.4
+Angle of View	45
+F-Number	1.0
+Image Height	43.16
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf	27.956474198782196
+[lens data]
+1	60.396731118094124	8.071	1.6779	54.57	55.2	S-LAL12	N-LAK12
+2	1756.4501708360956	0.1		54.57
+3	30.5947663251867	8.0	1.883	46.571	40.8	S-LAH58
+4	67.8790736044459	1.7857		44.644
+5	120.79050893424227	4.0714	1.7847	45.214	26.08	S-TIH23	SF56A
+6	19.78713309570184	9.35		31.6
+7	AS	7.1		30.6
+8	-23.03928682520623	1.357	1.72825	31.0	28.41	S-TIH10	SF10
+9	90.52749411586635	8.7143	1.883	37.643	40.8	S-LAH58
+10	-31.77901748330075	0.1		37.714
+11	90.45941812242472	4.0	1.788	35.286	47.49	S-LAH64	N-LAF21
+12	549.4487968357656	0.1		35.286
+13	80.26486366395117	4	1.788	33.429	47.49	S-LAH64	N-LAF21
+14	-197.00797069569617	27.956474198782196		33.429
+[aspherical data]
+[figure]
+[notes]
+Prescription prescription = new Prescription(52.4,1.0,45.0,43.2,false)
+	.surf(60.93448034183235, 8.071, 54.57, 1.6779, 55.2,	"N-LAK12")
+	.surf(1756.423894554349,	0.1,	54.57)
+	.surf(30.17091963464339,	8.0,	46.571,1.883,	40.8,	"S-LAH58")
+	.surf( 68.8969841585084, 1.7857, 44.644)
+	.surf( 121.40569225318634,	4.0714, 45.214,	1.7847,	26.08,	"SF56A")
+	.surf(19.554269954219002, 9.35, 31.6)
+	.stop(7.1,	30.6)
+	.surf(-23.83193616804,	1.357,		31.0,	1.72825,28.41,	"SF10")
+	.surf(91.8777392221589,	8.7143,		37.643,	1.883,40.8,	"S-LAH58")
+	.surf( -32.0992621547598,	0.1, 37.714)
+	.surf(92.56034743956,	4.0,		35.286,1.788,	47.49,	"N-LAF21")
+	.surf(549.3168895825511,	0.1, 35.286)
+	.surf(83.0795202171,	4,		33.429,1.788,	47.49,	"N-LAF21")
+	.surf(-197.873443,	27.365, 	33.429)
+	.field2(0.3)
+	.field3(0.7)
+	.build();
+var prescription = getPrescription();
+var f = new MeritFunction(prescription,
+	new Var[] {
+	     new VarRadius(prescription,0),
+	     new VarRadius(prescription,1),
+	     new VarRadius(prescription,2),
+	     new VarRadius(prescription,3),
+	     new VarRadius(prescription,4),
+	     new VarRadius(prescription,5),
+	     new VarRadius(prescription,7),
+	     new VarRadius(prescription,8),
+	     new VarRadius(prescription,9),
+	     new VarRadius(prescription,10),
+	     new VarRadius(prescription,11),
+	     new VarRadius(prescription,12),
+	     new VarRadius(prescription,13),
+	     new VarThickness(prescription,13)
+	},
+	new Goal[] {
+	      new GoalSpotRMS(prescription, 1, 13.0, 7.0),
+	      new GoalSpotRMS(prescription, 2, 30.0, 2.0),
+	      new GoalSpotRMS(prescription, 3, 60.0, 2.0),
+	      new GoalSpotMaxRadius(prescription, 1, 37.0, 5.0),
+	      new GoalSpotMaxRadius(prescription, 2, 100.0, 2.0),
+	      new GoalSpotMaxRadius(prescription, 3, 250.0, 2.0),
+	      new GoalParax(prescription, ParaxialFirstOrderInfo.Effective_focal_length,52.4, 1.0),
+	      new GoalParax(prescription, ParaxialFirstOrderInfo.Enp_dist, 42.9, 1.0)
+	});

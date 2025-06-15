@@ -7,7 +7,7 @@ import org.redukti.jfotoptix.spec.Prescription;
 
 public class Noctilux50Optim2 {
 
-   private static Prescription getPrescription() {
+   private static Prescription getPrescriptionX() {
         Prescription prescription = new Prescription(50.2,1.0,47.0,43.2,false)
                 .surf(60.93448034183235, 8.071, 54.57, 1.6779, 55.2,	"N-LAK12")
                 .surf(1756.423894554349,	0.1,	54.57)
@@ -23,6 +23,26 @@ public class Noctilux50Optim2 {
                 .surf(549.3168895825511,	0.1, 35.286)
                 .surf(83.0795202171,	4,		33.429,1.788,	47.49,	"N-LAF21")
                 .surf(-197.873443,	27.365, 	33.429)
+                .build();
+        return prescription;
+    }
+
+    private static Prescription getPrescription() {
+        Prescription prescription = new Prescription(52.4,1.0,45.0,43.2,false)
+                .surf(61.735, 8.071, 54.57, 1.6779, 55.2,	"N-LAK12")
+                .surf(1737.298,	0.1,	54.57)
+                .surf(29.78276,	8.0,	46.571,1.883,	40.8,	"S-LAH58")
+                .surf(68.0106, 1.7857, 44.644)
+                .surf(120.3241,	4.0714, 45.214,	1.7847,	26.08,	"SF56A")
+                .surf(19.322, 9.35, 31.6)
+                .stop(7.1,	30.6)
+                .surf(-23.596,	1.357,		31.0,	1.72825,28.41,	"SF10")
+                .surf(92.80589,	8.7143,		37.643,	1.883,40.8,	"S-LAH58")
+                .surf(-31.71798,	0.1, 37.714)
+                .surf(91.644,	4.0,		35.286,1.788,	47.49,	"N-LAF21")
+                .surf(554.8661,	0.1, 35.286)
+                .surf(82.33929,	4,		33.429,1.788,	47.49,	"N-LAF21")
+                .surf(-195.9143,	27.43, 	33.429)
                 .build();
         return prescription;
     }

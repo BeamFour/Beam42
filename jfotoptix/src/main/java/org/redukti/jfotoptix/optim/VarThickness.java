@@ -5,7 +5,7 @@ import org.redukti.jfotoptix.spec.Prescription;
 public class VarThickness extends Var {
     public final int surfaceId;
     public VarThickness(Prescription prescription, int surfaceId) {
-        super(prescription, prescription.surfaces[surfaceId].thickness);
+        super(prescription, prescription.surfaces[surfaceId].thickness,0.001);
         this.surfaceId = surfaceId;
     }
     @Override

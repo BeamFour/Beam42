@@ -5,7 +5,7 @@ import org.redukti.jfotoptix.spec.Prescription;
 public class VarRadius extends Var {
     public final int surfaceId;
     public VarRadius(Prescription prescription, int surfaceId) {
-        super(prescription, prescription.surfaces[surfaceId].radius);
+        super(prescription, prescription.surfaces[surfaceId].radius, prescription.surfaces[surfaceId].radius*0.001);
         this.surfaceId = surfaceId;
     }
     @Override

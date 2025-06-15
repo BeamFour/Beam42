@@ -6,7 +6,7 @@ public class VarAsphCoeff extends Var {
     public final int surfaceId;
     public final int index;
     public VarAsphCoeff(Prescription prescription, int surfaceId, int index) {
-        super(prescription, prescription.surfaces[surfaceId].coeffs[index]);
+        super(prescription, prescription.surfaces[surfaceId].coeffs[index],1e-8);
         this.surfaceId = surfaceId;
         this.index = index;
     }

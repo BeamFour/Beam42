@@ -5,7 +5,7 @@ import org.redukti.jfotoptix.spec.Prescription;
 public class VarAsphK extends Var {
     public final int surfaceId;
     public VarAsphK(Prescription prescription, int surfaceId) {
-        super(prescription, prescription.surfaces[surfaceId].k);
+        super(prescription, prescription.surfaces[surfaceId].k,0.001);
         this.surfaceId = surfaceId;
     }
     @Override

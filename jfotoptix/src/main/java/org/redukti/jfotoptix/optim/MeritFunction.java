@@ -13,7 +13,6 @@ public class MeritFunction implements LMLFunction {
 
         private double jac[][];
         private double resid[] ;
-        private double dDelta[] = {1E-6, 1E-6};
         private double point[]; // x,y at the first surface
         private Prescription prescription;
         private Var[] vars;
@@ -25,8 +24,6 @@ public class MeritFunction implements LMLFunction {
             this.vars = vars;
             this.outs = outs;
             this.resid = new double[outs.length];
-            this.dDelta = new double[outs.length];
-            Arrays.fill(dDelta, 1E-6);
             this.point = new double[vars.length];
             this.jac = new double[vars.length][vars.length];
         }
@@ -61,14 +58,14 @@ public class MeritFunction implements LMLFunction {
             // False should trigger an explanation.
             // Called by LMray.iLMiter().
             {
-                final int nadj = 2;
-                final int ngoals = 2;
+                final int nadj = vars.length;
+                final int ngoals = outs.length;
                 double delta[] = new double[nadj];
                 double d=0;
                 for (int j=0; j<nadj; j++)
                 {
                     for (int k=0; k<nadj; k++)
-                        delta[k] = (k==j) ? dDelta[j] : 0.0;
+                        delta[k] = (k==j) ? vars[j].dDelta : 0.0;
 
                     d = nudge(delta); // resid at pplus
                     if (d== BIGVAL)
@@ -80,7 +77,7 @@ public class MeritFunction implements LMLFunction {
                         jac[i][j] = getResidual(i);
 
                     for (int k=0; k<nadj; k++)
-                        delta[k] = (k==j) ? -2.0*dDelta[j] : 0.0;
+                        delta[k] = (k==j) ? -2.0*vars[j].dDelta : 0.0;
 
                     d = nudge(delta); // resid at pminus
                     if (d== BIGVAL)
@@ -93,10 +90,10 @@ public class MeritFunction implements LMLFunction {
                         jac[i][j] -= getResidual(i);
 
                     for (int i=0; i<ngoals; i++)
-                        jac[i][j] /= (2.0*dDelta[j]);
+                        jac[i][j] /= (2.0*vars[j].dDelta);
 
                     for (int k=0; k<nadj; k++)
-                        delta[k] = (k==j) ? dDelta[j] : 0.0;
+                        delta[k] = (k==j) ? vars[j].dDelta : 0.0;
 
                     d = nudge(delta);  // back to starting value.
 

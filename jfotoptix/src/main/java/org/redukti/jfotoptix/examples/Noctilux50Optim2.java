@@ -23,8 +23,8 @@ public class Noctilux50Optim2 {
                 .surf(549.3168895825511,	0.1, 35.286)
                 .surf(83.0795202171,	4,		33.429,1.788,	47.49,	"N-LAF21")
                 .surf(-197.873443,	27.365, 	33.429)
-                //.field2(0.2)
-                //.field3(0.5)
+                .field2(0.3)
+                .field3(0.7)
                 .build();
         return prescription;
     }
@@ -71,10 +71,12 @@ public class Noctilux50Optim2 {
                      new VarThickness(prescription,13)
                 },
                 new Goal[] {
-                      new GoalSpotRMS(prescription, 1, 13.0, 5.0),
-                      new GoalSpotRMS(prescription, 2, 20.0, 2.0),
-                      new GoalSpotMaxRadius(prescription, 1, 25.0, 5.0),
-                      new GoalSpotMaxRadius(prescription, 2, 50.0, 2.0),
+                      new GoalSpotRMS(prescription, 1, 13.0, 7.0),
+                      new GoalSpotRMS(prescription, 2, 30.0, 2.0),
+                      new GoalSpotRMS(prescription, 3, 60.0, 2.0),
+                      new GoalSpotMaxRadius(prescription, 1, 37.0, 5.0),
+                      new GoalSpotMaxRadius(prescription, 2, 100.0, 2.0),
+                      new GoalSpotMaxRadius(prescription, 3, 250.0, 2.0),
                       new GoalParax(prescription, ParaxialFirstOrderInfo.Effective_focal_length,52.4, 1.0),
                       new GoalParax(prescription, ParaxialFirstOrderInfo.Enp_dist, 42.9, 1.0)
                 });

@@ -1,17 +1,20 @@
 # Beam42 Optical Ray Tracer
 
+This project contains three different optical design and analysis software.
+
+* **BEAM FOUR** 
+* **JFotoptix** - a Java tool derived from [GNU Optical](https://github.com/dibyendumajumdar/goptical).  
+* **RayOptics** - a partial ongoing port of [MJH RayOptics](https://github.com/mjhoptics/ray-optics). 
+
+## BEAM FOUR
+
 This is a fork of the BEAM FOUR Optical Ray Tracer, by www.StellarSoftware.com.
 
 Original author is [Michael Lampton](https://www.ssl.berkeley.edu/~mlampton/).
 
 Copyright (c) M.Lampton, 2003-2020, STELLAR SOFTWARE all rights reserved.
 
-For any inquiries regarding this version, please raise issues here and do not contact StellarSoftware.com, as this
-version is not maintained by Mike Lampton.
-
-Note: This project now also includes a port of GNU Optical to Java.
-
-## About Beam42
+### About BEAM FOUR
 
 From  www.StellarSoftware.com:
 
@@ -23,16 +26,39 @@ There are three kinds of ray tracers out there...
 
 3. Optical ray tracing runs geometrical rays through lenses, gratings, irises, mirrors, prisms, etc and evaluates the image that a specified optical system delivers. Bingo!
 
-## Resources
+### Resources
 
 * [Introduction to BeamFour (YouTube)](https://youtu.be/-buXsCqEnq8)
   
-## Changes / Development Plan
+### Changes / Development Plan
 
-* The original BeamFour implementation made it difficult to use the ray tracing functions independently of the GUI. I am working on improving the de-coupling of the UI from the ray tracing functions.
-* The original BeamFour implementation assumed that there is a single workspace that a user is working in, and therefore used static data structures - this design is not as friendly to server side use cases where multiple simultaneous workspaces can be in use. I am modifying the system so that all the data structures are encapsulated in objects.
-* My Java port of GNU Optical has been merged into this project. For now there are two parallel implementations of ray tracing - longer term BeamFour implementation will be the main one because it is simpler and easier to understand.
-* I plan to add some features that are more specific to photo lenses - such as paraxial calculations, ray fan plots, etc.
+* The original implementation made it difficult to use the ray tracing functions independently of the GUI. I am working on improving the de-coupling of the UI from the ray tracing functions.
+* The implementation assumed that there is a single workspace that a user is working in, and therefore used static data structures - this design is not as friendly to server side use cases where multiple simultaneous workspaces can be in use.
+
+## JFotoptix
+
+This started off as a Java port of [GNU Optical](https://github.com/dibyendumajumdar/goptical), but now has a different set of features
+
+### Features
+
+* Mainly focused on Photo Lenses.
+* Can import lens specifications in the format supported by [PhotonsToPhotos Optical Bench](https://www.photonstophotos.net/GeneralTopics/Lenses/OpticalBench/OpticalBenchHub.htm).
+* Can export to Zemax, BEAM FOUR, MJH Ray Optics.
+* Features a command line tool that takes in the lens specification and generates following outputs:
+  * Spot diagrams (SVG)
+  * Layout diagrams (SVG)
+  * Spot report
+  * Paraxial report
+  * Zemax file
+* Features a Levenberg Marquardt Lampton solver based optimizer with following features
+  * Set variables on surface properties
+  * Fit to spot size goals
+  * Constrain by paraxial parameters
+  * This is still **work in progress**.
+
+## RayOptics
+
+This is an ongoing partial port of [MJH RayOptics](https://github.com/mjhoptics/ray-optics).
 
 ## Literature
 
@@ -49,11 +75,11 @@ There are three kinds of ray tracers out there...
 ## Related Projects
 
 * My fork of GNU Optical: https://github.com/dibyendumajumdar/goptical
-* Java port of GNU Optical: https://github.com/dibyendumajumdar/jfotoptix - now merged into this project.
 * For a product developed by Michael Hayford who worked many years at optical software company - see https://github.com/mjhoptics/ray-optics. 
 * Another Python project is https://github.com/quartiq/rayopt
 * An older C project 'ray' originally written by Don Wells at NRAO implements Feder's equations for ray tracing. https://github.com/dibyendumajumdar/ray
-* An attempt to maintain a commercial product KDP is here: https://github.com/dinosauria123/Koko. Lots of sphagetti Fortran code unfortunately. 
+* Geopter (C++,Qt): https://github.com/heterophyllus/Geopter
+* An attempt to maintain a commercial product KDP is here: https://github.com/dinosauria123/Koko. Lots of sphagetti Fortran code, unfortunately. 
 
 Here are some other projects that I have not personally tried out
 
@@ -61,5 +87,5 @@ Here are some other projects that I have not personally tried out
 * A C++ project: https://github.com/edeforas/Astree
 * Python project OpticsSpy: https://github.com/Sterncat/opticspy 
 * Another Python project https://github.com/mess42/pyrate
-* Geopter (C++,Qt): https://github.com/heterophyllus/Geopter 
 * A Matlab/Octave project: https://github.com/heterophyllus/OpticalDesign-Toolbox
+* Optiland: Another Python project: https://github.com/HarrisonKramer/optiland

@@ -16,11 +16,11 @@ public class MeritFunction implements LMLFunction {
         private double dDelta[] = {1E-6, 1E-6};
         private double point[]; // x,y at the first surface
         private Prescription prescription;
-        private In[] vars;
-        private Out[] outs;
+        private Var[] vars;
+        private Goal[] outs;
         private double tol = 1E-6;
 
-        public MeritFunction(Prescription prescription, In[] vars, Out[] outs) {
+        public MeritFunction(Prescription prescription, Var[] vars, Goal[] outs) {
             this.prescription = prescription;
             this.vars = vars;
             this.outs = outs;

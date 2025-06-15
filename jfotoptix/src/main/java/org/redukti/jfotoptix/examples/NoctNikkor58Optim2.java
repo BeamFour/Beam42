@@ -13,6 +13,7 @@ public class NoctNikkor58Optim2 {
        private static Prescription getPrescription() {
         Prescription prescription = new Prescription(58.0,1.2,40.9,43.28,false)
                 .surf(79.9975, 6.885, 50.4875, 1.795, 45.31,	"J-LASF017")
+                //.asph(0,new double[]{0.0,0.0,0.0,0.0})
                 .surf(0,	0.1,	50.4875)
                 .surf(33.737,	9.75,	44.832,1.8485,	43.79,	"J-LASFH22")
                 .surf( 70.18675, 1.56, 44.832)
@@ -33,8 +34,12 @@ public class NoctNikkor58Optim2 {
     public static void main(String[] args) {
         var prescription = getPrescription();
         var f = new MeritFunction(prescription,
-                new In[] {
+                new Var[] {
                      new VarRadius(prescription, 0),
+                     //new VarAsphCoeff(prescription,0,0),
+                     //new VarAsphCoeff(prescription,0,1),
+                     //new VarAsphCoeff(prescription,0,2),
+                     //new VarAsphCoeff(prescription,0,3),
                      new VarRadius(prescription,2),
                      new VarRadius(prescription,3),
                      new VarRadius(prescription,4),
@@ -48,16 +53,16 @@ public class NoctNikkor58Optim2 {
                      new VarRadius(prescription,13),
                      new VarThickness(prescription, 13)
                 },
-                new Out[] {
-                      new SpotRMS(prescription, 1, 13.0, 5.0),
-                      new SpotRMS(prescription, 2, 20.0, 2.0),
-                      new SpotMaxRadius(prescription, 1, 25.0, 5.0),
-                      new SpotMaxRadius(prescription, 2, 50.0, 2.0),
-                      new Parax(prescription, ParaxialFirstOrderInfo.Effective_focal_length,58.0, 1.0),
-                        new Parax(prescription, ParaxialFirstOrderInfo.Fno, 1.2, 1.0),
-                        new Parax(prescription, ParaxialFirstOrderInfo.Back_focal_length, 37.78, 1.0),
-                        new Parax(prescription, ParaxialFirstOrderInfo.Pp1, 51.8, 1.0),
-                      new Parax(prescription, ParaxialFirstOrderInfo.Ppk, 20.2, 1.0)
+                new Goal[] {
+                      new GoalSpotRMS(prescription, 1, 13.0, 5.0),
+                      new GoalSpotRMS(prescription, 2, 20.0, 2.0),
+                      new GoalSpotMaxRadius(prescription, 1, 25.0, 5.0),
+                      new GoalSpotMaxRadius(prescription, 2, 50.0, 2.0),
+                      new GoalParax(prescription, ParaxialFirstOrderInfo.Effective_focal_length,58.0, 1.0),
+                      new GoalParax(prescription, ParaxialFirstOrderInfo.Fno, 1.2, 1.0),
+                      new GoalParax(prescription, ParaxialFirstOrderInfo.Back_focal_length, 37.78, 1.0),
+                      new GoalParax(prescription, ParaxialFirstOrderInfo.Pp1, 51.8, 1.0),
+                      new GoalParax(prescription, ParaxialFirstOrderInfo.Ppk, 20.2, 1.0)
                 });
         var lm = f.getSolver();
         int istatus = 0;

@@ -5,7 +5,7 @@ import org.redukti.jfotoptix.spec.Prescription;
 
 public class Optim {
 
-    public static void run(Prescription prescription, In[] vars, Out[] outs) {
+    public static void run(Prescription prescription, Var[] vars, Goal[] outs) {
 
         var f = new MeritFunction(prescription, vars, outs);
         var solver = f.getSolver();

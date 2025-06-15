@@ -30,7 +30,7 @@ public class Noctilux50Optim2 {
     public static void main(String[] args) {
         var prescription = getPrescription();
         var f = new MeritFunction(prescription,
-                new In[] {
+                new Var[] {
                      new VarRadius(prescription, 0),
                      new VarRadius(prescription,1),
                      new VarRadius(prescription,2),
@@ -46,13 +46,13 @@ public class Noctilux50Optim2 {
                      new VarRadius(prescription,13),
                      new VarThickness(prescription,13)
                 },
-                new Out[] {
-                      new SpotRMS(prescription, 1, 13.0, 5.0),
-                      new SpotRMS(prescription, 2, 20.0, 2.0),
-                      new SpotMaxRadius(prescription, 1, 25.0, 5.0),
-                      new SpotMaxRadius(prescription, 2, 50.0, 2.0),
-                      new Parax(prescription, ParaxialFirstOrderInfo.Effective_focal_length,52.4, 1.0),
-                      new Parax(prescription, ParaxialFirstOrderInfo.Enp_dist, 42.9, 1.0)
+                new Goal[] {
+                      new GoalSpotRMS(prescription, 1, 13.0, 5.0),
+                      new GoalSpotRMS(prescription, 2, 20.0, 2.0),
+                      new GoalSpotMaxRadius(prescription, 1, 25.0, 5.0),
+                      new GoalSpotMaxRadius(prescription, 2, 50.0, 2.0),
+                      new GoalParax(prescription, ParaxialFirstOrderInfo.Effective_focal_length,52.4, 1.0),
+                      new GoalParax(prescription, ParaxialFirstOrderInfo.Enp_dist, 42.9, 1.0)
                 });
         var lm = f.getSolver();
         int istatus = 0;

@@ -27,8 +27,10 @@ public class Prescription {
 
     public double focalLength;
     public double fno;
+    // The quoted angle of view - e.g. 47 degrees for 50mm
     public double angleOfViewDegrees;
-    public double imageHeight;
+    // For 35mm this is sqrt(36^2 + 24^2) = 43.27
+    public double diameterImageCircle;
     public boolean d_line;
 
     // Used to build
@@ -45,11 +47,11 @@ public class Prescription {
     public double field2 = 0.7;
     public double field3 = 1.0;
 
-    public Prescription(double focalLength, double fno, double angleOfViewDegrees, double imageHeight, boolean d_line) {
+    public Prescription(double focalLength, double fno, double angleOfViewDegrees, double diameterImageCircle, boolean d_line) {
         this.focalLength = focalLength;
         this.fno = fno;
         this.angleOfViewDegrees = angleOfViewDegrees;
-        this.imageHeight = imageHeight;
+        this.diameterImageCircle = diameterImageCircle;
         this.d_line = d_line;
     }
 
@@ -89,6 +91,29 @@ public class Prescription {
             throw new IllegalArgumentException();
         return this;
     }
+
+    /**
+     * The diameter for given field
+     */
+    public double imageDiameterForField(double field) {
+        assert field >= 0 && field <= 1.0;
+        return diameterImageCircle*field;
+    }
+
+    /**
+     * Full angle of view in degrees for given field
+     */
+//    public double fullAngleOfViewDegrees(double field) {
+//        assert field > 0 && field <= 1.0;
+//        var radius = imageDiameterForField(field)/2.0;
+//        var radians = Math.atan(radius/focalLength);
+//        return 2.0*Math.toDegrees(radians);
+//    }
+    public double fullAngleOfViewDegrees(double field) {
+        assert field > 0 && field <= 1.0;
+        return Math.toDegrees(Math.atan(Math.tan(Math.toRadians(angleOfViewDegrees/2.0))*field))*2.0;
+    }
+
     public Prescription build() {
         this.surfaces = surfaceList.toArray(new SurfaceType[surfaceList.size()]);
         return this;
@@ -131,7 +156,7 @@ public class Prescription {
             image_pos += thickness;
         }
         sys.add(lens);
-        Image.Builder image = new Image.Builder().position(new Vector3Pair(new Vector3(0, 0, image_pos), Vector3.vector3_001)).curve(Flat.flat).shape(new Rectangle(imageHeight * 2.));
+        Image.Builder image = new Image.Builder().position(new Vector3Pair(new Vector3(0, 0, image_pos), Vector3.vector3_001)).curve(Flat.flat).shape(new Rectangle(diameterImageCircle * 2.));
         sys.add(image);
         sys.angle_of_view(this.angleOfViewDegrees);
         sys.f_number(this.fno);

@@ -3,9 +3,6 @@ package org.redukti.jfotoptix.optim;
 import org.redukti.jfotoptix.math.LMLFunction;
 import org.redukti.jfotoptix.math.LMLSolver;
 import org.redukti.jfotoptix.math.MathUtils;
-import org.redukti.jfotoptix.spec.Prescription;
-
-import java.util.Arrays;
 
 import static org.redukti.jfotoptix.math.LMLSolver.BIGVAL;
 
@@ -14,13 +11,13 @@ public class MeritFunction implements LMLFunction {
         private double jac[][];
         private double resid[] ;
         private double point[]; // x,y at the first surface
-        private Prescription prescription;
+        private Analysis analysis;
         private Var[] vars;
         private Goal[] outs;
         private double tol = 1E-6;
 
-        public MeritFunction(Prescription prescription, Var[] vars, Goal[] outs) {
-            this.prescription = prescription;
+        public MeritFunction(Analysis analysis, Var[] vars, Goal[] outs) {
+            this.analysis = analysis;
             this.vars = vars;
             this.outs = outs;
             this.resid = new double[outs.length];
@@ -34,14 +31,14 @@ public class MeritFunction implements LMLFunction {
                 vars[i].shift(point[i]);
             }
             try {
-                prescription.compute();
+                analysis.compute();
             }
             catch (Exception e) {
                 return BIGVAL;
             }
             double sos = 0.0;
             for (int i = 0; i < outs.length; i++) {
-                resid[i] = (outs[i].target - outs[i].value())*outs[i].weight;
+                resid[i] = (outs[i].target - outs[i]. value())*outs[i].weight;
                 sos += MathUtils.square(resid[i]);
             }
             return Math.sqrt(sos / outs.length);

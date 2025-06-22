@@ -33,7 +33,8 @@ public class NoctNikkor58Optim2 {
 
     public static void main(String[] args) {
         var prescription = getPrescription();
-        var f = new MeritFunction(prescription,
+        var analysis = new Analysis(prescription);
+        var f = new MeritFunction(analysis,
                 new Var[] {
                      new VarRadius(prescription, 0),
                      //new VarAsphCoeff(prescription,0,0),
@@ -54,15 +55,15 @@ public class NoctNikkor58Optim2 {
                      new VarThickness(prescription, 13)
                 },
                 new Goal[] {
-                      new GoalSpotRMS(prescription, 1, 13.0, 5.0),
-                      new GoalSpotRMS(prescription, 2, 20.0, 2.0),
-                      new GoalSpotMaxRadius(prescription, 1, 25.0, 5.0),
-                      new GoalSpotMaxRadius(prescription, 2, 50.0, 2.0),
-                      new GoalParax(prescription, ParaxialFirstOrderInfo.Effective_focal_length,58.0, 1.0),
-                      new GoalParax(prescription, ParaxialFirstOrderInfo.Fno, 1.2, 1.0),
-                      new GoalParax(prescription, ParaxialFirstOrderInfo.Back_focal_length, 37.78, 1.0),
-                      new GoalParax(prescription, ParaxialFirstOrderInfo.Pp1, 51.8, 1.0),
-                      new GoalParax(prescription, ParaxialFirstOrderInfo.Ppk, 20.2, 1.0)
+                      new GoalSpotRMS(analysis, 1, 13.0, 5.0),
+                      new GoalSpotRMS(analysis, 2, 20.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 1, 25.0, 5.0),
+                      new GoalSpotMaxRadius(analysis, 2, 50.0, 2.0),
+                      new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,58.0, 1.0),
+                      new GoalParax(analysis, ParaxialFirstOrderInfo.Fno, 1.2, 1.0),
+                      new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 37.78, 1.0),
+                      new GoalParax(analysis, ParaxialFirstOrderInfo.Pp1, 51.8, 1.0),
+                      new GoalParax(analysis, ParaxialFirstOrderInfo.Ppk, 20.2, 1.0)
                 });
         var lm = f.getSolver();
         int istatus = 0;

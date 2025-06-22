@@ -15,6 +15,8 @@ import org.redukti.jfotoptix.model.Lens;
 import org.redukti.jfotoptix.model.OpticalSystem;
 import org.redukti.jfotoptix.model.PointSource;
 import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
+import org.redukti.jfotoptix.patterns.Distribution;
+import org.redukti.jfotoptix.patterns.Pattern;
 import org.redukti.jfotoptix.shape.Disk;
 import org.redukti.jfotoptix.shape.Rectangle;
 
@@ -32,20 +34,11 @@ public class Prescription {
     // For 35mm this is sqrt(36^2 + 24^2) = 43.27
     public double diameterImageCircle;
     public boolean d_line;
+    public Distribution distribution;   // FIXME rename, used for ray finding only
 
     // Used to build
     public List<SurfaceType> surfaceList = new ArrayList<SurfaceType>();
     public SurfaceType[] surfaces;
-
-    public OpticalSystem sys1;
-    public double[] pfo;
-    public AnalysisSpot sys1Spot;
-    public OpticalSystem sys2;
-    public AnalysisSpot sys2Spot;
-    public OpticalSystem sys3;
-    public AnalysisSpot sys3Spot;
-    public double field2 = 0.7;
-    public double field3 = 1.0;
 
     public Prescription(double focalLength, double fno, double angleOfViewDegrees, double diameterImageCircle, boolean d_line) {
         this.focalLength = focalLength;
@@ -53,6 +46,7 @@ public class Prescription {
         this.angleOfViewDegrees = angleOfViewDegrees;
         this.diameterImageCircle = diameterImageCircle;
         this.d_line = d_line;
+        this.distribution = new Distribution(Pattern.UserDefined,10, 0.999);
     }
 
     public Prescription surf(double radius, double thickness, double diameter, double nd, double vd, String glassName) {
@@ -75,20 +69,6 @@ public class Prescription {
         var lastSurface = surfaceList.get(surfaceList.size()-1);
         lastSurface.k = k;
         lastSurface.coeffs = coeffs;
-        return this;
-    }
-    public Prescription field2(double value) {
-        if (value > 0.0 && value <= 1.0)
-            field2 = value;
-        else
-            throw new IllegalArgumentException();
-        return this;
-    }
-    public Prescription field3(double value) {
-        if (value > 0.0 && value <= 1.0)
-            field3 = value;
-        else
-            throw new IllegalArgumentException();
         return this;
     }
 
@@ -118,25 +98,17 @@ public class Prescription {
         this.surfaces = surfaceList.toArray(new SurfaceType[surfaceList.size()]);
         return this;
     }
-    public void compute() {
-        sys1 = buildSystem(true,0.0).build();
-        sys2 = buildSystem(true,field2).build();
-        sys3 = buildSystem(true,field3).build();
-        sys1Spot = new AnalysisSpot(sys1,10).process_analysis();
-        sys2Spot = new AnalysisSpot(sys2,10).process_analysis();
-        sys3Spot = new AnalysisSpot(sys3,10).process_analysis();
-        pfo = ParaxialFirstOrderInfo.compute(sys1).asArray();
-    }
     public OpticalSystem.Builder buildSystem(boolean addPointSource, double field) {
         OpticalSystem.Builder sys = new OpticalSystem.Builder();
         if (addPointSource) {
             Vector3 direction = Vector3.vector3_001;
-            if (field != 0.0) {
+            if (field != 0.0 || angleOfViewDegrees != 0.0) {
                 // Construct unit vector at an angle
                 //      double z1 = cos (angleOfView);
                 //      double y1 = sin (angleOfView);
                 //      unit_vector = math::Vector3 (0, y1, z1);
-                double aov = Math.toRadians(angleOfViewDegrees*field) / 2.0;
+                double effectiveAngle = field != 0? angleOfViewDegrees*field : angleOfViewDegrees;
+                double aov = Math.toRadians(effectiveAngle) / 2.0;
                 Matrix3 r = Matrix3.get_rotation_matrix(0, aov);
                 direction = r.times(direction);
             }

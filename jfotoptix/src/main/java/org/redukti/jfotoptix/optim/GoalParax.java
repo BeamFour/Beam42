@@ -5,13 +5,13 @@ import org.redukti.jfotoptix.spec.Prescription;
 
 public class GoalParax extends Goal {
     public final int paraxId;
-    public GoalParax(Prescription prescription, int paraxId, double target, double weight) {
-        super(prescription,target,weight);
+    public GoalParax(Analysis analysis, int paraxId, double target, double weight) {
+        super(analysis,target,weight);
         this.paraxId = paraxId;
     }
     @Override
     public double value() {
-        return prescription.pfo[paraxId];
+        return analysis.pfo[paraxId];
     }
     @Override
     public String toString() {

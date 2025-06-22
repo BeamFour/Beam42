@@ -23,8 +23,6 @@ public class Noctilux50Optim2 {
                 .surf(549.3168895825511,	0.1, 35.286)
                 .surf(83.0795202171,	4,		33.429,1.788,	47.49,	"N-LAF21")
                 .surf(-197.873443,	27.365, 	33.429)
-                .field2(0.3)
-                .field3(0.7)
                 .build();
         return prescription;
     }
@@ -53,7 +51,10 @@ public class Noctilux50Optim2 {
 
     public static void main(String[] args) {
         var prescription = getPrescription();
-        var f = new MeritFunction(prescription,
+        var analysis = new Analysis(prescription)
+                .field2(0.3)
+                .field3(0.7);
+        var f = new MeritFunction(analysis,
                 new Var[] {
                      new VarRadius(prescription,0),
                      new VarRadius(prescription,1),
@@ -71,14 +72,14 @@ public class Noctilux50Optim2 {
                      new VarThickness(prescription,13)
                 },
                 new Goal[] {
-                      new GoalSpotRMS(prescription, 1, 13.0, 7.0),
-                      new GoalSpotRMS(prescription, 2, 30.0, 2.0),
-                      new GoalSpotRMS(prescription, 3, 60.0, 2.0),
-                      new GoalSpotMaxRadius(prescription, 1, 37.0, 5.0),
-                      new GoalSpotMaxRadius(prescription, 2, 100.0, 2.0),
-                      new GoalSpotMaxRadius(prescription, 3, 250.0, 2.0),
-                      new GoalParax(prescription, ParaxialFirstOrderInfo.Effective_focal_length,52.4, 1.0),
-                      new GoalParax(prescription, ParaxialFirstOrderInfo.Enp_dist, 42.9, 1.0)
+                      new GoalSpotRMS(analysis, 1, 13.0, 7.0),
+                      new GoalSpotRMS(analysis, 2, 30.0, 2.0),
+                      new GoalSpotRMS(analysis, 3, 60.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 1, 37.0, 5.0),
+                      new GoalSpotMaxRadius(analysis, 2, 100.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 3, 250.0, 2.0),
+                      new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,52.4, 1.0),
+                      new GoalParax(analysis, ParaxialFirstOrderInfo.Enp_dist, 42.9, 1.0)
                 });
         var lm = f.getSolver();
         int istatus = 0;

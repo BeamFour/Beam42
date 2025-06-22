@@ -44,7 +44,8 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.redukti.jfotoptix.tools.LensTool</mainClass>
+                            <!-- <mainClass>org.redukti.jfotoptix.tools.LensTool</mainClass> -->
+                            <mainClass>org.redukti.jfotoptix.examples.NoctNikkor58YNU</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

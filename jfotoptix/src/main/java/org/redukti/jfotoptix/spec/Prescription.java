@@ -27,18 +27,20 @@ import java.util.List;
 // trying to optimize
 public class Prescription {
 
-    public double focalLength;
-    public double fno;
+    public final double focalLength;
+    public final double fno;
     // The quoted angle of view - e.g. 47 degrees for 50mm
-    public double angleOfViewDegrees;
+    public final double angleOfViewDegrees;
     // For 35mm this is sqrt(36^2 + 24^2) = 43.27
-    public double diameterImageCircle;
-    public boolean d_line;
-    public Distribution distribution;   // FIXME rename, used for ray finding only
+    public final double diameterImageCircle;
+    public final boolean d_line;
 
     // Used to build
     public List<SurfaceType> surfaceList = new ArrayList<SurfaceType>();
     public SurfaceType[] surfaces;
+
+    public Distribution distribution;   // FIXME rename, used for ray finding only
+    public double varAoV = 0.0;
 
     public Prescription(double focalLength, double fno, double angleOfViewDegrees, double diameterImageCircle, boolean d_line) {
         this.focalLength = focalLength;
@@ -102,12 +104,12 @@ public class Prescription {
             Vector3 direction = Vector3.vector3_001;
             // angleOfViewDegrees may be set when we are called
             // by the ray finder
-            if (field != 0.0 || angleOfViewDegrees != 0.0) {
+            if (field != 0.0 || varAoV != 0.0) {
                 // Construct unit vector at an angle
                 //      double z1 = cos (angleOfView);
                 //      double y1 = sin (angleOfView);
                 //      unit_vector = math::Vector3 (0, y1, z1);
-                double effectiveAngle = field != 0? angleOfViewDegrees*field : angleOfViewDegrees;
+                double effectiveAngle = field != 0? angleOfViewDegrees*field : varAoV;
                 double aov = Math.toRadians(effectiveAngle) / 2.0;
                 Matrix3 r = Matrix3.get_rotation_matrix(0, aov);
                 direction = r.times(direction);

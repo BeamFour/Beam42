@@ -10,13 +10,28 @@ import org.redukti.jfotoptix.tracing.RayTraceResults;
 public class Analysis {
 
     public Prescription prescription;
+    /**
+     * By default, the sys1 system is for parallel rays (field 0)
+     * but if being used to find rays then the angle of view is variable
+     * and set by the optimizer
+     */
     public OpticalSystem sys1;
     public double[] pfo;
     public AnalysisSpot sys1Spot;
+    /**
+     * Sys2 system is set up for field2
+     */
     public OpticalSystem sys2;
     public AnalysisSpot sys2Spot;
+    /**
+     * Sys3 system is set up for field3
+     */
     public OpticalSystem sys3;
     public AnalysisSpot sys3Spot;
+    /**
+     * Results for tracing a single ray
+     * used for ray finding
+     */
     public RayTraceResults singleRayTraceResults;
     public double field2 = 0.7;
     public boolean enableField2 = false;
@@ -44,7 +59,6 @@ public class Analysis {
             throw new IllegalArgumentException();
         return this;
     }
-
     public void compute() {
         sys1 = prescription.buildSystem(true,0.0).build();
         sys1Spot = new AnalysisSpot(sys1,10).process_analysis();

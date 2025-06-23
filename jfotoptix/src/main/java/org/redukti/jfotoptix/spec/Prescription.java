@@ -83,17 +83,15 @@ public class Prescription {
     /**
      * Full angle of view in degrees for given field
      */
-//    public double fullAngleOfViewDegrees(double field) {
-//        assert field > 0 && field <= 1.0;
-//        var radius = imageDiameterForField(field)/2.0;
-//        var radians = Math.atan(radius/focalLength);
-//        return 2.0*Math.toDegrees(radians);
-//    }
     public double fullAngleOfViewDegrees(double field) {
-        assert field > 0 && field <= 1.0;
-        return Math.toDegrees(Math.atan(Math.tan(Math.toRadians(angleOfViewDegrees/2.0))*field))*2.0;
+        if (field == 0.0) return 0.0;
+        if (field > 0 && field <= 1.0) {
+            var radius = imageDiameterForField(field)/2.0;
+            var radians = Math.atan(radius/focalLength);
+            return 2.0*Math.toDegrees(radians);
+        }
+        else throw new IllegalArgumentException("Field must be between 0 and 1.");
     }
-
     public Prescription build() {
         this.surfaces = surfaceList.toArray(new SurfaceType[surfaceList.size()]);
         return this;
@@ -102,6 +100,8 @@ public class Prescription {
         OpticalSystem.Builder sys = new OpticalSystem.Builder();
         if (addPointSource) {
             Vector3 direction = Vector3.vector3_001;
+            // angleOfViewDegrees may be set when we are called
+            // by the ray finder
             if (field != 0.0 || angleOfViewDegrees != 0.0) {
                 // Construct unit vector at an angle
                 //      double z1 = cos (angleOfView);

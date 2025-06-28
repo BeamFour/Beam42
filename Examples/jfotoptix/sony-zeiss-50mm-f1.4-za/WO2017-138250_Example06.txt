@@ -1,0 +1,51 @@
+[descriptive data]
+title	WO 2017/138250 Example 6 [NG]
+[metadata]
+NG	Patent aspherical data unreadable.
+[constants]
+[variable distances]
+Focal Length	82.55	undefined	undefined
+Angle of View	undefined	undefined	undefined
+F-Number	1.45	undefined	1.54
+Image Height	43.26	43.26	43.26
+Total Length	undefined	undefined	undefined
+Magnification(p)	0	-0.03	-0.15
+Magnification	0	-0.03796	-0.1505
+d0	Infinity	2171.69	544.08
+d11	2.000	5.439	17.915
+d15	17.915	14.477	2.000
+d22	25.360	25.360	25.360
+Bf	25.360	25.360	25.360
+[lens data]
+1	9999.000	4.736	1.72341	85.32	37.9
+2	-200.766	8.631		85.32	
+3	312.926	2.841	1.85134	67.98	40.1
+4	-754.681	1.800	1.51679	67.98	64.1
+5	50.899	26.470		60.98	
+6	-433.749	6.000	1.71735	65.32	29.5
+7	80.688	15.000	1.72916	71.64	54.6
+8	-132.311	6.121		71.64	
+9	AS	1.000		58.841
+10	218.081	10.830	1.59282	68.98	68.6
+11	-81.453	d11		68.98	
+12	-594.039	1.800	1.93889	66.80	28.1
+13	75.336	19.430		62.19
+14	181.463	4.352	2.10419	70.22	17.0
+15	-1007.000	d15		70.22
+16	120.640	9.500	1.80419	66.80	46.5
+17	-161.704	2.419		66.80
+18	99.396	18.990	1.80419	64.14	46.5
+19	-61.259	3.500	1.80518	64.14	25.4
+20	48.066	17.660		51.44
+21	-54.888	3.060	1.58312	51.72	59.3
+22	-86.857	d22		57.72
+[aspherical data]
+[figure]
+source	Data/WO2017-138250_Figure06.png
+originX	110
+originY	539
+ppmm	6.916
+[notes]
+Bill: CLD d0 computed and refined magnification.
+Figure appears to be for closest focus rather than infinity.
+Patent angle of view was clearly wrong.

@@ -1,0 +1,50 @@
+[descriptive data]
+title	WO 2017/138250 Example 3 [NG]
+[metadata]
+NG	Patent aspherical data unreadable.
+[constants]
+[variable distances]
+Focal Length	51.54	undefined	undefined
+Angle of View	45.58	undefined	undefined
+F-Number	1.45	undefined	1.58
+Image Height	43.26	43.26	43.26
+Total Length	undefined	undefined	undefined
+Magnification(p)	0	-0.03	-0.16
+Magnification	0	-0.03243	-0.1537
+d0	Infinity	1586.17	331.20
+d11	2.000	4.690	15.373
+d15	15.373	12.683	2.000
+d22	15.536	15.536	15.536
+Bf	15.536	15.536	15.536
+Aperture Diameter	36.525	36.525	36.525
+[lens data]
+1	9999.000	3.615	1.72341	48.10	37.9
+2	-145.001	4.699		48.10	
+3	110.928	4.305	1.85134	38.02	40.1
+4	-138.654	1.800	1.51679	38.02	64.1
+5	28.284	8.140		33.56	
+6	-59.944	5.165	1.71735	32.56	29.5
+7	39.249	10.590	1.72916	41.76	54.6
+8	-67.898	5.016		41.76
+9	AS	1.000		36.525
+10	81.463	8.518	1.59282	44.64	68.6
+11	-53.297	d11		44.64
+12	2340.952	1.800	1.83480	41.15	42.7
+13	42.266	3.000		36.43
+14	86.295	3.055	1.85510	39.31	22.1
+15	-3731.420	d15		39.31
+16	79.033	5.316	1.80419	36.14	46.5
+17	-73.445	0.500		36.14	
+18	75.335	9.892	1.80419	35.46	46.5
+19	-67.692	2.415	1.80518	35.46	25.4
+20	38.187	10.050		30.84	
+21	-39.149	1.800	1.58312	31.36	59.3
+22	-124.538	d22		34.26	
+[aspherical data]
+[figure]
+source	Data/WO2017-138250_Figure03.png
+originX	84
+originY	538
+ppmm	12.020
+[notes]
+Bill: CLD d0 computed and refined magnification.

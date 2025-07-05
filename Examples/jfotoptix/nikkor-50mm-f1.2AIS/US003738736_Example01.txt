@@ -34,3 +34,9 @@ originX	29
 originY	371
 ppmm	13.111
 [notes]
+NBFD2 - 797411
+J-LAF2 - 1.744 44.9
+SF8 - 1.69 31.1
+E-LASFH2 - 1.77 46.6
+LAL10 - 1.72 50.2
+FDS3 - 1.78 26.1

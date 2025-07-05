@@ -139,12 +139,12 @@ public class ZemaxExporter {
                 GCAT SCHOTT LACROIX HOYA HIKARI OHARA NIKON-HIKARI NIKON
                 RAIM 0 2 1 1 0 1 0 0 0
                 SDMA 0 1 0
-                FTYP 3 0 3 3 0 0 0
+                FTYP 3 0 5 3 0 0 0 5
                 ROPD 2
                 HYPR 0
                 PICB 1
                 XFLN 0 0 0 0 0 0 0 0 0 0 0 0
-                YFLN 0 15.141 21.63 0 0 0 0 0 0 0 0 0 0
+                YFLN 0 4.33 8.65 15.141 21.63 0 0 0 0 0 0 0 0
                 FWGN 1 1 1 1 1 1 1 1 1 1 1 1
                 VDXN 0 0 0 0 0 0 0 0 0 0 0 0
                 VDYN 0 0 0 0 0 0 0 0 0 0 0 0

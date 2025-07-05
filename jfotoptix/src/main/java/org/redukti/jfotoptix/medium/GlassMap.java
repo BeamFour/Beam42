@@ -758,7 +758,7 @@ public class GlassMap extends Solid {
         // Schott
         // Older
         glasses.put("K7",new GlassMap("Schott", "K7",1.51112,1.50854,1.517,60.41,0.0));
-        glasses.put("LAFN7",new GlassMap("Schott", "LAFN7",1.7495,1.74319,1.76464,34.95,-0.0025));
+        glasses.put("LAFN7",new GlassMap("Schott", "LAFN7",1.7495,1.74319,1.76464,34.95,-0.0025));  // A classic glass type with lead oxide as an essential component for outstanding optical properties.
         glasses.put("N-KZFS4HT",new GlassMap("Schott", "N-KZFS4HT",1.61336,1.60922,1.623,44.49,-0.01));
         glasses.put("N-LAF35",new GlassMap("Schott", "N-LAF35",1.7433,1.73876,1.75381,49.4,-0.0084));
         glasses.put("N-LASF45HT",new GlassMap("Schott", "N-LASF45HT",1.80107,1.79436,1.81726,34.97,0.0009));

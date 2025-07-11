@@ -5,8 +5,8 @@ import org.redukti.jfotoptix.spec.Prescription;
 public class VarAsphCoeff extends Var {
     public final int surfaceId;
     public final int index;
-    public VarAsphCoeff(Prescription prescription, int surfaceId, int index) {
-        super(prescription, prescription.surfaces[surfaceId].coeffs[index],1e-8);
+    public VarAsphCoeff(Prescription prescription, int surfaceId, int index, double ddelta) {
+        super(prescription, prescription.surfaces[surfaceId].coeffs[index],ddelta);
         this.surfaceId = surfaceId;
         this.index = index;
     }

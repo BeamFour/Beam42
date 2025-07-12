@@ -51,9 +51,7 @@ public class Noctilux50Optim2 {
 
     public static void main(String[] args) {
         var prescription = getPrescription();
-        var analysis = new Analysis(prescription)
-                .field2(0.3)
-                .field3(0.7);
+        var analysis = new Analysis(prescription, new double[]{0.3,0.7});
         var f = new MeritFunction(analysis,
                 new Var[] {
                      new VarRadius(prescription,0),

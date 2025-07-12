@@ -15,9 +15,7 @@ public class Nikkor58AFSOptim01 {
    }
     public static void main(String[] args) throws Exception {
         var prescription = getPrescription(args[0]);
-        var analysis = new Analysis(prescription)
-                .field2(0.3)
-                .field3(0.7);
+        var analysis = new Analysis(prescription, new double[]{0.3,0.7,1.0});
         var f = new MeritFunction(analysis,
                 new Var[] {
                      new VarRadius(prescription,0),
@@ -41,8 +39,8 @@ public class Nikkor58AFSOptim01 {
                      new VarRadius(prescription,12),
                      new VarRadius(prescription,13),
                      new VarRadius(prescription,14),
-                     //new VarAsphK(prescription,14),
-                     //new VarAsphCoeff(prescription,14,0,1.0e-8),
+//                     new VarAsphK(prescription,14),
+//                     new VarAsphCoeff(prescription,14,0,1.0e-8),
                      //new VarAsphCoeff(prescription,14,1,1.0e-10),
                      //new VarAsphCoeff(prescription,14,2,1.0e-12),
                      //new VarAsphCoeff(prescription,14,3,1.0e-14),
@@ -54,11 +52,13 @@ public class Nikkor58AFSOptim01 {
                       new GoalSpotRMS(analysis, 1, 10.0, 5.0),
                       new GoalSpotRMS(analysis, 2, 15.0, 2.0),
                       new GoalSpotRMS(analysis, 3, 25.0, 2.0),
-                      new GoalSpotMaxRadius(analysis, 1, 25.0, 5.0),
-                      new GoalSpotMaxRadius(analysis, 2, 80.0, 2.0),
-                      new GoalSpotMaxRadius(analysis, 3, 100.0, 2.0),
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,58.29, 5.0),
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Enp_dist, 28.745, 3.0),
+                      new GoalSpotRMS(analysis, 4, 45.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 1, 40.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 2, 50.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 3, 75.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 4, 100.0, 2.0),
+                      new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,58.29, 2.0),
+                      new GoalParax(analysis, ParaxialFirstOrderInfo.Enp_dist, 28.745, 1.0),
                       //new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 38.7, 1.0)
                 });
         var lm = f.getSolver();

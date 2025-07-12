@@ -379,11 +379,18 @@ public class OpticalBenchDataImporter {
             return false;
         }
 
-        double get_image_height() {
+        public double get_image_height() {
             Variable var = find_variable("Image Height");
             if (var != null)
                 return var.get_value_as_double(0);
             return 43.2; // Assume 35mm
+        }
+
+        public double get_focal_length() {
+            Variable var = find_variable("Focal Length");
+            if (var != null)
+                return var.get_value_as_double(0);
+            throw new IllegalArgumentException();
         }
 
         void parse_thickness(String value,

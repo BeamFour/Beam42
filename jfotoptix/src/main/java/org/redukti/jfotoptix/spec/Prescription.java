@@ -3,6 +3,7 @@ package org.redukti.jfotoptix.spec;
 import org.redukti.jfotoptix.analysis.AnalysisSpot;
 import org.redukti.jfotoptix.curve.Asphere;
 import org.redukti.jfotoptix.curve.Flat;
+import org.redukti.jfotoptix.importers.OpticalBenchDataImporter;
 import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.math.Matrix3;
 import org.redukti.jfotoptix.math.Vector3;
@@ -67,13 +68,18 @@ public class Prescription {
         surfaceList.add(new SurfaceType(Integer.toString(surfaceList.size()+1),true,0,thickness,diameter,0,0,null));
         return this;
     }
+    public Prescription field_stop(double thickness, double diameter) {
+        var surface = new SurfaceType(Integer.toString(surfaceList.size()+1),false,0,thickness,diameter,0,0,null);
+        surface.isFieldStop = true;
+        surfaceList.add(surface);
+        return this;
+    }
     public Prescription asph(double k, double[] coeffs) {
         var lastSurface = surfaceList.get(surfaceList.size()-1);
         lastSurface.k = k;
         lastSurface.coeffs = coeffs;
         return this;
     }
-
     /**
      * The diameter for given field
      */
@@ -98,6 +104,60 @@ public class Prescription {
         this.surfaces = surfaceList.toArray(new SurfaceType[surfaceList.size()]);
         return this;
     }
+    private Prescription import_surface(OpticalBenchDataImporter.LensSurface surface,
+                       int scenario, boolean use_glass_types) {
+        double thickness = surface.get_thickness(scenario);
+        double radius = surface.get_radius();
+        double refractive_index = surface.get_refractive_index();
+        double abbe_vd = surface.get_abbe_vd();
+        String glass_name = surface.get_glass_name();
+        if (surface.get_surface_type() == OpticalBenchDataImporter.SurfaceType.aperture_stop) {
+            stop(thickness,surface.get_diameter());
+            return this;
+        }
+        else if (surface.get_surface_type() == OpticalBenchDataImporter.SurfaceType.field_stop) {
+            field_stop(thickness,surface.get_diameter());
+            return this;
+        }
+        if (use_glass_types && glass_name != null && GlassMap.glassByName(glass_name) != null) {
+            surf(radius,thickness,surface.get_diameter(),refractive_index,abbe_vd,glass_name);
+        }
+        else if (refractive_index != 0.0) {
+            surf(radius,thickness,surface.get_diameter(),refractive_index, abbe_vd);
+        } else {
+            surf(radius,thickness,surface.get_diameter());
+        }
+        OpticalBenchDataImporter.AsphericalData aspherical_data = surface.get_aspherical_data();
+        if (aspherical_data != null) {
+            double k = aspherical_data.data(1);
+            double[] coeffs = new double[] {
+                    aspherical_data.data(2),
+                    aspherical_data.data(3),
+                    aspherical_data.data(4),
+                    aspherical_data.data(5),
+                    aspherical_data.data(6),
+                    aspherical_data.data(7),
+                    aspherical_data.data(8),
+                    aspherical_data.data(9),
+                    aspherical_data.data(10)};
+            asph(k,coeffs);
+        }
+        return this;
+    }
+
+    public static Prescription buildPrescription(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean use_glass_types) {
+        var prescription = new Prescription(specs.get_focal_length(),
+                    OpticalBenchDataImporter.get_f_number(specs,scenario),
+                OpticalBenchDataImporter.get_angle_of_view(specs,scenario)*2.0,
+                specs.get_image_height(),
+                false);
+        List<OpticalBenchDataImporter.LensSurface> surfaces = specs.get_surfaces();
+        for (int i = 0; i < surfaces.size(); i++) {
+            prescription.import_surface(surfaces.get(i),scenario,use_glass_types);
+        }
+        return prescription.build();
+    }
+
     public OpticalSystem.Builder buildSystem(boolean addPointSource, double field) {
         OpticalSystem.Builder sys = new OpticalSystem.Builder();
         if (addPointSource) {

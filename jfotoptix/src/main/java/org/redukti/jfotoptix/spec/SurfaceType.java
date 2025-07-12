@@ -6,6 +6,7 @@ public class SurfaceType {
     public double thickness;
     public double diameter;
     public boolean isStop;
+    public boolean isFieldStop;
     public double nd;
     public double vd;
     public String glassName;
@@ -28,6 +29,8 @@ public class SurfaceType {
         sb.append(id).append("\t");
         if (isStop)
             sb.append("AS");
+        else if (isFieldStop)
+            sb.append("FS");
         else
             sb.append(radius);
         sb.append("\t")

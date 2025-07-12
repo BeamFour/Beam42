@@ -39,7 +39,7 @@ public class Analysis {
         if (fields.length == 0)
             this.fields = new double[]{0.0};
         else {
-            if (this.fields[0] != 0.0) {
+            if (fields[0] != 0.0) {
                 this.fields = new double[fields.length+1];
                 this.fields[0] = 0.0;
                 for (int i = 0; i < fields.length; i++)

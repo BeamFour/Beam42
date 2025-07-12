@@ -37,9 +37,9 @@ public class Nikkor58AFSOptim {
                 new Var[] {
                      new VarRadius(prescription,0),
                      new VarAsphK(prescription,0),
-                     new VarAsphCoeff(prescription,0,0,1.0e-8),
-                     new VarAsphCoeff(prescription,0,1,1.0e-10),
-                     new VarAsphCoeff(prescription,0,2,1.0e-12),
+                     new VarAsphCoeff(prescription,0,0),
+                     new VarAsphCoeff(prescription,0,1),
+                     new VarAsphCoeff(prescription,0,2),
                      //new VarAsphCoeff(prescription,0,3,1.0e-14),
                      new VarRadius(prescription,1),
                      new VarRadius(prescription,2),
@@ -55,10 +55,10 @@ public class Nikkor58AFSOptim {
                      new VarRadius(prescription,13),
                      new VarRadius(prescription,14),
                      new VarAsphK(prescription,14),
-                     new VarAsphCoeff(prescription,14,0,1.0e-8),
-                     new VarAsphCoeff(prescription,14,1,1.0e-10),
-                     new VarAsphCoeff(prescription,14,2,1.0e-12),
-                     new VarAsphCoeff(prescription,14,3,1.0e-14),
+                     new VarAsphCoeff(prescription,14,0),
+                     new VarAsphCoeff(prescription,14,1),
+                     new VarAsphCoeff(prescription,14,2),
+                     new VarAsphCoeff(prescription,14,3),
                      //new VarThickness(prescription,14)
                 },
                 new Goal[] {

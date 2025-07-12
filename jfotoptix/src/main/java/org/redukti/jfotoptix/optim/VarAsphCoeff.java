@@ -7,10 +7,16 @@ public class VarAsphCoeff extends Var {
     public final int index;
     public final double scale;
     public VarAsphCoeff(Prescription prescription, int surfaceId, int index) {
-        super(prescription, prescription.surfaces[surfaceId].coeffs[index],0.001);
+        super(prescription, prescription.surfaces[surfaceId].coeffs[index],0.0001);
         this.surfaceId = surfaceId;
         this.index = index;
         this.scale = Math.pow(10.0,4+index);
+    }
+    public VarAsphCoeff(Prescription prescription, int surfaceId, int index,double scale) {
+        super(prescription, prescription.surfaces[surfaceId].coeffs[index],0.0001);
+        this.surfaceId = surfaceId;
+        this.index = index;
+        this.scale = scale;
     }
     @Override
     public void shift(double delta) {

@@ -215,9 +215,10 @@ public class NoctNikkor58 {
 
     static GlassType[] getGlassTypes() {
         return new GlassType[]{
-                new GlassType("J-SF5", 1.6727, 32.19),    // wakamiya J-SF5
                 new GlassType("S-TIM22", 1.64769, 33.79),   // US 4,234,242 50mm f1.8   S-TIM22
+                new GlassType("J-SF5", 1.6727, 32.19),    // wakamiya J-SF5
                 new GlassType("S-TIM28", 1.68893, 31.07),  // shimuzu - f1.2 US 3,738,736 S-TIM28
+                new GlassType("N-LAK9",1.691,54.71),
                 new GlassType("S-TIM35", 1.69895, 30.13),   // wakamiya S-TIM35
                 new GlassType("S-LAL8", 1.713, 53.87),     // shimuzu - f1.2 US 3,738,736 S-LAL8
                 new GlassType("J-SF1", 1.71736, 29.57),   // wakamiya J-SF1
@@ -228,14 +229,15 @@ public class NoctNikkor58 {
                 new GlassType("S-LAM2", 1.744, 44.78),     // shimuzu - f1.2 US 3,738,736 S-LAM2
                 new GlassType("J-SF4", 1.75520, 27.57),   // shimuzu - f1.2 US 3,738,736  J-SF4
                 new GlassType("J-LASFH2", 1.76684, 46.78),   // shimuzu - f1.2 US 3,738,736, US 4,234,242 J-LASFH2
-                new GlassType("J-LASF016", 1.7725, 46.62),   // wakamiya J-LASF016
+                new GlassType("J-LASF016", 1.7725, 49.62),   // wakamiya J-LASF016 TAF1
                 new GlassType("J-SFS3", 1.78470, 26.27),   // shimuzu - f1.2 US 3,738,736 J-SFS3
-                new GlassType("TAF4", 1.788, 47.37),   // wakamiya  S-LAH64 TAF4
+                new GlassType("TAF4", 1.788, 47.37),   // wakamiya  S-LAH64 TAF4  LAF21
                 new GlassType("J-LASF017", 1.795, 45.31),   // shimuzu - f1.2 US 3,738,736 J-LASF017?
                 new GlassType("TAF2", 1.7945, 45.4),  // 50mm f1.8s US 4234242 TAF2
                 new GlassType("J-LASF015", 1.8042, 46.52),   // wakamiya TAF3D    LASF015
+                new GlassType("S-LAH59",1.816,46.6),
                 new GlassType("J-LASFH22", 1.8485, 43.79),   // wakamiya  J-LASFH22
-                new GlassType("J-LASF08A", 1.883, 40.69)
+                new GlassType("J-LASF08A", 1.883, 40.69)    // S-LAH58
                 };
     }
 

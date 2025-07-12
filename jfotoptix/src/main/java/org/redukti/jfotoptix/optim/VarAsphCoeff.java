@@ -5,14 +5,24 @@ import org.redukti.jfotoptix.spec.Prescription;
 public class VarAsphCoeff extends Var {
     public final int surfaceId;
     public final int index;
-    public VarAsphCoeff(Prescription prescription, int surfaceId, int index, double ddelta) {
-        super(prescription, prescription.surfaces[surfaceId].coeffs[index],ddelta);
+    public final double scale;
+    public VarAsphCoeff(Prescription prescription, int surfaceId, int index) {
+        super(prescription, prescription.surfaces[surfaceId].coeffs[index],0.001);
         this.surfaceId = surfaceId;
         this.index = index;
+        this.scale = Math.pow(10.0,4+index);
     }
     @Override
     public void shift(double delta) {
-        prescription.surfaces[surfaceId].coeffs[index] = originalValue + delta;
+        if (delta != 0.0) {
+            double scaled = originalValue * scale;
+            double newValue = scaled + delta;
+            double unscaled = newValue / scale;
+            prescription.surfaces[surfaceId].coeffs[index] = unscaled;
+        }
+        else
+            prescription.surfaces[surfaceId].coeffs[index] = originalValue;
+
     }
     @Override
     public String toString() {

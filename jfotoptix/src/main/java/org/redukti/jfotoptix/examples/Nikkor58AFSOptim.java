@@ -32,7 +32,7 @@ public class Nikkor58AFSOptim {
 
     public static void main(String[] args) {
         var prescription = getPrescription();
-        var analysis = new Analysis(prescription, new double[]{0.3,0.7});
+        var analysis = new Analysis(prescription, new double[]{0.3,0.7,1.0});
         var f = new MeritFunction(analysis,
                 new Var[] {
                      new VarRadius(prescription,0),
@@ -64,10 +64,12 @@ public class Nikkor58AFSOptim {
                 new Goal[] {
                       new GoalSpotRMS(analysis, 1, 10.0, 7.0),
                       new GoalSpotRMS(analysis, 2, 25.0, 2.0),
-                      new GoalSpotRMS(analysis, 3, 35.0, 2.0),
-                      new GoalSpotMaxRadius(analysis, 1, 30.0, 5.0),
-                      new GoalSpotMaxRadius(analysis, 2, 175.0, 2.0),
-                      new GoalSpotMaxRadius(analysis, 3, 175.0, 2.0),
+                      new GoalSpotRMS(analysis, 3, 30.0, 2.0),
+                      new GoalSpotRMS(analysis, 4, 40.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 1, 40.0, 5.0),
+                      new GoalSpotMaxRadius(analysis, 2, 80.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 3, 100.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 4, 120.0, 2.0),
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,58.035, 3.0),
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Enp_dist, 29.4, 1.0),
                       //new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 38.7, 1.0)

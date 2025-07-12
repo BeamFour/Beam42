@@ -16,7 +16,6 @@ import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.jfotoptix.shape.Rectangle;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 // Takes too long to run for more than about 22 glasses (that takes 2 hrs as well)
 public class Noctilux50Optim {
@@ -134,7 +133,7 @@ public class Noctilux50Optim {
         sys.add(lens);
         Image.Builder image = new Image.Builder().position(new Vector3Pair(new Vector3(0, 0, image_pos), Vector3.vector3_001)).curve(Flat.flat).shape(new Rectangle(imageHeight * 2.));
         sys.add(image);
-        sys.angle_of_view(angleOfView);
+        sys.half_angle_of_view_in_degrees(angleOfView);
         sys.f_number(fNum);
         return sys;
     }

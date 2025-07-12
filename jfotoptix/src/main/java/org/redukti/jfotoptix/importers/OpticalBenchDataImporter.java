@@ -393,6 +393,16 @@ public class OpticalBenchDataImporter {
             throw new IllegalArgumentException();
         }
 
+        public double get_angle_of_view(LensSpecifications specs_, int scenario) {
+            Variable view_angles = specs_.find_variable("Angle of View");
+            return view_angles.get_value_as_double(scenario);
+        }
+
+        public double get_f_number(LensSpecifications specs, int scenario) {
+            Variable fnum = specs.find_variable("F-Number");
+            return fnum.get_value_as_double(scenario);
+        }
+
         void parse_thickness(String value,
                         LensSurface surface_builder) {
             if (value.length() == 0) {
@@ -557,18 +567,18 @@ public class OpticalBenchDataImporter {
                 .curve(Flat.flat)
                 .shape(new Rectangle(specs.get_image_height() * 2.));
         sys.add(image);
-        sys.angle_of_view(get_angle_of_view(specs, scenario));
+        sys.half_angle_of_view_in_degrees(get_half_angle_of_view_in_degrees(specs, scenario));
         sys.f_number(get_f_number(specs, scenario));
         return sys;
     }
 
-    public static double get_angle_of_view_in_radians(LensSpecifications specs_, int scenario) {
+    public static double get_half_angle_of_view_in_radians(LensSpecifications specs_, int scenario) {
         Variable view_angles = specs_.find_variable("Angle of View");
         return Math.toRadians(view_angles.get_value_as_double(scenario)
                 / 2.0);
     }
 
-    public static double get_angle_of_view(LensSpecifications specs_, int scenario) {
+    public static double get_half_angle_of_view_in_degrees(LensSpecifications specs_, int scenario) {
         Variable view_angles = specs_.find_variable("Angle of View");
         return view_angles.get_value_as_double(scenario)
                 / 2.0;

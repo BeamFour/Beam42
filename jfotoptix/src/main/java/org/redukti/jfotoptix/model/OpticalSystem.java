@@ -38,7 +38,7 @@ public class OpticalSystem implements Container {
     protected final List<Element> _elements;
     protected final Transform3Cache _transform3Cache;
     // full angle of view in degrees
-    protected double _angle_of_view;
+    protected double _half_angle_of_view_in_degrees;
     protected double _f_number;
 
     @Override
@@ -46,15 +46,15 @@ public class OpticalSystem implements Container {
         return _elements;
     }
 
-    public OpticalSystem(List<Element> elements, Transform3Cache transform3Cache, double angle_of_view, double f_number) {
+    public OpticalSystem(List<Element> elements, Transform3Cache transform3Cache, double half_angle_of_view_in_degrees, double f_number) {
         this._elements = elements;
         this._transform3Cache = transform3Cache;
-        this._angle_of_view = angle_of_view;
+        this._half_angle_of_view_in_degrees = half_angle_of_view_in_degrees;
         this._f_number = f_number;
     }
 
-    public double get_angle_of_view() {
-        return this._angle_of_view;
+    public double get_half_angle_of_view_in_degrees() {
+        return this._half_angle_of_view_in_degrees;
     }
 
     public double get_f_number() {
@@ -207,8 +207,7 @@ public class OpticalSystem implements Container {
     public static class Builder {
         private final ArrayList<Element.Builder> elements = new ArrayList<>();
         private Transform3Cache transform3Cache;
-        // full angle of view in degrees
-        private double _angle_of_view;
+        private double _half_angle_of_view_in_degrees;
         private double _f_number;
 
         public Builder add(Element.Builder element) {
@@ -216,8 +215,8 @@ public class OpticalSystem implements Container {
             return this;
         }
 
-        public OpticalSystem.Builder angle_of_view(double v) {
-            this._angle_of_view = v;
+        public OpticalSystem.Builder half_angle_of_view_in_degrees(double v) {
+            this._half_angle_of_view_in_degrees = v;
             return this;
         }
 
@@ -230,7 +229,7 @@ public class OpticalSystem implements Container {
             generateIds();
             Transform3Cache transform3Cache = setCoordinates();
             List<Element> elements = buildElements();
-            OpticalSystem system = new OpticalSystem(elements, transform3Cache, _angle_of_view, _f_number);
+            OpticalSystem system = new OpticalSystem(elements, transform3Cache, _half_angle_of_view_in_degrees, _f_number);
             for (Element e: system.elements()) {
                 e.set_system(system);
             }

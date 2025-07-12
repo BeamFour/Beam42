@@ -198,7 +198,7 @@ public class ParaxialFirstOrderInfo {
         String field = "field";
         obj_img_key = "object";
         value_key = "angle";
-        double max_fld = system.get_angle_of_view();
+        double max_fld = system.get_half_angle_of_view_in_degrees();
         int fn = 1;
         double ang = 0.0;
         double slpbar0 = 0.0;

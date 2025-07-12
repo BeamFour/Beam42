@@ -1,19 +1,16 @@
 package org.redukti.jfotoptix.examples;
 
-import org.redukti.jfotoptix.analysis.AnalysisSpot;
 import org.redukti.jfotoptix.curve.Flat;
 import org.redukti.jfotoptix.fastparax.YNUTracer;
 import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.math.Matrix3;
 import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.math.Vector3Pair;
-import org.redukti.jfotoptix.medium.Abbe;
 import org.redukti.jfotoptix.medium.GlassMap;
 import org.redukti.jfotoptix.model.Image;
 import org.redukti.jfotoptix.model.Lens;
 import org.redukti.jfotoptix.model.OpticalSystem;
 import org.redukti.jfotoptix.model.PointSource;
-import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.jfotoptix.shape.Rectangle;
 
 import java.util.ArrayList;
@@ -243,7 +240,7 @@ public class NoctNikkor58YNU {
         sys.add(lens);
         Image.Builder image = new Image.Builder().position(new Vector3Pair(new Vector3(0, 0, image_pos), Vector3.vector3_001)).curve(Flat.flat).shape(new Rectangle(imageHeight * 2.));
         sys.add(image);
-        sys.angle_of_view(angleOfView);
+        sys.half_angle_of_view_in_degrees(angleOfView);
         sys.f_number(fNum);
         return sys;
     }

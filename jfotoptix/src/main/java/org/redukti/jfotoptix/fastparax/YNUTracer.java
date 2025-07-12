@@ -65,7 +65,7 @@ public class YNUTracer {
                 .toList();
         int numElements = elements.size();
         this.f_number = system.get_f_number();
-        this.max_fld = system.get_angle_of_view();
+        this.max_fld = system.get_half_angle_of_view_in_degrees();
         this.elements = elements.toArray(new Element[0]);
         glass_names = glassNames;
         glass_nd = new double[glassNames.length];

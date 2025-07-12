@@ -30,7 +30,7 @@ public class LensTool {
 
     public static OpticalSystem createSystem(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean use_glass_types, boolean skew_rays, double percent_skew,  boolean d_line) {
         OpticalSystem.Builder systemBuilder = OpticalBenchDataImporter.build_system(specs, scenario, use_glass_types);
-        double angleOfView = OpticalBenchDataImporter.get_angle_of_view_in_radians(specs, scenario);
+        double angleOfView = OpticalBenchDataImporter.get_half_angle_of_view_in_radians(specs, scenario);
         Vector3 direction = Vector3.vector3_001;
         if (skew_rays) {
             // Construct unit vector at an angle

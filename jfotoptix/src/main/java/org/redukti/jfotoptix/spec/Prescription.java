@@ -1,6 +1,5 @@
 package org.redukti.jfotoptix.spec;
 
-import org.redukti.jfotoptix.analysis.AnalysisSpot;
 import org.redukti.jfotoptix.curve.Asphere;
 import org.redukti.jfotoptix.curve.Flat;
 import org.redukti.jfotoptix.importers.OpticalBenchDataImporter;
@@ -15,7 +14,6 @@ import org.redukti.jfotoptix.model.Image;
 import org.redukti.jfotoptix.model.Lens;
 import org.redukti.jfotoptix.model.OpticalSystem;
 import org.redukti.jfotoptix.model.PointSource;
-import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
 import org.redukti.jfotoptix.shape.Disk;
@@ -100,6 +98,9 @@ public class Prescription {
         }
         else throw new IllegalArgumentException("Field must be between 0 and 1.");
     }
+    public double getHalfAngleOfViewInDegrees() {
+        return angleOfViewDegrees/2.0;
+    }
     public Prescription build() {
         this.surfaces = surfaceList.toArray(new SurfaceType[surfaceList.size()]);
         return this;
@@ -146,9 +147,10 @@ public class Prescription {
     }
 
     public static Prescription buildPrescription(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean use_glass_types) {
-        var prescription = new Prescription(specs.get_focal_length(),
-                    OpticalBenchDataImporter.get_f_number(specs,scenario),
-                OpticalBenchDataImporter.get_angle_of_view(specs,scenario)*2.0,
+        var prescription = new Prescription(
+                specs.get_focal_length(),
+                specs.get_f_number(specs,scenario),
+                specs.get_angle_of_view(specs,scenario),
                 specs.get_image_height(),
                 false);
         List<OpticalBenchDataImporter.LensSurface> surfaces = specs.get_surfaces();
@@ -192,7 +194,7 @@ public class Prescription {
         sys.add(lens);
         Image.Builder image = new Image.Builder().position(new Vector3Pair(new Vector3(0, 0, image_pos), Vector3.vector3_001)).curve(Flat.flat).shape(new Rectangle(diameterImageCircle * 2.));
         sys.add(image);
-        sys.angle_of_view(this.angleOfViewDegrees);
+        sys.half_angle_of_view_in_degrees(getHalfAngleOfViewInDegrees());
         sys.f_number(this.fno);
         return sys;
     }

@@ -9,12 +9,7 @@ public class GoalSpotMaxRadius extends Goal {
 
     @Override
     public double value() {
-        if (field == 1)
-            return analysis.sys1Spot.get_max_radius();
-        else if (field >= 2)
-            return analysis.spots[field-2].get_max_radius();
-        else
-            throw new RuntimeException("Unsupported field: " + field);
+        return analysis.spots[field-1].get_max_radius();
     }
 
     @Override

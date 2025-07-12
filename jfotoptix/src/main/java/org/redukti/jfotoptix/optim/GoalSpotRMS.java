@@ -1,7 +1,5 @@
 package org.redukti.jfotoptix.optim;
 
-import org.redukti.jfotoptix.spec.Prescription;
-
 public class GoalSpotRMS extends Goal {
     public final int field;
     public GoalSpotRMS(Analysis analysis, int field, double target, double weight) {
@@ -11,12 +9,7 @@ public class GoalSpotRMS extends Goal {
 
     @Override
     public double value() {
-        if (field == 1)
-            return analysis.sys1Spot.get_rms_radius();
-        else if (field >= 2)
-            return analysis.spots[field-2].get_rms_radius();
-        else
-            throw new RuntimeException("Unsupported field: " + field);
+        return analysis.spots[field-1].get_rms_radius();
     }
 
     @Override

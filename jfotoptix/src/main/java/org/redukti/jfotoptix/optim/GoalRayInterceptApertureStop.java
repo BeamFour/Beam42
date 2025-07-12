@@ -17,7 +17,7 @@ public class GoalRayInterceptApertureStop extends Goal {
     @Override
     public double value() {
         var apertureStop = analysis
-                    .sys1.get_sequence()
+                    .systems[0].get_sequence()
                     .stream()
                     .filter(e -> e instanceof Stop.ApertureStop)
                     .map(e -> (Stop.ApertureStop)e)
@@ -42,7 +42,7 @@ public class GoalRayInterceptApertureStop extends Goal {
     @Override
     public String toString() {
         var apertureStop = analysis
-                    .sys1.get_sequence()
+                    .systems[0].get_sequence()
                     .stream()
                     .filter(e -> e instanceof Stop.ApertureStop)
                     .map(e -> (Stop.ApertureStop)e)

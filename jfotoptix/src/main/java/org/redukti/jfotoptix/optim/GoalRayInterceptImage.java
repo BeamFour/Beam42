@@ -17,7 +17,7 @@ public class GoalRayInterceptImage extends Goal {
     @Override
     public double value() {
         var image = (Image) analysis
-                .sys1
+                .systems[0]
                 .get_sequence()
                 .stream()
                 .filter(e-> e instanceof Image)
@@ -42,7 +42,7 @@ public class GoalRayInterceptImage extends Goal {
     @Override
     public String toString() {
         var image = (Image) analysis
-                .sys1
+                .systems[0]
                 .get_sequence()
                 .stream()
                 .filter(e-> e instanceof Image)

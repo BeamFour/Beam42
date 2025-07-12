@@ -28,7 +28,7 @@ public class VarRayDist extends Var {
             throw new RuntimeException("No user defined points");
         }
         var point = points.get(0);
-        System.out.println("Shifting Dist Point[" + index + "] from " + originalValue + " to " + (originalValue+delta));
+        //System.out.println("Shifting Dist Point[" + index + "] from " + originalValue + " to " + (originalValue+delta));
         var newPoint = point.set(index, originalValue + delta);
         prescription.distribution.set_user_defined_points(List.of(newPoint));
     }

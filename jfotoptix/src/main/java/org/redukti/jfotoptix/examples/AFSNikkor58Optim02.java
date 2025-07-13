@@ -5,7 +5,7 @@ import org.redukti.jfotoptix.optim.*;
 import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.jfotoptix.spec.Prescription;
 
-public class Nikkor58AFSOptim {
+public class AFSNikkor58Optim02 {
 
    private static Prescription getPrescription() {
         Prescription prescription = new Prescription(58.0216,1.45,41.72,43.2,false)

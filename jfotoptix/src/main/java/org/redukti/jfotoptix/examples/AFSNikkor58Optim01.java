@@ -6,7 +6,7 @@ import org.redukti.jfotoptix.optim.*;
 import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.jfotoptix.spec.Prescription;
 
-public class Nikkor58AFSOptim01 {
+public class AFSNikkor58Optim01 {
 
    public static Prescription getPrescription(String specfile) throws Exception {
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();

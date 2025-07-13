@@ -38,12 +38,12 @@ public class NoctNikkor58Optim3 {
                      //new VarThickness(prescription,16)
                 },
                 new Goal[] {
-                      new GoalSpotRMS(analysis, 1, 10.0, 7.0),
-                      new GoalSpotRMS(analysis, 2, 12.0, 5.0),
-                      new GoalSpotRMS(analysis, 3, 20.0, 2.0),
+                      new GoalSpotRMS(analysis, 1, 15.0, 5.0),
+                      new GoalSpotRMS(analysis, 2, 17.0, 5.0),
+                      new GoalSpotRMS(analysis, 3, 23.0, 2.0),
                       new GoalSpotRMS(analysis, 4, 30.0, 2.0),
                       new GoalSpotRMS(analysis, 5, 40.0, 2.0),
-                      new GoalSpotRMS(analysis, 6, 50.0, 2.0),
+                      new GoalSpotRMS(analysis, 6, 65.0, 3.0),
                       new GoalSpotMaxRadius(analysis, 1, 30.0, 2.0),
                       new GoalSpotMaxRadius(analysis, 2, 35.0, 2.0),
                       new GoalSpotMaxRadius(analysis, 3, 40.0, 2.0),

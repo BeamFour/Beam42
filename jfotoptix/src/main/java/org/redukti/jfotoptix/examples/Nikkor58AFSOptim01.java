@@ -15,7 +15,7 @@ public class Nikkor58AFSOptim01 {
    }
     public static void main(String[] args) throws Exception {
         var prescription = getPrescription(args[0]);
-        var analysis = new Analysis(prescription, new double[]{0.1,0.3,0.5,0.7,1.0});
+        var analysis = new Analysis(prescription, new double[]{0.1,0.3,0.5,0.7,1.0}).spotDensity(50);
         var f = new MeritFunction(analysis,
                 new Var[] {
                      new VarRadius(prescription,0),
@@ -55,10 +55,10 @@ public class Nikkor58AFSOptim01 {
                       new GoalSpotRMS(analysis, 4, 20.0, 2.0),
                       new GoalSpotRMS(analysis, 5, 30.0, 2.0),
                       new GoalSpotRMS(analysis, 6, 45.0, 2.0),
-                      new GoalSpotMaxRadius(analysis, 1, 30.0, 2.0),
-                      new GoalSpotMaxRadius(analysis, 2, 30.0, 2.0),
-                      new GoalSpotMaxRadius(analysis, 3, 40.0, 2.0),
-                      new GoalSpotMaxRadius(analysis, 4, 40.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 1, 40.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 2, 40.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 3, 60.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 4, 60.0, 2.0),
                       new GoalSpotMaxRadius(analysis, 5, 80.0, 2.0),
                       new GoalSpotMaxRadius(analysis, 6, 120.0, 2.0),
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,58.29, 2.0),
@@ -75,5 +75,4 @@ public class Nikkor58AFSOptim01 {
         System.out.println("Status = " + istatus);
         System.out.println(f.toString());
     }
-
 }

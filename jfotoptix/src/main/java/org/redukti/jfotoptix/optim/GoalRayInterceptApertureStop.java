@@ -8,6 +8,10 @@ import org.redukti.jfotoptix.tracing.TracedRay;
 
 import java.util.List;
 
+/**
+ * This goal is specialized to test ray intercept on the aperture
+ * It is primarily meant to be used for finding chief ray
+ */
 public class GoalRayInterceptApertureStop extends Goal {
     public final Vector2 targetPoint;
     public GoalRayInterceptApertureStop(Analysis analysis, Vector2 targetPoint, double weight) {

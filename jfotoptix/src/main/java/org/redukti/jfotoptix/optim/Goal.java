@@ -1,5 +1,8 @@
 package org.redukti.jfotoptix.optim;
 
+/**
+ * Goal represents a target we would like to achieve
+ */
 public abstract class Goal {
     public final Analysis analysis;
     public final double weight;

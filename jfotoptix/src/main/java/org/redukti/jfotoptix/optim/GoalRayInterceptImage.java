@@ -8,6 +8,12 @@ import org.redukti.jfotoptix.tracing.TracedRay;
 
 import java.util.List;
 
+/**
+ * This goal is for finding an intercept on the image place
+ * Because of the way it works, it tends to find a pair 0,y
+ * rather than x,y, because in both cases the merit function returns
+ * same result?
+ */
 public class GoalRayInterceptImage extends Goal {
     public final Vector2 targetPoint;
     public GoalRayInterceptImage(Analysis analysis, Vector2 targetPoint, double weight) {

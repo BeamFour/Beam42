@@ -9,6 +9,8 @@ import org.redukti.jfotoptix.tracing.RayTraceResults;
 
 public class Analysis {
 
+    public int spotDensity = 10;
+
     public Prescription prescription;
     public double[] pfo;
 
@@ -53,9 +55,12 @@ public class Analysis {
     public Analysis(Prescription prescription, double[] fields) {
         this(prescription,fields,false);
     }
-
     public Analysis(Prescription prescription) {
         this(prescription,new double[0],false);
+    }
+    public Analysis spotDensity(int density) {
+        this.spotDensity = density;
+        return this;
     }
 
     public void compute() {
@@ -63,7 +68,7 @@ public class Analysis {
         spots = new AnalysisSpot[fields.length];
         for (int i = 0; i < fields.length; i++) {
             systems[i] = prescription.buildSystem(true,fields[i]).build();
-            spots[i] = new AnalysisSpot(systems[i],10).process_analysis();
+            spots[i] = new AnalysisSpot(systems[i],spotDensity).process_analysis();
         }
         pfo = ParaxialFirstOrderInfo.compute(systems[0]).asArray();
         if (prescription.distribution.get_user_defined_points() != null) {

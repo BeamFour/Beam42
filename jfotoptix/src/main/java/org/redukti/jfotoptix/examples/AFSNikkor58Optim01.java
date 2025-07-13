@@ -55,11 +55,11 @@ public class AFSNikkor58Optim01 {
                       new GoalSpotRMS(analysis, 4, 20.0, 2.0),
                       new GoalSpotRMS(analysis, 5, 30.0, 2.0),
                       new GoalSpotRMS(analysis, 6, 45.0, 2.0),
-                      new GoalSpotMaxRadius(analysis, 1, 40.0, 2.0),
-                      new GoalSpotMaxRadius(analysis, 2, 40.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 1, 30.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 2, 30.0, 2.0),
                       new GoalSpotMaxRadius(analysis, 3, 60.0, 2.0),
                       new GoalSpotMaxRadius(analysis, 4, 60.0, 2.0),
-                      new GoalSpotMaxRadius(analysis, 5, 80.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 5, 90.0, 2.0),
                       new GoalSpotMaxRadius(analysis, 6, 120.0, 2.0),
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,58.29, 2.0),
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Enp_dist, 28.745, 1.0),
@@ -74,5 +74,6 @@ public class AFSNikkor58Optim01 {
         }
         System.out.println("Status = " + istatus);
         System.out.println(f.toString());
+        System.out.println(prescription.toString());
     }
 }

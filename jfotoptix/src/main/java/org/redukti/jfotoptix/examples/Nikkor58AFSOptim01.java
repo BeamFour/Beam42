@@ -15,7 +15,7 @@ public class Nikkor58AFSOptim01 {
    }
     public static void main(String[] args) throws Exception {
         var prescription = getPrescription(args[0]);
-        var analysis = new Analysis(prescription, new double[]{0.3,0.7,1.0});
+        var analysis = new Analysis(prescription, new double[]{0.1,0.3,0.5,0.7,1.0});
         var f = new MeritFunction(analysis,
                 new Var[] {
                      new VarRadius(prescription,0),
@@ -50,13 +50,17 @@ public class Nikkor58AFSOptim01 {
                 },
                 new Goal[] {
                       new GoalSpotRMS(analysis, 1, 10.0, 5.0),
-                      new GoalSpotRMS(analysis, 2, 15.0, 2.0),
-                      new GoalSpotRMS(analysis, 3, 25.0, 2.0),
-                      new GoalSpotRMS(analysis, 4, 45.0, 2.0),
-                      new GoalSpotMaxRadius(analysis, 1, 40.0, 2.0),
-                      new GoalSpotMaxRadius(analysis, 2, 50.0, 2.0),
-                      new GoalSpotMaxRadius(analysis, 3, 75.0, 2.0),
-                      new GoalSpotMaxRadius(analysis, 4, 100.0, 2.0),
+                      new GoalSpotRMS(analysis, 2, 10.0, 2.0),
+                      new GoalSpotRMS(analysis, 3, 20.0, 2.0),
+                      new GoalSpotRMS(analysis, 4, 20.0, 2.0),
+                      new GoalSpotRMS(analysis, 5, 30.0, 2.0),
+                      new GoalSpotRMS(analysis, 6, 45.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 1, 30.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 2, 30.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 3, 40.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 4, 40.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 5, 80.0, 2.0),
+                      new GoalSpotMaxRadius(analysis, 6, 120.0, 2.0),
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,58.29, 2.0),
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Enp_dist, 28.745, 1.0),
                       //new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 38.7, 1.0)

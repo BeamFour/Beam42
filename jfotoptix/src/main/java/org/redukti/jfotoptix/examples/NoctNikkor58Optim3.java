@@ -33,8 +33,8 @@ public class NoctNikkor58Optim3 {
                      new VarAsphK(prescription,0),
                      new VarAsphCoeff(prescription,0,0,1E6),
                      new VarAsphCoeff(prescription,0,1,1E9),
-//                     new VarAsphCoeff(prescription,0,2,1E13),
-//                     new VarAsphCoeff(prescription,0,3,1E16),
+                     new VarAsphCoeff(prescription,0,2,1E11),
+                     new VarAsphCoeff(prescription,0,3,1E14),
                      //new VarThickness(prescription,16)
                 },
                 new Goal[] {

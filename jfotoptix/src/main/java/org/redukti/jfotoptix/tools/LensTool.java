@@ -30,15 +30,15 @@ public class LensTool {
 
     public static OpticalSystem createSystem(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean use_glass_types, boolean skew_rays, double percent_skew,  boolean d_line) {
         OpticalSystem.Builder systemBuilder = OpticalBenchDataImporter.build_system(specs, scenario, use_glass_types);
-        double angleOfView = OpticalBenchDataImporter.get_half_angle_of_view_in_radians(specs, scenario);
+        double half_angle_of_view_in_radians = specs.get_half_angle_of_view_in_radians(scenario);
         Vector3 direction = Vector3.vector3_001;
         if (skew_rays) {
             // Construct unit vector at an angle
             //      double z1 = cos (angleOfView);
             //      double y1 = sin (angleOfView);
             //      unit_vector = math::Vector3 (0, y1, z1);
-            angleOfView *= percent_skew;
-            Matrix3 r = Matrix3.get_rotation_matrix(0, angleOfView);
+            half_angle_of_view_in_radians *= percent_skew;
+            Matrix3 r = Matrix3.get_rotation_matrix(0, half_angle_of_view_in_radians);
             direction = r.times(direction);
         }
         PointSource.Builder ps = new PointSource.Builder(PointSource.SourceInfinityMode.SourceAtInfinity, direction)

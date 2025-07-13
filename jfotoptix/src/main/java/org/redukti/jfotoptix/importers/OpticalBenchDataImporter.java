@@ -393,14 +393,26 @@ public class OpticalBenchDataImporter {
             throw new IllegalArgumentException();
         }
 
-        public double get_angle_of_view(LensSpecifications specs_, int scenario) {
-            Variable view_angles = specs_.find_variable("Angle of View");
+        public double get_angle_of_view(int scenario) {
+            Variable view_angles = find_variable("Angle of View");
             return view_angles.get_value_as_double(scenario);
         }
 
-        public double get_f_number(LensSpecifications specs, int scenario) {
-            Variable fnum = specs.find_variable("F-Number");
+        public double get_f_number(int scenario) {
+            Variable fnum = find_variable("F-Number");
             return fnum.get_value_as_double(scenario);
+        }
+
+        public double get_half_angle_of_view_in_radians(int scenario) {
+            Variable view_angles = find_variable("Angle of View");
+            return Math.toRadians(view_angles.get_value_as_double(scenario)
+                    / 2.0);
+        }
+
+        public double get_half_angle_of_view_in_degrees(int scenario) {
+            Variable view_angles = find_variable("Angle of View");
+            return view_angles.get_value_as_double(scenario)
+                    / 2.0;
         }
 
         void parse_thickness(String value,
@@ -567,25 +579,8 @@ public class OpticalBenchDataImporter {
                 .curve(Flat.flat)
                 .shape(new Rectangle(specs.get_image_height() * 2.));
         sys.add(image);
-        sys.half_angle_of_view_in_degrees(get_half_angle_of_view_in_degrees(specs, scenario));
-        sys.f_number(get_f_number(specs, scenario));
+        sys.half_angle_of_view_in_degrees(specs.get_half_angle_of_view_in_degrees(scenario));
+        sys.f_number(specs.get_f_number(scenario));
         return sys;
-    }
-
-    public static double get_half_angle_of_view_in_radians(LensSpecifications specs_, int scenario) {
-        Variable view_angles = specs_.find_variable("Angle of View");
-        return Math.toRadians(view_angles.get_value_as_double(scenario)
-                / 2.0);
-    }
-
-    public static double get_half_angle_of_view_in_degrees(LensSpecifications specs_, int scenario) {
-        Variable view_angles = specs_.find_variable("Angle of View");
-        return view_angles.get_value_as_double(scenario)
-                / 2.0;
-    }
-
-    public static double get_f_number(LensSpecifications specs, int scenario) {
-        Variable fnum = specs.find_variable("F-Number");
-        return fnum.get_value_as_double(scenario);
     }
 }

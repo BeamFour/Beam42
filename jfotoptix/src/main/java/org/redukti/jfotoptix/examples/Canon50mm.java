@@ -28,7 +28,7 @@ public class Canon50mm {
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file("C:\\work\\github\\goptical\\data\\canon-rf-50mmf1.2\\canon-rf-50mmf1.2.txt");
         OpticalSystem.Builder systemBuilder = OpticalBenchDataImporter.build_system(specs, 0, false);
-        double angleOfView = OpticalBenchDataImporter.get_half_angle_of_view_in_radians(specs, 0);
+        double half_angle_of_view_in_radians = specs.get_half_angle_of_view_in_radians(0);
         Vector3 direction = Vector3.vector3_001;
         boolean skew = true;
         if (skew)
@@ -38,7 +38,7 @@ public class Canon50mm {
             //      double y1 = sin (angleOfView);
             //      unit_vector = math::Vector3 (0, y1, z1);
 
-            Matrix3 r = Matrix3.get_rotation_matrix(0, angleOfView);
+            Matrix3 r = Matrix3.get_rotation_matrix(0, half_angle_of_view_in_radians);
             direction = r.times(direction);
         }
         PointSource.Builder ps = new PointSource.Builder(PointSource.SourceInfinityMode.SourceAtInfinity, direction)

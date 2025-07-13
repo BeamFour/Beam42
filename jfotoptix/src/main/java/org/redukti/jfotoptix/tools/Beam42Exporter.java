@@ -318,7 +318,7 @@ public class Beam42Exporter {
         Element firstSurface = system.get_sequence().stream().filter(e -> e instanceof OpticalSurface).findFirst().orElse(null);
         OpticalSurface s1 = (OpticalSurface) firstSurface;
 
-        double angleOfView = OpticalBenchDataImporter.get_half_angle_of_view_in_radians(specs, arguments.scenario);
+        double angleOfView = specs.get_half_angle_of_view_in_radians(arguments.scenario);
         Helper.createOutputFile(Helper.getOutputPath(arguments, ".RAY"), generate_rays_table(s1, 0.0));
         Helper.createOutputFile(Helper.getOutputPath(arguments, "-SKEW.RAY"), generate_rays_table(s1, angleOfView));
     }

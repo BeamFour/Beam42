@@ -149,8 +149,8 @@ public class Prescription {
     public static Prescription buildPrescription(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean use_glass_types) {
         var prescription = new Prescription(
                 specs.get_focal_length(),
-                specs.get_f_number(specs,scenario),
-                specs.get_angle_of_view(specs,scenario),
+                specs.get_f_number(scenario),
+                specs.get_angle_of_view(scenario),
                 specs.get_image_height(),
                 false);
         List<OpticalBenchDataImporter.LensSurface> surfaces = specs.get_surfaces();
@@ -249,9 +249,25 @@ public class Prescription {
     }
 
     public StringBuilder toOptBenchStr(StringBuilder sb) {
+        sb.append("[descriptive data]\n");
+        sb.append("[variable distances]\n");
+        sb.append("Focal Length\t").append(focalLength).append("\n");
+        sb.append("Angle of View\t").append(angleOfViewDegrees).append("\n");
+        sb.append("F-Number\t").append(fno).append("\n");
+        sb.append("Image Height\t").append(diameterImageCircle).append("\n");
+        sb.append("[lens data]\n");
         for (SurfaceType surface : surfaceList) {
             surface.toOptBenchStr(sb);
         }
+        sb.append("[aspherical data]\n");
+        for (SurfaceType surface : surfaceList) {
+            surface.asphericsToOptBenchStr(sb);
+        }
         return sb;
+    }
+
+    @Override
+    public String toString() {
+        return toOptBenchStr(new StringBuilder()).toString();
     }
 }

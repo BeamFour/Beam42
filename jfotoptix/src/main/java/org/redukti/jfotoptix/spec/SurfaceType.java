@@ -33,8 +33,7 @@ public class SurfaceType {
             sb.append("FS");
         else
             sb.append(radius);
-        sb.append("\t")
-                .append(thickness).append("\t");
+        sb.append("\t").append(thickness).append("\t");
         if (nd != 0.0)
             sb.append(nd);
         sb.append("\t");
@@ -44,6 +43,20 @@ public class SurfaceType {
         sb.append("\t");
         if (nd != 0.0 && glassName != null)
             sb.append(glassName);
+        sb.append("\n");
+        return sb;
+    }
+    public StringBuilder asphericsToOptBenchStr(StringBuilder sb) {
+        if (k == 0 && (coeffs == null || coeffs.length == 0))
+            return sb;
+        sb.append(id).append("\t");
+        sb.append(radius).append("\t");
+        sb.append(k).append("\t");
+        for (int i = 0; i < coeffs.length; i++) {
+            if (coeffs[i] == 0.0)
+                break;
+            sb.append(coeffs[i]).append("\t");
+        }
         sb.append("\n");
         return sb;
     }

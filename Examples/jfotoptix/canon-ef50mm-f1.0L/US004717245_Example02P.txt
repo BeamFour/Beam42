@@ -12,7 +12,7 @@ Total Length	undefined
 Magnification	0
 d0	Infinity
 Bf(p)	undefined
-Bf	38.71
+Bf	38.65
 [lens data]
 1	138.055	5.101	1.60311	60.55	60.7	N-SK14
 2	652.512	0.099		60.55	

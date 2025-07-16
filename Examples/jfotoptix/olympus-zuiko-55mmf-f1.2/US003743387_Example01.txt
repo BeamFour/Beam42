@@ -1,0 +1,33 @@
+[descriptive data]
+title	US 3,743,387 Example 1 (Olympus Zuiko Auto-S 55mm f1.2 G)
+[constants]
+Scaled	55	1
+[variable distances]
+Focal Length	55
+Angle of View	43
+F-Number	1.2
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf	37.9445
+[lens data]
+1	39.4075	6.0665	1.8030	45.85	46.6
+2	138.2590	0.1155		45.85
+3	25.8610	4.8950	1.8061	39.39	40.8
+4	39.5670	1.9085		39.39
+5	47.6465	1.7600	1.7618	37.00	27.1
+6	16.2635	9.9315		28.70
+6AS	AS	8.84		28.576
+7	-17.9685	1.7600	1.7283	28.92	28.5
+8	-97.7955	7.6340	1.7550	37.09	52.4
+9	-28.5615	0.0990		37.09
+10	-101.1670	5.5770	1.7130	39.17	53.9
+11	-31.5755	0.1155		39.17
+12	80.6025	3.4265	1.7130	34.80	53.9
+13	-917.2240	Bf		34.80	
+[figure]
+source	Data/US003743387_Figure01.png
+originX	141.85
+originY	518.61
+ppmm	14.192
+[notes]

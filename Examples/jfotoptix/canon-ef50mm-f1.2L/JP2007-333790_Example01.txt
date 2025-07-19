@@ -1,0 +1,42 @@
+[descriptive data]
+title	JP 2007-333790 Example 1
+[constants]
+[variable distances]
+Focal Length	51.7
+Angle of View	45.4
+F-Number	1.25
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf(p)	38.88
+Bf	38.33
+[lens data]
+1	61.844	4.99	1.772499	45.72	49.6
+2	411.251	0.24		45.72	
+3	28.537	5.34	1.834807	39.52	42.7
+4	41.757	1.14		37.58	
+5	54.433	2.16	1.639799	37.58	34.5
+6	19.579	12.95		32.18	
+7	AS	7.41		28.778
+8	-23.181	1.40	1.728250	31.12	28.5
+9	196.367	7.64	1.882997	34.70	40.8
+10	-29.011	0.45		34.70	
+11	-27.438	1.50	1.698947	34.70	30.1
+12	442.408	6.48	1.834807	39.08	42.7
+13	-41.024	0.15		39.08	
+14	146.157	5.87	1.804000	39.02	46.6
+15	-61.524	Bf		38.02	
+[aspherical data]
+14	146.157	0	-1.44531E-06	2.50160E-10	-1.46123E-13
+[figure]
+source	Data/JP2007-333790_Figure01.png
+originX	143.14
+originY	523.03
+ppmm	10.937
+[!figure]
+source	Data/JP2007-333790_Figure01P.png
+originX	87.56
+originY	137.92
+ppmm	2.784
+[notes]
+Bill: Not Canon EF50mm f1.2L USM

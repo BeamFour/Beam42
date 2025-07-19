@@ -43,3 +43,8 @@ originX	36
 originY	538
 ppmm	12.242
 [notes]
+converted to standard even aspheres
+The radius = 1/(2*A2)
+A2 = 0
+K = -1
+Rest of coefficients unchanged

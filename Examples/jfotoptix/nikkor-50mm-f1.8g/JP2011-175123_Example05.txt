@@ -1,0 +1,39 @@
+[descriptive data]
+title	JP 2011-175123 Example 5
+[constants]
+[variable distances]
+Focal Length	51.6	undefined
+Angle of View	46.10	undefined
+F-Number	1.85	undefined
+Total Length	77.06402	78.80311
+Image Height	43.26	43.26
+Magnification	0	-0.0333
+S	Infinity	1740
+d0	Infinity	1571.00
+Bf	40.16402	41.90311
+[lens data]
+1	37.3000	4.4	1.83481	32.88	42.72	J-LASF05
+2	300.5542	0.1		32.88	
+3	24.5000	2.9	1.83481	27.02	42.72	J-LASF05
+4	30.9227	1.3		24.05
+5	64.2355	1.3	1.68893	25.62	31.06	J-SF8
+6	18.9457	5.9		23.44	
+7	AS	5.3		20.721
+8	-20.6094	1.1	1.69895	22.38	30.13	J-SF15
+9	38.5017	2.9	1.77250	23.96	49.61	J-LASF016
+10	-269.9764	1.9		23.96	
+11	-97.2397	3.6	1.85135	25.44	40.04	M-TAFD305
+12	-33.8205	0.1		25.44	
+13	407.6013	2.6	1.80400	27.80	46.58	J-LASF015
+14	-5362.1017	0.5		27.80	
+15	1158.2078	3.0	1.77250	28.42	49.61	J-LASF016
+16	-38.4663	Bf		28.42	
+[aspherical data]
+11	-97.2397	0	-2.7883E-06	-3.8369E-09
+[figure]
+source	Data/JP2011-175123_Figure09.png
+originX	45.64
+originY	288.45
+ppmm	12.381
+[notes]
+Bill: d0 measured.

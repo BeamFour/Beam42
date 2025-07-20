@@ -1,0 +1,43 @@
+[descriptive data]
+title	JP 2011-175123 Example 1
+[constants]
+[variable distances]
+Focal Length	51.6	undefined
+Angle of View	46.14	undefined
+F-Number	1.85	undefined
+Total Length	76.16397	77.90701
+Image Height	43.26	43.26
+Magnification	0	-0.0333
+S	Infinity	1720
+d0	Infinity	1571.67
+Bf	40.16397	41.90701
+[lens data]
+1	40.0000	4.7	1.83481	32.28	42.73	J-LASF05
+2	381.8864	0.3		32.28	
+3	24.1500	2.9	1.80400	26.26	46.60	J-LASF015
+4	33.0000	1.5		24.80	
+5	79.4297	1.4	1.67270	24.80	32.19	J-SF5
+6	18.6247	5.9		22.56	
+7	AS	5.3		20.625
+8	-21.0783	1.1	1.69895	21.64	30.13	J-SF15
+9	48.0712	3.2	1.80400	23.74	46.60	J-LASF015
+10	-160.0000	1.9		23.74	
+11	-115.0000	0.1	1.55389	25.22	38.09
+12	-115.0000	3.6	1.77250	25.22	49.62	J-SF4
+13	-34.3596	0.1		25.22	
+14	435.5383	4.0	1.80400	26.54	46.60	J-LASF015
+15	-40.1003	Bf		26.54	
+[aspherical data]
+11	-115.0000	0	-4.1755E-06	-2.0235E-09
+[figure]
+source	Data/JP2011-175123_Figure01.png
+originX	28.60
+originY	341.53
+ppmm	14.885
+[!figure]
+source	Data/JP2011-175123_FigureP.png
+originX	54.52
+originY	80.38
+ppmm	2.115
+[notes]
+Bill: d0 measured. Not Nikon AF-S Nikkor 50mm f1.8G

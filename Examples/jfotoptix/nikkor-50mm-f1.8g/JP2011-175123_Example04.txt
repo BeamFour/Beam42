@@ -10,7 +10,7 @@ Image Height	43.26	43.26
 Magnification	0	-0.0333
 S	Infinity	1720
 d0	Infinity	1573.04
-Bf	40.16413	41.88397
+Bf	40.065	41.88397
 [lens data]
 1	35.3612	4.4	1.88300	32.24	40.77	J-LASF08A
 2	180.3711	0.1		32.24	

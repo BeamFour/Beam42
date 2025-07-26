@@ -1,0 +1,33 @@
+[descriptive data]
+title	US 4,234,242 Example 4
+[constants]
+Scaled	50	100
+[variable distances]
+Focal Length	50
+Angle of View	46
+F-Number	1.8
+Image Height	43.2
+Total Length	65.0
+Magnification	0
+d0	Infinity
+Bf	37.29
+[lens data]
+1	43.896	3.390	1.71300	28.06	53.9	J-LAK8
+2	1181.599	0.095		28.06
+3	19.719	4.360	1.71300	26.00	53.9	J-LAK8
+4	32.171	1.550		24.03	
+5	92.055	0.970	1.64831	24.03	33.8	SF12
+6	16.376	4.410		21.00
+6AS	AS	4.410		20.622
+7	-16.706	0.970	1.62004	20.76	36.3	J-F2
+8	-125.969	4.845	1.71300	23.84	53.9	J-LAK8
+9	-19.961	0.095		23.84
+10	104.454	2.520	1.71300	23.87	53.9	J-LAK8
+11	-80.184	Bf		23.87
+[figure]
+source	Data/US004234242_Figure02.png
+originX	38
+originY	509
+ppmm	22.484
+[notes]
+Bf amended

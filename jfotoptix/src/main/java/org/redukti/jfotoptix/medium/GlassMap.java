@@ -63,6 +63,10 @@ public class GlassMap extends Solid {
     public static Map<String, GlassMap> glasses = new HashMap<>();
     static {
         // hikari
+
+        // old
+        glasses.put("SF12", new GlassMap("Hikari","SF12",1.6483,1.6427,1.6619,33.77,0.0027)); // 70.406 487704 0.0027
+
         // old
         glasses.put("E-FK5", new GlassMap("Hikari","E-FK5",1.48749,1.48535,1.49227,70.406,0.0027)); // 70.406 487704 0.0027
         glasses.put("E-FK01", new GlassMap("Hikari","E-FK01",1.497,1.49514,1.50123,81.636,0.0299)); // 81.636 497816 0.0299

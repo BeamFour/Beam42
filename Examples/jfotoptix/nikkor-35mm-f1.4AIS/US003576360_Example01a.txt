@@ -10,7 +10,7 @@ Image Height	43.2
 Total Length	undefined
 Magnification	0
 d0	Infinity
-Bf	37.175
+Bf	37.165
 [lens data]
 1	45.403	2.0416	1.56883	42.50	56	J-BAK4
 2	24.889	4.2777		35.72

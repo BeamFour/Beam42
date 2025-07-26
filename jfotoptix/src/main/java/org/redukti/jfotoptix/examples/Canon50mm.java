@@ -26,7 +26,7 @@ public class Canon50mm {
     public static void main(String[] args) throws Exception {
 
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
-        specs.parse_file("C:\\work\\github\\goptical\\data\\canon-rf-50mmf1.2\\canon-rf-50mmf1.2.txt");
+        specs.parse_file(args[0]);
         OpticalSystem.Builder systemBuilder = OpticalBenchDataImporter.build_system(specs, 0, false);
         double half_angle_of_view_in_radians = specs.get_half_angle_of_view_in_radians(0);
         Vector3 direction = Vector3.vector3_001;

@@ -1,0 +1,40 @@
+[descriptive data]
+title	JP 1999-160615 Example 1 (Konica Minolta Hexanon 60mm F1.2 (1999))
+[constants]
+[variable distances]
+Focal Length	58.26	undefined
+Angle of View	40.53	undefined
+F-Number	1.24	undefined
+Image Height	43.2	43.2
+Magnification	0	-0.085
+d0	Infinity	717.02
+d9	6.70	7.90
+Bf(p)	undefined	undefined
+Bf	28.88	33.55
+[lens data]
+1	82.212	3.50	1.77250	52.70	49.6	TAF1
+2	155.652	0.20		52.70	
+3	46.616	5.50	1.77250	47.78	49.6	TAF1
+4	116.453	0.20		47.78	
+5	24.282	6.67	1.77250	39.51	49.6	TAF1
+6	37.324	2.00		37.84	
+7	43.350	2.34	1.84666	36.52	23.8	FDS90
+8	16.599	8.60		28.05
+9	AS	d9		26.628
+10	-23.022	1.83	1.69895	25.98	30.1	J-SF15
+11	64.890	7.13	1.80440	30.74	39.6	J-LASF013
+12	-28.656	0.20		30.74	
+13	80.976	3.40	1.80610	31.50	40.9	NBFD13
+14	-170.243	Bf		31.50	
+[figure]
+source	Data/JP1999-160615_Figure01.png
+originX	27.35
+originY	282.87
+ppmm	9.779
+[figure]
+source	Data/JP1999-160615_Figure01P.png
+originX	127.42
+originY	353.20
+ppmm	11.430
+[notes]
+Bill: d0 measured.

@@ -1,0 +1,35 @@
+[descriptive data]
+title	JP 1954-002028 Example 1
+[constants]
+Scaled	60	100
+[variable distances]
+Focal Length	60
+Angle of View	42
+F-Number	1.3
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf(p)	undefined
+Bf	26.93
+[lens data]
+1	61.2	3.9	1.62035	46.68	60.20
+2	149.4	0.06		46.68
+3	42	5.1	1.62035	44.59	60.20
+4	109.8	0.06		44.59
+5	24.6	6.00	1.67042	38.32	47.10
+6	45.6	3.60		38.32
+7	51	3.00	1.80515	33.68	25.50
+8	15.678	6.55		25.25
+8AS	AS	3.65		25.058
+9	-34.8	2.40	1.60342	24.66	38.00
+10	26.4	11.10	1.67042	25.58	47.10
+11	-20.7	1.20	1.53358	25.58	51.60
+12	-59.76	0.06		25.58
+13	45	4.80	1.67042	29.06	47.10
+14	-848.226	Bf		29.06
+[figure]
+source	Data/JP1954-002028_Figure01.png
+originX	54.50
+originY	489.96
+ppmm	10.614
+[notes]

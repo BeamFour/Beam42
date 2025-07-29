@@ -1,0 +1,40 @@
+[descriptive data]
+title	JP2025-108279 Example 1
+[constants]
+[variable distances]
+Focal Length	49.10
+Angle of View	47.88
+F-Number	3.56
+Total Length	36.58
+Image Height	43.26
+Magnification	0
+d0	Infinity
+Bf	33.14
+[lens data]
+1	25.402	1.10	1.48749	20.02	70.44	FC5
+2	16.246	2.67		18.36	
+3	27.070	2.81	1.88300	17.50	40.81	TAFD30
+4	51.591	0.46		17.50	
+5	16.622	5.07	1.72916	14.54	54.67	TAC8
+6	-49.139	1.13	1.60342	14.54	38.01	E-F5
+7	11.798	4.41		11.11
+8	AS	3.49		10.414
+9	-34.603	1.50	1.56732	10.66	42.84	E-FL6
+10	48.429	3.56	1.49700	13.14	81.61	FCD1
+11	-98.252	2.30		13.14	
+12	344.130	5.03	1.71300	18.72	53.94	LAC8
+13	-21.462	1.46		18.72	
+14	-21.458	1.60	1.68893	19.52	31.16	E-FD8
+15	-29.225	Bf		20.78	
+[figure]
+source	Data/JP2025-108279_Figure01.png
+originX	78.60
+originY	376.71
+ppmm	22.643
+[!figure]
+source	Data/JP2025-108279_Figure01P.png
+originX	42.52
+originY	217.51
+ppmm	17.653
+[notes]
+Bill: Bf not drawn to scale. Not quite Cosina APO-Lanthar 50mm F3.5 [Type 1 & 2]

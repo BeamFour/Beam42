@@ -9,7 +9,7 @@ Image Height	43.2
 Total Length	undefined
 Magnification	0
 d0	Infinity
-Bf	36.500
+Bf	36.430	36.5	36.4
 [lens data]
 1	50.193	1.500	1.58913	51.10	61.1	S-BAL35
 2	22.569	11.000		38.10	

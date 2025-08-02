@@ -1,0 +1,39 @@
+[descriptive data]
+title	US 3,291,553 Example 1 (Leica Summilux 50mm F1.4)
+[constants]
+SCaled	50	1
+[variable distances]
+Focal Length	50
+Angle of View	47
+F-Number	1.4
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf(p)	undefined
+Bf	27.60
+[lens data]
+1	39.99	5.11	1.7919	35.75	47.2
+2	140.10	2.86		35.08
+3	21.01	5.62	1.7919	30.20	47.2
+4	43.20	0.73		28.38
+5	57.84	2.35	1.7685	28.38	26.8
+6	14.34	5.62		22.28
+6AS	AS	5.01		22.008
+7	-18.45	1.16	1.7231	22.03	29.3
+8	-77.27	3.38	1.7919	25.11	47.2
+9	-23.99	0.10		25.11
+10	94.23	6.76	1.7479	23.91	44.7
+11	-14.97	2.42	1.7205	23.91	48.0
+12	-47.83	Bf		25.85
+[figure]
+source	Data/US003291553_Figure01P.png
+originX	33.81
+originY	206.36
+ppmm	10.572
+[figure]
+source	Data/US003291553_Figure01.png
+originX	93.55
+originY	332.16
+ppmm	12.094
+[notes]
+Bill: Required diameters larger than patent figure would suggest. Patent supports f/1.8

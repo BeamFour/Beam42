@@ -1,5 +1,9 @@
 [descriptive data]
 title	US 3,992,085 Example 1 (Canon FD24mm f1.4 SSC Aspherical)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US3992085	EX 1	1972	Kikuo Momiyama	Canon Inc 	https://patents.google.com/patent/US3992085A/en
+patent2	JP	JP S49-28336		1972	Kikuo Momiyama		https://worldwide.espacenet.com/patent/search?q=pn%3DJPS4928336A
+lens name	Canon FD 24mm f/1.4 S.S.C. Aspherical
 [constants]
 [variable distances]
 Focal Length	24.5

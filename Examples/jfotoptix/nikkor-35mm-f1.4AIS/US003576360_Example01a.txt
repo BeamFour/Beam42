@@ -1,5 +1,8 @@
 [descriptive data]
 title	US 3,576,360 Example 1 (Nikon AI Nikkor 35mm f/1.4S)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US3576360	EX 1	1968	Yoshiyuki Shimizu	Nikon Corp 	https://patents.google.com/patent/US3576360A/en
+lens name	AI Nikkor 35mm F1.4S
 [constants]
 Scaled	35	100.00
 [variable distances]
@@ -10,6 +13,7 @@ Image Height	43.2
 Total Length	undefined
 Magnification	0
 d0	Infinity
+Bf(o)	37.254
 Bf	37.165
 [lens data]
 1	45.403	2.0416	1.56883	42.50	56	J-BAK4

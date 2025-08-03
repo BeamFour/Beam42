@@ -1,5 +1,8 @@
 [descriptive data]
 title	US 3,738,736 Example 1
+#patent	country	number	example	year	inventors	org	link
+patent	US	US3738736	EX 1	1972	Yoshiyuki Shimizu	Nikon Corp	https://patents.google.com/patent/US3738736A
+lens name	AI Nikkor 50mm f1.2
 [constants]
 Scaled	51.6	100
 [variable distances]

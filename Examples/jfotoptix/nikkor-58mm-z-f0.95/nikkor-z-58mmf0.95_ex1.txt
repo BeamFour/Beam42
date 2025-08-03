@@ -1,5 +1,8 @@
 [descriptive data]								
-title	Nikkor-Z-58mmf0.95-WO2019229849A1							
+title	Nikkor-Z-58mmf0.95-WO2019229849A1
+#patent	country	number	example	year	inventors	org	link
+patent	US	US12025779B2	EX 1	2018	Keisuke TSUBONOYA, Hiroki Harada, Toshinori Take	Nikon Corp 	https://patents.google.com/patent/US12025779B2/en
+lens name	Nikkor Z 58mm f/0.95 Noct
 [variable distances]								
 Focal Length	59.62							
 Angle of View	39.96							

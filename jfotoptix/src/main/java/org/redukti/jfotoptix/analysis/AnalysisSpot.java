@@ -39,6 +39,8 @@ import org.redukti.jfotoptix.rendering.Renderer;
 import org.redukti.jfotoptix.rendering.RendererViewport;
 import org.redukti.jfotoptix.tracing.TracedRay;
 
+import java.text.DecimalFormat;
+
 /**
  Spot diagram analysis
 
@@ -60,6 +62,8 @@ public class AnalysisSpot extends AnalysisPointImage {
     protected double _useful_radius;
 
     protected PlotAxes _axes;
+
+    private static DecimalFormat decimalFormat = MathUtils.decimal_format();
 
     public AnalysisSpot(OpticalSystem system, int radial_density) {
         super(system, radial_density);
@@ -152,4 +156,18 @@ public class AnalysisSpot extends AnalysisPointImage {
         // Convert to mm (diff is um but squared?)
         return "Spot Result: RMS Radius " + _rms_radius * 1000.0 + " max radius " + _max_radius * 1000.0;
     }
+
+    public static StringBuilder toMarkdownTableHeader(StringBuilder sb) {
+        sb.append("| Field | Spot Mean Radius | Spot Max Radius |\n");
+        sb.append("| ---   | ---              | ---             |\n");
+        return sb;
+    }
+    public StringBuilder toMarkdownTableRow(StringBuilder sb, double field) {
+        sb.append(" | ").append(field)
+                .append(" | ").append(decimalFormat.format(get_rms_radius()))
+                .append(" | ").append(decimalFormat.format(get_max_radius()))
+                .append("|\n");
+        return sb;
+    }
+
 }

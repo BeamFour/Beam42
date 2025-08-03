@@ -1,5 +1,7 @@
 package org.redukti.jfotoptix.spec;
 
+import org.redukti.jfotoptix.medium.GlassMap;
+
 public class SurfaceType {
     public String id;
     public double radius;
@@ -60,6 +62,69 @@ public class SurfaceType {
         sb.append("\n");
         return sb;
     }
+    public boolean isAspheric() {
+        return k != 0 || (coeffs != null && coeffs.length > 0);
+    }
+    public static StringBuilder asphericMarkdownTableHeader(StringBuilder sb) {
+        sb.append("## Aspherical Data").append("\n");
+        sb.append("| ID  | k   | A4  | A6  | A8  | A10 | A12 | A14 | A16 | A18 |\n");
+        sb.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n");
+        return sb;
+    }
+    public StringBuilder ashericToMarkdownTableRow(StringBuilder sb) {
+        sb.append("| ").append(id);
+        sb.append(" | ").append(k);
+        for (int i = 0; i < 8; i++) {
+            if (coeffs != null && i < coeffs.length)
+                sb.append(" | ").append(coeffs[i]);
+            else
+                sb.append(" | 0 ");
+        }
+        sb.append(" |\n");
+        return sb;
+    }
+
+    public static StringBuilder toMarkdownTableHeader(StringBuilder sb) {
+        sb.append("## Surface Data").append("\n");
+        sb.append("Note that where glass types are shown the refractive index and abbe number is as per assigned glass type\n\n");
+        sb.append("| ID  | Radius | Thickness | Diameter | nd  | vd  | Glass Make | Glass |\n");
+        sb.append("| --- | ---    | ---       | ---      | --- | --- | ---        | ---   |\n");
+        return sb;
+    }
+    public StringBuilder toMarkdownTableRow(StringBuilder sb) {
+        sb.append("| ").append(id).append(" | ");
+        if (isStop)
+            sb.append("AS");
+        else if (isFieldStop)
+            sb.append("FS");
+        else
+            sb.append(radius);
+        sb.append(" | ").append(thickness).append(" | ");
+        sb.append(diameter).append(" | ");
+        String glassMaker = "";
+        if (nd != 0.0 && glassName != null) {
+            GlassMap glass = GlassMap.glassByName(glassName);
+            if (glass != null) {
+                nd = glass.nd;
+                vd = glass.vd;
+                glassMaker = glass.get_manufacturer();
+            }
+        }
+        if (nd != 0.0)
+            sb.append(nd);
+        sb.append(" | ");
+        if (nd != 0.0)
+            sb.append(vd);
+        sb.append(" | ");
+        if (nd != 0.0 && glassName != null) {
+            sb.append(glassMaker)
+                    .append(" | ")
+                    .append(glassName);
+        }
+        sb.append(" |\n");
+        return sb;
+    }
+
     public String toString() {
         return toOptBenchStr(new StringBuilder()).toString();
     }

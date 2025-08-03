@@ -13,6 +13,7 @@ import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
 import org.redukti.jfotoptix.rendering.RendererSvg;
 import org.redukti.jfotoptix.rendering.Rgb;
+import org.redukti.jfotoptix.spec.Prescription;
 import org.redukti.jfotoptix.tracing.RayTraceParameters;
 import org.redukti.jfotoptix.tracing.RayTraceRenderer;
 import org.redukti.jfotoptix.tracing.RayTraceResults;
@@ -97,6 +98,33 @@ public class LensTool {
         return spot;
     }
 
+    public static void createREADME(String specFile, OpticalBenchDataImporter.LensSpecifications specs, ParaxialFirstOrderInfo pfo, double[] fields, AnalysisSpot[] spots, Path output_file) throws Exception {
+        Prescription prescription = Prescription.buildPrescription(specs,0,true);
+        StringBuilder sb = prescription.toMarkdownStr(new StringBuilder());
+        sb.append("## Layouts\n");
+        sb.append("![Layout Only](./layoutonly.svg)\n");
+        sb.append("![Layout Only](./layout.svg)\n");
+        sb.append("![Layout Only](./layout-semi-skew.svg)\n");
+        sb.append("![Layout Only](./layout-skew.svg)\n");
+        sb.append("## Spot Diagrams\n");
+        sb.append("![Layout Only](./spot.svg)\n");
+        sb.append("![Layout Only](./spot-semi-skew.svg)\n");
+        sb.append("![Layout Only](./spot-skew.svg)\n");
+        sb.append("## Paraxial Parameters\n");
+        pfo.toMarkdown(sb);
+        sb.append("## Spot Analysis\n");
+        AnalysisSpot.toMarkdownTableHeader(sb);
+        for (int i = 0; i < fields.length; i++) {
+            spots[i].toMarkdownTableRow(sb,fields[i]);
+        }
+        String filename = Helper.getFilename(specFile);
+        String zmxFilename = Helper.replaceExtension(filename, ".zmx");
+        sb.append("## Resources\n");
+        sb.append("* [OpticalBench Compatible Data File, tab delimited](./" + filename + ")\n");
+        sb.append("* [Zemax file](./" + zmxFilename + ")\n");
+        Helper.createOutputFile(output_file,sb.toString());
+    }
+
     public static void main(String[] args) throws Exception {
         Args arguments = Args.parseArguments(args);
         if (arguments.specfile == null) {
@@ -127,12 +155,21 @@ public class LensTool {
             outputLayoutWithRays(semiSkewedSystem,Helper.getOutputPath(arguments.specfile,"layout-semi-skew.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
             outputLayoutWithRays(skewedSystem,Helper.getOutputPath(arguments.specfile,"layout-skew.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
             StringBuilder spotReport = new StringBuilder();
-            spotReport.append(outputSpotAnalysis(system,Helper.getOutputPath(arguments.specfile,"spot.svg",arguments.outdir),arguments.spot_density)).append("\n");
-            spotReport.append(outputSpotAnalysis(semiSkewedSystem,Helper.getOutputPath(arguments.specfile,"spot-semi-skew.svg",arguments.outdir),arguments.spot_density)).append("\n");
-            spotReport.append(outputSpotAnalysis(skewedSystem,Helper.getOutputPath(arguments.specfile,"spot-skew.svg",arguments.outdir),arguments.spot_density)).append("\n");
+            var spot0 = outputSpotAnalysis(system,Helper.getOutputPath(arguments.specfile,"spot.svg",arguments.outdir),arguments.spot_density);
+            var spot1 = outputSpotAnalysis(semiSkewedSystem,Helper.getOutputPath(arguments.specfile,"spot-semi-skew.svg",arguments.outdir),arguments.spot_density);
+            var spot2 = outputSpotAnalysis(skewedSystem,Helper.getOutputPath(arguments.specfile,"spot-skew.svg",arguments.outdir),arguments.spot_density);
+            spotReport.append(spot0).append("\n");
+            spotReport.append(spot1).append("\n");
+            spotReport.append(spot2).append("\n");
             Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"spot-report.txt",arguments.outdir), spotReport.toString());
             ZemaxExporter zemaxExporter = new ZemaxExporter();
             Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), zemaxExporter.generate(specs, arguments.scenario, arguments.only_d_line));
+            createREADME(arguments.specfile,
+                    specs,
+                    pfo,
+                    new double[] {0.0, 0.7, 1.0},
+                    new AnalysisSpot[] { spot0, spot1, spot2 },
+                    Helper.getOutputPath(arguments.specfile,"README.md",arguments.outdir));
         }
         catch (Exception e) {
             System.err.println("Failed due to: " + e.getMessage());

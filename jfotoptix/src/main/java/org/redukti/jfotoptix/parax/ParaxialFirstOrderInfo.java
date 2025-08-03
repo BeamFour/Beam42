@@ -9,8 +9,10 @@ package org.redukti.jfotoptix.parax;
 
 import org.redukti.jfotoptix.fastparax.YNUTracer;
 import org.redukti.jfotoptix.light.SpectralLine;
+import org.redukti.jfotoptix.math.MathUtils;
 import org.redukti.jfotoptix.model.*;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -128,6 +130,7 @@ public class ParaxialFirstOrderInfo {
     public double img_na;
 
     static final double DISTANCE = 1e10;
+    private static DecimalFormat decimalFormat = MathUtils.decimal_format();
 
     public static ParaxialFirstOrderInfo compute(OpticalSystem system) {
 
@@ -392,4 +395,32 @@ public class ParaxialFirstOrderInfo {
                 "\nimg_na                 " + img_na +
                 "\n";
     }
+    public StringBuilder toMarkdown(StringBuilder sb) {
+        sb.append("| parameter | value |\n");
+        sb.append("| ---       | ---   |\n");
+        return   sb.append("| effective_focal_length |" + decimalFormat.format(effective_focal_length) +
+                "\n| back_focal_length | " + decimalFormat.format(back_focal_length) +
+                "\n| optical_invariant | " + decimalFormat.format(optical_invariant) +
+                "\n| object_distance | " + object_distance +
+                "\n| image_distance | " + decimalFormat.format(image_distance) +
+                "\n| power | " + decimalFormat.format(power) +
+                "\n| pp1_H | " + decimalFormat.format(pp1) +
+                "\n| ppk_H' | " + decimalFormat.format(ppk) +
+                "\n| ffl_F | " + decimalFormat.format(ffl) +
+                "\n| fno | " + decimalFormat.format(fno) +
+                "\n| enp_dist_P | " + decimalFormat.format(enp_dist) +
+                "\n| enp_radius | " + decimalFormat.format(enp_radius) +
+                "\n| exp_dist_P' | " + decimalFormat.format(exp_dist) +
+                "\n| exp_radius | " + decimalFormat.format(exp_radius) +
+                "\n| m | " + decimalFormat.format(m) +
+                "\n| red | " + red +
+                "\n| n_obj | " + decimalFormat.format(n_obj) +
+                "\n| n_img | " + decimalFormat.format(n_img) +
+                "\n| img_ht | " + decimalFormat.format(img_ht) +
+                "\n| obj_ang | " + decimalFormat.format(obj_ang) +
+                "\n| obj_na | " + decimalFormat.format(obj_na) +
+                "\n| img_na | " + decimalFormat.format(img_na) +
+                "|\n");
+    }
+
 }

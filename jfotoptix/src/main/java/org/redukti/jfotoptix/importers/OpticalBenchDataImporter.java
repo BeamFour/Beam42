@@ -44,6 +44,17 @@ public class OpticalBenchDataImporter {
         }
 
         String _title;
+        List<Variable> variables_ = new ArrayList<>();
+
+        public void add_variable(Variable v) {variables_.add(v);}
+        public Variable find_variable(String name) {
+            for (int i = 0; i < variables_.size(); i++) {
+                if (name.equals(variables_.get(i).name())) {
+                    return variables_.get(i);
+                }
+            }
+            return null;
+        }
     }
 
     public static final class Variable {
@@ -61,6 +72,9 @@ public class OpticalBenchDataImporter {
         }
 
         public int num_scenarios() {
+            return _values.size();
+        }
+        public int num_values() {
             return _values.size();
         }
 
@@ -265,6 +279,13 @@ public class OpticalBenchDataImporter {
                     case DESCRIPTIVE_DATA:
                         if (words.length >= 2 && words[0].equals("title")) {
                             descriptive_data_.set_title(words[1]);
+                        }
+                        else if (words.length >= 2) {
+                            Variable var = new Variable(words[0]);
+                            for (int i = 1; i < words.length; i++) {
+                                var.add_value(words[i]);
+                            }
+                            descriptive_data_.add_variable(var);
                         }
                         break;
                     case CONSTANTS: {

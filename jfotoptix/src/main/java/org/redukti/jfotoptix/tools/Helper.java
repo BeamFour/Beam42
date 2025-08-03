@@ -42,6 +42,18 @@ public class Helper {
         Path path = new File(specfile).toPath().toAbsolutePath();
         return Paths.get(path.getParent().toString(), outputFile);
     }
+    public static String getFilename(String specfile) {
+        Path path = new File(specfile).toPath().toAbsolutePath();
+        return path.getFileName().toString();
+    }
+    public static String replaceExtension(String fileName, String extension) {
+        // Remove extension
+        int dotIndex = fileName.lastIndexOf('.');
+        if (dotIndex > 0 && dotIndex < fileName.length() - 1) {
+            fileName = fileName.substring(0, dotIndex);
+        }
+        return fileName + extension;
+    }
 
     public static Path getOutputPathChangeExt(String specfile, String extension) {
         Path path = new File(specfile).toPath().toAbsolutePath();

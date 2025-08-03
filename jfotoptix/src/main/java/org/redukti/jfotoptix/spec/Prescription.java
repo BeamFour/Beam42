@@ -41,6 +41,17 @@ public class Prescription {
     public Distribution distribution;   // FIXME rename, used for ray finding only
     public double varAoV = 0.0;
 
+    // Following are optional values for information only
+    public String title;
+    public String lensName;
+    public String patentCountry = "";
+    public String patentNumber;
+    public String patentExample = "";
+    public String applicationYear = "";
+    public String inventors = "";
+    public String organization = "";
+    public String patentLink = "";
+
     public Prescription(double focalLength, double fno, double angleOfViewDegrees, double diameterImageCircle, boolean d_line) {
         this.focalLength = focalLength;
         this.fno = fno;
@@ -153,6 +164,21 @@ public class Prescription {
                 specs.get_angle_of_view(scenario),
                 specs.get_image_height(),
                 false);
+        prescription.title = specs.get_descriptive_data().get_title();
+        var patentInfo = specs.get_descriptive_data().find_variable("patent");
+        if (patentInfo != null) {
+            prescription.patentCountry = patentInfo.get_value(0);
+            prescription.patentNumber = patentInfo.get_value(1);
+            prescription.patentExample = patentInfo.get_value(2);
+            prescription.applicationYear = patentInfo.get_value(3);
+            prescription.inventors = patentInfo.get_value( 4);
+            prescription.organization = patentInfo.get_value(5);
+            prescription.patentLink = patentInfo.get_value(6);
+        }
+        var lensName = specs.get_descriptive_data().find_variable("lens name");
+        if (lensName != null) {
+            prescription.lensName = lensName.get_value(0);
+        }
         List<OpticalBenchDataImporter.LensSurface> surfaces = specs.get_surfaces();
         for (int i = 0; i < surfaces.size(); i++) {
             prescription.import_surface(surfaces.get(i),scenario,use_glass_types);
@@ -262,6 +288,37 @@ public class Prescription {
         sb.append("[aspherical data]\n");
         for (SurfaceType surface : surfaceList) {
             surface.asphericsToOptBenchStr(sb);
+        }
+        return sb;
+    }
+    public StringBuilder toMarkdownStr(StringBuilder sb) {
+        if (lensName != null)
+            sb.append("# ").append(lensName).append("\n");
+        if (patentNumber != null) {
+            sb.append("## Patent Information\n");
+            sb.append("| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |\n");
+            sb.append("| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |\n");
+            sb.append("|").append(patentCountry).append(" | ")
+                    .append(patentNumber).append(" | ")
+                    .append(patentExample).append(" | ")
+                    .append(applicationYear).append(" | ")
+                    .append(inventors).append(" | ")
+                    .append(organization).append(" | ")
+                    .append("[link](").append(patentLink).append(") |\n");
+        }
+        boolean sawAsph = false;
+        SurfaceType.toMarkdownTableHeader(sb);
+        for (SurfaceType surface : surfaceList) {
+            surface.toMarkdownTableRow(sb);
+            if (surface.isAspheric())
+                sawAsph = true;
+        }
+        if (sawAsph) {
+            SurfaceType.asphericMarkdownTableHeader(sb);
+            for (SurfaceType surface : surfaceList) {
+                if (surface.isAspheric())
+                    surface.ashericToMarkdownTableRow(sb);
+            }
         }
         return sb;
     }

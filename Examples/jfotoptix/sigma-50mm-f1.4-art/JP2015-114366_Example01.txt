@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP 2015-114366 Example 1 (Sigma 50mm F1.4 DG HSM Art)
+#patent	country	number	example	year	inventors	org	link
+patent	JP	2015-114366	EX 1	2013	Ryo Shioda	Sigma Corp 	https://patents.google.com/patent/JP2015114366A/en
+lens name	Sigma 50mm f1.4 DG HSM ART
 [constants]
 [variable distances]
 Focal Length	49.58	48.35

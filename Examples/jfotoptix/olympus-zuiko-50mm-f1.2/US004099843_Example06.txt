@@ -1,5 +1,8 @@
 [descriptive data]
 title	US 4,099,843 Example 6 (Olympus Zuiko Auto-S 50mm F1.2)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US4099843	EX 6	1976	Toshihiro Imai	Olympus Corp 	https://patents.google.com/patent/US4099843A/en
+lens name	Olympus Zuiko 50mm F1.2
 [constants]
 Scaled	50	100
 [variable distances]

@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP2025-108279 Example 1
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP 2025-108279	EX 1	2025	Shoju Yomogita, Shibata	Cosina Inc	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2025-108279/11/en
+lens name	Voigtlander APO Lanthar 50mm f3.5
 [constants]
 [variable distances]
 Focal Length	49.10
@@ -9,7 +12,8 @@ Total Length	36.58
 Image Height	43.26
 Magnification	0
 d0	Infinity
-Bf	33.14
+Bf(o)	33.14
+Bf	33.11
 [lens data]
 1	25.402	1.10	1.48749	20.02	70.44	FC5
 2	16.246	2.67		18.36	

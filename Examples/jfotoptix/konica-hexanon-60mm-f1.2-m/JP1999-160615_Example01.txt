@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP 1999-160615 Example 1 (Konica Minolta Hexanon 60mm F1.2 (1999))
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP1999-160615	EX 1	1997	YAMASHITA ATSUSHI	Konica Corp 	https://patentscope.wipo.int/search/en/detail.jsf?docId=JP267945437
+lens name	Konica Hexanon 60mm F1.2 M
 [constants]
 [variable distances]
 Focal Length	58.26	undefined

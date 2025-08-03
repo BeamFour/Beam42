@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP2022-140076 Example 1
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP2022-140076	EX 1	2021	Yosuke Utagawa, Masaki Maruyama	Sony Group Corp	https://patents.google.com/patent/JP2022140076A/en
+lens name	Sony FE 50mm F1.2 GM
 [constants]
 [variable distances]
 Focal Length	53.90

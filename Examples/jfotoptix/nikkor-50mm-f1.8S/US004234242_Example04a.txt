@@ -1,5 +1,8 @@
 [descriptive data]
 title	US 4,234,242 Example 4
+#patent	country	number	example	year	inventors	org	link
+patent	US	US4234242	EX 4	1978	Soichi Nakamura	Nikon Corp	https://patents.google.com/patent/US4234242A/en
+lens name	AI NIKKOR 50mm f/1.8S
 [constants]
 Scaled	50	100
 [variable distances]

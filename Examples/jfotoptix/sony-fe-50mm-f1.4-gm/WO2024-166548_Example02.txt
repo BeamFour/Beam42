@@ -1,5 +1,8 @@
 [descriptive data]
 title	WO2024-166548 Example 2
+#patent	country	number	example	year	inventors	org	link
+patent	EU	WO2024-166548	EX 2	2023	YAMAGISHI, Masakazu 	Sony Group Corp 	https://patentscope.wipo.int/search/en/detail.jsf?docId=WO2024166548
+lens name	Sony FE 50mm f1.4 GM
 [constants]
 [variable distances]
 Focal Length	51.39

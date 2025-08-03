@@ -1,0 +1,31 @@
+[descriptive data]
+title	Leica 50mm Noctilux f/1.0 Reverse Engineered
+lens name	Leica 50mm Noctilux-M f/1.0 Reverse Engineered
+[constants]
+[variable distances]
+Focal Length	52.4
+Angle of View	45
+F-Number	1.0
+Image Height	43.16
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf	27.9565
+[lens data]
+1	60.3967	8.071	1.6779	54.57	55.2	S-LAL12	N-LAK12
+2	1756.45	0.1		54.57
+3	30.595	8.0	1.883	46.571	40.8	S-LAH58
+4	67.879	1.7857		44.644
+5	120.79	4.0714	1.7847	45.214	26.08	S-TIH23	SF56A
+6	19.787	9.35		31.6
+7	AS	7.1		30.6
+8	-23.04	1.357	1.72825	31.0	28.41	S-TIH10	SF10
+9	90.5275	8.7143	1.883	37.643	40.8	S-LAH58
+10	-31.779	0.1		37.714
+11	90.4594	4.0	1.788	35.286	47.49	S-LAH64	N-LAF21
+12	549.4488	0.1		35.286
+13	80.26486	4	1.788	33.429	47.49	S-LAH64	N-LAF21
+14	-197.008	27.9565		33.429
+[aspherical data]
+[figure]
+[notes]

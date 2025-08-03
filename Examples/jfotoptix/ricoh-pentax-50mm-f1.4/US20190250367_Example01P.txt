@@ -1,5 +1,8 @@
 [descriptive data]
 title	US 2019/0250367 Example 1 (Ricoh HD Pentax-D FA 50mm F1.4 SDM AW)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US 2019/0250367	EX 1	2018	Minoru Murayama	Ricoh Co Ltd 	https://patents.google.com/patent/US20190250367A1/en
+lens name	Ricoh HD PENTAX-D FA★50mmF1.4 SDM AW / Tokina Opera 50mm f1.4 FF
 [constants]
 [variable distances]
 Focal Length	49.57	48.01

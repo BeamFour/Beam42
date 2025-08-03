@@ -1,5 +1,8 @@
 [descriptive data]
 title	WO 2020/158622 Example 3 (Panasonic Lumix S Pro 50mm F1.4)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US12061376	EX 3	2020	Shunichiro Yoshinaga, Yasuto Suzuki	Panasonic Intellectual Property Management Co Ltd 	https://patents.google.com/patent/US12061376B2/en
+lens name	Panasonic Lumix S Pro 50mm f1.4
 [constants]
 [variable distances]
 Focal Length	49.0004	48.1279	45.2315

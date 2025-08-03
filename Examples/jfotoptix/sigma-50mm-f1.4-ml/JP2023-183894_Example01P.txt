@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP2023-183894 Example 1 (Sigma 50mm F1.4 DG DN A)
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP2023-183894	EX 1	2022	Yukihiro Yamamoto	Sigma Corp 	https://patents.google.com/patent/JP2023183894A/en
+lens name	Sigma 50mm f1.4 DG DN ART
 [constants]
 [variable distances]
 Focal Length	48.72	48.72

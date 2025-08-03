@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP 1999-030743 Example 5
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP 1999-030743	EX 5	1997	MITSUSAKA MAKOTO	Canon Inc	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-H11-030743/11/en
+lens name	Canon EF 24mm f1.4L
 [constants]
 [variable distances]
 Focal Length	24.6

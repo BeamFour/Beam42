@@ -1,5 +1,8 @@
 [descriptive data]
 title	WO 2019/220618 Example 9 (Nikon Nikkor Z 50mm f/1.8 S)
+#patent	country	number	example	year	inventors	org	link
+patent	EU	WO 2019/220618	EX 9	2018	MASUGI SABURO, SASHIMA TOMOYUKI	Nikon Corp 	https://patents.google.com/patent/WO2019220618A1/en
+lens name	NIKKOR Z 50mm f/1.8 S
 [constants]
 [variable distances]
 Focal Length	51.6	undefined

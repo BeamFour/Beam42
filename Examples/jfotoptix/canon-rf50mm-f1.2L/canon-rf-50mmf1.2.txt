@@ -1,5 +1,8 @@
 [descriptive data]							
 title	US2019/0265441 Example 2 (Canon RF 50mm F1.2 L USM)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US2019/0265441	EX 2	2018	Masato Katayose	Canon Inc 	https://patents.google.com/patent/US20190265441A1/en
+lens name	Canon RF 50mm f1.2L
 [constants]					
 [variable distances]
 Focal Length	51.10	undefined

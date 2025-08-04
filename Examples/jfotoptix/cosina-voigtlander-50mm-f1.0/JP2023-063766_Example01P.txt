@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP2023-063766 Example 1 (Cosina Voigtlander Nokton 50mm F1.0 Aspherical)
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP2023-063766	EX 1	2021	Kazuhiro Ogino	Cosina Co Ltd	https://patents.google.com/patent/JP2023063766A/en
+lens name	Voigtlander NOKTON 50mm f1.0 Aspherical
 [constants]
 [variable distances]
 Focal Length	50

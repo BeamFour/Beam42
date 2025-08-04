@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP2020-012952 Example 1
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP2020-012952	EX 1	2018	Takeshi Yamanaka	Sigma Corp	https://patents.google.com/patent/JP2020012952A/en
+lens name	Sigma 40mm f1.4 DG ART
 [constants]
 [variable distances]
 Focal Length	41.20	undefined

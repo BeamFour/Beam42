@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP 1964-010178 Example 01
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP 1964-010178	EX 1	1964	Ito Hiroshi	Canon Inc	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S39-010178/12/en
+lens name	Canon 50mm f0.95
 [constants]
 Scaled	51.6	1
 [variable distances]

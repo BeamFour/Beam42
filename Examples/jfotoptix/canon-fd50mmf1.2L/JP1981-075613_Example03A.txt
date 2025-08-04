@@ -1,7 +1,7 @@
 [descriptive data]
 title	JP 1985-040604/US4364644 Example 3
 #patent	country	number	example	year	inventors	org	link
-patent	JP	US4364644	EX 3	1979	Keiji Ikemori	Canon Inc	https://patents.google.com/patent/US4364644A/en
+patent	US	US4364644	EX 3	1979	Keiji Ikemori	Canon Inc	https://patents.google.com/patent/US4364644A/en
 lens name	Canon New FD 50mm f1.2L
 [constants]
 Scaled	50	100

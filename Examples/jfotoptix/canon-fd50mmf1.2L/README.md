@@ -2,7 +2,7 @@
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
-|JP | US4364644 | EX 3 | 1979 | Keiji Ikemori | Canon Inc | [link](https://patents.google.com/patent/US4364644A/en) |
+|US | US4364644 | EX 3 | 1979 | Keiji Ikemori | Canon Inc | [link](https://patents.google.com/patent/US4364644A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

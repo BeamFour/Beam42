@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP2021-043376 Example 5 (Cosina Voigtlander 50mm F2.0 Apo Prototype)
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP2021-043376	EX 5	2019	Nakano-shi, Nagano	Cosina Inc	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2021-043376/11/en
+lens name	Voigtlander APO Lanthar 50mm f2.0
 [constants]
 [variable distances]
 Focal Length	49.28

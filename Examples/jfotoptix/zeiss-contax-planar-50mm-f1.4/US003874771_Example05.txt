@@ -1,5 +1,8 @@
 [descriptive data]
 title	US 3,874,771 Example 5 (Zeiss Planar T f1.4 50mm)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US3874771	EX 5	1972	Karl-Heinrich Behrens, Erhard Glatzel	Carl Zeiss AG	https://patents.google.com/patent/US3874771A/en
+lens name	Carl Zeiss Planar 50mm f1.4 T* for Contax/Yashica
 [constants]
 Scaled	50	1
 [variable distances]

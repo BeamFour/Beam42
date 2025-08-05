@@ -1,5 +1,8 @@
 [descriptive data]
 title	US 3,560,079 Example 2
+#patent	country	number	example	year	inventors	org	link
+patent	US	US3560079	EX 2	1965	Zenji Wakimoto, Yoshiyuki Simizu	Nikon Corp	https://patents.google.com/patent/US3560079A
+lens name	Nikkor-S Auto 50mm F1.4
 [constants]
 Scaled 100 1
 [variable distances]

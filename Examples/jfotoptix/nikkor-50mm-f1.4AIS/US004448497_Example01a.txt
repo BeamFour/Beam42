@@ -1,5 +1,8 @@
 [descriptive data]
 title	US 4,448,497 Example 1 (Nikon Nikkor 50mm f/1.4)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US4448497	EX 1	1981	Koichi Wakamiya	Nikon Corp	https://patents.google.com/patent/US4448497
+lens name	AF Nikkor 50mm f1.4D / 50mm f1.4 AIS
 [constants]
 Scaled	51.6	100
 [variable distances]

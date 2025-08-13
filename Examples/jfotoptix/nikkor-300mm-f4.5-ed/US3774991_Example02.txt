@@ -1,0 +1,27 @@
+[descriptive data]
+title	US 3,774,991 Example 1
+[constants]
+[variable distances]
+Focal Length	300
+Angle of View	8.17
+F-Number	4.5
+Image Height	43.2
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf	70.05
+Bf(m)	70.05
+[lens data]
+1	106.0	11.0	1.48606	69.02	81.5
+2	-151.0	4.0		69.02
+3	-144.0	3.0	1.74400	65.74	44.9
+4	130.0	12.0	1.63930	65.54	45.0
+5	650.0	1.0		64.92
+6	95.0	7.7	1.48606	64.92	81.5
+7	878.8	69.3		64.92
+7AS	AS	50.0		34.722
+8	-43.0	1.0	1.62041	29.20	60.3
+9	150.0	3.5	1.62004	29.20	36.3	
+10	-104.82	Bf		29.20
+[notes]
+Related patent US 4154508

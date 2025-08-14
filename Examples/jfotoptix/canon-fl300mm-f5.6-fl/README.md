@@ -2,7 +2,7 @@
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
-|JP | JP S47-008749 | EX 2 | 1968 | Y Shimizu | Canon Inc  | [link](https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S47-008749/12/en) |
+|JP | JP S47-008749 | EX 2 | 1968 | MARUSHIMA, Giichi | Canon Inc  | [link](https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S47-008749/12/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

@@ -1,7 +1,7 @@
 [descriptive data]
 title	JP S47-008749 Example 2
 #patent	country	number	example	year	inventors	org	link
-patent	JP	JP S47-008749	EX 2	1968	Y Shimizu	Canon Inc 	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S47-008749/12/en
+patent	JP	JP S47-008749	EX 2	1968	MARUSHIMA, Giichi	Canon Inc 	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S47-008749/12/en
 lens name	Canon FL-F 300mm f5.6
 [constants]
 [variable distances]

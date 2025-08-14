@@ -13,7 +13,7 @@ Image Height	43.2
 Total Length	undefined
 Magnification	0
 d0	Infinity
-Bf	45.215
+Bf	44.97	45.215
 Aperture Diameter	10.203
 [lens data]				
 1	44.140	1.760	1.75520	55.56	27.5	J-SF4
@@ -45,4 +45,4 @@ originX	61
 originY	475
 ppmm	14.458
 [notes]
-
+dibyendu: bf adjusted to 44.97

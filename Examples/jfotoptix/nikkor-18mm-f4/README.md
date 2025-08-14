@@ -30,7 +30,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 20 | -62.217 | 1.76 | 12.47 | 1.5168 | 64.14 | Hikari | J-BK7A |
 | 21 | -15.612 | 0.117 | 12.47 |  |  |  |
 | 22 | -211.304 | 2.376 | 14.39 | 1.56384 | 60.71 | Hikari | J-SK11 |
-| 23 | -15.075 | 45.215 | 14.39 |  |  |  |
+| 23 | -15.075 | 44.97 | 14.39 |  |  |  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Only](./layout.svg)
@@ -47,7 +47,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | back_focal_length | 45.172
 | optical_invariant | 2.703
 | object_distance | 1.0E10
-| image_distance | 45.215
+| image_distance | 44.97
 | power | 0.046
 | pp1_H | 37.967
 | ppk_H' | -23.55
@@ -57,7 +57,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | enp_radius | 2.703
 | exp_dist_P' | -12.35
 | exp_radius | 7.19
-| m | -0.002
+| m | 0.009
 | red | -4.6249340229590607E8
 | n_obj | 1
 | n_img | 1
@@ -68,9 +68,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 21.24 | 41.318|
- | 0.7 | 29.513 | 99.765|
- | 1.0 | 50.002 | 178.028|
+ | 0.0 | 15.999 | 36.268|
+ | 0.7 | 33.713 | 127.784|
+ | 1.0 | 60.149 | 201.222|
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./US003549241_Example05.txt)
 * [Zemax file](./US003549241_Example05.zmx)

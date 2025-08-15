@@ -1,0 +1,41 @@
+[descriptive data]
+title	JP 1972-008749 Example 2 (Canon FL300mm f5.6 Fluorite)
+[constants]
+Scaled	300	100
+[variable distances]
+Focal Length	300
+Angle of View	8.2
+F-Number	5.6
+Total Length	207.126
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf(p)	undefined
+Bf	83.26	83.29	83.22
+[lens data]
+1	64.077	8.340	1.43387	53.89	95.1	NICF-V	CaF2
+2	-416.883	0.180		53.89
+3	66.816	6.219	1.43387	50.54	95.1	NICF-V	CaF2
+4	420.933	5.991		50.54
+5	-647.256	3.609	1.78470	54.91	26.1	S-TIH23	SFS3
+6	-191.487	1.479	1.80440	54.91	39.6	S-LAH63	LaSFo13
+7	105.162	59.854		51.69
+8AS	AS	25.61		23.166
+8	-32.367	2.841	1.74320	21.68	49.3	J-LAF010	LaFo10
+9	803.346	3.750		24.01
+10	344.637	6.060	1.59270	24.01	35.4	S-FTM16	F16
+11	-47.997	Bf		24.01
+[group data]
+f1	1	7	167.058
+f2	8	11	-142.221
+[figure]
+source	Data/JP1972-008749_Figure04.png
+originX	68.68
+originY	341.65
+ppmm	11.944
+[figure]
+source	Data/JP1972-008749_Figure04P.png
+originX	63.47
+originY	228.56
+ppmm	5.091
+[notes]

@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP 1982-064716 Example 1 (Canon New FD14mm f2.8L)
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP-S57-064716	EX 1	1976	Keiji Ikemori	Canon Inc 	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S57-064716/11/en
+lens name	Canon FD 14mm f/2.8L Aspherical
 [constants]
 Scaled	14	1
 [variable distances]
@@ -11,7 +14,7 @@ Total Length	269.682
 Magnification	0
 d0	Infinity
 Bf(p)	undefined
-Bf	36.97
+Bf	36.875	36.97
 [lens data]
 1	41.986	3.038	1.69680	64.26	55.5	LAC14
 2	25.606	11.298		50.12	
@@ -51,3 +54,4 @@ originX	74.70
 originY	518.84
 ppmm	10.305
 [notes]
+Dibyendu: assigned glass types and adjusted back focus

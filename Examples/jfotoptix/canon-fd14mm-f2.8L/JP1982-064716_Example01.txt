@@ -1,7 +1,7 @@
 [descriptive data]
 title	JP 1982-064716 Example 1 (Canon New FD14mm f2.8L)
 #patent	country	number	example	year	inventors	org	link
-patent	JP	JP-S57-064716	EX 1	1976	Keiji Ikemori	Canon Inc 	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S57-064716/11/en
+patent	JP	JP-S57-064716	EX 1	1980	Keiji Ikemori	Canon Inc 	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S57-064716/11/en
 lens name	Canon FD 14mm f/2.8L Aspherical
 [constants]
 Scaled	14	1

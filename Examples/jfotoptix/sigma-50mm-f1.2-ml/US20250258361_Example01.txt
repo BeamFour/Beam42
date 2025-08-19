@@ -1,7 +1,7 @@
 [descriptive data]
 title	US 2025/0258361 Example 1
 #patent	country	number	example	year	inventors	org	link
-patent	US	US 2025/0258361	EX 1	2025	TBC	Sigma Corp 	link
+patent	US	US 2025/0258361	EX 1	2024	UEDA HIROAKI	Sigma Corp 	https://worldwide.espacenet.com/patent/search?q=pn%3DUS2025258361A1
 lens name	Sigma 50mm f1.2 DG DN ART
 [constants]
 [variable distances]

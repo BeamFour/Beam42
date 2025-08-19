@@ -2,7 +2,7 @@
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
-|US | US 2025/0258361 | EX 1 | 2025 | TBC | Sigma Corp  | [link](link) |
+|US | US 2025/0258361 | EX 1 | 2024 | UEDA HIROAKI | Sigma Corp  | [link](https://worldwide.espacenet.com/patent/search?q=pn%3DUS2025258361A1) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

@@ -9,7 +9,7 @@ F-Number	1.4
 Image Height	43.2
 Magnification	0
 d0	Infinity
-Bf	36.75
+Bf	36.5
 [lens data]
 1	64.77	3.825	1.8061	38.48	40.7	NBFD13
 2	571.57	0.1		38.48

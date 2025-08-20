@@ -1,24 +1,25 @@
 [descriptive data]
-title	JP S47-008749 Example 2
+title	JP 1972-008749 Example 2
 #patent	country	number	example	year	inventors	org	link
-patent	JP	JP S47-008749	EX 2	1968	MARUSHIMA, Giichi	Canon Inc 	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S47-008749/12/en
+patent	JP	JP S47-008749	EX 2	1968	Michimi Suwa	Canon Inc 	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S47-008749/12/en
 lens name	Canon FL-F 300mm f5.6
 [constants]
+Scaled	300	100
 [variable distances]
 Focal Length	300
-Angle of View	8.17
+Angle of View	8.2
 F-Number	5.6
+Total Length	207.126
 Image Height	43.2
-Total Length	undefined
 Magnification	0
 d0	Infinity
-Bf	82.505
+Bf	83.26
 [lens data]
 1	64.077	8.34	1.43387	59.0	95.1	NICF-V
 2	-416.883	0.18		59.0
 3	66.816	6.219	1.43387	59.0	95.1	NICF-V
 4	420.933	5.991		59.0
-5	-653.256	3.609	1.7847	59.0	26.1	S-TIH23
+5	-647.256	3.609	1.7847	59.0	26.1	S-TIH23
 6	-191.487	1.479	1.8044	59.0	39.6	S-LAH63
 7	105.162	60.0		59.0
 7AS	AS	25.464		26.0

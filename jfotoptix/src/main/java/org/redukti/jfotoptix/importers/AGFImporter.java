@@ -76,7 +76,6 @@ public class AGFImporter {
                 for (int i = 0; i < coefs.length; i++) {
                     coefs[i] = parseDouble(words[i+1]);
                 }
-                //currentGlass = new Sellmeier(c1, c2, c3, c4, c5, c6);
                 if (dispersionFormula == 1)
                     currentGlass = new SchottFormula(currentName,coefs);
                 else if (dispersionFormula == 12)

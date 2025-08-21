@@ -8,7 +8,6 @@ public class SchottFormula extends AGFBase {
 
     @Override
     public double get_measurement_index(double wavelen) {
-        // adapted from https://github.com/mjhoptics/opticalglass/blob/master/src/opticalglass/hoya.py
         var wv = 0.001*wavelen;
         var wv2 = wv*wv;
         var n2 = _coefs[0] + _coefs[1]*wv2;

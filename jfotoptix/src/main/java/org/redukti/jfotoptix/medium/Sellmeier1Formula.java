@@ -8,7 +8,6 @@ public class Sellmeier1Formula extends AGFBase {
 
     @Override
     public double get_measurement_index(double wavelen) {
-        // adapted from https://github.com/mjhoptics/opticalglass/blob/master/src/opticalglass/schott.py
         var wv = 0.001*wavelen;
         var wv2 = wv*wv;
         // K1, L1, K2, L2, K3, L3

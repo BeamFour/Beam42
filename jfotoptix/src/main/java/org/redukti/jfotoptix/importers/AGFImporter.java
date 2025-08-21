@@ -1,0 +1,117 @@
+package org.redukti.jfotoptix.importers;
+
+import org.redukti.jfotoptix.light.SpectralLine;
+import org.redukti.jfotoptix.medium.*;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
+
+public class AGFImporter {
+
+    String[] splitLine(String line) {
+        return line.trim().split("\\s+");
+    }
+
+    static double parseDouble(String s) {
+        if (s == null || s.isEmpty()) {
+            return 0.0;
+        }
+        try {
+            return Double.parseDouble(s);
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
+    }
+
+    public Map<String, Medium> parse_file(String make,String file_name) throws Exception {
+        String currentName = null;
+        Medium currentGlass = null;
+        Map<String, Medium> glasses = new HashMap<>();
+        int dispersionFormula = 0;
+        String code = null;
+        String nd = null;
+        String vd = null;
+        var lines = Files.readAllLines(new File(file_name).toPath());
+        for (var line : lines) {
+            if (line.isEmpty() || line.startsWith("!")) continue;
+            var words = splitLine(line);
+            if (words[0].equals("NM")) {
+                /*
+                NM <glass name> <dispersion formula #> <MIL#> <N(d)> <V(d)> <Exclude Sub> <status> <melt freq>
+                   <glass name> is the name of the material.
+                   The dispersion formula number is
+                    1 for Schott,
+                    2 for Sellmeier 1,
+                    3 for Herzberger,
+                    4 for Sellmeier 2,
+                    5 for Conrady,
+                    6 for Sellmeier 3,
+                    7 for Handbook of Optics 1,
+                    8 for Handbook of Optics 2,
+                    9 for Sellmeier 4,
+                    10 for Extended,
+                    11 for Sellmeier 5,
+                    12 for Extended 2
+                    13 for Extended 3.
+                The MIL# is provided for back compatibility and is not used, but a placeholder value must be provided.
+                The nd and vd values are also provided for reference but are not used.
+                The "exclude sub" flag is 0 for no and 1 for yes.
+                Status is 0 for Standard, 1 for Preferred, 2 for Obsolete, 3 for Special, and 4 for Melt.
+                Melt Freq is an integer between 1 and 5 to indicate the relative frequency of melting by the manufacturer.
+                 */
+                if (currentGlass != null && currentName != null) {
+                    glasses.put(currentName, currentGlass);
+                }
+                currentGlass = null;
+                currentName = words[1];
+                dispersionFormula = (int)parseDouble(words[2]);
+                code = words[3];
+                nd = words[4];
+                vd = words[5];
+            } else if (words[0].equals("CD")) {
+                // coefficient data - up to 10
+                double[] coefs = new double[words.length-1];
+                for (int i = 0; i < coefs.length; i++) {
+                    coefs[i] = parseDouble(words[i+1]);
+                }
+                //currentGlass = new Sellmeier(c1, c2, c3, c4, c5, c6);
+                if (dispersionFormula == 1)
+                    currentGlass = new SchottFormula(currentName,coefs);
+                else if (dispersionFormula == 12)
+                    currentGlass = new Extended2Formula(currentName,coefs);
+                else if (dispersionFormula == 13)
+                    currentGlass = new Extended3Formula(currentName,coefs);
+                else if (dispersionFormula == 2)
+                    currentGlass = new Sellmeier1Formula(currentName,coefs);
+                else if (dispersionFormula == 3)
+                    currentGlass = null; // new HerzbergerFormula(currentName,coefs);
+                else if (dispersionFormula == 6)
+                    currentGlass = new Sellmeier3Formula(currentName,coefs);
+                else
+                    System.err.println("Unsupported dispersion formula " + dispersionFormula + " in glass " + currentName);
+            }
+        }
+        if (currentGlass != null && currentName != null) {
+            glasses.put(currentName, currentGlass);
+        }
+
+        return glasses;
+    }
+
+    public static void main(String[] args) throws Exception {
+        AGFImporter importer = new AGFImporter();
+        try {
+            Map<String, Medium> glasses = importer.parse_file("",args[0]);
+            var glass = (Dielectric) glasses.get(args[1]);
+            double nd = glass.get_refractive_index(SpectralLine.d);
+            System.out.println("nd=" + nd + "\n");
+            System.out.println("vd=" + glass.get_abbe_vd());
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+}

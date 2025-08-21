@@ -2,8 +2,8 @@ package org.redukti.jfotoptix.medium;
 
 public class Sellmeier5Formula extends AGFBase {
 
-    public Sellmeier5Formula(String name, double[] coefs) {
-        super("Schott",name,coefs);
+    public Sellmeier5Formula(String make,String name,double[] coefs) {
+        super(make,name,coefs);
     }
 
     @Override

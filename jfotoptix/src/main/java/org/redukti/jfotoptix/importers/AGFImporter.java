@@ -1,12 +1,11 @@
 package org.redukti.jfotoptix.importers;
 
-import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.medium.*;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AGFImporter {
 
@@ -25,10 +24,10 @@ public class AGFImporter {
         }
     }
 
-    public Map<String, Medium> parse_file(String make,String file_name) throws Exception {
+    public List<AGFBase> parse_file(String make, String file_name) throws Exception {
         String currentName = null;
-        Medium currentGlass = null;
-        Map<String, Medium> glasses = new HashMap<>();
+        AGFBase currentGlass = null;
+        List<AGFBase> glasses = new ArrayList<>();
         int dispersionFormula = 0;
         String code = null;
         String nd = null;
@@ -62,7 +61,7 @@ public class AGFImporter {
                 Melt Freq is an integer between 1 and 5 to indicate the relative frequency of melting by the manufacturer.
                  */
                 if (currentGlass != null && currentName != null) {
-                    glasses.put(currentName, currentGlass);
+                    glasses.add(currentGlass);
                 }
                 currentGlass = null;
                 currentName = words[1];
@@ -77,40 +76,24 @@ public class AGFImporter {
                     coefs[i] = parseDouble(words[i+1]);
                 }
                 if (dispersionFormula == 1)
-                    currentGlass = new SchottFormula(currentName,coefs);
+                    currentGlass = new SchottFormula(make,currentName,coefs);
                 else if (dispersionFormula == 12)
-                    currentGlass = new Extended2Formula(currentName,coefs);
+                    currentGlass = new Extended2Formula(make,currentName,coefs);
                 else if (dispersionFormula == 13)
-                    currentGlass = new Extended3Formula(currentName,coefs);
+                    currentGlass = new Extended3Formula(make,currentName,coefs);
                 else if (dispersionFormula == 2)
-                    currentGlass = new Sellmeier1Formula(currentName,coefs);
+                    currentGlass = new Sellmeier1Formula(make,currentName,coefs);
                 else if (dispersionFormula == 3)
-                    currentGlass = null; // new HerzbergerFormula(currentName,coefs);
+                    currentGlass = null; // new HerzbergerFormula(make,currentName,coefs);
                 else if (dispersionFormula == 6)
-                    currentGlass = new Sellmeier3Formula(currentName,coefs);
+                    currentGlass = new Sellmeier3Formula(make,currentName,coefs);
                 else
                     System.err.println("Unsupported dispersion formula " + dispersionFormula + " in glass " + currentName);
             }
         }
         if (currentGlass != null && currentName != null) {
-            glasses.put(currentName, currentGlass);
+            glasses.add(currentGlass);
         }
-
         return glasses;
     }
-
-    public static void main(String[] args) throws Exception {
-        AGFImporter importer = new AGFImporter();
-        try {
-            Map<String, Medium> glasses = importer.parse_file("",args[0]);
-            var glass = (Dielectric) glasses.get(args[1]);
-            double nd = glass.get_refractive_index(SpectralLine.d);
-            System.out.println("nd=" + nd + "\n");
-            System.out.println("vd=" + glass.get_abbe_vd());
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 }

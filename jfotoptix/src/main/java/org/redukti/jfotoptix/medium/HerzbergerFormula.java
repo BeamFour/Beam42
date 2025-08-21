@@ -2,8 +2,8 @@ package org.redukti.jfotoptix.medium;
 
 public class HerzbergerFormula extends AGFBase {
 
-    public HerzbergerFormula(String name, double[] coefs) {
-        super("Hoya",name,coefs);
+    public HerzbergerFormula(String make,String name,double[] coefs) {
+        super(make,name,coefs);
     }
 
     @Override

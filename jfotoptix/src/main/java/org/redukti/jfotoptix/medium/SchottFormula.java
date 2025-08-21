@@ -2,8 +2,8 @@ package org.redukti.jfotoptix.medium;
 
 public class SchottFormula extends AGFBase {
 
-    public SchottFormula(String name, double[] coefs) {
-        super("Hoya",name,coefs);
+    public SchottFormula(String make,String name, double[] coefs) {
+        super(make,name,coefs);
     }
 
     @Override

@@ -2,8 +2,8 @@ package org.redukti.jfotoptix.medium;
 
 public class Extended2Formula extends AGFBase {
 
-    public Extended2Formula(String name, double[] coefs) {
-        super("Hikari",name,coefs);
+    public Extended2Formula(String make,String name, double[] coefs) {
+        super(make,name,coefs);
     }
 
     @Override

@@ -55,3 +55,4 @@ ppmm	11.875
 Bill: From the figure it looks like the aperture consumes part of d21.
 21	Infinity	6.10	1.59508	8.06	35.6
 Dibyendu: Bf adjusted to 37.3 after setting glass types
+Missing vd for filter - best match based on refractive index is 52.3 (Schott KF6)

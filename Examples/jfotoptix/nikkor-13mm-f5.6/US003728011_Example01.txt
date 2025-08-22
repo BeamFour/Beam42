@@ -24,7 +24,7 @@ Aperture Diameter	4.317
 10	13.2	3.0		23.99
 11	17.6	1.0	1.73200	23.99	53.7
 12	12.0	6.5		20.00	
-12.1	Infinity	1.2	1.51743	24.46	
+12.1	Infinity	1.2	1.51743	24.46	52.3
 12.2	Infinity	0.5		24.46	
 13	350.0	3.0	1.83739	18.04	43.5
 14	12.08	12.3	1.54072	14.50	47.2
@@ -50,3 +50,4 @@ originX	42
 originY	496
 ppmm	6.386
 [notes]
+Dibyendu: Missing vd for filter - best match based on refractive index is 52.3 (Schott KF6)

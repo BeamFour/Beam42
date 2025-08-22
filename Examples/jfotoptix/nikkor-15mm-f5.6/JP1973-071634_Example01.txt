@@ -22,7 +22,7 @@ Aperture Diameter	6.806
 8	15.36	4.35		25.08
 9	19.61	1.00	1.69684	22.61	55.6
 10	10.88	5.20		18.51	
-11	Infinity	1.20	1.51743	18.51	?
+11	Infinity	1.20	1.51743	18.51	52.3
 12	Infinity	0.28		18.51	
 13	146.11	4.09	1.84131	18.86	43.3
 14	15.14	13.52	1.54800	14.87	45.9
@@ -50,3 +50,4 @@ originY	530
 ppmm	10.340
 [notes]
 Bill: From the figure it looks like the aperture consumes part of d21.
+Dibyendu: Missing vd for filter - best match based on refractive index is 52.3 (Schott KF6)

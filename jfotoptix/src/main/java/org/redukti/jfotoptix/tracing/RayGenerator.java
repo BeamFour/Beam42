@@ -57,6 +57,7 @@ public class RayGenerator {
         Distribution d = parameters.get_distribution(target_surface);
         final List<TracedRay> rays = new ArrayList<>();
         Consumer<Vector3> de = (Vector3 v) -> {
+            // v is a point on the target surface, z = sagitta(x,y)
             Vector3 r = target_surface.get_transform_to(source).transform(v); // pattern point on target surface
             Vector3 direction;
             Vector3 position;
@@ -69,9 +70,12 @@ public class RayGenerator {
                 default:
                 case SourceAtInfinity:
                     direction = Vector3.vector3_001;
-                    Vector3Pair plane = new Vector3Pair(
-                            target_surface.get_position(source).minus(Vector3.vector3_001.times(rlen)),
-                            Vector3.vector3_001);
+                    // get position of source with respect to target surface
+                    position = target_surface.get_position(source);
+                    Vector3 scaled3_v001 = Vector3.vector3_001.times(rlen);
+                    position = position.minus(scaled3_v001);
+                    // Plane at source?
+                    Vector3Pair plane = new Vector3Pair(position, Vector3.vector3_001);
                     position = plane.pl_ln_intersect(new Vector3Pair(r, direction));
                     break;
             }

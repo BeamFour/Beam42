@@ -11,18 +11,24 @@ public class ChiefRayFinder {
 
     static class Results {
         public final double aov;
-        public final Vector3 rayOrigin;
-        public final Vector3 rayIntercept;
+        public final Vector2 xy;
+        public final Vector3 origin;
+        public final Vector3 intercept;
 
-        public Results(double aov, Vector3 rayOrigin, Vector3 rayIntercept) {
+        public Results(double aov, Vector2 xy, Vector3 origin, Vector3 intercept) {
             this.aov = aov;
-            this.rayOrigin = rayOrigin;
-            this.rayIntercept = rayIntercept;
+            this.xy = xy;
+            this.origin = origin;
+            this.intercept = intercept;
         }
-
         @Override
         public String toString() {
-            return "Results{" + "aov=" + aov + ", rayOrigin=" + rayOrigin + ", rayIntercept=" + rayIntercept + '}';
+            return "Results{" +
+                    "aov=" + aov +
+                    ", xy=" + xy +
+                    ", origin=" + origin +
+                    ", intercept=" + intercept +
+                    '}';
         }
     }
 
@@ -59,7 +65,7 @@ public class ChiefRayFinder {
         System.out.println("Status = " + istatus);
         System.out.println(f.toString());
         if (istatus == LMLSolver.LEVELITER) {
-            // Get the ray from the pint source, this is the first element
+            // Get the ray from the point source, this is the first element
             var seq = analysis.systems[0].get_sequence();
             var tracedRay = analysis.singleRayTraceResults.get_generated(seq.get(0)).get(0);
             // Origin is the start of the ray
@@ -68,7 +74,8 @@ public class ChiefRayFinder {
             var intercept = tracedRay.get_intercept_point();
             // Angle of view
             var aov = prescription.varAoV;
-            return new Results(aov,origin,intercept);
+            var xy = prescription.distribution.get_user_defined_points().get(0);
+            return new Results(aov,xy,origin,intercept);
         }
         throw new RuntimeException("Failed to find chief ray angle");
     }

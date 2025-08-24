@@ -12,6 +12,7 @@ import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
 import org.redukti.jfotoptix.patterns.PatternGenerator;
 import org.redukti.jfotoptix.shape.Round;
+import org.redukti.jfotoptix.spec.Prescription;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -292,6 +293,30 @@ public class Beam42Exporter {
         return points;
     }
 
+    static String generate_skew_ray(Prescription prescription, double y_intercept) {
+        var results = ChiefRayFinder.findChiefRayAngle(prescription,y_intercept);
+        Vector3 v = results.intercept;
+        double z = results.intercept.z();
+//        Element firstSurface = system.get_sequence().stream().filter(e -> e instanceof OpticalSurface).findFirst().orElse(null);
+//        OpticalSurface s1 = (OpticalSurface) firstSurface;
+//        Round shape = (Round) s1.get_shape();
+//        Curve curve = s1.get_curve();
+//        Vector2 v = results.xy;
+//        double z = curve.sagitta(v);
+        double distance = 10 + z;
+        double obj_angle = prescription.getHalfAngleOfViewInRadians();
+        // tan(distance) tells us height of the triangle where tan(angle) = ht/distance.
+        double height_adjustment = obj_angle != 0 ? Math.tan(obj_angle) * distance : 1.0;
+        // Adjust y
+        double y_ht = v.y() - height_adjustment;
+        // Adjust z
+        Vector3 point = new Vector3(v.x(), y_ht, z-distance);
+        Vector3 direction = new Vector3(0, Math.sin(obj_angle), Math.cos(obj_angle));
+        //return generate_rays_table(List.of(point),direction);
+        List<Vector3> rays = RayGenerator.makeCircularRayStarts(v.x(),y_ht,z-distance,5.0,7);
+        return generate_rays_table(rays,direction);
+    }
+
     static String generate_rays_table(OpticalSurface surface, double obj_angle) {
         Vector3 direction = new Vector3(0, Math.sin(obj_angle), Math.cos(obj_angle));
         List<Vector3> list = generate_hexapolar_points(surface, 30, obj_angle);
@@ -320,6 +345,7 @@ public class Beam42Exporter {
 
         double angleOfView = specs.get_half_angle_of_view_in_radians(arguments.scenario);
         Helper.createOutputFile(Helper.getOutputPath(arguments, ".RAY"), generate_rays_table(s1, 0.0));
-        Helper.createOutputFile(Helper.getOutputPath(arguments, "-SKEW.RAY"), generate_rays_table(s1, angleOfView));
+        //Helper.createOutputFile(Helper.getOutputPath(arguments, "-SKEW.RAY"), generate_rays_table(s1, angleOfView));
+        Helper.createOutputFile(Helper.getOutputPath(arguments, "-SKEW.RAY"), generate_skew_ray(Prescription.buildPrescription(specs,arguments.scenario,true),21.63));
     }
 }

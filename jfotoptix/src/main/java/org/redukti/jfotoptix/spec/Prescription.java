@@ -112,6 +112,9 @@ public class Prescription {
     public double getHalfAngleOfViewInDegrees() {
         return angleOfViewDegrees/2.0;
     }
+    public double getHalfAngleOfViewInRadians() {
+        return Math.toRadians(angleOfViewDegrees/2.0);
+    }
     public Prescription build() {
         this.surfaces = surfaceList.toArray(new SurfaceType[surfaceList.size()]);
         return this;

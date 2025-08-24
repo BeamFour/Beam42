@@ -56,4 +56,18 @@ public class MathUtils {
         return _decimal_format;
     }
 
+    public static double cosd(double deg)
+    {
+        return Math.cos(Math.toRadians(deg));
+    }
+
+    public static double sind(double deg)
+    {
+        return Math.sin(Math.toRadians(deg));
+    }
+
+    public static double tand(double deg)
+    {
+        return Math.tan(Math.toRadians(deg));
+    }
 }

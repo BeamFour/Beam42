@@ -83,7 +83,7 @@ public class LensTool {
         } else {
             System.out.println(renderer.write(new StringBuilder()).toString());
         }
-        result.report();
+        //result.report();
     }
 
     public static AnalysisSpot outputSpotAnalysis(OpticalSystem system, Path output_file, int spot_density) throws Exception {

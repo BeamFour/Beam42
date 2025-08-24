@@ -39,6 +39,6 @@ public class VarRayDist extends Var {
             throw new RuntimeException("No user defined points");
         }
         var point = points.get(0);
-        return "Ray Dist Point " + point.toString();
+        return "Ray Dist Point [x,y] " + point.toString();
     }
 }

@@ -1,0 +1,158 @@
+<?xml version="1.0" standalone="no"?>
+<svg width="300px" height="300px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect x="0" y="0" width="300" height="300"  fill="#000000" />
+<defs>
+<g id="dot">
+<line x1="1" y1="1" x2="0" y2="0"  />
+</g>
+<g id="cross">
+<line x1="-3" y1="0" x2="3" y2="0"  />
+<line x1="0" y1="-3" x2="0" y2="3"  />
+</g>
+<g id="square">
+<line x1="-3" y1="-3" x2="-3" y2="3"  />
+<line x1="-3" y1="3" x2="3" y2="3"  />
+<line x1="3" y1="3" x2="3" y2="-3"  />
+<line x1="3" y1="-3" x2="-3" y2="-3"  />
+</g>
+<g id="round">
+<ellipse cx="0" cy="0" rx="3" ry="3"  fill="none" /></g>
+<g id="triangle">
+<line x1="0" y1="-3" x2="-3" y2="3"  />
+<line x1="-3" y1="3" x2="3" y2="3"  />
+<line x1="0" y1="-3" x2="3" y2="3"  />
+</g>
+</defs>
+<polygon fill="none" stroke="#ffffff" points="30.952,269.048 30.952,30.952 269.048,30.952 269.048,269.048 " />
+<text style="font-size:12;text-align:center;text-anchor:middle;" x="150" y="298.262" fill="#ffffff">Sagittal distance (um)</text>
+<use x="70.635" y="30.952" xlink:href="#cross"  stroke="#ffffff" />
+<use x="70.635" y="269.048" xlink:href="#cross"  stroke="#ffffff" />
+<text style="font-size:12;text-align:center;text-anchor:middle;" x="70.635" y="287.048" fill="#ffffff">-14</text>
+<use x="150" y="30.952" xlink:href="#cross"  stroke="#ffffff" />
+<use x="150" y="269.048" xlink:href="#cross"  stroke="#ffffff" />
+<text style="font-size:12;text-align:center;text-anchor:middle;" x="150" y="287.048" fill="#ffffff">0</text>
+<use x="229.365" y="30.952" xlink:href="#cross"  stroke="#ffffff" />
+<use x="229.365" y="269.048" xlink:href="#cross"  stroke="#ffffff" />
+<text style="font-size:12;text-align:center;text-anchor:middle;" x="229.365" y="287.048" fill="#ffffff">14</text>
+<text style="font-size:12;text-align:center;text-anchor:middle;" x="7.738" y="156" transform="rotate(-90,7.738,150)" fill="#ffffff">Tangential distance (um)</text>
+<use x="269.048" y="229.365" xlink:href="#cross"  stroke="#ffffff" />
+<use x="30.952" y="229.365" xlink:href="#cross"  stroke="#ffffff" />
+<text style="font-size:12;text-align:right;text-anchor:end;" x="24.952" y="235.365" fill="#ffffff">-14</text>
+<use x="269.048" y="150" xlink:href="#cross"  stroke="#ffffff" />
+<use x="30.952" y="150" xlink:href="#cross"  stroke="#ffffff" />
+<text style="font-size:12;text-align:right;text-anchor:end;" x="24.952" y="156" fill="#ffffff">0</text>
+<use x="269.048" y="70.635" xlink:href="#cross"  stroke="#ffffff" />
+<use x="30.952" y="70.635" xlink:href="#cross"  stroke="#ffffff" />
+<text style="font-size:12;text-align:right;text-anchor:end;" x="24.952" y="76.635" fill="#ffffff">14</text>
+<use x="150" y="150" xlink:href="#dot"  stroke="#ffe100" />
+<use x="150" y="150" xlink:href="#dot"  stroke="#ff0000" />
+<use x="150" y="150" xlink:href="#dot"  stroke="#00ebff" />
+<use x="150" y="269.048" xlink:href="#dot"  stroke="#ffe100" />
+<use x="150" y="244.736" xlink:href="#dot"  stroke="#ff0000" />
+<use x="150" y="246.882" xlink:href="#dot"  stroke="#00ebff" />
+<use x="109.283" y="261.868" xlink:href="#dot"  stroke="#ffe100" />
+<use x="117.598" y="239.023" xlink:href="#dot"  stroke="#ff0000" />
+<use x="116.864" y="241.04" xlink:href="#dot"  stroke="#00ebff" />
+<use x="73.478" y="241.196" xlink:href="#dot"  stroke="#ffe100" />
+<use x="89.105" y="222.572" xlink:href="#dot"  stroke="#ff0000" />
+<use x="87.725" y="224.216" xlink:href="#dot"  stroke="#00ebff" />
+<use x="46.902" y="209.524" xlink:href="#dot"  stroke="#ffe100" />
+<use x="67.956" y="197.368" xlink:href="#dot"  stroke="#ff0000" />
+<use x="66.097" y="198.441" xlink:href="#dot"  stroke="#00ebff" />
+<use x="32.761" y="170.672" xlink:href="#dot"  stroke="#ffe100" />
+<use x="56.703" y="166.451" xlink:href="#dot"  stroke="#ff0000" />
+<use x="54.589" y="166.823" xlink:href="#dot"  stroke="#00ebff" />
+<use x="32.761" y="129.328" xlink:href="#dot"  stroke="#ffe100" />
+<use x="56.703" y="133.549" xlink:href="#dot"  stroke="#ff0000" />
+<use x="54.589" y="133.177" xlink:href="#dot"  stroke="#00ebff" />
+<use x="46.902" y="90.476" xlink:href="#dot"  stroke="#ffe100" />
+<use x="67.956" y="102.632" xlink:href="#dot"  stroke="#ff0000" />
+<use x="66.097" y="101.559" xlink:href="#dot"  stroke="#00ebff" />
+<use x="73.478" y="58.804" xlink:href="#dot"  stroke="#ffe100" />
+<use x="89.105" y="77.428" xlink:href="#dot"  stroke="#ff0000" />
+<use x="87.725" y="75.784" xlink:href="#dot"  stroke="#00ebff" />
+<use x="109.283" y="38.132" xlink:href="#dot"  stroke="#ffe100" />
+<use x="117.598" y="60.977" xlink:href="#dot"  stroke="#ff0000" />
+<use x="116.864" y="58.96" xlink:href="#dot"  stroke="#00ebff" />
+<use x="150" y="30.952" xlink:href="#dot"  stroke="#ffe100" />
+<use x="150" y="55.264" xlink:href="#dot"  stroke="#ff0000" />
+<use x="150" y="53.118" xlink:href="#dot"  stroke="#00ebff" />
+<use x="190.717" y="38.132" xlink:href="#dot"  stroke="#ffe100" />
+<use x="182.402" y="60.977" xlink:href="#dot"  stroke="#ff0000" />
+<use x="183.136" y="58.96" xlink:href="#dot"  stroke="#00ebff" />
+<use x="226.522" y="58.804" xlink:href="#dot"  stroke="#ffe100" />
+<use x="210.895" y="77.428" xlink:href="#dot"  stroke="#ff0000" />
+<use x="212.275" y="75.784" xlink:href="#dot"  stroke="#00ebff" />
+<use x="253.098" y="90.476" xlink:href="#dot"  stroke="#ffe100" />
+<use x="232.044" y="102.632" xlink:href="#dot"  stroke="#ff0000" />
+<use x="233.903" y="101.559" xlink:href="#dot"  stroke="#00ebff" />
+<use x="267.239" y="129.328" xlink:href="#dot"  stroke="#ffe100" />
+<use x="243.297" y="133.549" xlink:href="#dot"  stroke="#ff0000" />
+<use x="245.411" y="133.177" xlink:href="#dot"  stroke="#00ebff" />
+<use x="267.239" y="170.672" xlink:href="#dot"  stroke="#ffe100" />
+<use x="243.297" y="166.451" xlink:href="#dot"  stroke="#ff0000" />
+<use x="245.411" y="166.823" xlink:href="#dot"  stroke="#00ebff" />
+<use x="253.098" y="209.524" xlink:href="#dot"  stroke="#ffe100" />
+<use x="232.044" y="197.368" xlink:href="#dot"  stroke="#ff0000" />
+<use x="233.903" y="198.441" xlink:href="#dot"  stroke="#00ebff" />
+<use x="226.522" y="241.196" xlink:href="#dot"  stroke="#ffe100" />
+<use x="210.895" y="222.572" xlink:href="#dot"  stroke="#ff0000" />
+<use x="212.275" y="224.216" xlink:href="#dot"  stroke="#00ebff" />
+<use x="190.717" y="261.868" xlink:href="#dot"  stroke="#ffe100" />
+<use x="182.402" y="239.023" xlink:href="#dot"  stroke="#ff0000" />
+<use x="183.136" y="241.04" xlink:href="#dot"  stroke="#00ebff" />
+<use x="150" y="205.172" xlink:href="#dot"  stroke="#ffe100" />
+<use x="150" y="180.843" xlink:href="#dot"  stroke="#ff0000" />
+<use x="150" y="213.819" xlink:href="#dot"  stroke="#00ebff" />
+<use x="122.414" y="197.781" xlink:href="#dot"  stroke="#ffe100" />
+<use x="134.578" y="176.711" xlink:href="#dot"  stroke="#ff0000" />
+<use x="118.09" y="205.269" xlink:href="#dot"  stroke="#00ebff" />
+<use x="102.219" y="177.586" xlink:href="#dot"  stroke="#ffe100" />
+<use x="123.289" y="165.422" xlink:href="#dot"  stroke="#ff0000" />
+<use x="94.731" y="181.91" xlink:href="#dot"  stroke="#00ebff" />
+<use x="94.828" y="150" xlink:href="#dot"  stroke="#ffe100" />
+<use x="119.157" y="150" xlink:href="#dot"  stroke="#ff0000" />
+<use x="86.181" y="150" xlink:href="#dot"  stroke="#00ebff" />
+<use x="102.219" y="122.414" xlink:href="#dot"  stroke="#ffe100" />
+<use x="123.289" y="134.578" xlink:href="#dot"  stroke="#ff0000" />
+<use x="94.731" y="118.09" xlink:href="#dot"  stroke="#00ebff" />
+<use x="122.414" y="102.219" xlink:href="#dot"  stroke="#ffe100" />
+<use x="134.578" y="123.289" xlink:href="#dot"  stroke="#ff0000" />
+<use x="118.09" y="94.731" xlink:href="#dot"  stroke="#00ebff" />
+<use x="150" y="94.828" xlink:href="#dot"  stroke="#ffe100" />
+<use x="150" y="119.157" xlink:href="#dot"  stroke="#ff0000" />
+<use x="150" y="86.181" xlink:href="#dot"  stroke="#00ebff" />
+<use x="177.586" y="102.219" xlink:href="#dot"  stroke="#ffe100" />
+<use x="165.422" y="123.289" xlink:href="#dot"  stroke="#ff0000" />
+<use x="181.91" y="94.731" xlink:href="#dot"  stroke="#00ebff" />
+<use x="197.781" y="122.414" xlink:href="#dot"  stroke="#ffe100" />
+<use x="176.711" y="134.578" xlink:href="#dot"  stroke="#ff0000" />
+<use x="205.269" y="118.09" xlink:href="#dot"  stroke="#00ebff" />
+<use x="205.172" y="150" xlink:href="#dot"  stroke="#ffe100" />
+<use x="180.843" y="150" xlink:href="#dot"  stroke="#ff0000" />
+<use x="213.819" y="150" xlink:href="#dot"  stroke="#00ebff" />
+<use x="197.781" y="177.586" xlink:href="#dot"  stroke="#ffe100" />
+<use x="176.711" y="165.422" xlink:href="#dot"  stroke="#ff0000" />
+<use x="205.269" y="181.91" xlink:href="#dot"  stroke="#00ebff" />
+<use x="177.586" y="197.781" xlink:href="#dot"  stroke="#ffe100" />
+<use x="165.422" y="176.711" xlink:href="#dot"  stroke="#ff0000" />
+<use x="181.91" y="205.269" xlink:href="#dot"  stroke="#00ebff" />
+<use x="150" y="157.277" xlink:href="#dot"  stroke="#ffe100" />
+<use x="150" y="143.119" xlink:href="#dot"  stroke="#ff0000" />
+<use x="150" y="167.552" xlink:href="#dot"  stroke="#00ebff" />
+<use x="143.698" y="153.638" xlink:href="#dot"  stroke="#ffe100" />
+<use x="155.959" y="146.56" xlink:href="#dot"  stroke="#ff0000" />
+<use x="134.799" y="158.776" xlink:href="#dot"  stroke="#00ebff" />
+<use x="143.698" y="146.362" xlink:href="#dot"  stroke="#ffe100" />
+<use x="155.959" y="153.44" xlink:href="#dot"  stroke="#ff0000" />
+<use x="134.799" y="141.224" xlink:href="#dot"  stroke="#00ebff" />
+<use x="150" y="142.723" xlink:href="#dot"  stroke="#ffe100" />
+<use x="150" y="156.881" xlink:href="#dot"  stroke="#ff0000" />
+<use x="150" y="132.448" xlink:href="#dot"  stroke="#00ebff" />
+<use x="156.302" y="146.362" xlink:href="#dot"  stroke="#ffe100" />
+<use x="144.041" y="153.44" xlink:href="#dot"  stroke="#ff0000" />
+<use x="165.201" y="141.224" xlink:href="#dot"  stroke="#00ebff" />
+<use x="156.302" y="153.638" xlink:href="#dot"  stroke="#ffe100" />
+<use x="144.041" y="146.56" xlink:href="#dot"  stroke="#ff0000" />
+<use x="165.201" y="158.776" xlink:href="#dot"  stroke="#00ebff" />
+</svg>

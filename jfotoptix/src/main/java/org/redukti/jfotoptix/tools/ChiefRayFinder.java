@@ -3,22 +3,41 @@ package org.redukti.jfotoptix.tools;
 import org.redukti.jfotoptix.importers.OpticalBenchDataImporter;
 import org.redukti.jfotoptix.math.LMLSolver;
 import org.redukti.jfotoptix.math.Vector2;
+import org.redukti.jfotoptix.math.Vector3;
 import org.redukti.jfotoptix.optim.*;
 import org.redukti.jfotoptix.spec.Prescription;
 
 public class ChiefRayFinder {
+
+    static class Results {
+        public final double aov;
+        public final Vector3 rayOrigin;
+        public final Vector3 rayIntercept;
+
+        public Results(double aov, Vector3 rayOrigin, Vector3 rayIntercept) {
+            this.aov = aov;
+            this.rayOrigin = rayOrigin;
+            this.rayIntercept = rayIntercept;
+        }
+
+        @Override
+        public String toString() {
+            return "Results{" + "aov=" + aov + ", rayOrigin=" + rayOrigin + ", rayIntercept=" + rayIntercept + '}';
+        }
+    }
+
     public static Prescription getPrescription(String specfile) throws Exception {
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(specfile);
         return Prescription.buildPrescription(specs,0,true);
     }
 
-    public static double findChiefRayAngle(String specFile, double y_intercept) throws Exception {
+    public static Results findChiefRayAngle(String specFile, double y_intercept) throws Exception {
         var prescription = getPrescription(specFile);
         return findChiefRayAngle(prescription, y_intercept);
     }
 
-    public static double findChiefRayAngle(Prescription prescription, double y_intercept) {
+    public static Results findChiefRayAngle(Prescription prescription, double y_intercept) {
         var analysis = new Analysis(prescription);
         var f = new MeritFunction(analysis,
                 new Var[] {
@@ -39,7 +58,19 @@ public class ChiefRayFinder {
         }
         System.out.println("Status = " + istatus);
         System.out.println(f.toString());
-        return prescription.varAoV;
+        if (istatus == LMLSolver.LEVELITER) {
+            // Get the ray from the pint source, this is the first element
+            var seq = analysis.systems[0].get_sequence();
+            var tracedRay = analysis.singleRayTraceResults.get_generated(seq.get(0)).get(0);
+            // Origin is the start of the ray
+            var origin = tracedRay.get_position();
+            // Intercept is where it met the first optical surface
+            var intercept = tracedRay.get_intercept_point();
+            // Angle of view
+            var aov = prescription.varAoV;
+            return new Results(aov,origin,intercept);
+        }
+        throw new RuntimeException("Failed to find chief ray angle");
     }
 
     public static void main(String[] args) throws Exception {
@@ -49,6 +80,6 @@ public class ChiefRayFinder {
         }
         String specFile = args[0];
         double y_intercept = Double.parseDouble(args[1]);
-        findChiefRayAngle(specFile,y_intercept);
+        System.out.println(findChiefRayAngle(specFile,y_intercept));
     }
 }

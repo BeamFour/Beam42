@@ -1,0 +1,50 @@
+[descriptive data]
+title	US 4,029,397 Example 2 (Olympus 18mm f3.5 Zuiko MC Auto-W)
+[constants]
+Scaled	18.3	100
+[variable distances]
+Focal Length	18.3	undefined
+Angle of View	101.8	undefined
+F-Number	3.5	undefined
+Image Height	43.2	43.2
+Magnification	0	-0.058
+d0	Infinity	301
+d16	2.21	0.89
+Bf(p)	undefined	undefined
+Bf	39.60	40.92
+[lens data]
+1	104.25	3.41	1.83400	51.56	37.19	S-LAH60
+2	240.26	0.20		51.56	
+3	31.51	1.61	1.67000	34.78	57.33	LAL52
+4	12.72	4.92		22.52	
+5	32.67	1.59	1.67000	25.39	57.33	LAL52
+6	18.25	4.26		20.51	
+7	78.06	4.27	1.80400	20.22	46.57	S-LAH65
+8	-368.49	0.20		20.22	
+9	19.46	1.00	1.69680	14.16	55.62	S-LAL14
+10	10.26	1.82		11.04	
+11	27.31	1.00	1.69680	11.04	55.62	S-LAL14
+12	9.67	8.31	1.59270	11.04	35.24	S-FTM16
+13	398.15	1.42		11.04	
+13AS	AS	1.42		9.709
+14	159.94	6.03	1.64000	11.18	60.25	J-LAK01
+15	-13.78	1.00	1.51454	11.18	54.69	NSL33
+16	-19.85	d16		11.18	
+17	-34.15	1.00	1.80518	14.07	25.43	S-TIH6
+18	41.99	1.00		14.07	
+19	-960.13	2.51	1.61800	16.25	63.38	S-PHM52
+20	-17.94	0.15		16.25	
+21	-47.59	2.26	1.61800	18.56	63.38	S-PHM52
+22	-20.12	Bf		18.56	
+[figure]
+source	Data/US004029397_Figure03.png
+originX	156.36
+originY	539.00
+ppmm	19.956
+[figure]
+source	Data/US004029397_Figure03P.png
+originX	83.05
+originY	411.27
+ppmm	14.344
+[notes]
+Bill: Repair sign r15 to match claim. d13 in claim is correct but doesn't match the figure.

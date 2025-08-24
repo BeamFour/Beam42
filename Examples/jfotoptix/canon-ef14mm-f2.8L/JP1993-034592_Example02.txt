@@ -12,7 +12,7 @@ Image Height	43.2
 Magnification	0
 d0	Infinity
 Bf(p)	undefined
-Bf	38.72
+Bf	38.65
 [lens data]
 1	44.219	3.10	1.69680	66.32	55.5	LAC14
 2	25.992	11.30		50.22	
@@ -55,3 +55,4 @@ originX	23.45
 originY	491.24
 ppmm	10.467
 [notes]
+Dibyendu: adjusted backfocus after assigning glass types

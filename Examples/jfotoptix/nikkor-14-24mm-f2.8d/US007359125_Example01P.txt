@@ -1,0 +1,59 @@
+[descriptive data]
+title	US 7,359,125 Example 1 (Nikon AF-S Nikkor 14-24mm f/2.8G ED)
+[constants]
+[variable distances]
+Focal Length	14.4	18	23.8	undefined	undefined	undefined	undefined	undefined	undefined
+Angle of View	114.7	undefined	83.8	undefined	undefined	undefined	undefined	undefined	undefined
+F-Number	2.88	2.88	2.88	undefined	undefined	undefined	undefined	undefined	undefined
+Image Height	43.2	43.2	43.2	43.2	43.2	43.2	43.2	43.2	43.2
+Total Length	undefined	undefined	undefined	undefined	undefined	undefined	undefined	undefined	undefined
+Magnification	0	0	0	-0.025	-0.025	-0.025	-0.08768	-0.10454	-0.13500
+d0	Infinity	Infinity	Infinity	536.77	682.52	916.19	125	134.71	140.46
+d11	31.93	16.37	1.2	33.18	17.33	1.95	36.36	20.38	5.21
+d14	5.86	5.86	5.86	4.61	4.9	5.11	1.43	1.85	1.85
+Bf	38.7	44.55	53.97	38.7	44.55	53.97	38.7	44.55	53.97
+Aperture Diameter	18.329	19.780	22.290	18.329	19.780	22.290	18.329	19.780	22.290
+[lens data]
+1	60.3937	3.5000	1.80400	82.82	46.58
+2	32.2703	7.0835		62.02	
+3	35.5000	4.0000	1.67790	59.46	55.34
+4	19.5117	12.8951		51.78	
+5	87.0449	2.5000	1.74100	50.18	52.67
+6	26.3306	0.3000	1.55389	39.62	38.09
+7	30.2448	12.6887		39.55	
+8	-67.9930	2.5896	1.49782	39.55	82.52
+9	48.0626	2.0000		39.30	
+10	48.4880	5.9634	1.80440	39.30	39.59
+11	-181.2948	d11		39.30	
+12	34.6184	1.0000	1.83481	24.14	42.72
+13	19.4637	5.2931	1.62374	23.12	47.04
+14	611.5990	d14		23.12	
+15	AS	1.6689		18.329
+16	-265.5383	2.6545	1.51680	23.72	64.20
+17	-47.2569	9.0744		23.72	
+18	-27.9322	1.6819	1.83481	23.52	42.72
+19	138.6775	0.1000		23.52	
+20	35.6745	4.4701	1.57099	24.54	50.80
+21	-71.8719	0.1000		24.54	
+22	27.2079	1.3817	1.77279	25.16	49.45
+23	16.4317	8.4910	1.49782	24.34	82.52
+24	-53.0000	1.7210		24.34	
+25	1336.7107	1.0000	1.80610	24.96	40.94
+26	20.3824	6.3537	1.58913	24.96	61.18
+27	-60.1135	Bf		24.96	
+[aspherical data]
+4	19.5117	-0.9087	-5.1181e-7	7.1056e-10	-1.9817e-11	1.9226e-14	-6.0945e-18
+7	30.2448	-7.3795	4.2239e-5	-7.8972e-8	2.9788e-10	-5.9331e-13	6.0285e-16	-7.4037e-20
+27	-60.1135	5.0164	1.9855e-5	6.9569e-9	1.5384e-10	-5.8393e-13
+[figure]
+source	Data/US007359125_Figure01.png
+ppmm	15.532
+originX	29
+originY	683
+[figure]
+source	Data/US007359125_Figure01P.png
+originX	122
+originY	307
+ppmm	5.642
+[notes]
+Bill: Maximum Magnification measured.

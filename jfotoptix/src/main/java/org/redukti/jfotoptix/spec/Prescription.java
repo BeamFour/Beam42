@@ -38,8 +38,11 @@ public class Prescription {
     public List<SurfaceType> surfaceList = new ArrayList<SurfaceType>();
     public SurfaceType[] surfaces;
 
+    public int[] _configurations;
+    public String[] _configuration_names;
     public double[] _angle_of_views_by_scenario;
     public double[] _focal_length_by_scenario;
+    public double[] _f_number_by_scenario;
 
     public Distribution distribution;   // FIXME rename, used for ray finding only
     public double varAoV = 0.0;
@@ -193,11 +196,43 @@ public class Prescription {
         if (lensName != null) {
             prescription.lensName = lensName.get_value(0);
         }
+        prescription.add_configurations(specs);
         List<OpticalBenchDataImporter.LensSurface> surfaces = specs.get_surfaces();
         for (int i = 0; i < surfaces.size(); i++) {
             prescription.import_surface(surfaces.get(i),0,use_glass_types);
         }
         return prescription.build();
+    }
+
+    private Prescription add_configurations(OpticalBenchDataImporter.LensSpecifications specs) {
+        OpticalBenchDataImporter.Variable configurations = specs.get_descriptive_data().find_variable("configurations");
+        if (configurations == null || configurations.num_values() < 2) {
+            // by default, we only do scenario 0
+            _configurations = new int[] {0};
+            _configuration_names = new String[] {"default"};
+        }
+        else {
+            _configurations = new int[configurations.num_values()/2];
+            _configuration_names = new String[configurations.num_values()/2];
+            for (int i = 0, j = 0; i < configurations.num_values(); i += 2, j++) {
+                int scenario = configurations.get_value_as_integer(i,-1);
+                if (scenario == -1)
+                    break;
+                String name = configurations.get_value(i+1);
+                _configurations[j] = scenario;
+                _configuration_names[j] = name;
+            }
+        }
+        _focal_length_by_scenario = new double[_configurations.length];
+        _f_number_by_scenario = new double[_configurations.length];
+        _angle_of_views_by_scenario = new double[_configurations.length];
+        for (int i = 0; i < _configurations.length; i++) {
+            int scenario = _configurations[i];
+            _focal_length_by_scenario[i] = specs.get_focal_length(scenario);
+            _f_number_by_scenario[i] = specs.get_f_number(scenario);
+            _angle_of_views_by_scenario[i] = specs.get_angle_of_view_in_degrees(scenario);
+        }
+        return this;
     }
 
     public OpticalSystem.Builder buildSystem(boolean addPointSource, double field) {

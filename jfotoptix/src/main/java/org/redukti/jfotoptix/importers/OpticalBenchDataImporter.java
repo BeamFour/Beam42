@@ -33,6 +33,16 @@ public class OpticalBenchDataImporter {
             return 0.0;
         }
     }
+    static int parseInteger(String s, int defaultValue) {
+        if (s == null || s.isEmpty()) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
 
     public static final class DescriptiveData {
         public String get_title() {
@@ -89,6 +99,10 @@ public class OpticalBenchDataImporter {
             } catch (Exception e) {
                 return 0.0;
             }
+        }
+        public int get_value_as_integer(int scenario, int defaultValue) {
+            String s = get_value(scenario);
+            return parseInteger(s,defaultValue);
         }
 
         private String _name;
@@ -412,6 +426,11 @@ public class OpticalBenchDataImporter {
             if (var != null)
                 return var.get_value_as_double(0);
             throw new IllegalArgumentException();
+        }
+
+        public double get_focal_length(int scenario) {
+            Variable var = find_variable("Focal Length");
+            return var.get_value_as_double(scenario);
         }
 
         public double get_stop_diameter(int scenario) {

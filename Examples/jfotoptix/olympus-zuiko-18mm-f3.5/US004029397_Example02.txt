@@ -14,7 +14,7 @@ Magnification	0	-0.058
 d0	Infinity	301
 d16	2.21	0.89
 Bf(p)	undefined	undefined
-Bf	39.60	40.92
+Bf	38.96	40.92
 [lens data]
 1	104.25	3.41	1.83400	51.56	37.19	S-LAH60
 2	240.26	0.20		51.56	
@@ -51,3 +51,4 @@ originY	411.27
 ppmm	14.344
 [notes]
 Bill: Repair sign r15 to match claim. d13 in claim is correct but doesn't match the figure.
+Dibyendu: applied glass types and updated back focus

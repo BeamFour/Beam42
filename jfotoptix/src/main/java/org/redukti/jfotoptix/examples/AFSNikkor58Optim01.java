@@ -11,7 +11,7 @@ public class AFSNikkor58Optim01 {
    public static Prescription getPrescription(String specfile) throws Exception {
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(specfile);
-        return Prescription.buildPrescription(specs,0,true);
+        return Prescription.buildPrescription(specs,true);
    }
     public static void main(String[] args) throws Exception {
         var prescription = getPrescription(args[0]);

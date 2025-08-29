@@ -16,6 +16,9 @@ public class SurfaceType {
     public double k;
     public double[] coeffs;
 
+    public double[] _thickness_by_scenario;
+    public double[] _diameter_by_scenario;
+
     public SurfaceType(String id, boolean isStop, double radius, double thickness, double diameter, double nd, double vd, String glassName) {
         this.id = id;
         this.radius = radius;
@@ -26,7 +29,14 @@ public class SurfaceType {
         this.vd = vd;
         this.glassName = glassName;
     }
-
+    public SurfaceType set_thickness_by_scenario(double[] thickness_by_scenario) {
+        this._thickness_by_scenario = thickness_by_scenario;
+        return this;
+    }
+    public SurfaceType set_diameter_by_scenario(double[] diameter_by_scenario) {
+        this._diameter_by_scenario = diameter_by_scenario;
+        return this;
+    }
     public StringBuilder toOptBenchStr(StringBuilder sb) {
         sb.append(id).append("\t");
         if (isStop)

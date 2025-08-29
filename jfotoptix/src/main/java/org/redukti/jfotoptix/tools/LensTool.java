@@ -99,7 +99,7 @@ public class LensTool {
     }
 
     public static void createREADME(String specFile, OpticalBenchDataImporter.LensSpecifications specs, ParaxialFirstOrderInfo pfo, double[] fields, AnalysisSpot[] spots, Path output_file) throws Exception {
-        Prescription prescription = Prescription.buildPrescription(specs,0,true);
+        Prescription prescription = Prescription.buildPrescription(specs,true);
         StringBuilder sb = prescription.toMarkdownStr(new StringBuilder());
         sb.append("## Layouts\n");
         sb.append("![Layout Only](./layoutonly.svg)\n");

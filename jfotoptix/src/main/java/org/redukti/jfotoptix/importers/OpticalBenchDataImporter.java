@@ -414,7 +414,12 @@ public class OpticalBenchDataImporter {
             throw new IllegalArgumentException();
         }
 
-        public double get_angle_of_view(int scenario) {
+        public double get_stop_diameter(int scenario) {
+            Variable view_angles = find_variable("Aperture Diameter");
+            return view_angles.get_value_as_double(scenario);
+        }
+
+        public double get_angle_of_view_in_degrees(int scenario) {
             Variable view_angles = find_variable("Angle of View");
             return view_angles.get_value_as_double(scenario);
         }

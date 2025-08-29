@@ -38,6 +38,9 @@ public class Prescription {
     public List<SurfaceType> surfaceList = new ArrayList<SurfaceType>();
     public SurfaceType[] surfaces;
 
+    public double[] _angle_of_views_by_scenario;
+    public double[] _focal_length_by_scenario;
+
     public Distribution distribution;   // FIXME rename, used for ray finding only
     public double varAoV = 0.0;
 
@@ -87,6 +90,14 @@ public class Prescription {
         var lastSurface = surfaceList.get(surfaceList.size()-1);
         lastSurface.k = k;
         lastSurface.coeffs = coeffs;
+        return this;
+    }
+    public Prescription set_focal_length_by_scenario(double[] focal_length_by_scenario) {
+        _focal_length_by_scenario = focal_length_by_scenario;
+        return this;
+    }
+    public Prescription set_angle_of_views_by_scenario(double[] angle_of_views_by_scenario) {
+        _angle_of_views_by_scenario = angle_of_views_by_scenario;
         return this;
     }
     /**
@@ -160,11 +171,11 @@ public class Prescription {
         return this;
     }
 
-    public static Prescription buildPrescription(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean use_glass_types) {
+    public static Prescription buildPrescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types) {
         var prescription = new Prescription(
                 specs.get_focal_length(),
-                specs.get_f_number(scenario),
-                specs.get_angle_of_view(scenario),
+                specs.get_f_number(0),  // default is scenario 0
+                specs.get_angle_of_view_in_degrees(0),  // default is scenario 0
                 specs.get_image_height(),
                 false);
         prescription.title = specs.get_descriptive_data().get_title();
@@ -184,7 +195,7 @@ public class Prescription {
         }
         List<OpticalBenchDataImporter.LensSurface> surfaces = specs.get_surfaces();
         for (int i = 0; i < surfaces.size(); i++) {
-            prescription.import_surface(surfaces.get(i),scenario,use_glass_types);
+            prescription.import_surface(surfaces.get(i),0,use_glass_types);
         }
         return prescription.build();
     }

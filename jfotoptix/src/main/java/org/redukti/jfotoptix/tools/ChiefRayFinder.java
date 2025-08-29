@@ -35,7 +35,7 @@ public class ChiefRayFinder {
     public static Prescription getPrescription(String specfile) throws Exception {
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(specfile);
-        return Prescription.buildPrescription(specs,0,true);
+        return Prescription.buildPrescription(specs,true);
     }
 
     public static Results findChiefRayAngle(String specFile, double y_intercept) throws Exception {

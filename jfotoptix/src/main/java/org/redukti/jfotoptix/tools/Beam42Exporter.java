@@ -346,6 +346,7 @@ public class Beam42Exporter {
         double angleOfView = specs.get_half_angle_of_view_in_radians(arguments.scenario);
         Helper.createOutputFile(Helper.getOutputPath(arguments, ".RAY"), generate_rays_table(s1, 0.0));
         //Helper.createOutputFile(Helper.getOutputPath(arguments, "-SKEW.RAY"), generate_rays_table(s1, angleOfView));
-        Helper.createOutputFile(Helper.getOutputPath(arguments, "-SKEW.RAY"), generate_skew_ray(Prescription.buildPrescription(specs,arguments.scenario,true),21.63));
+        // FIXME scenario
+        Helper.createOutputFile(Helper.getOutputPath(arguments, "-SKEW.RAY"), generate_skew_ray(Prescription.buildPrescription(specs,true),21.63));
     }
 }

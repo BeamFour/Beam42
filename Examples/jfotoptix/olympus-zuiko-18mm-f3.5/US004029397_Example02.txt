@@ -1,5 +1,8 @@
 [descriptive data]
 title	US 4,029,397 Example 2 (Olympus 18mm f3.5 Zuiko MC Auto-W)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US4029397	EX 2	1974	Nobuo Yamashita	Olympus Corp 	https://patents.google.com/patent/US4029397A/en
+lens name	Olympus Zuiko 18mm f3.5 MC. Auto-W
 [constants]
 Scaled	18.3	100
 [variable distances]

@@ -1,7 +1,7 @@
 [descriptive data]
 title	US 3,552,829 Example 1
 #patent	country	number	example	year	inventors	org	link
-patent	US	US552829	EX 1	1967	Heinz Marquardt	Ernst Leitz Wetzlar GmbH	https://patents.google.com/patent/US3552829A/en
+patent	US	US3552829	EX 1	1967	Heinz Marquardt	Ernst Leitz Wetzlar GmbH	https://patents.google.com/patent/US3552829A/en
 lens name	Leitz / Leica Summilux-R 50mm f1.4 v1
 [constants]
 Scaled	50	1

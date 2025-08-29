@@ -12,7 +12,9 @@ F-Number	3.5
 Image Height	43.2
 Magnification	0
 d0	Infinity
-Bf	36.2772
+Bf(o)	36.2772
+Bf(1)	36.065
+Bf	36.13
 [lens data]
 1	35.2854	4.3830	1.65160	42.08	58.7	S-LAL7
 2	66.5208	0.0972		42.08	
@@ -44,3 +46,4 @@ originX	116.64
 originY	478.91
 ppmm	22.134
 [notes]
+Dibyendu: Updated back focus distance after applying glass types

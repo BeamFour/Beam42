@@ -132,7 +132,7 @@ public class ZemaxExporter {
             }
             if (s.is_aspheric()) sb.append("  TYPE EVENASPH\n");
             else sb.append("  TYPE STANDARD\n");
-            double curvature = s.get_radius() == 0.0 ? 0 : 1.0 / s.get_radius();
+            double curvature = s.get_radius_of_curvature() == 0.0 ? 0 : 1.0 / s.get_radius_of_curvature();
             sb.append("  CURV ").append(curvature).append(" 0 0 0 0\n");
             sb.append("  HIDE 0 0 0 0 0 0 0 0 0 0\n");
             sb.append("  MIRR 2 0\n");

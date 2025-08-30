@@ -99,22 +99,22 @@ public class Lens extends Group {
          * Add an optical surface
          *
          * @param curvature curvature of the surface, 1/r
-         * @param radius    the radius of the disk
+         * @param ap_radius the aperture radius of the disk
          * @param thickness the thickness after this surface
          * @param glass     the material after this surface
          */
-        public Lens.Builder add_surface(double curvature, double radius, double thickness, Medium glass) {
+        public Lens.Builder add_surface(double curvature, double ap_radius, double thickness, Medium glass) {
             Curve curve;
             if (curvature == 0.)
                 curve = Flat.flat;
             else
                 curve = new Sphere(curvature);
-            return add_surface(curve, new Disk(radius), thickness,
+            return add_surface(curve, new Disk(ap_radius), thickness,
                     glass);
         }
 
-        public Lens.Builder add_surface(double curvature, double radius, double thickness) {
-            return add_surface(curvature, radius, thickness, null);
+        public Lens.Builder add_surface(double curvature, double ap_radius, double thickness) {
+            return add_surface(curvature, ap_radius, thickness, null);
         }
 
         public Lens.Builder add_surface(Curve curve, Shape shape, double thickness, Medium glass) {
@@ -135,8 +135,8 @@ public class Lens extends Group {
             return this;
         }
 
-        public Lens.Builder add_stop(double radius, double thickness, boolean is_aperturestop) {
-            return add_stop(new Disk(radius), thickness, is_aperturestop);
+        public Lens.Builder add_stop(double ap_radius, double thickness, boolean is_aperture_stop) {
+            return add_stop(new Disk(ap_radius), thickness, is_aperture_stop);
         }
         public Lens.Builder add_stop(Shape shape, double thickness, boolean is_aperturestop) {
             Stop.Builder stop = new Stop.Builder()

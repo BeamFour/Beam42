@@ -86,14 +86,14 @@ public class Prescription {
     }
     public Prescription field_stop(double thickness, double diameter) {
         var surface = new SurfaceType(Integer.toString(surfaceList.size()+1),false,0,thickness,diameter,0,0,null);
-        surface.isFieldStop = true;
+        surface._is_field_stop = true;
         surfaceList.add(surface);
         return this;
     }
     public Prescription asph(double k, double[] coeffs) {
         var lastSurface = surfaceList.get(surfaceList.size()-1);
-        lastSurface.k = k;
-        lastSurface.coeffs = coeffs;
+        lastSurface._k = k;
+        lastSurface._coeffs = coeffs;
         return this;
     }
     /**
@@ -211,7 +211,7 @@ public class Prescription {
                 int scenario = _configurations[i];
                 thickness[i] = thickness_by_scenario.get(scenario);
             }
-            assert thickness[0] == lastSurface.thickness;
+            assert thickness[0] == lastSurface._thickness;
             lastSurface.set_thickness_by_scenario(thickness);
         }
         if (lensSurface.is_aperture_stop()) {
@@ -222,7 +222,7 @@ public class Prescription {
                     int scenario = _configurations[i];
                     diameter[i] = diameter_by_scenario.get(scenario);
                 }
-                assert diameter[0] == lastSurface.diameter;
+                assert diameter[0] == lastSurface._diameter;
                 lastSurface.set_diameter_by_scenario(diameter);
             }
         }
@@ -298,53 +298,55 @@ public class Prescription {
         return sys;
     }
     private static double add_surface(Lens.Builder lens, SurfaceType s) {
-        double apertureRadius = s.diameter / 2.0;
-        if (s.isStop) {
-            lens.add_stop(apertureRadius, s.thickness, true);
-            return s.thickness;
+        double ap_radius = s.get_diameter() / 2.0;
+        double thickness = s.get_thickness();
+        if (s.is_aperture_stop()) {
+            lens.add_stop(ap_radius, thickness, true);
+            return thickness;
         }
-        if (s.k != 0 || (s.coeffs != null && s.coeffs.length > 0)) {
-            var curve = getAsphere(s);
-            var shape = new Disk(apertureRadius);
-            if (s.nd != 0.0) {
-                var glass = GlassMap.glassByName(s.glassName);
+        if (s.is_aspheric()) {
+            var curve = build_asphere(s);
+            var shape = new Disk(ap_radius);
+            if (s.get_refractive_index() != 0.0) {
+                var glass = GlassMap.glassByName(s.get_glass_name());
                 if (glass != null) {
-                    lens.add_surface(curve, shape, s.thickness, glass);
+                    lens.add_surface(curve, shape, thickness, glass);
                 } else {
-                    lens.add_surface(curve, shape, s.thickness, new Abbe(Abbe.AbbeFormula.AbbeVd, s.nd, s.vd, 0.0));
+                    lens.add_surface(curve, shape, thickness, new Abbe(Abbe.AbbeFormula.AbbeVd, s.get_refractive_index(), s.get_abbe_vd(), 0.0));
                 }
             } else {
-                lens.add_surface(curve, shape, s.thickness, Air.air);
+                lens.add_surface(curve, shape, thickness, Air.air);
             }
         }
         else {
             // Non aspherical
-            if (s.nd != 0.0) {
-                var glass = GlassMap.glassByName(s.glassName);
+            if (s.get_refractive_index() != 0.0) {
+                var glass = GlassMap.glassByName(s.get_glass_name());
                 if (glass == null) {
-                    lens.add_surface(s.radius, apertureRadius, s.thickness, new Abbe(Abbe.AbbeFormula.AbbeVd, s.nd, s.vd, 0.0));
+                    lens.add_surface(s.get_radius_of_curvature(), ap_radius, thickness, new Abbe(Abbe.AbbeFormula.AbbeVd, s.get_refractive_index(), s.get_abbe_vd(), 0.0));
                 } else {
-                    lens.add_surface(s.radius, apertureRadius, s.thickness, glass);
+                    lens.add_surface(s.get_radius_of_curvature(), ap_radius, thickness, glass);
                 }
             } else {
-                lens.add_surface(s.radius, apertureRadius, s.thickness);
+                lens.add_surface(s.get_radius_of_curvature(), ap_radius, thickness);
             }
         }
-        return s.thickness;
+        return thickness;
     }
 
-    private static Asphere getAsphere(SurfaceType s) {
-        double k = s.k + 1.0;
-        double a4 = s.coeffs.length > 0 ? s.coeffs[0] : 0.0;
-        double a6 = s.coeffs.length > 1 ? s.coeffs[1] : 0.0;
-        double a8 = s.coeffs.length > 2 ? s.coeffs[2] : 0.0;
-        double a10 = s.coeffs.length > 3 ? s.coeffs[3] : 0.0;
-        double a12 = s.coeffs.length > 4 ? s.coeffs[4] : 0.0;
-        double a14 = s.coeffs.length > 5 ? s.coeffs[5] : 0.0;
-        double a16 = s.coeffs.length > 6 ? s.coeffs[6] : 0.0;
-        double a18 = s.coeffs.length > 7 ? s.coeffs[7] : 0.0;
-        double a20 = s.coeffs.length > 8 ? s.coeffs[8] : 0.0;
-        return new Asphere(s.radius, k, a4, a6, a8, a10, a12, a14, a16, a18, a20);
+    private static Asphere build_asphere(SurfaceType s) {
+        double[] coeffs = s.get_aspheric_coeffs();
+        double k = s.get_conic_k() + 1.0;
+        double a4 = coeffs.length > 0 ? coeffs[0] : 0.0;
+        double a6 = coeffs.length > 1 ? coeffs[1] : 0.0;
+        double a8 = coeffs.length > 2 ? coeffs[2] : 0.0;
+        double a10 = coeffs.length > 3 ? coeffs[3] : 0.0;
+        double a12 = coeffs.length > 4 ? coeffs[4] : 0.0;
+        double a14 = coeffs.length > 5 ? coeffs[5] : 0.0;
+        double a16 = coeffs.length > 6 ? coeffs[6] : 0.0;
+        double a18 = coeffs.length > 7 ? coeffs[7] : 0.0;
+        double a20 = coeffs.length > 8 ? coeffs[8] : 0.0;
+        return new Asphere(s.get_radius_of_curvature(), k, a4, a6, a8, a10, a12, a14, a16, a18, a20);
     }
 
     public String get_title() {

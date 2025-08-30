@@ -148,7 +148,6 @@ public class OpticalBenchDataImporter {
             _id = id;
             _surface_type = SurfaceType.surface;
             _radius = 0;
-            _diameter = 0;
             _refractive_index = 0;
             _abbe_vd = 0;
             _is_cover_glass = false;
@@ -184,12 +183,17 @@ public class OpticalBenchDataImporter {
             _thickness_by_scenario.add(thickness);
         }
 
-        public double get_diameter() {
-            return _diameter;
+        public double get_diameter(int scenario) {
+            if (scenario < _diameter_by_scenario.size())
+                return _diameter_by_scenario.get(scenario);
+            else {
+                assert (1 == _diameter_by_scenario.size());
+                return _diameter_by_scenario.get(0);
+            }
         }
 
         void set_diameter(double value) {
-            _diameter = value;
+            _diameter_by_scenario.add(value);
         }
 
         public double get_refractive_index() {
@@ -236,7 +240,7 @@ public class OpticalBenchDataImporter {
         private SurfaceType _surface_type;
         private double _radius;
         private List<Double> _thickness_by_scenario = new ArrayList<>();
-        private double _diameter;
+        private List<Double> _diameter_by_scenario = new ArrayList<>();
         private double _refractive_index;
         private double _abbe_vd;
         private boolean _is_cover_glass;
@@ -543,7 +547,7 @@ public class OpticalBenchDataImporter {
                        int scenario, boolean use_glass_types) {
         double thickness = surface.get_thickness(scenario);
         double radius = surface.get_radius();
-        double aperture_radius = surface.get_diameter() / 2.0;
+        double aperture_radius = surface.get_diameter(scenario) / 2.0;
         double refractive_index = surface.get_refractive_index();
         double abbe_vd = surface.get_abbe_vd();
         String glass_name = surface.get_glass_name();

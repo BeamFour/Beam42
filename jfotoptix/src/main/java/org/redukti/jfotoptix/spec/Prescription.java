@@ -141,20 +141,20 @@ public class Prescription {
         double abbe_vd = surface.get_abbe_vd();
         String glass_name = surface.get_glass_name();
         if (surface.get_surface_type() == OpticalBenchDataImporter.SurfaceType.aperture_stop) {
-            stop(thickness,surface.get_diameter());
+            stop(thickness,surface.get_diameter(0));
             return this;
         }
         else if (surface.get_surface_type() == OpticalBenchDataImporter.SurfaceType.field_stop) {
-            field_stop(thickness,surface.get_diameter());
+            field_stop(thickness,surface.get_diameter(0));
             return this;
         }
         if (use_glass_types && glass_name != null && GlassMap.glassByName(glass_name) != null) {
-            surf(radius,thickness,surface.get_diameter(),refractive_index,abbe_vd,glass_name);
+            surf(radius,thickness,surface.get_diameter(0),refractive_index,abbe_vd,glass_name);
         }
         else if (refractive_index != 0.0) {
-            surf(radius,thickness,surface.get_diameter(),refractive_index, abbe_vd);
+            surf(radius,thickness,surface.get_diameter(0),refractive_index, abbe_vd);
         } else {
-            surf(radius,thickness,surface.get_diameter());
+            surf(radius,thickness,surface.get_diameter(0));
         }
         OpticalBenchDataImporter.AsphericalData aspherical_data = surface.get_aspherical_data();
         if (aspherical_data != null) {

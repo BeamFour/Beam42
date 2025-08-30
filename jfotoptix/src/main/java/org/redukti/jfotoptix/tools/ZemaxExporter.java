@@ -60,7 +60,7 @@ public class ZemaxExporter {
         for (int i = 0; i < surfaces.size(); i++) {
             OpticalBenchDataImporter.LensSurface s = surfaces.get(i);
             double thickness = 0.0;
-            double diameter = s.get_diameter();
+            double diameter = s.get_diameter(scenario);
             if (s.get_surface_type() == OpticalBenchDataImporter.SurfaceType.aperture_stop && aperture_diameters != null) {
                 diameter = aperture_diameters.get_value_as_double(scenario);
             }

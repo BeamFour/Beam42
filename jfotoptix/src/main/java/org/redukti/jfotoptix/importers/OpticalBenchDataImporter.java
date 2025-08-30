@@ -162,6 +162,10 @@ public class OpticalBenchDataImporter {
             _surface_type = surface_type;
         }
 
+        public boolean is_aperture_stop() {
+            return _surface_type == SurfaceType.aperture_stop;
+        }
+
         public double get_radius() {
             return _radius;
         }

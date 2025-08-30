@@ -193,8 +193,39 @@ public class Prescription {
         List<OpticalBenchDataImporter.LensSurface> surfaces = specs.get_surfaces();
         for (int i = 0; i < surfaces.size(); i++) {
             prescription.import_surface(surfaces.get(i),0,use_glass_types);
+            if (prescription._configurations != null) {
+                prescription.add_configuration_data(surfaces.get(i));
+            }
         }
         return prescription.build();
+    }
+
+    private void add_configuration_data(OpticalBenchDataImporter.LensSurface lensSurface) {
+        if (_configurations == null || _configurations.length == 0)
+            return;
+        var lastSurface = surfaceList.get(surfaceList.size()-1);
+        var thickness_by_scenario = lensSurface.get_thickness_by_scenario();
+        if (thickness_by_scenario.size() > 1) {
+            double[] thickness = new double[_configurations.length];
+            for (int i = 0; i < _configurations.length; i++) {
+                int scenario = _configurations[i];
+                thickness[i] = thickness_by_scenario.get(scenario);
+            }
+            assert thickness[0] == lastSurface.thickness;
+            lastSurface.set_thickness_by_scenario(thickness);
+        }
+        if (lensSurface.is_aperture_stop()) {
+            var diameter_by_scenario = lensSurface.get_diameter_by_scenario();
+            if (diameter_by_scenario.size() > 1) {
+                double[] diameter = new double[_configurations.length];
+                for (int i = 0; i < diameter.length; i++) {
+                    int scenario = _configurations[i];
+                    diameter[i] = diameter_by_scenario.get(scenario);
+                }
+                assert diameter[0] == lastSurface.diameter;
+                lastSurface.set_diameter_by_scenario(diameter);
+            }
+        }
     }
 
     private Prescription add_configurations(OpticalBenchDataImporter.LensSpecifications specs) {
@@ -316,6 +347,22 @@ public class Prescription {
         return new Asphere(s.radius, k, a4, a6, a8, a10, a12, a14, a16, a18, a20);
     }
 
+    public String get_title() {
+        return title;
+    }
+
+    public int get_num_configurations() {
+        return _configurations != null ? _configurations.length : 0;
+    }
+
+    public double get_f_number() {
+        return fno;
+    }
+
+    public SurfaceType[] get_surfaces() {
+        return surfaces;
+    }
+
     public StringBuilder toOptBenchStr(StringBuilder sb) {
         sb.append("[descriptive data]\n");
         sb.append("[variable distances]\n");
@@ -352,13 +399,13 @@ public class Prescription {
         SurfaceType.toMarkdownTableHeader(sb);
         for (SurfaceType surface : surfaceList) {
             surface.toMarkdownTableRow(sb);
-            if (surface.isAspheric())
+            if (surface.is_aspheric())
                 sawAsph = true;
         }
         if (sawAsph) {
             SurfaceType.asphericMarkdownTableHeader(sb);
             for (SurfaceType surface : surfaceList) {
-                if (surface.isAspheric())
+                if (surface.is_aspheric())
                     surface.ashericToMarkdownTableRow(sb);
             }
         }

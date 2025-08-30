@@ -37,6 +37,36 @@ public class SurfaceType {
         this._diameter_by_scenario = diameter_by_scenario;
         return this;
     }
+    public boolean is_aperture_stop() {
+        return isStop;
+    }
+    public boolean is_field_stop() {
+        return isFieldStop;
+    }
+    public double get_diameter() {
+        return diameter;
+    }
+    public double get_thickness() {
+        return thickness;
+    }
+    public double get_radius() {
+        return radius;
+    }
+    public double[] get_aspheric_coeffs() {
+        return coeffs;
+    }
+    public double get_conic_k() {
+        return k;
+    }
+    public double get_refractive_index() {
+        return nd;
+    }
+    public double get_abbe_vd() {
+        return vd;
+    }
+    public String get_glass_name() {
+        return glassName;
+    }
     public StringBuilder toOptBenchStr(StringBuilder sb) {
         sb.append(id).append("\t");
         if (isStop)
@@ -72,7 +102,7 @@ public class SurfaceType {
         sb.append("\n");
         return sb;
     }
-    public boolean isAspheric() {
+    public boolean is_aspheric() {
         return k != 0 || (coeffs != null && coeffs.length > 0);
     }
     public static StringBuilder asphericMarkdownTableHeader(StringBuilder sb) {

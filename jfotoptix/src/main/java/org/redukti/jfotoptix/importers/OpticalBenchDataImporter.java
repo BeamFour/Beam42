@@ -236,6 +236,14 @@ public class OpticalBenchDataImporter {
 
         public String get_glass_name() { return _glass_name; }
 
+        public List<Double> get_thickness_by_scenario() {
+            return _thickness_by_scenario;
+        }
+
+        public List<Double> get_diameter_by_scenario() {
+            return _diameter_by_scenario;
+        }
+
         private int _id;
         private SurfaceType _surface_type;
         private double _radius;
@@ -357,7 +365,7 @@ public class OpticalBenchDataImporter {
                         }
                         /* diameter */
                         if (words.length >= 5 && words[4].length() > 0) {
-                            surface_data.set_diameter(parseDouble(words[4]));
+                            parse_diameter(words[4], type == SurfaceType.aperture_stop, surface_data);
                         }
                         /* abbe vd */
                         if (words.length >= 6 && words[5].length() > 0) {
@@ -486,6 +494,28 @@ public class OpticalBenchDataImporter {
                 surface_builder.add_thickness(parseDouble(value));
             }
         }
+        void parse_diameter(String value,
+                        boolean isApertureStop,
+                        LensSurface surface_builder) {
+            double dValue = parseDouble(value);
+            if (!isApertureStop) {
+                surface_builder.set_diameter(dValue);
+            }
+            else {
+                Variable var = find_variable("Aperture Diameter");
+                if (var != null) {
+                    for (int i = 0; i < var.num_scenarios(); i++) {
+                        String s = var.get_value(i);
+                        double d = parseDouble(s);
+                        surface_builder.set_diameter(d);
+                    }
+                }
+                else {
+                    surface_builder.set_diameter(dValue);
+                }
+            }
+        }
+
         public DescriptiveData get_descriptive_data() {
             return descriptive_data_;
         }

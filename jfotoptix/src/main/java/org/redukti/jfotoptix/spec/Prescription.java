@@ -38,6 +38,7 @@ public class Prescription {
     public List<SurfaceType> surfaceList = new ArrayList<SurfaceType>();
     public SurfaceType[] surfaces;
 
+    // Maps our config id to scenario number in the OpticalBench specs
     public int[] _configurations;
     public String[] _configuration_names;
     public double[] _angle_of_views_by_scenario;
@@ -93,14 +94,6 @@ public class Prescription {
         var lastSurface = surfaceList.get(surfaceList.size()-1);
         lastSurface.k = k;
         lastSurface.coeffs = coeffs;
-        return this;
-    }
-    public Prescription set_focal_length_by_scenario(double[] focal_length_by_scenario) {
-        _focal_length_by_scenario = focal_length_by_scenario;
-        return this;
-    }
-    public Prescription set_angle_of_views_by_scenario(double[] angle_of_views_by_scenario) {
-        _angle_of_views_by_scenario = angle_of_views_by_scenario;
         return this;
     }
     /**

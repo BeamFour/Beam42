@@ -73,8 +73,8 @@ public class ChiefRayFinder {
             // Intercept is where it met the first optical surface
             var intercept = tracedRay.get_intercept_point();
             // Angle of view
-            var aov = prescription.varAoV;
-            var xy = prescription.distribution.get_user_defined_points().get(0);
+            var aov = prescription._var_angle_of_view;
+            var xy = prescription._distribution.get_user_defined_points().get(0);
             return new Results(aov,xy,origin,intercept);
         }
         throw new RuntimeException("Failed to find chief ray angle");

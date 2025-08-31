@@ -7,13 +7,13 @@ public class VarAsphCoeff extends Var {
     public final int index;
     public final double scalingFactor;
     public VarAsphCoeff(Prescription prescription, int surfaceId, int index) {
-        super(prescription, prescription.surfaces[surfaceId]._coeffs[index],0.0001);
+        super(prescription, prescription._surfaces[surfaceId]._coeffs[index],0.0001);
         this.surfaceId = surfaceId;
         this.index = index;
         this.scalingFactor = Math.pow(10.0,4+index);
     }
     public VarAsphCoeff(Prescription prescription, int surfaceId, int index,double scalingFactor) {
-        super(prescription, prescription.surfaces[surfaceId]._coeffs[index],0.0001);
+        super(prescription, prescription._surfaces[surfaceId]._coeffs[index],0.0001);
         this.surfaceId = surfaceId;
         this.index = index;
         this.scalingFactor = scalingFactor;
@@ -32,14 +32,14 @@ public class VarAsphCoeff extends Var {
             double scaled = originalValue * scalingFactor;
             double newValue = scaled + delta;
             double unscaled = newValue / scalingFactor;
-            prescription.surfaces[surfaceId]._coeffs[index] = unscaled;
+            prescription._surfaces[surfaceId]._coeffs[index] = unscaled;
         }
         else
-            prescription.surfaces[surfaceId]._coeffs[index] = originalValue;
+            prescription._surfaces[surfaceId]._coeffs[index] = originalValue;
 
     }
     @Override
     public String toString() {
-        return "Surface ID: " + surfaceId + " Asph Coeff [" + index + "]: " + prescription.surfaces[surfaceId]._coeffs[index] + " scaling factor " + scalingFactor;
+        return "Surface ID: " + surfaceId + " Asph Coeff [" + index + "]: " + prescription._surfaces[surfaceId]._coeffs[index] + " scaling factor " + scalingFactor;
     }
 }

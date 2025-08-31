@@ -26,17 +26,20 @@ import java.util.List;
 // trying to optimize
 public class Prescription {
 
-    public final double focalLength;
-    public final double fno;
-    // The quoted angle of view - e.g. 47 degrees for 50mm
-    public final double angleOfViewDegrees;
+    // Focal length of default scenario, in multi config this is defined by _focal_length_by_scenario
+    public final double _focal_length;
+    // F-number of default scenario, in multi config this is defined by _f_number_by_scenario
+    public final double _fno;
+    // The quoted angle of view - e.g. 47 degrees for 50mm; this is the full angle of view
+    // This is defined by _angle_of_views_by_scenario in multi config
+    public final double _angle_of_view_in_degrees;
     // For 35mm this is sqrt(36^2 + 24^2) = 43.27
-    public final double diameterImageCircle;
-    public final boolean d_line;
+    public final double _diameter_image_circle;
+    public final boolean _generate_d_line_only;
 
     // Used to build
-    public List<SurfaceType> surfaceList = new ArrayList<SurfaceType>();
-    public SurfaceType[] surfaces;
+    public List<SurfaceType> _surface_list = new ArrayList<SurfaceType>();
+    public SurfaceType[] _surfaces;
 
     // Maps our config id to scenario number in the OpticalBench specs
     public int[] _configurations;
@@ -45,53 +48,53 @@ public class Prescription {
     public double[] _focal_length_by_scenario;
     public double[] _f_number_by_scenario;
 
-    public Distribution distribution;   // FIXME rename, used for ray finding only
-    public double varAoV = 0.0;
+    public Distribution _distribution;   // FIXME rename, used for ray finding only
+    public double _var_angle_of_view = 0.0;
 
     // Following are optional values for information only
-    public String title;
-    public String lensName;
-    public String patentCountry = "";
-    public String patentNumber;
-    public String patentExample = "";
-    public String applicationYear = "";
-    public String inventors = "";
-    public String organization = "";
-    public String patentLink = "";
+    public String _title;
+    public String _lens_name;
+    public String _patent_country = "";
+    public String _patent_number;
+    public String _patent_example = "";
+    public String _application_year = "";
+    public String _inventors = "";
+    public String _organization = "";
+    public String _patent_link = "";
 
     public Prescription(double focalLength, double fno, double angleOfViewDegrees, double diameterImageCircle, boolean d_line) {
-        this.focalLength = focalLength;
-        this.fno = fno;
-        this.angleOfViewDegrees = angleOfViewDegrees;
-        this.diameterImageCircle = diameterImageCircle;
-        this.d_line = d_line;
-        this.distribution = new Distribution(Pattern.UserDefined,10, 0.999);
+        this._focal_length = focalLength;
+        this._fno = fno;
+        this._angle_of_view_in_degrees = angleOfViewDegrees;
+        this._diameter_image_circle = diameterImageCircle;
+        this._generate_d_line_only = d_line;
+        this._distribution = new Distribution(Pattern.UserDefined,10, 0.999);
     }
 
     public Prescription surf(double radius, double thickness, double diameter, double nd, double vd, String glassName) {
-        surfaceList.add(new SurfaceType(Integer.toString(surfaceList.size()+1), false, radius, thickness, diameter, nd, vd, glassName));
+        _surface_list.add(new SurfaceType(Integer.toString(_surface_list.size()+1), false, radius, thickness, diameter, nd, vd, glassName));
         return this;
     }
     public Prescription surf(double radius, double thickness, double diameter, double nd, double vd) {
-        surfaceList.add(new SurfaceType(Integer.toString(surfaceList.size()+1),false, radius, thickness, diameter, nd, vd, null));
+        _surface_list.add(new SurfaceType(Integer.toString(_surface_list.size()+1),false, radius, thickness, diameter, nd, vd, null));
         return this;
     }
     public Prescription surf(double radius, double thickness, double diameter) {
-        surfaceList.add(new SurfaceType(Integer.toString(surfaceList.size()+1),false, radius, thickness, diameter, 0, 0, null));
+        _surface_list.add(new SurfaceType(Integer.toString(_surface_list.size()+1),false, radius, thickness, diameter, 0, 0, null));
         return this;
     }
     public Prescription stop(double thickness, double diameter) {
-        surfaceList.add(new SurfaceType(Integer.toString(surfaceList.size()+1),true,0,thickness,diameter,0,0,null));
+        _surface_list.add(new SurfaceType(Integer.toString(_surface_list.size()+1),true,0,thickness,diameter,0,0,null));
         return this;
     }
     public Prescription field_stop(double thickness, double diameter) {
-        var surface = new SurfaceType(Integer.toString(surfaceList.size()+1),false,0,thickness,diameter,0,0,null);
+        var surface = new SurfaceType(Integer.toString(_surface_list.size()+1),false,0,thickness,diameter,0,0,null);
         surface._is_field_stop = true;
-        surfaceList.add(surface);
+        _surface_list.add(surface);
         return this;
     }
     public Prescription asph(double k, double[] coeffs) {
-        var lastSurface = surfaceList.get(surfaceList.size()-1);
+        var lastSurface = _surface_list.get(_surface_list.size()-1);
         lastSurface._k = k;
         lastSurface._coeffs = coeffs;
         return this;
@@ -101,7 +104,7 @@ public class Prescription {
      */
     public double imageDiameterForField(double field) {
         assert field >= 0 && field <= 1.0;
-        return diameterImageCircle*field;
+        return _diameter_image_circle *field;
     }
 
     /**
@@ -111,19 +114,19 @@ public class Prescription {
         if (field == 0.0) return 0.0;
         if (field > 0 && field <= 1.0) {
             var radius = imageDiameterForField(field)/2.0;
-            var radians = Math.atan(radius/focalLength);
+            var radians = Math.atan(radius/ _focal_length);
             return 2.0*Math.toDegrees(radians);
         }
         else throw new IllegalArgumentException("Field must be between 0 and 1.");
     }
     public double getHalfAngleOfViewInDegrees() {
-        return angleOfViewDegrees/2.0;
+        return _angle_of_view_in_degrees /2.0;
     }
     public double getHalfAngleOfViewInRadians() {
-        return Math.toRadians(angleOfViewDegrees/2.0);
+        return Math.toRadians(_angle_of_view_in_degrees /2.0);
     }
     public Prescription build() {
-        this.surfaces = surfaceList.toArray(new SurfaceType[surfaceList.size()]);
+        this._surfaces = _surface_list.toArray(new SurfaceType[_surface_list.size()]);
         return this;
     }
     private Prescription import_surface(OpticalBenchDataImporter.LensSurface surface,
@@ -174,20 +177,20 @@ public class Prescription {
                 specs.get_angle_of_view_in_degrees(0),  // default is scenario 0
                 specs.get_image_height(),
                 false);
-        prescription.title = specs.get_descriptive_data().get_title();
+        prescription._title = specs.get_descriptive_data().get_title();
         var patentInfo = specs.get_descriptive_data().find_variable("patent");
         if (patentInfo != null) {
-            prescription.patentCountry = patentInfo.get_value(0);
-            prescription.patentNumber = patentInfo.get_value(1);
-            prescription.patentExample = patentInfo.get_value(2);
-            prescription.applicationYear = patentInfo.get_value(3);
-            prescription.inventors = patentInfo.get_value( 4);
-            prescription.organization = patentInfo.get_value(5);
-            prescription.patentLink = patentInfo.get_value(6);
+            prescription._patent_country = patentInfo.get_value(0);
+            prescription._patent_number = patentInfo.get_value(1);
+            prescription._patent_example = patentInfo.get_value(2);
+            prescription._application_year = patentInfo.get_value(3);
+            prescription._inventors = patentInfo.get_value( 4);
+            prescription._organization = patentInfo.get_value(5);
+            prescription._patent_link = patentInfo.get_value(6);
         }
         var lensName = specs.get_descriptive_data().find_variable("lens name");
         if (lensName != null) {
-            prescription.lensName = lensName.get_value(0);
+            prescription._lens_name = lensName.get_value(0);
         }
         prescription.add_configurations(specs);
         List<OpticalBenchDataImporter.LensSurface> surfaces = specs.get_surfaces();
@@ -203,7 +206,7 @@ public class Prescription {
     private void add_configuration_data(OpticalBenchDataImporter.LensSurface lensSurface) {
         if (_configurations == null || _configurations.length == 0)
             return;
-        var lastSurface = surfaceList.get(surfaceList.size()-1);
+        var lastSurface = _surface_list.get(_surface_list.size()-1);
         var thickness_by_scenario = lensSurface.get_thickness_by_scenario();
         if (thickness_by_scenario.size() > 1) {
             double[] thickness = new double[_configurations.length];
@@ -230,12 +233,7 @@ public class Prescription {
 
     private Prescription add_configurations(OpticalBenchDataImporter.LensSpecifications specs) {
         OpticalBenchDataImporter.Variable configurations = specs.get_descriptive_data().find_variable("configurations");
-        if (configurations == null || configurations.num_values() < 2) {
-            // by default, we only do scenario 0
-            _configurations = new int[] {0};
-            _configuration_names = new String[] {"default"};
-        }
-        else {
+        if (configurations != null && configurations.num_values() >= 2) {
             _configurations = new int[configurations.num_values()/2];
             _configuration_names = new String[configurations.num_values()/2];
             for (int i = 0, j = 0; i < configurations.num_values(); i += 2, j++) {
@@ -246,15 +244,15 @@ public class Prescription {
                 _configurations[j] = scenario;
                 _configuration_names[j] = name;
             }
-        }
-        _focal_length_by_scenario = new double[_configurations.length];
-        _f_number_by_scenario = new double[_configurations.length];
-        _angle_of_views_by_scenario = new double[_configurations.length];
-        for (int i = 0; i < _configurations.length; i++) {
-            int scenario = _configurations[i];
-            _focal_length_by_scenario[i] = specs.get_focal_length(scenario);
-            _f_number_by_scenario[i] = specs.get_f_number(scenario);
-            _angle_of_views_by_scenario[i] = specs.get_angle_of_view_in_degrees(scenario);
+            _focal_length_by_scenario = new double[_configurations.length];
+            _f_number_by_scenario = new double[_configurations.length];
+            _angle_of_views_by_scenario = new double[_configurations.length];
+            for (int i = 0; i < _configurations.length; i++) {
+                int scenario = _configurations[i];
+                _focal_length_by_scenario[i] = specs.get_focal_length(scenario);
+                _f_number_by_scenario[i] = specs.get_f_number(scenario);
+                _angle_of_views_by_scenario[i] = specs.get_angle_of_view_in_degrees(scenario);
+            }
         }
         return this;
     }
@@ -265,19 +263,19 @@ public class Prescription {
             Vector3 direction = Vector3.vector3_001;
             // angleOfViewDegrees may be set when we are called
             // by the ray finder
-            if (field != 0.0 || varAoV != 0.0) {
+            if (field != 0.0 || _var_angle_of_view != 0.0) {
                 // Construct unit vector at an angle
                 //      double z1 = cos (angleOfView);
                 //      double y1 = sin (angleOfView);
                 //      unit_vector = math::Vector3 (0, y1, z1);
-                double effectiveAngle = field != 0? angleOfViewDegrees*field : varAoV;
+                double effectiveAngle = field != 0? _angle_of_view_in_degrees *field : _var_angle_of_view;
                 double aov = Math.toRadians(effectiveAngle) / 2.0;
                 Matrix3 r = Matrix3.get_rotation_matrix(0, aov);
                 direction = r.times(direction);
             }
             PointSource.Builder ps = new PointSource.Builder(PointSource.SourceInfinityMode.SourceAtInfinity, direction)
                     .add_spectral_line(SpectralLine.d);
-            if (!d_line)
+            if (!_generate_d_line_only)
                 ps.add_spectral_line(SpectralLine.C)
                     .add_spectral_line(SpectralLine.F);
             sys.add(ps);
@@ -285,16 +283,16 @@ public class Prescription {
         /* anchor lens */
         Lens.Builder lens = new Lens.Builder().position(Vector3Pair.position_000_001);
         double image_pos = 0.0;
-        for (int i = 0; i < surfaces.length; i++) {
-            var s = surfaces[i];
+        for (int i = 0; i < _surfaces.length; i++) {
+            var s = _surfaces[i];
             double thickness = add_surface(lens, s);
             image_pos += thickness;
         }
         sys.add(lens);
-        Image.Builder image = new Image.Builder().position(new Vector3Pair(new Vector3(0, 0, image_pos), Vector3.vector3_001)).curve(Flat.flat).shape(new Rectangle(diameterImageCircle * 2.));
+        Image.Builder image = new Image.Builder().position(new Vector3Pair(new Vector3(0, 0, image_pos), Vector3.vector3_001)).curve(Flat.flat).shape(new Rectangle(_diameter_image_circle * 2.));
         sys.add(image);
         sys.half_angle_of_view_in_degrees(getHalfAngleOfViewInDegrees());
-        sys.f_number(this.fno);
+        sys.f_number(this._fno);
         return sys;
     }
     private static double add_surface(Lens.Builder lens, SurfaceType s) {
@@ -350,7 +348,7 @@ public class Prescription {
     }
 
     public String get_title() {
-        return title;
+        return _title;
     }
 
     public int get_num_configurations() {
@@ -358,55 +356,55 @@ public class Prescription {
     }
 
     public double get_f_number() {
-        return fno;
+        return _fno;
     }
 
     public SurfaceType[] get_surfaces() {
-        return surfaces;
+        return _surfaces;
     }
 
     public StringBuilder toOptBenchStr(StringBuilder sb) {
         sb.append("[descriptive data]\n");
         sb.append("[variable distances]\n");
-        sb.append("Focal Length\t").append(focalLength).append("\n");
-        sb.append("Angle of View\t").append(angleOfViewDegrees).append("\n");
-        sb.append("F-Number\t").append(fno).append("\n");
-        sb.append("Image Height\t").append(diameterImageCircle).append("\n");
+        sb.append("Focal Length\t").append(_focal_length).append("\n");
+        sb.append("Angle of View\t").append(_angle_of_view_in_degrees).append("\n");
+        sb.append("F-Number\t").append(_fno).append("\n");
+        sb.append("Image Height\t").append(_diameter_image_circle).append("\n");
         sb.append("[lens data]\n");
-        for (SurfaceType surface : surfaceList) {
+        for (SurfaceType surface : _surface_list) {
             surface.toOptBenchStr(sb);
         }
         sb.append("[aspherical data]\n");
-        for (SurfaceType surface : surfaceList) {
+        for (SurfaceType surface : _surface_list) {
             surface.asphericsToOptBenchStr(sb);
         }
         return sb;
     }
     public StringBuilder toMarkdownStr(StringBuilder sb) {
-        if (lensName != null)
-            sb.append("# ").append(lensName).append("\n");
-        if (patentNumber != null) {
+        if (_lens_name != null)
+            sb.append("# ").append(_lens_name).append("\n");
+        if (_patent_number != null) {
             sb.append("## Patent Information\n");
             sb.append("| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |\n");
             sb.append("| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |\n");
-            sb.append("|").append(patentCountry).append(" | ")
-                    .append(patentNumber).append(" | ")
-                    .append(patentExample).append(" | ")
-                    .append(applicationYear).append(" | ")
-                    .append(inventors).append(" | ")
-                    .append(organization).append(" | ")
-                    .append("[link](").append(patentLink).append(") |\n");
+            sb.append("|").append(_patent_country).append(" | ")
+                    .append(_patent_number).append(" | ")
+                    .append(_patent_example).append(" | ")
+                    .append(_application_year).append(" | ")
+                    .append(_inventors).append(" | ")
+                    .append(_organization).append(" | ")
+                    .append("[link](").append(_patent_link).append(") |\n");
         }
         boolean sawAsph = false;
         SurfaceType.toMarkdownTableHeader(sb);
-        for (SurfaceType surface : surfaceList) {
+        for (SurfaceType surface : _surface_list) {
             surface.toMarkdownTableRow(sb);
             if (surface.is_aspheric())
                 sawAsph = true;
         }
         if (sawAsph) {
             SurfaceType.asphericMarkdownTableHeader(sb);
-            for (SurfaceType surface : surfaceList) {
+            for (SurfaceType surface : _surface_list) {
                 if (surface.is_aspheric())
                     surface.ashericToMarkdownTableRow(sb);
             }

@@ -10,12 +10,12 @@ public class VarAoV extends Var {
     @Override
     public void shift(double delta) {
         //System.out.println("Shifting AOV from " + originalValue + " to " + (originalValue+delta));
-        prescription.varAoV = originalValue + delta;
+        prescription._var_angle_of_view = originalValue + delta;
     }
 
     @Override
     public String toString() {
-        return "AOV : " + prescription.varAoV;
+        return "AOV : " + prescription._var_angle_of_view;
     }
 
 }

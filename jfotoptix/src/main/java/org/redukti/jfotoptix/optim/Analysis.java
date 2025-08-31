@@ -71,8 +71,8 @@ public class Analysis {
             spots[i] = new AnalysisSpot(systems[i],spotDensity).process_analysis();
         }
         pfo = ParaxialFirstOrderInfo.compute(systems[0]).asArray();
-        if (prescription.distribution.get_user_defined_points() != null) {
-            singleRayTraceResults = new AnalysisRayFinder(systems[0],prescription.distribution).compute();
+        if (prescription._distribution.get_user_defined_points() != null) {
+            singleRayTraceResults = new AnalysisRayFinder(systems[0],prescription._distribution).compute();
         }
     }
 }

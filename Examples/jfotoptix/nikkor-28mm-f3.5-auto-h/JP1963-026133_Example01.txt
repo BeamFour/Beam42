@@ -1,0 +1,35 @@
+[descriptive data]
+title	JP 1963-026133 Example 1 (Nikon Nikkor-H 2.8cm f/3.5)
+[constants]
+Scaled	28	100
+[variable distances]
+Focal Length	28
+Angle of View	73
+F-Number	3.5
+Image Height	43.2
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf(p)	undefined
+Bf	37.10
+[lens data]
+1	102.284	5.096	1.6726	47.66	32.2
+2	1960.000	0.196		47.66
+3	67.200	1.652	1.6212	38.40	60.1
+4	17.360	25.760		28.17
+5	17.976	3.332	1.6387	13.14	55.3
+6	-365.176	3.296		11.79	
+6AS	AS	1.8		10.630
+7	-16.940	0.868	1.6726	10.49	32.2
+8	29.400	1.484		11.41
+9	-112.588	2.548	1.6582	12.15	50.8
+10	-14.784	0.196		12.15
+11	59.640	1.764	1.5163	13.03	64
+12	-56.140	Bf		13.03
+[figure]
+source	Data/JP1963-026133_Example01_Tale12-Fig1.png
+ppmm	11.93847636
+originX	8
+originY	293
+[notes]
+

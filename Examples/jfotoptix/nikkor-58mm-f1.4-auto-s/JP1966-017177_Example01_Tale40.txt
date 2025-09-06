@@ -1,0 +1,39 @@
+[descriptive data]
+title	JP 1966-017177 Example 1 (Nikkor-S Auto 58mm f/1.4)
+[constants]
+Scaled	58	1
+[variable distances]
+Focal Length	58
+Angle of View	42
+F-Number	1.4
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf	37.004
+[lens data]
+1	85.492	4.5240	1.5750	46.56	41.3
+2	330.716	0.2900		46.56
+3	45.994	3.4220	1.6073	44.38	59.5
+4	77.372	0.1160		44.38
+5	27.492	9.9760	1.7200	42.31	50.3
+6	135.024	0.1160		42.31
+7	129.978	2.0880	1.6727	42.31	32.2
+8	16.820	7.9780		28.44
+9AS	AS	6.00		25.557
+9	-21.518	2.7840	1.6727	27.88	32.2
+10	400.026	11.6000	1.7440	35.93	44.9
+11	-31.378	0.2900		35.93
+12	90.016	5.2200	1.7200	33.83	50.3
+13	-69.948	Bf		33.83
+[figure]
+source	Data/JP1966-017177_Figure01.png
+originX	62.20
+originY	509.56
+ppmm	19.440
+[figure]
+source	Data/JP1966-017177_Example01_Tale40-Fig1.png
+caption	Nikon Nikkor-S Auto 58mm f/1.4
+originX	8.59
+originY	305.48
+ppmm	12.618
+[notes]

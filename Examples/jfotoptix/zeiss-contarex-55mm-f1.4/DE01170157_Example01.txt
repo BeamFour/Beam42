@@ -1,5 +1,8 @@
 [descriptive data]
 title	DE 1,170,157 Example 1 (Zeiss Planar f1.4 55mm)
+#patent	country	number	example	year	inventors	org	link
+patent	DE	DE 1170157	EX 1	1959	BERGER JOHANNES, LANGE DR. GUENTHER	Carl Zeiss	https://worldwide.espacenet.com/patent/search?q=pn%3DDE1170157B
+lens name	Zeiss Planar 55mm f1.4 for Contarex
 [constants]
 Scaled 55	1
 [variable distances]
@@ -12,20 +15,20 @@ d0	Infinity
 Bf(p)	36.30
 Bf	36.47
 [lens data]
-1	46.5630	6.3195	1.71700	45.56	47.90
+1	46.5630	6.3195	1.71700	45.56	47.90	N-LAF3
 2	149.3800	0.0935		44.10	
-3	26.5650	9.7570	1.62299	39.40	58.12
+3	26.5650	9.7570	1.62299	39.40	58.12	SK15
 4	Infinity	0.0000		39.40	
-5	Infinity	1.3915	1.57501	39.40	41.31
+5	Infinity	1.3915	1.57501	39.40	41.31	LF7
 6	16.5220	9.2870		27.78	
 6AS	AS	6.5090		24.638
-7	-19.9210	2.0460	1.80518	27.40	25.46
+7	-19.9210	2.0460	1.80518	27.40	25.46	SFL6
 8	204.9960	0.0000		28.74	
-9	204.9960	8.1730	1.78443	28.74	43.77
+9	204.9960	8.1730	1.78443	28.74	43.77	LAFN10
 10	-33.6875	0.0935		31.10	
-11	-88.9790	4.6475	1.78443	31.10	43.77
+11	-88.9790	4.6475	1.78443	31.10	43.77	LAFN10
 12	-42.7130	0.0935		32.00	
-13	131.2300	4.6475	1.71700	33.22	47.90
+13	131.2300	4.6475	1.71700	33.22	47.90	N-LAF3
 14	-62.5405	Bf		33.22	
 [figure]
 source	Data/DE01170157_Figure01.png

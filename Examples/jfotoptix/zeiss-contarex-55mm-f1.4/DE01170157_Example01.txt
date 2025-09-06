@@ -13,7 +13,8 @@ Image Height	43.26
 Magnification	0
 d0	Infinity
 Bf(p)	36.30
-Bf	36.47
+Bf(Bill)	36.47
+Bf	36.35
 [lens data]
 1	46.5630	6.3195	1.71700	45.56	47.90	N-LAF3
 2	149.3800	0.0935		44.10	
@@ -41,3 +42,4 @@ originX	284.41
 originY	304.90
 ppmm	8.924
 [notes]
+Dibyendu: Added glass types and amended back focus

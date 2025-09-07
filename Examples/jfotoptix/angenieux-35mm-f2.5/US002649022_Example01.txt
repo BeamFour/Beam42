@@ -1,5 +1,8 @@
 [descriptive data]
-title	GB 673,358 Example 1 (Angenieux 35mm f2.5 R1)
+title	US 2649022 Example 1 (Angenieux 35mm f2.5 R1)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US 2649022	EX 1	1950	Pierre Angenieux	Angenieux	https://patents.google.com/patent/US2649022A/en
+lens name	Angenieux 35mm f2.5 R1
 [constants]
 Scaled	35	100
 [variable distances]

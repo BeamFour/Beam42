@@ -1,5 +1,8 @@
 [descriptive data]
-title	GB 720,808 Example 1 (Angenieux 28mm f3.5 R11)
+title	US 2696758 Example 1 (Angenieux 28mm f3.5 R11)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US 2696758	EX 1	1950	Pierre Angenieux	Angenieux	https://patents.google.com/patent/US2696758A/en
+lens name	Angenieux 28mm f3.5 R11
 [constants]
 Scaled	28	100
 [variable distances]
@@ -15,16 +18,16 @@ Bf	37.62
 [lens data]
 1	95.52	5.87	1.6751	51.60	32.3
 2	805.67	0.30		48.46	
-1'	98.18	1.47	1.6204	41.48	60.2
+1'	98.18	1.47	1.6204	41.48	60.2	SK16
 2'	18.66	31.21		30.64	
-3	37.99	4.40	1.6204	14.62	60.2
+3	37.99	4.40	1.6204	14.62	60.2	SK16
 4	-90.62	0.15		13.66	
-5	20.36	4.29	1.6204	14.00	60.2
+5	20.36	4.29	1.6204	14.00	60.2	SK16
 6	55.25	1.37		11.46	
 6AS	AS	1.37		10.871
 7	-23.44	0.62	1.6287	10.86	35.3
 8	18.18	1.97		11.74	
-9	90.62	2.49	1.6204	10.94	60.2
+9	90.62	2.49	1.6204	10.94	60.2	SK16
 10	-15.14	Bf		12.00	
 [figure]	
 source	Data/GB0720808_Figure01.png

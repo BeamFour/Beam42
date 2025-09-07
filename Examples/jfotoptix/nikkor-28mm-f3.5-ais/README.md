@@ -1,0 +1,66 @@
+# AIS Nikkor 28mm f/3.5
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US 4099850 | EX 5 | 1977 | Sei Matsui | Nikon Corp | [link](https://patents.google.com/patent/US4099850A/en) |
+## Surface Data
+Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
+
+| ID  | Radius | Thickness | Diameter | nd  | vd  | Glass Make | Glass |
+| --- | ---    | ---       | ---      | --- | --- | ---        | ---   |
+| 1 | 102.05 | 3.0 | 41.22 | 1.62374 | 47.01 | Hikari | J-BAF8 |
+| 2 | 620.4 | 0.1 | 41.22 |  |  |  |
+| 3 | 57.0 | 1.6 | 35.71 | 1.62041 | 60.25 | Hikari | J-SK16 |
+| 4 | 15.8 | 27.3 | 24.96 |  |  |  |
+| 5 | 24.3 | 2.8 | 16.17 | 1.70154 | 41.02 | Hikari | J-BASF7 |
+| 6 | -53.54 | 0.8 | 16.17 |  |  |  |
+| 7 | AS | 4.8 | 12.638 |  |  |  |
+| 8 | -21.49 | 4.5 | 16.02 | 1.7552 | 27.57 | Hikari | J-SF4 |
+| 9 | 34.9 | 1.1 | 14.8 |  |  |  |
+| 10 | -90.0 | 2.7 | 14.8 | 1.62041 | 60.25 | Hikari | J-SK16 |
+| 11 | -18.08 | 0.1 | 16.02 |  |  |  |
+| 12 | 82.0 | 2.5 | 20.66 | 1.58913 | 61.22 | Hikari | J-SK5 |
+| 13 | -49.8 | 39.15 | 20.66 |  |  |  |
+## Layouts
+![Layout Only](./layoutonly.svg)
+![Layout Only](./layout.svg)
+![Layout Only](./layout-semi-skew.svg)
+![Layout Only](./layout-skew.svg)
+## Spot Diagrams
+![Layout Only](./spot.svg)
+![Layout Only](./spot-semi-skew.svg)
+![Layout Only](./spot-skew.svg)
+## Paraxial Parameters
+| parameter | value |
+| ---       | ---   |
+| effective_focal_length |28.604
+| back_focal_length | 39.289
+| optical_invariant | 3.09
+| object_distance | 1.0E10
+| image_distance | 39.15
+| power | 0.035
+| pp1_H | 35.889
+| ppk_H' | -10.685
+| ffl_F | 7.285
+| fno | 3.5
+| enp_dist_P | 21.764
+| enp_radius | 4.086
+| exp_dist_P' | -17.221
+| exp_radius | 8.073
+| m | 0.005
+| red | -3.4960181397592396E8
+| n_obj | 1
+| n_img | 1
+| img_ht | 21.633
+| obj_ang | 37.1
+| obj_na | 0
+| img_na | -0.141|
+## Spot Analysis
+| Field | Spot Mean Radius | Spot Max Radius |
+| ---   | ---              | ---             |
+ | 0.0 | 4.559 | 8.434|
+ | 0.7 | 14.457 | 33.83|
+ | 1.0 | 34.419 | 119.55|
+## Resources
+* [OpticalBench Compatible Data File, tab delimited](./US004099850_Example05.txt)
+* [Zemax file](./US004099850_Example05.zmx)

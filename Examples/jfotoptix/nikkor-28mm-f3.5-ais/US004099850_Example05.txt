@@ -1,0 +1,44 @@
+[descriptive data]				
+title	US 4,099,850 Example 5 (Nikon Nikkor 28mm f/3.5)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US 4099850	EX 5	1977	Sei Matsui	Nikon Corp	https://patents.google.com/patent/US4099850A/en
+lens name	AIS Nikkor 28mm f/3.5
+[constants]
+Scaled	28.6	100
+[variable distances]				
+Focal Length	28.6
+Angle of View	74.2			
+F-Number	3.5			
+Image Height	43.2
+Total Length	51.30
+Magnification	0			
+d0	Infinity			
+Bf(Bill)	39.28
+Bf	39.15
+[lens data]				
+1	102.05	3.0	1.62374	41.22	47.0	J-BAF8
+2	620.40	0.1		41.22	
+3	57.00	1.6	1.62041	35.71	60.3	J-SK16
+4	15.80	27.3		24.96	
+5	24.30	2.8	1.70154	16.17	41.1	J-BASF7
+6	-53.54	0.8		16.17	
+6AS	AS	4.8		12.638
+7	-21.49	4.5	1.75520	16.02	27.5	J-SF4
+8	34.90	1.1		14.80	
+9	-90.00	2.7	1.62041	14.80	60.3	J-SK16
+10	-18.08	0.1		16.02	
+11	82.00	2.5	1.58913	20.66	61.2	J-SK5
+12	-49.80	Bf		20.66	
+[group data]
+1-2	1	4	-44.80
+[figure]
+source	Data/US004099850_Figure01P.png
+originX	91
+originY	586
+ppmm	4.222
+[figure]
+source	Data/US004099850_Figure01.png
+originX	102			
+originY	1027			
+ppmm	37.193
+[notes]

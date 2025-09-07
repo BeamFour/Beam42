@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP 1963-026133 Example 1 (Nikon Nikkor-H 2.8cm f/3.5)
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP-S38-026133(1963)	EX 1	1958	Zenji Wakimoto	Nikon Corp	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S38-026133/12/en
+lens name	Nikkor-H 2.8cm Auto f/3.5
 [constants]
 Scaled	28	100
 [variable distances]
@@ -11,7 +14,8 @@ Total Length	undefined
 Magnification	0
 d0	Infinity
 Bf(p)	undefined
-Bf	37.10
+Bf(Bill)	37.10
+Bf	36.95
 [lens data]
 1	102.284	5.096	1.6726	47.66	32.2	SF5
 2	1960.000	0.196		47.66

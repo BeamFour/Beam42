@@ -1,0 +1,37 @@
+[descriptive data]
+title	US 4,203,653 Example 1 (Nikon LW-Nikkor 28mm f/2.8)
+[constants]
+Scaled	28	1
+[variable distances]
+Focal Length	28
+Angle of View	74
+F-Number	2.8
+Image Height	43.2
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf	36.260
+Aperture Diameter	12.833
+[lens data]
+1	35.448	1.960	1.67025	28.46	57.5		LAL52
+2	14.700	16.128		21.24	
+3	23.100	2.632	1.60323	15.54	42.5		BAFD5
+4	-47.488	4.464		15.54	
+4AS	AS	3.964		12.833
+5	-15.764	3.136	1.78470	12.02	26.1		FDS3
+6	63.644	0.728		13.27
+7	-58.744	2.044	1.80411	13.27	46.6		TAF3
+8	-18.116	0.112		14.28	
+9	-489.496	2.436	1.73200	16.38	51.0		J-LAK09	LAK16A
+10	-23.492	Bf		16.38	
+[figure]
+source	Data/US004203653_Figure01P.png
+originX	18.54
+originY	64.54
+ppmm	1.807
+[figure]
+source	Data/US004203653_Figure01.png
+originX	83
+originY	286
+ppmm	13.751
+[notes]

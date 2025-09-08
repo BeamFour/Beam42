@@ -1,0 +1,36 @@
+[descriptive data]
+title	US 4,203,653 Example 2
+#patent	country	number	example	year	inventors	org	link
+patent	US	US 4203653	EX 2	1977	Ikuo Mori	Nikon Corp	https://patents.google.com/patent/US4203653A
+lens name	Nikon 28mm f/2.8 Series-E
+[constants]
+Scaled	28	1
+[variable distances]
+Focal Length	28
+Angle of View	74
+F-Number	2.8
+Image Height	43.2
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf(orig)	36.652
+Bf	36.27
+Aperture Diameter	13.578
+[lens data]
+1	39.732	1.596	1.62280	30.40	56.9	J-SK10
+2	14.028	17.444		22.64	
+3	25.228	3.304	1.62374	16.66	47.0	J-BAF8
+4	-40.852	4.467		16.66	
+4AS	AS	4.689		13.578
+5	-16.464	3.416	1.75520	13.00	27.5	J-SF4
+6	53.172	0.588		13.77
+7	-175.308	2.436	1.71300	13.77	53.9	J-LAK8
+8	-17.724	0.112		15.30	
+9	-277.564	2.044	1.77279	17.40	49.4	J-LASF016
+10	-31.080	Bf		17.40	
+[figure]
+source	Data/US004203653_Figure01.png
+originX	83
+originY	286
+ppmm	12.899
+[notes]

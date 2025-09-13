@@ -1,0 +1,38 @@
+[descriptive data]
+title	JP 1964-025754 Example 1 (Nikon Nikkor-S Auto 50mm f/2)
+[constants]
+SCaled	50	100
+[variable distances]
+Focal Length	50
+Angle of View	46
+F-Number	2
+Image Height	43.2
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf	37.58
+[lens data]
+1	328.50	2.40	1.6127	25.04	58.6
+2	299.00	0.30		25.04
+3	31.30	3.40	1.6141	24.96	55.1
+4	125.95	0.40		24.96
+5	18.36	3.50	1.6141	22.98	55.1
+6	31.30	3.10	1.6483	22.98	33.8
+7	13.18	4.23		18.02
+7AS	AS	4.77		17.826
+8	-13.35	2.80	1.7408	17.53	27.7
+9	-49.54	3.20	1.7440	20.35	44.9
+10	-16.67	0.05		20.35
+11	274.25	2.35	1.7440	21.08	44.9
+12	-50.70	Bf		21.08
+[figure]
+source	Data/JP1964-025754_Figure01P.png
+originX	5.31
+originY	225.48
+ppmm	16.590
+[figure]
+source	Data/JP1964-025754_Figure01.png
+originX	145.99
+originY	504.97
+ppmm	27.914
+[notes]

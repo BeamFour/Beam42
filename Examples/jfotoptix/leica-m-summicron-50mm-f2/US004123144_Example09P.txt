@@ -1,5 +1,8 @@
 [descriptive data]
 title	US 4,123,144 Example 9 (Leica Summicron-M 50mm F2 v5)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US4123144	EX 9	1976	Walter Mandler,Garry Edwards,Erich Wagner	Ernst Leitz Wetzlar GmbH	https://patents.google.com/patent/US4123144A/en
+lens name	Leica Summicron-M 50mm F2 v5
 [constants]
 Scaled	52	100
 [variable distances]

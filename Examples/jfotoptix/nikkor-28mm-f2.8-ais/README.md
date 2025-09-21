@@ -1,3 +1,8 @@
+# AI Nikkor 28mm f/2.8S (v2) (secondary patent)
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US5917663 | EX 2 | 1998 | Kenzaburo Suzuki | Nikon Corp | [link](https://patents.google.com/patent/US5917663A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

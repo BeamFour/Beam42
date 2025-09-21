@@ -1,3 +1,8 @@
+# Leica Elmarit-R f/2.8 (v1)
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US3740120 | EX 3 | 1971 | R Ruhl | Ernst Leitz Wetzlar GmbH | [link](https://patents.google.com/patent/US3740120A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

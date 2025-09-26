@@ -1,0 +1,34 @@
+[descriptive data]
+title	US 4,139,265 Example 1
+#patent	country	number	example	year	inventors	org	link
+patent	US	US4139265	EX 1	1976	Sei Matsui	Nikon Corp	https://patents.google.com/patent/US4139265A/en
+lens name	AI NIKKOR 50mm f/1.8
+[constants]
+[variable distances]
+Focal Length	51.6
+Angle of View	46
+F-Number	1.8
+Image Height	43.2
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf	37.45
+[lens data]
+1	40.999	4.6	1.79631	33.64	40.8	NBFD2
+2	197.89	0.1		33.64	
+3	21.4	4.7	1.78797	27.76	47.5	J-LASF014
+4	32.59	1.0		25.24	
+5	50.99	1.1	1.74000	25.24	28.2	FD3
+6	16.199	7.41		20.91	
+6AS	AS	5.689		20.077
+7	-16.5	1.299	1.74000	19.83	28.2	FD3
+8	-99.99	5.399	1.74443	23.34	49.4	N-LAK28
+9	-20.64	0.1		24.90	
+10	204.299	3.449	1.79631	24.30	40.8	NBFD2
+11	-49.6521	Bf		24.30	
+[figure]
+source	Data/US004139265_Figure01.png
+ppmm	19.48474978
+originX	34
+originY	993
+[notes]

@@ -1,0 +1,44 @@
+[descriptive data]
+title	JP 1973-010083 Example 1
+[constants]
+Scaled	50	1
+[variable distances]
+Focal Length	50
+Angle of View	46
+F-Number	1.4
+Total Length	46.8
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf	35.490
+[lens data]
+1	35.375	6.40	1.62041	42.00	60.3	J-SK16
+2	182.850	0.15		42.00
+3	25.415	4.35	1.69350	33.43	53.4	S-LAL13
+4	44.595	0.70		33.43
+5	58.000	4.35	1.58215	31.19	42.0	FL3
+6	14.470	8.82		23.26
+6AS	AS	7.48		22.637
+7	-14.620	1.00	1.75520	22.54	27.5	J-SF4
+8	740.000	5.80	1.69350	29.44	53.4	S-LAL13
+9	-24.035	0.15		29.44
+10	-72.500	4.45	1.80610	31.62	40.7	S-LAH53
+11	-25.020	0.15		31.62
+12	104.000	3.00	1.69350	32.59	53.4	S-LAL13
+13	-129.725	Bf		32.59
+[group data]
+5	8	9	33.670
+6	10	11	45.490
+7	12	13	83.675
+[figure]
+source	Data/JP1973-010083_Figure01P.png
+caption	Canon FL50mm f1.4 II
+originX	18.33
+originY	109.55
+ppmm	5.602
+[figure]
+source	Data/JP1973-010083_Figure01.png
+originX	60.86
+originY	368.65	341.83
+ppmm	14.186
+[notes]

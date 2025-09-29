@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP 1973-010083 Example 1
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP 48-010083	EX 1	1967	Kikuo Momiyama	Canon Inc 	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S48-010083/12/en
+lens name	Canon FL 50mm f1.4 v2
 [constants]
 Scaled	50	1
 [variable distances]
@@ -10,7 +13,7 @@ Total Length	46.8
 Image Height	43.2
 Magnification	0
 d0	Infinity
-Bf	35.490
+Bf	35.435
 [lens data]
 1	35.375	6.40	1.62041	42.00	60.3	J-SK16
 2	182.850	0.15		42.00

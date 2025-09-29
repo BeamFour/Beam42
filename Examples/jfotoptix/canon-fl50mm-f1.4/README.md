@@ -1,3 +1,8 @@
+# Canon FL 50mm f1.4 v2
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|JP | JP 48-010083 | EX 1 | 1967 | Kikuo Momiyama | Canon Inc  | [link](https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S48-010083/12/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -16,7 +21,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 11 | -72.5 | 4.45 | 31.62 | 1.8061 | 40.93 | Ohara | S-LAH53 |
 | 12 | -25.02 | 0.15 | 31.62 |  |  |  |
 | 13 | 104.0 | 3.0 | 32.59 | 1.6935 | 53.21 | Ohara | S-LAL13 |
-| 14 | -129.725 | 35.49 | 32.59 |  |  |  |
+| 14 | -129.725 | 35.435 | 32.59 |  |  |  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Only](./layout.svg)
@@ -33,7 +38,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | back_focal_length | 35.49
 | optical_invariant | 7.58
 | object_distance | 1.0E10
-| image_distance | 35.49
+| image_distance | 35.435
 | power | 0.02
 | pp1_H | 48.732
 | ppk_H' | 14.51
@@ -43,7 +48,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | enp_radius | 17.857
 | exp_dist_P' | -38.543
 | exp_radius | 26.44
-| m | 0
+| m | 0.001
 | red | -1.9999938593540168E8
 | n_obj | 1
 | n_img | 1
@@ -54,9 +59,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 18.065 | 45.743|
- | 0.7 | 90.28 | 418.79|
- | 1.0 | 126.955 | 589.481|
+ | 0.0 | 17.341 | 46.991|
+ | 0.7 | 98.187 | 438.257|
+ | 1.0 | 133.118 | 605.723|
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./JP1973-010083_Example01.txt)
 * [Zemax file](./JP1973-010083_Example01.zmx)

@@ -1,0 +1,40 @@
+[descriptive data]
+title	US 3,506,339 Example 1 (Ricoh Pentax Super-Takumar 28mm f3.5)
+[constants]
+Scaled	28	100
+[variable distances]
+Focal Length	28
+Angle of View	74.30
+F-Number	3.5
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf(p)	undefined
+Bf	37.95
+[lens data]
+1	140.000	5.334	1.67003	38.01	47.2
+2	1931.924	0.148		38.01	
+3	22.960	1.176	1.62041	26.62	60.3
+4	11.967	9.436		20.38	
+5	-50.400	15.960	1.65160	18.21	58.5
+6	-55.416	0.140		12.31	
+7	22.400	3.920	1.72000	12.76	42.0
+8	-203.088	2.729		12.68	
+8AS	AS	1.331		10.722
+9	-20.720	0.560	1.69890	10.73	30.0
+10	31.528	1.680		10.73
+11	-75.600	1.960	1.62041	11.28	60.3
+12	-15.207	0.084		11.28
+13	-280.000	1.680	1.62041	11.28	60.3
+14	-29.982	Bf		11.28
+[figure]
+source	Data/US003506339_Figure01P.png
+originX	127.94
+originY	205.63
+ppmm	9.260
+[figure]
+source	Data/US003506339_Figure01.png
+originX	140.05
+originY	414.96
+ppmm	12.593
+[notes]

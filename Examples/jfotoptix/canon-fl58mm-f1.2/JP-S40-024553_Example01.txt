@@ -1,0 +1,28 @@
+[descriptive data]
+title	JP-S40-024553 Example 1
+[constants]
+Scaled	50	1
+[variable distances]
+Focal Length	50
+Angle of View	46
+F-Number	1.4
+Total Length	46.8
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf	29.9
+[lens data]
+1	42.65	6.35	1.7234	42.00	38.0		
+2	273.15	0.1		42.00
+3	26.45	10.25	1.6676	33.43	41.9		
+4	-131.8	2.2	1.7552	33.43	27.5
+5	16.35	6.325		24.2
+6	AS	6.325		22.637
+7	-17.55	1.5	1.5927	24.2	35.4
+8	52.75	9.9	1.713	28.5	53.89
+9	-27.75	0.1		28.5
+10	0	1.75	1.72	28.5	50.31
+11	-76.4	0.1		28.5
+12	112.05	2.2	1.744	28.5	44.9
+13	-109.75	Bf		28.5
+[notes]

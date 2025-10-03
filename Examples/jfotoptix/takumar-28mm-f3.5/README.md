@@ -1,3 +1,8 @@
+# Asahi Super-Takumar 28mm f3.5
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US 3506339 | EX 1 | 1967 | Tomokazu Kazamaki | Asahi Kogaku Kogyo Co Ltd | [link](https://patents.google.com/patent/US3506339A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

@@ -1,5 +1,8 @@
 [descriptive data]
-title	US 3,506,339 Example 1 (Ricoh Pentax Super-Takumar 28mm f3.5)
+title	US 3,506,339 Example 1 (Pentax Super-Takumar 28mm f3.5)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US 3506339	EX 1	1967	Tomokazu Kazamaki	Asahi Kogaku Kogyo Co Ltd	https://patents.google.com/patent/US3506339A/en
+lens name	Asahi Super-Takumar 28mm f3.5
 [constants]
 Scaled	28	100
 [variable distances]

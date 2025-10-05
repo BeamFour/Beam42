@@ -11,9 +11,4 @@ public class Tfm3d {
         this.rot_mat = rot_mat;
         this.vec = vec;
     }
-
-    public Tfm3d() {
-        this.rot_mat = Matrix3.IDENTITY;
-        this.vec = Vector3.ZERO;
-    }
 }

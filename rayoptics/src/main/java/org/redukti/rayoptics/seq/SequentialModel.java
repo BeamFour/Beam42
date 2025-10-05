@@ -201,8 +201,8 @@ public class SequentialModel {
      */
     public double central_rndx(int i) {
         int central_wvl = opt_model.optical_spec.spectral_region.reference_wvl;
-//        if (i < 0)
-//            i += rndx.size();
+        if (i < 0)
+            i += rndx.size();
         return rndx.get(i)[central_wvl];
     }
 
@@ -232,41 +232,41 @@ public class SequentialModel {
             stop_surface = null;
         return stop_surface;
     }
+    public Integer set_stop() {
+        return set_stop(null);
+    }
 
     /**
      * insert ifc and gap *after* cur_surface in seq_model lists
-     *
-     * @param ifc
-     * @param gap
-     * @param prev
-     * @param z_dir
      */
-    void insert(Interface ifc, Gap gap, boolean prev, ZDir z_dir) {
-        if (stop_surface != null) {
-            Objects.requireNonNull(cur_surface);
-            int num_ifcs = ifcs.size();
-            if (num_ifcs > 2) {
-                if (stop_surface > cur_surface &&
-                        stop_surface < num_ifcs - 2)
-                    stop_surface += 1;
+    void insert(Interface ifc, Gap gap, ZDir z_dir, Integer idx) {
+        if (idx == null) {
+            var num_ifcs = ifcs.size();
+            if (stop_surface != null) {
+                if (num_ifcs > 2) {
+                    if (stop_surface > cur_surface &&
+                            stop_surface < num_ifcs - 2)
+                        stop_surface += 1;
+                }
             }
+            idx = (num_ifcs < 1) ? 0 : cur_surface + 1;
         }
-        int idx = cur_surface == null ? 0 : cur_surface + 1;
+
         cur_surface = idx;
+
         ifcs.add(idx, ifc);
         if (gap != null) {
-            int idx_g = prev ? idx - 1 : idx;
-            gaps.add(idx_g, gap);
+            gaps.add(idx, gap);
             z_dir = z_dir == null ? ZDir.PROPAGATE_RIGHT : z_dir;
             ZDir new_z_dir = (idx > 1) ? ZDir.from(z_dir.value * this.z_dir.get(idx - 1).value) : z_dir;
             this.z_dir.add(idx, new_z_dir);
         } else {
             gap = gaps.get(idx);
         }
-        Tfm3d tfrm = new Tfm3d();
-        gbl_tfrms.add(tfrm);
-        lcl_tfrms.add(tfrm);
 
+        Tfm3d tfrm = new Tfm3d(Matrix3.IDENTITY,Vector3.ZERO);
+        gbl_tfrms.add(idx, tfrm);
+        lcl_tfrms.add(idx, tfrm);
 
         double[] wvls = opt_model.optical_spec.spectral_region.wavelengths;
         double[] rindex = new double[wvls.length];
@@ -277,6 +277,8 @@ public class SequentialModel {
         //         if ifc.interact_mode == 'reflect':
         //            self.update_reflections(start=idx)
     }
+
+    // TODO scan_for_reflections
 
     /**
      * add a surface where `surf_data` is a list that contains:
@@ -289,11 +291,13 @@ public class SequentialModel {
      * <p>
      * The `refractive_index, v-number` entry can have several forms:
      * <p>
-     * - **refractive_index, v-number**
-     * - **refractive_index** only -> constant index model
-     * - **'REFL'** -> set interact_mode to 'reflect'
-     * - **glass_name, catalog_name** as 1 or 2 strings
-     * - blank -> defaults to air
+     *       - **refractive_index, v-number** (numeric)
+     *       - **refractive_index** only -> constant index model
+     *       - **glass_name, catalog_name** as 1 or 2 strings
+     *       - an instance with a :meth:`~opticalglass.opticalmedium.OpticalMedium.rindex` attribute
+     *       - **air**, str -> :class:`~opticalglass.opticalmedium.Air`
+     *       - blank -> defaults to :class:`~opticalglass.opticalmedium.Air`
+     *       - **'REFL'** -> set interact_mode to 'reflect'
      * <p>
      * The `semi-diameter` entry is optional
      *
@@ -306,10 +310,77 @@ public class SequentialModel {
             Objects.requireNonNull(cur_surface);
             mat = gaps.get(cur_surface).medium;
         }
-        NewSurfaceSpec newSurfaceSpec = create_surface_and_gap(surf_data, radius_mode, mat, 550.0);
-        insert(newSurfaceSpec.surface, newSurfaceSpec.gap, false, newSurfaceSpec.z_dir);
+        NewSurfaceSpec newSurfaceSpec = create_surface_and_gap(surf_data, radius_mode, mat, null);
+        insert(newSurfaceSpec.surface, newSurfaceSpec.gap, newSurfaceSpec.z_dir, null);
     }
 
+    public void update_model() { update_model(null);}
+    public void update_model(Integer start) {
+        // delta n across each surface interface must be set to some
+        // reasonable default value. use the index at the central wavelength
+        OpticalSpecs osp = opt_model.optical_spec;
+        int ref_wl = osp.spectral_region.reference_wvl;
+
+        this.wvlns = osp.spectral_region.wavelengths;
+        this.rndx = calc_ref_indices_for_spectrum(wvlns);
+
+        var num_ifcs = ifcs.size();
+        if (cur_surface != null) {
+            if (num_ifcs == 2)
+                cur_surface = 0;
+            else if (cur_surface >= num_ifcs)
+                cur_surface = num_ifcs - 1;
+        }
+        else {
+            // if None set cur_surface to insert before image surface
+            cur_surface = num_ifcs - 2;
+        }
+
+        if (start == null)
+            start = 0;
+        var b4_idx = start == 0 ? start : start - 1;
+        double n_before = rndx.get(b4_idx)[ref_wl];
+        //this.z_dir = new ArrayList<>();
+        //ZDir z_dir_before = ZDir.PROPAGATE_RIGHT;
+        ZDir z_dir_before = z_dir.get(b4_idx);
+
+        List<Pair<Interface, Gap>> seq = zip_longest(Lists.from(this.ifcs,start), Lists.from(this.gaps,start));
+
+        for (int j = 0, i = start; j < seq.size(); j++) {
+            Interface ifc = seq.get(j).first;
+            Gap g = seq.get(j).second;
+            ZDir z_dir_after = z_dir_before;
+            if (ifc.interact_mode.equals("reflect"))
+                z_dir_after = z_dir_after.opposite();
+
+            // leave rndx data unsigned, track change of sign using z_dir
+            if (g != null) {
+                double n_after = this.rndx.get(i)[ref_wl];
+                if (z_dir_after.value < 0)
+                    n_after = -n_after;
+                ifc.delta_n = n_after - n_before;
+                n_before = n_after;
+
+                z_dir_after = z_dir_after;
+                this.z_dir.set(i,z_dir_after);
+            }
+
+            // call update() on the surface interface
+            ifc.update();
+            i++;
+        }
+
+        this.gbl_tfrms = this.compute_global_coords();
+        this.lcl_tfrms = this.compute_local_transforms();
+
+        /*
+         if self.do_apertures:
+            if len(self.ifcs) > 2:
+                osp.update_model(**kwargs)
+
+                self.set_clear_apertures()
+         */
+    }
 
     /**
      * create a surface and gap where `surf_data` is a list that contains:
@@ -322,11 +393,13 @@ public class SequentialModel {
      * <p>
      * The `refractive_index, v-number` entry can have several forms:
      * <p>
-     * - **refractive_index, v-number**
-     * - **refractive_index** only -> constant index model
-     * - **'REFL'** -> set interact_mode to 'reflect'
-     * - **glass_name, catalog_name** as 1 or 2 strings
-     * - blank -> defaults to air
+     *   - **refractive_index, v-number** (numeric)
+     *   - **refractive_index** only -> constant index model
+     *   - **glass_name, catalog_name** as 1 or 2 strings
+     *   - an instance with a :meth:`~opticalglass.opticalmedium.OpticalMedium.rindex` attribute
+     *   - **air**, str -> :class:`~opticalglass.opticalmedium.Air`
+     *   - blank -> defaults to :class:`~opticalglass.opticalmedium.Air`
+     *   - **'REFL'** -> set interact_mode to 'reflect'
      * <p>
      * The `semi-diameter` entry is optional
      *
@@ -335,8 +408,10 @@ public class SequentialModel {
      * @param prev_medium
      * @param wvl
      */
-    public NewSurfaceSpec create_surface_and_gap(SurfaceData surf_data, boolean radius_mode, Medium prev_medium, double wvl) {
+    public NewSurfaceSpec create_surface_and_gap(SurfaceData surf_data, boolean radius_mode, Medium prev_medium, Double wvl) {
 
+        if (wvl == null)
+            wvl = 550.0;
         Surface s = new Surface();
 
         if (radius_mode) {
@@ -384,6 +459,27 @@ public class SequentialModel {
         return new NewSurfaceSpec(s, g, rndx, tfrm, z_dir);
     }
 
+    /**
+     * Return global surface coordinates (rot, t) wrt surface `glo`.
+     *
+     *         If origin isn't None, it should be a tuple (r, t) being the transform
+     *         from the desired global origin to the specified global surface.
+     */
+    public List<Tfm3d> compute_global_coords(Integer glo, Tfm3d origin) {
+        if (glo == null) glo = 1;
+        return Transform.compute_global_coords(this, glo, origin);
+    }
+    public List<Tfm3d> compute_global_coords() {
+        return compute_global_coords(null,null);
+    }
+
+    public List<Tfm3d> compute_local_transforms(List<Pair<Interface, Gap>> seq, Integer step) {
+        if (step == null) step = 1;
+        return Transform.compute_local_transforms(this, seq, step);
+    }
+    public List<Tfm3d> compute_local_transforms() {
+        return compute_local_transforms(null,null);
+    }
 
     public StringBuilder list_surfaces(StringBuilder sb) {
         for (int i = 0; i < ifcs.size(); i++) {
@@ -411,169 +507,6 @@ public class SequentialModel {
             list.add(new Pair<>(ifc, g));
         }
         return list;
-    }
-
-    public void update_model() {
-        // delta n across each surface interface must be set to some
-        // reasonable default value. use the index at the central wavelength
-        OpticalSpecs osp = opt_model.optical_spec;
-        int ref_wl = osp.spectral_region.reference_wvl;
-
-        this.wvlns = osp.spectral_region.wavelengths;
-        this.rndx = calc_ref_indices_for_spectrum(wvlns);
-        double n_before = rndx.get(0)[ref_wl];
-
-        this.z_dir = new ArrayList<>();
-        ZDir z_dir_before = ZDir.PROPAGATE_RIGHT;
-
-        List<Pair<Interface, Gap>> seq = zip_longest(this.ifcs, this.gaps);
-
-        for (int i = 0; i < seq.size(); i++) {
-            Interface ifc = seq.get(i).first;
-            Gap g = seq.get(i).second;
-            ZDir z_dir_after = z_dir_before;
-            if (ifc.interact_mode.equals("reflect"))
-                z_dir_after = z_dir_after.opposite();
-
-            // leave rndx data unsigned, track change of sign using z_dir
-            if (g != null) {
-                double n_after = this.rndx.get(i)[ref_wl];
-                if (z_dir_after.value < 0)
-                    n_after = -n_after;
-                ifc.delta_n = n_after - n_before;
-                n_before = n_after;
-
-                z_dir_after = z_dir_after;
-                this.z_dir.add(z_dir_after);
-            }
-
-            // call update() on the surface interface
-            ifc.update();
-        }
-
-        this.gbl_tfrms = this.compute_global_coords(1);
-        this.lcl_tfrms = this.compute_local_transforms(null, 1);
-
-        /*
-         if self.do_apertures:
-            if len(self.ifcs) > 2:
-                osp.update_model(**kwargs)
-
-                self.set_clear_apertures()
-         */
-    }
-
-    /**
-     * Return forward surface coordinates (r.T, t) for each interface.
-     * @param seq
-     * @param step
-     * @return
-     */
-    public List<Tfm3d> compute_local_transforms(List<Pair<Interface, Gap>> seq, int step) {
-        List<Tfm3d> tfrms = new ArrayList<>();
-        if (seq == null) {
-            seq = zip_longest(
-                    Lists.slice(ifcs, null, null, step),
-                    Lists.slice(gaps, null, null, step));
-        }
-        Iterator<Pair<Interface, Gap>> iter = seq.iterator();
-        Pair<Interface, Gap> before = iter.next();
-        Interface b4_ifc = before.first;
-        Gap b4_gap = before.second;
-        while (true) {
-            Pair<Interface, Gap> after;
-            Interface ifc;
-            Gap gap;
-            if (iter.hasNext()) {
-                after = iter.next();
-                ifc = after.first;
-                gap = after.second;
-            }
-            else {
-                tfrms.add(new Tfm3d());
-                break;
-            }
-            double zdist = step * b4_gap.thi;
-            Tfm3d tr3 = Transform.forward_transform(b4_ifc, zdist, ifc);
-            Matrix3 r = tr3.rot_mat;
-            Vector3 t = tr3.vec;
-            Matrix3 rt = r.transpose();
-            tfrms.add(new Tfm3d(rt, t));
-            before = after;
-            b4_ifc = ifc;
-            b4_gap = gap;
-        }
-        return tfrms;
-    }
-
-    /**
-     * Return global surface coordinates (rot, t) wrt surface glo.
-     *
-     * @param glo
-     * @return
-     */
-    public List<Tfm3d> compute_global_coords(int glo) {
-        List<Tfm3d> tfrms = new ArrayList<>();
-        Tfm3d prev = new Tfm3d();
-        tfrms.add(prev);
-        List<Pair<Interface, Gap>> seq;
-        Interface b4_ifc;
-        Gap b4_gap;
-        if (glo > 0) {
-            // iterate in reverse over the segments before the
-            // global reference surface
-            int step = -1;
-            seq = zip_longest(
-                    Lists.slice(ifcs, glo, null, step),
-                    Lists.slice(gaps, glo - 1, null, step));
-            Iterator<Pair<Interface, Gap>> iter = seq.iterator();
-            Pair<Interface, Gap> after = iter.next();
-            Interface ifc = after.first;
-            Gap gap = after.second;
-            // loop of remaining surfaces in path
-            while (iter.hasNext()) {
-                Pair<Interface, Gap> before = iter.next();
-                b4_ifc = before.first;
-                b4_gap = before.second;
-                double zdist = gap.thi;
-                Tfm3d tr3 = Transform.reverse_transform(ifc, zdist, b4_ifc);
-                Matrix3 r = tr3.rot_mat;
-                Vector3 t = tr3.vec;
-                t = prev.rot_mat.multiply(t).add(prev.vec); //  t = prev[0].dot(t) + prev[1]
-                r = prev.rot_mat.multiply(r);
-                prev = new Tfm3d(r, t);
-                tfrms.add(prev);
-                after = before;
-                ifc = b4_ifc;
-                gap = b4_gap;
-            }
-            tfrms = Lists.slice(tfrms, null, null, -1); // reverse
-        }
-
-        seq = zip_longest(Lists.from(ifcs, glo), Lists.from(gaps, glo));
-        Iterator<Pair<Interface, Gap>> iter = seq.iterator();
-        Pair<Interface, Gap> before = iter.next();
-        b4_ifc = before.first;
-        b4_gap = before.second;
-        prev = new Tfm3d(Matrix3.IDENTITY, Vector3.ZERO);
-        // loop forward over the remaining surfaces in path
-        while (iter.hasNext()) {
-            Pair<Interface, Gap> after = iter.next();
-            Interface ifc = after.first;
-            Gap gap = after.second;
-            double zdist = b4_gap.thi;
-            Tfm3d tr3 = Transform.forward_transform(b4_ifc, zdist, ifc);
-            Matrix3 r = tr3.rot_mat;
-            Vector3 t = tr3.vec;
-            t = prev.rot_mat.multiply(t).add(prev.vec); //  t = prev[0].dot(t) + prev[1]
-            r = prev.rot_mat.multiply(r);
-            prev = new Tfm3d(r, t);
-            tfrms.add(prev);
-            before = after;
-            b4_ifc = ifc;
-            b4_gap = gap;
-        }
-        return tfrms;
     }
 
     public static List<PathSeg> zip_longest(List<Interface> ifcs,

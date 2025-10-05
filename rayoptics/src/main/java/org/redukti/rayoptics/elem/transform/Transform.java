@@ -2,7 +2,7 @@ package org.redukti.rayoptics.elem.transform;
 
 import org.redukti.mathlib.Matrix3;
 import org.redukti.mathlib.Vector3;
-import org.redukti.rayoptics.math.Transform3;
+import org.redukti.rayoptics.math.Tfm3d;
 import org.redukti.rayoptics.raytr.RayData;
 import org.redukti.rayoptics.seq.Interface;
 import org.redukti.rayoptics.util.Pair;
@@ -18,7 +18,7 @@ public class Transform {
      * @param s2
      * @return
      */
-    public static Transform3 forward_transform(Interface s1, double zdist, Interface s2) {
+    public static Tfm3d forward_transform(Interface s1, double zdist, Interface s2) {
         // calculate origin of s2 wrt to s1
         Vector3 t_orig = new Vector3(0., 0., zdist);
         Matrix3 r_after_s1 = null,
@@ -49,7 +49,7 @@ public class Transform {
         else if (r_before_s2 != null) {
             r_cascade = r_before_s2;
         }
-        return new Transform3(r_cascade, t_orig);
+        return new Tfm3d(r_cascade, t_orig);
     }
 
     /**
@@ -61,7 +61,7 @@ public class Transform {
      * @param s2
      * @return
      */
-    public static Transform3 reverse_transform(Interface s1, double zdist, Interface s2) {
+    public static Tfm3d reverse_transform(Interface s1, double zdist, Interface s2) {
         // calculate origin of s2 wrt to s1
         Vector3 t_orig = new Vector3(0., 0., zdist);
         Matrix3 r_after_s1 = null,
@@ -94,7 +94,7 @@ public class Transform {
         else if (r_after_s1 != null) {
             r_cascade = r_after_s1.transpose();
         }
-        return new Transform3(r_cascade, t_orig);
+        return new Tfm3d(r_cascade, t_orig);
     }
 
     /**

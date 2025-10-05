@@ -4,7 +4,7 @@ import org.redukti.mathlib.Matrix3;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.elem.surface.Surface;
 import org.redukti.rayoptics.elem.transform.Transform;
-import org.redukti.rayoptics.math.Transform3;
+import org.redukti.rayoptics.math.Tfm3d;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.specs.OpticalSpecs;
 import org.redukti.rayoptics.util.Lists;
@@ -61,13 +61,13 @@ public class SequentialModel {
     public List<Interface> ifcs = new ArrayList<>();
     public List<Gap> gaps = new ArrayList<>();
     public List<ZDir> z_dir = new ArrayList<>();
-    public Integer stop_surface;
-    public Integer cur_surface;
+    public Integer stop_surface;    // index of stop interface
+    public Integer cur_surface;     // insertion index for next interface
     public boolean do_apertures = true;
 
     // derived attributes
-    public List<Transform3> gbl_tfrms = new ArrayList<>();
-    public List<Transform3> lcl_tfrms = new ArrayList<>();
+    public List<Tfm3d> gbl_tfrms = new ArrayList<>();  // global coordinates of each interface wrt the 1st interface
+    public List<Tfm3d> lcl_tfrms = new ArrayList<>();  // forward transform, interface to interface
 
     //  data for a wavelength vs index vs gap data arrays
     /**
@@ -75,6 +75,7 @@ public class SequentialModel {
      */
     public double[] wvlns;
     /**
+     * a list with refractive indices for all **wvls**
      * refractive index vs wv and gap
      */
     public List<double[]> rndx = new ArrayList<>();
@@ -96,7 +97,7 @@ public class SequentialModel {
         // add object interface
         ifcs.add(new Surface("Obj", "dummy"));
 
-        Transform3 tfrm = new Transform3();
+        Tfm3d tfrm = new Tfm3d( Matrix3.IDENTITY,Vector3.ZERO);
         gbl_tfrms.add(tfrm);
         lcl_tfrms.add(tfrm);
 
@@ -112,6 +113,169 @@ public class SequentialModel {
         ifcs.add(new Surface("Img", "dummy"));
         gbl_tfrms.add(tfrm);
         lcl_tfrms.add(tfrm);
+    }
+
+    public int get_num_surfaces() {
+        return ifcs.size();
+    }
+
+    /**
+     * returns an iterable path tuple for a range in the sequential model
+     *
+     * @param wl    wavelength in nm for path, defaults to central wavelength
+     * @param start start of range
+     * @param stop  first value beyond the end of the range
+     * @param step  increment or stride of range
+     * @return (* * ifcs, gaps, lcl_tfrms, rndx, z_dir * *)
+     */
+    public List<PathSeg> path(Double wl, Integer start, Integer stop, int step) {
+        if (wl == null)
+            wl = central_wavelength();
+        Integer gap_start;
+        if (step < 0)
+            gap_start = start != null ? start - 1 : null;
+        else
+            gap_start = start;
+        int wl_idx = index_for_wavelength(wl);
+        /* extract the refractive index for given wavelength and list of surfaces */
+        List<double[]> rndx_list = Lists.slice(rndx, start, stop, step);
+        List<Double> rndx = new ArrayList<>();
+        for (double[] narr: rndx_list) {
+            rndx.add(narr[wl_idx]);
+        }
+        return zip_longest(
+                Lists.slice(ifcs, start, stop, step),
+                Lists.slice(gaps, gap_start, stop, step),
+                Lists.slice(lcl_tfrms, start, stop, step),
+                rndx,
+                Lists.slice(z_dir, start, stop, step)
+        );
+    }
+
+    // TODO reverse_path()
+
+    /**
+     * returns a list with refractive indices for all **wvls**
+     *
+     * @param wvls list of wavelengths in nm
+     */
+    public List<double[]> calc_ref_indices_for_spectrum(double[] wvls) {
+        List<double[]> indices = new ArrayList<>();
+        for (Gap g : gaps) {
+            double[] ri = new double[wvlns.length];
+            Medium mat = g.medium;
+            for (int i = 0; i < wvls.length; i++) {
+                double rndx = mat.rindex(wvls[i]);
+                ri[i] = rndx;
+            }
+            indices.add(ri);
+        }
+        return indices;
+    }
+
+    /**
+     * returns the central wavelength in nm of the model's `WvlSpec`
+     */
+    public double central_wavelength() {
+        return opt_model.optical_spec.spectral_region.central_wvl();
+    }
+
+    /**
+     * returns index into rndx array for wavelength `wvl` in nm
+     * @param wvl
+     * @return
+     */
+    public int index_for_wavelength(double wvl) {
+        this.wvlns = opt_model.optical_spec.spectral_region.wavelengths;
+        for (int i = 0; i < wvlns.length; i++) {
+            if (wvlns[i] == wvl)
+                return i;
+        }
+        throw new IllegalArgumentException("Wavelength " + wvl + " not found");
+    }
+
+    /**
+     * returns the central refractive index of the model's WvlSpec
+     * @param i
+     * @return
+     */
+    public double central_rndx(int i) {
+        int central_wvl = opt_model.optical_spec.spectral_region.reference_wvl;
+//        if (i < 0)
+//            i += rndx.size();
+        return rndx.get(i)[central_wvl];
+    }
+
+    public Pair<Interface,Gap> get_surface_and_gap(Integer srf) {
+        if (srf == null)
+            srf = cur_surface;
+        var s = ifcs.get(srf);
+        Gap g = null;
+        if (srf < gaps.size())
+            g = gaps.get(srf);
+        return new Pair<>(s,g);
+    }
+
+    public void set_cur_surface(int s) {
+        cur_surface = s;
+    }
+
+    /**
+     * sets the stop surface to the current surface
+     */
+    public Integer set_stop(Integer cur_idx) {
+        if (cur_idx == null)
+            cur_idx = cur_surface;
+        if (cur_idx != null && ifcs.size() > 2)
+            stop_surface = cur_idx > 0 ? cur_idx : 1;
+        else
+            stop_surface = null;
+        return stop_surface;
+    }
+
+    /**
+     * insert ifc and gap *after* cur_surface in seq_model lists
+     *
+     * @param ifc
+     * @param gap
+     * @param prev
+     * @param z_dir
+     */
+    void insert(Interface ifc, Gap gap, boolean prev, ZDir z_dir) {
+        if (stop_surface != null) {
+            Objects.requireNonNull(cur_surface);
+            int num_ifcs = ifcs.size();
+            if (num_ifcs > 2) {
+                if (stop_surface > cur_surface &&
+                        stop_surface < num_ifcs - 2)
+                    stop_surface += 1;
+            }
+        }
+        int idx = cur_surface == null ? 0 : cur_surface + 1;
+        cur_surface = idx;
+        ifcs.add(idx, ifc);
+        if (gap != null) {
+            int idx_g = prev ? idx - 1 : idx;
+            gaps.add(idx_g, gap);
+            z_dir = z_dir == null ? ZDir.PROPAGATE_RIGHT : z_dir;
+            ZDir new_z_dir = (idx > 1) ? ZDir.from(z_dir.value * this.z_dir.get(idx - 1).value) : z_dir;
+            this.z_dir.add(idx, new_z_dir);
+        } else {
+            gap = gaps.get(idx);
+        }
+        Tfm3d tfrm = new Tfm3d();
+        gbl_tfrms.add(tfrm);
+        lcl_tfrms.add(tfrm);
+
+
+        double[] wvls = opt_model.optical_spec.spectral_region.wavelengths;
+        double[] rindex = new double[wvls.length];
+        for (int i = 0; i < wvls.length; i++)
+            rindex[i] = gap.medium.rindex(wvls[i]);
+        rndx.add(idx, rindex);
+
+        //         if ifc.interact_mode == 'reflect':
+        //            self.update_reflections(start=idx)
     }
 
     /**
@@ -144,52 +308,6 @@ public class SequentialModel {
         }
         NewSurfaceSpec newSurfaceSpec = create_surface_and_gap(surf_data, radius_mode, mat, 550.0);
         insert(newSurfaceSpec.surface, newSurfaceSpec.gap, false, newSurfaceSpec.z_dir);
-    }
-
-    /**
-     * insert surf and gap at the cur_gap edge of the sequential model
-     * graph
-     *
-     * @param ifc
-     * @param gap
-     * @param prev
-     * @param z_dir
-     */
-    void insert(Interface ifc, Gap gap, boolean prev, ZDir z_dir) {
-        if (stop_surface != null) {
-            Objects.requireNonNull(cur_surface);
-            int num_ifcs = ifcs.size();
-            if (num_ifcs > 2) {
-                if (stop_surface > cur_surface &&
-                        stop_surface < num_ifcs - 2)
-                    stop_surface += 1;
-            }
-        }
-        int idx = cur_surface == null ? 0 : cur_surface + 1;
-        cur_surface = idx;
-        ifcs.add(idx, ifc);
-        if (gap != null) {
-            int idx_g = prev ? idx - 1 : idx;
-            gaps.add(idx_g, gap);
-            z_dir = z_dir == null ? ZDir.PROPAGATE_RIGHT : z_dir;
-            ZDir new_z_dir = (idx > 1) ? ZDir.from(z_dir.value * this.z_dir.get(idx - 1).value) : z_dir;
-            this.z_dir.add(idx, new_z_dir);
-        } else {
-            gap = gaps.get(idx);
-        }
-        Transform3 tfrm = new Transform3();
-        gbl_tfrms.add(tfrm);
-        lcl_tfrms.add(tfrm);
-
-
-        double[] wvls = opt_model.optical_spec.spectral_region.wavelengths;
-        double[] rindex = new double[wvls.length];
-        for (int i = 0; i < wvls.length; i++)
-            rindex[i] = gap.medium.rindex(wvls[i]);
-        rndx.add(idx, rindex);
-
-        //         if ifc.interact_mode == 'reflect':
-        //            self.update_reflections(start=idx)
     }
 
 
@@ -261,18 +379,11 @@ public class SequentialModel {
         double thi = surf_data.thickness;
         Gap g = new Gap(thi, mat);
         double rndx = mat.rindex(wvl);
-        Transform3 tfrm = new Transform3(Matrix3.IDENTITY, new Vector3(0., 0., thi));
+        Tfm3d tfrm = new Tfm3d(Matrix3.IDENTITY, new Vector3(0., 0., thi));
 
         return new NewSurfaceSpec(s, g, rndx, tfrm, z_dir);
     }
 
-    /**
-     * sets the stop surface to the current surface
-     */
-    public int set_stop() {
-        stop_surface = cur_surface;
-        return stop_surface;
-    }
 
     public StringBuilder list_surfaces(StringBuilder sb) {
         for (int i = 0; i < ifcs.size(); i++) {
@@ -358,8 +469,8 @@ public class SequentialModel {
      * @param step
      * @return
      */
-    public List<Transform3> compute_local_transforms(List<Pair<Interface, Gap>> seq, int step) {
-        List<Transform3> tfrms = new ArrayList<>();
+    public List<Tfm3d> compute_local_transforms(List<Pair<Interface, Gap>> seq, int step) {
+        List<Tfm3d> tfrms = new ArrayList<>();
         if (seq == null) {
             seq = zip_longest(
                     Lists.slice(ifcs, null, null, step),
@@ -379,15 +490,15 @@ public class SequentialModel {
                 gap = after.second;
             }
             else {
-                tfrms.add(new Transform3());
+                tfrms.add(new Tfm3d());
                 break;
             }
             double zdist = step * b4_gap.thi;
-            Transform3 tr3 = Transform.forward_transform(b4_ifc, zdist, ifc);
+            Tfm3d tr3 = Transform.forward_transform(b4_ifc, zdist, ifc);
             Matrix3 r = tr3.rot_mat;
             Vector3 t = tr3.vec;
             Matrix3 rt = r.transpose();
-            tfrms.add(new Transform3(rt, t));
+            tfrms.add(new Tfm3d(rt, t));
             before = after;
             b4_ifc = ifc;
             b4_gap = gap;
@@ -401,9 +512,9 @@ public class SequentialModel {
      * @param glo
      * @return
      */
-    public List<Transform3> compute_global_coords(int glo) {
-        List<Transform3> tfrms = new ArrayList<>();
-        Transform3 prev = new Transform3();
+    public List<Tfm3d> compute_global_coords(int glo) {
+        List<Tfm3d> tfrms = new ArrayList<>();
+        Tfm3d prev = new Tfm3d();
         tfrms.add(prev);
         List<Pair<Interface, Gap>> seq;
         Interface b4_ifc;
@@ -425,12 +536,12 @@ public class SequentialModel {
                 b4_ifc = before.first;
                 b4_gap = before.second;
                 double zdist = gap.thi;
-                Transform3 tr3 = Transform.reverse_transform(ifc, zdist, b4_ifc);
+                Tfm3d tr3 = Transform.reverse_transform(ifc, zdist, b4_ifc);
                 Matrix3 r = tr3.rot_mat;
                 Vector3 t = tr3.vec;
                 t = prev.rot_mat.multiply(t).add(prev.vec); //  t = prev[0].dot(t) + prev[1]
                 r = prev.rot_mat.multiply(r);
-                prev = new Transform3(r, t);
+                prev = new Tfm3d(r, t);
                 tfrms.add(prev);
                 after = before;
                 ifc = b4_ifc;
@@ -444,19 +555,19 @@ public class SequentialModel {
         Pair<Interface, Gap> before = iter.next();
         b4_ifc = before.first;
         b4_gap = before.second;
-        prev = new Transform3(Matrix3.IDENTITY, Vector3.ZERO);
+        prev = new Tfm3d(Matrix3.IDENTITY, Vector3.ZERO);
         // loop forward over the remaining surfaces in path
         while (iter.hasNext()) {
             Pair<Interface, Gap> after = iter.next();
             Interface ifc = after.first;
             Gap gap = after.second;
             double zdist = b4_gap.thi;
-            Transform3 tr3 = Transform.forward_transform(b4_ifc, zdist, ifc);
+            Tfm3d tr3 = Transform.forward_transform(b4_ifc, zdist, ifc);
             Matrix3 r = tr3.rot_mat;
             Vector3 t = tr3.vec;
             t = prev.rot_mat.multiply(t).add(prev.vec); //  t = prev[0].dot(t) + prev[1]
             r = prev.rot_mat.multiply(r);
-            prev = new Transform3(r, t);
+            prev = new Tfm3d(r, t);
             tfrms.add(prev);
             before = after;
             b4_ifc = ifc;
@@ -465,126 +576,40 @@ public class SequentialModel {
         return tfrms;
     }
 
-    /**
-     * returns a list with refractive indices for all **wvls**
-     *
-     * @param wvls list of wavelengths in nm
-     */
-    public List<double[]> calc_ref_indices_for_spectrum(double[] wvls) {
-        List<double[]> indices = new ArrayList<>();
-        for (Gap g : gaps) {
-            double[] ri = new double[wvlns.length];
-            Medium mat = g.medium;
-            for (int i = 0; i < wvls.length; i++) {
-                double rndx = mat.rindex(wvls[i]);
-                ri[i] = rndx;
-            }
-            indices.add(ri);
-        }
-        return indices;
-    }
-
-    public int get_num_surfaces() {
-        return ifcs.size();
-    }
-
-    /**
-     * returns the central refractive index of the model's WvlSpec
-     * @param i
-     * @return
-     */
-    public double central_rndx(int i) {
-        int central_wvl = opt_model.optical_spec.spectral_region.reference_wvl;
-        if (i < 0)
-            i += rndx.size();
-        return rndx.get(i)[central_wvl];
-    }
-
-    public static List<SeqPathComponent> zip_longest(List<Interface> ifcs,
-                                                     List<Gap> gaps,
-                                                     List<Transform3> lcl_tfrms,
-                                                     List<Double> rndx,
-                                                     List<ZDir> z_dir) {
-        List<SeqPathComponent> list = new ArrayList<>();
+    public static List<PathSeg> zip_longest(List<Interface> ifcs,
+                                            List<Gap> gaps,
+                                            List<Tfm3d> lcl_tfrms,
+                                            List<Double> rndx,
+                                            List<ZDir> z_dir) {
+        List<PathSeg> list = new ArrayList<>();
         List<Integer> sizes = List.of(ifcs.size(), gaps.size(), lcl_tfrms.size(), rndx.size(), z_dir.size());
         int maxSize = sizes.stream().max(Comparator.naturalOrder()).orElse(0);
         for (int i = 0; i < maxSize; i++) {
             Interface ifc = i < ifcs.size() ? ifcs.get(i) : null;
             Gap gap = i < gaps.size() ? gaps.get(i) : null;
-            Transform3 tr3 = i < lcl_tfrms.size() ? lcl_tfrms.get(i) : null;
+            Tfm3d tr3 = i < lcl_tfrms.size() ? lcl_tfrms.get(i) : null;
             Double n = i < rndx.size() ? rndx.get(i) : null;
             ZDir dir = i < z_dir.size() ? z_dir.get(i) : null;
-            list.add(new SeqPathComponent(ifc, gap, tr3, n, dir));
+            list.add(new PathSeg(ifc, gap, tr3, n, dir));
         }
         return list;
     }
 
-    public static List<SeqPathComponent> zip_longest(List<Interface> ifcs,
-                                                     List<Gap> gaps,
-                                                     List<ZDir> z_dir) {
-        List<SeqPathComponent> list = new ArrayList<>();
+    public static List<PathSeg> zip_longest(List<Interface> ifcs,
+                                            List<Gap> gaps,
+                                            List<ZDir> z_dir) {
+        List<PathSeg> list = new ArrayList<>();
         List<Integer> sizes = List.of(ifcs.size(), gaps.size(), z_dir.size());
         int maxSize = sizes.stream().max(Comparator.naturalOrder()).orElse(0);
         for (int i = 0; i < maxSize; i++) {
             Interface ifc = i < ifcs.size() ? ifcs.get(i) : null;
             Gap gap = i < gaps.size() ? gaps.get(i) : null;
             ZDir dir = i < z_dir.size() ? z_dir.get(i) : null;
-            list.add(new SeqPathComponent(ifc, gap, null, null, dir));
+            list.add(new PathSeg(ifc, gap, null, null, dir));
         }
         return list;
     }
 
-
-    /**
-     * returns an iterable path tuple for a range in the sequential model
-     *
-     * @param wl    wavelength in nm for path, defaults to central wavelength
-     * @param start start of range
-     * @param stop  first value beyond the end of the range
-     * @param step  increment or stride of range
-     * @return (* * ifcs, gaps, lcl_tfrms, rndx, z_dir * *)
-     */
-    public List<SeqPathComponent> path(Double wl, Integer start, Integer stop, int step) {
-        if (wl == null)
-            wl = central_wavelength();
-        Integer gap_start;
-        if (step < 0)
-            gap_start = start != null ? start - 1 : null;
-        else
-            gap_start = start;
-        int wl_idx = index_for_wavelength(wl);
-        /* extract the refractive index for given wavelength and list of surfaces */
-        List<double[]> rndx_list = Lists.slice(rndx, start, stop, step);
-        List<Double> rndx = new ArrayList<>();
-        for (double[] narr: rndx_list) {
-            rndx.add(narr[wl_idx]);
-        }
-        return zip_longest(
-                Lists.slice(ifcs, start, stop, step),
-                Lists.slice(gaps, gap_start, stop, step),
-                Lists.slice(lcl_tfrms, start, stop, step),
-                rndx,
-                Lists.slice(z_dir, start, stop, step)
-        );
-    }
-
-    public double central_wavelength() {
-        return opt_model.optical_spec.spectral_region.central_wvl();
-    }
-
-    /**
-     * returns index into rndx array for wavelength `wvl` in nm
-     * @param wvl
-     * @return
-     */
-    public int index_for_wavelength(double wvl) {
-        this.wvlns = opt_model.optical_spec.spectral_region.wavelengths;
-        for (int i = 0; i < wvlns.length; i++) {
-            if (wvlns[i] == wvl)
-                return i;
-        }
-        throw new IllegalArgumentException();
-    }
 
     /*
         def calc_ref_indices_for_spectrum(self, wvls: List[float]):

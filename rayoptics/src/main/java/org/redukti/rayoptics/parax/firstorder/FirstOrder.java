@@ -4,7 +4,7 @@ import org.redukti.mathlib.M;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.seq.Gap;
 import org.redukti.rayoptics.seq.Interface;
-import org.redukti.rayoptics.seq.SeqPathComponent;
+import org.redukti.rayoptics.seq.PathSeg;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.specs.*;
 import org.redukti.rayoptics.util.Lists;
@@ -202,13 +202,13 @@ public class FirstOrder {
     /**
      * Perform a paraxial raytrace of 2 linearly independent rays
      */
-    public static Pair<List<ParaxComponent>, List<ParaxComponent>> paraxial_trace(List<SeqPathComponent> path, int start, ParaxComponent start_yu, ParaxComponent start_yu_bar) {
+    public static Pair<List<ParaxComponent>, List<ParaxComponent>> paraxial_trace(List<PathSeg> path, int start, ParaxComponent start_yu, ParaxComponent start_yu_bar) {
 
         List<ParaxComponent> p_ray = new ArrayList<>();
         List<ParaxComponent> p_ray_bar = new ArrayList<>();
 
-        Iterator<SeqPathComponent> iter = path.iterator();
-        SeqPathComponent before = iter.next();
+        Iterator<PathSeg> iter = path.iterator();
+        PathSeg before = iter.next();
 
         Interface b4_ifc = before.ifc;
         Gap b4_gap = before.gap;
@@ -245,7 +245,7 @@ public class FirstOrder {
 
         // loop over remaining surfaces in path
         while (iter.hasNext()) {
-            SeqPathComponent after = iter.next();
+            PathSeg after = iter.next();
             Interface ifc = after.ifc;
             Gap gap = after.gap;
             Double rndx = after.rndx;

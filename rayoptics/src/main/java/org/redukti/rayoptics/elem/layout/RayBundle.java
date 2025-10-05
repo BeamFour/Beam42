@@ -1,6 +1,6 @@
 package org.redukti.rayoptics.elem.layout;
 
-import org.redukti.rayoptics.math.Transform3;
+import org.redukti.rayoptics.math.Tfm3d;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.RayPkg;
 import org.redukti.rayoptics.raytr.RaySeg;
@@ -40,14 +40,14 @@ public class RayBundle {
         //  start_offset, then modify rayset start to match start_offset.
         // Remember object transformation for resetting at the end.
         SequentialModel seq_model = opt_model.seq_model;
-        List<Transform3> tfrms = seq_model.gbl_tfrms;
-        Transform3 tfrtm0 = tfrms.get(0);
+        List<Tfm3d> tfrms = seq_model.gbl_tfrms;
+        Tfm3d tfrtm0 = tfrms.get(0);
 
         List<RaySeg> start_bundle = this.rayset.values().stream().map(pkg -> pkg.ray.get(0))
                 .collect(Collectors.toList());
         List<RayPkg> ray_list = this.rayset.values().stream().collect(Collectors.toList());
         if (Math.abs(tfrtm0.vec.z) > this.start_offset) {
-            Transform3 tfrm = Layout.setup_shift_of_ray_bundle(seq_model, this.start_offset);
+            Tfm3d tfrm = Layout.setup_shift_of_ray_bundle(seq_model, this.start_offset);
             tfrms.set(0, tfrm);
             Layout.shift_start_of_ray_bundle(start_bundle, ray_list, tfrm, 0);
         }

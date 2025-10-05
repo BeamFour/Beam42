@@ -6,9 +6,9 @@ import org.redukti.rayoptics.elem.surface.IntersectionResult;
 import org.redukti.rayoptics.elem.transform.Transform;
 import org.redukti.rayoptics.exceptions.TraceMissedSurfaceException;
 import org.redukti.rayoptics.exceptions.TraceTIRException;
-import org.redukti.rayoptics.math.Transform3;
+import org.redukti.rayoptics.math.Tfm3d;
 import org.redukti.rayoptics.seq.Interface;
-import org.redukti.rayoptics.seq.SeqPathComponent;
+import org.redukti.rayoptics.seq.PathSeg;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.util.ZDir;
 
@@ -50,7 +50,7 @@ public class RayTrace {
      * @param wvl
      */
     public static RayPkg trace(SequentialModel seq_model, Vector3 pt0, Vector3 dir0, double wvl) {
-        List<SeqPathComponent> path = seq_model.path(wvl, null, null, 1);
+        List<PathSeg> path = seq_model.path(wvl, null, null, 1);
         RayTraceOptions options = new RayTraceOptions();
         options.first_surf = 1;
         options.last_surf = seq_model.get_num_surfaces()-2;
@@ -111,7 +111,7 @@ public class RayTrace {
      * - **op_delta** - optical path wrt equally inclined chords to the optical axis
      * - **wvl** - wavelength (in nm) that the ray was traced in
      */
-    public static RayPkg trace_raw(List<SeqPathComponent> path, Vector3 pt0, Vector3 dir0, double wvl, RayTraceOptions options) {
+    public static RayPkg trace_raw(List<PathSeg> path, Vector3 pt0, Vector3 dir0, double wvl, RayTraceOptions options) {
         int first_surf = options.first_surf != null ? options.first_surf : 0;
         Integer last_surf = options.last_surf;
 
@@ -119,18 +119,18 @@ public class RayTrace {
         List<double[]> eic = new ArrayList<>();
 
         // trace object surface
-        Iterator<SeqPathComponent> iter = path.iterator();
-        SeqPathComponent obj = iter.next();
+        Iterator<PathSeg> iter = path.iterator();
+        PathSeg obj = iter.next();
         Interface srf_obj = obj.ifc;
         IntersectionResult intersection = srf_obj.intersect(pt0, dir0, 1.0e-12, obj.z_dir);
         double dst_b4 = intersection.distance;
         Vector3 pt_obj = intersection.intersection_point;
 
-        SeqPathComponent before = obj;
+        PathSeg before = obj;
         Vector3 before_pt = pt_obj;
         Vector3 before_dir = dir0;
         Vector3 before_normal = srf_obj.normal(before_pt);
-        Transform3 tfrm_from_before = before.transform3;
+        Tfm3d tfrm_from_before = before.transform3;
         ZDir z_dir_before = before.z_dir;
 
         double op_delta = 0.0;
@@ -148,7 +148,7 @@ public class RayTrace {
             double pp_dst = 0.0;
             Interface ifc = null;
             try {
-                SeqPathComponent after = iter.next();
+                PathSeg after = iter.next();
                 Matrix3 rt = tfrm_from_before.rot_mat;
                 Vector3 t = tfrm_from_before.vec;
                 Vector3 b4_pt = rt.multiply(before_pt.minus(t));

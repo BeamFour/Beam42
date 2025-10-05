@@ -3,7 +3,7 @@ package org.redukti.rayoptics.elem.layout;
 import org.redukti.mathlib.Matrix3;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.elem.transform.Transform;
-import org.redukti.rayoptics.math.Transform3;
+import org.redukti.rayoptics.math.Tfm3d;
 import org.redukti.rayoptics.raytr.RayPkg;
 import org.redukti.rayoptics.raytr.RaySeg;
 import org.redukti.rayoptics.seq.Interface;
@@ -28,7 +28,7 @@ public class Layout {
      * @param start_offset
      * @return
      */
-    public static Transform3 setup_shift_of_ray_bundle(SequentialModel seq_model, double start_offset) {
+    public static Tfm3d setup_shift_of_ray_bundle(SequentialModel seq_model, double start_offset) {
         Interface s1 = Lists.get(seq_model.ifcs, 1);
         Interface s0 = Lists.get(seq_model.ifcs, 0);
         return Transform.reverse_transform(s0, start_offset, s1);
@@ -50,7 +50,7 @@ public class Layout {
      * @param trfm
      * @param cr_indx
      */
-    public static void shift_start_of_ray_bundle(List<RaySeg> start_bundle, List<RayPkg> ray_bundle, Transform3 trfm, int cr_indx) {
+    public static void shift_start_of_ray_bundle(List<RaySeg> start_bundle, List<RayPkg> ray_bundle, Tfm3d trfm, int cr_indx) {
 
         Matrix3 rot = trfm.rot_mat;
         Vector3 t = trfm.vec;

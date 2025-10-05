@@ -3,7 +3,7 @@ package org.redukti.rayoptics.parax.firstorder;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.seq.Gap;
 import org.redukti.rayoptics.seq.Interface;
-import org.redukti.rayoptics.seq.SeqPathComponent;
+import org.redukti.rayoptics.seq.PathSeg;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.ZDir;
@@ -61,10 +61,10 @@ public class ParaxialModel {
      *             mode
      * @param path
      */
-    public List<ParaxPathComp> seq_path_to_paraxial_lens(List<SeqPathComponent> path) {
+    public List<ParaxPathComp> seq_path_to_paraxial_lens(List<PathSeg> path) {
         List<ParaxPathComp> sys = new ArrayList<>();
         for (int i = 0; i < path.size(); i++) {
-            SeqPathComponent sg = path.get(i);
+            PathSeg sg = path.get(i);
             Interface ifc = sg.ifc;
             Gap gap = sg.gap;
             Double rndx = sg.rndx;

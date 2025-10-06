@@ -134,7 +134,11 @@ public class EvenPolynomial extends SurfaceProfile {
 
     @Override
     public void apply_scale_factor(double scale_factor) {
-
+        cv /= scale_factor;
+        var sf = 1.0 / scale_factor;
+        for (int i = 0; i < coefs.length; i++) {
+            coefs[i] = Math.pow(sf,2*i+1) * coefs[i];
+        }
     }
 
     void gen_coef_list() {

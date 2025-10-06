@@ -152,7 +152,53 @@ public class SequentialModel {
         );
     }
 
-    // TODO reverse_path()
+    /**
+     * returns an iterable path tuple for a range in the sequential model
+     *
+     *         Args:
+     *             wl: wavelength in nm for path, defaults to central wavelength
+     *             start: start of range
+     *             stop: first value beyond the end of the range
+     *             step: increment or stride of range
+     *
+     *         Returns:
+     *             (**ifcs, gaps, lcl_tfrms, rndx, z_dir**)
+     */
+    public List<PathSeg> reverse_path(Integer start, Integer stop, Integer step, Double wl) {
+        if (step == null)
+            step = -1;
+        if (wl == null)
+            wl = central_wavelength();
+        int gap_start;
+        int rndx_start;
+        if (step < 0) {
+            gap_start = start - 1;
+            rndx_start = start - 1;
+        }
+        else {
+            gap_start = start;
+            rndx_start = start; // TODO verify as not set in original
+        }
+        var trfms = compute_local_transforms(-1);
+        var wl_idx = index_for_wavelength(wl);
+        List<double[]> rndx_list = Lists.slice(rndx, rndx_start, stop, step);
+        List<ZDir> zdir_list = Lists.slice(z_dir, start, stop, step);
+        List<Double> rndx = new ArrayList<>();
+        List<ZDir> z_dir = new ArrayList<>();
+        for (double[] narr: rndx_list) {
+            rndx.add(narr[wl_idx]);
+        }
+        for (ZDir zdir: zdir_list) {
+            z_dir.add(zdir.opposite());
+        }
+        return zip_longest(
+                Lists.slice(ifcs, start, stop, step),
+                Lists.slice(gaps, gap_start, stop, step),
+                Lists.slice(trfms, -(start+1), stop, 1),
+                rndx,
+                z_dir
+        );
+    }
 
     /**
      * returns a list with refractive indices for all **wvls**
@@ -182,8 +228,6 @@ public class SequentialModel {
 
     /**
      * returns index into rndx array for wavelength `wvl` in nm
-     * @param wvl
-     * @return
      */
     public int index_for_wavelength(double wvl) {
         this.wvlns = opt_model.optical_spec.spectral_region.wavelengths;
@@ -196,8 +240,6 @@ public class SequentialModel {
 
     /**
      * returns the central refractive index of the model's WvlSpec
-     * @param i
-     * @return
      */
     public double central_rndx(int i) {
         int central_wvl = opt_model.optical_spec.spectral_region.reference_wvl;
@@ -373,90 +415,84 @@ public class SequentialModel {
         this.gbl_tfrms = this.compute_global_coords();
         this.lcl_tfrms = this.compute_local_transforms();
 
-        /*
-         if self.do_apertures:
-            if len(self.ifcs) > 2:
-                osp.update_model(**kwargs)
+        // self.seq_def.update()
+    }
 
-                self.set_clear_apertures()
-         */
+//    public void update_optical_properties() {
+//        if (do_apertures)
+//            if (ifcs.size() > 2)
+//                set_clear_apertures();
+//    }
+
+    public void apply_scale_factor(double scale_factor) {
+        apply_scale_factor_over(scale_factor, null);
     }
 
     /**
-     * create a surface and gap where `surf_data` is a list that contains:
-     * <p>
-     * [curvature, thickness, refractive_index, v-number, semi-diameter]
-     * <p>
-     * The `curvature` entry is interpreted as radius if `radius_mode` is **True**
-     * <p>
-     * The `thickness` is the signed thickness
-     * <p>
-     * The `refractive_index, v-number` entry can have several forms:
-     * <p>
-     *   - **refractive_index, v-number** (numeric)
-     *   - **refractive_index** only -> constant index model
-     *   - **glass_name, catalog_name** as 1 or 2 strings
-     *   - an instance with a :meth:`~opticalglass.opticalmedium.OpticalMedium.rindex` attribute
-     *   - **air**, str -> :class:`~opticalglass.opticalmedium.Air`
-     *   - blank -> defaults to :class:`~opticalglass.opticalmedium.Air`
-     *   - **'REFL'** -> set interact_mode to 'reflect'
-     * <p>
-     * The `semi-diameter` entry is optional
+     * Apply the `scale_factor` to the `surfs` arg.
      *
-     * @param surf_data
-     * @param radius_mode
-     * @param prev_medium
-     * @param wvl
+     *         - If `surfs` isn't present, the `scale_factor` is applied to all interfaces and gaps.
+     *         - If `surfs` contains a single value, it is applied to that interface and gap.
+     *         - If `surfs` contains 2 values it is considered an interface range and the `scale_factor` is applied to the interface range and the gaps contained between the outer interfaces.
      */
-    public NewSurfaceSpec create_surface_and_gap(SurfaceData surf_data, boolean radius_mode, Medium prev_medium, Double wvl) {
+    public void apply_scale_factor_over(double scale_factor, int[] surfs) {
+        if (surfs == null || surfs.length == 0)
+            surfs = new int[]{0, ifcs.size()};
 
-        if (wvl == null)
-            wvl = 550.0;
-        Surface s = new Surface();
-
-        if (radius_mode) {
-            if (surf_data.curvature != 0.0)
-                s.profile.cv = 1.0 / surf_data.curvature;
-            else
-                s.profile.cv = 0.0;
-        } else {
-            s.profile.cv = surf_data.curvature;
+        if (surfs.length == 1) {
+            var idx = surfs[0];
+            ifcs.get(idx).apply_scale_factor(scale_factor);
+            if (idx < gaps.size())
+                gaps.get(idx).apply_scale_factor(scale_factor);
         }
-
-        Medium mat = null;
-        ZDir z_dir = ZDir.PROPAGATE_RIGHT;
-
-        if (surf_data.refractive_index != null) {
-            if (surf_data.v_number == null) {
-                if (surf_data.refractive_index == 1.0)
-                    mat = new Air();
-                else
-                    mat = new Medium(surf_data.refractive_index);
-            } else {
-                if (surf_data.refractive_index == 1.0)
-                    mat = new Air();
-                else
-                    mat = new Glass(surf_data.refractive_index, surf_data.v_number);
+        else if (surfs.length == 2) {
+            var idx1 = surfs[0];
+            var idx2 = surfs[1];
+            for (int i = idx1; i < idx2+1; i++) {
+                try {
+                    if (i < idx2)
+                        gaps.get(i).apply_scale_factor(scale_factor);
+                }
+                catch (IndexOutOfBoundsException e) {
+                    break;
+                }
             }
-        } else if (surf_data.interact_mode != null && surf_data.interact_mode.toUpperCase().equals("REFL")) {
-            s.interact_mode = "reflect";
-            mat = prev_medium;
-            z_dir = ZDir.PROPAGATE_LEFT;
-        } else if (surf_data.glass_name != null && surf_data.catalog_name != null) {
-            throw new UnsupportedOperationException(); // Not implemented yet
-        } else {
-            mat = new Air();
         }
-        if (surf_data.max_aperture != null) {
-            s.set_max_aperture(surf_data.max_aperture);
+        gbl_tfrms = this.compute_global_coords();
+        lcl_tfrms = this.compute_local_transforms();
+    }
+
+    /**
+     * Sum gap thicknesses from `os_idx` to `is_idx`
+     *
+     *         The default arguments return the thickness sum between the 1st and last surfaces.
+     *
+     *         To include the image surface, is_idx=len(sm.gaps)
+     *
+     *         Args:
+     *             os_idx: starting gap index
+     *             is_idx: final gap index
+     *
+     *         Returns:
+     *             oal: float, overal length of gap range
+     */
+    public double overall_length(Integer os_idx, Integer is_idx) {
+        if (os_idx == null)
+            os_idx = 1;
+        if (is_idx == null)
+            is_idx = 1;
+        double oal = 0;
+        for (Gap g: Lists.slice(gaps,os_idx,is_idx,null)) {
+            oal += g.thi;
         }
+        return oal;
+    }
 
-        double thi = surf_data.thickness;
-        Gap g = new Gap(thi, mat);
-        double rndx = mat.rindex(wvl);
-        Tfm3d tfrm = new Tfm3d(Matrix3.IDENTITY, new Vector3(0., 0., thi));
-
-        return new NewSurfaceSpec(s, g, rndx, tfrm, z_dir);
+    /**
+     * Total track length, distance from object to image.
+     */
+    public double total_track() {
+        return overall_length(0,gaps.size());
     }
 
     /**
@@ -476,6 +512,9 @@ public class SequentialModel {
     public List<Tfm3d> compute_local_transforms(List<Pair<Interface, Gap>> seq, Integer step) {
         if (step == null) step = 1;
         return Transform.compute_local_transforms(this, seq, step);
+    }
+    public List<Tfm3d> compute_local_transforms(int step) {
+        return compute_local_transforms(null,step);
     }
     public List<Tfm3d> compute_local_transforms() {
         return compute_local_transforms(null,null);
@@ -562,4 +601,84 @@ public class SequentialModel {
 
         return indices
      */
+
+    /**
+     * create a surface and gap where `surf_data` is a list that contains:
+     * <p>
+     * [curvature, thickness, refractive_index, v-number, semi-diameter]
+     * <p>
+     * The `curvature` entry is interpreted as radius if `radius_mode` is **True**
+     * <p>
+     * The `thickness` is the signed thickness
+     * <p>
+     * The `refractive_index, v-number` entry can have several forms:
+     * <p>
+     *   - **refractive_index, v-number** (numeric)
+     *   - **refractive_index** only -> constant index model
+     *   - **glass_name, catalog_name** as 1 or 2 strings
+     *   - an instance with a :meth:`~opticalglass.opticalmedium.OpticalMedium.rindex` attribute
+     *   - **air**, str -> :class:`~opticalglass.opticalmedium.Air`
+     *   - blank -> defaults to :class:`~opticalglass.opticalmedium.Air`
+     *   - **'REFL'** -> set interact_mode to 'reflect'
+     * <p>
+     * The `semi-diameter` entry is optional
+     *
+     * @param surf_data
+     * @param radius_mode
+     * @param prev_medium
+     * @param wvl
+     */
+    public NewSurfaceSpec create_surface_and_gap(SurfaceData surf_data,
+                                                 boolean radius_mode,
+                                                 Medium prev_medium,
+                                                 Double wvl) {
+
+        if (wvl == null)
+            wvl = 550.0;
+        Surface s = new Surface();
+
+        if (radius_mode) {
+            if (surf_data.curvature != 0.0)
+                s.profile.cv = 1.0 / surf_data.curvature;
+            else
+                s.profile.cv = 0.0;
+        } else {
+            s.profile.cv = surf_data.curvature;
+        }
+
+        Medium mat = null;
+        ZDir z_dir = ZDir.PROPAGATE_RIGHT;
+
+        if (surf_data.refractive_index != null) {
+            if (surf_data.v_number == null) {
+                if (surf_data.refractive_index == 1.0)
+                    mat = new Air();
+                else
+                    mat = new Medium(surf_data.refractive_index);
+            } else {
+                if (surf_data.refractive_index == 1.0)
+                    mat = new Air();
+                else
+                    mat = new Glass(surf_data.refractive_index, surf_data.v_number);
+            }
+        } else if (surf_data.interact_mode != null && surf_data.interact_mode.toUpperCase().equals("REFL")) {
+            s.interact_mode = "reflect";
+            mat = prev_medium;
+            z_dir = ZDir.PROPAGATE_LEFT;
+        } else if (surf_data.glass_name != null && surf_data.catalog_name != null) {
+            throw new UnsupportedOperationException(); // Not implemented yet
+        } else {
+            mat = new Air();
+        }
+        if (surf_data.max_aperture != null) {
+            s.set_max_aperture(surf_data.max_aperture);
+        }
+
+        double thi = surf_data.thickness;
+        Gap g = new Gap(thi, mat);
+        double rndx = mat.rindex(wvl);
+        Tfm3d tfrm = new Tfm3d(Matrix3.IDENTITY, new Vector3(0., 0., thi));
+
+        return new NewSurfaceSpec(s, g, rndx, tfrm, z_dir);
+    }
 }

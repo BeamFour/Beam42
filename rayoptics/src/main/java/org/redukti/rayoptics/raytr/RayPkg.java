@@ -7,12 +7,7 @@ import java.util.List;
  */
 public class RayPkg {
     /**
-     * List of RaySegs for each interface in the path,
-     * Each RaySeg contains
-     * pt: the intersection point of the ray
-     * after_dir: the ray direction cosine following the interface
-     * after_dst: the geometric distance to the next interface
-     * normal: the surface normal at the intersection point
+     * List of RaySegs
      */
     public List<RaySeg> ray;
     /**

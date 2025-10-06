@@ -9,19 +9,19 @@ import java.util.Objects;
  */
 public class RaySeg {
     /**
-     * intersection point with interface
+     * the point of incidence
      */
     public Vector3 p;
     /**
-     * direction cosine exiting the interface
+     * ray direction cosine following the interface
      */
     public Vector3 d;
     /**
-     * distance from intersection point to next interface
+     * geometric distance to next point of incidence
      */
     public double dst;
     /**
-     * surface normal at intersection point
+     * surface normal vector at the point of incidence
      */
     public Vector3 nrml;
 

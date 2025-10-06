@@ -185,62 +185,11 @@ public class Analysis {
         List<RayFanItem> fan = new ArrayList<>();
         for (int r = 0; r < num; r++) {
             Vector2 pupil = start;
-            trace_safe(opt_model, pupil, fld, wvl, fan,
+            Trace.trace_safe(opt_model, pupil, fld, wvl, fan,
                     output_filter, rayerr_filter);
             start = start.plus(step);
         }
         return fan;
-    }
-
-    /**
-     * Wrapper for trace_base that handles exceptions.
-     * <p>
-     * Args:
-     * opt_model: :class:`~.OpticalModel` instance
-     * pupil: 2d vector of relatice pupil coordinates
-     * fld: :class:`~.Field` point for wave aberration calculation
-     * wvl: wavelength of ray (nm)
-     * ray_list: list to append the ray data
-     * output_filter:
-     * <p>
-     * - if None, append entire ray
-     * - if 'last', append the last ray segment only
-     * - else treat as callable and append the return value
-     * <p>
-     * rayerr_filter:
-     * <p>
-     * - if None, on ray error append nothing
-     * - if 'summary', append the exception without ray data
-     * - if 'full', append the exception with ray data up to error
-     * - else append nothing
-     *
-     * @param opt_model
-     * @param pupil
-     * @param fld
-     * @param wvl
-     * @param ray_list
-     * @param output_filter
-     * @param rayerr_filter
-     */
-    public static void trace_safe(OpticalModel opt_model, Vector2 pupil, Field fld, double wvl,
-                                  List<RayFanItem> ray_list, String output_filter, String rayerr_filter) {
-
-        RayPkg ray_pkg;
-        try {
-            ray_pkg = Trace.trace_base(opt_model, pupil.as_array(), fld, wvl);
-        } catch (Exception e) {
-            // TODO
-            return;
-        }
-        if (output_filter == null)
-            ray_list.add(new RayFanItem(pupil.x, pupil.y, ray_pkg));
-        else if ("last".equals(output_filter)) {
-            RaySeg seg = Lists.get(ray_pkg.ray, -1);
-            ray_pkg = new RayPkg(Arrays.asList(seg), ray_pkg.op_delta, ray_pkg.wvl);
-            ray_list.add(new RayFanItem(pupil.x, pupil.y, ray_pkg));
-        } else {
-            throw new UnsupportedOperationException();
-        }
     }
 
     /**

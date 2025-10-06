@@ -1,9 +1,6 @@
 package org.redukti.rayoptics.raytr;
 
-import org.redukti.mathlib.LMLFunction;
-import org.redukti.mathlib.LMLSolver;
-import org.redukti.mathlib.SecantSolver;
-import org.redukti.mathlib.Vector3;
+import org.redukti.mathlib.*;
 import org.redukti.rayoptics.elem.transform.Transform;
 import org.redukti.rayoptics.exceptions.TraceException;
 import org.redukti.rayoptics.exceptions.TraceMissedSurfaceException;
@@ -20,6 +17,58 @@ import org.redukti.rayoptics.util.Lists;
 import java.util.*;
 
 public class Trace {
+
+    /**
+     * Wrapper for trace_base that handles exceptions.
+     * <p>
+     * Args:
+     * opt_model: :class:`~.OpticalModel` instance
+     * pupil: 2d vector of relatice pupil coordinates
+     * fld: :class:`~.Field` point for wave aberration calculation
+     * wvl: wavelength of ray (nm)
+     * ray_list: list to append the ray data
+     * output_filter:
+     * <p>
+     * - if None, append entire ray
+     * - if 'last', append the last ray segment only
+     * - else treat as callable and append the return value
+     * <p>
+     * rayerr_filter:
+     * <p>
+     * - if None, on ray error append nothing
+     * - if 'summary', append the exception without ray data
+     * - if 'full', append the exception with ray data up to error
+     * - else append nothing
+     *
+     * @param opt_model
+     * @param pupil
+     * @param fld
+     * @param wvl
+     * @param ray_list
+     * @param output_filter
+     * @param rayerr_filter
+     */
+    public static void trace_safe(OpticalModel opt_model, Vector2 pupil, Field fld, double wvl,
+                                  List<RayFanItem> ray_list, String output_filter, String rayerr_filter) {
+
+        RayPkg ray_pkg;
+        try {
+            ray_pkg = Trace.trace_base(opt_model, pupil.as_array(), fld, wvl);
+        } catch (Exception e) {
+            // TODO
+            return;
+        }
+        if (output_filter == null)
+            ray_list.add(new RayFanItem(pupil.x, pupil.y, ray_pkg));
+        else if ("last".equals(output_filter)) {
+            RaySeg seg = Lists.get(ray_pkg.ray, -1);
+            ray_pkg = new RayPkg(Arrays.asList(seg), ray_pkg.op_delta, ray_pkg.wvl);
+            ray_list.add(new RayFanItem(pupil.x, pupil.y, ray_pkg));
+        } else {
+            throw new UnsupportedOperationException();
+        }
+    }
+
 
     static class BaseObjectiveFunction {
         final SequentialModel seq_model;
@@ -420,31 +469,6 @@ public class Trace {
     */
 
     /**
-     * Trace a chief ray for fld and wvl, returning the ray_pkg and exit pupil segment.
-     * @param opt_model
-     * @param fld
-     * @param wvl
-     * @param foc
-     * @return
-     */
-    public static ChiefRayPkg trace_chief_ray(OpticalModel opt_model, Field fld, double wvl, double foc) {
-        OpticalSpecs osp = opt_model.optical_spec;
-        FirstOrderData fod = osp.parax_data.fod;
-
-        RayPkg cr = trace_base(opt_model, new double[]{0., 0.}, fld, wvl);
-        // op = rt.calc_optical_path(ray, opt_model.seq_model.path())
-
-        // cr_exp_pt: E upper bar prime: pupil center for pencils from Q
-        // cr_exp_pt, cr_b4_dir, cr_exp_dist
-        ChiefRayExitPupilSegment cr_exp_seg = Analysis.transfer_to_exit_pupil(
-                Lists.get(opt_model.seq_model.ifcs, -2),
-                new RayData(Lists.get(cr.ray, -2).p,
-                        Lists.get(cr.ray, -2).d), fod.exp_dist);
-
-        return new ChiefRayPkg(cr, cr_exp_seg);
-    }
-
-    /**
      * returns a list of RayPkgs for the boundary rays for field fld
      *
      * @param opt_model
@@ -499,6 +523,31 @@ public class Trace {
             rayset.add(new RayDataFrame(ray.ray));
         }
         return rayset;
+    }
+
+    /**
+     * Trace a chief ray for fld and wvl, returning the ray_pkg and exit pupil segment.
+     * @param opt_model
+     * @param fld
+     * @param wvl
+     * @param foc
+     * @return
+     */
+    public static ChiefRayPkg trace_chief_ray(OpticalModel opt_model, Field fld, double wvl, double foc) {
+        OpticalSpecs osp = opt_model.optical_spec;
+        FirstOrderData fod = osp.parax_data.fod;
+
+        RayPkg cr = trace_base(opt_model, new double[]{0., 0.}, fld, wvl);
+        // op = rt.calc_optical_path(ray, opt_model.seq_model.path())
+
+        // cr_exp_pt: E upper bar prime: pupil center for pencils from Q
+        // cr_exp_pt, cr_b4_dir, cr_exp_dist
+        ChiefRayExitPupilSegment cr_exp_seg = Analysis.transfer_to_exit_pupil(
+                Lists.get(opt_model.seq_model.ifcs, -2),
+                new RayData(Lists.get(cr.ray, -2).p,
+                        Lists.get(cr.ray, -2).d), fod.exp_dist);
+
+        return new ChiefRayPkg(cr, cr_exp_seg);
     }
 
     /**

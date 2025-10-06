@@ -46,7 +46,7 @@ public class RayBundle {
         List<RaySeg> start_bundle = this.rayset.values().stream().map(pkg -> pkg.ray.get(0))
                 .collect(Collectors.toList());
         List<RayPkg> ray_list = this.rayset.values().stream().collect(Collectors.toList());
-        if (Math.abs(tfrtm0.vec.z) > this.start_offset) {
+        if (Math.abs(tfrtm0.t.z) > this.start_offset) {
             Tfm3d tfrm = Layout.setup_shift_of_ray_bundle(seq_model, this.start_offset);
             tfrms.set(0, tfrm);
             Layout.shift_start_of_ray_bundle(start_bundle, ray_list, tfrm, 0);

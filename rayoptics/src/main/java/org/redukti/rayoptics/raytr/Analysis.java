@@ -16,6 +16,39 @@ import java.util.List;
 
 public class Analysis {
 
+
+    /**
+     * Given the exiting interface and chief ray data, return exit pupil ray coords.
+     *
+     * @param ifc           the exiting :class:'~.Interface' for the path sequence
+     * @param ray_seg       ray segment exiting from **interface**
+     * @param exp_dst_parax z distance to the paraxial exit pupil
+     */
+    public static ChiefRayExitPupilSegment transfer_to_exit_pupil(Interface ifc, RayData ray_seg, double exp_dst_parax) {
+        RayData b4_ray = Transform.transform_after_surface(ifc, ray_seg);
+        Vector3 b4_pt = b4_ray.p;
+        Vector3 b4_dir = b4_ray.d;
+
+        // h = b4_pt[0]**2 + b4_pt[1]**2
+        // u = b4_dir[0]**2 + b4_dir[1]**2
+        // handle field points in the YZ plane
+
+        double h = b4_pt.y;
+        double u = b4_dir.y;
+        double exp_dst;
+        if (Math.abs(u) < 1e-14) {
+            exp_dst = exp_dst_parax;
+        } else {
+            // exp_dst = -np.sign(b4_dir[2])*sqrt(h/u)
+            exp_dst = -h / u;
+        }
+        Vector3 exp_pt = b4_pt.plus(b4_dir.times(exp_dst));
+        Vector3 exp_dir = b4_dir;
+
+        return new ChiefRayExitPupilSegment(exp_pt, exp_dir, exp_dst, ifc, b4_pt, b4_dir);
+    }
+
+
     /**
      * Get the chief ray package at **fld**, computing it if necessary.
      *
@@ -242,11 +275,11 @@ public class Analysis {
         int k = -2; // last interface in sequence
 
         // eq 3.12
-        double e1 = RayTrace.eic_distance(
+        double e1 = Trace.eic_distance(
                 new RayData(Lists.get(ray, 1).p, Lists.get(ray, 0).d),
                 new RayData(Lists.get(chief_ray, 1).p, Lists.get(chief_ray, 0).d));
         // eq 3.13
-        double ekp = RayTrace.eic_distance(
+        double ekp = Trace.eic_distance(
                 new RayData(Lists.get(ray, k).p, Lists.get(ray, k).d),
                 new RayData(Lists.get(chief_ray, k).p, Lists.get(chief_ray, k).d));
 

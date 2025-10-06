@@ -5,8 +5,10 @@ import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.elem.surface.IntersectionResult;
 import org.redukti.rayoptics.elem.transform.Transform;
 import org.redukti.rayoptics.exceptions.TraceMissedSurfaceException;
+import org.redukti.rayoptics.exceptions.TraceRayBlockedException;
 import org.redukti.rayoptics.exceptions.TraceTIRException;
 import org.redukti.rayoptics.math.Tfm3d;
+import org.redukti.rayoptics.seq.InteractMode;
 import org.redukti.rayoptics.seq.Interface;
 import org.redukti.rayoptics.seq.PathSeg;
 import org.redukti.rayoptics.seq.SequentialModel;
@@ -18,6 +20,37 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 public class RayTrace {
+
+
+    /**
+     * refract incoming direction, d_in, about normal
+     */
+    private static Vector3 bend(Vector3 d_in, Vector3 normal, Double n_in, Double n_out) {
+        double normal_len = normal.length();
+        double cosI = d_in.dot(normal) / normal_len;
+        double sinI_sqr = 1.0 - cosI * cosI;
+        double sqrrt_in = n_out*n_out - n_in*n_in*sinI_sqr;
+        if (sqrrt_in <= 0)
+            throw new TraceTIRException(d_in, normal, n_in, n_out);
+        double sqrrt = Math.sqrt(sqrrt_in);
+        double n_cosIp = cosI > 0 ? sqrrt : -sqrrt;
+        double alpha = n_cosIp - n_in*cosI;
+        Vector3 d_out = (d_in.times(n_in).plus(normal.times(alpha))).times(1.0 / n_out);
+        return d_out;
+    }
+
+    /**
+     * reflect incoming direction, d_in, about normal
+     * @param d_in
+     * @param normal
+     * @return
+     */
+    private static Vector3 reflect(Vector3 d_in, Vector3 normal) {
+        double normal_len = normal.length();
+        double cosI = d_in.dot(normal) / normal_len;
+        Vector3 d_out = d_in.minus(normal.times(2.0 * cosI));
+        return d_out;
+    }
 
     /**
      * fundamental raytrace function
@@ -44,28 +77,38 @@ public class RayTrace {
      *         - **op_delta** - optical path wrt equally inclined chords to the
      *           optical axis
      *         - **wvl** - wavelength (in nm) that the ray was traced in
-     * @param seq_model
-     * @param pt0
-     * @param dir0
-     * @param wvl
      */
-    public static RayPkg trace(SequentialModel seq_model, Vector3 pt0, Vector3 dir0, double wvl) {
+    public static RayPkg trace(SequentialModel seq_model, Vector3 pt0, Vector3 dir0, double wvl, RayTraceOptions options) {
         List<PathSeg> path = seq_model.path(wvl, null, null, 1);
+        return trace_raw(path, pt0, dir0, wvl, options);
+    }
+    public static RayPkg trace(SequentialModel seq_model, Vector3 pt0, Vector3 dir0, double wvl) {
         RayTraceOptions options = new RayTraceOptions();
         options.first_surf = 1;
         options.last_surf = seq_model.get_num_surfaces()-2;
-        return trace_raw(path, pt0, dir0, wvl, options);
+        return trace(seq_model, pt0, dir0, wvl, options);
     }
 
-    private static boolean in_surface_range(int first_surf, Integer last_surf, int s, boolean include_last_surf) {
+    private static boolean in_gap_range(int first_surf, Integer last_surf, int gap_indx, boolean include_last_surf) {
         if (last_surf != null && first_surf == last_surf)
             return false;
-        if (s < first_surf)
+        if (gap_indx < first_surf)
             return false;
         if (last_surf == null)
             return true;
         else
-            return include_last_surf ? s <= last_surf : s < last_surf;
+            return include_last_surf ? gap_indx <= last_surf : gap_indx < last_surf;
+    }
+
+    private static boolean in_surface_range(int first_surf, Integer last_surf, int s) {
+        if (s < first_surf)
+            return false;
+        if (last_surf == null)
+            return true;
+        else if (s > last_surf)
+            return false;
+        else
+            return true;
     }
 
     /**
@@ -116,26 +159,33 @@ public class RayTrace {
         Integer last_surf = options.last_surf;
 
         List<RaySeg> ray = new ArrayList<>();
-        List<double[]> eic = new ArrayList<>();
+
+        Iterator<PathSeg> iter = path.iterator();
 
         // trace object surface
-        Iterator<PathSeg> iter = path.iterator();
         PathSeg obj = iter.next();
-        Interface srf_obj = obj.ifc;
-        IntersectionResult intersection = srf_obj.intersect(pt0, dir0, 1.0e-12, obj.z_dir);
-        double dst_b4 = intersection.distance;
-        Vector3 pt_obj = intersection.intersection_point;
-
         PathSeg before = obj;
-        Vector3 before_pt = pt_obj;
+        InteractMode b4_interact_mode = InteractMode.DUMMY;
+        Vector3 before_pt;
+        Vector3 before_normal;
+        if (options.intersect_obj) {
+            Interface srf_obj = obj.ifc;
+            b4_interact_mode = srf_obj.interact_mode;
+            IntersectionResult intersection = srf_obj.intersect(pt0, dir0, options.eps, obj.Zdir);
+            before_pt = intersection.intersection_point;
+            before_normal = srf_obj.normal(before_pt);
+        }
+        else {
+            before_pt = pt0;
+            before_normal = Vector3.vector3_001;
+        }
+
         Vector3 before_dir = dir0;
-        Vector3 before_normal = srf_obj.normal(before_pt);
-        Tfm3d tfrm_from_before = before.transform3;
-        ZDir z_dir_before = before.z_dir;
+        Tfm3d tfrm_from_before = before.Tfrm;
+        ZDir z_dir_before = before.Zdir;
 
         double op_delta = 0.0;
         double opl = 0.0;
-        double opl_eic = 0.0;
         int surf = 0;
 
         Vector3 inc_pt = null;
@@ -149,96 +199,101 @@ public class RayTrace {
             Interface ifc = null;
             try {
                 PathSeg after = iter.next();
-                Matrix3 rt = tfrm_from_before.rot_mat;
-                Vector3 t = tfrm_from_before.vec;
+                surf += 1;
+
+                Matrix3 rt = tfrm_from_before.rt;
+                Vector3 t = tfrm_from_before.t;
                 Vector3 b4_pt = rt.multiply(before_pt.minus(t));
                 Vector3 b4_dir = rt.multiply(before_dir);
+
                 pp_dst = -b4_pt.dot(b4_dir);
                 Vector3 pp_pt_before = b4_pt.plus(b4_dir.times(pp_dst));
 
                 ifc = after.ifc;
-                ZDir z_dir_after = after.z_dir;
+                InteractMode interact_mode = ifc.interact_mode;
+                ZDir z_dir_after = after.Zdir;
 
                 // intersect ray with profile
-                intersection = ifc.intersect(pp_pt_before, b4_dir, options.eps, z_dir_before);
+                IntersectionResult intersection = ifc.intersect(pp_pt_before, b4_dir, options.eps, z_dir_before);
                 double pp_dst_intrsct = intersection.distance;
                 inc_pt = intersection.intersection_point;
-                dst_b4 = pp_dst + pp_dst_intrsct;
-                ray.add(new RaySeg(before_pt, before_dir, dst_b4, before_normal));
+                double dst_b4 = pp_dst + pp_dst_intrsct;
 
-                if (in_surface_range(first_surf, last_surf, surf, false))
-                    opl += before.rndx * dst_b4;
+                if (b4_interact_mode == InteractMode.PHANTOM && options.filter_out_phantoms) {
+                    // if a phantom interface, don't add intersection point
+                    // but do add the path length.
+                    ray.get(ray.size()-1).dst += dst_b4;
+                }
+                else {
+                    // add *previous* intersection point, direction, etc., to ray
+                    ray.add(new RaySeg(before_pt, before_dir, dst_b4, before_normal));
+                }
+
+                if (in_gap_range(first_surf,last_surf,surf-1,false))
+                    opl += before.Indx * dst_b4;
 
                 normal = ifc.normal(inc_pt);
-                double eic_dst_before = eic_distance_from_axis(inc_pt, b4_dir, z_dir_before);
+
+                if (options.check_apertures &&
+                    in_surface_range(first_surf,last_surf,surf) &&
+                        interact_mode != InteractMode.PHANTOM) {
+                    if (!ifc.point_inside(inc_pt.x, inc_pt.y, options.fuzz))
+                        throw new TraceRayBlockedException(ifc, inc_pt);
+                }
 
                 /*
-                # if the interface has a phase element, process that first
+                # if present, use the phase element to calculate after_dir
                 if hasattr(ifc, 'phase_element'):
-                    doe_dir, phs = phase(ifc, inc_pt, b4_dir, normal, z_dir_before,
-                                     wvl, before[Indx], after[Indx])
-                    # the output of the phase element becomes the input for the
-                    #  refraction/reflection calculation
-                    b4_dir = doe_dir
+                    ifc_cntxt = (z_dir_before, wvl,
+                                 before[mc.Indx], after[mc.Indx],
+                                 interact_mode)
+                    after_dir, phs = phase(ifc, inc_pt, b4_dir, normal, ifc_cntxt)
                     op_delta += phs
+                else:
                  */
 
                 // refract or reflect ray at interface
-                if (ifc.interact_mode.equals("reflect"))
+                if (interact_mode == InteractMode.REFLECT)
                     after_dir = reflect(b4_dir, normal);
-                else if (ifc.interact_mode.equals("transmit"))
-                    after_dir = bend(b4_dir, normal, before.rndx, after.rndx);
-                else if (ifc.interact_mode.equals("dummy"))
+                else if (interact_mode == InteractMode.TRANSMIT)
+                    after_dir = bend(b4_dir, normal, before.Indx, after.Indx);
+                else if (interact_mode == InteractMode.DUMMY)
+                    after_dir = b4_dir;
+                else if (interact_mode == InteractMode.PHANTOM)
                     after_dir = b4_dir;
                 else // no action, input becomes output
                     after_dir = b4_dir;
-
-                surf += 1;
-
-                // Per `Hopkins, 1981 <https://dx.doi.org/10.1080/713820605>`_, the
-                //  propagation direction is given by the direction cosines of the
-                //  ray and therefore doesn't require the use of a negated
-                //  refractive index following a reflection. Thus we use the
-                //  (positive) refractive indices from the seq_model.rndx array.
-
-                if (!ifc.interact_mode.equals("dummy")) {
-                    double eic_dst_after = eic_distance_from_axis(inc_pt, after_dir, z_dir_after);
-                    double dW = after.rndx*eic_dst_after - before.rndx*eic_dst_before;
-                    eic.add(new double[]{before.rndx, eic_dst_before,
-                            after.rndx, eic_dst_after, dW});
-                    if (in_surface_range(first_surf, last_surf, surf, true))
-                        opl_eic += dW;
-                    /*
-                                    if print_details:
-                    print("after:", surf, inc_pt, after_dir)
-                    print("e{}= {:12.5g} e{}'= {:12.5g} dW={:10.8g} n={:8.5g}"
-                          " n'={:8.5g} zdb4={:2.0f} zdaft={:2.0f}"
-                          .format(surf, eic_dst_before, surf, eic_dst_after,
-                                  dW, before[Indx], after[Indx],
-                                  z_dir_before, z_dir_after))
-                     */
-                }
 
                 before_pt = inc_pt;
                 before_normal = normal;
                 before_dir = after_dir;
                 z_dir_before = z_dir_after;
+                b4_interact_mode = interact_mode;
                 before = after;
-                tfrm_from_before = before.transform3;
+                tfrm_from_before = before.Tfrm;
+
             } catch (TraceMissedSurfaceException ray_miss) {
                 ray.add(new RaySeg(before_pt, before_dir, pp_dst, before_normal));
-                ray_miss.surf = surf + 1;
+                ray_miss.surf = surf;
                 ray_miss.ifc = ifc;
-                ray_miss.prev_tfrm = before.transform3;
+                ray_miss.prev_tfrm = before.Tfrm;
                 ray_miss.ray_pkg = new RayPkg(ray, opl, wvl);
                 throw ray_miss;
+
             } catch (TraceTIRException ray_tir) {
                 ray.add(new RaySeg(inc_pt, before_dir, 0.0, normal));
-                ray_tir.surf = surf + 1;
+                ray_tir.surf = surf;
                 ray_tir.ifc = ifc;
                 ray_tir.int_pt = inc_pt;
                 ray_tir.ray_pkg = new RayPkg(ray, opl, wvl);
                 throw ray_tir;
+
+            } catch (TraceRayBlockedException ray_blocked) {
+                ray.add(new RaySeg(inc_pt, before_dir, 0.0, normal));
+                ray_blocked.surf = surf;
+                ray_blocked.ray_pkg = new RayPkg(ray, opl, wvl);
+                throw ray_blocked;
+
             } catch (NoSuchElementException e) {
                 ray.add(new RaySeg(inc_pt, after_dir, 0.0, normal));
                 op_delta += opl;
@@ -248,92 +303,4 @@ public class RayTrace {
         return new RayPkg(ray, op_delta, wvl);
     }
 
-    /**
-     * refract incoming direction, d_in, about normal
-     * @param d_in
-     * @param normal
-     * @param n_in
-     * @param n_out
-     * @return
-     */
-    private static Vector3 bend(Vector3 d_in, Vector3 normal, Double n_in, Double n_out) {
-        double normal_len = normal.length();
-        double cosI = d_in.dot(normal) / normal_len;
-        double sinI_sqr = 1.0 - cosI * cosI;
-        double sqrrt_in = n_out*n_out - n_in*n_in*sinI_sqr;
-        if (sqrrt_in <= 0)
-            throw new TraceTIRException(d_in, normal, n_in, n_out);
-        double sqrrt = Math.sqrt(sqrrt_in);
-        double n_cosIp = cosI > 0 ? sqrrt : -sqrrt;
-        double alpha = n_cosIp - n_in*cosI;
-        Vector3 d_out = (d_in.times(n_in).plus(normal.times(alpha))).times(1.0 / n_out);
-        return d_out;
-    }
-
-    /**
-     * reflect incoming direction, d_in, about normal
-     * @param d_in
-     * @param normal
-     * @return
-     */
-    private static Vector3 reflect(Vector3 d_in, Vector3 normal) {
-        double normal_len = normal.length();
-        double cosI = d_in.dot(normal) / normal_len;
-        Vector3 d_out = d_in.minus(normal.times(2.0 * cosI));
-        return d_out;
-    }
-
-    /**
-     * Given the exiting interface and chief ray data, return exit pupil ray coords.
-     *
-     * @param ifc           the exiting :class:'~.Interface' for the path sequence
-     * @param ray_seg       ray segment exiting from **interface**
-     * @param exp_dst_parax z distance to the paraxial exit pupil
-     */
-    public static ChiefRayExitPupilSegment transfer_to_exit_pupil(Interface ifc, RayData ray_seg, double exp_dst_parax) {
-        RayData b4_ray = Transform.transform_after_surface(ifc, ray_seg);
-        Vector3 b4_pt = b4_ray.p;
-        Vector3 b4_dir = b4_ray.d;
-
-        // h = b4_pt[0]**2 + b4_pt[1]**2
-        // u = b4_dir[0]**2 + b4_dir[1]**2
-        // handle field points in the YZ plane
-
-        double h = b4_pt.y;
-        double u = b4_dir.y;
-        double exp_dst;
-        if (Math.abs(u) < 1e-14) {
-            exp_dst = exp_dst_parax;
-        } else {
-            // exp_dst = -np.sign(b4_dir[2])*sqrt(h/u)
-            exp_dst = -h / u;
-        }
-        Vector3 exp_pt = b4_pt.plus(b4_dir.times(exp_dst));
-        Vector3 exp_dir = b4_dir;
-
-        return new ChiefRayExitPupilSegment(exp_pt, exp_dir, exp_dst, ifc, b4_pt, b4_dir);
-    }
-
-    /**
-     * calculate equally inclined chord distance between 2 rays
-     * <p>
-     * Args:
-     * r: (p, d), where p is a point on the ray r and d is the direction
-     * cosine of r
-     * r0: (p0, d0), where p0 is a point on the ray r0 and d0 is the direction
-     * cosine of r0
-     * <p>
-     * Returns:
-     * float: distance along r from equally inclined chord point to p
-     *
-     * @param r
-     * @param r0
-     * @return
-     */
-    public static double eic_distance(RayData r, RayData r0) {
-        // eq 3.9 Hopkins paper
-        double e = (r.d.plus(r0.d).dot(r.p.minus(r0.p))) /
-                (1. + r.d.dot(r0.d));
-        return e;
-    }
 }

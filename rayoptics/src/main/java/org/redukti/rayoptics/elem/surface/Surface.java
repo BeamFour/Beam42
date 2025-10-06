@@ -3,6 +3,7 @@ package org.redukti.rayoptics.elem.surface;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.elem.profiles.Spherical;
 import org.redukti.rayoptics.elem.profiles.SurfaceProfile;
+import org.redukti.rayoptics.seq.InteractMode;
 import org.redukti.rayoptics.seq.Interface;
 import org.redukti.rayoptics.util.ZDir;
 
@@ -19,14 +20,14 @@ public class Surface extends Interface {
     public List<Aperture> edge_apertures = new ArrayList<>();
 
     public Surface() {
-        this("", "transmit");
+        this("", InteractMode.TRANSMIT);
     }
 
-    public Surface(String label, String interact_mode) {
+    public Surface(String label, InteractMode interact_mode) {
         this(interact_mode, 0.0, 1.0, null, label, null);
     }
 
-    public Surface(String interact_mode, double delta_n,
+    public Surface(InteractMode interact_mode, double delta_n,
                    double max_ap, DecenterData decenter, String label, SurfaceProfile profile) {
         super(interact_mode, delta_n, max_ap, decenter);
         this.label = label;

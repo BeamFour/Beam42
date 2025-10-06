@@ -95,7 +95,7 @@ public class SequentialModel {
      */
     private void initialize_arrays() {
         // add object interface
-        ifcs.add(new Surface("Obj", "dummy"));
+        ifcs.add(new Surface("Obj", InteractMode.DUMMY));
 
         Tfm3d tfrm = new Tfm3d( Matrix3.IDENTITY,Vector3.ZERO);
         gbl_tfrms.add(tfrm);
@@ -110,7 +110,7 @@ public class SequentialModel {
         cur_surface = 0;
 
         // add image interface
-        ifcs.add(new Surface("Img", "dummy"));
+        ifcs.add(new Surface("Img", InteractMode.DUMMY));
         gbl_tfrms.add(tfrm);
         lcl_tfrms.add(tfrm);
     }
@@ -348,7 +348,7 @@ public class SequentialModel {
     public void add_surface(SurfaceData surf_data) {
         boolean radius_mode = opt_model.radius_mode;
         Medium mat = null;
-        if (Objects.equals(surf_data.interact_mode, "REFL")) {
+        if (surf_data.interact_mode == InteractMode.REFLECT) {
             Objects.requireNonNull(cur_surface);
             mat = gaps.get(cur_surface).medium;
         }
@@ -392,7 +392,7 @@ public class SequentialModel {
             Interface ifc = seq.get(j).first;
             Gap g = seq.get(j).second;
             ZDir z_dir_after = z_dir_before;
-            if (ifc.interact_mode.equals("reflect"))
+            if (ifc.interact_mode == InteractMode.REFLECT)
                 z_dir_after = z_dir_after.opposite();
 
             // leave rndx data unsigned, track change of sign using z_dir
@@ -661,8 +661,8 @@ public class SequentialModel {
                 else
                     mat = new Glass(surf_data.refractive_index, surf_data.v_number);
             }
-        } else if (surf_data.interact_mode != null && surf_data.interact_mode.toUpperCase().equals("REFL")) {
-            s.interact_mode = "reflect";
+        } else if (surf_data.interact_mode == InteractMode.REFLECT) {
+            s.interact_mode = InteractMode.REFLECT;
             mat = prev_medium;
             z_dir = ZDir.PROPAGATE_LEFT;
         } else if (surf_data.glass_name != null && surf_data.catalog_name != null) {

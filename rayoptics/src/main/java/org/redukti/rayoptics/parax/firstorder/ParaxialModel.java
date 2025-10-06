@@ -1,10 +1,7 @@
 package org.redukti.rayoptics.parax.firstorder;
 
 import org.redukti.rayoptics.optical.OpticalModel;
-import org.redukti.rayoptics.seq.Gap;
-import org.redukti.rayoptics.seq.Interface;
-import org.redukti.rayoptics.seq.PathSeg;
-import org.redukti.rayoptics.seq.SequentialModel;
+import org.redukti.rayoptics.seq.*;
 import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.ZDir;
 
@@ -67,9 +64,9 @@ public class ParaxialModel {
             PathSeg sg = path.get(i);
             Interface ifc = sg.ifc;
             Gap gap = sg.gap;
-            Double rndx = sg.rndx;
-            ZDir z_dir = sg.z_dir;
-            String imode = ifc.interact_mode;
+            Double rndx = sg.Indx;
+            ZDir z_dir = sg.Zdir;
+            InteractMode imode = ifc.interact_mode;
             double power = ifc.optical_power();
             if (gap != null) {
                 double n_after = (z_dir.value > 0) ? rndx : -rndx;

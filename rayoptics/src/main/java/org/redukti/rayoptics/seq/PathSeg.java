@@ -6,15 +6,15 @@ import org.redukti.rayoptics.util.ZDir;
 public class PathSeg {
     public final Interface ifc;
     public final Gap gap;
-    public final Tfm3d transform3;
-    public final Double rndx;
-    public final ZDir z_dir;
+    public final Tfm3d Tfrm;
+    public final Double Indx;
+    public final ZDir Zdir;
 
-    public PathSeg(Interface ifc, Gap gap, Tfm3d transform3, Double rndx, ZDir z_dir) {
+    public PathSeg(Interface ifc, Gap gap, Tfm3d Tfrm, Double Indx, ZDir Zdir) {
         this.ifc = ifc;
         this.gap = gap;
-        this.transform3 = transform3;
-        this.rndx = rndx;
-        this.z_dir = z_dir;
+        this.Tfrm = Tfrm;
+        this.Indx = Indx;
+        this.Zdir = Zdir;
     }
 }

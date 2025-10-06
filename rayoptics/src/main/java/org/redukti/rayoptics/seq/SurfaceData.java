@@ -8,7 +8,7 @@ public class SurfaceData {
     Double max_aperture;
     String catalog_name;
     String glass_name;
-    String interact_mode;
+    InteractMode interact_mode;
 
     public SurfaceData(double curvature, double thickness) {
         this.curvature = curvature;
@@ -23,7 +23,7 @@ public class SurfaceData {
         return this;
     }
 
-    public SurfaceData mode(String mode) {
+    public SurfaceData mode(InteractMode mode) {
         this.interact_mode = mode;
         this.glass_name = null;
         this.catalog_name = null;

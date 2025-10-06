@@ -52,8 +52,8 @@ public class Layout {
      */
     public static void shift_start_of_ray_bundle(List<RaySeg> start_bundle, List<RayPkg> ray_bundle, Tfm3d trfm, int cr_indx) {
 
-        Matrix3 rot = trfm.rot_mat;
-        Vector3 t = trfm.vec;
+        Matrix3 rot = trfm.rt;
+        Vector3 t = trfm.t;
 
         // For the chief ray, use the input offset.
         RayPkg cr = ray_bundle.get(cr_indx);

@@ -4,11 +4,13 @@ import org.redukti.mathlib.LMLFunction;
 import org.redukti.mathlib.LMLSolver;
 import org.redukti.mathlib.SecantSolver;
 import org.redukti.mathlib.Vector3;
+import org.redukti.rayoptics.elem.transform.Transform;
 import org.redukti.rayoptics.exceptions.TraceException;
 import org.redukti.rayoptics.exceptions.TraceMissedSurfaceException;
 import org.redukti.rayoptics.exceptions.TraceTIRException;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.firstorder.FirstOrderData;
+import org.redukti.rayoptics.seq.Interface;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.specs.FieldSpec;
@@ -434,7 +436,7 @@ public class Trace {
 
         // cr_exp_pt: E upper bar prime: pupil center for pencils from Q
         // cr_exp_pt, cr_b4_dir, cr_exp_dist
-        ChiefRayExitPupilSegment cr_exp_seg = RayTrace.transfer_to_exit_pupil(
+        ChiefRayExitPupilSegment cr_exp_seg = Analysis.transfer_to_exit_pupil(
                 Lists.get(opt_model.seq_model.ifcs, -2),
                 new RayData(Lists.get(cr.ray, -2).p,
                         Lists.get(cr.ray, -2).d), fod.exp_dist);
@@ -498,5 +500,29 @@ public class Trace {
         }
         return rayset;
     }
+
+    /**
+     * calculate equally inclined chord distance between 2 rays
+     * <p>
+     * Args:
+     * r: (p, d), where p is a point on the ray r and d is the direction
+     * cosine of r
+     * r0: (p0, d0), where p0 is a point on the ray r0 and d0 is the direction
+     * cosine of r0
+     * <p>
+     * Returns:
+     * float: distance along r from equally inclined chord point to p
+     *
+     * @param r
+     * @param r0
+     * @return
+     */
+    public static double eic_distance(RayData r, RayData r0) {
+        // eq 3.9 Hopkins paper
+        double e = (r.d.plus(r0.d).dot(r.p.minus(r0.p))) /
+                (1. + r.d.dot(r0.d));
+        return e;
+    }
+
 
 }

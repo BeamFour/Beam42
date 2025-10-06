@@ -2,10 +2,7 @@ package org.redukti.rayoptics.parax.firstorder;
 
 import org.redukti.mathlib.M;
 import org.redukti.rayoptics.optical.OpticalModel;
-import org.redukti.rayoptics.seq.Gap;
-import org.redukti.rayoptics.seq.Interface;
-import org.redukti.rayoptics.seq.PathSeg;
-import org.redukti.rayoptics.seq.SequentialModel;
+import org.redukti.rayoptics.seq.*;
 import org.redukti.rayoptics.specs.*;
 import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.Pair;
@@ -212,8 +209,8 @@ public class FirstOrder {
 
         Interface b4_ifc = before.ifc;
         Gap b4_gap = before.gap;
-        double b4_rndx = before.rndx;
-        ZDir z_dir_before = before.z_dir;
+        double b4_rndx = before.Indx;
+        ZDir z_dir_before = before.Zdir;
 
         double n_before = z_dir_before.value > 0 ? b4_rndx : -b4_rndx;
 
@@ -248,8 +245,8 @@ public class FirstOrder {
             PathSeg after = iter.next();
             Interface ifc = after.ifc;
             Gap gap = after.gap;
-            Double rndx = after.rndx;
-            ZDir z_dir_after = after.z_dir;
+            Double rndx = after.Indx;
+            ZDir z_dir_after = after.Zdir;
 
             // Transfer
             double t = b4_gap.thi;
@@ -259,7 +256,7 @@ public class FirstOrder {
             double cur_slp;
             double cur_slpb;
             // Refraction/Reflection
-            if (ifc.interact_mode.equals("dummy")) { // Object or Image
+            if (ifc.interact_mode == InteractMode.DUMMY) { // Object or Image
                 cur_slp = b4_yui.slp;
                 cur_slpb = b4_yui_bar.slp;
             } else {

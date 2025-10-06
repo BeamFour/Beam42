@@ -31,16 +31,16 @@ public class Transform {
                                               List<Tfm3d> tfrms) {
         var b4_ifc = b4_seg.ifc;
         var b4_gap = b4_seg.gap;
-        var r_prev = tfrm_prev.rot_mat;
-        var t_prev = tfrm_prev.vec;
+        var r_prev = tfrm_prev.rt;
+        var t_prev = tfrm_prev.t;
         while (seq.hasNext()) {
             PathSeg seg = seq.next();
             var ifc = seg.ifc;
             var gap = seg.gap;
             var zdist = tfrm_dir * b4_gap.thi;
             var tf = transform_calc.transform(b4_ifc, zdist, ifc);
-            var r = tf.rot_mat;
-            var t = tf.vec;
+            var r = tf.rt;
+            var t = tf.t;
             var t_new = r_prev.multiply(t).add(t_prev);
             var r_new = r_prev.multiply(r);
             tfrms.add(new Tfm3d(r_new, t_new));
@@ -113,8 +113,8 @@ public class Transform {
             var gap = seg.second;
             var zdist = tfrm_dir * b4_gap.thi;
             var tf = transform_calc.transform(b4_ifc, zdist, ifc);
-            var r = tf.rot_mat;
-            var t = tf.vec;
+            var r = tf.rt;
+            var t = tf.t;
             var rt = r.transpose();
             tfrms.add(new Tfm3d(rt, t));
             b4_ifc = ifc;

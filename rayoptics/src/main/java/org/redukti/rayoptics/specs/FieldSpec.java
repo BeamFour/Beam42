@@ -1,7 +1,8 @@
 package org.redukti.rayoptics.specs;
 
+import org.redukti.mathlib.Matrix3;
 import org.redukti.mathlib.Vector3;
-import org.redukti.rayoptics.parax.firstorder.FirstOrderData;
+import org.redukti.rayoptics.raytr.Wideangle;
 import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.Pair;
 
@@ -27,6 +28,7 @@ public class FieldSpec {
      * if True, `fields` are relative to max field
      */
     public boolean is_relative;
+    public boolean is_wide_angle;
     /**
      * list of Field instances
      */
@@ -83,38 +85,102 @@ public class FieldSpec {
         return new Pair(max_fld_value, max_fld);
     }
 
+
+    public static double hypot(double[] dir_tan) {
+        return Math.sqrt(1 + dir_tan[0] * dir_tan[0] + dir_tan[1] * dir_tan[1]);
+    }
+
     /**
-     * calculates object coordinates
+     * Return a pt, direction pair characterizing `fld`.
+     *
+     *         If a field point is defined in image space, the paraxial object
+     *         space data is used to calculate the field coordinates.
      *
      * @param fld Field
      * @return Vector3
      */
-    public Vector3 obj_coords(Field fld) {
-        Vector3 fld_coord = new Vector3(fld.x, fld.y, 0.0);
-        if (is_relative)
-            fld_coord = fld_coord.times(value);
-
-        SpecType field = key.type;
+    public Coord obj_coords(Field fld) {
         ImageKey obj_img_key = key.imageKey;
         ValueKey value_key = key.valueKey;
 
-        Vector3 obj_pt = null;
+        Vector3 fld_coord = new Vector3(fld.x, fld.y, 0.0);
+        Vector3 rel_fld_coord = new Vector3(fld.x, fld.y, 0.0);
+        if (is_relative)
+            fld_coord = fld_coord.times(value);
+        else if (value != 0.0)
+            rel_fld_coord = rel_fld_coord.times(1.0/value);
 
-        FirstOrderData fod = optical_spec.parax_data.fod;
-        if (obj_img_key == ImageKey.Object) {
-            if (value_key == ValueKey.Angle) {
-                Vector3 dir_tan = fld_coord.deg2rad().tan();
-                obj_pt = dir_tan.times(fod.obj_dist + fod.enp_dist).negate();
-            } else if (value_key == ValueKey.Height) {
-                obj_pt = fld_coord;
+        var opt_model = optical_spec.opt_model;
+        var pr = optical_spec.parax_data.pr_ray;
+        var fod = optical_spec.parax_data.fod;
+        Vector3 obj_pt = null;
+        Vector3 obj_dir = null;
+
+        var obj2enp_dist = (-fod.obj_dist + fod.enp_dist);
+        var pt1 = new Vector3(0.0, 0.0, obj2enp_dist);
+        ConjugateType obj_conj = optical_spec.conjugate_type(ImageKey.Object);
+        if (obj_conj == ConjugateType.INFINITE) {
+            // generate 'object', 'angle' fld_spec
+            Vector3 fld_angle;
+            if (obj_img_key == ImageKey.Image) {
+                double max_field_ang;
+                if (value_key == ValueKey.RealHeight) {
+                    double wvl = optical_spec.spectral_region.central_wvl();
+                    var pkg = Wideangle.eval_real_image_ht(opt_model,fld,wvl);
+                    obj_pt = pkg.ray_data.pt;
+                    obj_dir = pkg.ray_data.dir;
+                    fld.z_enp = pkg.z_enp;
+                    return new Coord(obj_pt,obj_dir);
+                }
+                else {
+                    max_field_ang = Math.atan(pr.get(0).slp);
+                    fld_angle = rel_fld_coord.times(max_field_ang);
+                }
             }
-        } else if (obj_img_key == ImageKey.Image) {
-            if (value_key == ValueKey.Height) {
-                Vector3 img_pt = fld_coord;
-                obj_pt = img_pt.times(fod.red);
+            else {
+                if (value_key == ValueKey.Angle) {
+                    fld_angle = fld_coord.deg2rad();
+                }
+                else {
+                    obj_pt = fld_coord;
+                    obj_dir = pt1.minus(obj_pt).normalize();
+                    return new Coord(obj_pt,obj_dir);
+                }
+            }
+            var dir_cos = fld_angle.sin();
+            var z = Math.sqrt(1.0 - dir_cos.x * dir_cos.x - dir_cos.y * dir_cos.y);
+            dir_cos = new Vector3(dir_cos.x, dir_cos.y, z);
+            if (is_wide_angle) {
+                var rot_mat = Matrix3.rot_v1_into_v2(Vector3.vector3_001,dir_cos);
+                obj_pt = rot_mat.multiply(pt1).minus(pt1);
+            }
+            else {
+                obj_pt = new Vector3(dir_cos.x/dir_cos.z,
+                        dir_cos.y/dir_cos.z,0.0).times(obj2enp_dist);
+            }
+            obj_dir = dir_cos;
+        }
+        else if (obj_conj == ConjugateType.FINITE) {
+            if (obj_img_key == ImageKey.Image) {
+                var max_field_ht = pr.get(0).ht;
+                obj_pt = rel_fld_coord.times(max_field_ht);
+            }
+            else {
+                if (value_key == ValueKey.Angle) {
+                    var fld_angle = fld_coord.deg2rad();
+                    obj_dir = fld_angle.sin();
+                    var z = Math.sqrt(1.0 - obj_dir.x * obj_dir.x - obj_dir.y * obj_dir.y);
+                    obj_dir = new Vector3(obj_dir.x, obj_dir.y, z);
+                    obj_pt = new Vector3(obj_dir.x/obj_dir.z, obj_dir.y/obj_dir.z,0.0).times(obj2enp_dist);
+                    return new Coord(obj_pt,obj_dir);
+                }
+                else {
+                    obj_pt = fld_coord;
+                }
+                obj_dir = pt1.minus(obj_pt).normalize();
             }
         }
-        return obj_pt;
+        return new Coord(obj_pt,obj_dir);
     }
 
     public void update_model() {

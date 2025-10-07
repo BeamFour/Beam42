@@ -242,6 +242,36 @@ public class Matrix3 {
                 n20, n21, n22);
     }
 
+    /**
+     * rotate v1 into v2 using equivalent angle rotation.
+     *
+     * Compute a rotation matrix from v1 to v2.
+     * Take the cross product of the input vectors to get
+     * the rotation axis. The eqivalent angle rotation is
+     * equation 2.80 from Introduction to Robotics, 2nd ed, by John J Craig.
+     */
+    public static Matrix3 rot_v1_into_v2(Vector3 v1, Vector3 v2) {
+        var rot_axis = v1.cross(v2).negate();
+        var s = rot_axis.length();
+        var cosine_ang = v1.dot(v2);
+        var c = cosine_ang;
+        var v = 1.0 - cosine_ang;
+        var ax = rot_axis.normalize();
+        var n00 = ax.x*ax.x*v + c;
+        var n01 = ax.x*ax.y*v - ax.z*s;
+        var n02 = ax.x*ax.z*v + ax.y*s;
+        var n10 = ax.x*ax.y*v + ax.z*s;
+        var n11 = ax.y*ax.y*v + c;
+        var n12 = ax.y*ax.z*v + ax.x*s;
+        var n20 = ax.x*ax.z*v + ax.y*s;
+        var n21 = ax.y*ax.z*v + ax.x*s;
+        var n22 = ax.z*ax.z*v + c;
+        return new Matrix3(
+                n00, n01, n02,
+                n10, n11, n12,
+                n20, n21, n22);
+    }
+
     public Matrix3 multiply(Matrix3 other) {
         double n00 = m00 * other.m00 + m01 * other.m10 + m02 * other.m20;
         double n10 = m10 * other.m00 + m11 * other.m10 + m12 * other.m20;

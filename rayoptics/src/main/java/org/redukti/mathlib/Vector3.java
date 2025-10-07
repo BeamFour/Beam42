@@ -124,6 +124,8 @@ public class Vector3 {
         return new Vector3(x(), y(), v);
     }
 
+    public final Vector3 sin() { return new Vector3(Math.sin(x), Math.sin(y), Math.sin(z)); }
+
     public Vector2 project_xy() {
         return new Vector2(x(), y());
     }

@@ -1,14 +1,13 @@
 package org.redukti.rayoptics.raytr;
 
 import org.redukti.mathlib.*;
-import org.redukti.rayoptics.elem.transform.Transform;
 import org.redukti.rayoptics.exceptions.TraceException;
 import org.redukti.rayoptics.exceptions.TraceMissedSurfaceException;
 import org.redukti.rayoptics.exceptions.TraceTIRException;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.firstorder.FirstOrderData;
-import org.redukti.rayoptics.seq.Interface;
 import org.redukti.rayoptics.seq.SequentialModel;
+import org.redukti.rayoptics.specs.Coord;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.specs.FieldSpec;
 import org.redukti.rayoptics.specs.OpticalSpecs;
@@ -17,6 +16,61 @@ import org.redukti.rayoptics.util.Lists;
 import java.util.*;
 
 public class Trace {
+
+    /**
+     * Trace a single ray via pupil, field and wavelength specs.
+     *
+     *     This function traces a single ray at a given wavelength, pupil and field specification.
+     *
+     *     Ray failures (miss surface, TIR) and aperture clipping are handled via RayError exceptions. If a failure occurs, a second item is returned (if  *rayerr_filter* is set to 'summary' or 'full') that contains information about the failure. Apertures are tested using the :meth:`~.seq.interface.Interface.point_inside` API when *check_apertures* is True.
+     *
+     *     The pupil coordinates by default are normalized to the vignetted pupil extent. Alternatively, the pupil coordinates can be taken as actual coordinates on the pupil plane (and similarly for ray direction) using the **pupil_type** keyword argument.
+     *
+     *     The amount of output that is returned can range from the entire ray (default) to the image segment only or even the return from a user-supplied filtering function.
+     *
+     *     Args:
+     *         opt_model: :class:`~.OpticalModel` instance
+     *         pupil: 2d vector of relative pupil coordinates
+     *         fld: :class:`~.Field` point for wave aberration calculation
+     *         wvl: wavelength of ray (nm)
+     *
+     *         check_apertures: if True, do point_inside() test on inc_pt
+     *         apply_vignetting: if True, apply the `fld` vignetting factors to **pupil**
+     *
+     *         pupil_type: ::
+     *
+     *             - 'rel pupil': relative pupil coordinates
+     *             - 'aim pt': aim point on pupil plane
+     *             - 'aim dir': aim direction in object space
+     *
+     *         use_named_tuples: if True, returns data as RayPkg and RaySeg.
+     *
+     *         output_filter: ::
+     *
+     *             - if None, append entire ray
+     *             - if 'last', append the last ray segment only
+     *             - else treat as callable and append the return value
+     *
+     *         rayerr_filter: ::
+     *
+     *             - if None, on ray error append nothing
+     *             - if 'summary', append the exception without ray data
+     *             - if 'full', append the exception with ray data up to error
+     *             - else append nothing
+     *
+     *         eps: accuracy tolerance for surface intersection calculation
+     *
+     *     Returns:
+     *         tuple: ray_pkg, trace_error | None
+     */
+    public RayResult trace_ray(
+            OpticalModel opt_model,
+            Vector2 pupil,
+            Field fld,
+            double wvl,
+            TraceOptions trace_options) {
+        return trace_safe(opt_model, pupil, fld, wvl, trace_options);
+    }
 
     /**
      * Wrapper for trace_base that handles exceptions.
@@ -47,17 +101,15 @@ public class Trace {
                                   Vector2 pupil,
                                   Field fld,
                                   double wvl,
-                                  List<RayFanItem> ray_list,
-                                  String output_filter,
-                                  String rayerr_filter) {
+                                  TraceOptions trace_options) {
 
         RayResult result = new RayResult();
         RayPkg ray_pkg;
         try {
-            ray_pkg = Trace.trace_base(opt_model, pupil.as_array(), fld, wvl);
-            if (output_filter == null)
+            ray_pkg = Trace.trace_base(opt_model, pupil.as_array(), fld, wvl, trace_options);
+            if (trace_options.output_filter == null)
                 result.pkg = ray_pkg;
-            else if ("last".equals(output_filter)) {
+            else if ("last".equals(trace_options.output_filter)) {
                 RaySeg seg = Lists.get(ray_pkg.ray, -1);
                 ray_pkg = new RayPkg(Arrays.asList(seg), ray_pkg.op_delta, ray_pkg.wvl);
                 result.pkg = ray_pkg;
@@ -65,12 +117,12 @@ public class Trace {
                 throw new UnsupportedOperationException();
             }
         } catch (TraceException rayerr) {
-            if (Objects.equals(rayerr_filter, "full")) {
+            if (Objects.equals(trace_options.rayerr_filter, "full")) {
                 ray_pkg = rayerr.ray_pkg;
                 result.pkg = ray_pkg;
                 result.err = rayerr;
             }
-            else if (Objects.equals(rayerr_filter, "summary")) {
+            else if (Objects.equals(trace_options.rayerr_filter, "summary")) {
                 rayerr.ray_pkg = null;
                 result.err = rayerr;
                 result.pkg = null;
@@ -79,37 +131,162 @@ public class Trace {
         return result;
     }
 
+    /**
+     * returns (ray, ray_opl, wvl)
+     * <p>
+     * Args:
+     * seq_model: the :class:`~.SequentialModel` to be traced
+     * pt0: starting coordinate at object interface
+     * dir0: starting direction cosines following object interface
+     * wvl: ray trace wavelength in nm
+     * **kwargs: keyword arguments
+     * <p>
+     * Returns:
+     * (**ray**, **op_delta**, **wvl**)
+     * <p>
+     * - **ray** is a list for each interface in **path_pkg** of these
+     * elements: [pt, after_dir, after_dst, normal]
+     * <p>
+     * - pt: the intersection point of the ray
+     * - after_dir: the ray direction cosine following the interface
+     * - after_dst: after_dst: the geometric distance to the next
+     * interface
+     * - normal: the surface normal at the intersection point
+     * <p>
+     * - **op_delta** - optical path wrt equally inclined chords to the
+     * optical axis
+     * - **wvl** - wavelength (in nm) that the ray was traced in
+     *
+     * @param seq_model
+     * @param pt0
+     * @param dir0
+     * @param wvl
+     * @return
+     */
+    public static RayPkg trace(SequentialModel seq_model, Vector3 pt0, Vector3 dir0, double wvl, TraceOptions trace_options) {
+        var options = new RayTraceOptions();
+        options.check_apertures = trace_options.check_apertures;
+        return RayTrace.trace(seq_model, pt0, dir0, wvl, options);
+    }
+
+    /**
+     * Trace ray specified by relative aperture and field point.
+     * <p>
+     * `pupil_type` controls how `pupil` data is interpreted when calculating the starting ray coordinates.
+     * <p>
+     * Args:
+     * opt_model: instance of :class:`~.OpticalModel` to trace
+     * pupil: aperture coordinates of ray
+     * fld: instance of :class:`~.Field`
+     * wvl: ray trace wavelength in nm
+     * apply_vignetting: if True, apply the `fld` vignetting factors to **pupil**
+     * pupil_type: ::
+     * <p>
+     * - 'rel pupil': relative pupil coordinates
+     * - 'aim pt': aim point on pupil plane
+     * - 'aim dir': aim direction in object space
+     * <p>
+     * **kwargs: keyword arguments
+     * <p>
+     * Returns:
+     * (**ray**, **op_delta**, **wvl**)
+     * <p>
+     * - **ray** is a list for each interface in **path_pkg** of these
+     * elements: [pt, after_dir, after_dst, normal]
+     * <p>
+     * - pt: the intersection point of the ray
+     * - after_dir: the ray direction cosine following the interface
+     * - after_dst: after_dst: the geometric distance to the next
+     * interface
+     * - normal: the surface normal at the intersection point
+     * <p>
+     * - **op_delta** - optical path wrt equally inclined chords to the
+     * optical axis
+     * - **wvl** - wavelength (in nm) that the ray was traced in
+     *
+     * @param opt_model instance of :class:`~.OpticalModel` to trace
+     * @param pupil     relative pupil coordinates of ray
+     * @param fld       instance of :class:`~.Field`
+     * @param wvl       ray trace wavelength in nm
+     */
+    public static RayPkg trace_base(OpticalModel opt_model, double[] pupil, Field fld, double wvl, TraceOptions trace_options) {
+        double[] pupil_coords = pupil;
+        if (trace_options.pupil_type == PupilType.REL_PUPIL) {
+            if (trace_options.apply_vignetting)
+                pupil_coords = fld.apply_vignetting(pupil);
+        }
+        Coord coord = opt_model.optical_spec.ray_start_from_osp(pupil_coords,fld,trace_options.pupil_type);
+        var pt0 = coord.pt;
+        var dir0 = coord.dir;
+
+        // if wide_angle, don't try to intercept object and don't disallow
+        // propagation against z_dir; this will be the case for rays exceeding
+        // 90 degrees at the first surface.
+        var options = new RayTraceOptions();
+        options.check_apertures = trace_options.check_apertures;
+        if (opt_model.optical_spec.field_of_view.is_wide_angle)
+            options.intersect_obj = false;
+        else {
+            // otherwise, if not wide angle, propagation against z_dir means
+            // a virtual object. To handle virtual object distances, always
+            // propagate from the object in a positive Z direction.
+            if (dir0.z * opt_model.seq_model.z_dir.get(0).value < 0)
+                dir0 = dir0.negate();
+        }
+        /*
+        double[] vig_pupil = fld.apply_vignetting(pupil);
+        OpticalSpecs osp = opt_model.optical_spec;
+        FirstOrderData fod = osp.parax_data.fod;
+        double eprad = fod.enp_radius;
+        double[] aim_pt = new double[]{0., 0.};
+        if (fld.aim_pt != null) {
+            aim_pt = fld.aim_pt;
+        }
+        Vector3 pt1 = new Vector3(eprad * vig_pupil[0] + aim_pt[0], eprad * vig_pupil[1] + aim_pt[1], fod.obj_dist + fod.enp_dist);
+        Vector3 pt0 = osp.obj_coords(fld);
+        Vector3 dir0 = pt1.minus(pt0);
+        dir0 = dir0.normalize();
+        */
+        return RayTrace.trace(opt_model.seq_model, pt0, dir0, wvl, options);
+    }
 
     static class BaseObjectiveFunction {
         final SequentialModel seq_model;
         final Integer ifcx;
         final Vector3 pt0;
-        final double dist;
+        final double obj2enp_dist;
         final double wvl;
+        final boolean not_wa;
+        final RayResult rr;
 
-        public BaseObjectiveFunction(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl) {
+        public BaseObjectiveFunction(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double obj2enp_dist, double wvl, boolean not_wa, RayResult rr) {
             this.seq_model = seq_model;
             this.ifcx = ifcx;
             this.pt0 = pt0;
-            this.dist = dist;
+            this.obj2enp_dist = obj2enp_dist;
             this.wvl = wvl;
+            this.not_wa = not_wa;
+            this.rr = rr;
         }
 
         public RaySeg eval(double x1, double y1) {
-            Vector3 pt1 = new Vector3(x1, y1, dist);
-            Vector3 dir0 = pt1.minus(pt0);
-            dir0 = dir0.normalize();
+            Vector3 pt1 = new Vector3(x1, y1, obj2enp_dist);
+            Vector3 dir0 = pt1.minus(pt0).normalize();
+            // handle case where entrance pupil is behind the object
+            if (not_wa && dir0.z * seq_model.z_dir.get(0).value < 0)
+                dir0 = dir0.negate();
+
             RayPkg pkg = null;
             try {
                 pkg = RayTrace.trace(seq_model, pt0, dir0, wvl);
-            } catch (TraceMissedSurfaceException ray_miss) {
-                pkg = ray_miss.ray_pkg;
-                if (ray_miss.surf <= ifcx)
-                    throw ray_miss;
-            } catch (TraceTIRException ray_tir) {
-                pkg = ray_tir.ray_pkg;
-                if (ray_tir.surf < ifcx)
-                    throw ray_tir;
+                rr.pkg = pkg;
+                rr.err = null;
+            } catch (TraceException ray_error) {
+                pkg = ray_error.ray_pkg;
+                rr.pkg = ray_error.ray_pkg;
+                rr.err = ray_error;
+                if (ray_error.surf <= ifcx)
+                    throw ray_error;
             }
             return pkg.ray.get(ifcx);
         }
@@ -120,8 +297,8 @@ public class Trace {
 
         final double y_target;
 
-        public SecantFunction(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double y_target) {
-            super(seq_model, ifcx, pt0, dist, wvl);
+        public SecantFunction(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double y_target, boolean not_wa, RayResult rr) {
+            super(seq_model, ifcx, pt0, dist, wvl, not_wa, rr);
             this.y_target = y_target;
         }
 
@@ -177,8 +354,8 @@ public class Trace {
 
         final double[] xy_target; // target x,y values
 
-        public ObjectiveFunction(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target) {
-            super(seq_model, ifcx, pt0, dist, wvl);
+        public ObjectiveFunction(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target, boolean not_wa, RayResult rr) {
+            super(seq_model, ifcx, pt0, dist, wvl, not_wa, rr);
             this.xy_target = xy_target;
         }
 
@@ -191,7 +368,8 @@ public class Trace {
                 resid[i] = xy_target[i] - p[i];
                 sos += (resid[i] * resid[i]);
             }
-            return Math.sqrt(sos / p.length);
+            //return Math.sqrt(sos / p.length);
+            return sos;
         }
 
         @Override
@@ -266,24 +444,26 @@ public class Trace {
     }
 
 
-    public static double[] aim_chief_ray(OpticalModel opt_model, Field fld, Double wvl) {
+    public static IterationResult aim_chief_ray(OpticalModel opt_model, Field fld, Double wvl) {
         // aim chief ray at center of stop surface and save results on **fld**
         SequentialModel seq_model = opt_model.seq_model;
         if (wvl == null)
             wvl = seq_model.central_wavelength();
         Integer stop = seq_model.stop_surface;
-        double[] aim_pt = iterate_ray(opt_model, stop, new double[]{0., 0.}, fld, wvl);
-        return aim_pt;
+        return iterate_ray(opt_model, stop, new double[]{0., 0.}, fld, wvl);
     }
 
-    public static double[] get_1d_solution(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double y_target) {
-        SecantFunction fn = new SecantFunction(seq_model, ifcx, pt0, dist, wvl, y_target);
+    public static IterationResult get_1d_solution(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double y_target, boolean not_wa) {
+        IterationResult res = new IterationResult();
+        SecantFunction fn = new SecantFunction(seq_model, ifcx, pt0, dist, wvl, y_target, not_wa, res.rr);
         double start_y = SecantSolver.find_root(fn, 0., 50, 1.48e-8);
-        return new double[]{0, start_y};
+        res.start_coords = new double[]{0, start_y};
+        return res;
     }
 
-    public static double[] get_2d_mike_lampton_lavenberg_marquardt_solution(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target) {
-        ObjectiveFunction fn = new ObjectiveFunction(seq_model, ifcx, pt0, dist, wvl, Arrays.copyOf(xy_target, xy_target.length));
+    public static IterationResult get_2d_mike_lampton_lavenberg_marquardt_solution(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target, boolean not_wa) {
+        IterationResult res = new IterationResult();
+        ObjectiveFunction fn = new ObjectiveFunction(seq_model, ifcx, pt0, dist, wvl, Arrays.copyOf(xy_target, xy_target.length), not_wa, res.rr);
         LMLSolver lm = new LMLSolver(fn, 1e-12, 2, 2);
         int istatus = 0;
         while (istatus != LMLSolver.BADITER &&
@@ -291,9 +471,10 @@ public class Trace {
                 istatus != LMLSolver.MAXITER) {
             istatus = lm.iLMiter();
         }
-        if (istatus == LMLSolver.LEVELITER)
-            return fn.point;
-        return new double[]{0.0, 0.0};
+        if (istatus == LMLSolver.LEVELITER) {
+            res.start_coords = fn.point;
+        }
+        return res;
     }
 
 //    public static double[] get_2d_minpack_lavenberg_marquardt_solution(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target, FirstOrderData fod) {
@@ -329,111 +510,37 @@ public class Trace {
      * @param wvl
      * @return
      */
-    public static double[] iterate_ray(final OpticalModel opt_model, Integer ifcx, double[] xy_target, Field fld, double wvl) {
-        final SequentialModel seq_model = opt_model.seq_model;
-        final OpticalSpecs osp = opt_model.optical_spec;
-        final FirstOrderData fod = osp.parax_data.fod;
-        double dist = fod.obj_dist + fod.enp_dist;
-        Vector3 pt0 = osp.obj_coords(fld);
+    public static IterationResult iterate_ray(final OpticalModel opt_model, Integer ifcx, double[] xy_target, Field fld, double wvl) {
+        var seq_model = opt_model.seq_model;
+        var osp = opt_model.optical_spec;
+        var fod = osp.parax_data.fod;
+        double obj2enp_dist = fod.obj_dist + fod.enp_dist;
+        boolean not_wa = !osp.field_of_view.is_wide_angle;
+
+        Coord coord = osp.obj_coords(fld);
+        var pt0 = coord.pt;
+        var d0 = coord.dir;
 
         // 0.3171082641317441 (secant)
         // 0.3171081317490797 (lm)
         // 0.3171081737822994 (expected)
         if (ifcx != null) {
             if (pt0.x == 0.0 && xy_target[0] == 0.0) {
-                return get_1d_solution(seq_model, ifcx, pt0, dist, wvl, xy_target[1]);
+                // do 1D iteration if field and target points are zero in x
+                var y_target = xy_target[1];
+                return get_1d_solution(seq_model, ifcx, pt0, obj2enp_dist, wvl, y_target, not_wa);
             } else {
-                return get_2d_mike_lampton_lavenberg_marquardt_solution(seq_model, ifcx, pt0, dist, wvl, xy_target);
+                return get_2d_mike_lampton_lavenberg_marquardt_solution(seq_model, ifcx, pt0, obj2enp_dist, wvl, xy_target, not_wa);
                 //return get_2d_minpack_lavenberg_marquardt_solution(seq_model, ifcx, pt0, dist, wvl, xy_target, fod);
             }
         } else {
             // floating stop surface - use entrance pupil for aiming
-            return xy_target;
+            var result = new IterationResult();
+            result.start_coords = xy_target;
+            return result;
         }
     }
 
-    /**
-     * Trace ray specified by relative aperture and field point.
-     *
-     *     Args:
-     *         opt_model: instance of :class:`~.OpticalModel` to trace
-     *         pupil: relative pupil coordinates of ray
-     *         fld: instance of :class:`~.Field`
-     *         wvl: ray trace wavelength in nm
-     *         **kwargs: keyword arguments
-     *
-     *     Returns:
-     *         (**ray**, **op_delta**, **wvl**)
-     *
-     *         - **ray** is a list for each interface in **path_pkg** of these
-     *           elements: [pt, after_dir, after_dst, normal]
-     *
-     *             - pt: the intersection point of the ray
-     *             - after_dir: the ray direction cosine following the interface
-     *             - after_dst: after_dst: the geometric distance to the next
-     *               interface
-     *             - normal: the surface normal at the intersection point
-     *
-     *         - **op_delta** - optical path wrt equally inclined chords to the
-     *           optical axis
-     *         - **wvl** - wavelength (in nm) that the ray was traced in
-     * @param opt_model instance of :class:`~.OpticalModel` to trace
-     * @param pupil relative pupil coordinates of ray
-     * @param fld instance of :class:`~.Field`
-     * @param wvl ray trace wavelength in nm
-     */
-    public static RayPkg trace_base(OpticalModel opt_model, double[] pupil, Field fld, double wvl) {
-        double[] vig_pupil = fld.apply_vignetting(pupil);
-        OpticalSpecs osp = opt_model.optical_spec;
-        FirstOrderData fod = osp.parax_data.fod;
-        double eprad = fod.enp_radius;
-        double[] aim_pt = new double[]{0., 0.};
-        if (fld.aim_pt != null) {
-            aim_pt = fld.aim_pt;
-        }
-        Vector3 pt1 = new Vector3(eprad * vig_pupil[0] + aim_pt[0],
-                eprad * vig_pupil[1] + aim_pt[1],
-                fod.obj_dist + fod.enp_dist);
-        Vector3 pt0 = osp.obj_coords(fld);
-        Vector3 dir0 = pt1.minus(pt0);
-        dir0 = dir0.normalize();
-        return RayTrace.trace(opt_model.seq_model, pt0, dir0, wvl);
-    }
-
-    /**
-     * returns (ray, ray_opl, wvl)
-     *
-     *     Args:
-     *         seq_model: the :class:`~.SequentialModel` to be traced
-     *         pt0: starting coordinate at object interface
-     *         dir0: starting direction cosines following object interface
-     *         wvl: ray trace wavelength in nm
-     *         **kwargs: keyword arguments
-     *
-     *     Returns:
-     *         (**ray**, **op_delta**, **wvl**)
-     *
-     *         - **ray** is a list for each interface in **path_pkg** of these
-     *           elements: [pt, after_dir, after_dst, normal]
-     *
-     *             - pt: the intersection point of the ray
-     *             - after_dir: the ray direction cosine following the interface
-     *             - after_dst: after_dst: the geometric distance to the next
-     *               interface
-     *             - normal: the surface normal at the intersection point
-     *
-     *         - **op_delta** - optical path wrt equally inclined chords to the
-     *           optical axis
-     *         - **wvl** - wavelength (in nm) that the ray was traced in
-     * @param seq_model
-     * @param pt0
-     * @param dir0
-     * @param wvl
-     * @return
-     */
-    public static RayPkg trace(SequentialModel seq_model, Vector3 pt0, Vector3 dir0, double wvl) {
-        return RayTrace.trace(seq_model, pt0, dir0, wvl);
-    }
 
     /*
     public static Pair<RefSpherePkg, RayPkg> setup_canonical_coords(OpticalModel opt_model, Field fld, double wvl, Vector3 image_pt) {
@@ -492,7 +599,7 @@ public class Trace {
         for (double[] p : osp.pupil.pupil_rays) {
             RayPkg ray_pkg;
             try {
-                ray_pkg = trace_base(opt_model, p, fld, wvl);
+                ray_pkg = trace_base(opt_model, p, fld, wvl, new TraceOptions());
             } catch (TraceException ray_error) {
                 ray_pkg = ray_error.ray_pkg;
             }
@@ -529,7 +636,7 @@ public class Trace {
     public static List<RayDataFrame> trace_ray_list_at_field(OpticalModel opt_model, double[][] ray_list, Field fld, double wvl, double foc) {
         ArrayList<RayDataFrame> rayset = new ArrayList<>();
         for (double[] p : ray_list) {
-            RayPkg ray = trace_base(opt_model, p, fld, wvl);
+            RayPkg ray = trace_base(opt_model, p, fld, wvl, new TraceOptions());
             rayset.add(new RayDataFrame(ray.ray));
         }
         return rayset;
@@ -547,7 +654,7 @@ public class Trace {
         OpticalSpecs osp = opt_model.optical_spec;
         FirstOrderData fod = osp.parax_data.fod;
 
-        RayPkg cr = trace_base(opt_model, new double[]{0., 0.}, fld, wvl);
+        RayPkg cr = trace_base(opt_model, new double[]{0., 0.}, fld, wvl, new TraceOptions());
         // op = rt.calc_optical_path(ray, opt_model.seq_model.path())
 
         // cr_exp_pt: E upper bar prime: pupil center for pencils from Q
@@ -578,8 +685,8 @@ public class Trace {
      */
     public static double eic_distance(RayData r, RayData r0) {
         // eq 3.9 Hopkins paper
-        double e = (r.d.plus(r0.d).dot(r.p.minus(r0.p))) /
-                (1. + r.d.dot(r0.d));
+        double e = (r.dir.plus(r0.dir).dot(r.pt.minus(r0.pt))) /
+                (1. + r.dir.dot(r0.dir));
         return e;
     }
 

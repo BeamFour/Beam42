@@ -79,7 +79,7 @@ public class FirstOrder {
             double slp0;
             SpecKey key = pupil.key;
             if (key.imageKey == ImageKey.Object) {
-                if (key.valueKey == ValueKey.Pupil) {
+                if (key.valueKey == ValueKey.EPD) {
                     slp0 = 0.5 * pupil.value / obj2enp_dist;
                 } else if (key.valueKey == ValueKey.Fnum) {
                     slp0 = -1. / (2.0 * pupil.value);

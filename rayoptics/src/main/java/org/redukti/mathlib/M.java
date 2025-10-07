@@ -8,4 +8,14 @@ public class M {
         return Math.abs(d) <= EPSILON;
     }
 
+    public static boolean is_kinda_big(double x) {
+        return is_kinda_big(x, 1e8);
+    }
+    public static boolean is_kinda_big(double x, double kinda_big) {
+        if (Double.isInfinite(x))
+            return true;
+        if (Math.abs(x) > kinda_big)
+            return true;
+        return false;
+    }
 }

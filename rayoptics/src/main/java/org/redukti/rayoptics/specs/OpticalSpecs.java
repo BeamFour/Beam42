@@ -1,9 +1,15 @@
 package org.redukti.rayoptics.specs;
 
+import org.redukti.mathlib.M;
+import org.redukti.mathlib.Matrix3;
+import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.optical.OpticalModel;
+import org.redukti.rayoptics.parax.firstorder.Etendue;
 import org.redukti.rayoptics.parax.firstorder.FirstOrder;
 import org.redukti.rayoptics.parax.firstorder.ParaxData;
+import org.redukti.rayoptics.raytr.IterationResult;
+import org.redukti.rayoptics.raytr.PupilType;
 import org.redukti.rayoptics.raytr.Trace;
 import org.redukti.rayoptics.util.Pair;
 import org.redukti.rayoptics.util.Triple;
@@ -46,7 +52,7 @@ public class OpticalSpecs {
     public OpticalSpecs(OpticalModel opt_model) {
         this.opt_model = opt_model;
         this.spectral_region = new WvlSpec(new WvlWt[]{new WvlWt("d", 1.)}, 0);
-        this.pupil = new PupilSpec(this, new Pair<>(ImageKey.Object, ValueKey.Pupil), 1.0);
+        this.pupil = new PupilSpec(this, new Pair<>(ImageKey.Object, ValueKey.EPD), 1.0);
         this.field_of_view = new FieldSpec(this, new Pair<>(ImageKey.Object, ValueKey.Angle), new double[]{0.});
         this.focus = new FocusRange();
         this.parax_data = null;
@@ -65,14 +71,14 @@ public class OpticalSpecs {
             if (do_aiming) {
                 for (int i = 0; i < field_of_view.fields.length; i++) {
                     Field fld = field_of_view.fields[i];
-                    double[] aim_pt = Trace.aim_chief_ray(opt_model, fld, wvl);
-                    fld.aim_pt = aim_pt;
+                    IterationResult result = Trace.aim_chief_ray(opt_model, fld, wvl);
+                    fld.aim_pt = result.start_coords;
                 }
             }
         }
     }
 
-    public Vector3 obj_coords(Field fld) {
+    public Coord obj_coords(Field fld) {
         return field_of_view.obj_coords(fld);
     }
 
@@ -108,4 +114,149 @@ public class OpticalSpecs {
     public Triple<Field, Double, Double> lookup_fld_wvl_focus(int fi) {
         return lookup_fld_wvl_focus(fi, null, 0.0);
     }
+
+
+    public ConjugateType conjugate_type(ImageKey space) {
+        if (space == null)
+            space = ImageKey.Object;
+        var seq_model = opt_model.seq_model;
+        var conj_type = ConjugateType.FINITE;
+        if (space == ImageKey.Object) {
+            if (M.is_kinda_big(seq_model.gaps.get(0).thi))
+                conj_type = ConjugateType.INFINITE;
+        }
+        else if (space == ImageKey.Image) {
+            if (M.is_kinda_big(seq_model.gaps.get(seq_model.gaps.size()-1).thi))
+                conj_type = ConjugateType.INFINITE;
+        }
+        else
+            throw new IllegalArgumentException("Unrecognized value for space " + space);
+        return conj_type;
+    }
+
+    /**
+     * turn pupil and field specs into ray start specification.
+     *
+     *         Args:
+     *             pupil: aperture coordinates of ray
+     *             fld: instance of :class:`~.Field`
+     *             pupil_type: controls how `pupil` data is interpreted
+     *                 - 'rel pupil': relative pupil coordinates
+     *                 - 'aim pt': aim point on pupil plane
+     *                 - 'aim dir': aim direction in object space
+     */
+    public Coord ray_start_from_osp(double[] pupil, Field fld, PupilType pupil_type) {
+        var pupil_oi_key = this.pupil.key.imageKey;
+        var pupil_value_key = this.pupil.key.valueKey;
+        var pupil_value = this.pupil.value;
+        Coord coord = obj_coords(fld);
+        var p0 = coord.pt;
+        var d0 = coord.dir;
+
+        var opt_model = this.opt_model;
+        var fod = opt_model.parax_model.parax_data.fod;
+        // if image space specification, swap in the corresponding first order
+        // object space parameter
+        if (pupil_oi_key == ImageKey.Image) {
+            if (Math.abs(fod.m) < 1e-10) { // infinite object distance
+                if (pupil_value_key == ValueKey.EPD)
+                    pupil_value = 2.0 * fod.enp_radius;
+                else {
+                    pupil_value_key = ValueKey.EPD;
+                    pupil_value = 2.0 * fod.enp_radius;
+                }
+            }
+            else { // finite conjugate
+                if (Math.abs(fod.enp_dist) > 1e10) { // telecentric entrance pupil
+                    pupil_value_key = ValueKey.NA;
+                    pupil_value = fod.obj_na;
+                }
+                else {
+                    pupil_value_key = ValueKey.EPD;
+                    pupil_value = 2.0 * fod.enp_radius;
+                }
+            }
+        }
+
+        Vector3 pt0 = null;
+        Vector3 dir0 = null;
+        var z_enp = fod.enp_dist;
+        // generate starting pt and dir depending on whether the pupil spec is
+        // spatial or angular
+        if (ValueKey.EPD == pupil_value_key) {
+            Vector3 pt1 = null;
+            if (pupil_type == PupilType.AIM_PT) {
+                pt0 = p0;
+                pt1 = new Vector3(pupil[0], pupil[1], fod.obj_dist + z_enp);
+            }
+            else {
+                var eprad = pupil_value / 2.0;
+                if (field_of_view.is_wide_angle) {
+                    // transform pupil_pt, in direction coords into surf#1 coordinates
+                    var pupil_pt = new Vector3(pupil[0], pupil[1], 0.0).times(eprad);
+                    var rot_mat_d2s = Matrix3.rot_v1_into_v2(d0, Vector3.vector3_001);
+                    pt1 = rot_mat_d2s.multiply(pupil_pt);
+                    if (fld.z_enp != null)
+                        z_enp = fld.z_enp;
+                    var obj2enp_dist = -(fod.obj_dist + z_enp);
+                    // rotate the on-axis object pt into the incident direction
+                    // and then position wrt z_enp
+                    var enp_pt = new Vector3(0.0, 0.0, obj2enp_dist);
+                    var rot_mat_s2d = Matrix3.rot_v1_into_v2(Vector3.vector3_001, d0);
+                    pt0 = rot_mat_s2d.multiply(enp_pt).minus(enp_pt);
+                    pt1 = new Vector3(pt1.x, pt1.y, pt1.z - obj2enp_dist);
+                }
+                else {
+                    var aim_pt = fld.aim_pt;
+                    var obj2enp_dist = -(fod.obj_dist + z_enp);
+                    pt1 = new Vector3(eprad*pupil[0]+aim_pt[0],
+                                    eprad*pupil[1]+aim_pt[1],
+                                    fod.obj_dist+z_enp);
+                    pt0 = new Vector3(d0.x/d0.z,d0.y/d0.z, 0.0).times(obj2enp_dist);
+                }
+            }
+            dir0 = pt1.minus(pt0).normalize();
+        }
+        else { //an angular based measure
+            double[] dir_tot;
+            if (pupil_type == PupilType.AIM_DIR) {
+                dir_tot = pupil;
+                pt0 = p0;
+            }
+            else {
+                double slope;
+                if (pupil_value_key == ValueKey.NA) {
+                    var na = pupil_value;
+                    slope = Etendue.na2slp(na);
+                }
+                else if (pupil_value_key == ValueKey.Fnum) {
+                    var fno = pupil_value;
+                    slope = -1.0/(2.0*fno);
+                }
+                else
+                    throw new IllegalArgumentException("Invalid pupil value key " + pupil_value_key);
+                var hypt = Math.sqrt(1.0 + (pupil[0]*slope)*(pupil[0]*slope) +  (pupil[1]*slope)*(pupil[1]*slope));
+                var pupil_dir = new double[] {slope*pupil[0]/hypt,
+                                      slope*pupil[1]/hypt};
+                pt0 = p0;
+                double[] cr_dir;
+                if (d0 != null) {
+                    cr_dir = new double[]{d0.x,d0.y};
+                }
+                else {
+                    var aim_pt = fld.aim_pt;
+                    var pt1 = new Vector3(aim_pt[0], aim_pt[1],
+                                    fod.obj_dist+fod.enp_dist);
+                    var diff = pt1.minus(p0).normalize();
+                    cr_dir = new double[]{diff.x,diff.y};
+                }
+                dir_tot = new double[] {pupil_dir[0] + cr_dir[0],
+                        pupil_dir[1] + cr_dir[1]};
+            }
+            dir0 = new Vector3(dir_tot[0], dir_tot[1],
+                             Math.sqrt(1.0 - dir_tot[0]*dir_tot[0] - dir_tot[1]*dir_tot[1]));
+        }
+        return new Coord(pt0,dir0);
+    }
+
 }

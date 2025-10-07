@@ -9,13 +9,13 @@ import org.redukti.rayoptics.util.Pair;
  * where pupil is the pupil diameter.
  * <p>
  * Attributes:
- * key: 'aperture', 'object'|'image', 'pupil'|'NA'|'f/#'
+ * key: 'aperture', 'object'|'image', 'epd'|'NA'|'f/#'
  * value: size of the pupil
  * pupil_rays: list of relative pupil coordinates for pupil limiting rays
  * ray_labels: list of string labels for pupil_rays
  */
 public class PupilSpec {
-    public OpticalSpecs parent;
+    public OpticalSpecs optical_spec;
     public SpecKey key;
     public double value;
 
@@ -31,8 +31,12 @@ public class PupilSpec {
     static final double[][] default_pupil_rays = {{0., 0.}, {1., 0.}, {-1., 0.}, {0., 1.}, {0., -1.}};
     static final String[] default_ray_labels = {"00", "+X", "-X", "+Y", "-Y"};
 
-    public PupilSpec(OpticalSpecs parent, Pair<ImageKey, ValueKey> k, double value) {
-        this.parent = parent;
+    public PupilSpec(OpticalSpecs parent, Pair<ImageKey, ValueKey> k, Double value) {
+        if (k == null)
+            k = new Pair<>(ImageKey.Object, ValueKey.EPD);
+        if (value == null)
+            value = 1.0;
+        this.optical_spec = parent;
         this.key = new SpecKey(SpecType.Aperture, k.first, k.second);
         this.value = value;
         this.pupil_rays = default_pupil_rays;

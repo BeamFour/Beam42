@@ -19,6 +19,7 @@ public class Field {
     public double vlx; // -x vignetting factor
     public double vly; // -y vignetting factor
     public double wt; //  field weight
+    public Double z_enp;
     /**
      * ray package for the ray from the field point through the
      * center of the aperture stop, traced in the central wavelength

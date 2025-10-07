@@ -11,7 +11,6 @@ import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.Pair;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Analysis {
@@ -26,8 +25,8 @@ public class Analysis {
      */
     public static ChiefRayExitPupilSegment transfer_to_exit_pupil(Interface ifc, RayData ray_seg, double exp_dst_parax) {
         RayData b4_ray = Transform.transform_after_surface(ifc, ray_seg);
-        Vector3 b4_pt = b4_ray.p;
-        Vector3 b4_dir = b4_ray.d;
+        Vector3 b4_pt = b4_ray.pt;
+        Vector3 b4_dir = b4_ray.dir;
 
         // h = b4_pt[0]**2 + b4_pt[1]**2
         // u = b4_dir[0]**2 + b4_dir[1]**2
@@ -182,11 +181,14 @@ public class Analysis {
         Vector2 stop = new Vector2(fan_rng.fan_stop[0], fan_rng.fan_stop[1]);
         int num = fan_rng.num_rays;
         Vector2 step = start.minus(stop).divide(num - 1);
+        // FIXME fan is not populated
         List<RayFanItem> fan = new ArrayList<>();
         for (int r = 0; r < num; r++) {
             Vector2 pupil = start;
-            Trace.trace_safe(opt_model, pupil, fld, wvl, fan,
-                    output_filter, rayerr_filter);
+            TraceOptions trace_options = new TraceOptions();
+            trace_options.output_filter = output_filter;
+            trace_options.rayerr_filter = rayerr_filter;
+            Trace.trace_safe(opt_model, pupil, fld, wvl, trace_options);
             start = start.plus(step);
         }
         return fan;
@@ -234,8 +236,8 @@ public class Analysis {
 
         double pre_opd = -Math.abs(fod.n_obj) * e1 - ray_op + Math.abs(fod.n_img) * ekp + chief_ray_op;
         RayData b4 = Transform.transform_after_surface(ifc, new RayData(Lists.get(ray, k).p, Lists.get(ray, k).d));
-        Vector3 b4_pt = b4.p;
-        Vector3 b4_dir = b4.d;
+        Vector3 b4_pt = b4.pt;
+        Vector3 b4_dir = b4.dir;
         double dst = ekp - cr_exp_dist;
         Vector3 eic_exp_pt = b4_pt.minus(b4_dir.times(dst));
         Vector3 p_coord = eic_exp_pt.minus(cr_exp_pt);

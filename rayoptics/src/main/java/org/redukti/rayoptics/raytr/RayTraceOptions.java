@@ -26,4 +26,10 @@ public class RayTraceOptions {
     public boolean filter_out_phantoms = false;
 
     public double fuzz = 1e-5;
+
+    public RayTraceOptions() {}
+
+    public RayTraceOptions(TraceOptions trace_options) {
+        this.check_apertures = trace_options.check_apertures;
+    }
 }

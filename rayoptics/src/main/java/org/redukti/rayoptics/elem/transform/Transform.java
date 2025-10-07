@@ -263,18 +263,18 @@ public class Transform {
             Matrix3 r = xform.first;
             Vector3 t = xform.second;
             if (r == null) {
-                b4_pt = ray_seg.p.minus(t);
-                b4_dir = ray_seg.d;
+                b4_pt = ray_seg.pt.minus(t);
+                b4_dir = ray_seg.dir;
             }
             else {
                 Matrix3 rt = r.transpose();
-                b4_pt = rt.multiply(ray_seg.p.minus((t)));
-                b4_dir = rt.multiply(ray_seg.d);
+                b4_pt = rt.multiply(ray_seg.pt.minus((t)));
+                b4_dir = rt.multiply(ray_seg.dir);
             }
         }
         else {
-            b4_pt = ray_seg.p;
-            b4_dir = ray_seg.d;
+            b4_pt = ray_seg.pt;
+            b4_dir = ray_seg.dir;
         }
         return new RayData(b4_pt, b4_dir);
     }

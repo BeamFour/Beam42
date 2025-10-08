@@ -4,15 +4,15 @@ import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.math.Tfm3d;
 
 public class ReferenceSphere {
-    private final Vector3 imagePt;
-    private final Vector3 refDir;
-    private final double refSphereRadius;
-    private final Tfm3d lclTfrmLast;
+    private final Vector3 image_pt;
+    private final Vector3 ref_dir;
+    private final double ref_sphere_radius;
+    private final Tfm3d lcl_tfrm_last;
 
-    public ReferenceSphere(Vector3 imagePt, Vector3 refDir, double refSphereRadius, Tfm3d lclTfrmLast) {
-        this.imagePt = imagePt;
-        this.refDir = refDir;
-        this.refSphereRadius = refSphereRadius;
-        this.lclTfrmLast = lclTfrmLast;
+    public ReferenceSphere(Vector3 image_pt, Vector3 ref_dir, double ref_sphere_radius, Tfm3d lcl_tfrm_last) {
+        this.image_pt = image_pt;
+        this.ref_dir = ref_dir;
+        this.ref_sphere_radius = ref_sphere_radius;
+        this.lcl_tfrm_last = lcl_tfrm_last;
     }
 }

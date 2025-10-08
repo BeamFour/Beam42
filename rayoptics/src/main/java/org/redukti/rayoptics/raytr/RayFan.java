@@ -60,13 +60,13 @@ public class RayFan {
     }
 
     void update_data(String build) {
-        if ("rebuild".equals(build)) {
-            fan_pkg = Analysis.trace_fan(
-                    opt_model, fld, wvl, foc, xyfan,
-                    image_pt_2d, num_rays, output_filter,
-                    rayerr_filter);
-        }
-        fan = Analysis.focus_fan(opt_model, fan_pkg, fld, wvl, foc,
-                image_pt_2d);
+//        if ("rebuild".equals(build)) {
+//            fan_pkg = Analysis.trace_fan(
+//                    opt_model, fld, wvl, foc, xyfan,
+//                    image_pt_2d, num_rays, output_filter,
+//                    rayerr_filter);
+//        }
+//        fan = Analysis.focus_fan(opt_model, fan_pkg, fld, wvl, foc,
+//                image_pt_2d);
     }
 }

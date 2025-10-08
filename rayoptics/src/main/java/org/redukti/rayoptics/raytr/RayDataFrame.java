@@ -5,6 +5,8 @@ import org.redukti.mathlib.Vector3;
 
 import java.util.List;
 
+// r = pd.DataFrame(ray, columns=['inc_pt', 'after_dir',
+//                                   'after_dst', 'normal'])
 public class RayDataFrame {
     public final Vector3[] inc_pt;
     public final Vector3[] after_dir;

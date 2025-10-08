@@ -70,8 +70,7 @@ public class OpticalSpecs {
             if (do_aiming) {
                 for (int i = 0; i < fov.fields.length; i++) {
                     Field fld = fov.fields[i];
-                    IterationResult result = Trace.aim_chief_ray(opt_model, fld, wvl);
-                    fld.aim_pt = result.start_coords;
+                    fld.aim_pt = Trace.aim_chief_ray(opt_model, fld, wvl);
                 }
             }
         }

@@ -2,7 +2,9 @@ package org.redukti.rayoptics.raytr;
 
 import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
+import org.redukti.rayoptics.elem.transform.Transform;
 import org.redukti.rayoptics.optical.OpticalModel;
+import org.redukti.rayoptics.seq.Interface;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.util.Lists;
 
@@ -64,6 +66,51 @@ public class WaveAbr {
         var ref_dir = ref_sphere_vec.normalize();
 
         return new ReferenceSphere(image_pt, ref_dir, ref_sphere_radius, lcl_tfrm_last);
+    }
+
+    /**
+     * Given the exiting interface and chief ray data, return exit pupil ray coords.
+     *
+     *     Args:
+     *         interface: the exiting :class:'~.Interface' for the path sequence
+     *         ray_seg: ray segment exiting from **interface**
+     *         exp_dst_parax: z distance to the paraxial exit pupil
+     *
+     *     Returns:
+     *         (**exp_pt**, **exp_dir**, **exp_dst**)
+     *
+     *         - **exp_pt** - ray intersection with exit pupil plane
+     *         - **exp_dir** - direction cosine of the ray in exit pupil space
+     *         - **exp_dst** - distance from interface to exit pupil pt
+     *         - **interface** - exiting :class:'~.Interface' for the path sequence
+     *         - **b4_pt** - ray intersection pt wrt image gap coordinates
+     *         - **b4_dir** - ray direction cosine wrt image gap coordinates
+     */
+    public static ChiefRayExitPupilSegment transfer_to_exit_pupil(
+            Interface ifc,
+            RayData ray_seg,
+            double exp_dst_parax) {
+        RayData b4_ray = Transform.transform_after_surface(ifc, ray_seg);
+        Vector3 b4_pt = b4_ray.pt;
+        Vector3 b4_dir = b4_ray.dir;
+
+        // h = b4_pt[0]**2 + b4_pt[1]**2
+        // u = b4_dir[0]**2 + b4_dir[1]**2
+        // handle field points in the YZ plane
+
+        double h = b4_pt.y;     // y=1
+        double u = b4_dir.y;    // y=1
+        double exp_dst;
+        if (Math.abs(u) < 1e-14) {
+            exp_dst = exp_dst_parax;
+        } else {
+            // exp_dst = -np.sign(b4_dir[2])*sqrt(h/u)
+            exp_dst = -h / u;
+        }
+        Vector3 exp_pt = b4_pt.plus(b4_dir.times(exp_dst));
+        Vector3 exp_dir = b4_dir;
+
+        return new ChiefRayExitPupilSegment(exp_pt, exp_dir, exp_dst, ifc, b4_pt, b4_dir);
     }
 
 }

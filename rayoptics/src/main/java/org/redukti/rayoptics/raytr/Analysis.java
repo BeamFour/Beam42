@@ -16,58 +16,6 @@ import java.util.List;
 public class Analysis {
 
 
-    /**
-     * Given the exiting interface and chief ray data, return exit pupil ray coords.
-     *
-     * @param ifc           the exiting :class:'~.Interface' for the path sequence
-     * @param ray_seg       ray segment exiting from **interface**
-     * @param exp_dst_parax z distance to the paraxial exit pupil
-     */
-    public static ChiefRayExitPupilSegment transfer_to_exit_pupil(Interface ifc, RayData ray_seg, double exp_dst_parax) {
-        RayData b4_ray = Transform.transform_after_surface(ifc, ray_seg);
-        Vector3 b4_pt = b4_ray.pt;
-        Vector3 b4_dir = b4_ray.dir;
-
-        // h = b4_pt[0]**2 + b4_pt[1]**2
-        // u = b4_dir[0]**2 + b4_dir[1]**2
-        // handle field points in the YZ plane
-
-        double h = b4_pt.y;
-        double u = b4_dir.y;
-        double exp_dst;
-        if (Math.abs(u) < 1e-14) {
-            exp_dst = exp_dst_parax;
-        } else {
-            // exp_dst = -np.sign(b4_dir[2])*sqrt(h/u)
-            exp_dst = -h / u;
-        }
-        Vector3 exp_pt = b4_pt.plus(b4_dir.times(exp_dst));
-        Vector3 exp_dir = b4_dir;
-
-        return new ChiefRayExitPupilSegment(exp_pt, exp_dir, exp_dst, ifc, b4_pt, b4_dir);
-    }
-
-
-    /**
-     * Get the chief ray package at **fld**, computing it if necessary.
-     *
-     * @param opt_model
-     * @param fld       :class:`~.Field` point for wave aberration calculation
-     * @param wvl       wavelength of ray (nm)
-     * @param foc       defocus amount
-     * @return tuple of chief_ray, cr_exp_seg
-     */
-    public static ChiefRayPkg get_chief_ray_pkg(OpticalModel opt_model, Field fld, double wvl, double foc) {
-        if (fld.chief_ray == null) {
-            Trace.aim_chief_ray(opt_model, fld, wvl);
-            ChiefRayPkg chief_ray_pkg = Trace.trace_chief_ray(opt_model, fld, wvl, foc);
-            fld.chief_ray = chief_ray_pkg;
-        } else if (fld.chief_ray.chief_ray.wvl != wvl) {
-            ChiefRayPkg chief_ray_pkg = Trace.trace_chief_ray(opt_model, fld, wvl, foc);
-            fld.chief_ray = chief_ray_pkg;
-        }
-        return fld.chief_ray;
-    }
 
     /**
      * Compute the reference sphere for a defocussed image point at **fld
@@ -122,48 +70,48 @@ public class Analysis {
         }
     }
 
-    /**
-     * Trace a fan of rays and precalculate data for rapid refocus later.
-     *
-     * @param opt_model
-     * @param fld
-     * @param wvl
-     * @param foc
-     * @param xy
-     * @param image_pt_2d
-     * @param num_rays
-     * @return
-     */
-    public static Pair<List<RayFanItem>, List<WaveAbrPreCalc>> trace_fan(OpticalModel opt_model, Field fld, double wvl,
-                                                                         double foc, int xy, Vector2 image_pt_2d, int num_rays,
-                                                                         String output_filter, String rayerr_filter) {
-        FirstOrderData fod = opt_model.optical_spec.parax_data.fod;
-        ChiefRayPkg cr_pkg = get_chief_ray_pkg(opt_model, fld, wvl, foc);
-        RefSphere ref_sphere = setup_exit_pupil_coords(opt_model, fld, wvl, foc, cr_pkg,
-                image_pt_2d);
-        fld.chief_ray = cr_pkg;
-        fld.ref_sphere = ref_sphere;
-
-        // xy determines whether x (=0) or y (=1) fan
-        double[] fan_start = new double[]{0., 0.};
-        double[] fan_stop = new double[]{0., 0.};
-        fan_stop[xy] = -1.0;
-        fan_stop[xy] = 1.0;
-        FanDef fan_def = new FanDef(fan_start, fan_stop, num_rays);
-        List<RayFanItem> fan = trace_ray_fan(opt_model, fan_def, fld, wvl, foc, output_filter, rayerr_filter);
-
-        List<WaveAbrPreCalc> upd_fan = new ArrayList<>();
-        for (int i = 0; i < fan.size(); i++) {
-            RayFanItem fi = fan.get(i);
-            if (fi.ray_pkg != null) { // && ! instanceof TraceError
-                WaveAbrPreCalc re_opd_pkg = wave_abr_pre_calc(fod, fld, wvl, foc, fi.ray_pkg, cr_pkg);
-                upd_fan.add(re_opd_pkg);
-            } else {
-                upd_fan.add(null);
-            }
-        }
-        return new Pair<>(fan, upd_fan);
-    }
+//    /**
+//     * Trace a fan of rays and precalculate data for rapid refocus later.
+//     *
+//     * @param opt_model
+//     * @param fld
+//     * @param wvl
+//     * @param foc
+//     * @param xy
+//     * @param image_pt_2d
+//     * @param num_rays
+//     * @return
+//     */
+//    public static Pair<List<RayFanItem>, List<WaveAbrPreCalc>> trace_fan(OpticalModel opt_model, Field fld, double wvl,
+//                                                                         double foc, int xy, Vector2 image_pt_2d, int num_rays,
+//                                                                         String output_filter, String rayerr_filter) {
+//        FirstOrderData fod = opt_model.optical_spec.parax_data.fod;
+//        ChiefRayPkg cr_pkg = Trace.get_chief_ray_pkg(opt_model, fld, wvl, foc);
+//        RefSphere ref_sphere = setup_exit_pupil_coords(opt_model, fld, wvl, foc, cr_pkg,
+//                image_pt_2d);
+//        fld.chief_ray = cr_pkg;
+//        fld.ref_sphere = ref_sphere;
+//
+//        // xy determines whether x (=0) or y (=1) fan
+//        double[] fan_start = new double[]{0., 0.};
+//        double[] fan_stop = new double[]{0., 0.};
+//        fan_stop[xy] = -1.0;
+//        fan_stop[xy] = 1.0;
+//        FanDef fan_def = new FanDef(fan_start, fan_stop, num_rays);
+//        List<RayFanItem> fan = trace_ray_fan(opt_model, fan_def, fld, wvl, foc, output_filter, rayerr_filter);
+//
+//        List<WaveAbrPreCalc> upd_fan = new ArrayList<>();
+//        for (int i = 0; i < fan.size(); i++) {
+//            RayFanItem fi = fan.get(i);
+//            if (fi.ray_pkg != null) { // && ! instanceof TraceError
+//                WaveAbrPreCalc re_opd_pkg = wave_abr_pre_calc(fod, fld, wvl, foc, fi.ray_pkg, cr_pkg);
+//                upd_fan.add(re_opd_pkg);
+//            } else {
+//                upd_fan.add(null);
+//            }
+//        }
+//        return new Pair<>(fan, upd_fan);
+//    }
 
     /**
      * Trace a fan of rays, according to fan_rng.
@@ -301,7 +249,7 @@ public class Analysis {
         FirstOrderData fod = opt_model.optical_spec.parax_data.fod;
         List<RayFanItem> fan = fan_pkg.first;
         List<WaveAbrPreCalc> upd_fan = fan_pkg.second;
-        ChiefRayPkg cr_pkg = get_chief_ray_pkg(opt_model, fld, wvl, foc);
+        ChiefRayPkg cr_pkg = Trace.get_chief_ray_pkg(opt_model, fld, wvl, foc);
         RefSphere ref_sphere = setup_exit_pupil_coords(opt_model, fld, wvl, foc, cr_pkg,
                 image_pt_2d);
         double central_wvl = opt_model.optical_spec.spectral_region.central_wvl();

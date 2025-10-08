@@ -61,7 +61,7 @@ public class Trace {
      *     Returns:
      *         tuple: ray_pkg, trace_error | None
      */
-    public RayResult trace_ray(
+    public static RayResult trace_ray(
             OpticalModel opt_model,
             Vector2 pupil,
             Field fld,
@@ -308,40 +308,6 @@ public class Trace {
         }
     }
 
-//    /* Solver for use in Minpack algos */
-//    static class LmObjectiveFunction extends BaseObjectiveFunction implements MinPack.Hybrd_Function, MinPack.Lmder_function {
-//        final double[] xy_target; // target x,y values
-//
-//        public LmObjectiveFunction(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target) {
-//            super(seq_model, ifcx, pt0, dist, wvl);
-//            this.xy_target = xy_target;
-//        }
-//
-//        @Override
-//        public void apply(int n, double[] x, double[] fvec, int[] iflag) {
-//            RaySeg seg = eval(x[0], x[1]);
-//            // TODO following is only applicable when solving for y alone
-//            // we need a way to not do this when solving x and y.
-//            double residual = seg.p.x - xy_target[0];
-//            if (Math.abs(residual) > 2.2204460492503131e-16)
-//                residual = 9.876543e+99;
-//            fvec[0] = residual;
-//            fvec[1] = seg.p.y - xy_target[1];
-//        }
-//
-//        @Override
-//        public int apply(int m, int n, double[] x, double[] fvec, int iflag) {
-//            int[] iflags = new int[1];
-//            apply(n, x, fvec, iflags);
-//            return iflags[0];
-//        }
-//
-//        @Override
-//        public boolean hasJacobian() {
-//            return false;
-//        }
-//    }
-
     /* Solver for use in LMLSolver */
     static class ObjectiveFunction extends BaseObjectiveFunction implements LMLFunction {
 
@@ -442,15 +408,6 @@ public class Trace {
     }
 
 
-    public static IterationResult aim_chief_ray(OpticalModel opt_model, Field fld, Double wvl) {
-        // aim chief ray at center of stop surface and save results on **fld**
-        SequentialModel seq_model = opt_model.seq_model;
-        if (wvl == null)
-            wvl = seq_model.central_wavelength();
-        Integer stop = seq_model.stop_surface;
-        return iterate_ray(opt_model, stop, new double[]{0., 0.}, fld, wvl);
-    }
-
     public static IterationResult get_1d_solution(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double y_target, boolean not_wa) {
         IterationResult res = new IterationResult();
         SecantFunction fn = new SecantFunction(seq_model, ifcx, pt0, dist, wvl, y_target, not_wa, res.rr);
@@ -474,6 +431,40 @@ public class Trace {
         }
         return res;
     }
+
+//    /* Solver for use in Minpack algos */
+//    static class LmObjectiveFunction extends BaseObjectiveFunction implements MinPack.Hybrd_Function, MinPack.Lmder_function {
+//        final double[] xy_target; // target x,y values
+//
+//        public LmObjectiveFunction(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target) {
+//            super(seq_model, ifcx, pt0, dist, wvl);
+//            this.xy_target = xy_target;
+//        }
+//
+//        @Override
+//        public void apply(int n, double[] x, double[] fvec, int[] iflag) {
+//            RaySeg seg = eval(x[0], x[1]);
+//            // TODO following is only applicable when solving for y alone
+//            // we need a way to not do this when solving x and y.
+//            double residual = seg.p.x - xy_target[0];
+//            if (Math.abs(residual) > 2.2204460492503131e-16)
+//                residual = 9.876543e+99;
+//            fvec[0] = residual;
+//            fvec[1] = seg.p.y - xy_target[1];
+//        }
+//
+//        @Override
+//        public int apply(int m, int n, double[] x, double[] fvec, int iflag) {
+//            int[] iflags = new int[1];
+//            apply(n, x, fvec, iflags);
+//            return iflags[0];
+//        }
+//
+//        @Override
+//        public boolean hasJacobian() {
+//            return false;
+//        }
+//    }
 
 //    public static double[] get_2d_minpack_lavenberg_marquardt_solution(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target, FirstOrderData fod) {
 //
@@ -539,71 +530,43 @@ public class Trace {
         }
     }
 
+    public static TraceWithOPDResult trace_with_opd(
+            OpticalModel opt_model,
+            Vector2 pupil,
+            Field fld,
+            double wvl,
+            double foc,
+            TraceOptions trace_options) {
+        var chief_ray_pkg = get_chief_ray_pkg(opt_model, fld, wvl, foc);
+        var image_pt_2d = trace_options.image_pt_2d;
+        var image_delta = trace_options.image_delta;
+        var ref_sphere = WaveAbr.calculate_reference_sphere(opt_model,fld,wvl,foc,
+                                chief_ray_pkg, image_pt_2d, image_delta);
 
-    /*
-    public static Pair<RefSpherePkg, RayPkg> setup_canonical_coords(OpticalModel opt_model, Field fld, double wvl, Vector3 image_pt) {
-        OpticalSpecs osp = opt_model.optical_spec;
-        SequentialModel seq_model = opt_model.seq_model;
-        FirstOrderData fod = osp.parax_data.fod;
+        var ray_result = trace_ray(opt_model,pupil,fld,wvl,trace_options);
+        var ray_pkg = ray_result.pkg;
+        var ray_err =  ray_result.err;
 
-        if (fld.chief_ray == null) {
-            fld.chief_ray = trace_base(opt_model, new double[] {0., 0.}, fld, wvl);
-        }
-        RayPkg cr = fld.chief_ray;
-        if (image_pt == null)
-            image_pt = Lists.get(cr.ray, -1).p;
-
-        // cr_exp_pt: E upper bar prime: pupil center for pencils from Q
-        // cr_exp_pt, cr_b4_dir, cr_dst
-        ChiefRayExitPupilSegment cr_exp_seg = RayTrace.transfer_to_exit_pupil(Lists.get(seq_model.ifcs, -2),
-                new Ray(Lists.get(cr.ray, -2).p,
-                        Lists.get(cr.ray, -2).d),
-                fod.exp_dist);
-        Vector3 cr_exp_pt = cr_exp_seg.exp_pt;
-        double cr_exp_dist = cr_exp_seg.exp_dst;
-
-        double img_dist = Lists.get(seq_model.gaps, -1).thi;
-        Vector3 img_pt = new Vector3(image_pt.x, image_pt.y, image_pt.z + img_dist);
-
-        // R' radius of reference sphere for O'
-        Vector3 ref_sphere_vec = img_pt.minus(cr_exp_pt);
-        double ref_sphere_radius = ref_sphere_vec.length();
-        Vector3 ref_dir = ref_sphere_vec.normalize();
-
-        RefSphere ref_sphere = new RefSphere(image_pt, cr_exp_pt, cr_exp_dist,
-                ref_dir, ref_sphere_radius);
-
-        ZDir z_dir = Lists.get(seq_model.z_dir, -1);
-        int wl = seq_model.index_for_wavelength(wvl);
-        double n_obj = Lists.get(seq_model.rndx, 0)[wl];
-        double n_img = Lists.get(seq_model.rndx, -1)[wl];
-        RefSpherePkg ref_sphere_pkg = new RefSpherePkg(ref_sphere, osp.parax_data, n_obj, n_img, z_dir);
-        fld.ref_sphere = ref_sphere_pkg;
-        return new Pair<>(ref_sphere_pkg, cr);
+        fld.chief_ray = chief_ray_pkg;
+        fld.ref_sphere = ref_sphere;
+        var fod = opt_model.optical_spec.parax_data.fod;
+        // FIXME
+        throw new UnsupportedOperationException("Not supported yet.");
     }
-    */
 
     /**
      * returns a list of RayPkgs for the boundary rays for field fld
-     *
-     * @param opt_model
-     * @param fld
-     * @param wvl
-     * @return
      */
-    public static List<RayPkg> trace_boundary_rays_at_field(OpticalModel opt_model, Field fld, double wvl) {
-        TraceOptions trace_options = new TraceOptions();
+    public static List<RayPkg> trace_boundary_rays_at_field(OpticalModel opt_model, Field fld, double wvl, TraceOptions trace_options) {
         trace_options.rayerr_filter = "full";
+        var ref_sphere_cr = setup_pupil_coords(opt_model,fld,wvl,0.0,null,null);
+        fld.chief_ray = ref_sphere_cr.chief_ray_pkg;
+        fld.ref_sphere = ref_sphere_cr.ref_sphere;
         List<RayPkg> rim_rays = new ArrayList<>();
-        OpticalSpecs osp = opt_model.optical_spec;
+        var osp = opt_model.optical_spec;
         for (double[] p : osp.pupil.pupil_rays) {
-            RayPkg ray_pkg;
-            try {
-                ray_pkg = trace_base(opt_model, p, fld, wvl, new TraceOptions());
-            } catch (TraceException ray_error) {
-                ray_pkg = ray_error.ray_pkg;
-            }
-            rim_rays.add(ray_pkg);
+            var ray_result = trace_ray(opt_model, new Vector2(p[0], p[1]), fld, wvl, trace_options);
+            rim_rays.add(ray_result.pkg);
         }
         return rim_rays;
     }
@@ -619,52 +582,154 @@ public class Trace {
         return pupil_rays;
     }
 
-    public static List<RayPkg> trace_boundary_rays(OpticalModel opt_model) {
+    public static List<RayPkg> trace_boundary_rays(OpticalModel opt_model, TraceOptions trace_options) {
         List<RayPkg> rayset = new ArrayList<>();
         double wvl = opt_model.seq_model.central_wavelength();
         FieldSpec fov = opt_model.optical_spec.fov;
         for (int fi = 0; fi < fov.fields.length; fi++) {
             Field fld = fov.fields[fi];
-            List<RayPkg> rim_rays = trace_boundary_rays_at_field(opt_model, fld, wvl);
+            var rim_rays = trace_boundary_rays_at_field(opt_model, fld, wvl,trace_options);
             fld.pupil_rays = boundary_ray_dict(opt_model, rim_rays);
             rayset.addAll(rim_rays);
         }
         return rayset;
     }
 
+
     /* returns a list of ray |DataFrame| for the ray_list at field fld */
-    public static List<RayDataFrame> trace_ray_list_at_field(OpticalModel opt_model, double[][] ray_list, Field fld, double wvl, double foc) {
+    public static List<RayDataFrame> trace_ray_list_at_field(OpticalModel opt_model, double[][] ray_list, Field fld, double wvl, double foc, TraceOptions trace_options) {
         ArrayList<RayDataFrame> rayset = new ArrayList<>();
         for (double[] p : ray_list) {
-            RayPkg ray = trace_base(opt_model, p, fld, wvl, new TraceOptions());
-            rayset.add(new RayDataFrame(ray.ray));
+            var ray_result = trace_ray(opt_model, new Vector2(p[0], p[1]), fld, wvl, trace_options);
+            rayset.add(new RayDataFrame(ray_result.pkg.ray));
         }
         return rayset;
     }
 
+    public static RayDataFrameByField trace_field(
+            OpticalModel opt_model,
+            Field fld,
+            double wvl,
+            double foc) {
+        var osp = opt_model.optical_spec;
+        var pupil_rays  = osp.pupil.pupil_rays;
+        var rdf_list = trace_ray_list_at_field(opt_model,pupil_rays,fld,wvl,foc,new TraceOptions());
+        return new RayDataFrameByField(fld,rdf_list);
+    }
+
+    public static List<RayDataFrameByField> trace_all_fields(OpticalModel opt_mode) {
+        var osp = opt_mode.optical_spec;
+        var t = osp.lookup_fld_wvl_focus(0);
+        var fld = t.first;
+        var wvl = t.second;
+        var foc = t.third;
+        List<RayDataFrameByField> fset  = new ArrayList<>();
+        for (var f: osp.fov.fields) {
+            var rset = trace_field(opt_mode,f,wvl,foc);
+            fset.add(rset);
+        }
+        return fset;
+    }
+
     /**
-     * Trace a chief ray for fld and wvl, returning the ray_pkg and exit pupil segment.
-     * @param opt_model
-     * @param fld
-     * @param wvl
-     * @param foc
-     * @return
+     * Trace a chief ray at fld and wvl.
+     *
+     *     Returns:
+     *         tuple: **chief_ray**, **cr_exp_seg**
+     *
+     *             - **chief_ray**: RayPkg of chief ray
+     *             - **cr_exp_seg**: exp_pt, exp_dir, exp_dst, ifc, b4_pt, b4_dir
      */
     public static ChiefRayPkg trace_chief_ray(OpticalModel opt_model, Field fld, double wvl, double foc) {
-        OpticalSpecs osp = opt_model.optical_spec;
-        FirstOrderData fod = osp.parax_data.fod;
-
-        RayPkg cr = trace_base(opt_model, new double[]{0., 0.}, fld, wvl, new TraceOptions());
+        var osp = opt_model.optical_spec;
+        var fod = osp.parax_data.fod;
+        var options = new TraceOptions();
+        options.rayerr_filter = "full";
+        var ray_result = trace_safe(opt_model, new Vector2(0., 0.), fld, wvl, options);
+        var cr = ray_result.pkg;
         // op = rt.calc_optical_path(ray, opt_model.seq_model.path())
 
         // cr_exp_pt: E upper bar prime: pupil center for pencils from Q
         // cr_exp_pt, cr_b4_dir, cr_exp_dist
-        ChiefRayExitPupilSegment cr_exp_seg = Analysis.transfer_to_exit_pupil(
+        var cr_exp_seg = WaveAbr.transfer_to_exit_pupil(
                 Lists.get(opt_model.seq_model.ifcs, -2),
-                new RayData(Lists.get(cr.ray, -2).p,
-                        Lists.get(cr.ray, -2).d), fod.exp_dist);
+                new RayData(Lists.get(cr.ray, -2).p, Lists.get(cr.ray, -2).d),
+                fod.exp_dist);
 
         return new ChiefRayPkg(cr, cr_exp_seg);
+    }
+
+    /**
+     * Get the chief ray package at **fld**, computing it if necessary.
+     *
+     *     Args:
+     *         opt_model: :class:`~.OpticalModel` instance
+     *         fld: :class:`~.Field` point for wave aberration calculation
+     *         wvl: wavelength of ray (nm)
+     *         foc: defocus amount
+     *
+     *     Returns:
+     *         tuple: **chief_ray**, **cr_exp_seg**
+     *
+     *             - **chief_ray**: chief_ray, chief_ray_op, wvl
+     *             - **cr_exp_seg**: chief ray exit pupil segment (pt, dir, dist)
+     *
+     *                 - pt: chief ray intersection with exit pupil plane
+     *                 - dir: direction cosine of the chief ray in exit pupil space
+     *                 - dist: distance from interface to the exit pupil point
+     *
+     */
+    public static ChiefRayPkg get_chief_ray_pkg(OpticalModel opt_model, Field fld, double wvl, double foc) {
+        ChiefRayPkg chief_ray_pkg;
+        if (fld.chief_ray == null) {
+            fld.aim_pt = aim_chief_ray(opt_model, fld, wvl);
+            chief_ray_pkg = trace_chief_ray(opt_model, fld, wvl, foc);
+        }
+        else if (fld.chief_ray.chief_ray.wvl != wvl) {
+            chief_ray_pkg = trace_chief_ray(opt_model, fld, wvl, foc);
+        }
+        else {
+            chief_ray_pkg = fld.chief_ray;
+        }
+        return chief_ray_pkg;
+    }
+
+    /**
+     * Trace chief ray and setup reference sphere for `fld`.
+     *
+     *     Returns:
+     *         tuple: **ref_sphere**, **chief_ray_pkg**
+     *
+     *             - **ref_sphere**: image_pt, ref_dir, ref_sphere_radius, lcl_tfrm_last
+     *             - **chief_ray_pkg**: chief_ray, cr_exp_seg
+     */
+    public static RefSphereCR setup_pupil_coords(
+            OpticalModel opt_model,
+            Field fld,
+            double wvl,
+            double foc,
+            Vector2 image_pt,
+            Vector2 image_delta) {
+        var chief_ray_pkg = get_chief_ray_pkg(opt_model, fld, wvl, foc);
+        var ref_sphere = WaveAbr.calculate_reference_sphere(opt_model,fld,wvl,foc,
+                                chief_ray_pkg, image_pt, image_delta);
+        return new RefSphereCR(ref_sphere, chief_ray_pkg);
+    }
+
+    public static double[] aim_chief_ray(OpticalModel opt_model, Field fld, Double wvl) {
+        // aim chief ray at center of stop surface and save results on **fld**
+        var seq_model = opt_model.seq_model;
+        var osp = opt_model.optical_spec;
+        if (wvl == null)
+            wvl = seq_model.central_wavelength();
+        Integer stop = seq_model.stop_surface;
+        IterationResult res;
+        if (osp.fov.is_wide_angle)
+            // TODO aim_info, rr = find_real_enp(opt_model, stop, fld, wvl)
+            throw new UnsupportedOperationException("NYI");
+        else
+            res = iterate_ray(opt_model, stop, new double[]{0., 0.}, fld, wvl);
+        return res.start_coords;
     }
 
     /**
@@ -689,6 +754,4 @@ public class Trace {
                 (1. + r.dir.dot(r0.dir));
         return e;
     }
-
-
 }

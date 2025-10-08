@@ -1,5 +1,7 @@
 package org.redukti.rayoptics.raytr;
 
+import org.redukti.mathlib.Vector2;
+
 public class TraceOptions {
 
     /**
@@ -28,4 +30,7 @@ public class TraceOptions {
      *             - else append nothing
      */
     String rayerr_filter = null;
+
+    Vector2 image_pt_2d;
+    Vector2 image_delta;
 }

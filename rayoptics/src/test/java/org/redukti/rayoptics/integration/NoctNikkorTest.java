@@ -29,7 +29,7 @@ public class NoctNikkorTest {
         OpticalSpecs osp = opm.optical_spec;
         ParaxialModel pm = opm.parax_model;
         osp.pupil = new PupilSpec(osp, new Pair<>(ImageKey.Image, ValueKey.Fnum), 0.98);
-        osp.field_of_view = new FieldSpec(osp, new Pair<>(ImageKey.Object, ValueKey.Angle), new double[]{0., 19.98});
+        osp.fov = new FieldSpec(osp, new Pair<>(ImageKey.Object, ValueKey.Angle), new double[]{0., 19.98});
         osp.spectral_region = new WvlSpec(new WvlWt[]{new WvlWt(486.1327, 0.5),
                 new WvlWt(587.5618, 1.0),
                 new WvlWt(656.2725, 0.5)}, 1);
@@ -139,7 +139,7 @@ public class NoctNikkorTest {
         Assertions.assertEquals(59.62, fod.efl, 0.001);
         Assertions.assertEquals(1.660, fod.ffl, 0.001);
         Assertions.assertEquals(61.28, fod.pp1, 0.001);
-        Assertions.assertEquals(58.63, fod.ppk, 0.01);
+        Assertions.assertEquals(-58.63, fod.ppk, 0.01);
         Assertions.assertEquals(0.9925, fod.bfl, 0.001);
         Assertions.assertEquals(0.9800, fod.fno, 0.001);
         Assertions.assertEquals(-5.962e-09, fod.m, 1e-9);

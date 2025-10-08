@@ -22,4 +22,17 @@ public class Etendue {
         return slp2na(slp, 1.0);
     }
 
+    /**
+     * convert an angle in degrees to a slope
+     */
+    public static double ang2slp(double ang) {
+        return Math.tan(Math.toRadians(ang));
+    }
+
+    /**
+     * convert a slope to an angle in degrees
+     */
+    public static double slp2ang(double slp) {
+        return Math.toDegrees(Math.atan(slp));
+    }
 }

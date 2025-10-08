@@ -480,12 +480,15 @@ public class SequentialModel {
         if (os_idx == null)
             os_idx = 1;
         if (is_idx == null)
-            is_idx = 1;
+            is_idx = -1;
         double oal = 0;
         for (Gap g: Lists.slice(gaps,os_idx,is_idx,null)) {
             oal += g.thi;
         }
         return oal;
+    }
+    public double overall_length() {
+        return overall_length(1,-1);
     }
 
     /**

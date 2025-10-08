@@ -2,8 +2,6 @@ package org.redukti.rayoptics.raytr;
 
 import org.redukti.mathlib.*;
 import org.redukti.rayoptics.exceptions.TraceException;
-import org.redukti.rayoptics.exceptions.TraceMissedSurfaceException;
-import org.redukti.rayoptics.exceptions.TraceTIRException;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.firstorder.FirstOrderData;
 import org.redukti.rayoptics.seq.SequentialModel;
@@ -224,7 +222,7 @@ public class Trace {
         // 90 degrees at the first surface.
         var options = new RayTraceOptions();
         options.check_apertures = trace_options.check_apertures;
-        if (opt_model.optical_spec.field_of_view.is_wide_angle)
+        if (opt_model.optical_spec.fov.is_wide_angle)
             options.intersect_obj = false;
         else {
             // otherwise, if not wide angle, propagation against z_dir means
@@ -515,7 +513,7 @@ public class Trace {
         var osp = opt_model.optical_spec;
         var fod = osp.parax_data.fod;
         double obj2enp_dist = fod.obj_dist + fod.enp_dist;
-        boolean not_wa = !osp.field_of_view.is_wide_angle;
+        boolean not_wa = !osp.fov.is_wide_angle;
 
         Coord coord = osp.obj_coords(fld);
         var pt0 = coord.pt;
@@ -622,7 +620,7 @@ public class Trace {
     public static List<RayPkg> trace_boundary_rays(OpticalModel opt_model) {
         List<RayPkg> rayset = new ArrayList<>();
         double wvl = opt_model.seq_model.central_wavelength();
-        FieldSpec fov = opt_model.optical_spec.field_of_view;
+        FieldSpec fov = opt_model.optical_spec.fov;
         for (int fi = 0; fi < fov.fields.length; fi++) {
             Field fld = fov.fields[fi];
             List<RayPkg> rim_rays = trace_boundary_rays_at_field(opt_model, fld, wvl);

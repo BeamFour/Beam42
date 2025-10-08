@@ -33,34 +33,55 @@ public class FirstOrderData {
      * optical invariant
      */
     public double opt_inv;
+    /**
+     * optical power of system
+     */
     public double power;
     /**
      * effective focal length
      */
     public double efl;
     /**
-     * distance of front principle plane from 1st interface
+     * object space focal length, f
+     */
+    public double fl_obj;
+    /**
+     * image space focal length, f'
+     */
+    public double fl_img;
+    /**
+     * distance from the 1st interface to the front principle plane
      */
     public double pp1;
     /**
-     * distance of rear principle plane from last interface
+     * distance from the last interface to the rear principle plane
      */
     public double ppk;
     /**
-     * front focal length
+     * distance from the front principle plane to the rear principle
+     * plane
+     */
+    public double pp_sep;
+    /**
+     * front focal length, distance from the 1st interface to the front
+     * focal point
      */
     public double ffl;
     /**
-     * back focal length
+     * back focal length, distance from the last interface to the back
+     * focal point
      */
     public double bfl;
     /**
      * focal ratio at working conjugates, f/#
      */
     public double fno;
+    /**
+     * transverse magnification
+     */
     public double m;
     /**
-     * reduction ratio
+     * reduction ratio, -1/m
      */
     public double red;
     /**
@@ -116,10 +137,13 @@ public class FirstOrderData {
     public StringBuilder toString(StringBuilder sb) {
         // list the first order properties
         sb.append(String.format("efl        %12.4g", efl)).append(System.lineSeparator());
+        sb.append(String.format("f          %12.4g", fl_obj)).append(System.lineSeparator());
+        sb.append(String.format("f'         %12.4g", fl_img)).append(System.lineSeparator());
         sb.append(String.format("ffl        %12.4g", ffl)).append(System.lineSeparator());
         sb.append(String.format("pp1        %12.4g", pp1)).append(System.lineSeparator());
         sb.append(String.format("bfl        %12.4g", bfl)).append(System.lineSeparator());
         sb.append(String.format("ppk        %12.4g", ppk)).append(System.lineSeparator());
+        sb.append(String.format("pp sep     %12.4g", pp_sep)).append(System.lineSeparator());
         sb.append(String.format("f/#        %12.4g", fno)).append(System.lineSeparator());
         sb.append(String.format("m          %12.4g", m)).append(System.lineSeparator());
         sb.append(String.format("red        %12.4g", red)).append(System.lineSeparator());

@@ -18,4 +18,16 @@ public class M {
             return true;
         return false;
     }
+
+    /**
+     * Replace IEEE inf with a signed big number.
+     */
+    public static double infinity_guard(double x, double big) {
+        if (Double.isInfinite(x))
+            return x == Double.NEGATIVE_INFINITY ? -big : big;
+        return x;
+    }
+    public static double infinity_guard(double x) {
+        return infinity_guard(x,1e12);
+    }
 }

@@ -1,6 +1,8 @@
 package org.redukti.rayoptics.specs;
 
+import org.redukti.rayoptics.parax.firstorder.Etendue;
 import org.redukti.rayoptics.util.Pair;
+import org.redukti.rayoptics.util.Triple;
 
 /**
  * The PupilSpec class maintains the aperture specification.
@@ -48,5 +50,34 @@ public class PupilSpec {
             pupil_rays = default_pupil_rays;
             ray_labels = default_ray_labels;
         }
+    }
+
+    /**
+     * return pupil spec as paraxial height or slope value
+     */
+    public Triple<ImageKey,ValueKey,Double> derive_parax_params() {
+        var pupil_oi_key = key.imageKey;
+        var pupil_value_key = key.valueKey;
+        var pupil_value = this.value;
+        ValueKey pupil_key = null;
+
+        if (ValueKey.NA == pupil_value_key) {
+            var na = pupil_value;
+            var slope = Etendue.na2slp(na);
+            pupil_key = ValueKey.Slope;
+            pupil_value = slope;
+        }
+        else if (ValueKey.Fnum == pupil_value_key) {
+            var fno = pupil_value;
+            var slope = -1.0/(2.0*fno);
+            pupil_key = ValueKey.Slope;
+            pupil_value = slope;
+        }
+        else if (ValueKey.EPD == pupil_value_key) {
+            var height = pupil_value/2.0;
+            pupil_key = ValueKey.Height;
+            pupil_value = height;
+        }
+        return new Triple<>(pupil_oi_key, pupil_key, pupil_value);
     }
 }

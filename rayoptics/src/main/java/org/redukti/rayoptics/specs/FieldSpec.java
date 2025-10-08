@@ -2,9 +2,11 @@ package org.redukti.rayoptics.specs;
 
 import org.redukti.mathlib.Matrix3;
 import org.redukti.mathlib.Vector3;
+import org.redukti.rayoptics.parax.firstorder.Etendue;
 import org.redukti.rayoptics.raytr.Wideangle;
 import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.Pair;
+import org.redukti.rayoptics.util.Triple;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -213,6 +215,34 @@ public class FieldSpec {
         if (index_labels.size() > 1)
             Lists.set(index_labels, -1, "edge");
         this.index_labels = index_labels.toArray(new String[0]);
+    }
+
+        /**
+     * return pupil spec as paraxial height or slope value
+     */
+    public Triple<ImageKey,ValueKey,Double> derive_parax_params() {
+        var fov_oi_key = key.imageKey;
+        var fov_value_key = key.valueKey;
+        var fov_value = this.value;
+        ValueKey field_key = null;
+        double field_value = 0.0;
+
+        if (ValueKey.Angle == fov_value_key) {
+            var slope_bar = Etendue.ang2slp(fov_value);
+            field_key = ValueKey.Slope;
+            field_value = slope_bar;
+        }
+        else if (ValueKey.Height == fov_value_key) {
+            var height_bar = fov_value;
+            field_key = ValueKey.Height;
+            field_value = height_bar;
+        }
+        else if (ValueKey.RealHeight == fov_value_key) {
+            var height_bar = fov_value;
+            field_key = ValueKey.Height;
+            field_value = height_bar;
+        }
+        return new Triple<>(fov_oi_key, field_key, field_value);
     }
 
 }

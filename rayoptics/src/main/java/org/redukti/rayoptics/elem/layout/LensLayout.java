@@ -16,7 +16,7 @@ public class LensLayout {
 
     public List<RayBundle> create_ray_entities(double start_offset) {
         List<RayBundle> ray_bundles = new ArrayList<>();
-        FieldSpec fov = opt_model.optical_spec.field_of_view;
+        FieldSpec fov = opt_model.optical_spec.fov;
         double wvl = opt_model.seq_model.central_wavelength();
         for (int i = 0; i < fov.fields.length; i++) {
             Field fld = fov.fields[i];

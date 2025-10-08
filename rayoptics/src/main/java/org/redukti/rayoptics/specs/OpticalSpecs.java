@@ -2,7 +2,6 @@ package org.redukti.rayoptics.specs;
 
 import org.redukti.mathlib.M;
 import org.redukti.mathlib.Matrix3;
-import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.firstorder.Etendue;
@@ -35,7 +34,7 @@ public class OpticalSpecs {
     /**
      * Field of view specification
      */
-    public FieldSpec field_of_view;
+    public FieldSpec fov;
     /**
      * Wavelengths
      */
@@ -53,7 +52,7 @@ public class OpticalSpecs {
         this.opt_model = opt_model;
         this.spectral_region = new WvlSpec(new WvlWt[]{new WvlWt("d", 1.)}, 0);
         this.pupil = new PupilSpec(this, new Pair<>(ImageKey.Object, ValueKey.EPD), 1.0);
-        this.field_of_view = new FieldSpec(this, new Pair<>(ImageKey.Object, ValueKey.Angle), new double[]{0.});
+        this.fov = new FieldSpec(this, new Pair<>(ImageKey.Object, ValueKey.Angle), new double[]{0.});
         this.focus = new FocusRange();
         this.parax_data = null;
         this.do_aiming = OpticalSpecs.do_aiming_default;
@@ -62,15 +61,15 @@ public class OpticalSpecs {
     public void update_model() {
         spectral_region.update_model();
         pupil.update_model();
-        field_of_view.update_model();
+        fov.update_model();
         Integer stop = opt_model.seq_model.stop_surface;
         double wvl = spectral_region.central_wvl();
 
         if (opt_model.seq_model.get_num_surfaces() > 2) {
-            parax_data = FirstOrder.compute_first_order(opt_model, stop, wvl);
+            parax_data = FirstOrder.compute_first_order(opt_model, stop, wvl,null);
             if (do_aiming) {
-                for (int i = 0; i < field_of_view.fields.length; i++) {
-                    Field fld = field_of_view.fields[i];
+                for (int i = 0; i < fov.fields.length; i++) {
+                    Field fld = fov.fields[i];
                     IterationResult result = Trace.aim_chief_ray(opt_model, fld, wvl);
                     fld.aim_pt = result.start_coords;
                 }
@@ -79,7 +78,7 @@ public class OpticalSpecs {
     }
 
     public Coord obj_coords(Field fld) {
-        return field_of_view.obj_coords(fld);
+        return fov.obj_coords(fld);
     }
 
     public FocusRange defocus() {
@@ -106,7 +105,7 @@ public class OpticalSpecs {
             wvl = spectral_region.central_wvl();
         else
             wvl = spectral_region.wavelengths[wl];
-        Field fld = field_of_view.fields[fi];
+        Field fld = fov.fields[fi];
         double foc = defocus().get_focus(fr);
         return new Triple<>(fld, wvl, foc);
     }
@@ -191,7 +190,7 @@ public class OpticalSpecs {
             }
             else {
                 var eprad = pupil_value / 2.0;
-                if (field_of_view.is_wide_angle) {
+                if (fov.is_wide_angle) {
                     // transform pupil_pt, in direction coords into surf#1 coordinates
                     var pupil_pt = new Vector3(pupil[0], pupil[1], 0.0).times(eprad);
                     var rot_mat_d2s = Matrix3.rot_v1_into_v2(d0, Vector3.vector3_001);

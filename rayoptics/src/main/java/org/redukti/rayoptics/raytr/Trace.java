@@ -592,6 +592,8 @@ public class Trace {
      * @return
      */
     public static List<RayPkg> trace_boundary_rays_at_field(OpticalModel opt_model, Field fld, double wvl) {
+        TraceOptions trace_options = new TraceOptions();
+        trace_options.rayerr_filter = "full";
         List<RayPkg> rim_rays = new ArrayList<>();
         OpticalSpecs osp = opt_model.optical_spec;
         for (double[] p : osp.pupil.pupil_rays) {

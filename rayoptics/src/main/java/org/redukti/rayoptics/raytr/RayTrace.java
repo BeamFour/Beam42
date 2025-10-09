@@ -80,6 +80,8 @@ public class RayTrace {
      */
     public static RayPkg trace(SequentialModel seq_model, Vector3 pt0, Vector3 dir0, double wvl, RayTraceOptions options) {
         List<PathSeg> path = seq_model.path(wvl, null, null, 1);
+        if (options.first_surf == null) options.first_surf = 1;
+        if (options.last_surf == null) options.last_surf = seq_model.get_num_surfaces()-2;
         return trace_raw(path, pt0, dir0, wvl, options);
     }
     public static RayPkg trace(SequentialModel seq_model, Vector3 pt0, Vector3 dir0, double wvl) {

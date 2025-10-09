@@ -9,10 +9,7 @@ import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.firstorder.FirstOrderData;
 import org.redukti.rayoptics.parax.firstorder.ParaxialModel;
-import org.redukti.rayoptics.raytr.RayPkg;
-import org.redukti.rayoptics.raytr.RaySeg;
-import org.redukti.rayoptics.raytr.RayTrace;
-import org.redukti.rayoptics.raytr.RayTraceOptions;
+import org.redukti.rayoptics.raytr.*;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.seq.SurfaceData;
 import org.redukti.rayoptics.specs.*;
@@ -204,18 +201,17 @@ public class NoctNikkorTest {
         Assertions.assertTrue(compare(expected[14], raypkg.ray.get(14)));
         Assertions.assertTrue(compare(expected[31], raypkg.ray.get(31)));
 
-        LensLayout layout = new LensLayout(opm);
+        for (var fld: osp.fov.fields) {
+            var wvl = sm.central_wavelength();
+            var foc = osp.defocus().get_focus();
 
-        //System.out.println("---- elements ----");
-        //System.out.println(opm.ele_model.list_elements());
+            var t = Trace.setup_pupil_coords(opm,fld,wvl,foc,null,null);
+            fld.chief_ray = t.chief_ray_pkg;
+            fld.ref_sphere = t.ref_sphere;
+        }
 
-        //System.out.println("---- ele model ----");
-        //System.out.println(opm.ele_model.list_model());
-
-        List<RayBundle> rays = layout.create_ray_entities(0.0);
-        for (RayBundle ray : rays)
-            ray.update_shape();
-        return;
+        var result = Trace.trace_boundary_rays(opm,new TraceOptions());
+        System.out.println(result);
     }
 
     static boolean compare(RaySeg s1, RaySeg s2) {

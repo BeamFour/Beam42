@@ -581,15 +581,15 @@ public class Trace {
         return pupil_rays;
     }
 
-    public static List<RayPkg> trace_boundary_rays(OpticalModel opt_model, TraceOptions trace_options) {
-        List<RayPkg> rayset = new ArrayList<>();
+    public static List<List<RayPkg>> trace_boundary_rays(OpticalModel opt_model, TraceOptions trace_options) {
+        List<List<RayPkg>> rayset = new ArrayList<>();
         double wvl = opt_model.seq_model.central_wavelength();
         FieldSpec fov = opt_model.optical_spec.fov;
         for (int fi = 0; fi < fov.fields.length; fi++) {
             Field fld = fov.fields[fi];
             var rim_rays = trace_boundary_rays_at_field(opt_model, fld, wvl,trace_options);
             fld.pupil_rays = boundary_ray_dict(opt_model, rim_rays);
-            rayset.addAll(rim_rays);
+            rayset.add(rim_rays);
         }
         return rayset;
     }

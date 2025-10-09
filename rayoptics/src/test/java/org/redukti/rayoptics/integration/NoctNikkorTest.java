@@ -13,6 +13,7 @@ import org.redukti.rayoptics.raytr.*;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.seq.SurfaceData;
 import org.redukti.rayoptics.specs.*;
+import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.Pair;
 
 import java.util.List;
@@ -154,10 +155,6 @@ public class NoctNikkorTest {
         Assertions.assertEquals(11.06, fod.opt_inv, 0.001);
 
         // Test a ray trace
-        RayTraceOptions options = new RayTraceOptions();
-        options.first_surf = 1;
-        options.last_surf = sm.get_num_surfaces() - 2;
-
         RaySeg[] expected = new RaySeg[]{
                 new RaySeg(new Vector3(0.00000000e+00, -3635749788.7098503, 0.00000000e+00), new Vector3(0., 0.34169210791780597, 0.9398119510767493), 10640426514.13607, new Vector3(-0., 0., 1.)),
                 new RaySeg(new Vector3(0., -23.95018415, 2.53899499), new Vector3(0., 0.27421071, 0.96166963), 5.002303876715387, new Vector3(-0., 0.19829001, 0.98014339)),
@@ -193,6 +190,9 @@ public class NoctNikkorTest {
                 new RaySeg(new Vector3(0., 21.70138483624297, 0.), new Vector3(0., 0.4434501309129979, 0.8962990468550369), 0.0, new Vector3(-0., -0., 1.))
         };
 
+        RayTraceOptions options = new RayTraceOptions();
+        options.first_surf = 1;
+        options.last_surf = sm.get_num_surfaces() - 2;
         RayPkg raypkg = RayTrace.trace_raw(sm.path(587.5618, null, null, 1),
                 new Vector3(0, -3635749788.7098503, 0.0),
                 new Vector3(0.0, 0.34169210791780597, 0.9398119510767493), 587.5618, options);
@@ -201,11 +201,20 @@ public class NoctNikkorTest {
         Assertions.assertTrue(compare(expected[14], raypkg.ray.get(14)));
         Assertions.assertTrue(compare(expected[31], raypkg.ray.get(31)));
 
-        for (var fld: osp.fov.fields) {
+        double cr_expected_op_delta[] = { 239.18720860000005, 245.3448599476832 };
+        RaySeg[] cr_expected_final_rayseg = {
+            new RaySeg(new Vector3(0., 0., 0.), new Vector3(0., 0., 1.), 0.0, new Vector3(-0., -0., 1.)),
+            new RaySeg(new Vector3(0., 21.70138483624297, 0.), new Vector3(0., 0.4434501309129979, 0.8962990468550369), 0.0, new Vector3(-0., -0., 1.))
+        };
+
+        for (int fi = 0; fi < osp.fov.fields.length; fi++) {
+            var fld = osp.fov.fields[fi];
             var wvl = sm.central_wavelength();
             var foc = osp.defocus().get_focus();
 
             var t = Trace.setup_pupil_coords(opm,fld,wvl,foc,null,null);
+            Assertions.assertEquals(cr_expected_op_delta[fi],t.chief_ray_pkg.chief_ray.op_delta,1e-8);
+            Assertions.assertTrue(compare(Lists.get(t.chief_ray_pkg.chief_ray.ray,-1),cr_expected_final_rayseg[fi]));
             fld.chief_ray = t.chief_ray_pkg;
             fld.ref_sphere = t.ref_sphere;
         }

@@ -3,12 +3,11 @@ package org.redukti.rayoptics.raytr;
 import org.redukti.mathlib.*;
 import org.redukti.rayoptics.exceptions.TraceException;
 import org.redukti.rayoptics.optical.OpticalModel;
-import org.redukti.rayoptics.parax.firstorder.FirstOrderData;
 import org.redukti.rayoptics.seq.SequentialModel;
+import org.redukti.rayoptics.seq.TraceGridForm;
 import org.redukti.rayoptics.specs.Coord;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.specs.FieldSpec;
-import org.redukti.rayoptics.specs.OpticalSpecs;
 import org.redukti.rayoptics.util.Lists;
 
 import java.util.*;
@@ -753,5 +752,42 @@ public class Trace {
         double e = (r.dir.plus(r0.dir).dot(r.pt.minus(r0.pt))) /
                 (1. + r.dir.dot(r0.dir));
         return e;
+    }
+
+    public static List<GridItem> trace_grid(OpticalModel opt_model, TraceGridDef grid_rng, Field fld, double wvl, double foc, ImageFilter img_filter, boolean append_if_none, TraceOptions trace_options) {
+        trace_options.rayerr_filter = null;
+        trace_options.output_filter = null;
+        trace_options.check_apertures = true;
+        var start = grid_rng.grid_start;
+        var stop = grid_rng.grid_stop;
+        var num = grid_rng.num_rays;
+        var step = (stop.minus(start)).divide(num-1);
+        var grid = new ArrayList<GridItem>();
+        for (int i = 0; i < num; i++) {
+            for (int j = 0; j < num; j++) {
+                var pupil = start;
+                var ray_result = trace_safe(opt_model,pupil,fld,wvl,trace_options);
+                if (ray_result.pkg != null) {
+                    if (img_filter != null) {
+                        grid.add(img_filter.apply(pupil,ray_result.pkg));
+                    }
+                    else {
+                        grid.add(new GridItem(pupil.x,pupil.y,ray_result.pkg));
+                    }
+                }
+                else {
+                    //ray outside pupil or failed
+                    if (img_filter != null) {
+                        grid.add(img_filter.apply(pupil,null));
+                    }
+                    else {
+                        grid.add(new GridItem(pupil.x,pupil.y,null));
+                    }
+                }
+                start = new Vector2(start.x,start.y+step.y);
+            }
+            start = new Vector2(start.x+step.x, grid_rng.grid_start.y);
+        }
+        return grid;
     }
 }

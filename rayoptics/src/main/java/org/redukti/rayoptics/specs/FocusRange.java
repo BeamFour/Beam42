@@ -39,4 +39,5 @@ public class FocusRange {
     public double get_focus(double fr) {
         return focus_shift + fr * defocus_range;
     }
+    public double get_focus() { return get_focus(0.0); }
 }

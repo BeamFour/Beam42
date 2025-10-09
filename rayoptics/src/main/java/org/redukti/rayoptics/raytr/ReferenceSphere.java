@@ -4,10 +4,10 @@ import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.math.Tfm3d;
 
 public class ReferenceSphere {
-    private final Vector3 image_pt;
-    private final Vector3 ref_dir;
-    private final double ref_sphere_radius;
-    private final Tfm3d lcl_tfrm_last;
+    public final Vector3 image_pt;
+    public final Vector3 ref_dir;
+    public final double ref_sphere_radius;
+    public final Tfm3d lcl_tfrm_last;
 
     public ReferenceSphere(Vector3 image_pt, Vector3 ref_dir, double ref_sphere_radius, Tfm3d lcl_tfrm_last) {
         this.image_pt = image_pt;

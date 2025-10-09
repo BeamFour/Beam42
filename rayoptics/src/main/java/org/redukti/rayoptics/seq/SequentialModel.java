@@ -1,11 +1,14 @@
 package org.redukti.rayoptics.seq;
 
 import org.redukti.mathlib.Matrix3;
+import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.elem.surface.Surface;
 import org.redukti.rayoptics.elem.transform.Transform;
 import org.redukti.rayoptics.math.Tfm3d;
 import org.redukti.rayoptics.optical.OpticalModel;
+import org.redukti.rayoptics.raytr.*;
+import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.specs.OpticalSpecs;
 import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.Pair;
@@ -683,5 +686,68 @@ public class SequentialModel {
         Tfm3d tfrm = new Tfm3d(Matrix3.IDENTITY, new Vector3(0., 0., thi));
 
         return new NewSurfaceSpec(s, g, rndx, tfrm, z_dir);
+    }
+
+    static final class ImgFilterImp implements ImageFilter {
+        final int wi;
+        final Field fld;
+        final double wvl;
+        final double foc;
+        final TraceGridCallback fct;
+
+        public ImgFilterImp(int wi, Field fld, double wvl, double foc, TraceGridCallback fct) {
+            this.wi = wi;
+            this.fld = fld;
+            this.wvl = wvl;
+            this.foc = foc;
+            this.fct = fct;
+        }
+
+        @Override
+        public GridItem apply(Vector2 p, RayPkg pkg) {
+            return fct.apply(p,wi,pkg,fld,wvl,foc);
+        }
+    }
+
+    public List<List<GridItem>> trace_grid(
+        TraceGridCallback fct,
+        int fi,
+        Integer wl,
+        int num_rays,
+        boolean append_if_none,
+        TraceOptions trace_options) {
+        // fct is applied to the raw grid and returned as a grid
+        var osp = opt_model.optical_spec;
+        var wvls = osp.spectral_region;
+        var wvl = central_wavelength();
+        double[] wv_list;
+        if (wl != null) {
+            wv_list = wvls.wavelengths;
+        }
+        else {
+            wv_list = new double[]{wvl};
+        }
+        var fld = osp.fov.fields[fi];
+        var foc = osp.defocus().get_focus();
+
+        var pc = Trace.setup_pupil_coords(opt_model, fld, wvl, foc, null, null);
+        var rs_pkg = pc.ref_sphere;
+        var cr_pkg = pc.chief_ray_pkg;
+
+        fld.chief_ray = cr_pkg;
+        fld.ref_sphere = rs_pkg;
+
+        List<List<GridItem>> grids = new ArrayList<>();
+        var grid_start = new Vector2(-1.0, -1.0);
+        var grid_stop =  new Vector2(1.0, 1.0);
+        var grid_def = new TraceGridDef(grid_start,grid_stop,num_rays);
+        for (int wi = 0; wi < wv_list.length; wi++) {
+            wvl =  wv_list[wi];
+            var grid = Trace.trace_grid(opt_model,grid_def,fld,wvl,foc,
+                    new ImgFilterImp(wi,fld,wvl,foc,fct),
+                    append_if_none,trace_options);
+            grids.add(grid);
+        }
+        return grids;
     }
 }

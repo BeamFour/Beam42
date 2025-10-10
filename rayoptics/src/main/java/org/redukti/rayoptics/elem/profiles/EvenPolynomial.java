@@ -7,7 +7,33 @@ import org.redukti.rayoptics.exceptions.TraceMissedSurfaceException;
 import java.util.List;
 
 /**
- * Even Polynomial asphere up to 20th order, on base conic.
+ * Even Polynomial asphere, even terms up to 20th order, on base conic.
+ *
+ *     Conics produced for conic constant values:
+ *
+ *         + cc > 0.0: oblate spheroid
+ *         + cc = 0.0: sphere
+ *         + cc < 0.0 and > -1.0: ellipsoid
+ *         + cc = -1.0: paraboloid
+ *         + cc < -1.0: hyperboloid
+ *
+ *     Conics produced for conic asphere values:
+ *
+ *         + ec > 1.0: oblate spheroid
+ *         + ec = 1.0: sphere
+ *         + ec > 0.0 and < 1.0: ellipsoid
+ *         + ec = 0.0: paraboloid
+ *         + ec < 0.0: hyperboloid
+ *
+ *     The conic constant is related to the conic asphere as:
+ *
+ *         + cc = ec - 1
+ *
+ *     The sag :math:`z` is given by:
+ *
+ *     :math:`z(r)=\\dfrac{cr^2}{1+\sqrt[](1-\\textbf{ec } c^2 r^2)}+\sum_{i=1}^{20} a_ir^{2i}`
+ *
+ *     where :math:`r^2=x^2+y^2`
  */
 public class EvenPolynomial extends SurfaceProfile {
 
@@ -37,13 +63,13 @@ public class EvenPolynomial extends SurfaceProfile {
         if (coefs != null) {
             this.coefs = coefs;
         } else {
-            this.coefs = new double[0];
+            this.coefs = new double[10];
         }
         max_nonzero_coef = 0;
     }
 
     public EvenPolynomial() {
-        this.coefs = new double[0];
+        this.coefs = new double[10];
     }
 
     public EvenPolynomial c(double _c) {

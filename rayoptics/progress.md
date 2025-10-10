@@ -1,4 +1,0 @@
-### Track progress
-
-* Gap
-* SequentialModel

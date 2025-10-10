@@ -244,5 +244,4 @@ public class FieldSpec {
         }
         return new Triple<>(fov_oi_key, field_key, field_value);
     }
-
 }

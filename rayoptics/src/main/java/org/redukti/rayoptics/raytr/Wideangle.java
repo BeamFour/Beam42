@@ -2,6 +2,7 @@ package org.redukti.rayoptics.raytr;
 
 import org.redukti.mathlib.Matrix3;
 import org.redukti.mathlib.SecantSolver;
+import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.exceptions.TraceException;
 import org.redukti.rayoptics.exceptions.TraceMissedSurfaceException;
@@ -247,7 +248,47 @@ public class Wideangle {
         return new Pair<>(z_enp,rr);
     }
 
-    public static RayDataWithDist  eval_real_image_ht(OpticalModel opt_model, Field ld, double wvl) {
-        return null;
+    /**
+     * Trace reverse ray from image point to get object space inputs.
+     *
+     *     This function traces the chief ray for `fld` and `wvl` through the center of the stop surface, starting from the specified real image height.
+     *
+     *     This is the implementation of :meth:`~.raytr.opticalspec.FieldSpec.obj_coords` for ('image', 'real height')
+     */
+    public static RayDataWithZ_Enp eval_real_image_ht(OpticalModel opt_model, Field fld, double wvl) {
+        var sm = opt_model.seq_model;
+        var osp = opt_model.optical_spec;
+        var fov = osp.fov;
+        var fod = osp.parax_data.fod;
+
+        var not_wa = !fov.is_wide_angle;
+        var stop_idx = sm.stop_surface == null ? 1 : sm.stop_surface;
+        var ifcx = sm.ifcs.size() - stop_idx - 1;
+        var rpath = sm.reverse_path(wvl, sm.ifcs.size(), null, -1);
+        var eprad = fod.exp_radius;
+        var obj2pup_dist = fod.exp_dist - fod.img_dist;
+        var p_exp = new Vector3(0., 0., obj2pup_dist);
+        var xy_target = Vector2.vector2_0;
+        var p_i = new Vector3(fld.x, fld.y, 0);
+        if (fov.is_relative)
+            p_i = p_i.times(fov.value);
+        var d_i = p_exp.minus(p_i).normalize();
+        var result = Trace.iterate_ray_raw(rpath,ifcx,xy_target.as_array(),p_i,d_i,obj2pup_dist,eprad,wvl,not_wa);
+        var rrev_cr = result.rr;
+
+        var p_k = Lists.get(rrev_cr.pkg.ray,-2).p;
+        var p_k01 = Math.sqrt(p_k.x*p_k.x + p_k.y*p_k.y);
+        var d_k = Lists.get(rrev_cr.pkg.ray,-2).d;
+        var d_o = d_k.negate();
+        var d_k01 = Math.sqrt(d_k.x*d_k.x + d_k.y*d_k.y);
+        double z_enp;
+        if (d_k01 == 0.)
+            z_enp = fod.enp_dist;
+        else
+            z_enp = p_k.z + p_k01 * d_o.z / d_k01;
+        var obj2enp_dist = fod.obj_dist + z_enp;
+        var enp_pt = new Vector3(0,0,obj2enp_dist);
+        var p_o = enp_pt.plus(d_k.times(obj2enp_dist));
+        return new RayDataWithZ_Enp(new RayData(p_o,d_o),z_enp);
     }
 }

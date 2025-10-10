@@ -3,6 +3,7 @@ package org.redukti.rayoptics.raytr;
 import org.redukti.mathlib.*;
 import org.redukti.rayoptics.exceptions.TraceException;
 import org.redukti.rayoptics.optical.OpticalModel;
+import org.redukti.rayoptics.seq.PathSeg;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.seq.TraceGridForm;
 import org.redukti.rayoptics.specs.Coord;
@@ -790,4 +791,233 @@ public class Trace {
         }
         return grid;
     }
+
+    static class BaseObjectiveFunctionRaw {
+        final List<PathSeg> pthlist;
+        final Integer ifcx;
+        final Vector3 pt0;
+        final double dist;
+        final double wvl;
+        final boolean not_wa;
+        final RayResult rr;
+
+        public BaseObjectiveFunctionRaw(List<PathSeg> pthlist, Integer ifcx, Vector3 pt0, double dist, double wvl, boolean not_wa, RayResult rr) {
+            this.pthlist = pthlist;
+            this.ifcx = ifcx;
+            this.pt0 = pt0;
+            this.dist = dist;
+            this.wvl = wvl;
+            this.not_wa = not_wa;
+            this.rr = rr;
+        }
+
+        public RaySeg eval(double x1, double y1) {
+            Vector3 pt1 = new Vector3(x1, y1, dist);
+            Vector3 dir0 = pt1.minus(pt0).normalize();
+            // handle case where entrance pupil is behind the object
+            if (not_wa && dir0.z * pthlist.get(0).Zdir.value < 0)
+                dir0 = dir0.negate();
+
+            RayPkg pkg = null;
+            try {
+                var options = new RayTraceOptions();
+                options.check_apertures = false;
+                options.intersect_obj = true;
+                options.filter_out_phantoms = false;
+                pkg = RayTrace.trace_raw(pthlist, pt0, dir0, wvl, options);
+                rr.pkg = pkg;
+                rr.err = null;
+            } catch (TraceException ray_error) {
+                pkg = ray_error.ray_pkg;
+                rr.pkg = ray_error.ray_pkg;
+                rr.err = ray_error;
+                if (ray_error.surf <= ifcx)
+                    throw ray_error;
+            }
+            return pkg.ray.get(ifcx);
+        }
+    }
+
+    /* 1D solver */
+    static class SecantFunctionRaw extends BaseObjectiveFunctionRaw implements SecantSolver.ObjectiveFunction {
+
+        final double y_target;
+
+        public SecantFunctionRaw(List<PathSeg> pthlist, Integer ifcx, Vector3 pt0, double dist, double wvl, double y_target, boolean not_wa, RayResult rr) {
+            super(pthlist, ifcx, pt0, dist, wvl, not_wa, rr);
+            this.y_target = y_target;
+        }
+
+        @Override
+        public double eval(double y1) {
+            RaySeg seg = eval(0., y1);
+            double y_ray = seg.p.y;
+            return y_ray - y_target;
+        }
+    }
+
+    /* Solver for use in LMLSolver */
+    static class ObjectiveFunctionRaw extends BaseObjectiveFunctionRaw implements LMLFunction {
+
+        private final double[][] jac = new double[2][2];
+        private final double[] resid = {0, 0};
+        private final double[] dDelta = {1E-6, 1E-6};
+        private final double[] point = {0, 0}; // Actual x,y values
+
+        final double[] xy_target; // target x,y values
+
+        public ObjectiveFunctionRaw(List<PathSeg> pthlist, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target, boolean not_wa, RayResult rr) {
+            super(pthlist, ifcx, pt0, dist, wvl, not_wa, rr);
+            this.xy_target = xy_target;
+        }
+
+        @Override
+        public double computeResiduals() {
+            RaySeg seg = eval(point[0], point[1]);
+            double[] p = {seg.p.x, seg.p.y};
+            double sos = 0.0;
+            for (int i = 0; i < p.length; i++) {
+                resid[i] = xy_target[i] - p[i];
+                sos += (resid[i] * resid[i]);
+            }
+            //return Math.sqrt(sos / p.length);
+            return sos;
+        }
+
+        @Override
+        public boolean buildJacobian()             // Uses current vector parms[].
+        // If current parms[] is bad, returns false.
+        // False should trigger an explanation.
+        // Called by LMray.iLMiter().
+        {
+            final int nadj = 2;
+            final int ngoals = 2;
+            double delta[] = new double[nadj];
+            double d = 0;
+            for (int j = 0; j < nadj; j++) {
+                for (int k = 0; k < nadj; k++)
+                    delta[k] = (k == j) ? dDelta[j] : 0.0;
+
+                d = nudge(delta); // resid at pplus
+                if (d == LMLSolver.BIGVAL) {
+                    //badray = true;
+                    return false;
+                }
+                for (int i = 0; i < ngoals; i++)
+                    jac[i][j] = getResidual(i);
+
+                for (int k = 0; k < nadj; k++)
+                    delta[k] = (k == j) ? -2.0 * dDelta[j] : 0.0;
+
+                d = nudge(delta); // resid at pminus
+                if (d == LMLSolver.BIGVAL) {
+                    //badray = true;
+                    return false;
+                }
+
+                for (int i = 0; i < ngoals; i++)
+                    jac[i][j] -= getResidual(i);
+
+                for (int i = 0; i < ngoals; i++)
+                    jac[i][j] /= (2.0 * dDelta[j]);
+
+                for (int k = 0; k < nadj; k++)
+                    delta[k] = (k == j) ? dDelta[j] : 0.0;
+
+                d = nudge(delta);  // back to starting value.
+
+                if (d == LMLSolver.BIGVAL) {
+                    //badray = true;
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public double getResidual(int i)         // Returns one element of the array resid[].
+        {
+            return resid[i];
+        }
+
+        @Override
+        public double getJacobian(int i, int j)         // Returns one element of the Jacobian matrix.
+        // i=datapoint, j=whichparm.
+        {
+            return jac[i][j];
+        }
+
+        @Override
+        public double nudge(double[] delta) {
+            point[0] += delta[0];
+            point[1] += delta[1];
+            return computeResiduals();
+        }
+    }
+
+    public static IterationResult get_1d_solution_raw(List<PathSeg> pthlist, Integer ifcx, Vector3 pt0, double dist, double wvl, double y_target, boolean not_wa) {
+        IterationResult res = new IterationResult();
+        SecantFunctionRaw fn = new SecantFunctionRaw(pthlist, ifcx, pt0, dist, wvl, y_target, not_wa, res.rr);
+        double start_y = SecantSolver.find_root(fn, 0., 50, 1.48e-8);
+        res.start_coords = new double[]{0, start_y};
+        return res;
+    }
+
+    public static IterationResult get_2d_mike_lampton_lavenberg_marquardt_solution_raw(List<PathSeg> pthlist, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target, boolean not_wa) {
+        IterationResult res = new IterationResult();
+        ObjectiveFunctionRaw fn = new ObjectiveFunctionRaw(pthlist, ifcx, pt0, dist, wvl, Arrays.copyOf(xy_target, xy_target.length), not_wa, res.rr);
+        LMLSolver lm = new LMLSolver(fn, 1e-12, 2, 2);
+        int istatus = 0;
+        while (istatus != LMLSolver.BADITER &&
+                istatus != LMLSolver.LEVELITER &&
+                istatus != LMLSolver.MAXITER) {
+            istatus = lm.iLMiter();
+        }
+        if (istatus == LMLSolver.LEVELITER) {
+            res.start_coords = fn.point;
+        }
+        return res;
+    }
+
+    /**
+     * iterates a ray to xy_target on interface ifcx, returns aim points on
+     *     the paraxial entrance pupil plane
+     *
+     *     If idcx is None, i.e. a floating stop surface, returns xy_target.
+     *
+     *     If the iteration fails, a TraceError will be raised
+     */
+    public static IterationResult iterate_ray_raw(List<PathSeg> pthlist, Integer ifcx, double[] xy_target, Vector3 pt0, Vector3 d0, double obj2pup_dist,
+                                                  double eprad, double wvl, boolean not_wa) {
+        if (ifcx != null) {
+            if (pt0.x == 0.0 && xy_target[0] == 0.0) {
+                // do 1D iteration if field and target points are zero in x
+                var y_target = xy_target[1];
+                try {
+                    return get_1d_solution_raw(pthlist, ifcx, pt0, obj2pup_dist, wvl, y_target, not_wa);
+                }
+                catch (TraceException ray_err) {
+                    var result = new IterationResult();
+                    result.start_coords = new double[]{0,0};
+                    return result;
+                }
+            } else {
+                try {
+                    return get_2d_mike_lampton_lavenberg_marquardt_solution_raw(pthlist, ifcx, pt0, obj2pup_dist, wvl, xy_target, not_wa);
+                    //return get_2d_minpack_lavenberg_marquardt_solution(seq_model, ifcx, pt0, dist, wvl, xy_target, fod);
+                }
+                catch (TraceException ray_err) {
+                    var result = new IterationResult();
+                    result.start_coords = new double[]{0,0};
+                    return result;
+                }
+            }
+        } else {
+            // floating stop surface - use entrance pupil for aiming
+            var result = new IterationResult();
+            result.start_coords = xy_target;
+            return result;
+        }
+    }
+
 }

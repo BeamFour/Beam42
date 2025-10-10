@@ -167,20 +167,25 @@ public class SequentialModel {
      *         Returns:
      *             (**ifcs, gaps, lcl_tfrms, rndx, z_dir**)
      */
-    public List<PathSeg> reverse_path(Integer start, Integer stop, Integer step, Double wl) {
+    public List<PathSeg> reverse_path(Double wl, Integer start, Integer stop, Integer step) {
         if (step == null)
             step = -1;
         if (wl == null)
             wl = central_wavelength();
-        int gap_start;
-        int rndx_start;
+        Integer gap_start = null;
+        Integer rndx_start = null;
         if (step < 0) {
-            gap_start = start - 1;
-            rndx_start = start - 1;
+            if (start != null) {
+                gap_start = start - 1;
+                rndx_start = start - 1;
+            }
+            else {
+                gap_start = start;
+                rndx_start = -1;
+            }
         }
         else {
             gap_start = start;
-            rndx_start = start; // TODO verify as not set in original
         }
         var trfms = compute_local_transforms(-1);
         var wl_idx = index_for_wavelength(wl);
@@ -197,7 +202,7 @@ public class SequentialModel {
         return zip_longest(
                 Lists.slice(ifcs, start, stop, step),
                 Lists.slice(gaps, gap_start, stop, step),
-                Lists.slice(trfms, -(start+1), stop, 1),
+                Lists.slice(trfms, -(start+1), null, 1),
                 rndx,
                 z_dir
         );

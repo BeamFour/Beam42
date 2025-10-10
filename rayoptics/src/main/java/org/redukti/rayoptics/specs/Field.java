@@ -9,10 +9,6 @@ import java.util.Arrays;
 import java.util.Map;
 
 public class Field {
-    /**
-     * x, y chief ray coords on the paraxial entrance pupil plane
-     */
-    public double[] aim_pt;
     public double x; // x field component
     public double y; // y field component
     public double vux; // +x vignetting factor
@@ -20,6 +16,14 @@ public class Field {
     public double vlx; // -x vignetting factor
     public double vly; // -y vignetting factor
     public double wt; //  field weight
+    /**
+     * Populated for non wide-angle system
+     * x, y chief ray coords on the paraxial entrance pupil plane
+     */
+    public double[] aim_pt;
+    /**
+     * Populated for wide-angle system
+     */
     public Double z_enp;
     /**
      * ray package for the ray from the field point through the

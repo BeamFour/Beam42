@@ -114,8 +114,8 @@ public class Wideangle {
             // do 1D iteration if field and target points are zero in x
             try {
                 var func = new Eval_Z_Enp_Function(seq_model,stop_idx,dir0,obj_dist,wvl,y_target);
-                rr = func.rr;
                 z_enp = SecantSolver.find_root(func,z_enp,50,1.48e-8);
+                rr = func.rr;
             }
             catch (TraceException ray_err) {
                 z_enp = 0.0;

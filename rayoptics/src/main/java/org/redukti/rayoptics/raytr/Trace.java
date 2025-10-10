@@ -10,6 +10,7 @@ import org.redukti.rayoptics.specs.Coord;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.specs.FieldSpec;
 import org.redukti.rayoptics.util.Lists;
+import org.redukti.rayoptics.util.Pair;
 
 import java.util.*;
 
@@ -682,7 +683,11 @@ public class Trace {
     public static ChiefRayPkg get_chief_ray_pkg(OpticalModel opt_model, Field fld, double wvl, double foc) {
         ChiefRayPkg chief_ray_pkg;
         if (fld.chief_ray == null) {
-            fld.aim_pt = aim_chief_ray(opt_model, fld, wvl);
+            var res = aim_chief_ray(opt_model, fld, wvl);
+            if (res.first != null)
+                fld.aim_pt = res.first;
+            else
+                fld.z_enp = res.second;
             chief_ray_pkg = trace_chief_ray(opt_model, fld, wvl, foc);
         }
         else if (fld.chief_ray.chief_ray.wvl != wvl) {
@@ -716,20 +721,23 @@ public class Trace {
         return new RefSphereCR(ref_sphere, chief_ray_pkg);
     }
 
-    public static double[] aim_chief_ray(OpticalModel opt_model, Field fld, Double wvl) {
+    public static Pair<double[],Double> aim_chief_ray(OpticalModel opt_model, Field fld, Double wvl) {
         // aim chief ray at center of stop surface and save results on **fld**
         var seq_model = opt_model.seq_model;
         var osp = opt_model.optical_spec;
         if (wvl == null)
             wvl = seq_model.central_wavelength();
         Integer stop = seq_model.stop_surface;
-        IterationResult res;
-        if (osp.fov.is_wide_angle)
-            // TODO aim_info, rr = find_real_enp(opt_model, stop, fld, wvl)
-            throw new UnsupportedOperationException("NYI");
-        else
-            res = iterate_ray(opt_model, stop, new double[]{0., 0.}, fld, wvl);
-        return res.start_coords;
+        Pair<double[],Double> rvalue;
+        if (osp.fov.is_wide_angle) {
+            var res = Wideangle.find_real_enp(opt_model, stop, fld, wvl);
+            rvalue = new Pair<>(null,res.first);
+        }
+        else {
+            var res = iterate_ray(opt_model, stop, new double[]{0., 0.}, fld, wvl);
+            rvalue = new Pair<>(res.start_coords,null);
+        }
+        return rvalue;
     }
 
     /**

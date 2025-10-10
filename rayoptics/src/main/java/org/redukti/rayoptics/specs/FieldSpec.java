@@ -37,23 +37,27 @@ public class FieldSpec {
     public Field[] fields;
     public String[] index_labels;
 
-    public FieldSpec(OpticalSpecs parent, Pair<ImageKey, ValueKey> key, double value, double[] flds,
-                     boolean is_relative, boolean do_init) {
+    public FieldSpec(OpticalSpecs parent, Pair<ImageKey, ValueKey> key, Double value, double[] flds,
+                     Boolean is_relative, Boolean is_wide_angle, Boolean do_init) {
+        if (key == null) key = new Pair<>(ImageKey.Object, ValueKey.Angle);
+        if (value == null) value = 0.0;
+        if (is_relative == null) is_relative = false;
+        if (is_wide_angle == null) is_wide_angle = false;
+        if (do_init == null) do_init = true;
         optical_spec = parent;
         this.key = new SpecKey(SpecType.Field, key.first, key.second);
         this.value = value;
         this.is_relative = is_relative;
+        this.is_wide_angle = is_wide_angle;
         this.fields = do_init ? set_from_list(flds) : new Field[0];
     }
 
-    public FieldSpec(OpticalSpecs parent) {
-        this(parent, new Pair<>(ImageKey.Object, ValueKey.Angle), 0.0, new double[]{0.0}, false, true);
-    }
-
     public FieldSpec(OpticalSpecs parent, Pair<ImageKey, ValueKey> key, double[] flds) {
-        this(parent, key, 0.0, flds, false, true);
+        this(parent, key, 0.0, flds, null, null, null);
     }
-
+    public FieldSpec(OpticalSpecs parent, Pair<ImageKey, ValueKey> key, double[] flds, boolean is_wide_angle) {
+        this(parent, key, 0.0, flds, null, is_wide_angle, null);
+    }
 
     private Field[] set_from_list(double[] flds) {
         fields = new Field[flds.length];

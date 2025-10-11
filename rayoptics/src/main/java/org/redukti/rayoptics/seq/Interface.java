@@ -1,5 +1,6 @@
 package org.redukti.rayoptics.seq;
 
+import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.elem.profiles.SurfaceProfile;
 import org.redukti.rayoptics.elem.surface.DecenterData;
@@ -40,7 +41,7 @@ public class Interface {
 
     public Interface(InteractMode interact_mode, double delta_n,
                      double max_ap, DecenterData decenter) { // TODO phase element
-        this.interact_mode = interact_mode;
+        this.interact_mode = interact_mode == null ? InteractMode.TRANSMIT : interact_mode;
         this.delta_n = delta_n;
         this.decenter = decenter;
         this.max_aperture = max_ap;
@@ -64,15 +65,36 @@ public class Interface {
     }
 
     /**
+     * Get a target for ray aiming to aperture boundaries.
+     *
+     *         The main use case for this function is iterating a ray to the internal
+     *         edge of a surface.
+     *
+     *         Although `rel_dir` is given as a 2d vector, in practice only the 4
+     *         quadrant axes are handled in the implementation, a 1D directional
+     *         search along a coordinate axis.
+     *
+     *         Args:
+     *             rel_dir: 2d vector encoding coord axis and direction for edge sample
+     *
+     *         Returns:
+     *             edge_pt: intersection point of rel_dir with the aperture boundary
+     */
+    public Vector2 edge_pt_target(Vector2 rel_dir) {
+        return rel_dir.times(max_aperture);
+    }
+
+    /**
      * Returns True if the point (x, y) is inside the clear aperture.
      *
-     * @param x    x coordinate of the test point
-     * @param y    y coordinate of the test point
-     * @param fuzz tolerance on test pt/aperture comparison,
-     *             i.e. pt fuzzy <= surface_od
+     *         Args:
+     *             x: x coodinate of the test point
+     *             y: y coodinate of the test point
+     *             fuzz: tolerance on test pt/aperture comparison,
+     *                   i.e. pt fuzzy <= surface_od
      */
     public boolean point_inside(double x, double y, double fuzz) {
-        return Math.sqrt(x * x + y * y) <= max_aperture + fuzz;
+        return Math.sqrt(x*x + y*y) <= max_aperture + fuzz;
     }
 
     public void set_max_aperture(double max_ap) {
@@ -80,13 +102,26 @@ public class Interface {
     }
 
     /**
+     * default behavior is returning +/-max_aperture
+     */
+    public Vector2 get_y_aperture_extent() {
+        return new Vector2(-max_aperture,max_aperture);
+    }
+
+    /**
      * Intersect an :class:`~.Interface`, starting from an arbitrary point.
      *
-     * @param p0 start point of the ray in the interface's coordinate system
-     * @param d direction cosine of the ray in the interface's coordinate system
-     * @param eps numeric tolerance for convergence of any iterative procedure
-     * @param z_dir +1 if propagation positive direction, -1 if otherwise
-     * @return tuple: distance to intersection point *s1*, intersection point *p*
+     *         Args:
+     *             p0:  start point of the ray in the interface's coordinate system
+     *             d:  direction cosine of the ray in the interface's coordinate system
+     *             z_dir: +1 if propagation positive direction, -1 if otherwise
+     *             eps: numeric tolerance for convergence of any iterative procedure
+     *
+     *         Returns:
+     *             tuple: distance to intersection point *s1*, intersection point *p*
+     *
+     *         Raises:
+     *             :exc:`~rayoptics.raytr.traceerror.TraceMissedSurfaceError`
      */
     public IntersectionResult intersect(Vector3 p0, Vector3 d, double eps, ZDir z_dir) {
         throw new UnsupportedOperationException();

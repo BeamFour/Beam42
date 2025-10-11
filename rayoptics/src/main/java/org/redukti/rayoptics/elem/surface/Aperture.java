@@ -25,7 +25,8 @@ public abstract class Aperture {
         return Math.sqrt(d.x * d.x + d.y * d.y);
     }
 
-    public abstract boolean point_inside(double x, double y);
+    public abstract boolean point_inside(double x, double y,double fuzz);
+    public abstract Vector2 edge_pt_target(Vector2 rel_dir);
 
     public Pair<Vector2, Vector2> bounding_box() {
         Vector2 center = new Vector2(x_offset, y_offset);

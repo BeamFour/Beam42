@@ -68,6 +68,8 @@ public class Trace {
             Field fld,
             double wvl,
             TraceOptions trace_options) {
+        if (trace_options.rayerr_filter == null)
+            trace_options.rayerr_filter = "full";
         return trace_safe(opt_model, pupil, fld, wvl, trace_options);
     }
 
@@ -163,8 +165,7 @@ public class Trace {
      * @return
      */
     public static RayPkg trace(SequentialModel seq_model, Vector3 pt0, Vector3 dir0, double wvl, TraceOptions trace_options) {
-        var options = new RayTraceOptions();
-        options.check_apertures = trace_options.check_apertures;
+        var options = new RayTraceOptions(trace_options);
         return RayTrace.trace(seq_model, pt0, dir0, wvl, options);
     }
 

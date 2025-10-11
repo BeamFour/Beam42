@@ -1,5 +1,6 @@
 package org.redukti.rayoptics.elem.surface;
 
+import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.elem.profiles.Spherical;
 import org.redukti.rayoptics.elem.profiles.SurfaceProfile;
@@ -11,7 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Container of profile, extent, position and orientation
+ * Container of profile, extent, position and orientation.
+ *
+ *     Attributes:
+ *         label: optional label
+ *         profile: :class:`~.elem.profiles.SurfaceProfile`
+ *         clear_apertures: list of :class:`Aperture`
+ *         edge_apertures: list of :class:`Aperture`
  */
 public class Surface extends Interface {
 
@@ -95,5 +102,35 @@ public class Surface extends Interface {
             od = max_aperture;
         }
         return od;
+    }
+
+    @Override
+    public boolean point_inside(double x, double y, double fuzz) {
+        boolean is_inside = true;
+        if (clear_apertures.size() > 0) {
+            for (var ca: clear_apertures) {
+                is_inside = is_inside && ca.point_inside(x,y,fuzz);
+                if (!is_inside)
+                    return is_inside;
+            }
+        }
+        else return super.point_inside(x,y,fuzz);
+        return is_inside;
+    }
+
+    @Override
+    public Vector2 edge_pt_target(Vector2 rel_dir) {
+        if (clear_apertures.size() > 0)
+            return clear_apertures.get(0).edge_pt_target(rel_dir);
+        else
+            return super.edge_pt_target(rel_dir);
+    }
+
+    @Override
+    public void set_max_aperture(double max_ap) {
+        super.set_max_aperture(max_ap);
+        for (var ap: clear_apertures) {
+            ap.set_dimension(max_ap,max_ap);
+        }
     }
 }

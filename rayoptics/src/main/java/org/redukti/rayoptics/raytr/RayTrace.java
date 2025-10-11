@@ -84,6 +84,7 @@ public class RayTrace {
         if (options.last_surf == null) options.last_surf = seq_model.get_num_surfaces()-2;
         return trace_raw(path, pt0, dir0, wvl, options);
     }
+
     public static RayPkg trace(SequentialModel seq_model, Vector3 pt0, Vector3 dir0, double wvl) {
         RayTraceOptions options = new RayTraceOptions();
         options.first_surf = 1;
@@ -239,7 +240,7 @@ public class RayTrace {
                 if (options.check_apertures &&
                     in_surface_range(first_surf,last_surf,surf) &&
                         interact_mode != InteractMode.PHANTOM) {
-                    if (!ifc.point_inside(inc_pt.x, inc_pt.y, options.fuzz))
+                    if (options.pt_inside_fuzz != null && !ifc.point_inside(inc_pt.x, inc_pt.y, options.pt_inside_fuzz))
                         throw new TraceRayBlockedException(ifc, inc_pt);
                 }
 

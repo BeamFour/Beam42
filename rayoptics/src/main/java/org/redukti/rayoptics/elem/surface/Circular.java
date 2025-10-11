@@ -5,11 +5,6 @@ import org.redukti.mathlib.Vector2;
 public class Circular extends Aperture {
     public double radius = 1.0;
 
-    public Circular(double radius) {
-        super();
-        this.radius = radius;
-    }
-
     public Circular(double x_offset, double y_offset, double rotation, double radius) {
         super(x_offset, y_offset, rotation);
         this.radius = radius;
@@ -22,7 +17,7 @@ public class Circular extends Aperture {
 
     @Override
     public void set_dimension(double x, double y) {
-        radius = Math.sqrt(x*x + y*y);
+        radius = x;
     }
 
     @Override
@@ -31,9 +26,17 @@ public class Circular extends Aperture {
     }
 
     @Override
-    public boolean point_inside(double x, double y) {
+    public boolean point_inside(double x, double y,double fuzz) {
         Vector2 v = tform(x, y);
-        return Math.sqrt(v.x*v.x + v.y*v.y) <= radius;
+        return Math.sqrt(v.x*v.x + v.y*v.y) <= radius + fuzz;
+    }
+
+    /**
+     * Get a target for ray aiming to aperture boundaries.
+     */
+    @Override
+    public Vector2 edge_pt_target(Vector2 rel_dir) {
+        return new Vector2(radius*rel_dir.x, radius*rel_dir.y);
     }
 
     @Override

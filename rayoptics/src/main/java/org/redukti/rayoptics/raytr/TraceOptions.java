@@ -4,6 +4,7 @@ import org.redukti.mathlib.Vector2;
 
 public class TraceOptions {
 
+    public Double pt_inside_fuzz;
     /**
      * if True, do point_inside() test on inc_pt
      */

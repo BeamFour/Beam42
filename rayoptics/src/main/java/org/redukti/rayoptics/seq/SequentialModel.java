@@ -389,16 +389,14 @@ public class SequentialModel {
         if (start == null)
             start = 0;
         var b4_idx = start == 0 ? start : start - 1;
-        double n_before = rndx.get(b4_idx)[ref_wl];
-        //this.z_dir = new ArrayList<>();
-        //ZDir z_dir_before = ZDir.PROPAGATE_RIGHT;
-        ZDir z_dir_before = z_dir.get(b4_idx);
+        double n_before = Lists.get(rndx,b4_idx)[ref_wl];
+        ZDir z_dir_before = Lists.get(z_dir,b4_idx);
 
         List<Pair<Interface, Gap>> seq = zip_longest(Lists.from(this.ifcs,start), Lists.from(this.gaps,start));
 
         for (int j = 0, i = start; j < seq.size(); j++) {
-            Interface ifc = seq.get(j).first;
-            Gap g = seq.get(j).second;
+            var ifc = seq.get(j).first;
+            var g = seq.get(j).second;
             ZDir z_dir_after = z_dir_before;
             if (ifc.interact_mode == InteractMode.REFLECT)
                 z_dir_after = z_dir_after.opposite();
@@ -425,12 +423,6 @@ public class SequentialModel {
 
         // self.seq_def.update()
     }
-
-//    public void update_optical_properties() {
-//        if (do_apertures)
-//            if (ifcs.size() > 2)
-//                set_clear_apertures();
-//    }
 
     public void apply_scale_factor(double scale_factor) {
         apply_scale_factor_over(scale_factor, null);
@@ -504,6 +496,20 @@ public class SequentialModel {
      */
     public double total_track() {
         return overall_length(0,gaps.size());
+    }
+
+    public void set_clear_aperture_paraxial() {
+        var ax_ray = opt_model.parax_model.parax_data.ax_ray;
+        var pr_ray = opt_model.parax_model.parax_data.pr_ray;
+        for (int i = 0; i < ifcs.size(); i++) {
+            var ifc = ifcs.get(i);
+            var sd = Math.abs(ax_ray.get(i).ht) + Math.abs(pr_ray.get(i).ht);
+            ifc.set_max_aperture(sd);
+        }
+    }
+
+    public void set_clear_apertures() {
+        Vigcalc.set_ape(opt_model);
     }
 
     /**
@@ -592,26 +598,6 @@ public class SequentialModel {
         }
         return list;
     }
-
-
-    /*
-        def calc_ref_indices_for_spectrum(self, wvls: List[float]):
-        """ returns a list with refractive indices for all **wvls**
-
-        Args:
-            wvls: list of wavelengths in nm
-        """
-        indices = []
-        for g in self.gaps:
-            ri = []
-            mat = g.medium
-            for w in wvls:
-                rndx = mat.rindex(w)
-                ri.append(rndx)
-            indices.append(ri)
-
-        return indices
-     */
 
     /**
      * create a surface and gap where `surf_data` is a list that contains:

@@ -29,7 +29,7 @@ public class Vigcalc {
      *     :class:`~.elements.ElementModel` via
      *     :meth:`~.elements.ElementModel.sync_to_seq`.
      */
-    public void set_ape(OpticalModel opm) {
+    public static void set_ape(OpticalModel opm) {
         var rayset = Trace.trace_boundary_rays(opm,new TraceOptions());
         for (int i = 0; i < opm.seq_model.ifcs.size(); i++) {
             var ifc = opm.seq_model.ifcs.get(i);
@@ -73,7 +73,7 @@ public class Vigcalc {
      *     segments of this ray to update the pupil specification value
      *     e.g. EPD, NA or f/#.
      */
-    public void set_pupil(OpticalModel opm) {
+    public static void set_pupil(OpticalModel opm) {
         var sm = opm.seq_model;
         if (sm.stop_surface == null) {
             System.out.println("floating stop surface");

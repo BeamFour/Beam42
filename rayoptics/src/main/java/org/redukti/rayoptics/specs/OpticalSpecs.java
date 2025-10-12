@@ -1,3 +1,6 @@
+// Copyright 2017-2015 Michael J. Hayford
+// Original software https://github.com/mjhoptics/ray-optics
+// Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.specs;
 
 import org.redukti.mathlib.M;
@@ -7,7 +10,6 @@ import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.firstorder.Etendue;
 import org.redukti.rayoptics.parax.firstorder.FirstOrder;
 import org.redukti.rayoptics.parax.firstorder.ParaxData;
-import org.redukti.rayoptics.raytr.IterationResult;
 import org.redukti.rayoptics.raytr.PupilType;
 import org.redukti.rayoptics.raytr.Trace;
 import org.redukti.rayoptics.util.Pair;
@@ -72,7 +74,7 @@ public class OpticalSpecs {
                     Field fld = fov.fields[i];
                     var res = Trace.aim_chief_ray(opt_model, fld, wvl);
                     if (res.first != null)
-                        fld.aim_pt = res.first;
+                        fld.aim_info = res.first;
                     else
                         fld.z_enp = res.second;
                 }
@@ -209,7 +211,7 @@ public class OpticalSpecs {
                     pt1 = new Vector3(pt1.x, pt1.y, pt1.z - obj2enp_dist);
                 }
                 else {
-                    var aim_pt = fld.aim_pt;
+                    var aim_pt = fld.aim_info;
                     var obj2enp_dist = -(fod.obj_dist + z_enp);
                     pt1 = new Vector3(eprad*pupil[0]+aim_pt[0],
                                     eprad*pupil[1]+aim_pt[1],
@@ -246,7 +248,7 @@ public class OpticalSpecs {
                     cr_dir = new double[]{d0.x,d0.y};
                 }
                 else {
-                    var aim_pt = fld.aim_pt;
+                    var aim_pt = fld.aim_info;
                     var pt1 = new Vector3(aim_pt[0], aim_pt[1],
                                     fod.obj_dist+fod.enp_dist);
                     var diff = pt1.minus(p0).normalize();

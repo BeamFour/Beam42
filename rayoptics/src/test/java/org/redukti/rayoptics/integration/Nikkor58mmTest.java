@@ -3,8 +3,6 @@ package org.redukti.rayoptics.integration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.redukti.mathlib.Vector3;
-import org.redukti.rayoptics.elem.layout.LensLayout;
-import org.redukti.rayoptics.elem.layout.RayBundle;
 import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.firstorder.FirstOrderData;
@@ -16,9 +14,7 @@ import org.redukti.rayoptics.specs.*;
 import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.Pair;
 
-import java.util.List;
-
-public class NoctNikkorTest {
+public class Nikkor58mmTest {
 
     @Test
     public void test() {

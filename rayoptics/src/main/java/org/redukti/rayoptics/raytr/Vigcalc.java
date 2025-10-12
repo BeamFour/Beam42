@@ -1,3 +1,6 @@
+// Copyright 2017-2015 Michael J. Hayford
+// Original software https://github.com/mjhoptics/ray-optics
+// Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.raytr;
 
 import org.redukti.mathlib.SecantSolver;
@@ -113,7 +116,7 @@ public class Vigcalc {
                 var rs0 = ray_pkg.ray.get(0);
                 var slp0 = rs0.d.y / rs0.d.z;
                 if (pupil_spec == ValueKey.NA) {
-                    var n0 = sm.rndx.get(0)[0]; // FIXME bug n0 = sm.rindx[0]
+                    var n0 = sm.central_rndx(0);
                     osp.pupil.value = n0*rs0.d.y;
                 }
                 else if (pupil_spec == ValueKey.Fnum) {
@@ -130,7 +133,7 @@ public class Vigcalc {
             else {
                 var slpk = rsm2.d.y/rsm2.d.z;
                 if (pupil_spec == ValueKey.NA) {
-                    var nk = sm.rndx.get(0)[0]; // FIXME bug nk = sm.rindx[-1]
+                    var nk = sm.central_rndx(0);
                     osp.pupil.value = -nk * rsm2.d.y;
                 }
                 else if (pupil_spec == ValueKey.Fnum) {

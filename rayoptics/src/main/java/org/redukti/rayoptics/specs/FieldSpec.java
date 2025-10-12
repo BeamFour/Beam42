@@ -1,3 +1,6 @@
+// Copyright 2017-2015 Michael J. Hayford
+// Original software https://github.com/mjhoptics/ray-optics
+// Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.specs;
 
 import org.redukti.mathlib.Matrix3;
@@ -12,8 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Field of view specification. The FieldSpec can be defined in object or image space.
- * The defining parameters can be height or angle, where angle is given in degrees.
+ * Field of view specification
+ *
+ *     Attributes:
+ *         key: 'object'|'image', 'height'|'angle'
+ *         value: maximum field, per the key
+ *         fields: list of Field instances
+ *         is_relative: if True, `fields` are relative to max field
+ *         is_wide_angle: if True, aim at real entrance pupil
  */
 public class FieldSpec {
 
@@ -49,7 +58,12 @@ public class FieldSpec {
         this.value = value;
         this.is_relative = is_relative;
         this.is_wide_angle = is_wide_angle;
-        this.fields = do_init ? set_from_list(flds) : new Field[0];
+        if (do_init) {
+            if (flds == null) flds = new double[] { 0., 1.};
+            set_from_list(flds);
+        }
+        else
+            this.fields = new Field[0];
     }
 
     public FieldSpec(OpticalSpecs parent, Pair<ImageKey, ValueKey> key, double[] flds) {
@@ -70,30 +84,97 @@ public class FieldSpec {
     }
 
     /**
-     * calculates the maximum field of view
-     *
-     * @return magnitude of maximum field, maximum Field instance
+     * return pupil spec as paraxial height or slope value
      */
-    public Pair<Double, Integer> max_field() {
-        Integer max_fld = null;
-        double max_fld_sqrd = -1.0;
-        for (int i = 0; i < fields.length; i++) {
-            Field f = fields[i];
-            double fld_sqrd = f.x * f.x + f.y * f.y;
-            if (fld_sqrd > max_fld_sqrd) {
-                max_fld_sqrd = fld_sqrd;
-                max_fld = i;
-            }
+    public Triple<ImageKey,ValueKey,Double> derive_parax_params() {
+        var fov_oi_key = key.imageKey;
+        var fov_value_key = key.valueKey;
+        // guard against zero as a field spec for parax calc
+        var fov_value = this.value != 0 ? this.value : 1.0;
+        ValueKey field_key = null;
+        double field_value = 0.0;
+
+        if (ValueKey.Angle == fov_value_key) {
+            var slope_bar = Etendue.ang2slp(fov_value);
+            field_key = ValueKey.Slope;
+            field_value = slope_bar;
         }
-        double max_fld_value = Math.sqrt(max_fld_sqrd);
-        if (is_relative)
-            max_fld_value *= value;
-        return new Pair(max_fld_value, max_fld);
+        else if (ValueKey.Height == fov_value_key) {
+            var height_bar = fov_value;
+            field_key = ValueKey.Height;
+            field_value = height_bar;
+        }
+        else if (ValueKey.RealHeight == fov_value_key) {
+            var height_bar = fov_value;
+            field_key = ValueKey.Height;
+            field_value = height_bar;
+        }
+        return new Triple<>(fov_oi_key, field_key, field_value);
     }
 
+    /**
+     * Checks for object angles greater than the threshold.
+     */
+    public boolean check_is_wide_angle(double angle_threshold) {
+        is_wide_angle = false;
+        if (key.imageKey == ImageKey.Image &&
+                key.valueKey == ValueKey.RealHeight &&
+            optical_spec.conjugate_type(ImageKey.Object) == ConjugateType.INFINITE) {
+            is_wide_angle = true;
+        }
+        else if (key.imageKey == ImageKey.Object &&
+                key.valueKey == ValueKey.Angle) {
+            var max_angle = max_field().second;
+            is_wide_angle = (max_angle > angle_threshold);
+        }
+        return is_wide_angle;
+    }
+    public boolean check_is_wide_angle() {
+        return check_is_wide_angle(45.);
+    }
 
-    public static double hypot(double[] dir_tan) {
-        return Math.sqrt(1 + dir_tan[0] * dir_tan[0] + dir_tan[1] * dir_tan[1]);
+    public void update_model() {
+        for (Field f : fields) {
+            f.update();
+        }
+        // recalculate max_field and relabel fields.
+        //  relabeling really assumes the fields are radial, specifically,
+        //  y axis only
+        double field_norm;
+        if (is_relative)
+            field_norm = 1.0;
+        else
+            field_norm = (value == 0.0) ? 1.0 : 1.0 / value;
+
+        List<String> index_labels = new ArrayList<>();
+        for (Field f : fields) {
+            String fldx, fldy;
+            if (f.x != 0.0)
+                fldx = String.format("%5.2fx", field_norm * f.x);
+            else
+                fldx = "";
+            if (f.y != 0.0)
+                fldy = String.format("%5.2fy", field_norm * f.y);
+            else
+                fldy = "";
+            index_labels.add(fldx + fldy);
+        }
+        index_labels.set(0, "axis");
+        if (index_labels.size() > 1)
+            Lists.set(index_labels, -1, "edge");
+        this.index_labels = index_labels.toArray(new String[0]);
+    }
+
+    public void apply_scale_factor(double scale_factor) {
+        ValueKey value_key = key.valueKey;
+        if (value_key == ValueKey.Height) {
+            if (!is_relative) {
+                for (var f: fields) {
+                    f.apply_scale_factor(scale_factor);
+                }
+            }
+            value *= scale_factor;
+        }
     }
 
     /**
@@ -101,9 +182,6 @@ public class FieldSpec {
      *
      *         If a field point is defined in image space, the paraxial object
      *         space data is used to calculate the field coordinates.
-     *
-     * @param fld Field
-     * @return Vector3
      */
     public Coord obj_coords(Field fld) {
         ImageKey obj_img_key = key.imageKey;
@@ -189,63 +267,36 @@ public class FieldSpec {
         return new Coord(obj_pt,obj_dir);
     }
 
-    public void update_model() {
-        for (Field f : fields) {
-            f.update();
+    /**
+     * calculates the maximum field of view
+     *
+     *         Returns:
+     *             magnitude of maximum field, maximum Field instance
+     */
+    public Pair<Double, Integer> max_field() {
+        Integer max_fld = null;
+        double max_fld_sqrd = -1.0;
+        for (int i = 0; i < fields.length; i++) {
+            Field f = fields[i];
+            double fld_sqrd = f.x * f.x + f.y * f.y;
+            if (fld_sqrd > max_fld_sqrd) {
+                max_fld_sqrd = fld_sqrd;
+                max_fld = i;
+            }
         }
-        // recalculate max_field and relabel fields.
-        //  relabeling really assumes the fields are radial, specifically,
-        //  y axis only
-        double field_norm;
+        double max_fld_value = Math.sqrt(max_fld_sqrd);
         if (is_relative)
-            field_norm = 1.0;
-        else
-            field_norm = (value == 0.0) ? 1.0 : 1.0 / value;
-
-        List<String> index_labels = new ArrayList<>();
-        for (Field f : fields) {
-            String fldx, fldy;
-            if (f.x != 0.0)
-                fldx = String.format("%5.2fx", field_norm * f.x);
-            else
-                fldx = "";
-            if (f.y != 0.0)
-                fldy = String.format("%5.2fy", field_norm * f.y);
-            else
-                fldy = "";
-            index_labels.add(fldx + fldy);
-        }
-        index_labels.set(0, "axis");
-        if (index_labels.size() > 1)
-            Lists.set(index_labels, -1, "edge");
-        this.index_labels = index_labels.toArray(new String[0]);
+            max_fld_value *= value;
+        return new Pair<>(max_fld_value, max_fld);
     }
 
-        /**
-     * return pupil spec as paraxial height or slope value
-     */
-    public Triple<ImageKey,ValueKey,Double> derive_parax_params() {
-        var fov_oi_key = key.imageKey;
-        var fov_value_key = key.valueKey;
-        var fov_value = this.value;
-        ValueKey field_key = null;
-        double field_value = 0.0;
 
-        if (ValueKey.Angle == fov_value_key) {
-            var slope_bar = Etendue.ang2slp(fov_value);
-            field_key = ValueKey.Slope;
-            field_value = slope_bar;
+    /**
+     * Reset the vignetting to 0 for all fields.
+     */
+    public void clear_vignetting() {
+        for (var f: fields) {
+            f.clear_vignetting();
         }
-        else if (ValueKey.Height == fov_value_key) {
-            var height_bar = fov_value;
-            field_key = ValueKey.Height;
-            field_value = height_bar;
-        }
-        else if (ValueKey.RealHeight == fov_value_key) {
-            var height_bar = fov_value;
-            field_key = ValueKey.Height;
-            field_value = height_bar;
-        }
-        return new Triple<>(fov_oi_key, field_key, field_value);
     }
 }

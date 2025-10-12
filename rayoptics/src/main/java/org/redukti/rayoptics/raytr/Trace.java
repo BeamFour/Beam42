@@ -1,3 +1,6 @@
+// Copyright 2017-2015 Michael J. Hayford
+// Original software https://github.com/mjhoptics/ray-optics
+// Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.raytr;
 
 import org.redukti.mathlib.*;
@@ -5,7 +8,6 @@ import org.redukti.rayoptics.exceptions.TraceException;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.seq.PathSeg;
 import org.redukti.rayoptics.seq.SequentialModel;
-import org.redukti.rayoptics.seq.TraceGridForm;
 import org.redukti.rayoptics.specs.Coord;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.specs.FieldSpec;
@@ -686,7 +688,7 @@ public class Trace {
         if (fld.chief_ray == null) {
             var res = aim_chief_ray(opt_model, fld, wvl);
             if (res.first != null)
-                fld.aim_pt = res.first;
+                fld.aim_info = res.first;
             else
                 fld.z_enp = res.second;
             chief_ray_pkg = trace_chief_ray(opt_model, fld, wvl, foc);

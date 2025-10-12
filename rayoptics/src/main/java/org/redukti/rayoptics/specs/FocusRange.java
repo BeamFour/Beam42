@@ -1,7 +1,15 @@
+// Copyright 2017-2015 Michael J. Hayford
+// Original software https://github.com/mjhoptics/ray-optics
+// Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.specs;
 
 /**
  Focus range specification
+
+    Attributes:
+        focus_shift: focus shift (z displacement) from nominal image interface
+        defocus_range: +/- half the total focal range, from the focus_shift
+                       position
  */
 public class FocusRange {
     /**
@@ -30,11 +38,19 @@ public class FocusRange {
                 '}';
     }
 
+    public void apply_scale_factor(double scale_factor) {
+        focus_shift *= scale_factor;
+        defocus_range *= scale_factor;
+    }
+
     /**
      * return focus position for input focus range parameter
      *
-     * @param fr focus range parameter, -1.0 to 1.0
-     * @return focus position for input focus range parameter
+     *         Args:
+     *             fr (float): focus range parameter, -1.0 to 1.0
+     *
+     *         Returns:
+     *             focus position for input focus range parameter
      */
     public double get_focus(double fr) {
         return focus_shift + fr * defocus_range;

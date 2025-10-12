@@ -4,7 +4,6 @@ This project contains three different optical design and analysis software.
 
 * **BEAM FOUR** 
 * **JFotoptix** - a Java tool derived from [GNU Optical](https://github.com/dibyendumajumdar/goptical).  
-* **RayOptics** - a partial ongoing port of [MJH RayOptics](https://github.com/mjhoptics/ray-optics). 
 
 ## BEAM FOUR
 
@@ -75,7 +74,8 @@ This is an ongoing partial port of [MJH RayOptics](https://github.com/mjhoptics/
 ## Related Projects
 
 * My fork of GNU Optical: https://github.com/dibyendumajumdar/goptical
-* RayOptics (python) by Michael Hayford who worked many years at optical software company: https://github.com/mjhoptics/ray-optics. 
+* RayOptics (python) by Michael Hayford who worked many years at optical software company: https://github.com/mjhoptics/ray-optics.
+* rayoptics4j - a partial port of above. See https://github.com/BeamFour/rayoptics4j
 * Rayopt (python): https://github.com/quartiq/rayopt
 * An older C project 'ray' originally written by Don Wells at NRAO implements Feder's equations for ray tracing. https://github.com/dibyendumajumdar/ray
 * Geopter (C++,Qt): https://github.com/heterophyllus/Geopter

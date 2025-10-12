@@ -1,16 +1,13 @@
+// Copyright 2017-2015 Michael J. Hayford
+// Original software https://github.com/mjhoptics/ray-optics
+// Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.elem.layout;
 
-import org.redukti.rayoptics.math.Tfm3d;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.RayPkg;
-import org.redukti.rayoptics.raytr.RaySeg;
-import org.redukti.rayoptics.raytr.Trace;
-import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.specs.Field;
 
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /* class for ray bundle from a single field point */
 public class RayBundle {

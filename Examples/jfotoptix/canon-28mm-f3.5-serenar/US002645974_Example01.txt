@@ -1,0 +1,35 @@
+[descriptive data]
+title	US 2,645,974 Example 1 (Canon Serenar 28mm f3.5)
+[constants]
+Scaled	28	1
+[variable distances]
+Focal Length	28.00
+Angle of View	75
+F-Number	3.50
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf	22.40
+[lens data]
+1	16.884	1.904	1.5638	12.18	60.7
+2	72.660	0.140		12.18	
+3	13.216	2.744	1.6237	10.26	47.0
+4	-84.000	0.672	1.5955	10.26	39.2
+5	9.044	1.400		7.02
+5AS	AS	1.400		6.239
+6	-9.268	0.476	1.5785	8.08	41.7
+7	22.344	3.472	1.6204	10.96	60.3
+8	-11.984	0.112		10.96	
+9	Infinity	2.520	1.6204	16.82	60.3
+10	-24.248	Bf		16.82	
+[figure]
+source	Data/US002645974_Figure01P.png
+originX	83.95
+originY	115.24
+ppmm	13.189
+[figure]
+source	Data/US002645974_Figure01.png
+originX	207.77
+originY	432.58
+ppmm	38.320
+[notes]

@@ -1,3 +1,8 @@
+# Canon Serenar 28mm f3.5
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US2645974 | EX 1 | 1951 | Ito Hiroshi | Canon Inc | [link](https://patents.google.com/patent/US2645974A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

@@ -1,5 +1,8 @@
 [descriptive data]
 title	US 2,645,974 Example 1 (Canon Serenar 28mm f3.5)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US2645974	EX 1	1951	Ito Hiroshi	Canon Inc	https://patents.google.com/patent/US2645974A/en
+lens name	Canon Serenar 28mm f3.5
 [constants]
 Scaled	28	1
 [variable distances]

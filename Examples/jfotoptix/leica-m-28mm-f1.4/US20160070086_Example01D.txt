@@ -1,5 +1,8 @@
 [descriptive data]
 title	US 2016/0070086 Example 1 (Leica Summilux-M 28mm F1.4 Asph)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US9703072	EX 1	2014	Alexander Martin	Leica Camera AG	https://patents.google.com/patent/US9703072B2/en
+lens name	Leica Summilux-M 28mm F1.4 Asph
 [constants]
 [variable distances]
 Focal Length	28	undefined
@@ -60,3 +63,6 @@ L	f(p)	f(m)	f(m)
 For lens 1 chose a real glass after determining that the index of refraction must be near 1.51
 Hand adjusted first aspherical term for reasonable convergence.
 2022-11-21: Zemax improvements from Larry. Adjusted CG thickness slightly to match Figure. Set AD etc.
+
+Dibyendu:
+2025-11-07: Re-optimized using custom software

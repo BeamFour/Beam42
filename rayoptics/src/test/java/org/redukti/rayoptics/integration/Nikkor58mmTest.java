@@ -3,6 +3,16 @@ package org.redukti.rayoptics.integration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.redukti.mathlib.Vector3;
+import org.redukti.output.data.DataSet;
+import org.redukti.output.data.DiscreteSet;
+import org.redukti.output.data.Interpolation;
+import org.redukti.output.data.Range;
+import org.redukti.output.plotting.Plot;
+import org.redukti.output.plotting.PlotAxes;
+import org.redukti.output.plotting.PlotStyleMask;
+import org.redukti.output.rendering.Renderer;
+import org.redukti.output.rendering.RendererSvg;
+import org.redukti.output.rendering.Rgb;
 import org.redukti.rayoptics.analysis.SpotAnalysis;
 import org.redukti.rayoptics.analysis.TransverseRayAberrationAnalysis;
 import org.redukti.rayoptics.analysis.WavefrontAberrationAnalysis;
@@ -220,6 +230,31 @@ public class Nikkor58mmTest {
         Assertions.assertEquals(-3.2620548349684384, transAber.fans_y.get(1).get(0),1e-15);
         Assertions.assertEquals(0.0, transAber.fans_y.get(1).get(9),1e-15);
         Assertions.assertEquals(-0.3119345075482975, transAber.fans_y.get(1).get(19),1e-15);
+
+        Plot plot = new Plot();
+        plot.set_title("Transverse ray aberration");
+        plot.get_axes().set_position(org.redukti.output.math.Vector3.vector3_0);
+        plot.get_axes().set_range(new Range(-1.0, 1.0), PlotAxes.AxisMask.X);
+        plot.get_axes().set_tics_step(1.0,  PlotAxes.AxisMask.X);
+        plot.get_axes().set_range(new Range(-5.0, 5.0), PlotAxes.AxisMask.Y);
+        var set = new DiscreteSet();
+        set.set_interpolation(Interpolation.Cubic);
+        var x_data = transAber.fans_x.get(1);
+        var y_data = transAber.fans_y.get(1);
+        // p.set_color (light::SpectralLine::get_wavelen_color (w));
+        for (int i = 0; i < x_data.size(); i++) {
+            double x = x_data.get(i);
+            double y = y_data.get(i);
+            set.add_data(x,y);
+        }
+        plot.add_plot_data(set, Rgb.rgb_red,"label", PlotStyleMask.InterpolatePlot.value());
+        plot.get_axes ().set_label ("X", PlotAxes.AxisMask.X);
+        plot.get_axes ().set_label ("Y", PlotAxes.AxisMask.Y);
+        //plot.get_axes().set_unit("",false,false,0, PlotAxes.AxisMask.X);
+        //plot.get_axes().set_unit("",false,false,0, PlotAxes.AxisMask.Y);
+        RendererSvg r = new RendererSvg(640,480);
+        r.draw_plot(plot);
+        System.out.println(r.write(new StringBuilder()));
 
         var waveAber = WavefrontAberrationAnalysis.eval_opd_fan(opm,1,1,21,new TraceOptions());
         Assertions.assertEquals(-0.0002035451272355, waveAber.fans_y.get(1).get(0),1e-15);

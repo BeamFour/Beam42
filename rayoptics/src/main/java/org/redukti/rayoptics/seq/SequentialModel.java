@@ -1,4 +1,4 @@
-// Copyright 2017-2015 Michael J. Hayford
+// Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.seq;
@@ -234,14 +234,14 @@ public class SequentialModel {
      * returns the central wavelength in nm of the model's `WvlSpec`
      */
     public double central_wavelength() {
-        return opt_model.optical_spec.spectral_region.central_wvl();
+        return opt_model.optical_spec.wvls.central_wvl();
     }
 
     /**
      * returns index into rndx array for wavelength `wvl` in nm
      */
     public int index_for_wavelength(double wvl) {
-        this.wvlns = opt_model.optical_spec.spectral_region.wavelengths;
+        this.wvlns = opt_model.optical_spec.wvls.wavelengths;
         for (int i = 0; i < wvlns.length; i++) {
             if (wvlns[i] == wvl)
                 return i;
@@ -253,7 +253,7 @@ public class SequentialModel {
      * returns the central refractive index of the model's WvlSpec
      */
     public double central_rndx(int i) {
-        int central_wvl = opt_model.optical_spec.spectral_region.reference_wvl;
+        int central_wvl = opt_model.optical_spec.wvls.reference_wvl;
         if (i < 0)
             i += rndx.size();
         return rndx.get(i)[central_wvl];
@@ -321,7 +321,7 @@ public class SequentialModel {
         gbl_tfrms.add(idx, tfrm);
         lcl_tfrms.add(idx, tfrm);
 
-        double[] wvls = opt_model.optical_spec.spectral_region.wavelengths;
+        double[] wvls = opt_model.optical_spec.wvls.wavelengths;
         double[] rindex = new double[wvls.length];
         for (int i = 0; i < wvls.length; i++)
             rindex[i] = gap.medium.rindex(wvls[i]);
@@ -372,9 +372,9 @@ public class SequentialModel {
         // delta n across each surface interface must be set to some
         // reasonable default value. use the index at the central wavelength
         OpticalSpecs osp = opt_model.optical_spec;
-        int ref_wl = osp.spectral_region.reference_wvl;
+        int ref_wl = osp.wvls.reference_wvl;
 
-        this.wvlns = osp.spectral_region.wavelengths;
+        this.wvlns = osp.wvls.wavelengths;
         this.rndx = calc_ref_indices_for_spectrum(wvlns);
 
         var num_ifcs = ifcs.size();
@@ -395,7 +395,7 @@ public class SequentialModel {
         double n_before = Lists.get(rndx,b4_idx)[ref_wl];
         ZDir z_dir_before = Lists.get(z_dir,b4_idx);
 
-        List<Pair<Interface, Gap>> seq = zip_longest(Lists.from(this.ifcs,start), Lists.from(this.gaps,start));
+        List<Pair<Interface, Gap>> seq = Lists.zip_longest(Lists.from(this.ifcs,start), Lists.from(this.gaps,start));
 
         for (int j = 0, i = start; j < seq.size(); j++) {
             var ifc = seq.get(j).first;
@@ -425,6 +425,13 @@ public class SequentialModel {
         this.lcl_tfrms = this.compute_local_transforms();
 
         // self.seq_def.update()
+    }
+
+    public void update_optical_properties() {
+        if (do_apertures) {
+            if (ifcs.size() > 2)
+                set_clear_apertures();
+        }
     }
 
     public void apply_scale_factor(double scale_factor) {
@@ -502,8 +509,9 @@ public class SequentialModel {
     }
 
     public void set_clear_aperture_paraxial() {
-        var ax_ray = opt_model.parax_model.parax_data.ax_ray;
-        var pr_ray = opt_model.parax_model.parax_data.pr_ray;
+        var osp = opt_model.optical_spec;
+        var ax_ray = osp.parax_data.ax_ray;
+        var pr_ray = osp.parax_data.pr_ray;
         for (int i = 0; i < ifcs.size(); i++) {
             var ifc = ifcs.get(i);
             var sd = Math.abs(ax_ray.get(i).ht) + Math.abs(pr_ray.get(i).ht);
@@ -512,7 +520,7 @@ public class SequentialModel {
     }
 
     public void set_clear_apertures() {
-        Vigcalc.set_ape(opt_model);
+        VigCalc.set_ape(opt_model);
     }
 
     /**
@@ -558,16 +566,6 @@ public class SequentialModel {
         return sb;
     }
 
-    public static List<Pair<Interface, Gap>> zip_longest(List<Interface> ifcs, List<Gap> gaps) {
-        List<Pair<Interface, Gap>> list = new ArrayList<>();
-        for (int i = 0; i < Math.max(ifcs.size(), gaps.size()); i++) {
-            Interface ifc = i < ifcs.size() ? ifcs.get(i) : null;
-            Gap g = i < gaps.size() ? gaps.get(i) : null;
-            list.add(new Pair<>(ifc, g));
-        }
-        return list;
-    }
-
     public static List<PathSeg> zip_longest(List<Interface> ifcs,
                                             List<Gap> gaps,
                                             List<Tfm3d> lcl_tfrms,
@@ -588,8 +586,8 @@ public class SequentialModel {
     }
 
     public static List<PathSeg> zip_longest(List<Interface> ifcs,
-                                            List<Gap> gaps,
-                                            List<ZDir> z_dir) {
+                                                List<Gap> gaps,
+                                                List<ZDir> z_dir) {
         List<PathSeg> list = new ArrayList<>();
         List<Integer> sizes = List.of(ifcs.size(), gaps.size(), z_dir.size());
         int maxSize = sizes.stream().max(Comparator.naturalOrder()).orElse(0);
@@ -601,7 +599,6 @@ public class SequentialModel {
         }
         return list;
     }
-
     /**
      * create a surface and gap where `surf_data` is a list that contains:
      * <p>
@@ -634,7 +631,7 @@ public class SequentialModel {
                                                  Double wvl) {
 
         if (wvl == null)
-            wvl = 550.0;
+            wvl = 587.5618;
         Surface s = new Surface();
 
         if (radius_mode) {
@@ -650,16 +647,22 @@ public class SequentialModel {
         ZDir z_dir = ZDir.PROPAGATE_RIGHT;
 
         if (surf_data.refractive_index != null) {
+            Glass g = surf_data.glass_name != null ? Glass.glassByName(surf_data.glass_name) : null;
             if (surf_data.v_number == null) {
                 if (surf_data.refractive_index == 1.0)
                     mat = new Air();
+                else if (g != null)
+                    mat = g;
                 else
                     mat = new Medium(surf_data.refractive_index);
             } else {
                 if (surf_data.refractive_index == 1.0)
                     mat = new Air();
-                else
-                    mat = new Glass(surf_data.refractive_index, surf_data.v_number);
+                else if (g != null)
+                    mat = g;
+                else {
+                    mat = new Glass(surf_data.refractive_index, surf_data.v_number, 0.0);
+                }
             }
         } else if (surf_data.interact_mode == InteractMode.REFLECT) {
             s.interact_mode = InteractMode.REFLECT;
@@ -703,6 +706,95 @@ public class SequentialModel {
         }
     }
 
+    static final class FanFilter implements ImageFilter {
+        final OpticalModel opt_model;
+        final int wi;
+        final Field fld;
+        final double wvl;
+        final double foc;
+        final RayFanCallback fct;
+
+        public FanFilter(OpticalModel opt_model, int wi, Field fld, double wvl, double foc, RayFanCallback fct) {
+            this.opt_model = opt_model;
+            this.wi = wi;
+            this.fld = fld;
+            this.wvl = wvl;
+            this.foc = foc;
+            this.fct = fct;
+        }
+
+        @Override
+        public GridItem apply(Vector2 p, RayPkg pkg) {
+            var result = fct.apply(opt_model,p,wi,pkg,fld,wvl,foc);
+            if (result != null)
+                return new GridItem(p, pkg, result);
+            else
+                return new GridItem(p, pkg);
+        }
+    }
+
+    /**
+     * xy determines whether x (=0) or y (=1) fan
+     */
+    public TraceFanResult trace_fan(
+            RayFanCallback fct,
+            int fi,
+            int xy,
+            int num_rays,
+            TraceOptions trace_options)
+    {
+        var osp = opt_model.optical_spec;
+        var fld = osp.fov.fields[fi];
+        var foc = osp.defocus().get_focus();
+
+        Vector2 ref_img_pt;
+        {
+            var wvl = central_wavelength();
+            var coords = Trace.setup_pupil_coords(opt_model,fld,wvl,foc,null,null);
+            var rs_pkg = coords.ref_sphere;
+            var cr_pkg = coords.chief_ray_pkg;
+
+            fld.chief_ray = cr_pkg;
+            fld.ref_sphere = rs_pkg;
+            ref_img_pt = rs_pkg.image_pt.project_xy();
+        }
+        // Use the central wavelength reference image point for the wavefront error calculations
+        var wvls = osp.spectral_region();
+        var fans_x = new ArrayList<List<Double>>();
+        var fans_y = new ArrayList<List<Double>>();
+        var fan_start = Vector2.vector2_0;
+        var fan_stop = Vector2.vector2_0;
+        fan_start = fan_start.set(xy,-1.0);
+        fan_stop = fan_stop.set(xy,1.0);
+        var fan_def = new TraceFanDef(fan_start,fan_stop,num_rays);
+        var max_rho_val = 0.0;
+        var max_y_val = 0.0;
+        for (int wi = 0; wi < wvls.wavelengths.length; wi++) {
+            double wvl = wvls.wavelengths[wi];
+            var coords = Trace.setup_pupil_coords(opt_model,fld,wvl,foc,ref_img_pt,null);
+            var rs_pkg = coords.ref_sphere;
+            var cr_pkg = coords.chief_ray_pkg;
+            fld.chief_ray = cr_pkg;
+            fld.ref_sphere = rs_pkg;
+            var fan = Trace.trace_fan(opt_model,fan_def,fld,wvl,foc,new FanFilter(opt_model,xy,fld,wvl,foc,fct),trace_options);
+            var f_x = new ArrayList<Double>();
+            var f_y = new ArrayList<Double>();
+            for (int i = 0; i < fan.size(); i++) {
+                var p = fan.get(i).pupil;
+                var y_val = fan.get(i).result;
+                f_x.add(p.v(xy));
+                f_y.add(y_val);
+                if (Math.abs(p.v(xy)) > max_rho_val)
+                    max_rho_val = Math.abs(p.v(xy));
+                if (Math.abs(y_val) > max_y_val)
+                    max_y_val = Math.abs(y_val);
+            }
+            fans_x.add(f_x);
+            fans_y.add(f_y);
+        }
+        return new TraceFanResult(fans_x,fans_y,max_rho_val,max_y_val);
+    }
+
     public List<List<GridItem>> trace_grid(
         TraceGridCallback fct,
         int fi,
@@ -712,10 +804,10 @@ public class SequentialModel {
         TraceOptions trace_options) {
         // fct is applied to the raw grid and returned as a grid
         var osp = opt_model.optical_spec;
-        var wvls = osp.spectral_region;
+        var wvls = osp.wvls;
         var wvl = central_wavelength();
         double[] wv_list;
-        if (wl != null) {
+        if (wl == null) {
             wv_list = wvls.wavelengths;
         }
         else {

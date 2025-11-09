@@ -1,4 +1,4 @@
-// Copyright 2017-2015 Michael J. Hayford
+// Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.specs;
@@ -81,6 +81,8 @@ public class WvlSpec {
     public void update_model() {
         // TODO self.calc_colors()
     }
+
+    public void apply_scale_factor(double scale_factor) {}
 
     public double central_wvl() {
         return wavelengths[reference_wvl];

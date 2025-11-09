@@ -1,4 +1,4 @@
-// Copyright 2017-2015 Michael J. Hayford
+// Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.seq;
@@ -10,21 +10,21 @@ import java.util.Objects;
  */
 public class Medium {
     String label;
-    double n;
+    double nd;
     String catalog_name;
 
-    public Medium(String label, double n, String catalog_name) {
+    public Medium(String label, double nd, String catalog_name) {
         this.label = label;
-        this.n = n;
+        this.nd = nd;
         this.catalog_name = catalog_name;
     }
 
-    public Medium(String label, double n) {
-        this(label, n, "");
+    public Medium(String label, double nd) {
+        this(label, nd, "");
     }
 
-    public Medium(double n) {
-        this("", n, "");
+    public Medium(double nd) {
+        this("", nd, "");
     }
 
     /**
@@ -33,7 +33,7 @@ public class Medium {
      * @return float: the refractive index at wv_nm
      */
     public double rindex(double wv_nm) {
-        return n;
+        return nd;
     }
 
     public StringBuilder toString(StringBuilder sb) {
@@ -42,7 +42,7 @@ public class Medium {
             sb.append(catalog_name).append("(")
                     .append(label).append(")");
         } else {
-            sb.append("Medium(n=").append(n).append(")");
+            sb.append("Medium(n=").append(nd).append(")");
         }
         return sb;
     }
@@ -56,11 +56,11 @@ public class Medium {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Medium medium = (Medium) o;
-        return Double.compare(medium.n, n) == 0 && Objects.equals(label, medium.label) && Objects.equals(catalog_name, medium.catalog_name);
+        return Double.compare(medium.nd, nd) == 0 && Objects.equals(label, medium.label) && Objects.equals(catalog_name, medium.catalog_name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(label, n, catalog_name);
+        return Objects.hash(label, nd, catalog_name);
     }
 }

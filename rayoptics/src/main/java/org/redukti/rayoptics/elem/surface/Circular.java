@@ -1,4 +1,4 @@
-// Copyright 2017-2015 Michael J. Hayford
+// Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.elem.surface;
@@ -29,7 +29,8 @@ public class Circular extends Aperture {
     }
 
     @Override
-    public boolean point_inside(double x, double y,double fuzz) {
+    public boolean point_inside(double x, double y,Double fuzz) {
+        if (fuzz == null) fuzz = 1e-5;
         Vector2 v = tform(x, y);
         return Math.sqrt(v.x*v.x + v.y*v.y) <= radius + fuzz;
     }

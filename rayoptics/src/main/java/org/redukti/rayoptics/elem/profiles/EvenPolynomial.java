@@ -1,4 +1,4 @@
-// Copyright 2017-2015 Michael J. Hayford
+// Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.elem.profiles;
@@ -40,7 +40,7 @@ import java.util.List;
  */
 public class EvenPolynomial extends SurfaceProfile {
 
-    double cc;
+    public double cc;
     double[] coefs;
     int max_nonzero_coef;
 
@@ -69,6 +69,7 @@ public class EvenPolynomial extends SurfaceProfile {
             this.coefs = new double[10];
         }
         max_nonzero_coef = 0;
+        update();
     }
 
     public EvenPolynomial() {
@@ -88,6 +89,7 @@ public class EvenPolynomial extends SurfaceProfile {
 
     public EvenPolynomial coefs(double[] _coefs) {
         this.coefs = _coefs;
+        update();
         return this;
     }
 
@@ -106,7 +108,7 @@ public class EvenPolynomial extends SurfaceProfile {
 
     @Override
     public SurfaceProfile update() {
-        gen_coef_list();
+        calc_max_nonzero_coef();
         return this;
     }
 
@@ -156,6 +158,13 @@ public class EvenPolynomial extends SurfaceProfile {
         return z_tot;
     }
 
+    /**
+     * Access to coefficients via polynomial order
+     */
+    public double get_by_order(int i) {
+        return coefs[i/2 -1];
+    }
+
     @Override
     public List<Vector2> profile(double[] sd, int dir, int steps) {
         return null;
@@ -170,7 +179,8 @@ public class EvenPolynomial extends SurfaceProfile {
         }
     }
 
-    void gen_coef_list() {
+    void calc_max_nonzero_coef() {
+        max_nonzero_coef = -1;
         for (int i = 0; i < coefs.length; i++) {
             if (coefs[i] != 0.0)
                 max_nonzero_coef = i;
@@ -193,4 +203,5 @@ public class EvenPolynomial extends SurfaceProfile {
         sb.append(")");
         return sb;
     }
+
 }

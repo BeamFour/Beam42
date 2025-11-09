@@ -1,4 +1,4 @@
-// Copyright 2017-2015 Michael J. Hayford
+// Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.elem.surface;
@@ -28,7 +28,7 @@ public abstract class Aperture {
         return Math.sqrt(d.x * d.x + d.y * d.y);
     }
 
-    public abstract boolean point_inside(double x, double y,double fuzz);
+    public abstract boolean point_inside(double x, double y,Double fuzz);
     public abstract Vector2 edge_pt_target(Vector2 rel_dir);
 
     public Pair<Vector2, Vector2> bounding_box() {

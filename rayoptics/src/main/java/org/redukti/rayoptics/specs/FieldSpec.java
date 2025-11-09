@@ -1,11 +1,11 @@
-// Copyright 2017-2015 Michael J. Hayford
+// Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.specs;
 
 import org.redukti.mathlib.Matrix3;
 import org.redukti.mathlib.Vector3;
-import org.redukti.rayoptics.parax.firstorder.Etendue;
+import org.redukti.rayoptics.parax.Etendue;
 import org.redukti.rayoptics.raytr.Wideangle;
 import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.Pair;
@@ -192,7 +192,7 @@ public class FieldSpec {
         if (is_relative)
             fld_coord = fld_coord.times(value);
         else if (value != 0.0)
-            rel_fld_coord = rel_fld_coord.times(1.0/value);
+            rel_fld_coord = rel_fld_coord.divide(value);
 
         var opt_model = optical_spec.opt_model;
         var pr = optical_spec.parax_data.pr_ray;
@@ -200,7 +200,7 @@ public class FieldSpec {
         Vector3 obj_pt = null;
         Vector3 obj_dir = null;
 
-        var obj2enp_dist = (-fod.obj_dist + fod.enp_dist);
+        var obj2enp_dist = -(fod.obj_dist + fod.enp_dist);
         var pt1 = new Vector3(0.0, 0.0, obj2enp_dist);
         ConjugateType obj_conj = optical_spec.conjugate_type(ImageKey.Object);
         if (obj_conj == ConjugateType.INFINITE) {
@@ -209,7 +209,7 @@ public class FieldSpec {
             if (obj_img_key == ImageKey.Image) {
                 double max_field_ang;
                 if (value_key == ValueKey.RealHeight) {
-                    double wvl = optical_spec.spectral_region.central_wvl();
+                    double wvl = optical_spec.wvls.central_wvl();
                     var pkg = Wideangle.eval_real_image_ht(opt_model,fld,wvl);
                     obj_pt = pkg.ray_data.pt;
                     obj_dir = pkg.ray_data.dir;
@@ -298,5 +298,10 @@ public class FieldSpec {
         for (var f: fields) {
             f.clear_vignetting();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "FieldSpec(key=" + key + ", max field=" + max_field().first + ", is wide angle=" + is_wide_angle + ")";
     }
 }

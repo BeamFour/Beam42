@@ -1,4 +1,4 @@
-// Copyright 2017-2015 Michael J. Hayford
+// Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.seq;
@@ -23,6 +23,14 @@ public class SurfaceData {
         this.v_number = vd;
         this.glass_name = null;
         this.catalog_name = null;
+        return this;
+    }
+
+    public SurfaceData rindex(double index, double vd, String glass_name, String catalog_name) {
+        this.refractive_index = index;
+        this.v_number = vd;
+        this.glass_name = glass_name;
+        this.catalog_name = catalog_name;
         return this;
     }
 

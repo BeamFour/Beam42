@@ -1,4 +1,4 @@
-// Copyright 2017-2015 Michael J. Hayford
+// Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.seq;
@@ -37,8 +37,7 @@ public class Gap {
     }
 
     public StringBuilder toString(StringBuilder sb) {
-        sb.append(getClass().getSimpleName()).append("(")
-                .append("t=").append(thi).append(", medium=");
+        sb.append("Gap(").append("t=").append(thi).append(", medium=");
         medium.toString(sb);
         sb.append(")");
         return sb;

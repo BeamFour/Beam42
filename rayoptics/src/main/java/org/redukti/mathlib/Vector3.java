@@ -36,6 +36,9 @@ public class Vector3 {
     public Vector3 times(double scale) {
         return new Vector3(x * scale, y * scale, z * scale);
     }
+    public Vector3 divide(double scale) {
+        return new Vector3(x / scale, y / scale, z / scale);
+    }
 
     public Vector3 negate() {
         return new Vector3(-x, -y, -z);
@@ -45,17 +48,15 @@ public class Vector3 {
         return Math.sqrt(x * x + y * y + z * z);
     }
 
-    public double lengthSquared() {
-        return x * x + y * y + z * z;
-    }
-
     public Vector3 normalize() {
         double lengthsq = x * x + y * y + z * z;
         if (M.isZero(lengthsq)) {
             return ZERO;
         } else {
-            double factor = 1.0 / Math.sqrt(lengthsq);
-            return new Vector3(x * factor, y * factor, z * factor);
+            //double factor = 1.0 / Math.sqrt(lengthsq);
+            //return new Vector3(x * factor, y * factor, z * factor);
+            double denom = Math.sqrt(lengthsq);
+            return new Vector3(x / denom, y / denom, z / denom);
         }
     }
 

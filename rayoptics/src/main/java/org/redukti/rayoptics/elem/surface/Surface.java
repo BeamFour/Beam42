@@ -1,4 +1,4 @@
-// Copyright 2017-2015 Michael J. Hayford
+// Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.elem.surface;
@@ -108,7 +108,8 @@ public class Surface extends Interface {
     }
 
     @Override
-    public boolean point_inside(double x, double y, double fuzz) {
+    public boolean point_inside(double x, double y, Double fuzz) {
+        if (fuzz == null) fuzz = 1e-5;
         boolean is_inside = true;
         if (clear_apertures.size() > 0) {
             for (var ca: clear_apertures) {

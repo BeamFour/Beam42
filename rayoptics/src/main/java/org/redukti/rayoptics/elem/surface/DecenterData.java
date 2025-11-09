@@ -1,10 +1,11 @@
-// Copyright 2017-2015 Michael J. Hayford
+// Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.elem.surface;
 
 import org.redukti.mathlib.Matrix3;
 import org.redukti.mathlib.Vector3;
+import org.redukti.rayoptics.math.Tfm3d;
 import org.redukti.rayoptics.util.Pair;
 
 import java.util.Objects;
@@ -61,22 +62,22 @@ public class DecenterData {
         rot_pt = rot_pt.times(scale_factor);
     }
 
-    public Pair<Matrix3, Vector3> tform_before_surf() {
+    public Tfm3d tform_before_surf() {
         if (!Objects.equals(dtype, "reverse"))
-            return new Pair<>(rot_mat, dec);
+            return new Tfm3d(rot_mat, dec);
         else
-            return new Pair<>(null, Vector3.ZERO);
+            return new Tfm3d(null, Vector3.ZERO);
     }
 
-    public Pair<Matrix3, Vector3> tform_after_surf() {
+    public Tfm3d tform_after_surf() {
         if (Objects.equals(dtype, "reverse") || Objects.equals(dtype, "dec and return")) {
             Matrix3 rt = rot_mat;
             if (rot_mat != null)
                 rt = rot_mat.transpose();
-            return new Pair<>(rt, dec.negate());
+            return new Tfm3d(rt, dec.negate());
         } else if (Objects.equals(dtype, "bend"))
-            return new Pair<>(rot_mat, Vector3.ZERO);
+            return new Tfm3d(rot_mat, Vector3.ZERO);
         else
-            return new Pair<>(null, Vector3.ZERO);
+            return new Tfm3d(null, Vector3.ZERO);
     }
 }

@@ -65,9 +65,9 @@ public class Lists {
     public static <T1, T2> List<Pair<T1, T2>> zip_longest(List<T1> list1, List<T2> list2) {
         List<Pair<T1, T2>> list = new ArrayList<>();
         for (int i = 0; i < Math.max(list1.size(), list2.size()); i++) {
-            T1 ifc = i < list1.size() ? list1.get(i) : null;
-            T2 g = i < list2.size() ? list2.get(i) : null;
-            list.add(new Pair<>(ifc, g));
+            T1 t1 = i < list1.size() ? list1.get(i) : null;
+            T2 t2 = i < list2.size() ? list2.get(i) : null;
+            list.add(new Pair<>(t1, t2));
         }
         return list;
     }

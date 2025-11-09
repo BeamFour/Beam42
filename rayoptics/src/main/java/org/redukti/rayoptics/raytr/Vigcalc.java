@@ -1,4 +1,4 @@
-// Copyright 2017-2015 Michael J. Hayford
+// Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.raytr;
@@ -12,12 +12,11 @@ import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.specs.ImageKey;
 import org.redukti.rayoptics.specs.ValueKey;
 import org.redukti.rayoptics.util.Lists;
-import org.redukti.rayoptics.util.Triple;
 
 import java.util.Objects;
 
 // Vignetting and clear aperture setting operations
-public class Vigcalc {
+public class VigCalc {
 
     /**
      * From existing fields and vignetting, calculate clear apertures.
@@ -160,14 +159,14 @@ public class Vigcalc {
             int xy = i/2;
             var start =  pupil_starts[i+1];
             var startv = new Vector2(start[0],start[1]);
-            Triple<Double,Integer,RayPkg> result;
+            VigResult result;
             if (use_bisection) {
                 result = calc_vignetted_ray_by_bisection(opm,xy,startv,fld,wvl,null);
             }
             else {
                 result = calc_vignetted_ray(opm,xy,startv,fld,wvl,null);
             }
-            vig_factors[i] = result.first;
+            vig_factors[i] = result.vig;
         }
 
         // update the field's vignetting factors
@@ -177,7 +176,7 @@ public class Vigcalc {
         fld.vly = vig_factors[3];
     }
 
-    public static Triple<Double,Integer,RayPkg> calc_vignetted_ray(
+    public static VigResult calc_vignetted_ray(
             OpticalModel opm,
             int xy,
             Vector2 start_dir,
@@ -236,7 +235,7 @@ public class Vigcalc {
             }
         }
         var vig = 1.0 - (rel_p1.v(xy)/start_dir.v(xy));
-        return new Triple<>(vig,last_index,ray_pkg);
+        return new VigResult(vig,last_index,ray_pkg);
     }
 
     /**
@@ -258,7 +257,7 @@ public class Vigcalc {
      *         - **last_indx** - the index of the limiting interface
      *         - **ray_pkg** - the vignetting-limited ray
      */
-    public static Triple<Double,Integer,RayPkg> calc_vignetted_ray_by_bisection(
+    public static VigResult calc_vignetted_ray_by_bisection(
             OpticalModel opm,
             int xy,
             Vector2 start_dir,
@@ -292,7 +291,7 @@ public class Vigcalc {
             }
         }
         var vig = 1.0 - (rel_p1.v(xy)/start_dir.v(xy));
-        return new Triple<>(vig,last_index,ray_pkg);
+        return new VigResult(vig,last_index,ray_pkg);
     }
 
     static class R_Pupil_Coordinate implements SecantSolver.ObjectiveFunction {

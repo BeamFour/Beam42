@@ -1,9 +1,9 @@
-// Copyright 2017-2015 Michael J. Hayford
+// Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.specs;
 
-import org.redukti.rayoptics.parax.firstorder.Etendue;
+import org.redukti.rayoptics.parax.Etendue;
 import org.redukti.rayoptics.util.Pair;
 import org.redukti.rayoptics.util.Triple;
 
@@ -55,6 +55,12 @@ public class PupilSpec {
         }
     }
 
+    public void apply_scale_factor(double scale_factor) {
+        var value_key = key.valueKey;
+        if (value_key == ValueKey.EPD || value_key == ValueKey.PUPIL)
+            value *= scale_factor;
+    }
+
     /**
      * return pupil spec as paraxial height or slope value
      */
@@ -82,5 +88,10 @@ public class PupilSpec {
             pupil_value = height;
         }
         return new Triple<>(pupil_oi_key, pupil_key, pupil_value);
+    }
+
+    @Override
+    public String toString() {
+        return "PupilSpec(key=" + key + ", value=" +  value + ")";
     }
 }

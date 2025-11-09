@@ -1,4 +1,4 @@
-// Copyright 2017-2015 Michael J. Hayford
+// Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.analysis;
@@ -20,21 +20,27 @@ public class SpotAnalysis {
             var image_pt = fld.ref_sphere.image_pt;
             var ray = ray_pkg.ray;
             var dist = foc / Lists.get(ray,-1).d.z;
-            var defocussed_pt = Lists.get(ray,-1).d.plus(Lists.get(ray,-1).d.times(dist));
+            var defocussed_pt = Lists.get(ray,-1).p.plus(Lists.get(ray,-1).d.times(dist));
             var t_abr = defocussed_pt.minus(image_pt);
-            return new GridItem(t_abr.x,t_abr.y,ray_pkg);
+            return new GridItem(t_abr.project_xy(),ray_pkg);
         }
         else
             return null;
     }
 
     public static List<List<GridItem>> eval_grid(OpticalModel opt_model, int fi, Integer wl, int num_rays, TraceOptions trace_options) {
-//        var osp = opt_model.optical_spec;
         var seq_model =  opt_model.seq_model;
-//        var t = osp.lookup_fld_wvl_focus(fi,wl,null);
-//        var fld = t.first;
-//        var wvl = t.second;
-//        var foc = t.third;
         return seq_model.trace_grid(SpotAnalysis::spot,fi,wl,num_rays,false,trace_options);
     }
+
+    public static SpotAnalysisResult eval(OpticalModel opt_model, int num_rays, TraceOptions trace_options) {
+        SpotAnalysisResult result = new SpotAnalysisResult();
+        var fov = opt_model.optical_spec.fov;
+        for (int fi = 0; fi < fov.fields.length; fi++) {
+            Field f = fov.fields[fi];
+            result.add(f, eval_grid(opt_model,fi,null,num_rays,trace_options));
+        }
+        return result;
+    }
+
 }

@@ -1,4 +1,4 @@
-// Copyright 2017-2015 Michael J. Hayford
+// Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.elem.transform;
@@ -83,7 +83,7 @@ public class Transform {
             // iterate in reverse over the segments before the
             // global reference surface
             int step = -1;
-            seq = zip_longest(
+            seq = SequentialModel.zip_longest(
                     Lists.slice(seq_model.ifcs, glo, null, step),
                     Lists.slice(seq_model.gaps, glo - 1, null, step),
                     Lists.slice(seq_model.z_dir, glo - 1, null, step));
@@ -94,9 +94,10 @@ public class Transform {
             tfrms = Lists.slice(tfrms, null, null, -1); // reverse
         }
         // Compute transforms from global surface to image surface
-        seq = zip_longest(Lists.from(seq_model.ifcs, glo),
-                            Lists.from(seq_model.gaps, glo),
-                            Lists.from(seq_model.z_dir,glo));
+        seq = SequentialModel.zip_longest(
+                    Lists.from(seq_model.ifcs, glo),
+                    Lists.from(seq_model.gaps, glo),
+                    Lists.from(seq_model.z_dir,glo));
         var iter = seq.iterator();
         b4_seg = iter.next();
         accumulate_transforms(iter,b4_seg,Transform::forward_transform,tfrm_origin,1,tfrms);
@@ -136,7 +137,7 @@ public class Transform {
         List<Tfm3d> tfrms = new ArrayList<>();
         if (step == -1) {
             if (seq == null) {
-                seq = zip_longest(
+                seq = Lists.zip_longest(
                     Lists.slice(seq_model.ifcs, num_ifcs, null, step),
                     Lists.slice(seq_model.gaps, num_ifcs-1, null, step));
             }
@@ -144,7 +145,7 @@ public class Transform {
         }
         else if (step == 1) {
             if (seq == null) {
-                seq = zip_longest(
+                seq = Lists.zip_longest(
                     Lists.step(seq_model.ifcs, step),
                     Lists.step(seq_model.gaps, step));
             }
@@ -157,11 +158,6 @@ public class Transform {
     /**
      * generate transform rotation and translation from
      *         s1 coords to s2 coords
-     *
-     * @param s1
-     * @param zdist
-     * @param s2
-     * @return
      */
     public static Tfm3d forward_transform(Interface s1, double zdist, Interface s2) {
         // calculate origin of s2 wrt to s1
@@ -170,19 +166,19 @@ public class Transform {
                 r_before_s2 = null;
         if (s1.decenter != null) {
             // get transformation info after s1
-            Pair<Matrix3, Vector3> after = s1.decenter.tform_after_surf();
-            r_after_s1 = after.first;
-            Vector3 t_after_s1 = after.second;
+            var after = s1.decenter.tform_after_surf();
+            r_after_s1 = after.rt;
+            Vector3 t_after_s1 = after.t;
             t_orig = t_orig.add(t_after_s1);
         }
         if (s2.decenter != null) {
             // get transformation info before s2
-            Pair<Matrix3, Vector3> before = s2.decenter.tform_before_surf();
-            r_before_s2 = before.first;
-            Vector3 t_before_s2 = before.second;
+            var before = s2.decenter.tform_before_surf();
+            r_before_s2 = before.rt;
+            Vector3 t_before_s2 = before.t;
             t_orig = t_orig.add(t_before_s2);
         }
-        Matrix3 r_cascade = Matrix3.IDENTITY;
+        var r_cascade = Matrix3.IDENTITY;
         if (r_after_s1 != null) {
             // rotate the origin of s2 around s1 "after" transformation
             t_orig = r_after_s1.multiply(t_orig);
@@ -200,11 +196,6 @@ public class Transform {
     /**
      * generate transform rotation and translation from
      *         s2 coords to s1 coords
-     *
-     * @param s1
-     * @param zdist
-     * @param s2
-     * @return
      */
     public static Tfm3d reverse_transform(Interface s1, double zdist, Interface s2) {
         // calculate origin of s2 wrt to s1
@@ -213,21 +204,21 @@ public class Transform {
                 r_before_s2 = null;
         if (s1.decenter != null) {
             // get transformation info after s1
-            Pair<Matrix3, Vector3> after = s1.decenter.tform_after_surf();
-            r_after_s1 = after.first;
-            Vector3 t_after_s1 = after.second;
+            var after = s1.decenter.tform_after_surf();
+            r_after_s1 = after.rt;
+            Vector3 t_after_s1 = after.t;
             t_orig = t_orig.add(t_after_s1);
         }
         if (s2.decenter != null) {
             // get transformation info before s2
-            Pair<Matrix3, Vector3> before = s2.decenter.tform_before_surf();
-            r_before_s2 = before.first;
-            Vector3 t_before_s2 = before.second;
+            var before = s2.decenter.tform_before_surf();
+            r_before_s2 = before.rt;
+            Vector3 t_before_s2 = before.t;
             t_orig = t_orig.add(t_before_s2);
         }
         // going in reverse direction so negate translation
         t_orig = t_orig.negate();
-        Matrix3 r_cascade = Matrix3.IDENTITY;
+        var r_cascade = Matrix3.IDENTITY;
         if (r_before_s2 != null) {
             // rotate the origin of s1 around s2 "before" transformation
             r_cascade = r_before_s2.transpose();
@@ -254,23 +245,21 @@ public class Transform {
      *
      *         - **b4_pt** - ray intersection pt wrt following seg
      *         - **b4_dir** - ray direction cosine wrt following seg
-     * @param ifc
-     * @param ray_seg
      */
     public static RayData transform_after_surface(Interface ifc, RayData ray_seg) {
         Vector3 b4_pt;
         Vector3 b4_dir;
         if (ifc.decenter != null) {
             // get transformation info after surf
-            Pair<Matrix3, Vector3> xform = ifc.decenter.tform_after_surf();
-            Matrix3 r = xform.first;
-            Vector3 t = xform.second;
+            var xform = ifc.decenter.tform_after_surf();
+            var r = xform.rt;
+            var t = xform.t;
             if (r == null) {
                 b4_pt = ray_seg.pt.minus(t);
                 b4_dir = ray_seg.dir;
             }
             else {
-                Matrix3 rt = r.transpose();
+                var rt = r.transpose();
                 b4_pt = rt.multiply(ray_seg.pt.minus((t)));
                 b4_dir = rt.multiply(ray_seg.dir);
             }
@@ -280,31 +269,6 @@ public class Transform {
             b4_dir = ray_seg.dir;
         }
         return new RayData(b4_pt, b4_dir);
-    }
-
-    public static List<Pair<Interface, Gap>> zip_longest(List<Interface> ifcs, List<Gap> gaps) {
-        List<Pair<Interface, Gap>> list = new ArrayList<>();
-        for (int i = 0; i < Math.max(ifcs.size(), gaps.size()); i++) {
-            Interface ifc = i < ifcs.size() ? ifcs.get(i) : null;
-            Gap g = i < gaps.size() ? gaps.get(i) : null;
-            list.add(new Pair<>(ifc, g));
-        }
-        return list;
-    }
-
-    public static List<PathSeg> zip_longest(List<Interface> ifcs,
-                                                List<Gap> gaps,
-                                                List<ZDir> z_dir) {
-        List<PathSeg> list = new ArrayList<>();
-        List<Integer> sizes = List.of(ifcs.size(), gaps.size(), z_dir.size());
-        int maxSize = sizes.stream().max(Comparator.naturalOrder()).orElse(0);
-        for (int i = 0; i < maxSize; i++) {
-            Interface ifc = i < ifcs.size() ? ifcs.get(i) : null;
-            Gap gap = i < gaps.size() ? gaps.get(i) : null;
-            ZDir dir = i < z_dir.size() ? z_dir.get(i) : null;
-            list.add(new PathSeg(ifc, gap, null, null, dir));
-        }
-        return list;
     }
 
 }

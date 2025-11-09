@@ -1,5 +1,5 @@
 /* Code derived from https://github.com/jvanverth/essentialmath */
-// Portions Copyright 2017-2015 Michael J. Hayford
+// Portions Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 

@@ -1,4 +1,4 @@
-// Copyright 2017-2015 Michael J. Hayford
+// Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.specs;
@@ -7,9 +7,9 @@ import org.redukti.mathlib.M;
 import org.redukti.mathlib.Matrix3;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.optical.OpticalModel;
-import org.redukti.rayoptics.parax.firstorder.Etendue;
-import org.redukti.rayoptics.parax.firstorder.FirstOrder;
-import org.redukti.rayoptics.parax.firstorder.ParaxData;
+import org.redukti.rayoptics.parax.Etendue;
+import org.redukti.rayoptics.parax.FirstOrder;
+import org.redukti.rayoptics.parax.ParaxData;
 import org.redukti.rayoptics.raytr.PupilType;
 import org.redukti.rayoptics.raytr.Trace;
 import org.redukti.rayoptics.util.Pair;
@@ -40,7 +40,7 @@ public class OpticalSpecs {
     /**
      * Wavelengths
      */
-    public WvlSpec spectral_region;
+    public WvlSpec wvls;
     /**
      * Focal position
      */
@@ -52,7 +52,7 @@ public class OpticalSpecs {
 
     public OpticalSpecs(OpticalModel opt_model) {
         this.opt_model = opt_model;
-        this.spectral_region = new WvlSpec(new WvlWt[]{new WvlWt("d", 1.)}, 0);
+        this.wvls = new WvlSpec(new WvlWt[]{new WvlWt("d", 1.)}, 0);
         this.pupil = new PupilSpec(this, new Pair<>(ImageKey.Object, ValueKey.EPD), 1.0);
         this.fov = new FieldSpec(this, new Pair<>(ImageKey.Object, ValueKey.Angle), new double[]{0.});
         this.focus = new FocusRange();
@@ -61,14 +61,19 @@ public class OpticalSpecs {
     }
 
     public void update_model() {
-        spectral_region.update_model();
+        wvls.update_model();
         pupil.update_model();
         fov.update_model();
-        Integer stop = opt_model.seq_model.stop_surface;
-        double wvl = spectral_region.central_wvl();
+    }
 
-        if (opt_model.seq_model.get_num_surfaces() > 2) {
-            parax_data = FirstOrder.compute_first_order(opt_model, stop, wvl,null);
+    public void update_optical_properies() {
+        var opm = opt_model;
+        var sm = opm.seq_model;
+        if (sm.get_num_surfaces() > 2) {
+            var stop = sm.stop_surface;
+            var wvl = wvls.central_wvl();
+            var parax_pkg = FirstOrder.compute_first_order(opm,stop,wvl);
+            parax_data = parax_pkg;
             if (do_aiming) {
                 for (int i = 0; i < fov.fields.length; i++) {
                     Field fld = fov.fields[i];
@@ -80,6 +85,13 @@ public class OpticalSpecs {
                 }
             }
         }
+    }
+
+    public void apply_scale_factor(double scale_factor) {
+        wvls.apply_scale_factor(scale_factor);
+        pupil.apply_scale_factor(scale_factor);
+        fov.apply_scale_factor(scale_factor);
+        focus.apply_scale_factor(scale_factor);
     }
 
     public Coord obj_coords(Field fld) {
@@ -107,9 +119,9 @@ public class OpticalSpecs {
         if (fr == null)
             fr = 0.0;
         if (wl == null)
-            wvl = spectral_region.central_wvl();
+            wvl = wvls.central_wvl();
         else
-            wvl = spectral_region.wavelengths[wl];
+            wvl = wvls.wavelengths[wl];
         Field fld = fov.fields[fi];
         double foc = defocus().get_focus(fr);
         return new Triple<>(fld, wvl, foc);
@@ -158,7 +170,7 @@ public class OpticalSpecs {
         var d0 = coord.dir;
 
         var opt_model = this.opt_model;
-        var fod = opt_model.parax_model.parax_data.fod;
+        var fod = parax_data.fod;
         // if image space specification, swap in the corresponding first order
         // object space parameter
         if (pupil_oi_key == ImageKey.Image) {
@@ -263,4 +275,10 @@ public class OpticalSpecs {
         return new Coord(pt0,dir0);
     }
 
+    public WvlSpec spectral_region() {
+        return wvls;
+    }
+    public FieldSpec field_of_view() {
+        return fov;
+    }
 }

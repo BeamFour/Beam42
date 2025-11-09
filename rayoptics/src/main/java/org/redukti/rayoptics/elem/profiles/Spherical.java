@@ -1,4 +1,4 @@
-// Copyright 2017-2015 Michael J. Hayford
+// Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.elem.profiles;
@@ -30,9 +30,29 @@ public class Spherical extends SurfaceProfile {
         return null;
     }
 
+    /**
+     * surface function for Spherical profile
+     *
+     *         This function implements Spencer's eq 25, with kappa=1 (i.e. spherical).
+     *
+     *         To see this, start with the code:
+     *         F = p[2] - 0.5*cv*(np.dot(p, p))
+     *
+     *         Expand np.dot(p, p):
+     *         F = p[2] - 0.5*cv*(p[0]*p[0] + p[1]*p[1] + p[2]*p[2])
+     *
+     *         in Spencer's notation:
+     *         rho**2 = p[0]*p[0] + p[1]*p[1]
+     *         Z = p[2]
+     *
+     *         Substituting notation, the result is:
+     *         F = Z - 0.5*cv*(rho**2 + Z**2)
+     *
+     *         which is Spencer's eq 25.
+     */
     @Override
     public double f(Vector3 p) {
-        return p.z - 0.5 * cv * p.lengthSquared();
+        return p.z - 0.5 * cv * p.dot(p);
     }
 
     @Override
@@ -84,14 +104,13 @@ public class Spherical extends SurfaceProfile {
 //         cx2 = 2c
 
         double ax2 = cv;
-        double cx2 = cv * p.lengthSquared() - 2.0 * p.z;
+        double cx2 = cv * p.dot(p) - 2.0 * p.z;
         double b = cv * d.dot(p) - d.z;
         double s = 0.0;
-        try {
-            s = cx2 / (z_dir.value * Math.sqrt(b * b - ax2 * cx2) - b);
-        } catch (Exception e) {
-            throw new TraceMissedSurfaceException(e);
-        }
+        double tmp = b * b - ax2 * cx2;
+        if (tmp < 0)
+            throw new TraceMissedSurfaceException();
+        s = cx2 / (z_dir.value * Math.sqrt(tmp) - b);
         Vector3 p1 = p.add(d.times(s));
         return new IntersectionResult(s, p1);
     }

@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
 import org.redukti.rayoptics.optical.OpticalModel;
-import org.redukti.rayoptics.parax.firstorder.FirstOrderData;
-import org.redukti.rayoptics.parax.firstorder.ParaxialModel;
+import org.redukti.rayoptics.parax.FirstOrderData;
 import org.redukti.rayoptics.raytr.*;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.seq.SurfaceData;
@@ -21,10 +20,9 @@ public class Nikkor14mmTest {
         OpticalModel opm = new OpticalModel();
         SequentialModel sm = opm.seq_model;
         OpticalSpecs osp = opm.optical_spec;
-        ParaxialModel pm = opm.parax_model;
         osp.pupil = new PupilSpec(osp, new Pair<>(ImageKey.Image, ValueKey.Fnum), 4.0);
         osp.fov = new FieldSpec(osp, new Pair<>(ImageKey.Object, ValueKey.Angle), new double[]{0., 57.68}, true);
-        osp.spectral_region = new WvlSpec(
+        osp.wvls = new WvlSpec(
                 new WvlWt[]{
                         new WvlWt(486.1327, 0.5),
                         new WvlWt(587.5618, 1.0),
@@ -122,8 +120,7 @@ public class Nikkor14mmTest {
         System.out.println(sm.list_gaps(new StringBuilder()).toString());
         sm.do_apertures = false;
         opm.update_model();
-        pm.first_order_data();
-        FirstOrderData fod = pm.parax_data.fod;
+        FirstOrderData fod = osp.parax_data.fod;
         Assertions.assertEquals(14.42, fod.efl, 0.001);
         Assertions.assertEquals(15.5, fod.ffl, 0.01);
         Assertions.assertEquals(29.92, fod.pp1, 0.01);

@@ -1,4 +1,4 @@
-// Copyright 2017-2015 Michael J. Hayford
+// Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.raytr;
@@ -38,7 +38,7 @@ public class RayTrace {
         double sqrrt = Math.sqrt(sqrrt_in);
         double n_cosIp = cosI > 0 ? sqrrt : -sqrrt;
         double alpha = n_cosIp - n_in*cosI;
-        Vector3 d_out = (d_in.times(n_in).plus(normal.times(alpha))).times(1.0 / n_out);
+        Vector3 d_out = (d_in.times(n_in).plus(normal.times(alpha))).divide(n_out);
         return d_out;
     }
 
@@ -243,7 +243,7 @@ public class RayTrace {
                 if (options.check_apertures &&
                     in_surface_range(first_surf,last_surf,surf) &&
                         interact_mode != InteractMode.PHANTOM) {
-                    if (options.pt_inside_fuzz != null && !ifc.point_inside(inc_pt.x, inc_pt.y, options.pt_inside_fuzz))
+                    if (!ifc.point_inside(inc_pt.x, inc_pt.y, options.pt_inside_fuzz))
                         throw new TraceRayBlockedException(ifc, inc_pt);
                 }
 

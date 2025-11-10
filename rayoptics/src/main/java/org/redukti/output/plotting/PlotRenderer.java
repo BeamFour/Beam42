@@ -46,7 +46,7 @@ public class PlotRenderer {
         _decimal_format = MathUtils.decimal_format(0);
     }
 
-    void draw_plot(RendererViewport r, Plot plot) {
+    public void draw_plot(RendererViewport r, Plot plot) {
         switch (plot.get_dimensions()) {
             case 1: {
                 set_2d_plot_window(r, plot);
@@ -82,8 +82,7 @@ public class PlotRenderer {
         Vector2Pair _window2d = r.get_window2d();
         Vector2 _2d_output_res = r.get_2d_output_res();
         if ((style.get_style() & PlotStyleMask.InterpolatePlot.value()) != 0) {
-            final double x_step
-                    = (_window2d.v1.x() - _window2d.v0.x()) / _2d_output_res.x();
+            final double x_step = (_window2d.v1.x() - _window2d.v0.x()) / _2d_output_res.x();
             Range xr = data.get_x_range(0);
             double x_low = Math.max(_window2d_fit.v0.x(), xr.first);
             double x_high = Math.min(_window2d_fit.v1.x(), xr.second);
@@ -92,7 +91,8 @@ public class PlotRenderer {
             for (double x = x_low + x_step; x < x_high + x_step / 2; x += x_step) {
                 double y2 = data.interpolate(x);
 
-                r.draw_segment(new Vector3Pair(new Vector3(x - x_step, y1, 0),
+                r.draw_segment(new Vector3Pair(
+                                new Vector3(x - x_step, y1, 0),
                                 new Vector3(x, y2, 0)),
                         style.get_color());
 
@@ -124,7 +124,6 @@ public class PlotRenderer {
         if ((style.get_style() & PlotStyleMask.PointPlot.value()) != 0) {
             for (int j = 0; j < data.get_count(); j++) {
                 Vector2 p = new Vector2(data.get_x_value(j), data.get_y_value(j));
-
                 r.draw_point(p, style.get_color(), PointStyleCross);
             }
         }
@@ -134,7 +133,6 @@ public class PlotRenderer {
         if ((style.get_style() & PlotStyleMask.ValuePlot.value()) != 0) {
             for (int j = 0; j < data.get_count(); j++) {
                 EnumSet<Renderer.TextAlignMask> a;
-                // FIXME remove use of data pair
                 Range p = new Range(data.get_x_value(j),
                         data.get_y_value(j));
 
@@ -142,21 +140,21 @@ public class PlotRenderer {
                 double next = j + 1 < data.get_count() ? data.get_y_value(j + 1)
                         : p.second;
 
-                if (p.second
-                        > prev) // FIXME use derivative to find best text position
+                if (p.second > prev) // FIXME use derivative to find best text position
                 {
                     if (p.second > next)
                         a = EnumSet.of(TextAlignBottom, TextAlignCenter);
                     else
                         a = EnumSet.of(TextAlignBottom, TextAlignRight);
-                } else {
+                }
+                else {
                     if (p.second > next)
                         a = EnumSet.of(TextAlignTop, TextAlignRight);
                     else
                         a = EnumSet.of(TextAlignBottom, TextAlignLeft);
                 }
 
-                String s = String.format(".2f", p.second);
+                String s = String.format("%.02f", p.second);
 
                 r.draw_text(new Vector2(p.first, p.second), Vector2.vector2_10,
                         s, a, 12, style.get_color());
@@ -298,21 +296,9 @@ public class PlotRenderer {
             // draw grid
             for (int x = min[0]; x <= max[0]; x++)
                 for (int y = min[1]; y <= max[1]; y++) {
-                    switch (N) {
-//                        case 3:
-//                            for (int z = min[2]; z <= max[2]; z++)
-//                                renderer.draw_point (new Vector3 (p[0] + x * step[0],
-//                                p[1] + y * step[1],
-//                                p[2] + z * step[2]),
-//                            renderer.get_style_color (StyleForeground));
-//                            break;
-
-                        case 2:
-                            renderer.draw_point(
+                    renderer.draw_point(
                                     new Vector2(p.v(0) + x * step[0], p.v(1) + y * step[1]),
                                     renderer.get_style_color(StyleForeground), Renderer.PointStyle.PointStyleDot);
-                            break;
-                    }
                 }
         }
     }
@@ -344,19 +330,15 @@ public class PlotRenderer {
 
         // draw tic value text
         if (ax._values) {
-            EnumSet<Renderer.TextAlignMask> align0 = EnumSet.of(TextAlignCenter, TextAlignTop);
-            EnumSet<Renderer.TextAlignMask> align1 = EnumSet.of(TextAlignRight, TextAlignMiddle);
-            EnumSet<Renderer.TextAlignMask> align2 = EnumSet.of(TextAlignTop, TextAlignCenter);
+            EnumSet<Renderer.TextAlignMask>[] alignments = new EnumSet[]  {
+                EnumSet.of(TextAlignCenter, TextAlignTop),
+                EnumSet.of(TextAlignRight, TextAlignMiddle),
+                EnumSet.of(TextAlignTop, TextAlignCenter)};
 
             String s = _decimal_format.format((x + p.v(i) - a._origin.v(i)) / Math.pow(10., pow10));
-            switch (N) {
-                case 2:
-                    EnumSet<Renderer.TextAlignMask> align = i == 0 ? align0
-                            : (i == 1 ? align1 : align2);
-                    r.draw_text(vtic, Vector2.vector2_10, s, align, 12,
+            EnumSet<Renderer.TextAlignMask> align = alignments[i];
+            r.draw_text(vtic, Vector2.vector2_10, s, align, 12,
                             r.get_style_color(StyleForeground));
-                    break;
-            }
         }
     }
 }

@@ -9,6 +9,7 @@ import org.redukti.output.data.Interpolation;
 import org.redukti.output.data.Range;
 import org.redukti.output.plotting.Plot;
 import org.redukti.output.plotting.PlotAxes;
+import org.redukti.output.plotting.PlotRenderer;
 import org.redukti.output.plotting.PlotStyleMask;
 import org.redukti.output.rendering.Renderer;
 import org.redukti.output.rendering.RendererSvg;
@@ -253,7 +254,8 @@ public class Nikkor58mmTest {
         //plot.get_axes().set_unit("",false,false,0, PlotAxes.AxisMask.X);
         //plot.get_axes().set_unit("",false,false,0, PlotAxes.AxisMask.Y);
         RendererSvg r = new RendererSvg(640,480);
-        r.draw_plot(plot);
+        PlotRenderer plotRenderer = new PlotRenderer();
+        plotRenderer.draw_plot(r,plot);
         System.out.println(r.write(new StringBuilder()));
 
         var waveAber = WavefrontAberrationAnalysis.eval_opd_fan(opm,1,1,21,new TraceOptions());

@@ -134,10 +134,12 @@ public class SequentialModel {
      * @param step  increment or stride of range
      * @return (* * ifcs, gaps, lcl_tfrms, rndx, z_dir * *)
      */
-    public List<PathSeg> path(Double wl, Integer start, Integer stop, int step) {
+    public List<PathSeg> path(Double wl, Integer start, Integer stop, Integer step) {
         if (wl == null)
             wl = central_wavelength();
         Integer gap_start;
+        if (step == null)
+            step = 1;
         if (step < 0)
             gap_start = start != null ? start - 1 : null;
         else
@@ -156,6 +158,9 @@ public class SequentialModel {
                 rndx,
                 Lists.slice(z_dir, start, stop, step)
         );
+    }
+    public List<PathSeg> path() {
+        return path(null,null,null,null);
     }
 
     /**

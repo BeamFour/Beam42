@@ -639,6 +639,27 @@ public class Trace {
         return new ChiefRayPkg(cr, cr_exp_seg);
     }
 
+    public static void apply_paraxial_vignetting(OpticalModel opt_model) {
+        var fov = opt_model.optical_spec.field_of_view();
+        var pm = opt_model.parax_model;
+        var mf = fov.max_field();
+        var max_field = mf.first;
+        var jth = mf.second;
+        for (int j = 0; j < fov.fields.length; j++) {
+            var fld = fov.fields[j];
+            var rel_fov = Math.sqrt(fld.x*fld.x + fld.y*fld.y);
+            if (!fov.is_relative && max_field != 0)
+                rel_fov = rel_fov/max_field;
+            var vg = pm.paraxial_vignetting(rel_fov);
+            var min_vly = vg.first;
+            var min_vuy = vg.second;
+            if (min_vly.second != null)
+                fld.vly = 1.0 - min_vly.first;
+            if (min_vuy.second != null)
+                fld.vuy = 1.0 - min_vuy.first;
+        }
+    }
+
     /**
      * Get the chief ray package at **fld**, computing it if necessary.
      *

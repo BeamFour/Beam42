@@ -3,6 +3,7 @@
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.optical;
 
+import org.redukti.rayoptics.parax.ParaxModel;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.specs.OpticalSpecs;
 import org.redukti.rayoptics.specs.SystemSpec;
@@ -32,6 +33,7 @@ public class OpticalModel {
     public SequentialModel seq_model;
     public OpticalSpecs optical_spec;
     public SystemSpec system_spec;
+    public ParaxModel parax_model;
     public boolean radius_mode;
     public String dimensions = "mm";
 
@@ -39,6 +41,7 @@ public class OpticalModel {
         seq_model = new SequentialModel(this);
         optical_spec = new OpticalSpecs(this);
         system_spec = new SystemSpec();
+        parax_model = new ParaxModel(this,1.0);
         seq_model.update_model();
     }
     public OpticalModel() {
@@ -60,6 +63,8 @@ public class OpticalModel {
     public void update_optical_properties() {
         // OpticalSpec maintains first order and ray aiming for fields
         optical_spec.update_optical_properies();
+        // Update the ParaxialModel as needed
+        parax_model.update_model();
         // Update surface apertures, if requested (do_apertures=True)
         seq_model.update_optical_properties();
     }

@@ -128,9 +128,6 @@ public class Transform {
 
     /**
      * Return forward surface coordinates (r.T, t) for each interface.
-     * @param seq
-     * @param step
-     * @return
      */
     public static List<Tfm3d> compute_local_transforms(SequentialModel seq_model, List<Pair<Interface, Gap>> seq, int step) {
         var num_ifcs = seq_model.get_num_surfaces();
@@ -160,7 +157,6 @@ public class Transform {
      *         s1 coords to s2 coords
      */
     public static Tfm3d forward_transform(Interface s1, double zdist, Interface s2) {
-        // calculate origin of s2 wrt to s1
         Vector3 t_orig = new Vector3(0., 0., zdist);
         Matrix3 r_after_s1 = null,
                 r_before_s2 = null;
@@ -168,14 +164,14 @@ public class Transform {
             // get transformation info after s1
             var after = s1.decenter.tform_after_surf();
             r_after_s1 = after.rt;
-            Vector3 t_after_s1 = after.t;
+            var t_after_s1 = after.t;
             t_orig = t_orig.add(t_after_s1);
         }
         if (s2.decenter != null) {
             // get transformation info before s2
             var before = s2.decenter.tform_before_surf();
             r_before_s2 = before.rt;
-            Vector3 t_before_s2 = before.t;
+            var t_before_s2 = before.t;
             t_orig = t_orig.add(t_before_s2);
         }
         var r_cascade = Matrix3.IDENTITY;
@@ -195,36 +191,30 @@ public class Transform {
 
     /**
      * generate transform rotation and translation from
-     *         s2 coords to s1 coords
+     * s2 coords to s1 coords, applying transforms in the reverse order
      */
-    public static Tfm3d reverse_transform(Interface s1, double zdist, Interface s2) {
-        // calculate origin of s2 wrt to s1
+    public static Tfm3d reverse_transform(Interface s2, double zdist, Interface s1) {
         Vector3 t_orig = new Vector3(0., 0., zdist);
-        Matrix3 r_after_s1 = null,
-                r_before_s2 = null;
-        if (s1.decenter != null) {
-            // get transformation info after s1
-            var after = s1.decenter.tform_after_surf();
-            r_after_s1 = after.rt;
-            Vector3 t_after_s1 = after.t;
-            t_orig = t_orig.add(t_after_s1);
-        }
+        Matrix3 r_before_s2 = null,
+                r_after_s1 = null;
         if (s2.decenter != null) {
-            // get transformation info before s2
-            var before = s2.decenter.tform_before_surf();
-            r_before_s2 = before.rt;
-            Vector3 t_before_s2 = before.t;
+            var tfm_b4 = s2.decenter.tform_before_surf();
+            r_before_s2 = tfm_b4.rt;
+            var t_before_s2 = tfm_b4.t;
             t_orig = t_orig.add(t_before_s2);
         }
-        // going in reverse direction so negate translation
-        t_orig = t_orig.negate();
+        if (s1.decenter != null) {
+            var tfm_after = s1.decenter.tform_after_surf();
+            r_after_s1 = tfm_after.rt;
+            var t_after_s1 = tfm_after.t;
+            t_orig = t_orig.add(t_after_s1);
+        }
         var r_cascade = Matrix3.IDENTITY;
         if (r_before_s2 != null) {
-            // rotate the origin of s1 around s2 "before" transformation
             r_cascade = r_before_s2.transpose();
-            t_orig = r_cascade.multiply(t_orig); // TODO check what dot() does
+            t_orig = r_cascade.multiply(t_orig);
             if (r_after_s1 != null) {
-                r_cascade = r_cascade.multiply(r_after_s1.transpose()); // TODO check what dot does
+                r_cascade = r_cascade.multiply(r_after_s1.transpose());
             }
         }
         else if (r_after_s1 != null) {

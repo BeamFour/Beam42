@@ -1001,6 +1001,7 @@ public class Trace {
                 catch (TraceException ray_err) {
                     var result = new IterationResult();
                     result.start_coords = new double[]{0,0};
+                    result.rr = new RayResult(ray_err.ray_pkg,ray_err);
                     return result;
                 }
             } else {

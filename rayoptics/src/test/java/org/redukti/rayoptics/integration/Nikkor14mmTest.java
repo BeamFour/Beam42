@@ -158,6 +158,13 @@ public class Nikkor14mmTest {
             fld.chief_ray = t.chief_ray_pkg;
             fld.ref_sphere = t.ref_sphere;
         }
+
+        var result = Wideangle.eval_real_image_ht(opm,osp.fov.fields[1],587.5618);
+        var pt = new Vector3(0.0, -2866312975.4227800369262695,  419590299.1519107818603516);
+        var dir = new Vector3(-0.,  0.2866312938130761,  0.9580409706307147);
+        Assertions.assertEquals(130.10449270101637,result.z_enp,1e-5);
+        Assertions.assertTrue(pt.isEqual(result.ray_data.pt,1e-7));
+        Assertions.assertTrue(dir.isEqual(result.ray_data.dir,1e-7));
     }
 
     static boolean compare(RaySeg s1, RaySeg s2) {

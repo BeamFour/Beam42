@@ -235,21 +235,11 @@ public class Trace {
             if (dir0.z * opt_model.seq_model.z_dir.get(0).value < 0)
                 dir0 = dir0.negate();
         }
-        /*
-        double[] vig_pupil = fld.apply_vignetting(pupil);
-        OpticalSpecs osp = opt_model.optical_spec;
-        FirstOrderData fod = osp.parax_data.fod;
-        double eprad = fod.enp_radius;
-        double[] aim_pt = new double[]{0., 0.};
-        if (fld.aim_pt != null) {
-            aim_pt = fld.aim_pt;
-        }
-        Vector3 pt1 = new Vector3(eprad * vig_pupil[0] + aim_pt[0], eprad * vig_pupil[1] + aim_pt[1], fod.obj_dist + fod.enp_dist);
-        Vector3 pt0 = osp.obj_coords(fld);
-        Vector3 dir0 = pt1.minus(pt0);
-        dir0 = dir0.normalize();
-        */
-        return RayTrace.trace(opt_model.seq_model, pt0, dir0, wvl, options);
+        var pkg = RayTrace.trace(opt_model.seq_model, pt0, dir0, wvl, options);
+        pkg.input_pupil = new Vector2(pupil[0], pupil[1]);
+        pkg.vig_pupil = new Vector2(pupil_coords[0], pupil_coords[1]);
+        pkg.fld = fld;
+        return pkg;
     }
 
     static class BaseObjectiveFunction {
@@ -753,11 +743,11 @@ public class Trace {
             var ray_result = trace_safe(opt_model, pupil, fld, wvl, trace_options);
             if (ray_result.pkg != null) {
                 if (img_filter != null) {
-                    var result = img_filter.apply(pupil,ray_result.pkg);
+                    var result = img_filter.apply(ray_result.pkg.vig_pupil,ray_result.pkg);
                     fan.add(result);
                 }
                 else {
-                    fan.add(new GridItem(pupil,ray_result.pkg));
+                    fan.add(new GridItem(ray_result.pkg.vig_pupil,ray_result.pkg));
                 }
             }
             start = new Vector2(start.x+step.x, start.y+step.y);

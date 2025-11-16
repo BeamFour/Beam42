@@ -3,6 +3,9 @@
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.raytr;
 
+import org.redukti.mathlib.Vector2;
+import org.redukti.rayoptics.specs.Field;
+
 import java.util.List;
 
 /**
@@ -21,6 +24,16 @@ public class RayPkg {
      * wavelength (in nm) that the ray was traced in
      */
     public double wvl;
+
+    public Field fld;
+    /**
+     * Input pupil
+     */
+    public Vector2 input_pupil;
+    /**
+     * Vignetted pupil
+     */
+    public Vector2 vig_pupil;
 
     public RayPkg(List<RaySeg> ray, double op_delta, double wvl) {
         this.ray = ray;

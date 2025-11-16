@@ -20,7 +20,7 @@ public class WaveAbr {
      * Compute the reference sphere for a defocussed image point at **fld**.
      *
      *         The local transform from the final interface to the image interface is
-     *         included to facilitate infinite refernce sphere calculations.
+     *         included to facilitate infinite reference sphere calculations.
      *
      *     Args:
      *         opt_model: :class:`~.OpticalModel` instance

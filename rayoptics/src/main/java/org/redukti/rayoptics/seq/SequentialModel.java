@@ -765,8 +765,7 @@ public class SequentialModel {
         }
         // Use the central wavelength reference image point for the wavefront error calculations
         var wvls = osp.spectral_region();
-        var fans_x = new ArrayList<List<Double>>();
-        var fans_y = new ArrayList<List<Double>>();
+        var fans = new ArrayList<TraceFanPoints>();
         var fan_start = Vector2.vector2_0;
         var fan_stop = Vector2.vector2_0;
         fan_start = fan_start.set(xy,-1.0);
@@ -794,10 +793,9 @@ public class SequentialModel {
                 if (Math.abs(y_val) > max_y_val)
                     max_y_val = Math.abs(y_val);
             }
-            fans_x.add(f_x);
-            fans_y.add(f_y);
+            fans.add(new TraceFanPoints(wvl,f_x,f_y));
         }
-        return new TraceFanResult(fans_x,fans_y,max_rho_val,max_y_val);
+        return new TraceFanResult(fld,xy,fans,max_rho_val,max_y_val);
     }
 
     public List<List<GridItem>> trace_grid(

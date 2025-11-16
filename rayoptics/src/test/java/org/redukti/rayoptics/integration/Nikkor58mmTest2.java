@@ -136,7 +136,26 @@ public class Nikkor58mmTest2 {
         sm.do_apertures = false;
         opm.update_model();
         Trace.apply_paraxial_vignetting(opm);
+        //VigCalc.set_vig(opm,true);
+        //opm.update_model();
         var transAber = TransverseRayAberrationAnalysis.eval_abr_fan(opm,0,1,21,new TraceOptions());
+
+        double[] xvals = {-2.46527285e-01, -2.21874556e-01, -1.97221828e-01, -1.72569099e-01,
+  -1.47916371e-01, -1.23263642e-01, -9.86109139e-02, -7.39581854e-02,
+  -4.93054570e-02, -2.46527285e-02, -3.42125335e-17,  4.75361045e-02,
+   9.50722090e-02,  1.42608313e-01,  1.90144418e-01,  2.37680522e-01,
+   2.85216627e-01,  3.32752731e-01,  3.80288836e-01,  4.27824940e-01,
+   4.75361045e-01};
+        double[] yvals = {-0.01041473, -0.00961803, -0.00852592, -0.00726078, -0.00592679, -0.00460919,
+  -0.00337449, -0.00227133, -0.00133184, -0.00057331,  0.,          0.00061566,
+   0.0007114,   0.00049971,  0.00022418,  0.00011907,  0.00037392,  0.0011027,
+   0.00231606,  0.00389579,  0.00557028};
+
+        for (int i = 0; i < xvals.length; i++) {
+            System.out.println("x expected " + xvals[i] + " got " + transAber.fans.get(0).fan_x.get(i));
+            System.out.println("y expected " + yvals[i] + " got " + transAber.fans.get(0).fan_y.get(i));
+        }
+
 
         Plot plot = new Plot();
         plot.set_title("Transverse ray aberration");
@@ -146,8 +165,8 @@ public class Nikkor58mmTest2 {
         plot.get_axes().set_range(new Range(-0.03, 0.03), PlotAxes.AxisMask.Y);
         var set = new DiscreteSet();
         set.set_interpolation(Interpolation.Cubic);
-        var x_data = transAber.fans_x.get(0);
-        var y_data = transAber.fans_y.get(0);
+        var x_data = transAber.fans.get(0).fan_x;
+        var y_data = transAber.fans.get(0).fan_y;
         // p.set_color (light::SpectralLine::get_wavelen_color (w));
         for (int i = 0; i < x_data.size(); i++) {
             double x = x_data.get(i);

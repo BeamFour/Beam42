@@ -7,6 +7,7 @@ import org.redukti.mathlib.Vector2;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.GridItem;
 import org.redukti.rayoptics.raytr.RayPkg;
+import org.redukti.rayoptics.raytr.TraceGridByWvl;
 import org.redukti.rayoptics.raytr.TraceOptions;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.util.Lists;
@@ -28,7 +29,7 @@ public class SpotAnalysis {
             return null;
     }
 
-    public static List<List<GridItem>> eval_grid(OpticalModel opt_model, int fi, Integer wl, int num_rays, TraceOptions trace_options) {
+    public static List<TraceGridByWvl> eval_grid(OpticalModel opt_model, int fi, Integer wl, int num_rays, TraceOptions trace_options) {
         var seq_model =  opt_model.seq_model;
         return seq_model.trace_grid(SpotAnalysis::spot,fi,wl,num_rays,false,trace_options);
     }

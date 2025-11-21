@@ -26,7 +26,7 @@ Original GNU Optical License and Authors are as follows:
 package org.redukti.output.plotting;
 
 import org.redukti.output.data.Range;
-import org.redukti.output.math.Vector3;
+import org.redukti.output.math.Vec3;
 
 public class PlotAxes {
     /**
@@ -93,14 +93,14 @@ public class PlotAxes {
     public Axis[] _axes = new Axis[]{new Axis(), new Axis()};
     public boolean _grid;
     public boolean _frame;
-    public Vector3 _pos;
-    public Vector3 _origin;
+    public Vec3 _pos;
+    public Vec3 _origin;
 
     public PlotAxes() {
         _grid = false;
         _frame = true;
-        _pos = Vector3.vector3_0;
-        _origin = Vector3.vector3_0;
+        _pos = Vec3.vector3_0;
+        _origin = Vec3.vector3_0;
     }
 
     static final int[] _axes_bits = {AxisMask.X.get_value(), AxisMask.Y.get_value()};
@@ -161,28 +161,28 @@ public class PlotAxes {
     /**
      * This sets axis tics values origin.
      */
-    public void set_origin(Vector3 origin) {
+    public void set_origin(Vec3 origin) {
         _origin = origin;
     }
 
     /**
      * This returns axes tics values origin.
      */
-    public Vector3 get_origin() {
+    public Vec3 get_origin() {
         return _origin;
     }
 
     /**
      * This returns axis position
      */
-    public void set_position(Vector3 position) {
+    public void set_position(Vec3 position) {
         _pos = position;
     }
 
     /**
      * This returns axis position
      */
-    public Vector3 get_position() {
+    public Vec3 get_position() {
         return _pos;
     }
 

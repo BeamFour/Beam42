@@ -32,20 +32,20 @@ import static org.redukti.output.math.MathUtils.square;
  * Vector with 3 components named x,y,z.
  * Note that in the optical system the lens axis is z.
  */
-public class Vector3 {
+public class Vec3 {
 
     private static final int N = 3;
 
-    public static final Vector3 vector3_0 = new Vector3(0.0, 0.0, 0.0);
-    public static final Vector3 vector3_1 = new Vector3(1.0, 1.0, 1.0);
+    public static final Vec3 vector3_0 = new Vec3(0.0, 0.0, 0.0);
+    public static final Vec3 vector3_1 = new Vec3(1.0, 1.0, 1.0);
 
-    public static final Vector3 vector3_001 = new Vector3(0.0, 0.0, 1.0);
-    public static final Vector3 vector3_010 = new Vector3(0.0, 1.0, 0.0);
-    public static final Vector3 vector3_100 = new Vector3(1.0, 0.0, 0.0);
+    public static final Vec3 vector3_001 = new Vec3(0.0, 0.0, 1.0);
+    public static final Vec3 vector3_010 = new Vec3(0.0, 1.0, 0.0);
+    public static final Vec3 vector3_100 = new Vec3(1.0, 0.0, 0.0);
 
     final double[] _values;
 
-    public Vector3(double x, double y, double z) {
+    public Vec3(double x, double y, double z) {
         if (Double.isNaN(x) || Double.isNaN(y) || Double.isNaN(z)) {
             throw new IllegalArgumentException("NaN");
         }
@@ -54,11 +54,11 @@ public class Vector3 {
         this._values[1] = y;
         this._values[2] = z;
     }
-    public Vector3(double v) {
+    public Vec3(double v) {
         this(v, v, v);
     }
 
-    private Vector3(double[] values) {
+    private Vec3(double[] values) {
         this._values = values;
     }
 
@@ -74,17 +74,17 @@ public class Vector3 {
         return this._values[2];
     }
 
-    public final Vector3 x(double v) {
-        return new Vector3(v, y(), z());
+    public final Vec3 x(double v) {
+        return new Vec3(v, y(), z());
     }
-    public final Vector3 y(double v) {
-        return new Vector3(x(), v, z());
+    public final Vec3 y(double v) {
+        return new Vec3(x(), v, z());
     }
-    public final Vector3 z(double v) {
-        return new Vector3(x(), y(), v);
+    public final Vec3 z(double v) {
+        return new Vec3(x(), y(), v);
     }
 
-    public double dot(Vector3 v)
+    public double dot(Vec3 v)
     {
         double r = 0;
         for (int i = 0; i < N; i++)
@@ -99,41 +99,41 @@ public class Vector3 {
      *
      * https://en.wikipedia.org/wiki/Cross_product
      */
-    public Vector3 cross(Vector3 b) {
-        return new Vector3(y() * b.z() - z() * b.y(),
+    public Vec3 cross(Vec3 b) {
+        return new Vec3(y() * b.z() - z() * b.y(),
                 z() * b.x() - x() * b.z(),
                 x() * b.y() - y() * b.x());
     }
 
-    public Vector3 plus(Vector3 v)
+    public Vec3 plus(Vec3 v)
     {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
             r[i] = _values[i] + v._values[i];
-        return new Vector3(r);
+        return new Vec3(r);
     }
 
-    public Vector3 minus(Vector3 v)
+    public Vec3 minus(Vec3 v)
     {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
             r[i] = _values[i] - v._values[i];
-        return new Vector3(r);
+        return new Vec3(r);
     }
 
-    public Vector3 negate()
+    public Vec3 negate()
     {
         double[] r = new double[N];
         for ( int i = 0; i < N; i++)
             r[i] = -_values[i];
-        return new Vector3(r);
+        return new Vec3(r);
     }
 
-    public Vector2 project_xy() {
-        return new Vector2(x (), y());
+    public Vec2 project_xy() {
+        return new Vec2(x (), y());
     }
-    public Vector2 project_zy() {
-        return new Vector2(z (), y());
+    public Vec2 project_zy() {
+        return new Vec2(z (), y());
     }
 
     public double len ()
@@ -144,31 +144,31 @@ public class Vector3 {
         return Math.sqrt (r);
     }
 
-    public Vector3 times(double scale) {
+    public Vec3 times(double scale) {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
             r[i] = _values[i] * scale;
-        return new Vector3(r);
+        return new Vec3(r);
     }
 
-    public Vector3 divide(double scale) {
+    public Vec3 divide(double scale) {
         double[] r = new double[N];
         for (int i = 0; i < N; i++)
             r[i] = _values[i] / scale;
-        return new Vector3(r);
+        return new Vec3(r);
     }
 
-    public Vector3 normalize() {
+    public Vec3 normalize() {
         return this.divide(len());
     }
 
     public double v(int i) {
         return this._values[i];
     }
-    public Vector3 v(int i, double d) {
+    public Vec3 v(int i, double d) {
         double[] val = this._values.clone();
         val[i] = d;
-        return new Vector3(val);
+        return new Vec3(val);
     }
 
     @Override
@@ -176,7 +176,7 @@ public class Vector3 {
         return "[" + x() + ',' + y() + ',' + z() + ']';
     }
 
-    public final boolean isEqual(Vector3 other, double tolerance) {
+    public final boolean isEqual(Vec3 other, double tolerance) {
         return Math.abs(this.x() - other.x()) < tolerance &&
                 Math.abs(this.y() - other.y()) < tolerance &&
                 Math.abs(this.z() - other.z()) < tolerance;

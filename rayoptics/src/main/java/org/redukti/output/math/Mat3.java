@@ -29,12 +29,12 @@ package org.redukti.output.math;
 /**
  * 3D Matrix class - immutable implementation.
  */
-public class Matrix3 {
+public class Mat3 {
 
     /* row major storage for 3d matrix */
     private final double _values[];
 
-    private Matrix3(double[] values) {
+    private Mat3(double[] values) {
         this._values = values;
     }
 
@@ -43,12 +43,12 @@ public class Matrix3 {
     }
 
     /* Create a diagonal matrix with given values */
-    public static Matrix3 diag(double x, double y, double z) {
+    public static Mat3 diag(double x, double y, double z) {
         double values[] = new double[9];
         values[idx(0, 0)] = x;
         values[idx(1, 1)] = y;
         values[idx(2, 2)] = z;
-        return new Matrix3(values);
+        return new Mat3(values);
     }
 
     /*
@@ -60,7 +60,7 @@ public class Matrix3 {
     //
     // see https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation
     */
-    public static Matrix3 to_rotation_matrix(Quaternion q) {
+    public static Mat3 to_rotation_matrix(Quaternion q) {
         double values[] = new double[9];
         values[idx(0, 0)] = 1.0 - 2.0 * (q.y * q.y + q.z * q.z);
         values[idx(1, 0)] = 2.0 * (q.x * q.y + q.z * q.w);
@@ -73,7 +73,7 @@ public class Matrix3 {
         values[idx(0, 2)] = 2.0 * (q.x * q.z + q.y * q.w);
         values[idx(1, 2)] = 2.0 * (q.y * q.z - q.x * q.w);
         values[idx(2, 2)] = 1.0 - 2.0 * (q.x * q.x + q.y * q.y);
-        return new Matrix3(values);
+        return new Mat3(values);
     }
 
     /**
@@ -82,7 +82,7 @@ public class Matrix3 {
      * @param from Unit vector
      * @param to Unit vector
      */
-    public static Matrix3 get_rotation_between(Vector3 from, Vector3 to) {
+    public static Mat3 get_rotation_between(Vec3 from, Vec3 to) {
         // Do not know the source of following equation
         // Believe it generates a Quaternion representing the rotation
         // of vector a to vector b
@@ -93,7 +93,7 @@ public class Matrix3 {
     }
 
     /** Matrix times vector */
-    public final Vector3 times(Vector3 v) {
+    public final Vec3 times(Vec3 v) {
         double[] r = new double[3];
         for (int i = 0; i < 3; i++) {
             double s = 0;
@@ -102,11 +102,11 @@ public class Matrix3 {
             }
             r[i] = s;
         }
-        return new Vector3(r[0], r[1], r[2]);
+        return new Vec3(r[0], r[1], r[2]);
     }
 
     /** Martrix times matrix */
-    public final Matrix3 times(Matrix3 m) {
+    public final Mat3 times(Mat3 m) {
         double[] r = new double[9];
 
         for (int i = 0; i < 3; i++) {
@@ -118,11 +118,11 @@ public class Matrix3 {
                 r[idx(i, j)] = s;
             }
         }
-        return new Matrix3(r);
+        return new Mat3(r);
     }
 
     /** Matrix inverse */
-    public final Matrix3 inverse() {
+    public final Mat3 inverse() {
         // inverse = adjugate / determinant
         double s1 = _values[idx(1, 1)] * _values[idx(2, 2)] - _values[idx(2, 1)] * _values[idx(1, 2)];
         double s2 = _values[idx(1, 0)] * _values[idx(2, 2)] - _values[idx(2, 0)] * _values[idx(1, 2)];
@@ -151,14 +151,14 @@ public class Matrix3 {
         r[idx(2, 2)]
                 = +(_values[idx(0, 0)] * _values[idx(1, 1)] - _values[idx(0, 1)] * _values[idx(1, 0)]) / det;
 
-        return new Matrix3(r);
+        return new Mat3(r);
     }
 
     /** Get rotation matrix for rotation about axis.
      * @param axis the axis of rotation, x=0, y=1, z=2
      * @param angleInRadians the angle to rotate in radians
      */
-    public static Matrix3 get_rotation_matrix(int axis, double angleInRadians) {
+    public static Mat3 get_rotation_matrix(int axis, double angleInRadians) {
         assert (axis < 3 && axis >= 0);
 
         /*
@@ -221,7 +221,7 @@ public class Matrix3 {
             default:
                 throw new IllegalArgumentException("Invalid rotation axis, must be 0=x, 1=y or 2=z");
         }
-        return new Matrix3(r);
+        return new Mat3(r);
     }
 
     @Override
@@ -245,7 +245,7 @@ public class Matrix3 {
         return sb.toString();
     }
 
-    public final boolean isEquals(Matrix3 other, double tolerance) {
+    public final boolean isEquals(Mat3 other, double tolerance) {
         for (int i = 0; i < _values.length; i++) {
             if (Math.abs(_values[i]-other._values[i]) > tolerance)
                 return false;

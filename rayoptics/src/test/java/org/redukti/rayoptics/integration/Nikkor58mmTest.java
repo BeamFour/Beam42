@@ -229,7 +229,7 @@ public class Nikkor58mmTest {
         var spotAnal = SpotAnalysis.eval_grid(opm,1,1,21,new TraceOptions());
         var grids = spotAnal.get(0);
         double mean = 0, max = 0;
-        for (var grid: grids) {
+        for (var grid: grids.grid) {
             //System.out.println("pupil = " + grid.pupil.toString());
             var l = grid.pupil.len();
             //System.out.println("len = " + l);
@@ -238,7 +238,7 @@ public class Nikkor58mmTest {
             }
             mean += (l*l);
         }
-        mean = Math.sqrt(mean/grids.size());
+        mean = Math.sqrt(mean/grids.grid.size());
         Assertions.assertEquals(mean*1000,10.636873278679923,1e-15);
         Assertions.assertEquals(max*1000,26.879611127471307,1e-15);
     }

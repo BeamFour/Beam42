@@ -28,29 +28,29 @@ package org.redukti.output.math;
 
 import java.util.Objects;
 
-public class Vector2Pair {
+public class Vec2Pair {
 
-    public final Vector2 v0;
-    public final Vector2 v1;
+    public final Vec2 v0;
+    public final Vec2 v1;
 
-    public final static Vector2Pair vector2_pair_00 = new Vector2Pair(Vector2.vector2_0, Vector2.vector2_0);
+    public final static Vec2Pair vector2_pair_00 = new Vec2Pair(Vec2.vector2_0, Vec2.vector2_0);
 
-    public Vector2Pair(Vector2 v0, Vector2 b) {
+    public Vec2Pair(Vec2 v0, Vec2 b) {
         Objects.requireNonNull(v0);
         Objects.requireNonNull(b);
         this.v0 = v0;
         this.v1 = b;
     }
 
-    public final boolean isEquals(Vector2Pair other, double tolerance) {
+    public final boolean isEquals(Vec2Pair other, double tolerance) {
         return v0.isEqual(other.v0, tolerance) && v1.isEqual(other.v1, tolerance);
     }
 
-    public double ln_intersect_ln_scale(Vector2Pair line) {
+    public double ln_intersect_ln_scale(Vec2Pair line) {
         // based on
         // http://geometryalgorithms.com/Archive/algorithm_0104/algorithm_0104B.htm
 
-        Vector2 w = v0.minus(line.v0);
+        Vec2 w = v0.minus(line.v0);
 
         double d = v1.x() * line.v1.y() - v1.y() * line.v1.x();
 
@@ -62,7 +62,7 @@ public class Vector2Pair {
         return s;
     }
 
-    public Vector2 ln_intersect_ln(Vector2Pair line) {
+    public Vec2 ln_intersect_ln(Vec2Pair line) {
         return v0.plus(v1.times(ln_intersect_ln_scale(line)));
     }
 
@@ -70,8 +70,8 @@ public class Vector2Pair {
      * Create a 2d vector pair and initialize vectors from
      * specified components of vectors from an other pair.
      */
-    public static Vector2Pair from(Vector3Pair v, int c0, int c1) {
-        return new Vector2Pair(Vector2.from(v.v0, c0, c1), Vector2.from(v.v1, c0, c1));
+    public static Vec2Pair from(Vec3Pair v, int c0, int c1) {
+        return new Vec2Pair(Vec2.from(v.v0, c0, c1), Vec2.from(v.v1, c0, c1));
     }
 
     public String toString() {

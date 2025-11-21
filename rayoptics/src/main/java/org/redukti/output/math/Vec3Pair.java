@@ -34,60 +34,60 @@ Plane can be represented as two vectors: point and normal
 Ray can be represented as two vectors: origin and direction
 */
 
-public class Vector3Pair {
+public class Vec3Pair {
 
-    public static final Vector3Pair position_000_001 = new Vector3Pair(Vector3.vector3_0, Vector3.vector3_001);
+    public static final Vec3Pair position_000_001 = new Vec3Pair(Vec3.vector3_0, Vec3.vector3_001);
 
-    public final Vector3 v0;
-    public final Vector3 v1;
+    public final Vec3 v0;
+    public final Vec3 v1;
 
     /**
      * @param v0 First vector, origin / point
      * @param v1 Second vector, direction / normal
      */
-    public Vector3Pair(Vector3 v0, Vector3 v1) {
+    public Vec3Pair(Vec3 v0, Vec3 v1) {
         Objects.requireNonNull(v0);
         Objects.requireNonNull(v1);
         this.v0 = v0;
         this.v1 = v1;
     }
 
-    public final Vector3 point() {
+    public final Vec3 point() {
         return v0;
     }
 
-    public final Vector3 origin() {
+    public final Vec3 origin() {
         return v0;
     }
 
-    public final Vector3 direction() {
+    public final Vec3 direction() {
         return v1;
     }
 
-    public final Vector3 normal() {
+    public final Vec3 normal() {
         return v1;
     }
 
     public final double z0() { return  v0.z(); }
     public final double z1() { return  v1.z(); }
 
-    public final boolean isEquals(Vector3Pair other, double tolerance) {
+    public final boolean isEquals(Vec3Pair other, double tolerance) {
         return v0.isEqual(other.v0, tolerance) && v1.isEqual(other.v1, tolerance);
     }
 
-    public double pl_ln_intersect_scale(Vector3Pair line) {
+    public double pl_ln_intersect_scale(Vec3Pair line) {
         // See https://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection
         return (origin().dot(normal()) - normal().dot(line.origin())) /
                 (line.normal().dot(normal()));
     }
-    public Vector3 pl_ln_intersect (Vector3Pair line)
+    public Vec3 pl_ln_intersect (Vec3Pair line)
     {
         return line.v0.plus(line.v1.times(pl_ln_intersect_scale (line)));
     }
     /**
      * Swap the given element between the member vectors and return a new pair
      */
-    public static Vector3Pair swapElement(Vector3Pair p, int j) {
+    public static Vec3Pair swapElement(Vec3Pair p, int j) {
         double[] n0 = new double[3];
         double[] n1 = new double[3];
 
@@ -103,7 +103,7 @@ public class Vector3Pair {
                 n1[i] = p.v1.v(i);
             }
         }
-        return new Vector3Pair(new Vector3(n0[0],n0[1],n0[2]), new Vector3(n0[0],n0[1],n0[2]));
+        return new Vec3Pair(new Vec3(n0[0],n0[1],n0[2]), new Vec3(n0[0],n0[1],n0[2]));
     }
 
     public String toString() {

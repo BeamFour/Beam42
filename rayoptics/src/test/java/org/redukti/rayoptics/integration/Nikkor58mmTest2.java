@@ -1,28 +1,27 @@
 package org.redukti.rayoptics.integration;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.redukti.mathlib.Vector3;
 import org.redukti.output.data.DiscreteSet;
 import org.redukti.output.data.Interpolation;
 import org.redukti.output.data.Range;
+import org.redukti.output.math.Vec2;
+import org.redukti.output.math.Vec2Pair;
+import org.redukti.output.math.Vec3;
 import org.redukti.output.plotting.Plot;
 import org.redukti.output.plotting.PlotAxes;
 import org.redukti.output.plotting.PlotRenderer;
 import org.redukti.output.plotting.PlotStyleMask;
+import org.redukti.output.rendering.Renderer;
 import org.redukti.output.rendering.RendererSvg;
 import org.redukti.output.rendering.Rgb;
 import org.redukti.rayoptics.analysis.SpotAnalysis;
 import org.redukti.rayoptics.analysis.TransverseRayAberrationAnalysis;
-import org.redukti.rayoptics.analysis.WavefrontAberrationAnalysis;
 import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
 import org.redukti.rayoptics.optical.OpticalModel;
-import org.redukti.rayoptics.parax.FirstOrderData;
 import org.redukti.rayoptics.raytr.*;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.seq.SurfaceData;
 import org.redukti.rayoptics.specs.*;
-import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.Pair;
 
 public class Nikkor58mmTest2 {
@@ -159,7 +158,7 @@ public class Nikkor58mmTest2 {
 
         Plot plot = new Plot();
         plot.set_title("Transverse ray aberration");
-        plot.get_axes().set_position(org.redukti.output.math.Vector3.vector3_0);
+        plot.get_axes().set_position(Vec3.vector3_0);
         plot.get_axes().set_range(new Range(-1.0, 1.0), PlotAxes.AxisMask.X);
         plot.get_axes().set_tics_step(1.0,  PlotAxes.AxisMask.X);
         plot.get_axes().set_range(new Range(-0.03, 0.03), PlotAxes.AxisMask.Y);
@@ -181,7 +180,81 @@ public class Nikkor58mmTest2 {
         RendererSvg r = new RendererSvg(640,480);
         PlotRenderer plotRenderer = new PlotRenderer();
         plotRenderer.draw_plot(r,plot);
-        System.out.println(r.write(new StringBuilder()));
+        //System.out.println(r.write(new StringBuilder()));
 
+        r = new RendererSvg(480,480);
+        r.set_window(new Vec2Pair(new Vec2(-100, -100), new Vec2(100, 100)), true);
+
+        var axes = new PlotAxes();
+        axes.set_show_axes (false, PlotAxes.AxisMask.XY);
+        axes.set_label ("Sagittal distance", PlotAxes.AxisMask.X);
+        axes.set_label ("Tangential distance", PlotAxes.AxisMask.Y);
+        axes.set_unit ("m", true, true, -3, PlotAxes.AxisMask.XY);
+        axes.set_tics_count (3, PlotAxes.AxisMask.XY);
+
+        plotRenderer = new PlotRenderer();
+        plotRenderer.draw_axes_2d (r, axes);
+
+        var spot = SpotAnalysis.eval(opm,21, new TraceOptions());
+        for (var byfld : spot.spot_results)
+        {
+            for (var ray: byfld.trace_results) {
+                for (var g: ray.grid) {
+                    r.draw_point (new Vec2(g.pupil.x()*1000, g.pupil.y()*1000), get_wavelen_color(ray.wvl), Renderer.PointStyle.PointStyleDot);
+                }
+            }
+        }
+
+        System.out.println(r.write(new StringBuilder()));
+    }
+
+        /** get rgb color associated with wavelen */
+    public static Rgb get_wavelen_color (double wl) {
+        // based on algorithm from Dan Bruton
+        // (www.physics.sfasu.edu/astro/color.html)
+        // http://www.physics.sfasu.edu/astro/color/spectra.html
+
+        if (wl < 380.0 || wl > 780.0)
+            return Rgb.rgb_black;
+
+        double s = 1.0;
+
+        if (wl < 420.0)
+            s = 0.3 + 0.7 * (wl - 380.0f) / 40.0;
+        else if (wl > 700.0)
+            s = 0.3 + 0.7 * (780.0 - wl) / 80.0;
+
+        if (wl < 510.0)
+        {
+            if (wl < 490.0)
+            {
+                if (wl < 440.0)
+                    // 380 to 440
+                    return new Rgb (s * -(wl - 440.0) / 60.0, 0.0, s, 1.0);
+          else
+                // 440 to 490
+                return new Rgb (0.0, s * (wl - 440.0) / 50.0, s, 1.0);
+            }
+            else
+                // 490 to 510
+                return new Rgb (0.0, s, s * -(wl - 510.0) / 20.0, 1.0);
+        }
+        else
+        {
+            if (wl < 645.0)
+            {
+                if (wl < 580.0)
+                    // 510 to 580
+                    return new Rgb (s * (wl - 510.0) / 70.0, s, 0.0, 1.0);
+          else
+                // 580 to 645
+                return new Rgb (s, s * -(wl - 645.0) / 65.0, 0.0, 1.0);
+            }
+            else
+            {
+                // 645 to 780
+                return new Rgb (s, 0.0, 0.0, 1.0);
+            }
+        }
     }
 }

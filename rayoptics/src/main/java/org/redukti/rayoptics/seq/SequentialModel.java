@@ -798,7 +798,7 @@ public class SequentialModel {
         return new TraceFanResult(fld,xy,fans,max_rho_val,max_y_val);
     }
 
-    public List<List<GridItem>> trace_grid(
+    public List<TraceGridByWvl> trace_grid(
         TraceGridCallback fct,
         int fi,
         Integer wl,
@@ -826,7 +826,7 @@ public class SequentialModel {
         fld.chief_ray = cr_pkg;
         fld.ref_sphere = rs_pkg;
 
-        List<List<GridItem>> grids = new ArrayList<>();
+        List<TraceGridByWvl> grids = new ArrayList<>();
         var grid_start = new Vector2(-1.0, -1.0);
         var grid_stop =  new Vector2(1.0, 1.0);
         var grid_def = new TraceGridDef(grid_start,grid_stop,num_rays);
@@ -835,7 +835,7 @@ public class SequentialModel {
             var grid = Trace.trace_grid(opt_model,grid_def,fld,wvl,foc,
                     new ImgFilterImp(wi,fld,wvl,foc,fct),
                     append_if_none,trace_options);
-            grids.add(grid);
+            grids.add(new TraceGridByWvl(wvl,grid));
         }
         return grids;
     }

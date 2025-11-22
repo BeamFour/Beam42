@@ -2,11 +2,11 @@ package org.redukti.rayoptics.integration;
 
 import org.junit.jupiter.api.Test;
 import org.redukti.mathlib.Vector2;
+import org.redukti.mathlib.Vector3;
 import org.redukti.output.data.DiscreteSet;
 import org.redukti.output.data.Interpolation;
 import org.redukti.output.data.Range;
 import org.redukti.output.math.Vec2Pair;
-import org.redukti.output.math.Vec3;
 import org.redukti.output.plotting.Plot;
 import org.redukti.output.plotting.PlotAxes;
 import org.redukti.output.plotting.PlotRenderer;
@@ -158,7 +158,7 @@ public class Nikkor58mmTest2 {
 
         Plot plot = new Plot();
         plot.set_title("Transverse ray aberration");
-        plot.get_axes().set_position(Vec3.vector3_0);
+        plot.get_axes().set_position(Vector3.vector3_0);
         plot.get_axes().set_range(new Range(-1.0, 1.0), PlotAxes.AxisMask.X);
         plot.get_axes().set_tics_step(1.0,  PlotAxes.AxisMask.X);
         plot.get_axes().set_range(new Range(-0.03, 0.03), PlotAxes.AxisMask.Y);

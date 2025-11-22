@@ -26,6 +26,8 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.output.math;
 
+import org.redukti.mathlib.Vector3;
+
 /**
  * 3D Matrix class - immutable implementation.
  */
@@ -82,7 +84,7 @@ public class Mat3 {
      * @param from Unit vector
      * @param to Unit vector
      */
-    public static Mat3 get_rotation_between(Vec3 from, Vec3 to) {
+    public static Mat3 get_rotation_between(Vector3 from, Vector3 to) {
         // Do not know the source of following equation
         // Believe it generates a Quaternion representing the rotation
         // of vector a to vector b
@@ -93,16 +95,16 @@ public class Mat3 {
     }
 
     /** Matrix times vector */
-    public final Vec3 times(Vec3 v) {
+    public final Vector3 times(Vector3 v) {
         double[] r = new double[3];
         for (int i = 0; i < 3; i++) {
             double s = 0;
             for (int k = 0; k < 3; k++) {
-                s += _values[idx(i, k)] * v._values[k];
+                s += _values[idx(i, k)] * v.v(k);
             }
             r[i] = s;
         }
-        return new Vec3(r[0], r[1], r[2]);
+        return new Vector3(r[0], r[1], r[2]);
     }
 
     /** Martrix times matrix */

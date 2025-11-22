@@ -27,6 +27,7 @@ Original GNU Optical License and Authors are as follows:
 package org.redukti.output.rendering;
 
 import org.redukti.mathlib.Vector2;
+import org.redukti.mathlib.Vector3;
 import org.redukti.output.math.*;
 
 import static org.redukti.output.rendering.Renderer.Style.StyleForeground;
@@ -285,14 +286,14 @@ public abstract class RendererViewport extends Renderer {
         _feature_size = v;
     }
 
-    public void set_camera_direction (Vec3 dir)
+    public void set_camera_direction (Vector3 dir)
     {
         Tfm3 t = get_camera_transform ();
         t = t.set_direction (dir);
         set_camera_transform (t);
     }
 
-    public void set_camera_position (Vec3 pos)
+    public void set_camera_position (Vector3 pos)
     {
         Tfm3 t = get_camera_transform ();
         t = t.set_translation (pos);

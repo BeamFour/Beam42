@@ -26,9 +26,11 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.output.math;
 
+import org.redukti.mathlib.Vector3;
+
 public class Tfm3 {
 
-    public final Vec3 translation;
+    public final Vector3 translation;
     /* Rotation matrix to rotate a unit vector toward z to the required direction */
     public final Mat3 rotation_matrix;
     /** Whether to use rotation matrix */
@@ -37,7 +39,7 @@ public class Tfm3 {
     public Tfm3() {
         this.rotation_matrix = Mat3.diag(1.0, 1.0, 1.0);
         this.use_rotation_matrix = false;
-        this.translation = Vec3.vector3_0;
+        this.translation = Vector3.vector3_0;
     }
 
     public Tfm3(Vec3Pair position) {
@@ -53,12 +55,12 @@ public class Tfm3 {
         } else {
             // Get a rotation matrix representing the rotation of unit vector in z
             // to the direction vector.
-            this.rotation_matrix = Mat3.get_rotation_between(Vec3.vector3_001, position.direction());
+            this.rotation_matrix = Mat3.get_rotation_between(Vector3.vector3_001, position.direction());
             this.use_rotation_matrix = true;
         }
     }
 
-    public Tfm3(Vec3 translation, Mat3 rotation_matrix, boolean use_rotation_matrix) {
+    public Tfm3(Vector3 translation, Mat3 rotation_matrix, boolean use_rotation_matrix) {
         this.translation = translation;
         this.rotation_matrix = rotation_matrix;
         this.use_rotation_matrix = use_rotation_matrix;
@@ -67,7 +69,7 @@ public class Tfm3 {
     /**
      * Apply this transforms rotation to given vector
      */
-    public final Vec3 apply_rotation(Vec3 v) {
+    public final Vector3 apply_rotation(Vector3 v) {
         if (use_rotation_matrix)
             return this.rotation_matrix.times(v);
         else
@@ -83,7 +85,7 @@ public class Tfm3 {
      * @param c Child component
      */
     public static Tfm3 compose(Tfm3 p, Tfm3 c) {
-        Vec3 translation = p.apply_rotation(c.translation).plus(p.translation);
+        Vector3 translation = p.apply_rotation(c.translation).plus(p.translation);
         boolean use_rotation_matrix = p.use_rotation_matrix || c.use_rotation_matrix;
         Mat3 rotation_matrix = p.rotation_matrix.times(c.rotation_matrix);
         return new Tfm3(translation, rotation_matrix, use_rotation_matrix);
@@ -92,7 +94,7 @@ public class Tfm3 {
     /**
      * Transform given vector - vector is rotated and then translated.
      */
-    public final Vec3 transform(Vec3 v) {
+    public final Vector3 transform(Vector3 v) {
         return apply_rotation(v).plus(translation);
     }
 
@@ -101,7 +103,7 @@ public class Tfm3 {
      */
     public final Tfm3 inverse() {
         Mat3 rotation_matrix = this.rotation_matrix.inverse();
-        Vec3 translation = rotation_matrix.times(this.translation.negate());
+        Vector3 translation = rotation_matrix.times(this.translation.negate());
         return new Tfm3(translation, rotation_matrix, true);
     }
 
@@ -110,7 +112,7 @@ public class Tfm3 {
      *
      * @param v Vector with angles per axis
      */
-    public Tfm3 rotate_axis_by_angles(Vec3 v) {
+    public Tfm3 rotate_axis_by_angles(Vector3 v) {
         Tfm3 t = this;
         for (int i = 0; i < 3; i++) { // i stands for x,y,z axis
             if (v.v(i) != 0.0) {
@@ -146,11 +148,11 @@ public class Tfm3 {
         return new Vec3Pair(transform(p.v0), transform(p.v1));
     }
 
-    public Tfm3 set_translation(Vec3 translation) {
+    public Tfm3 set_translation(Vector3 translation) {
         return new Tfm3(translation, rotation_matrix, use_rotation_matrix);
     }
 
-    public Tfm3 set_direction(Vec3 direction) {
+    public Tfm3 set_direction(Vector3 direction) {
         if (direction.x() == 0.0 && direction.y() == 0.0) {
             if (direction.z() < 0.0) {
                 return new Tfm3(translation, Mat3.diag(1.0, 1.0, -1.0), true);
@@ -158,7 +160,7 @@ public class Tfm3 {
                 return new Tfm3(translation, Mat3.diag(1.0, 1.0, 1.0), false);
             }
         } else {
-            return new Tfm3(translation, Mat3.get_rotation_between(Vec3.vector3_001, direction), true);
+            return new Tfm3(translation, Mat3.get_rotation_between(Vector3.vector3_001, direction), true);
         }
     }
 

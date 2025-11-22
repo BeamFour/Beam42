@@ -27,6 +27,7 @@ Original GNU Optical License and Authors are as follows:
 package org.redukti.output.rendering;
 
 import org.redukti.mathlib.Vector2;
+import org.redukti.mathlib.Vector3;
 import org.redukti.output.math.*;
 import org.redukti.output.plotting.Plot;
 
@@ -167,7 +168,7 @@ public abstract class Renderer {
         draw_segment (a, b, Rgb.rgb_gray);
     }
 
-    public void draw_segment (Vec3 a, Vec3 b, Rgb rgb)
+    public void draw_segment (Vector3 a, Vector3 b, Rgb rgb)
     {
         draw_segment (new Vec3Pair(a, b), rgb);
     }

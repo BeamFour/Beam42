@@ -26,6 +26,7 @@ Original GNU Optical License and Authors are as follows:
 package org.redukti.output.plotting;
 
 import org.redukti.mathlib.Vector2;
+import org.redukti.mathlib.Vector3;
 import org.redukti.output.data.Range;
 import org.redukti.output.data.Set1d;
 import org.redukti.output.math.*;
@@ -93,8 +94,8 @@ public class PlotRenderer {
                 double y2 = data.interpolate(x);
 
                 r.draw_segment(new Vec3Pair(
-                                new Vec3(x - x_step, y1, 0),
-                                new Vec3(x, y2, 0)),
+                                new Vector3(x - x_step, y1, 0),
+                                new Vector3(x, y2, 0)),
                         style.get_color());
 
                 y1 = y2;
@@ -112,8 +113,8 @@ public class PlotRenderer {
                         data.get_y_value(j));
 
                 r.draw_segment(
-                        new Vec3Pair(new Vec3(p1.first, p1.second, 0),
-                                new Vec3(p2.first, p2.second, 0)),
+                        new Vec3Pair(new Vector3(p1.first, p1.second, 0),
+                                new Vector3(p2.first, p2.second, 0)),
                         style.get_color());
 
                 p1 = p2;

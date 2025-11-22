@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP 2022-100641 Example 1 (Cosina Voigtlander Ultron Vintage Line 28mm F2 Aspherical)
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP2022-100641	EX 1	2020	Yoshihisa Yomogida, Yuki Shibata	Cosina Co Ltd	https://patents.google.com/patent/JP2022100641A/en
+lens name	Cosina Voigtlander Ultron Vintage Line 28mm F2 Aspherical
 [constants]
 [variable distances]
 Focal Length	28.5000	undefined
@@ -10,23 +13,23 @@ Magnification	0	-0.0676
 d0	Infinity	430
 Bf	18.40	20.33
 [lens data]
-1	89.943	1.20	1.51680	23.42	64.20
+1	89.943	1.20	1.51680	23.42	64.20	BSC7
 2	22.131	5.24		19.74	
-3	-23.578	1.05	1.64769	19.30	33.84
-4	Infinity	2.75	1.91082	18.78	35.25
+3	-23.578	1.05	1.64769	19.30	33.84	E-FD2
+4	Infinity	2.75	1.91082	18.78	35.25	TAFD35
 5	-36.797	0.15		18.78	
-6	22.947	5.46	1.91082	18.78	35.25
-7	-24.267	1.10	1.76182	18.78	26.61
+6	22.947	5.46	1.91082	18.78	35.25	TAFD35
+7	-24.267	1.10	1.76182	18.78	26.61	FD14
 8	97.122	2.27		18.78	
 9	AS	3.54		14.890
-10	-17.809	1.00	1.71736	14.68	29.50
-11	17.500	3.86	1.69680	16.34	55.46
+10	-17.809	1.00	1.71736	14.68	29.50	FD1
+11	17.500	3.86	1.69680	16.34	55.46	LAC14
 12	-171.048	0.32		16.34
-13	35.878	4.85	1.88300	20.18	40.81
+13	35.878	4.85	1.88300	20.18	40.81	TAFD30
 14	-27.184	1.14		20.18	
-15	-32.873	1.50	1.62999	20.36	58.12
+15	-32.873	1.50	1.62999	20.36	58.12	BACD15
 16	-70.814	4.31		21.32	
-17	-38.030	2.10	1.80610	21.92	40.73
+17	-38.030	2.10	1.80610	21.92	40.73	M-NBFD13
 18	-43.027	Bf		24.28	
 [aspherical data]
 17	-38.030	0	-9.97E-05	-5.86E-07	7.76E-09	-2.26E-11	

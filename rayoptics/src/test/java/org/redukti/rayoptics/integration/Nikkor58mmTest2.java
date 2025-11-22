@@ -182,22 +182,18 @@ public class Nikkor58mmTest2 {
         plotRenderer.draw_plot(r,plot);
         //System.out.println(r.write(new StringBuilder()));
 
+        var spot = SpotAnalysis.eval(opm,21, new TraceOptions());
         r = new RendererSvg(480,480);
         r.set_window(new Vec2Pair(new Vector2(-100, -100), new Vector2(100, 100)), true);
-
         var axes = new PlotAxes();
         axes.set_show_axes (false, PlotAxes.AxisMask.XY);
         axes.set_label ("Sagittal distance", PlotAxes.AxisMask.X);
         axes.set_label ("Tangential distance", PlotAxes.AxisMask.Y);
         axes.set_unit ("m", true, true, -3, PlotAxes.AxisMask.XY);
         axes.set_tics_count (3, PlotAxes.AxisMask.XY);
-
         plotRenderer = new PlotRenderer();
         plotRenderer.draw_axes_2d (r, axes);
-
-        var spot = SpotAnalysis.eval(opm,21, new TraceOptions());
-        for (var byfld : spot.spot_results)
-        {
+        for (var byfld : spot.spot_results) {
             for (var ray: byfld.trace_results) {
                 for (var g: ray.grid) {
                     r.draw_point (new Vector2(g.pupil.x()*1000, g.pupil.y()*1000), get_wavelen_color(ray.wvl), Renderer.PointStyle.PointStyleDot);

@@ -839,4 +839,46 @@ public class SequentialModel {
         }
         return grids;
     }
+
+    public List<TraceGridByWvl> trace_rings(
+        TraceGridCallback fct,
+        int fi,
+        Integer wl,
+        Integer num_rings,
+        boolean append_if_none,
+        TraceOptions trace_options) {
+        // fct is applied to the raw grid and returned as a grid
+        var osp = opt_model.optical_spec;
+        var wvls = osp.wvls;
+        var wvl = central_wavelength();
+        double[] wv_list;
+        if (wl == null) {
+            wv_list = wvls.wavelengths;
+        }
+        else {
+            wv_list = new double[]{wvl};
+        }
+        var fld = osp.fov.fields[fi];
+        var foc = osp.defocus().get_focus();
+        var pc = Trace.setup_pupil_coords(opt_model, fld, wvl, foc, null, null);
+        var rs_pkg = pc.ref_sphere;
+        var cr_pkg = pc.chief_ray_pkg;
+
+        fld.chief_ray = cr_pkg;
+        fld.ref_sphere = rs_pkg;
+        if (num_rings == null) num_rings = 21;
+
+        List<TraceGridByWvl> grids = new ArrayList<>();
+        var grid_def = new TraceRingsDef();
+        grid_def.num_rings = num_rings;
+        for (int wi = 0; wi < wv_list.length; wi++) {
+            wvl =  wv_list[wi];
+            var grid = Trace.trace_rings(opt_model,grid_def,fld,wvl,foc,
+                    new ImgFilterImp(wi,fld,wvl,foc,fct),
+                    append_if_none,trace_options);
+            grids.add(new TraceGridByWvl(wvl,grid));
+        }
+        return grids;
+    }
+
 }

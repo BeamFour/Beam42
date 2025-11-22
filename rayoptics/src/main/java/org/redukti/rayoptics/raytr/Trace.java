@@ -794,6 +794,67 @@ public class Trace {
         return grid;
     }
 
+    public static List<GridItem> trace_rings(OpticalModel opt_model, TraceRingsDef grid_rng, Field fld, double wvl, double foc, ImageFilter img_filter, boolean append_if_none, TraceOptions trace_options) {
+        trace_options.rayerr_filter = null;
+        trace_options.output_filter = null;
+        trace_options.check_apertures = true;
+        trace_options.pupil_type = PupilType.REL_PUPIL;
+        trace_options.apply_vignetting = true;
+
+        var grid = new ArrayList<GridItem>();
+        // Below creates concentric rings of points that will be relative to pupil of radius 1.0
+        List<Vector2> points = new ArrayList<>();
+        double cx = grid_rng.cx, cy = grid_rng.cy;  // center of ring
+        points.add(new Vector2(cx,cy));
+        int num_rings = grid_rng.num_rings;
+        double max_radius = grid_rng.max_radius; // max radius
+        int num_points_in_ring_one = grid_rng.num_points_in_ring_one;
+        double angle_deg_ring_one = 360.0 / num_points_in_ring_one;
+        for (int ring=1; ring <= num_rings; ring++) {
+            // angular step
+            double daz = angle_deg_ring_one / ring;
+             // Odd rings offset by half-step
+            double offset = (ring % 2 == 0) ? 0.0 : 0.5*daz;
+            // Linear radius spacing
+            double r = ring * max_radius / num_rings;
+            // Number of points on this ring
+            int numPoints = num_points_in_ring_one * ring;
+            for (int jaz = 0; jaz < numPoints; jaz++) {
+                double angle_deg  = offset + jaz*daz;
+                double angle_rad = Math.toRadians(angle_deg);
+                double x = cx + r*Math.cos(angle_rad);
+                double y = cy + r*Math.sin(angle_deg);
+                points.add(new Vector2(x, y));
+            }
+        }
+
+        for (int i = 0; i < points.size(); i++) {
+            var pupil = points.get(i);
+            var ray_result = trace_safe(opt_model,pupil,fld,wvl,trace_options);
+            if (ray_result.pkg != null) {
+                if (img_filter != null) {
+                    grid.add(img_filter.apply(pupil,ray_result.pkg));
+                }
+                else {
+                    grid.add(new GridItem(pupil,ray_result.pkg));
+                }
+            }
+            else {
+                //ray outside pupil or failed
+                if (img_filter != null) {
+                    var item = img_filter.apply(pupil,null);
+                    if (item != null || append_if_none)
+                        grid.add(item);
+                }
+                else {
+                    grid.add(new GridItem(pupil,null));
+                }
+            }
+        }
+        return grid;
+    }
+
+
     static class BaseObjectiveFunctionRaw {
         final List<PathSeg> pthlist;
         final Integer ifcx;

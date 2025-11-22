@@ -1,5 +1,8 @@
 [descriptive data]
 title	WO 2022/071249 Example 2 (Nikon Nikkor Z 28mm f/2.8)
+#patent	country	number	example	year	inventors	org	link
+patent	EU	WO 2022/071249	EX 2	2021	SHIMADA, Toshiyuki	Nikon Corp	https://patentscope.wipo.int/search/en/detail.jsf?docId=WO2022071249
+lens name	Nikkor Z 28mm f/2.8
 [constants]
 [variable distances]
 Focal Length	28.824	undefined
@@ -32,7 +35,7 @@ Bf	0	0
 16	Infinity	4.50	1.80400	28.58	46.60	J-LASF015HS
 17	-36.85132	d17		28.58	
 18	-34.46648	1.20	1.64769	29.44	33.73	J-SF2
-19	173.14403	11.223		32.30	
+19	173.14403	11.17		32.30
 20	CG	1.60	1.51680	44.10	63.88
 21	CG	0.86		44.10	
 [aspherical data]
@@ -56,3 +59,4 @@ originX	40.50
 originY	194.71
 ppmm	5.403
 [notes]
+Dibyendu 19 thickness adjusted to 11.17. original value 11.223

@@ -1,3 +1,8 @@
+# Nikkor Z 28mm f/2.8
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|EU | WO 2022/071249 | EX 2 | 2021 | SHIMADA, Toshiyuki | Nikon Corp | [link](https://patentscope.wipo.int/search/en/detail.jsf?docId=WO2022071249) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -21,7 +26,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 16 | 0.0 | 4.5 | 28.58 | 1.804 | 46.6 | Hikari | J-LASF015HS |
 | 17 | -36.85132 | 3.7 | 28.58 |  |  |  |
 | 18 | -34.46648 | 1.2 | 29.44 | 1.64769 | 33.72 | Hikari | J-SF2 |
-| 19 | 173.14403 | 11.223 | 32.3 |  |  |  |
+| 19 | 173.14403 | 11.17 | 32.3 |  |  |  |
 | 20 | 0.0 | 1.6 | 44.1 | 1.5168 | 63.88 |  |
 | 21 | 0.0 | 0.86 | 44.1 |  |  |  |
 ## Aspherical Data
@@ -43,20 +48,20 @@ Note that where glass types are shown the refractive index and abbe number is as
 | parameter | value |
 | ---       | ---   |
 | effective_focal_length |28.824
-| back_focal_length | 0.86
+| back_focal_length | 0.913
 | optical_invariant | 3.875
 | object_distance | 1.0E10
 | image_distance | 0.86
 | power | 0.035
 | pp1_H | 15.447
-| ppk_H' | 27.964
+| ppk_H' | 27.911
 | ffl_F | -13.377
 | fno | 2.909
 | enp_dist_P | 3.621
 | enp_radius | 4.954
-| exp_dist_P' | -48.017
+| exp_dist_P' | -47.964
 | exp_radius | 8.401
-| m | -0
+| m | 0.002
 | red | -3.4693528096068496E8
 | n_obj | 1
 | n_img | 1
@@ -67,9 +72,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 6.941 | 12.667|
- | 0.7 | 10.526 | 44.875|
- | 1.0 | 27.835 | 116.147|
+ | 0.0 | 2.323 | 4.357|
+ | 0.7 | 10.802 | 53.366|
+ | 1.0 | 31.414 | 124.016|
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./WO2022-071249_Example02P.txt)
 * [Zemax file](./WO2022-071249_Example02P.zmx)

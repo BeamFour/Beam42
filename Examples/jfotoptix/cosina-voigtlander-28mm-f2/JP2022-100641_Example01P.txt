@@ -1,0 +1,46 @@
+[descriptive data]
+title	JP 2022-100641 Example 1 (Cosina Voigtlander Ultron Vintage Line 28mm F2 Aspherical)
+[constants]
+[variable distances]
+Focal Length	28.5000	undefined
+Angle of View	75.4	undefined
+F-Number	2.0	undefined
+Image Height	43.26	43.26
+Magnification	0	-0.0676
+d0	Infinity	430
+Bf	18.40	20.33
+[lens data]
+1	89.943	1.20	1.51680	23.42	64.20
+2	22.131	5.24		19.74	
+3	-23.578	1.05	1.64769	19.30	33.84
+4	Infinity	2.75	1.91082	18.78	35.25
+5	-36.797	0.15		18.78	
+6	22.947	5.46	1.91082	18.78	35.25
+7	-24.267	1.10	1.76182	18.78	26.61
+8	97.122	2.27		18.78	
+9	AS	3.54		14.890
+10	-17.809	1.00	1.71736	14.68	29.50
+11	17.500	3.86	1.69680	16.34	55.46
+12	-171.048	0.32		16.34
+13	35.878	4.85	1.88300	20.18	40.81
+14	-27.184	1.14		20.18	
+15	-32.873	1.50	1.62999	20.36	58.12
+16	-70.814	4.31		21.32	
+17	-38.030	2.10	1.80610	21.92	40.73
+18	-43.027	Bf		24.28	
+[aspherical data]
+17	-38.030	0	-9.97E-05	-5.86E-07	7.76E-09	-2.26E-11	
+18	-43.027	0	-4.13E-05	-3.36E-07	6.38E-09	-2.06E-11	9.67E-15
+[group data]
+Gr	10	18	69.2904
+[figure]
+source	Data/JP2022-100641_Figure01.png
+originX	298.57
+originY	571.92
+ppmm	20.989
+[figure]
+source	Data/JP2022-100641_Figure01P.png
+originX	30.52
+originY	52.50
+ppmm	3.927
+[notes]

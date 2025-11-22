@@ -26,6 +26,8 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.output.math;
 
+import org.redukti.mathlib.Vector2;
+
 import static org.redukti.output.math.MathUtils.square;
 
 /**
@@ -129,11 +131,11 @@ public class Vec3 {
         return new Vec3(r);
     }
 
-    public Vec2 project_xy() {
-        return new Vec2(x (), y());
+    public Vector2 project_xy() {
+        return new Vector2(x (), y());
     }
-    public Vec2 project_zy() {
-        return new Vec2(z (), y());
+    public Vector2 project_zy() {
+        return new Vector2(z (), y());
     }
 
     public double len ()

@@ -1,5 +1,7 @@
 package org.redukti.mathlib;
 
+import org.redukti.output.math.Vec3;
+
 public class Vector2 {
 
     public static final Vector2 vector2_0 = new Vector2(0.0, 0.0);
@@ -108,7 +110,7 @@ public class Vector2 {
         return Math.sqrt(r);
     }
 
-    public static Vector2 from(Vector3 v3, int a, int b) {
+    public static Vector2 from(Vec3 v3, int a, int b) {
         double x = v3.v(a);
         double y = v3.v(b);
         return new Vector2(x, y);

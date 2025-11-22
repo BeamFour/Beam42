@@ -26,8 +26,8 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.output.rendering;
 
+import org.redukti.mathlib.Vector2;
 import org.redukti.output.math.MathUtils;
-import org.redukti.output.math.Vec2;
 import org.redukti.output.math.Vec2Pair;
 
 import java.text.DecimalFormat;
@@ -62,7 +62,7 @@ public class RendererSvg extends Renderer2d {
         super();
 
         _decimal_format = MathUtils.decimal_format();
-        _2d_output_res = new Vec2(width, height);
+        _2d_output_res = new Vector2(width, height);
         _styles_color[StyleBackground.value] = bg;
         _styles_color[Renderer.Style.StyleForeground.value] = bg.negate();
 
@@ -227,11 +227,11 @@ public class RendererSvg extends Renderer2d {
     static String[] ids = {"dot", "cross", "round", "square", "triangle"};
 
     @Override
-    public void draw_point(Vec2 p, Rgb rgb, PointStyle s) {
+    public void draw_point(Vector2 p, Rgb rgb, PointStyle s) {
         if (s.value >= ids.length)
             s = PointStyleCross;
 
-        Vec2 v2d = trans_pos(p);
+        Vector2 v2d = trans_pos(p);
 
         svg_begin_use(ids[s.value], v2d.x(), v2d.y(), false);
         svg_add_stroke(rgb);
@@ -240,8 +240,8 @@ public class RendererSvg extends Renderer2d {
 
     @Override
     public void draw_segment(Vec2Pair l, Rgb rgb) {
-        Vec2 v2da = trans_pos(l.v0);
-        Vec2 v2db = trans_pos(l.v1);
+        Vector2 v2da = trans_pos(l.v0);
+        Vector2 v2db = trans_pos(l.v1);
 
         svg_begin_line(v2da.x(), v2da.y(), v2db.x(), v2db.y(), false);
         svg_add_stroke(rgb);
@@ -249,8 +249,8 @@ public class RendererSvg extends Renderer2d {
     }
 
     @Override
-    public void draw_circle(Vec2 c, double r, Rgb rgb, boolean filled) {
-        Vec2 v2d = trans_pos(c);
+    public void draw_circle(Vector2 c, double r, Rgb rgb, boolean filled) {
+        Vector2 v2d = trans_pos(c);
 
         svg_begin_ellipse(v2d.x(), v2d.y(), x_scale(r), y_scale(r), false);
         svg_add_stroke(rgb);
@@ -262,11 +262,11 @@ public class RendererSvg extends Renderer2d {
     }
 
     @Override
-    public void draw_text(Vec2 v, Vec2 dir,
+    public void draw_text(Vector2 v, Vector2 dir,
                           String str, EnumSet<TextAlignMask> a, int size,
                           Rgb rgb) {
         int margin = size / 2;
-        Vec2 v2d = trans_pos(v);
+        Vector2 v2d = trans_pos(v);
         double x = v2d.x();
         double y = v2d.y();
         double yo = y, xo = x;
@@ -301,7 +301,7 @@ public class RendererSvg extends Renderer2d {
     }
 
     @Override
-    public void draw_polygon(Vec2[] array,
+    public void draw_polygon(Vector2[] array,
                              Rgb rgb, boolean filled, boolean closed) {
         if (array.length < 3)
             return;
@@ -326,7 +326,7 @@ public class RendererSvg extends Renderer2d {
         _out.append(" points=\"");
 
         for (int i = 0; i < array.length; i++) {
-            Vec2 v2d = trans_pos(array[i]);
+            Vector2 v2d = trans_pos(array[i]);
 
             _out.append(format(v2d.x())).append(",").append(format(v2d.y())).append(" ");
         }
@@ -335,8 +335,8 @@ public class RendererSvg extends Renderer2d {
     }
 
 
-    Vec2 trans_pos(Vec2 v) {
-        return new Vec2(x_trans_pos(v.x()), y_trans_pos(v.y()));
+    Vector2 trans_pos(Vector2 v) {
+        return new Vector2(x_trans_pos(v.x()), y_trans_pos(v.y()));
     }
 
     double y_trans_pos(double y) {

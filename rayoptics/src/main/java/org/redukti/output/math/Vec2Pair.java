@@ -26,16 +26,18 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.output.math;
 
+import org.redukti.mathlib.Vector2;
+
 import java.util.Objects;
 
 public class Vec2Pair {
 
-    public final Vec2 v0;
-    public final Vec2 v1;
+    public final Vector2 v0;
+    public final Vector2 v1;
 
-    public final static Vec2Pair vector2_pair_00 = new Vec2Pair(Vec2.vector2_0, Vec2.vector2_0);
+    public final static Vec2Pair vector2_pair_00 = new Vec2Pair(Vector2.vector2_0, Vector2.vector2_0);
 
-    public Vec2Pair(Vec2 v0, Vec2 b) {
+    public Vec2Pair(Vector2 v0, Vector2 b) {
         Objects.requireNonNull(v0);
         Objects.requireNonNull(b);
         this.v0 = v0;
@@ -50,7 +52,7 @@ public class Vec2Pair {
         // based on
         // http://geometryalgorithms.com/Archive/algorithm_0104/algorithm_0104B.htm
 
-        Vec2 w = v0.minus(line.v0);
+        Vector2 w = v0.minus(line.v0);
 
         double d = v1.x() * line.v1.y() - v1.y() * line.v1.x();
 
@@ -62,7 +64,7 @@ public class Vec2Pair {
         return s;
     }
 
-    public Vec2 ln_intersect_ln(Vec2Pair line) {
+    public Vector2 ln_intersect_ln(Vec2Pair line) {
         return v0.plus(v1.times(ln_intersect_ln_scale(line)));
     }
 
@@ -71,7 +73,7 @@ public class Vec2Pair {
      * specified components of vectors from an other pair.
      */
     public static Vec2Pair from(Vec3Pair v, int c0, int c1) {
-        return new Vec2Pair(Vec2.from(v.v0, c0, c1), Vec2.from(v.v1, c0, c1));
+        return new Vec2Pair(Vector2.from(v.v0, c0, c1), Vector2.from(v.v1, c0, c1));
     }
 
     public String toString() {

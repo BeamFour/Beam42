@@ -26,9 +26,9 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.output.rendering;
 
+import org.redukti.mathlib.M;
 import org.redukti.mathlib.Vector2;
-import org.redukti.output.math.MathUtils;
-import org.redukti.output.math.Vec2Pair;
+import org.redukti.mathlib.Vec2Pair;
 
 import java.text.DecimalFormat;
 import java.util.EnumSet;
@@ -61,7 +61,7 @@ public class RendererSvg extends Renderer2d {
                 Rgb bg) {
         super();
 
-        _decimal_format = MathUtils.decimal_format();
+        _decimal_format = M.decimal_format();
         _2d_output_res = new Vector2(width, height);
         _styles_color[StyleBackground.value] = bg;
         _styles_color[Renderer.Style.StyleForeground.value] = bg.negate();

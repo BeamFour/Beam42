@@ -6,7 +6,7 @@ import org.redukti.mathlib.Vector3;
 import org.redukti.output.data.DiscreteSet;
 import org.redukti.output.data.Interpolation;
 import org.redukti.output.data.Range;
-import org.redukti.output.math.Vec2Pair;
+import org.redukti.mathlib.Vec2Pair;
 import org.redukti.output.plotting.Plot;
 import org.redukti.output.plotting.PlotAxes;
 import org.redukti.output.plotting.PlotRenderer;

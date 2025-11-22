@@ -24,9 +24,7 @@ Original GNU Optical License and Authors are as follows:
  */
 
 
-package org.redukti.output.math;
-
-import org.redukti.mathlib.Vector2;
+package org.redukti.mathlib;
 
 public class Triangle2 {
     private static final int N = 3;

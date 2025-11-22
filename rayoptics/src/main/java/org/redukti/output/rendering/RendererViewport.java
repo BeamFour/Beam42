@@ -26,9 +26,10 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.output.rendering;
 
+import org.redukti.mathlib.Tfm3;
+import org.redukti.mathlib.Vec2Pair;
 import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
-import org.redukti.output.math.*;
 
 import static org.redukti.output.rendering.Renderer.Style.StyleForeground;
 

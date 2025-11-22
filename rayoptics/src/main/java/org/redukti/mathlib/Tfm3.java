@@ -24,10 +24,7 @@ Original GNU Optical License and Authors are as follows:
  */
 
 
-package org.redukti.output.math;
-
-import org.redukti.mathlib.Matrix3;
-import org.redukti.mathlib.Vector3;
+package org.redukti.mathlib;
 
 public class Tfm3 {
 

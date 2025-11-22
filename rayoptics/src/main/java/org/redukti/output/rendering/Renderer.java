@@ -26,9 +26,7 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.output.rendering;
 
-import org.redukti.mathlib.Vector2;
-import org.redukti.mathlib.Vector3;
-import org.redukti.output.math.*;
+import org.redukti.mathlib.*;
 import org.redukti.output.plotting.Plot;
 
 import java.util.EnumSet;

@@ -5,8 +5,6 @@
 
 package org.redukti.mathlib;
 
-import org.redukti.output.math.Quaternion;
-
 /**
  * Column major 3d matrix where
  *

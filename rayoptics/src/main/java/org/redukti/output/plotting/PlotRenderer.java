@@ -25,11 +25,9 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.output.plotting;
 
-import org.redukti.mathlib.Vector2;
-import org.redukti.mathlib.Vector3;
+import org.redukti.mathlib.*;
 import org.redukti.output.data.Range;
 import org.redukti.output.data.Set1d;
-import org.redukti.output.math.*;
 import org.redukti.output.rendering.Renderer;
 import org.redukti.output.rendering.RendererViewport;
 
@@ -45,7 +43,7 @@ public class PlotRenderer {
     final DecimalFormat _decimal_format;
 
     public PlotRenderer() {
-        _decimal_format = MathUtils.decimal_format(0);
+        _decimal_format = M.decimal_format(0);
     }
 
     public void draw_plot(RendererViewport r, Plot plot) {
@@ -215,8 +213,8 @@ public class PlotRenderer {
 
             double s = step[i] = Math.abs(a.get_tics_step(i, r));
 
-            min[i] = MathUtils.trunc((r.first - p.v(i)) / s);
-            max[i] = MathUtils.trunc((r.second - p.v(i)) / s);
+            min[i] = M.trunc((r.first - p.v(i)) / s);
+            max[i] = M.trunc((r.second - p.v(i)) / s);
 
             pow10 = ax._pow10_scale ? (int) Math.floor(Math.log10(s)) : 0;
 

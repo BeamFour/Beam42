@@ -30,7 +30,7 @@ import org.redukti.output.util.ArrayIndex2D;
 
 import java.util.ArrayList;
 
-import static org.redukti.output.math.MathUtils.square;
+import static org.redukti.mathlib.M.square;
 
 public class Interpolated1d {
 

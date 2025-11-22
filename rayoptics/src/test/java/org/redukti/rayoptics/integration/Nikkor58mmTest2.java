@@ -1,12 +1,12 @@
 package org.redukti.rayoptics.integration;
 
 import org.junit.jupiter.api.Test;
+import org.redukti.mathlib.Vector2;
+import org.redukti.mathlib.Vector3;
 import org.redukti.output.data.DiscreteSet;
 import org.redukti.output.data.Interpolation;
 import org.redukti.output.data.Range;
-import org.redukti.output.math.Vec2;
-import org.redukti.output.math.Vec2Pair;
-import org.redukti.output.math.Vec3;
+import org.redukti.mathlib.Vec2Pair;
 import org.redukti.output.plotting.Plot;
 import org.redukti.output.plotting.PlotAxes;
 import org.redukti.output.plotting.PlotRenderer;
@@ -158,7 +158,7 @@ public class Nikkor58mmTest2 {
 
         Plot plot = new Plot();
         plot.set_title("Transverse ray aberration");
-        plot.get_axes().set_position(Vec3.vector3_0);
+        plot.get_axes().set_position(Vector3.vector3_0);
         plot.get_axes().set_range(new Range(-1.0, 1.0), PlotAxes.AxisMask.X);
         plot.get_axes().set_tics_step(1.0,  PlotAxes.AxisMask.X);
         plot.get_axes().set_range(new Range(-0.03, 0.03), PlotAxes.AxisMask.Y);
@@ -183,7 +183,7 @@ public class Nikkor58mmTest2 {
         //System.out.println(r.write(new StringBuilder()));
 
         r = new RendererSvg(480,480);
-        r.set_window(new Vec2Pair(new Vec2(-100, -100), new Vec2(100, 100)), true);
+        r.set_window(new Vec2Pair(new Vector2(-100, -100), new Vector2(100, 100)), true);
 
         var axes = new PlotAxes();
         axes.set_show_axes (false, PlotAxes.AxisMask.XY);
@@ -200,11 +200,10 @@ public class Nikkor58mmTest2 {
         {
             for (var ray: byfld.trace_results) {
                 for (var g: ray.grid) {
-                    r.draw_point (new Vec2(g.pupil.x()*1000, g.pupil.y()*1000), get_wavelen_color(ray.wvl), Renderer.PointStyle.PointStyleDot);
+                    r.draw_point (new Vector2(g.pupil.x()*1000, g.pupil.y()*1000), get_wavelen_color(ray.wvl), Renderer.PointStyle.PointStyleDot);
                 }
             }
         }
-
         System.out.println(r.write(new StringBuilder()));
     }
 

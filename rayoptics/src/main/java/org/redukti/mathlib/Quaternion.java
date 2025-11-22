@@ -24,7 +24,7 @@ Original GNU Optical License and Authors are as follows:
  */
 
 
-package org.redukti.output.math;
+package org.redukti.mathlib;
 
 public class Quaternion {
     public final double x, y, z, w;
@@ -40,7 +40,7 @@ public class Quaternion {
      * Get shortest arc rotation between for a to be in the same direction as b.
      * Both vectors must be unit vectors.
      */
-    public static Quaternion get_rotation_between (Vec3 a, Vec3 b)
+    public static Quaternion get_rotation_between (Vector3 a, Vector3 b)
     {
         // Do not know the source of following equation
         // Believe it generates a Quaternion representing the rotation
@@ -51,7 +51,7 @@ public class Quaternion {
         // See QuaternionBase<Derived>::setFromTwoVectors in eigen library
         // Also stackoverflow discussion
 
-        Vec3 cp = a.cross(b);
+        Vector3 cp = a.cross(b);
         double _x = cp.x ();
         double _y = cp.y ();
         double _z = cp.z ();

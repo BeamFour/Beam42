@@ -25,7 +25,7 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.output.rendering;
 
-import org.redukti.output.math.*;
+import org.redukti.mathlib.*;
 
 import java.util.EnumSet;
 
@@ -53,9 +53,9 @@ public abstract class Renderer2d extends RendererViewport {
                 = (_2d_output_res.y() / _rows) / (_2d_output_res.x() / _cols);
 
         if (out_ratio < 1.)
-            _window2d = new Vec2Pair(new Vec2(-1. / out_ratio, -1.), new Vec2(1. / out_ratio, 1.));
+            _window2d = new Vec2Pair(new Vector2(-1. / out_ratio, -1.), new Vector2(1. / out_ratio, 1.));
         else
-            _window2d = new Vec2Pair(new Vec2(-1, -out_ratio), new Vec2(1., out_ratio));
+            _window2d = new Vec2Pair(new Vector2(-1, -out_ratio), new Vector2(1., out_ratio));
         _window2d_fit = _window2d;
         update_2d_window();
         set_page(_pageid);
@@ -69,7 +69,7 @@ public abstract class Renderer2d extends RendererViewport {
     }
 
     /** project in 2d space */
-    public Vec2 project(Vec3 v) {
+    public Vector2 project(Vector3 v) {
         switch (_projection_type) {
             case Perspective:
                 return projection_perspective(v);
@@ -79,21 +79,21 @@ public abstract class Renderer2d extends RendererViewport {
     }
 
     /** project in 2d space and scale for ploting to 2d output */
-    public Vec2 project_scale(Vec3 v) {
-        Vec2 v2d = project(v);
-        return new Vec2(x_trans_pos(v2d.x()), y_trans_pos(v2d.y()));
+    public Vector2 project_scale(Vector3 v) {
+        Vector2 v2d = project(v);
+        return new Vector2(x_trans_pos(v2d.x()), y_trans_pos(v2d.y()));
     }
 
-    public Vec2 projection_ortho(Vec3 v) {
+    public Vector2 projection_ortho(Vector3 v) {
         return _cam_transform.transform(v).project_xy();
     }
 
-    public Vec2 projection_perspective(Vec3 v) {
-        Vec3 t = _cam_transform.transform(v);
-        return new Vec2(t.x() * _eye_dist / -t.z(), t.y() * _eye_dist / -t.z());
+    public Vector2 projection_perspective(Vector3 v) {
+        Vector3 t = _cam_transform.transform(v);
+        return new Vector2(t.x() * _eye_dist / -t.z(), t.y() * _eye_dist / -t.z());
     }
 
-    public void draw_point(Vec3 p, Rgb rgb,
+    public void draw_point(Vector3 p, Rgb rgb,
                            Renderer.PointStyle s) {
         draw_point(project(p), rgb, s);
     }
@@ -102,7 +102,7 @@ public abstract class Renderer2d extends RendererViewport {
         draw_segment(new Vec2Pair(project(l.point()), project(l.direction())), rgb);
     }
 
-    public void draw_text(Vec3 pos, Vec3 dir,
+    public void draw_text(Vector3 pos, Vector3 dir,
                           String str, Renderer.TextAlignMask a, int size,
                           Rgb rgb) {
         draw_text(project(pos), project(dir), str, EnumSet.of(a), size, rgb);

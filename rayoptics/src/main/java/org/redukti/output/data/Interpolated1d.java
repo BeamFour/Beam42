@@ -25,12 +25,12 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.output.data;
 
-import org.redukti.output.math.Vec2;
+import org.redukti.mathlib.Vector2;
 import org.redukti.output.util.ArrayIndex2D;
 
 import java.util.ArrayList;
 
-import static org.redukti.output.math.MathUtils.square;
+import static org.redukti.mathlib.M.square;
 
 public class Interpolated1d {
 
@@ -415,10 +415,10 @@ public class Interpolated1d {
 
         resizePoly(n + 1);
 
-        Vec2 vm1 = new Vec2(_data_set.get_x_value(0), _data_set.get_y_value(0));
-        Vec2 vm2 = vm1;
-        Vec2 v = new Vec2(_data_set.get_x_value(1), _data_set.get_y_value(1));
-        Vec2 vp1 = new Vec2(_data_set.get_x_value(2), _data_set.get_y_value(2));
+        Vector2 vm1 = new Vector2(_data_set.get_x_value(0), _data_set.get_y_value(0));
+        Vector2 vm2 = vm1;
+        Vector2 v = new Vector2(_data_set.get_x_value(1), _data_set.get_y_value(1));
+        Vector2 vp1 = new Vector2(_data_set.get_x_value(2), _data_set.get_y_value(2));
 
         double d1 = (v.y() - vm1.y()) / (v.x() - vm1.x());
         double d2 = (vp1.y() - vm1.y()) / (vp1.x() - vm1.x());
@@ -433,7 +433,7 @@ public class Interpolated1d {
             vm2 = vm1;
             vm1 = v;
             v = vp1;
-            vp1 = new Vec2(_data_set.get_x_value(i + 1), _data_set.get_y_value(i + 1));
+            vp1 = new Vector2(_data_set.get_x_value(i + 1), _data_set.get_y_value(i + 1));
 
             d1 = d2;
             d2 = (vp1.y() - vm1.y()) / (vp1.x() - vm1.x());

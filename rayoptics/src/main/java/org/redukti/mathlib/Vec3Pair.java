@@ -24,7 +24,7 @@ Original GNU Optical License and Authors are as follows:
  */
 
 
-package org.redukti.output.math;
+package org.redukti.mathlib;
 
 import java.util.Objects;
 
@@ -36,35 +36,35 @@ Ray can be represented as two vectors: origin and direction
 
 public class Vec3Pair {
 
-    public static final Vec3Pair position_000_001 = new Vec3Pair(Vec3.vector3_0, Vec3.vector3_001);
+    public static final Vec3Pair position_000_001 = new Vec3Pair(Vector3.vector3_0, Vector3.vector3_001);
 
-    public final Vec3 v0;
-    public final Vec3 v1;
+    public final Vector3 v0;
+    public final Vector3 v1;
 
     /**
      * @param v0 First vector, origin / point
      * @param v1 Second vector, direction / normal
      */
-    public Vec3Pair(Vec3 v0, Vec3 v1) {
+    public Vec3Pair(Vector3 v0, Vector3 v1) {
         Objects.requireNonNull(v0);
         Objects.requireNonNull(v1);
         this.v0 = v0;
         this.v1 = v1;
     }
 
-    public final Vec3 point() {
+    public final Vector3 point() {
         return v0;
     }
 
-    public final Vec3 origin() {
+    public final Vector3 origin() {
         return v0;
     }
 
-    public final Vec3 direction() {
+    public final Vector3 direction() {
         return v1;
     }
 
-    public final Vec3 normal() {
+    public final Vector3 normal() {
         return v1;
     }
 
@@ -80,7 +80,7 @@ public class Vec3Pair {
         return (origin().dot(normal()) - normal().dot(line.origin())) /
                 (line.normal().dot(normal()));
     }
-    public Vec3 pl_ln_intersect (Vec3Pair line)
+    public Vector3 pl_ln_intersect (Vec3Pair line)
     {
         return line.v0.plus(line.v1.times(pl_ln_intersect_scale (line)));
     }
@@ -103,7 +103,7 @@ public class Vec3Pair {
                 n1[i] = p.v1.v(i);
             }
         }
-        return new Vec3Pair(new Vec3(n0[0],n0[1],n0[2]), new Vec3(n0[0],n0[1],n0[2]));
+        return new Vec3Pair(new Vector3(n0[0],n0[1],n0[2]), new Vector3(n0[0],n0[1],n0[2]));
     }
 
     public String toString() {

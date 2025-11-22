@@ -26,7 +26,7 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.output.rendering;
 
-import org.redukti.output.math.*;
+import org.redukti.mathlib.*;
 import org.redukti.output.plotting.Plot;
 
 import java.util.EnumSet;
@@ -140,14 +140,14 @@ public abstract class Renderer {
     public double get_feature_size() { return _feature_size; }
 
     /** Draw a point in 2d */
-    public abstract void draw_point (Vec2 p, Rgb rgb, PointStyle s);
-    public abstract void draw_text (Vec2 pos, Vec2 dir,
+    public abstract void draw_point (Vector2 p, Rgb rgb, PointStyle s);
+    public abstract void draw_text (Vector2 pos, Vector2 dir,
                                     String str, EnumSet<TextAlignMask> a, int size,
                                     Rgb rgb);
     public abstract void draw_segment (Vec2Pair s, Rgb rgb);
     public abstract void draw_segment(Vec3Pair s, Rgb rgb);
 
-    public void draw_point(Vec2 p) {
+    public void draw_point(Vector2 p) {
         draw_point(p, Rgb.rgb_gray, PointStyle.PointStyleDot);
     }
 
@@ -157,16 +157,16 @@ public abstract class Renderer {
     }
 
     /**  Draw a line segment in 2d */
-    public void draw_segment (Vec2 a, Vec2 b, Rgb rgb)
+    public void draw_segment (Vector2 a, Vector2 b, Rgb rgb)
     {
         draw_segment (new Vec2Pair(a, b), rgb);
     }
-    public void draw_segment (Vec2 a, Vec2 b)
+    public void draw_segment (Vector2 a, Vector2 b)
     {
         draw_segment (a, b, Rgb.rgb_gray);
     }
 
-    public void draw_segment (Vec3 a, Vec3 b, Rgb rgb)
+    public void draw_segment (Vector3 a, Vector3 b, Rgb rgb)
     {
         draw_segment (new Vec3Pair(a, b), rgb);
     }
@@ -175,7 +175,7 @@ public abstract class Renderer {
  * Misc shapes 2d drawing
  */
 
-    public void draw_polygon(Vec2[] array, Rgb rgb, boolean filled, boolean closed) {
+    public void draw_polygon(Vector2[] array, Rgb rgb, boolean filled, boolean closed) {
         int i;
 
         if (array.length < 3)
@@ -188,18 +188,18 @@ public abstract class Renderer {
             draw_segment(new Vec2Pair(array[i], array[0]), rgb);
     }
 
-    public void draw_circle (Vec2 v, double r, Rgb rgb, boolean filled)
+    public void draw_circle (Vector2 v, double r, Rgb rgb, boolean filled)
     {
         int count
             = Math.min (100, Math.max (6, (int)(2. * Math.PI * r / _feature_size)));
 
-        Vec2[] p = new Vec2[count];
+        Vector2[] p = new Vector2[count];
         double astep = 2. * Math.PI / count;
         double a = astep;
-        p[0] = new Vec2(r, 0);
+        p[0] = new Vector2(r, 0);
 
         for (int i = 0; i < count; i++, a += astep)
-            p[i] = v.plus(new Vec2(r * Math.cos (a), r * Math.sin (a)));
+            p[i] = v.plus(new Vector2(r * Math.cos (a), r * Math.sin (a)));
 
         draw_polygon (p, rgb, filled, true);
     }
@@ -211,10 +211,10 @@ public abstract class Renderer {
 
     public void draw_box (Vec2Pair c, Rgb rgb)
     {
-        draw_segment (new Vec2(c.v0.x (), c.v0.y ()), new Vec2(c.v1.x (), c.v0.y ()), rgb);
-        draw_segment (new Vec2(c.v1.x (), c.v1.y ()), new Vec2(c.v1.x (), c.v0.y ()), rgb);
-        draw_segment (new Vec2(c.v1.x (), c.v1.y ()), new Vec2(c.v0.x (), c.v1.y ()), rgb);
-        draw_segment (new Vec2(c.v0.x (), c.v0.y ()), new Vec2(c.v0.x (), c.v1.y ()), rgb);
+        draw_segment (new Vector2(c.v0.x (), c.v0.y ()), new Vector2(c.v1.x (), c.v0.y ()), rgb);
+        draw_segment (new Vector2(c.v1.x (), c.v1.y ()), new Vector2(c.v1.x (), c.v0.y ()), rgb);
+        draw_segment (new Vector2(c.v1.x (), c.v1.y ()), new Vector2(c.v0.x (), c.v1.y ()), rgb);
+        draw_segment (new Vector2(c.v0.x (), c.v0.y ()), new Vector2(c.v0.x (), c.v1.y ()), rgb);
     }
 
     public void group_begin (String name)

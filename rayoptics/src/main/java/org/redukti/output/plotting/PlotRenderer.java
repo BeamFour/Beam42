@@ -25,9 +25,9 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.output.plotting;
 
+import org.redukti.mathlib.*;
 import org.redukti.output.data.Range;
 import org.redukti.output.data.Set1d;
-import org.redukti.output.math.*;
 import org.redukti.output.rendering.Renderer;
 import org.redukti.output.rendering.RendererViewport;
 
@@ -43,7 +43,7 @@ public class PlotRenderer {
     final DecimalFormat _decimal_format;
 
     public PlotRenderer() {
-        _decimal_format = MathUtils.decimal_format(0);
+        _decimal_format = M.decimal_format(0);
     }
 
     public void draw_plot(RendererViewport r, Plot plot) {
@@ -56,9 +56,9 @@ public class PlotRenderer {
                 Vec2Pair _window2d = r.get_window2d();
                 Vec2Pair _window2d_fit = r.get_window2d_fit();
                 r.draw_text(
-                        new Vec2((_window2d.v0.x() + _window2d.v1.x()) / 2.,
+                        new Vector2((_window2d.v0.x() + _window2d.v1.x()) / 2.,
                                 (_window2d_fit.v1.y() + _window2d.v1.y()) / 2.),
-                        Vec2.vector2_10, plot.get_title(),
+                        Vector2.vector2_10, plot.get_title(),
                         EnumSet.of(TextAlignCenter, TextAlignMiddle), 18,
                         r.get_style_color(StyleForeground));
 
@@ -80,7 +80,7 @@ public class PlotRenderer {
         // spline interpolated curve between points
         Vec2Pair _window2d_fit = r.get_window2d_fit();
         Vec2Pair _window2d = r.get_window2d();
-        Vec2 _2d_output_res = r.get_2d_output_res();
+        Vector2 _2d_output_res = r.get_2d_output_res();
         if ((style.get_style() & PlotStyleMask.InterpolatePlot.value()) != 0) {
             final double x_step = (_window2d.v1.x() - _window2d.v0.x()) / _2d_output_res.x();
             Range xr = data.get_x_range(0);
@@ -92,8 +92,8 @@ public class PlotRenderer {
                 double y2 = data.interpolate(x);
 
                 r.draw_segment(new Vec3Pair(
-                                new Vec3(x - x_step, y1, 0),
-                                new Vec3(x, y2, 0)),
+                                new Vector3(x - x_step, y1, 0),
+                                new Vector3(x, y2, 0)),
                         style.get_color());
 
                 y1 = y2;
@@ -111,8 +111,8 @@ public class PlotRenderer {
                         data.get_y_value(j));
 
                 r.draw_segment(
-                        new Vec3Pair(new Vec3(p1.first, p1.second, 0),
-                                new Vec3(p2.first, p2.second, 0)),
+                        new Vec3Pair(new Vector3(p1.first, p1.second, 0),
+                                new Vector3(p2.first, p2.second, 0)),
                         style.get_color());
 
                 p1 = p2;
@@ -123,7 +123,7 @@ public class PlotRenderer {
 
         if ((style.get_style() & PlotStyleMask.PointPlot.value()) != 0) {
             for (int j = 0; j < data.get_count(); j++) {
-                Vec2 p = new Vec2(data.get_x_value(j), data.get_y_value(j));
+                Vector2 p = new Vector2(data.get_x_value(j), data.get_y_value(j));
                 r.draw_point(p, style.get_color(), PointStyleCross);
             }
         }
@@ -156,20 +156,20 @@ public class PlotRenderer {
 
                 String s = String.format("%.02f", p.second);
 
-                r.draw_text(new Vec2(p.first, p.second), Vec2.vector2_10,
+                r.draw_text(new Vector2(p.first, p.second), Vector2.vector2_10,
                         s, a, 12, style.get_color());
             }
         }
     }
 
     void draw_frame_2d(RendererViewport r) {
-        Vec2[] fr = new Vec2[4];
+        Vector2[] fr = new Vector2[4];
         Vec2Pair _window2d_fit = r.get_window2d_fit();
 
         fr[0] = _window2d_fit.v0;
-        fr[1] = new Vec2(_window2d_fit.v0.x(), _window2d_fit.v1.y());
+        fr[1] = new Vector2(_window2d_fit.v0.x(), _window2d_fit.v1.y());
         fr[2] = _window2d_fit.v1;
-        fr[3] = new Vec2(_window2d_fit.v1.x(), _window2d_fit.v0.y());
+        fr[3] = new Vector2(_window2d_fit.v1.x(), _window2d_fit.v0.y());
 
         r.draw_polygon(fr, r.get_style_color(StyleForeground), false, true);
     }
@@ -185,8 +185,8 @@ public class PlotRenderer {
         if (y_range.first == y_range.second)
             y_range = plot.get_y_data_range();
 
-        r.set_window(new Vec2Pair(new Vec2(x_range.first, y_range.first),
-                        new Vec2(x_range.second, y_range.second)),
+        r.set_window(new Vec2Pair(new Vector2(x_range.first, y_range.first),
+                        new Vector2(x_range.second, y_range.second)),
                 false);
     }
 
@@ -196,7 +196,7 @@ public class PlotRenderer {
 
     public void draw_axes_2d(RendererViewport renderer, PlotAxes a) {
         int N = 2;
-        Vec2 p = new Vec2(a.get_position().x(), a.get_position().y());
+        Vector2 p = new Vector2(a.get_position().x(), a.get_position().y());
         int pow10;
         int[] max = new int[N];
         int[] min = new int[N];
@@ -213,8 +213,8 @@ public class PlotRenderer {
 
             double s = step[i] = Math.abs(a.get_tics_step(i, r));
 
-            min[i] = MathUtils.trunc((r.first - p.v(i)) / s);
-            max[i] = MathUtils.trunc((r.second - p.v(i)) / s);
+            min[i] = M.trunc((r.first - p.v(i)) / s);
+            max[i] = M.trunc((r.second - p.v(i)) / s);
 
             pow10 = ax._pow10_scale ? (int) Math.floor(Math.log10(s)) : 0;
 
@@ -228,21 +228,21 @@ public class PlotRenderer {
                 }
             }
 
-            Vec2 lp = null;
-            Vec2 ld = null;
+            Vector2 lp = null;
+            Vector2 ld = null;
 
             switch (i) {
                 case 0:
-                    lp = new Vec2(
+                    lp = new Vector2(
                             (_window2d.v0.x() + _window2d.v1.x()) / 2.,
                             (_window2d_fit.v0.y() * .50 + _window2d.v0.y() * 1.50) / 2.);
-                    ld = Vec2.vector2_10;
+                    ld = Vector2.vector2_10;
                     break;
                 case 1:
-                    lp = new Vec2(
+                    lp = new Vector2(
                             (_window2d_fit.v0.x() * .50 + _window2d.v0.x() * 1.50) / 2.,
                             (_window2d.v0.y() + _window2d.v1.y()) / 2.);
-                    ld = Vec2.vector2_01;
+                    ld = Vector2.vector2_01;
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid axis " + i);
@@ -297,7 +297,7 @@ public class PlotRenderer {
             for (int x = min[0]; x <= max[0]; x++)
                 for (int y = min[1]; y <= max[1]; y++) {
                     renderer.draw_point(
-                                    new Vec2(p.v(0) + x * step[0], p.v(1) + y * step[1]),
+                                    new Vector2(p.v(0) + x * step[0], p.v(1) + y * step[1]),
                                     renderer.get_style_color(StyleForeground), Renderer.PointStyle.PointStyleDot);
                 }
         }
@@ -307,9 +307,9 @@ public class PlotRenderer {
     void draw_axes_tic2(RendererViewport r, PlotAxes a, int i,
                         int pow10, boolean oor, double x) {
         final int N = 2;
-        Vec2 p = new Vec2(a.get_position().x(), a.get_position().y());
+        Vector2 p = new Vector2(a.get_position().x(), a.get_position().y());
         PlotAxes.Axis ax = a._axes[i];
-        Vec2 vtic = null;
+        Vector2 vtic = null;
         Vec2Pair _window2d_fit = r.get_window2d_fit();
 
         if (!oor && ax._axis) {
@@ -337,7 +337,7 @@ public class PlotRenderer {
 
             String s = _decimal_format.format((x + p.v(i) - a._origin.v(i)) / Math.pow(10., pow10));
             EnumSet<Renderer.TextAlignMask> align = alignments[i];
-            r.draw_text(vtic, Vec2.vector2_10, s, align, 12,
+            r.draw_text(vtic, Vector2.vector2_10, s, align, 12,
                             r.get_style_color(StyleForeground));
         }
     }

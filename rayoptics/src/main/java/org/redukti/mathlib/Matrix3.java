@@ -54,10 +54,14 @@ public class Matrix3 {
     }
 
     public static Matrix3 identity() {
+        return diag(1.,1.,1.);
+    }
+    /* Create a diagonal matrix with given values */
+    public static Matrix3 diag(double x, double y, double z) {
         return new Matrix3(
-                1.0, 0.0, 0.0,
-                0.0, 1.0, 0.0,
-                0.0, 0.0, 1.0
+                x, 0.0, 0.0,
+                0.0, y, 0.0,
+                0.0, 0.0, z
         );
     }
 
@@ -103,6 +107,49 @@ public class Matrix3 {
                 m00, n01, n02,
                 n10, m11, n12,
                 n20, n21, m22);
+    }
+
+    /*
+    // Quaternion to Rotation Matrix
+    // Q = (x, y, z, w)
+    // 1-2y^2-2z^2      2xy-2wz         2xz+2wy
+    // 2xy+2zw          1-2x^2-2z^2     2yz-2xw
+    // 2xz-2yw          2yz+2xw         1-2x^2-2y^2
+    //
+    // see https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation
+    */
+    public static Matrix3 to_rotation_matrix(Quaternion q) {
+        double n00 = 1.0 - 2.0 * (q.y * q.y + q.z * q.z);
+        double n10 = 2.0 * (q.x * q.y + q.z * q.w);
+        double n20 = 2.0 * (q.x * q.z - q.y * q.w);
+
+        double n01 = 2.0 * (q.x * q.y - q.z * q.w);
+        double n11 = 1.0 - 2.0 * (q.x * q.x + q.z * q.z);
+        double n21 = 2.0 * (q.z * q.y + q.x * q.w);
+
+        double n02 = 2.0 * (q.x * q.z + q.y * q.w);
+        double n12 = 2.0 * (q.y * q.z - q.x * q.w);
+        double n22 = 1.0 - 2.0 * (q.x * q.x + q.y * q.y);
+        return new Matrix3(
+                n00, n01, n02,
+                n10, n11, n12,
+                n20, n21, n22);
+    }
+
+    /**
+     * Get a rotation matrix that describes the rotation of vector a
+     * to obtain vector 3.
+     * @param from Unit vector
+     * @param to Unit vector
+     */
+    public static Matrix3 get_rotation_between(Vector3 from, Vector3 to) {
+        // Do not know the source of following equation
+        // Believe it generates a Quaternion representing the rotation
+        // of vector a to vector b
+        // Closest match of the algo:
+        // https://stackoverflow.com/questions/1171849/finding-quaternion-representing-the-rotation-from-one-vector-to-another
+        Quaternion q = Quaternion.get_rotation_between(from, to);
+        return to_rotation_matrix(q);
     }
 
 //    /**
@@ -244,6 +291,80 @@ public class Matrix3 {
                 n10, n11, n12,
                 n20, n21, n22);
     }
+
+    /** Get rotation matrix for rotation about axis.
+     * @param axis the axis of rotation, x=0, y=1, z=2
+     * @param angleInRadians the angle to rotate in radians
+     */
+    public static Matrix3 get_rotation_matrix(int axis, double angleInRadians) {
+        assert (axis < 3 && axis >= 0);
+
+        /*
+         * Note on convention used below.
+         *
+         * See https://mathworld.wolfram.com/RotationMatrix.html
+         * coordinate system rotations of the x-, y-, and z-axes in a
+         * counterclockwise direction when looking towards the origin give the
+         * matrices.
+         *
+         * This appears to correspond to xyz convention described in appendix A,
+         * Classical Mechanics, Goldstein, 3rd Ed. 'It appears that most U.S. and
+         * British aerodynamicists and pilots prefer the sequence in which the first
+         * rotation is the yaw angle (phi) about a z-axis, the second is the pitch
+         * angle (theta) about an intermediary y-axis, and the third is a bank or
+         * roll angle (psi) about the final x-axis.'
+         *
+         * Also see https://youtu.be/wg9bI8-Qx2Q
+         */
+        double n00,n01,n02,n10,n11,n12,n20,n21,n22;
+        switch (axis) {
+            case 0:
+                // rotation counter clockwise around the X axis
+                n00 = 1;
+                n01 = 0;
+                n02 = 0;
+                n10 = 0;
+                n11 = Math.cos(angleInRadians);
+                n12 = Math.sin(angleInRadians);
+                n20 = 0;
+                n21 = -Math.sin(angleInRadians);
+                n22 = Math.cos(angleInRadians);
+                break;
+
+            case 1:
+                // rotation counter clockwise around the Y axis
+                n00 = Math.cos(angleInRadians);
+                n01 = 0;
+                n02 = -Math.sin(angleInRadians);
+                n10 = 0;
+                n11 = 1;
+                n12 = 0;
+                n20 = Math.sin(angleInRadians);
+                n21 = 0;
+                n22 = Math.cos(angleInRadians);
+                break;
+
+            case 2:
+                // rotation counter clockwise around the Z axis
+                n00 = Math.cos(angleInRadians);
+                n01 = Math.sin(angleInRadians);
+                n02 = 0;
+                n10 = -Math.sin(angleInRadians);
+                n11 = Math.cos(angleInRadians);
+                n12 = 0;
+                n20 = 0;
+                n21 = 0;
+                n22 = 1;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid rotation axis, must be 0=x, 1=y or 2=z");
+        }
+        return new Matrix3(
+                n00, n01, n02,
+                n10, n11, n12,
+                n20, n21, n22);
+    }
+
 
     /**
      * rotate v1 into v2 using equivalent angle rotation.

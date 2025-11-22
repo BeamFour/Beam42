@@ -24,26 +24,26 @@ Original GNU Optical License and Authors are as follows:
  */
 
 
-package org.redukti.output.math;
+package org.redukti.mathlib;
 
 public class Triangle2 {
     private static final int N = 3;
-    private final Vec2[] _v;
+    private final Vector2[] _v;
 
-    public Triangle2 (Vec2 a, Vec2 b, Vec2 c)
+    public Triangle2 (Vector2 a, Vector2 b, Vector2 c)
     {
-        _v = new Vec2[N];
+        _v = new Vector2[N];
         _v[0] = a;
         _v[1] = b;
         _v[2] = c;
     }
 
-    public Vec2 get_centroid ()
+    public Vector2 get_centroid ()
     {
         return _v[0].plus(_v[1]).plus(_v[2]).divide(3.);
     }
 
-    public Vec2[] as_array() {
+    public Vector2[] as_array() {
         return _v.clone();
     }
 }

@@ -26,7 +26,10 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.output.rendering;
 
-import org.redukti.output.math.*;
+import org.redukti.mathlib.Tfm3;
+import org.redukti.mathlib.Vec2Pair;
+import org.redukti.mathlib.Vector2;
+import org.redukti.mathlib.Vector3;
 
 import static org.redukti.output.rendering.Renderer.Style.StyleForeground;
 
@@ -45,7 +48,7 @@ public abstract class RendererViewport extends Renderer {
     /**
      * 2d device resolution
      */
-    Vec2 _2d_output_res;
+    Vector2 _2d_output_res;
 
     enum margin_type_e {
         /**
@@ -88,7 +91,7 @@ public abstract class RendererViewport extends Renderer {
 
     RendererViewport() {
         _margin_type = margin_type_e.MarginRatio;
-        _margin = new Vec2Pair(new Vec2(0.13, 0.13), new Vec2(0.13, 0.13));
+        _margin = new Vec2Pair(new Vector2(0.13, 0.13), new Vector2(0.13, 0.13));
         _rows = 1;
         _cols = 1;
         _pageid = 0;
@@ -96,34 +99,34 @@ public abstract class RendererViewport extends Renderer {
         _page = Vec2Pair.vector2_pair_00;
         _window2d = Vec2Pair.vector2_pair_00;
         _window2d_fit = Vec2Pair.vector2_pair_00;
-        _2d_output_res = Vec2.vector2_0;
+        _2d_output_res = Vector2.vector2_0;
         //_precision (3), _format ()
     }
 
     void set_2d_size(double width, double height) {
-        _2d_output_res = new Vec2(width, height);
+        _2d_output_res = new Vector2(width, height);
     }
 
-    public void set_window(Vec2 center, Vec2 size, boolean keep_aspect) {
-        Vec2 s = size;
+    public void set_window(Vector2 center, Vector2 size, boolean keep_aspect) {
+        Vector2 s = size;
 
         if (keep_aspect) {
             double out_ratio
                     = (_2d_output_res.x() / _cols) / (_2d_output_res.y() / _rows);
             if (Math.abs(s.x() / s.y()) < out_ratio)
                 //s.x () = s.y () * out_ratio;
-                s = new Vec2(s.y() * out_ratio, s.y());
+                s = new Vector2(s.y() * out_ratio, s.y());
             else
                 //s.y () = s.x () / out_ratio;
-                s = new Vec2(s.x(), s.x() / out_ratio);
+                s = new Vector2(s.x(), s.x() / out_ratio);
         }
 
-        Vec2 sby2 = s.divide(2.0);
+        Vector2 sby2 = s.divide(2.0);
         //  (center - s / 2., center + s / 2.)
         _window2d_fit = new Vec2Pair(center.minus(sby2), center.plus(sby2));
 
-        Vec2 ms0 = sby2;
-        Vec2 ms1 = sby2;
+        Vector2 ms0 = sby2;
+        Vector2 ms1 = sby2;
 
         switch (_margin_type) {
             case MarginLocal:
@@ -141,8 +144,8 @@ public abstract class RendererViewport extends Renderer {
             case MarginOutput:
 //                ms[0] = ms[0] / (math::vector2_1 - _margin[0] / _2d_output_res * 2);
 //                ms[1] = ms[1] / (math::vector2_1 - _margin[1] / _2d_output_res * 2);
-                ms0 = ms0.ebeDivide(Vec2.vector2_1.minus(_margin.v0.ebeDivide(_2d_output_res.times(2.0))));
-                ms1 = ms1.ebeDivide(Vec2.vector2_1.minus(_margin.v1.ebeDivide(_2d_output_res.times(2.0))));
+                ms0 = ms0.ebeDivide(Vector2.vector2_1.minus(_margin.v0.ebeDivide(_2d_output_res.times(2.0))));
+                ms1 = ms1.ebeDivide(Vector2.vector2_1.minus(_margin.v1.ebeDivide(_2d_output_res.times(2.0))));
                 break;
         }
 
@@ -154,10 +157,10 @@ public abstract class RendererViewport extends Renderer {
         set_page(_pageid);
     }
 
-    public void set_window (Vec2 center, double radius,
+    public void set_window (Vector2 center, double radius,
                             boolean keep_aspect)
     {
-        Vec2 size = new Vec2(radius, radius);
+        Vector2 size = new Vector2(radius, radius);
         set_window (center, size, keep_aspect);
     }
 
@@ -181,13 +184,13 @@ public abstract class RendererViewport extends Renderer {
         int row = page / _cols;
         int col = page % _cols;
 
-        Vec2 size = new Vec2(_window2d.v1.x() - _window2d.v0.x(),
+        Vector2 size = new Vector2(_window2d.v1.x() - _window2d.v0.x(),
                 _window2d.v1.y() - _window2d.v0.y());
 
-        Vec2 a = new Vec2(_window2d.v0.x() - size.x() * col,
+        Vector2 a = new Vector2(_window2d.v0.x() - size.x() * col,
                 _window2d.v0.y() - size.y() * (_rows - 1 - row));
 
-        Vec2 b = new Vec2(a.x() + size.x() * _cols, a.y() + size.y() * _rows);
+        Vector2 b = new Vector2(a.x() + size.x() * _cols, a.y() + size.y() * _rows);
 
         _page = new Vec2Pair(a, b);
     }
@@ -215,7 +218,7 @@ public abstract class RendererViewport extends Renderer {
         return _window2d;
     }
 
-    public Vec2 get_2d_output_res() {
+    public Vector2 get_2d_output_res() {
         return _2d_output_res;
     }
 
@@ -234,41 +237,41 @@ public abstract class RendererViewport extends Renderer {
     void set_margin(double left, double bottom, double right,
                     double top) {
         _margin_type = margin_type_e.MarginLocal;
-        _margin = new Vec2Pair(new Vec2(left, bottom), new Vec2(right, top));
+        _margin = new Vec2Pair(new Vector2(left, bottom), new Vector2(right, top));
         set_window(_window2d_fit, false);
     }
 
     void set_margin_ratio(double left, double bottom, double right,
                           double top) {
         _margin_type = margin_type_e.MarginRatio;
-        _margin = new Vec2Pair(new Vec2(left, bottom), new Vec2(right, top));
+        _margin = new Vec2Pair(new Vector2(left, bottom), new Vector2(right, top));
         set_window(_window2d_fit, false);
     }
 
     void set_margin_output(double left, double bottom, double right,
                            double top) {
         _margin_type = margin_type_e.MarginOutput;
-        _margin = new Vec2Pair(new Vec2(left, bottom), new Vec2(right, top));
+        _margin = new Vec2Pair(new Vector2(left, bottom), new Vector2(right, top));
         set_window(_window2d_fit, false);
     }
 
     public void set_window(Vec2Pair window, boolean keep_aspect) {
         //(window[0] + window[1]) / 2
-        Vec2 center = window.v0.plus(window.v1).divide(2.0);
+        Vector2 center = window.v0.plus(window.v1).divide(2.0);
         //(window[1].x () - window[0].x (),
         //window[1].y () - window[0].y ());
-        Vec2 size = new Vec2(window.v1.x() - window.v0.x(),
+        Vector2 size = new Vector2(window.v1.x() - window.v0.x(),
                 window.v1.y() - window.v0.y());
         set_window(center, size, keep_aspect);
     }
 
     void draw_frame_2d() {
-        Vec2[] fr = new Vec2[4];
+        Vector2[] fr = new Vector2[4];
 
         fr[0] = _window2d_fit.v0;
-        fr[1] = new Vec2(_window2d_fit.v0.x(), _window2d_fit.v1.y());
+        fr[1] = new Vector2(_window2d_fit.v0.x(), _window2d_fit.v1.y());
         fr[2] = _window2d_fit.v1;
-        fr[3] = new Vec2(_window2d_fit.v1.x(), _window2d_fit.v0.y());
+        fr[3] = new Vector2(_window2d_fit.v1.x(), _window2d_fit.v0.y());
 
         draw_polygon(fr, get_style_color(StyleForeground), false, true);
     }
@@ -284,14 +287,14 @@ public abstract class RendererViewport extends Renderer {
         _feature_size = v;
     }
 
-    public void set_camera_direction (Vec3 dir)
+    public void set_camera_direction (Vector3 dir)
     {
         Tfm3 t = get_camera_transform ();
         t = t.set_direction (dir);
         set_camera_transform (t);
     }
 
-    public void set_camera_position (Vec3 pos)
+    public void set_camera_position (Vector3 pos)
     {
         Tfm3 t = get_camera_transform ();
         t = t.set_translation (pos);

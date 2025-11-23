@@ -6,6 +6,7 @@ import java.util.List;
 
 public class TraceFanResult {
 
+    public RayFanType type;
     public Field fld;
     public int fi;
     /**
@@ -23,5 +24,9 @@ public class TraceFanResult {
         this.fans = fans;
         this.max_rho_val = max_rho_val;
         this.max_y_val = max_y_val;
+    }
+    public TraceFanResult setFanType(RayFanType type) {
+        this.type = type;
+        return this;
     }
 }

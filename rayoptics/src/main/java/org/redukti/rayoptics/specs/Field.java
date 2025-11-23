@@ -111,6 +111,6 @@ public class Field {
 
     @Override
     public String toString() {
-        return "Field(x=" + x + ", y=" + y + ", wt=" + wt + ")";
+        return "Field(x=" + x + ", y=" + y + ")";
     }
 }

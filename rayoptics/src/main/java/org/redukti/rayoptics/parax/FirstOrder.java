@@ -282,10 +282,10 @@ public class FirstOrder {
             List<ParaxComponent> q_ray,
             int kth,
             double n_k) {
-        var ak1 = p_ray.get(kth).ht;
-        var bk1 = q_ray.get(kth).ht;
-        var ck1 = n_k*p_ray.get(kth).slp;
-        var dk1 = n_k*q_ray.get(kth).slp;
+        var ak1 = Lists.get(p_ray,kth).ht;
+        var bk1 = Lists.get(q_ray,kth).ht;
+        var ck1 = n_k*Lists.get(p_ray,kth).slp;
+        var dk1 = n_k*Lists.get(q_ray,kth).slp;
         var Mk1 = new Matrix2(ak1, bk1, ck1, dk1);
         var M1k = new Matrix2(dk1, -bk1, -ck1, ak1);
         return new Pair<>(Mk1, M1k);

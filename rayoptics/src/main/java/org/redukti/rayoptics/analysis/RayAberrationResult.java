@@ -28,25 +28,24 @@ public class RayAberrationResult {
         results.add(fan_result);
     }
 
-    public String plot(TraceFanResult fan_result) {
+    public String plot(TraceFanResult fan_result,double yscale) {
         Plot plot = new Plot();
         plot.set_title(title);
         plot.get_axes().set_position(Vector3.vector3_0);
         plot.get_axes().set_range(new Range(-1.0, 1.0), PlotAxes.AxisMask.X);
         plot.get_axes().set_tics_step(1.0,  PlotAxes.AxisMask.X);
-        plot.get_axes().set_range(new Range(-0.03, 0.03), PlotAxes.AxisMask.Y);
-        var set = new DiscreteSet();
-        set.set_interpolation(Interpolation.Cubic);
+        plot.get_axes().set_range(new Range(-yscale, yscale), PlotAxes.AxisMask.Y);
         for (var fan: fan_result.fans) {
             var x_data = fan.fan_x;
             var y_data = fan.fan_y;
-            plot.set_color (Analysis.get_wavelen_color(fan.wvl));
+            var set = new DiscreteSet();
+            set.set_interpolation(Interpolation.Cubic);
             for (int i = 0; i < x_data.size(); i++) {
                 double x = x_data.get(i);
                 double y = y_data.get(i);
                 set.add_data(x,y);
             }
-            plot.add_plot_data(set, Rgb.rgb_red,"label", PlotStyleMask.InterpolatePlot.value());
+            plot.add_plot_data(set, Analysis.get_wavelen_color(fan.wvl),"label", PlotStyleMask.InterpolatePlot.value());
         }
         plot.get_axes ().set_label ("X", PlotAxes.AxisMask.X);
         plot.get_axes ().set_label ("Y", PlotAxes.AxisMask.Y);

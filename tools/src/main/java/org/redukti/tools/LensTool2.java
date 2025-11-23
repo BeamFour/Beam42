@@ -5,6 +5,8 @@ import org.redukti.jfotoptix.analysis.AnalysisSpot;
 import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.rayoptics.analysis.SpotAnalysis;
 import org.redukti.rayoptics.analysis.SpotAnalysisResult;
+import org.redukti.rayoptics.analysis.TransverseRayAberrationAnalysis;
+import org.redukti.rayoptics.analysis.WavefrontAberrationAnalysis;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.TraceOptions;
 import org.redukti.spec.Prescription;
@@ -29,7 +31,6 @@ public class LensTool2 {
     public static OpticalModel createSystem(Prescription prescription) {
         return prescription.build_rayoptic_model(prescription);
     }
-
 
     public static void outputSpotAnalysis(SpotAnalysisResult.SpotResultsByField result, Path output_file) throws Exception {
         if (output_file != null) {
@@ -92,6 +93,22 @@ public class LensTool2 {
                 var outfile = Helper.getOutputPath(arguments.specfile,filenames[i],arguments.outdir);
                 outputSpotAnalysis(spotFld,outfile);
             }
+
+            var rayAber = TransverseRayAberrationAnalysis.eval(opm, 21, new TraceOptions());
+            for (var fan_results: rayAber.results) {
+                String filename = "rayabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag") + ".svg";
+                var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
+                Helper.createOutputFile(output_file, rayAber.plot(fan_results, 1.0));
+            }
+
+            var opdAber = WavefrontAberrationAnalysis.eval(opm, 21, new TraceOptions());
+            for (var fan_results: opdAber.results) {
+                String filename = "opdabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag") + ".svg";
+                var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
+                Helper.createOutputFile(output_file, opdAber.plot(fan_results, 2e-5));
+            }
+
+
 //            spotReport.append(spot0).append("\n");
 //            spotReport.append(spot1).append("\n");
 //            spotReport.append(spot2).append("\n");

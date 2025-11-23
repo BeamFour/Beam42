@@ -795,7 +795,7 @@ public class SequentialModel {
             }
             fans.add(new TraceFanPoints(wvl,f_x,f_y));
         }
-        return new TraceFanResult(fld,xy,fans,max_rho_val,max_y_val);
+        return new TraceFanResult(fld,fi,xy,fans,max_rho_val,max_y_val);
     }
 
     public List<TraceGridByWvl> trace_grid(

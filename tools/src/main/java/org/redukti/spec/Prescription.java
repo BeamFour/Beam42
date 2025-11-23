@@ -20,6 +20,7 @@ import org.redukti.jfotoptix.shape.Disk;
 import org.redukti.jfotoptix.shape.Rectangle;
 import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
 import org.redukti.rayoptics.optical.OpticalModel;
+import org.redukti.rayoptics.raytr.Trace;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.seq.SurfaceData;
 import org.redukti.rayoptics.specs.*;
@@ -382,6 +383,7 @@ public class Prescription {
         System.out.println(sm.list_surfaces(new StringBuilder()).toString());
         System.out.println(sm.list_gaps(new StringBuilder()).toString());
         opm.update_model();
+        Trace.apply_paraxial_vignetting(opm);
         return opm;
     }
 

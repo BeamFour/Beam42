@@ -1,14 +1,21 @@
 package org.redukti.rayoptics.analysis;
 
+import org.redukti.mathlib.Vector2;
+import org.redukti.mathlib.Vector2Pair;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.raytr.GridItem;
 import org.redukti.rayoptics.raytr.TraceGridByWvl;
 import org.redukti.rayoptics.specs.Field;
+import org.redukti.render.plotting.PlotAxes;
+import org.redukti.render.plotting.PlotRenderer;
+import org.redukti.render.rendering.Renderer;
+import org.redukti.render.rendering.RendererSvg;
+import org.redukti.render.rendering.Rgb;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SpotAnalysisResult {
+public class SpotAnalysisResult extends Analysis {
 
     public static class SpotResultsByField {
         public Field fld;
@@ -47,6 +54,26 @@ public class SpotAnalysisResult {
         @Override
         public String toString() {
             return "Field angle " + fld.y + "\n" + " mean radius " + mean_radius * 1000 + "\n" + "  max radius " + max_radius * 1000 + "\n";
+        }
+
+        public String plot() {
+            RendererSvg r = new RendererSvg(640,480);
+            r = new RendererSvg(640,640, Rgb.rgb_black);
+            r.set_window(new Vector2Pair(new Vector2(-300, -300), new Vector2(300, 300)), true);
+            var axes = new PlotAxes();
+            axes.set_show_axes (false, PlotAxes.AxisMask.XY);
+            axes.set_label ("Sagittal distance", PlotAxes.AxisMask.X);
+            axes.set_label ("Tangential distance", PlotAxes.AxisMask.Y);
+            axes.set_unit ("m", true, true, -3, PlotAxes.AxisMask.XY);
+            axes.set_tics_count (3, PlotAxes.AxisMask.XY);
+            var plotRenderer = new PlotRenderer();
+            plotRenderer.draw_axes_2d (r, axes);
+            for (var ray: trace_results) {
+                for (var g: ray.grid) {
+                    r.draw_point (new Vector2(g.pupil.x()*1000, g.pupil.y()*1000), get_wavelen_color(ray.wvl), Renderer.PointStyle.PointStyleDot);
+                }
+            }
+            return r.write(new StringBuilder()).toString();
         }
     }
 

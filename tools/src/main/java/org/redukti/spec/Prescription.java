@@ -18,6 +18,12 @@ import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
 import org.redukti.jfotoptix.shape.Disk;
 import org.redukti.jfotoptix.shape.Rectangle;
+import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
+import org.redukti.rayoptics.optical.OpticalModel;
+import org.redukti.rayoptics.seq.SequentialModel;
+import org.redukti.rayoptics.seq.SurfaceData;
+import org.redukti.rayoptics.specs.*;
+import org.redukti.rayoptics.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -345,6 +351,68 @@ public class Prescription {
         double a18 = coeffs.length > 7 ? coeffs[7] : 0.0;
         double a20 = coeffs.length > 8 ? coeffs[8] : 0.0;
         return new Asphere(s.get_radius_of_curvature(), k, a4, a6, a8, a10, a12, a14, a16, a18, a20);
+    }
+
+    public OpticalModel build_rayoptic_model(Prescription spec) {
+        OpticalModel opm = new OpticalModel();
+        SequentialModel sm = opm.seq_model;
+        OpticalSpecs osp = opm.optical_spec;
+        osp.pupil = new PupilSpec(osp, new Pair<>(ImageKey.Image, ValueKey.Fnum), spec._fno);
+        osp.fov = new FieldSpec(osp, new Pair<>(ImageKey.Image, ValueKey.RealHeight), new double[]{0., .707, 1.});
+        osp.fov.is_relative = true;
+        osp.fov.value = spec._diameter_image_circle/2.0;
+        if (spec._generate_d_line_only) {
+            osp.wvls = new WvlSpec(new WvlWt[]{
+                new WvlWt(587.5618, 1.0)}, 0);
+        }
+        else {
+            osp.wvls = new WvlSpec(new WvlWt[]{new WvlWt(486.1327, 0.5),
+                new WvlWt(587.5618, 1.0),
+                new WvlWt(656.2725, 0.5)}, 1);
+        }
+        opm.system_spec.title = spec._title;
+        opm.system_spec.dimensions = "MM";
+        opm.radius_mode = true;
+        sm.gaps.get(0).thi = 1e10;
+        for (int i = 0; i < _surfaces.length; i++) {
+            var s = _surfaces[i];
+            add_rayoptic_surface(sm,s);
+        }
+        sm.do_apertures = false;
+        System.out.println(sm.list_surfaces(new StringBuilder()).toString());
+        System.out.println(sm.list_gaps(new StringBuilder()).toString());
+        opm.update_model();
+        return opm;
+    }
+
+    private void add_rayoptic_surface(SequentialModel sm, SurfaceType s) {
+        double ap_radius = s.get_diameter() / 2.0;
+        double thickness = s.get_thickness();
+
+        if (s.get_refractive_index() != 0.0) {
+            var glass = GlassMap.glassByName(s.get_glass_name());
+            if (glass == null) {
+                sm.add_surface(new SurfaceData(s.get_radius_of_curvature(), thickness)
+                        .max_aperture(ap_radius)
+                        .rindex(s.get_refractive_index(), s.get_abbe_vd()));
+            }
+            else {
+                sm.add_surface(new SurfaceData(s.get_radius_of_curvature(), thickness)
+                        .max_aperture(ap_radius)
+                        .rindex(s.get_refractive_index(), s.get_abbe_vd(), glass.get_name(), glass.get_manufacturer()));
+            }
+        } else {
+            sm.add_surface(new SurfaceData(s.get_radius_of_curvature(), thickness)
+                        .max_aperture(ap_radius));
+        }
+        if (s.is_aspheric()) {
+            double[] coeffs = new double[s._coeffs.length + 1];
+            for (int i = 0; i < s._coeffs.length; i++) {
+                coeffs[i + 1] = s._coeffs[i];
+            }
+            sm.ifcs.get(sm.cur_surface).profile = new EvenPolynomial().r(s.get_radius_of_curvature()).cc(s.get_conic_k()).coefs(coeffs);
+        }
+        if (s.is_aperture_stop()) sm.set_stop();
     }
 
     public String get_title() {

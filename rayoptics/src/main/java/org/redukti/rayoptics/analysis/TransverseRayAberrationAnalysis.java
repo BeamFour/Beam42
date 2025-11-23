@@ -26,4 +26,15 @@ public class TransverseRayAberrationAnalysis {
         var seq_model =  opt_model.seq_model;
         return seq_model.trace_fan(TransverseRayAberrationAnalysis::ray_abr,fi,xy,num_rays,trace_options);
     }
+
+    public static RayAberrationResult eval(OpticalModel opt_model, int num_rays, TraceOptions trace_options) {
+        RayAberrationResult result = new RayAberrationResult("Transverse ray aberration");
+        var fov = opt_model.optical_spec.fov;
+        for (int fi = 0; fi < fov.fields.length; fi++) {
+            for (int xy = 0; xy < 2; xy++) {
+                result.add(eval_abr_fan(opt_model,fi,xy,num_rays,trace_options));
+            }
+        }
+        return result;
+    }
 }

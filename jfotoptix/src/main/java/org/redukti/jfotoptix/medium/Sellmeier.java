@@ -26,7 +26,7 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.medium;
 
-import static org.redukti.jfotoptix.math.MathUtils.square;
+import static org.redukti.mathlib.M.square;
 
 /**
  * Sellmeier model for optical glass material

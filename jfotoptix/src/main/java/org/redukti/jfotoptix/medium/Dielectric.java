@@ -26,10 +26,10 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.medium;
 
-import org.redukti.jfotoptix.data.DiscreteSet;
+import org.redukti.data.DiscreteSet;
 import org.redukti.jfotoptix.light.SpectralLine;
 
-import static org.redukti.jfotoptix.data.Interpolation.Cubic;
+import static org.redukti.data.Interpolation.Cubic;
 import static org.redukti.jfotoptix.medium.Air.std_air;
 
 /**

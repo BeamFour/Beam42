@@ -26,10 +26,10 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.shape;
 
-import org.redukti.jfotoptix.math.Vector2;
-import org.redukti.jfotoptix.math.Vector2Pair;
+import org.redukti.mathlib.Vector2;
+import org.redukti.mathlib.Vector2Pair;
 
-import static org.redukti.jfotoptix.math.MathUtils.square;
+import static org.redukti.mathlib.M.square;
 
 public class Disk extends Round {
 

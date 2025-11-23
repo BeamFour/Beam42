@@ -27,7 +27,7 @@ Original GNU Optical License and Authors are as follows:
 package org.redukti.jfotoptix.tracing;
 
 import org.redukti.jfotoptix.medium.Medium;
-import org.redukti.jfotoptix.math.*;
+import org.redukti.mathlib.*;
 import org.redukti.jfotoptix.model.*;
 
 import java.util.ArrayList;
@@ -122,7 +122,7 @@ public class RayTracer {
                         RayTraceResults result, TracedRay incident,
                         Vector3Pair local,
                         Vector3Pair pt) {
-        incident.set_len((pt.origin().minus(local.origin())).len());
+        incident.set_len((pt.origin().minus(local.origin())).length());
         incident.set_intercept(surface, pt.origin());
         incident.set_intercept_intensity(1.0);
         if (surface instanceof Stop stop) {
@@ -223,11 +223,11 @@ public class RayTracer {
         // Algorithm from Bram de Greve article "Reflections & Refractions in
         // Raytracing" http://www.bramz.org/
 
-        assert (Math.abs(normal.len() - 1.0) < 1e-10);
-        assert (Math.abs((ray.direction().len()) - 1.0) < 1e-10);
+        assert (Math.abs(normal.length() - 1.0) < 1e-10);
+        assert (Math.abs((ray.direction().length()) - 1.0) < 1e-10);
 
         double cosi = normal.dot(ray.direction());
-        double sint2 = MathUtils.square(refract_index) * (1.0 - MathUtils.square(cosi));
+        double sint2 = M.square(refract_index) * (1.0 - M.square(cosi));
 
         if (sint2 > 1.0)
             return null; // total internal reflection
@@ -243,8 +243,8 @@ public class RayTracer {
         // Algorithm from Bram de Greve article "Reflections & Refractions in
         // Raytracing" http://www.bramz.org/
 
-        assert (Math.abs(normal.len() - 1.0) < 1e-10);
-        assert (Math.abs((ray.direction().len()) - 1.0) < 1e-10);
+        assert (Math.abs(normal.length() - 1.0) < 1e-10);
+        assert (Math.abs((ray.direction().length()) - 1.0) < 1e-10);
 
         double cosi = normal.dot(ray.direction());
 

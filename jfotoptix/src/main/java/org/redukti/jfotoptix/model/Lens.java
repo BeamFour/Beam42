@@ -31,9 +31,9 @@ import org.redukti.jfotoptix.curve.Flat;
 import org.redukti.jfotoptix.curve.Sphere;
 import org.redukti.jfotoptix.medium.Air;
 import org.redukti.jfotoptix.medium.Medium;
-import org.redukti.jfotoptix.math.Transform3;
-import org.redukti.jfotoptix.math.Vector3;
-import org.redukti.jfotoptix.math.Vector3Pair;
+import org.redukti.mathlib.Transform3;
+import org.redukti.mathlib.Vector3;
+import org.redukti.mathlib.Vector3Pair;
 import org.redukti.jfotoptix.shape.Disk;
 import org.redukti.jfotoptix.shape.Shape;
 

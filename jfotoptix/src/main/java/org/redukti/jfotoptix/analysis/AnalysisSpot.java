@@ -27,16 +27,16 @@ Original GNU Optical License and Authors are as follows:
 package org.redukti.jfotoptix.analysis;
 
 import org.redukti.jfotoptix.light.SpectralLine;
-import org.redukti.jfotoptix.math.MathUtils;
-import org.redukti.jfotoptix.math.Vector2;
-import org.redukti.jfotoptix.math.Vector2Pair;
-import org.redukti.jfotoptix.math.Vector3;
+import org.redukti.mathlib.M;
+import org.redukti.mathlib.Vector2;
+import org.redukti.mathlib.Vector2Pair;
+import org.redukti.mathlib.Vector3;
 import org.redukti.jfotoptix.model.OpticalSystem;
 import org.redukti.jfotoptix.model.Surface;
-import org.redukti.jfotoptix.plotting.PlotAxes;
-import org.redukti.jfotoptix.plotting.PlotRenderer;
-import org.redukti.jfotoptix.rendering.Renderer;
-import org.redukti.jfotoptix.rendering.RendererViewport;
+import org.redukti.render.plotting.PlotAxes;
+import org.redukti.render.plotting.PlotRenderer;
+import org.redukti.render.rendering.Renderer;
+import org.redukti.render.rendering.RendererViewport;
 import org.redukti.jfotoptix.tracing.TracedRay;
 
 import java.text.DecimalFormat;
@@ -63,7 +63,7 @@ public class AnalysisSpot extends AnalysisPointImage {
 
     protected PlotAxes _axes;
 
-    private static DecimalFormat decimalFormat = MathUtils.decimal_format();
+    private static DecimalFormat decimalFormat = M.decimal_format();
 
     public AnalysisSpot(OpticalSystem system, int radial_density) {
         super(system, radial_density);
@@ -95,12 +95,12 @@ public class AnalysisSpot extends AnalysisPointImage {
 
         for (TracedRay i : _intercepts)
         {
-            double dist = (i.get_intercept_point ().minus(_centroid)).len ();
+            double dist = (i.get_intercept_point ().minus(_centroid)).length ();
 
             if (max < dist)
                 max = dist;
 
-            mean += MathUtils.square (dist);
+            mean += M.square (dist);
             intensity += i.get_intensity ();
         }
 

@@ -24,9 +24,9 @@ Original GNU Optical License and Authors are as follows:
  */
 package org.redukti.jfotoptix.curve;
 
-import org.redukti.jfotoptix.math.MathUtils;
-import org.redukti.jfotoptix.math.Vector3;
-import org.redukti.jfotoptix.math.Vector3Pair;
+import org.redukti.mathlib.M;
+import org.redukti.mathlib.Vector3;
+import org.redukti.mathlib.Vector3Pair;
 
 public class Conic extends ConicBase {
 
@@ -37,18 +37,18 @@ public class Conic extends ConicBase {
     public double derivative(double r) {
         // conical section differentiate (computed with Maxima)
 
-        final double s2 = _sh * MathUtils.square(r);
-        final double s3 = Math.sqrt(1 - s2 / MathUtils.square(_roc));
+        final double s2 = _sh * M.square(r);
+        final double s3 = Math.sqrt(1 - s2 / M.square(_roc));
         final double s4
                 = 2.0 / (_roc * (s3 + 1))
-                + s2 / (MathUtils.square(_roc) * _roc * s3 * MathUtils.square(s3 + 1));
+                + s2 / (M.square(_roc) * _roc * s3 * M.square(s3 + 1));
         return r * s4;
     }
 
     public double sagitta(double r) {
-        return MathUtils.square(r)
+        return M.square(r)
                 / (_roc
-                * (Math.sqrt(1 - (_sh * MathUtils.square(r)) / MathUtils.square(_roc)) + 1));
+                * (Math.sqrt(1 - (_sh * M.square(r)) / M.square(_roc)) + 1));
     }
 
     @Override
@@ -61,9 +61,9 @@ public class Conic extends ConicBase {
         final double bz = ray.direction().z();
 
         /* find intersection point between conical section and ray, Telescope Optics, Rutten & van Venrooij, page 266 */
-        double a = (_sh * MathUtils.square(bz) + MathUtils.square(by) + MathUtils.square(bx));
+        double a = (_sh * M.square(bz) + M.square(by) + M.square(bx));
         double b = ((_sh * bz * az + by * ay + bx * ax) / _roc - bz) * 2.0;
-        double c = (_sh * MathUtils.square(az) + MathUtils.square(ay) + MathUtils.square(ax))
+        double c = (_sh * M.square(az) + M.square(ay) + M.square(ax))
                 / _roc
                 - 2.0 * az;
 
@@ -73,7 +73,7 @@ public class Conic extends ConicBase {
             /* when A = 0 there is only 1 solution */
             t = -c / b;
         } else {
-            double d = MathUtils.square(b) - 4.0 * a * c / _roc;
+            double d = M.square(b) - 4.0 * a * c / _roc;
 
             if (d < 0)
                 return null; // no intersection

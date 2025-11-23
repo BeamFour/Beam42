@@ -29,8 +29,8 @@ package org.redukti.jfotoptix.model;
 import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.medium.Air;
 import org.redukti.jfotoptix.medium.Medium;
-import org.redukti.jfotoptix.math.Transform3;
-import org.redukti.jfotoptix.math.Vector3Pair;
+import org.redukti.mathlib.Transform3;
+import org.redukti.mathlib.Vector3Pair;
 
 import java.util.ArrayList;
 import java.util.List;

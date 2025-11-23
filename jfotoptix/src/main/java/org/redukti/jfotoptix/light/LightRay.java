@@ -26,7 +26,7 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.light;
 
-import org.redukti.jfotoptix.math.Vector3Pair;
+import org.redukti.mathlib.Vector3Pair;
 
 /**
  * Describe a ray of light

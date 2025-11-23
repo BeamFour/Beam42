@@ -4,9 +4,9 @@ Copyright (c) 2021 Dibyendu Majumdar
 */
 package org.redukti.jfotoptix.curve;
 
-import org.redukti.jfotoptix.math.Vector2;
-import org.redukti.jfotoptix.math.Vector3;
-import org.redukti.jfotoptix.math.Vector3Pair;
+import org.redukti.mathlib.Vector2;
+import org.redukti.mathlib.Vector3;
+import org.redukti.mathlib.Vector3Pair;
 
 /**
  * Let

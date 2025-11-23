@@ -1,9 +1,9 @@
 package org.redukti.jfotoptix.analysis;
 
-import org.redukti.jfotoptix.math.LMLFunction;
-import org.redukti.jfotoptix.math.LMLSolver;
-import org.redukti.jfotoptix.math.MathUtils;
-import org.redukti.jfotoptix.math.Vector2;
+import org.redukti.mathlib.LMLFunction;
+import org.redukti.mathlib.LMLSolver;
+import org.redukti.mathlib.M;
+import org.redukti.mathlib.Vector2;
 import org.redukti.jfotoptix.model.OpticalSystem;
 import org.redukti.jfotoptix.model.Stop;
 import org.redukti.jfotoptix.patterns.Distribution;
@@ -58,7 +58,7 @@ public class ChiefRayFinder {
             double sos = 0.0;
             for (int i = 0; i < p.length; i++) {
                 resid[i] = 0.0 - p[i];
-                sos += MathUtils.square(resid[i]);
+                sos += M.square(resid[i]);
             }
             return Math.sqrt(sos / p.length);
         }

@@ -29,8 +29,8 @@ package org.redukti.jfotoptix.model;
 import org.redukti.jfotoptix.curve.Curve;
 import org.redukti.jfotoptix.medium.Medium;
 import org.redukti.jfotoptix.medium.Mirror;
-import org.redukti.jfotoptix.math.Transform3;
-import org.redukti.jfotoptix.math.Vector3Pair;
+import org.redukti.mathlib.Transform3;
+import org.redukti.mathlib.Vector3Pair;
 import org.redukti.jfotoptix.shape.Shape;
 
 public class MirrorSurface extends OpticalSurface {

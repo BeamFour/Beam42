@@ -24,7 +24,7 @@ Original GNU Optical License and Authors are as follows:
  */
 package org.redukti.jfotoptix.curve;
 
-import org.redukti.jfotoptix.math.*;
+import org.redukti.mathlib.*;
 
 public abstract class CurveBase implements Curve {
 

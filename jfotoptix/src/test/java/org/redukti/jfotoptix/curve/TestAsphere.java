@@ -2,8 +2,8 @@ package org.redukti.jfotoptix.curve;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.redukti.jfotoptix.math.Vector3;
-import org.redukti.jfotoptix.math.Vector3Pair;
+import org.redukti.mathlib.Vector3;
+import org.redukti.mathlib.Vector3Pair;
 
 public class TestAsphere {
 

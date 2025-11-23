@@ -27,10 +27,10 @@ Original GNU Optical License and Authors are as follows:
 package org.redukti.jfotoptix.model;
 
 import org.redukti.jfotoptix.curve.Curve;
-import org.redukti.jfotoptix.math.*;
+import org.redukti.mathlib.*;
 import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.PatternGenerator;
-import org.redukti.jfotoptix.rendering.Renderer;
+import org.redukti.render.rendering.Renderer;
 import org.redukti.jfotoptix.shape.Shape;
 
 import java.util.function.Consumer;

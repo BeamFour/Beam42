@@ -1,0 +1,181 @@
+package org.redukti.tools;
+
+import org.redukti.exporters.ZemaxExporter;
+import org.redukti.jfotoptix.analysis.AnalysisSpot;
+import org.redukti.importers.obench.OpticalBenchDataImporter;
+import org.redukti.jfotoptix.layout.SystemLayout2D;
+import org.redukti.jfotoptix.light.SpectralLine;
+import org.redukti.mathlib.Matrix3;
+import org.redukti.mathlib.Vector3;
+import org.redukti.jfotoptix.model.OpticalSystem;
+import org.redukti.jfotoptix.model.PointSource;
+import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
+import org.redukti.jfotoptix.patterns.Distribution;
+import org.redukti.jfotoptix.patterns.Pattern;
+import org.redukti.render.rendering.RendererSvg;
+import org.redukti.render.rendering.Rgb;
+import org.redukti.spec.Prescription;
+import org.redukti.jfotoptix.tracing.RayTraceParameters;
+import org.redukti.jfotoptix.tracing.RayTraceRenderer;
+import org.redukti.jfotoptix.tracing.RayTraceResults;
+import org.redukti.jfotoptix.tracing.RayTracer;
+import org.redukti.util.Args;
+import org.redukti.util.Helper;
+
+import java.nio.file.Path;
+
+public class LensTool {
+
+    public static OpticalBenchDataImporter.LensSpecifications getSpecsFromFile(String specfile) throws Exception {
+        OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
+        specs.parse_file(specfile);
+        return specs;
+    }
+
+    public static OpticalSystem createSystem(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean use_glass_types, boolean skew_rays, double percent_skew,  boolean d_line) {
+        OpticalSystem.Builder systemBuilder = OpticalBenchDataImporter.build_system(specs, scenario, use_glass_types);
+        double half_angle_of_view_in_radians = specs.get_half_angle_of_view_in_radians(scenario);
+        Vector3 direction = Vector3.vector3_001;
+        if (skew_rays) {
+            // Construct unit vector at an angle
+            //      double z1 = cos (angleOfView);
+            //      double y1 = sin (angleOfView);
+            //      unit_vector = math::Vector3 (0, y1, z1);
+            half_angle_of_view_in_radians *= percent_skew;
+            Matrix3 r = Matrix3.get_rotation_matrix(0, half_angle_of_view_in_radians);
+            direction = r.multiply(direction);
+        }
+        PointSource.Builder ps = new PointSource.Builder(PointSource.SourceInfinityMode.SourceAtInfinity, direction)
+                .add_spectral_line(SpectralLine.d);
+        if (!d_line) {
+            ps.add_spectral_line(SpectralLine.C)
+                    .add_spectral_line(SpectralLine.F);
+        }
+        systemBuilder.add(ps);
+        return systemBuilder.build();
+    }
+
+    public static void outputLayout(OpticalSystem system, Path output_file) throws Exception {
+        // draw 2d system layout
+        RendererSvg renderer = new RendererSvg(2400, 1400);
+        SystemLayout2D systemLayout2D = new SystemLayout2D();
+        systemLayout2D.layout2d(renderer, system);
+        if (output_file != null) {
+            Helper.createOutputFile(output_file, renderer.write(new StringBuilder()).toString());
+        } else {
+            System.out.println(renderer.write(new StringBuilder()).toString());
+        }
+    }
+
+    public static void outputLayoutWithRays(OpticalSystem system, Path output_file, int trace_density, boolean dump_system, boolean include_lost_rays) throws Exception {
+        // draw 2d system layout
+        RendererSvg renderer = new RendererSvg(800, 400);
+        SystemLayout2D systemLayout2D = new SystemLayout2D();
+        systemLayout2D.layout2d(renderer, system);
+        RayTraceParameters parameters = new RayTraceParameters(system);
+        RayTracer rayTracer = new RayTracer();
+        parameters.set_default_distribution(
+                new Distribution(Pattern.MeridionalDist, trace_density, 0.999));
+        if (dump_system) {
+            System.out.println(parameters.sequenceToString(new StringBuilder()).toString());
+        }
+        RayTraceResults result = rayTracer.trace(system, parameters);
+        RayTraceRenderer.draw_2d(renderer, result, !include_lost_rays, null);
+        if (output_file != null) {
+            Helper.createOutputFile(output_file, renderer.write(new StringBuilder()).toString());
+        } else {
+            System.out.println(renderer.write(new StringBuilder()).toString());
+        }
+        //result.report();
+    }
+
+    public static AnalysisSpot outputSpotAnalysis(OpticalSystem system, Path output_file, int spot_density) throws Exception {
+        RendererSvg renderer = new RendererSvg(300, 300, Rgb.rgb_black);
+        AnalysisSpot spot = new AnalysisSpot(system, spot_density);
+        spot.draw_diagram(renderer, true);
+        if (output_file != null) {
+            Helper.createOutputFile(output_file, renderer.write(new StringBuilder()).toString());
+        } else {
+            System.out.println(renderer.write(new StringBuilder()).toString());
+        }
+        return spot;
+    }
+
+    public static void createREADME(String specFile, OpticalBenchDataImporter.LensSpecifications specs, ParaxialFirstOrderInfo pfo, double[] fields, AnalysisSpot[] spots, Path output_file) throws Exception {
+        Prescription prescription = Prescription.buildPrescription(specs,true);
+        StringBuilder sb = prescription.toMarkdownStr(new StringBuilder());
+        sb.append("## Layouts\n");
+        sb.append("![Layout Only](./layoutonly.svg)\n");
+        sb.append("![Layout Only](./layout.svg)\n");
+        sb.append("![Layout Only](./layout-semi-skew.svg)\n");
+        sb.append("![Layout Only](./layout-skew.svg)\n");
+        sb.append("## Spot Diagrams\n");
+        sb.append("![Layout Only](./spot.svg)\n");
+        sb.append("![Layout Only](./spot-semi-skew.svg)\n");
+        sb.append("![Layout Only](./spot-skew.svg)\n");
+        sb.append("## Paraxial Parameters\n");
+        pfo.toMarkdown(sb);
+        sb.append("## Spot Analysis\n");
+        AnalysisSpot.toMarkdownTableHeader(sb);
+        for (int i = 0; i < fields.length; i++) {
+            spots[i].toMarkdownTableRow(sb,fields[i]);
+        }
+        String filename = Helper.getFilename(specFile);
+        String zmxFilename = Helper.replaceExtension(filename, ".zmx");
+        sb.append("## Resources\n");
+        sb.append("* [OpticalBench Compatible Data File, tab delimited](./" + filename + ")\n");
+        sb.append("* [Zemax file](./" + zmxFilename + ")\n");
+        Helper.createOutputFile(output_file,sb.toString());
+    }
+
+    public static void main(String[] args) throws Exception {
+        Args arguments = Args.parseArguments(args);
+        if (arguments.specfile == null) {
+            System.err.println("Usage: --specfile inputfile [--scenario num] [--dump-system] [--exclude-lost-rays] [--spot-density n] [--trace-density n] [--only-d-line] [-o outfilename] [--dont-use-glass-types]");
+            System.err.println("       --spot-density defaults to 50");
+            System.err.println("       --trace-density defaults to 20");
+            System.err.println("       --scenario defaults to 0");
+            System.err.println("       Output file will be created in the same location as the specfile");
+            System.exit(1);
+        }
+        try {
+            OpticalBenchDataImporter.LensSpecifications specs = getSpecsFromFile(arguments.specfile);
+            OpticalSystem system = createSystem(specs,arguments.scenario,arguments.use_glass_types,false,0,arguments.only_d_line);
+            if (arguments.dumpSystem) {
+                System.out.println(system);
+            }
+            OpticalSystem skewedSystem = createSystem(specs,arguments.scenario,arguments.use_glass_types,true,1.0,arguments.only_d_line);
+            if (arguments.dumpSystem) {
+                System.out.println(skewedSystem);
+            }
+            OpticalSystem semiSkewedSystem = createSystem(specs,arguments.scenario,arguments.use_glass_types,true,0.7,arguments.only_d_line);
+            ParaxialFirstOrderInfo pfo = ParaxialFirstOrderInfo.compute(system);
+            Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"paraxial.txt",arguments.outdir), pfo.toString());
+//            pfo = ParaxialFirstOrderInfo.computeFast(system);
+//            Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"paraxial2.txt",arguments.outdir), pfo.toString());
+            outputLayout(system,Helper.getOutputPath(arguments.specfile,"layoutonly.svg",arguments.outdir));
+            outputLayoutWithRays(system,Helper.getOutputPath(arguments.specfile,"layout.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
+            outputLayoutWithRays(semiSkewedSystem,Helper.getOutputPath(arguments.specfile,"layout-semi-skew.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
+            outputLayoutWithRays(skewedSystem,Helper.getOutputPath(arguments.specfile,"layout-skew.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
+            StringBuilder spotReport = new StringBuilder();
+            var spot0 = outputSpotAnalysis(system,Helper.getOutputPath(arguments.specfile,"spot.svg",arguments.outdir),arguments.spot_density);
+            var spot1 = outputSpotAnalysis(semiSkewedSystem,Helper.getOutputPath(arguments.specfile,"spot-semi-skew.svg",arguments.outdir),arguments.spot_density);
+            var spot2 = outputSpotAnalysis(skewedSystem,Helper.getOutputPath(arguments.specfile,"spot-skew.svg",arguments.outdir),arguments.spot_density);
+            spotReport.append(spot0).append("\n");
+            spotReport.append(spot1).append("\n");
+            spotReport.append(spot2).append("\n");
+            Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"spot-report.txt",arguments.outdir), spotReport.toString());
+            ZemaxExporter zemaxExporter = new ZemaxExporter();
+            Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), zemaxExporter.generate(specs, arguments.scenario, arguments.only_d_line));
+            createREADME(arguments.specfile,
+                    specs,
+                    pfo,
+                    new double[] {0.0, 0.7, 1.0},
+                    new AnalysisSpot[] { spot0, spot1, spot2 },
+                    Helper.getOutputPath(arguments.specfile,"README.md",arguments.outdir));
+        }
+        catch (Exception e) {
+            System.err.println("Failed due to: " + e.getMessage());
+        }
+    }
+}

@@ -1,11 +1,11 @@
 package org.redukti.jfotoptix.layout;
 
 import org.redukti.jfotoptix.medium.Solid;
-import org.redukti.jfotoptix.math.*;
-import org.redukti.jfotoptix.rendering.Renderer;
-import org.redukti.jfotoptix.rendering.RendererSvg;
-import org.redukti.jfotoptix.rendering.RendererViewport;
-import org.redukti.jfotoptix.rendering.Rgb;
+import org.redukti.mathlib.*;
+import org.redukti.render.rendering.Renderer;
+import org.redukti.render.rendering.RendererSvg;
+import org.redukti.render.rendering.RendererViewport;
+import org.redukti.render.rendering.Rgb;
 import org.redukti.jfotoptix.model.*;
 
 import java.util.List;

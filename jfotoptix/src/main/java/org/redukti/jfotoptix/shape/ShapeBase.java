@@ -26,7 +26,7 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.shape;
 
-import org.redukti.jfotoptix.math.Vector2;
+import org.redukti.mathlib.Vector2;
 
 import java.util.Random;
 

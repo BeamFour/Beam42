@@ -24,9 +24,9 @@ Original GNU Optical License and Authors are as follows:
  */
 package org.redukti.jfotoptix.curve;
 
-import org.redukti.jfotoptix.math.Vector2;
-import org.redukti.jfotoptix.math.Vector3;
-import org.redukti.jfotoptix.math.Vector3Pair;
+import org.redukti.mathlib.Vector2;
+import org.redukti.mathlib.Vector3;
+import org.redukti.mathlib.Vector3Pair;
 
 public interface Curve {
     /** Get curve sagitta (z) at specified point */

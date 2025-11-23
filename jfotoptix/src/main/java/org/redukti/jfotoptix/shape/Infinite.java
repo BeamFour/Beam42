@@ -26,9 +26,9 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.shape;
 
-import org.redukti.jfotoptix.math.Triangle2;
-import org.redukti.jfotoptix.math.Vector2;
-import org.redukti.jfotoptix.math.Vector2Pair;
+import org.redukti.mathlib.Triangle2;
+import org.redukti.mathlib.Vector2;
+import org.redukti.mathlib.Vector2Pair;
 
 import java.util.function.Consumer;
 

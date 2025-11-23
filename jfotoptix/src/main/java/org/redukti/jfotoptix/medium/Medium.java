@@ -26,9 +26,9 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.medium;
 
-import org.redukti.jfotoptix.rendering.Rgb;
+import org.redukti.render.rendering.Rgb;
 
-import static org.redukti.jfotoptix.math.MathUtils.square;
+import static org.redukti.mathlib.M.square;
 
 public abstract class Medium {
     protected final String _name;

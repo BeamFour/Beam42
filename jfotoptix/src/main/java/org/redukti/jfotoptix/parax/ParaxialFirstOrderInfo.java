@@ -9,8 +9,8 @@ package org.redukti.jfotoptix.parax;
 
 import org.redukti.jfotoptix.fastparax.YNUTracer;
 import org.redukti.jfotoptix.light.SpectralLine;
-import org.redukti.jfotoptix.math.MathUtils;
 import org.redukti.jfotoptix.model.*;
+import org.redukti.mathlib.M;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -45,7 +45,7 @@ public class ParaxialFirstOrderInfo {
     public static final int Exp_dist = 12;
     // exp_radius: exit pupil radius
     public static final int Exp_radius = 13;
-    public static final int M = 14;
+    public static final int M_ = 14;
     // red: reduction ratio
     public static final int Red = 15;
     // n_obj: refractive index at central wavelength in object space
@@ -130,7 +130,7 @@ public class ParaxialFirstOrderInfo {
     public double img_na;
 
     static final double DISTANCE = 1e10;
-    private static DecimalFormat decimalFormat = MathUtils.decimal_format();
+    private static DecimalFormat decimalFormat = M.decimal_format();
 
     public static ParaxialFirstOrderInfo compute(OpticalSystem system) {
 
@@ -305,7 +305,7 @@ public class ParaxialFirstOrderInfo {
         v[Enp_radius] = enp_radius;
         v[Exp_dist] = exp_dist;
         v[Exp_radius] = exp_radius;
-        v[M] = m;
+        v[M_] = m;
         v[Red] = red;
         v[N_obj] = n_obj;
         v[N_img] = n_img;

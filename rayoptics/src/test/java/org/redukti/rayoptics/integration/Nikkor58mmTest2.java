@@ -3,17 +3,17 @@ package org.redukti.rayoptics.integration;
 import org.junit.jupiter.api.Test;
 import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
-import org.redukti.output.data.DiscreteSet;
-import org.redukti.output.data.Interpolation;
-import org.redukti.output.data.Range;
-import org.redukti.mathlib.Vec2Pair;
-import org.redukti.output.plotting.Plot;
-import org.redukti.output.plotting.PlotAxes;
-import org.redukti.output.plotting.PlotRenderer;
-import org.redukti.output.plotting.PlotStyleMask;
-import org.redukti.output.rendering.Renderer;
-import org.redukti.output.rendering.RendererSvg;
-import org.redukti.output.rendering.Rgb;
+import org.redukti.data.DiscreteSet;
+import org.redukti.data.Interpolation;
+import org.redukti.data.Range;
+import org.redukti.mathlib.Vector2Pair;
+//import org.redukti.render.plotting.Plot;
+//import org.redukti.render.plotting.PlotAxes;
+//import org.redukti.render.plotting.PlotRenderer;
+//import org.redukti.render.plotting.PlotStyleMask;
+//import org.redukti.render.rendering.Renderer;
+//import org.redukti.render.rendering.RendererSvg;
+//import org.redukti.render.rendering.Rgb;
 import org.redukti.rayoptics.analysis.SpotAnalysis;
 import org.redukti.rayoptics.analysis.TransverseRayAberrationAnalysis;
 import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
@@ -156,100 +156,100 @@ public class Nikkor58mmTest2 {
         }
 
 
-        Plot plot = new Plot();
-        plot.set_title("Transverse ray aberration");
-        plot.get_axes().set_position(Vector3.vector3_0);
-        plot.get_axes().set_range(new Range(-1.0, 1.0), PlotAxes.AxisMask.X);
-        plot.get_axes().set_tics_step(1.0,  PlotAxes.AxisMask.X);
-        plot.get_axes().set_range(new Range(-0.03, 0.03), PlotAxes.AxisMask.Y);
-        var set = new DiscreteSet();
-        set.set_interpolation(Interpolation.Cubic);
-        var x_data = transAber.fans.get(0).fan_x;
-        var y_data = transAber.fans.get(0).fan_y;
-        // p.set_color (light::SpectralLine::get_wavelen_color (w));
-        for (int i = 0; i < x_data.size(); i++) {
-            double x = x_data.get(i);
-            double y = y_data.get(i);
-            set.add_data(x,y);
-        }
-        plot.add_plot_data(set, Rgb.rgb_red,"label", PlotStyleMask.InterpolatePlot.value());
-        plot.get_axes ().set_label ("X", PlotAxes.AxisMask.X);
-        plot.get_axes ().set_label ("Y", PlotAxes.AxisMask.Y);
-        //plot.get_axes().set_unit("",false,false,0, PlotAxes.AxisMask.X);
-        //plot.get_axes().set_unit("",false,false,0, PlotAxes.AxisMask.Y);
-        RendererSvg r = new RendererSvg(640,480);
-        PlotRenderer plotRenderer = new PlotRenderer();
-        plotRenderer.draw_plot(r,plot);
+//        Plot plot = new Plot();
+//        plot.set_title("Transverse ray aberration");
+//        plot.get_axes().set_position(Vector3.vector3_0);
+//        plot.get_axes().set_range(new Range(-1.0, 1.0), PlotAxes.AxisMask.X);
+//        plot.get_axes().set_tics_step(1.0,  PlotAxes.AxisMask.X);
+//        plot.get_axes().set_range(new Range(-0.03, 0.03), PlotAxes.AxisMask.Y);
+//        var set = new DiscreteSet();
+//        set.set_interpolation(Interpolation.Cubic);
+//        var x_data = transAber.fans.get(0).fan_x;
+//        var y_data = transAber.fans.get(0).fan_y;
+//        // p.set_color (light::SpectralLine::get_wavelen_color (w));
+//        for (int i = 0; i < x_data.size(); i++) {
+//            double x = x_data.get(i);
+//            double y = y_data.get(i);
+//            set.add_data(x,y);
+//        }
+//        plot.add_plot_data(set, Rgb.rgb_red,"label", PlotStyleMask.InterpolatePlot.value());
+//        plot.get_axes ().set_label ("X", PlotAxes.AxisMask.X);
+//        plot.get_axes ().set_label ("Y", PlotAxes.AxisMask.Y);
+//        //plot.get_axes().set_unit("",false,false,0, PlotAxes.AxisMask.X);
+//        //plot.get_axes().set_unit("",false,false,0, PlotAxes.AxisMask.Y);
+//        RendererSvg r = new RendererSvg(640,480);
+//        PlotRenderer plotRenderer = new PlotRenderer();
+//        plotRenderer.draw_plot(r,plot);
         //System.out.println(r.write(new StringBuilder()));
 
         var spot = SpotAnalysis.eval(opm,21, new TraceOptions());
-        r = new RendererSvg(480,480);
-        r.set_window(new Vec2Pair(new Vector2(-100, -100), new Vector2(100, 100)), true);
-        var axes = new PlotAxes();
-        axes.set_show_axes (false, PlotAxes.AxisMask.XY);
-        axes.set_label ("Sagittal distance", PlotAxes.AxisMask.X);
-        axes.set_label ("Tangential distance", PlotAxes.AxisMask.Y);
-        axes.set_unit ("m", true, true, -3, PlotAxes.AxisMask.XY);
-        axes.set_tics_count (3, PlotAxes.AxisMask.XY);
-        plotRenderer = new PlotRenderer();
-        plotRenderer.draw_axes_2d (r, axes);
-        for (var byfld : spot.spot_results) {
-            for (var ray: byfld.trace_results) {
-                for (var g: ray.grid) {
-                    r.draw_point (new Vector2(g.pupil.x()*1000, g.pupil.y()*1000), get_wavelen_color(ray.wvl), Renderer.PointStyle.PointStyleDot);
-                }
-            }
-        }
-        System.out.println(r.write(new StringBuilder()));
+//        r = new RendererSvg(480,480);
+//        r.set_window(new Vec2Pair(new Vector2(-100, -100), new Vector2(100, 100)), true);
+//        var axes = new PlotAxes();
+//        axes.set_show_axes (false, PlotAxes.AxisMask.XY);
+//        axes.set_label ("Sagittal distance", PlotAxes.AxisMask.X);
+//        axes.set_label ("Tangential distance", PlotAxes.AxisMask.Y);
+//        axes.set_unit ("m", true, true, -3, PlotAxes.AxisMask.XY);
+//        axes.set_tics_count (3, PlotAxes.AxisMask.XY);
+//        plotRenderer = new PlotRenderer();
+//        plotRenderer.draw_axes_2d (r, axes);
+//        for (var byfld : spot.spot_results) {
+//            for (var ray: byfld.trace_results) {
+//                for (var g: ray.grid) {
+//                    r.draw_point (new Vector2(g.pupil.x()*1000, g.pupil.y()*1000), get_wavelen_color(ray.wvl), Renderer.PointStyle.PointStyleDot);
+//                }
+//            }
+//        }
+//        System.out.println(r.write(new StringBuilder()));
     }
 
-        /** get rgb color associated with wavelen */
-    public static Rgb get_wavelen_color (double wl) {
-        // based on algorithm from Dan Bruton
-        // (www.physics.sfasu.edu/astro/color.html)
-        // http://www.physics.sfasu.edu/astro/color/spectra.html
-
-        if (wl < 380.0 || wl > 780.0)
-            return Rgb.rgb_black;
-
-        double s = 1.0;
-
-        if (wl < 420.0)
-            s = 0.3 + 0.7 * (wl - 380.0f) / 40.0;
-        else if (wl > 700.0)
-            s = 0.3 + 0.7 * (780.0 - wl) / 80.0;
-
-        if (wl < 510.0)
-        {
-            if (wl < 490.0)
-            {
-                if (wl < 440.0)
-                    // 380 to 440
-                    return new Rgb (s * -(wl - 440.0) / 60.0, 0.0, s, 1.0);
-          else
-                // 440 to 490
-                return new Rgb (0.0, s * (wl - 440.0) / 50.0, s, 1.0);
-            }
-            else
-                // 490 to 510
-                return new Rgb (0.0, s, s * -(wl - 510.0) / 20.0, 1.0);
-        }
-        else
-        {
-            if (wl < 645.0)
-            {
-                if (wl < 580.0)
-                    // 510 to 580
-                    return new Rgb (s * (wl - 510.0) / 70.0, s, 0.0, 1.0);
-          else
-                // 580 to 645
-                return new Rgb (s, s * -(wl - 645.0) / 65.0, 0.0, 1.0);
-            }
-            else
-            {
-                // 645 to 780
-                return new Rgb (s, 0.0, 0.0, 1.0);
-            }
-        }
-    }
+//        /** get rgb color associated with wavelen */
+//    public static Rgb get_wavelen_color (double wl) {
+//        // based on algorithm from Dan Bruton
+//        // (www.physics.sfasu.edu/astro/color.html)
+//        // http://www.physics.sfasu.edu/astro/color/spectra.html
+//
+//        if (wl < 380.0 || wl > 780.0)
+//            return Rgb.rgb_black;
+//
+//        double s = 1.0;
+//
+//        if (wl < 420.0)
+//            s = 0.3 + 0.7 * (wl - 380.0f) / 40.0;
+//        else if (wl > 700.0)
+//            s = 0.3 + 0.7 * (780.0 - wl) / 80.0;
+//
+//        if (wl < 510.0)
+//        {
+//            if (wl < 490.0)
+//            {
+//                if (wl < 440.0)
+//                    // 380 to 440
+//                    return new Rgb (s * -(wl - 440.0) / 60.0, 0.0, s, 1.0);
+//          else
+//                // 440 to 490
+//                return new Rgb (0.0, s * (wl - 440.0) / 50.0, s, 1.0);
+//            }
+//            else
+//                // 490 to 510
+//                return new Rgb (0.0, s, s * -(wl - 510.0) / 20.0, 1.0);
+//        }
+//        else
+//        {
+//            if (wl < 645.0)
+//            {
+//                if (wl < 580.0)
+//                    // 510 to 580
+//                    return new Rgb (s * (wl - 510.0) / 70.0, s, 0.0, 1.0);
+//          else
+//                // 580 to 645
+//                return new Rgb (s, s * -(wl - 645.0) / 65.0, 0.0, 1.0);
+//            }
+//            else
+//            {
+//                // 645 to 780
+//                return new Rgb (s, 0.0, 0.0, 1.0);
+//            }
+//        }
+//    }
 }

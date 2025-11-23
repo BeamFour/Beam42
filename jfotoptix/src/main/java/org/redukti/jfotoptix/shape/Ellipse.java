@@ -26,9 +26,9 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.shape;
 
-import org.redukti.jfotoptix.math.MathUtils;
-import org.redukti.jfotoptix.math.Vector2;
-import org.redukti.jfotoptix.math.Vector2Pair;
+import org.redukti.mathlib.M;
+import org.redukti.mathlib.Vector2;
+import org.redukti.mathlib.Vector2Pair;
 
 public class Ellipse extends Round {
 
@@ -40,7 +40,7 @@ public class Ellipse extends Round {
         _xr = x_radius;
         _yr = y_radius;
         _xy_ratio = x_radius / y_radius;
-        _e2 = MathUtils.square(Math.sqrt(Math.abs(_xr * _xr - _yr * _yr))
+        _e2 = M.square(Math.sqrt(Math.abs(_xr * _xr - _yr * _yr))
                 / Math.max(_xr, _yr));
     }
 
@@ -67,8 +67,8 @@ public class Ellipse extends Round {
 
     @Override
     public boolean inside(Vector2 point) {
-        return (MathUtils.square(point.x()) + MathUtils.square(point.y() * _xy_ratio)
-                <= MathUtils.square(_xr));
+        return (M.square(point.x()) + M.square(point.y() * _xy_ratio)
+                <= M.square(_xr));
     }
 
     @Override
@@ -84,9 +84,9 @@ public class Ellipse extends Round {
     @Override
     public double get_outter_radius(Vector2 dir) {
         return _xr > _yr
-                ? Math.sqrt(MathUtils.square(_yr) / (1. - _e2 * MathUtils.square(dir.x())))
-                : Math.sqrt(MathUtils.square(_xr)
-                / (1. - _e2 * MathUtils.square(dir.y())));
+                ? Math.sqrt(M.square(_yr) / (1. - _e2 * M.square(dir.x())))
+                : Math.sqrt(M.square(_xr)
+                / (1. - _e2 * M.square(dir.y())));
     }
 
     @Override

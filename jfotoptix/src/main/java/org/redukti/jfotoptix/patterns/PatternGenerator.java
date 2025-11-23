@@ -1,6 +1,6 @@
 package org.redukti.jfotoptix.patterns;
 
-import org.redukti.jfotoptix.math.Vector2;
+import org.redukti.mathlib.Vector2;
 import org.redukti.jfotoptix.shape.Rectangle;
 import org.redukti.jfotoptix.shape.Round;
 import org.redukti.jfotoptix.shape.Shape;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
 
-import static org.redukti.jfotoptix.math.MathUtils.square;
+import static org.redukti.mathlib.M.square;
 
 public class PatternGenerator {
 

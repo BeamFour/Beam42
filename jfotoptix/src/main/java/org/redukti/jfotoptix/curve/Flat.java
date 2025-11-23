@@ -24,8 +24,8 @@ Original GNU Optical License and Authors are as follows:
  */
 package org.redukti.jfotoptix.curve;
 
-import org.redukti.jfotoptix.math.Vector3;
-import org.redukti.jfotoptix.math.Vector3Pair;
+import org.redukti.mathlib.Vector3;
+import org.redukti.mathlib.Vector3Pair;
 
 public class Flat extends Rotational {
 

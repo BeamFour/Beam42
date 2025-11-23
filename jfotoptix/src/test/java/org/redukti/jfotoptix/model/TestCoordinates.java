@@ -3,8 +3,8 @@ package org.redukti.jfotoptix.model;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.redukti.jfotoptix.curve.Flat;
-import org.redukti.jfotoptix.math.Vector3;
-import org.redukti.jfotoptix.math.Vector3Pair;
+import org.redukti.mathlib.Vector3;
+import org.redukti.mathlib.Vector3Pair;
 import org.redukti.jfotoptix.shape.Infinite;
 
 public class TestCoordinates {

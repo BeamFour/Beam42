@@ -360,7 +360,10 @@ public class Prescription {
         OpticalSpecs osp = opm.optical_spec;
         osp.pupil = new PupilSpec(osp, new Pair<>(ImageKey.Image, ValueKey.Fnum), spec._fno);
         osp.fov = new FieldSpec(osp, new Pair<>(ImageKey.Image, ValueKey.RealHeight), new double[]{0., .707, 1.});
+        //osp.fov = new FieldSpec(osp, new Pair<>(ImageKey.Image, ValueKey.Angle), new double[]{0., .707, 1.});
         osp.fov.is_relative = true;
+        osp.fov.is_wide_angle = (spec._angle_of_view_in_degrees / 2.0) > 45.;
+        //osp.fov.value = spec._angle_of_view_in_degrees;
         osp.fov.value = spec._diameter_image_circle/2.0;
         if (spec._generate_d_line_only) {
             osp.wvls = new WvlSpec(new WvlWt[]{

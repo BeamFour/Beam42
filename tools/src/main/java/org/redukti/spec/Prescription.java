@@ -21,6 +21,7 @@ import org.redukti.jfotoptix.shape.Rectangle;
 import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.Trace;
+import org.redukti.rayoptics.raytr.VigCalc;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.seq.SurfaceData;
 import org.redukti.rayoptics.specs.*;
@@ -354,17 +355,22 @@ public class Prescription {
         return new Asphere(s.get_radius_of_curvature(), k, a4, a6, a8, a10, a12, a14, a16, a18, a20);
     }
 
-    public OpticalModel build_rayoptic_model(Prescription spec) {
+    public OpticalModel build_rayoptic_model(Prescription spec, boolean fov_angle) {
         OpticalModel opm = new OpticalModel();
         SequentialModel sm = opm.seq_model;
         OpticalSpecs osp = opm.optical_spec;
+        double half_angle_deg = spec._angle_of_view_in_degrees/2.0;
         osp.pupil = new PupilSpec(osp, new Pair<>(ImageKey.Image, ValueKey.Fnum), spec._fno);
-        osp.fov = new FieldSpec(osp, new Pair<>(ImageKey.Image, ValueKey.RealHeight), new double[]{0., .707, 1.});
-        //osp.fov = new FieldSpec(osp, new Pair<>(ImageKey.Image, ValueKey.Angle), new double[]{0., .707, 1.});
-        osp.fov.is_relative = true;
-        osp.fov.is_wide_angle = (spec._angle_of_view_in_degrees / 2.0) > 45.;
-        //osp.fov.value = spec._angle_of_view_in_degrees;
-        osp.fov.value = spec._diameter_image_circle/2.0;
+        if (fov_angle) {
+            osp.fov = new FieldSpec(osp, new Pair<>(ImageKey.Object, ValueKey.Angle), new double[]{0., .707, 1.});
+            osp.fov.value = half_angle_deg;
+        }
+        else {
+            osp.fov = new FieldSpec(osp, new Pair<>(ImageKey.Image, ValueKey.RealHeight), new double[]{0., .707, 1.});
+            osp.fov.value = spec._diameter_image_circle/2.0;
+        }
+        osp.fov.is_relative = true; // Fields are specified as 0, 0.7, 1.0 etc - without actual sizes
+        osp.fov.is_wide_angle = half_angle_deg > 45.;
         if (spec._generate_d_line_only) {
             osp.wvls = new WvlSpec(new WvlWt[]{
                 new WvlWt(587.5618, 1.0)}, 0);
@@ -386,7 +392,11 @@ public class Prescription {
         System.out.println(sm.list_surfaces(new StringBuilder()).toString());
         System.out.println(sm.list_gaps(new StringBuilder()).toString());
         opm.update_model();
-        Trace.apply_paraxial_vignetting(opm);
+        if (osp.fov.is_wide_angle)
+            VigCalc.set_vig(opm,true);
+        else
+            Trace.apply_paraxial_vignetting(opm);
+        opm.update_model();
         return opm;
     }
 

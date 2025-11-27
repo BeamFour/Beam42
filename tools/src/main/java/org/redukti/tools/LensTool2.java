@@ -28,8 +28,8 @@ public class LensTool2 {
         return p;
     }
 
-    public static OpticalModel createSystem(Prescription prescription) {
-        return prescription.build_rayoptic_model(prescription);
+    public static OpticalModel createSystem(Prescription prescription,boolean fov_angle) {
+        return prescription.build_rayoptic_model(prescription,fov_angle);
     }
 
     public static void outputSpotAnalysis(SpotAnalysisResult.SpotResultsByField result, Path output_file) throws Exception {
@@ -78,7 +78,7 @@ public class LensTool2 {
         try {
             OpticalBenchDataImporter.LensSpecifications specs = getSpecsFromFile(arguments.specfile);
             var prescription = createPrescription(specs,arguments.scenario,arguments.use_glass_types,arguments.only_d_line);
-            var opm = createSystem(prescription);
+            var opm = createSystem(prescription,true);
             //ParaxialFirstOrderInfo pfo = ParaxialFirstOrderInfo.compute(system);
             //Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"paraxial.txt",arguments.outdir), pfo.toString());
 //            outputLayout(system,Helper.getOutputPath(arguments.specfile,"layoutonly.svg",arguments.outdir));

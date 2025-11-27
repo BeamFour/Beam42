@@ -9,7 +9,8 @@ F-Number	1.4
 Image Height	43.2
 Magnification	0
 d0	Infinity
-Bf	19.1415
+Bf(o)	19.1415
+Bf	18.86
 [lens data]
 1	29.45985	3.50000	1.72341	30.82	50.10	N-LAK10
 2	89.9115	0.0210		30.82

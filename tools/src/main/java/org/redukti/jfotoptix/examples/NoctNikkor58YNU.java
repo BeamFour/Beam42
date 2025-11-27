@@ -65,7 +65,7 @@ public class NoctNikkor58YNU {
             return thickness;
         }
         if (nd != 0.0) {
-            lens.add_surface(radius, apertureRadius, thickness, new GlassMap("Any", glassName, nd, 0,0, vd, 0.0));
+            lens.add_surface(radius, apertureRadius, thickness, new GlassMap("Any", glassName, nd, 0,0,0,0,0, vd,0, 0.0));
         } else {
             lens.add_surface(radius, apertureRadius, thickness);
         }

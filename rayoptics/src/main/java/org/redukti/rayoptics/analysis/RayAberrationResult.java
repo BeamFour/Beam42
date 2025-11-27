@@ -24,7 +24,18 @@ public class RayAberrationResult {
         results.add(fan_result);
     }
 
+    private double auto_y_scale() {
+        double yscale = 0.0;
+        for (TraceFanResult fan_result : results) {
+            if (yscale < fan_result.max_y_val)
+                yscale = fan_result.max_y_val;
+        }
+        return yscale;
+    }
+
     public String plot(TraceFanResult fan_result,double yscale) {
+        if (yscale == 0)
+            yscale = auto_y_scale();
         Plot plot = new Plot();
         plot.set_title(fan_result.type.toString() + " " + fan_result.fld.toString());
         plot.get_axes().set_position(Vector3.vector3_0);

@@ -1,0 +1,43 @@
+[descriptive data]
+title	US005161060 Example 1 (Leica Summilux-M 35mm F1.4 Asph v1)
+[constants]
+[variable distances]
+Focal Length	35
+Angle of View	64
+F-Number	1.4
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf(p)	19.595
+Bf	19.64
+[lens data]
+1	-110.114	2.01	1.503	34.45	56.1
+2	24.920	7.40	1.820	34.45	45.1
+3	-305.000	0.10		34.45
+4	28.346	6.07	1.820	24.12	45.1
+5	-57.560	1.61	1.694	24.12	31.0
+6	16.624	4.34		19.61
+7	AS	1.66		19.521
+8	-197.204	6.07	1.792	19.64	47.2
+9	-38.628	1.50		19.64
+10	-21.142	1.72	1.652	21.82	33.6
+11	101.985	5.86	1.820	21.82	45.1
+12	-21.905	0.11		21.82
+13	60.026	5.94	1.820	26.16	45.1
+14	-31.325	2.05	1.624	26.16	36.1
+15	31.325	Bf		26.16
+[aspherical data]
+4	28.346	0	-1.01662E-05	-3.85859E-08	-5.57379E-12
+13	60.026	0	-5.31166E-06	-6.51374E-09	3.61001E-11
+[figure]
+source	Data/US005161060_Figure01P.png
+originX	43.57
+originY	88.38
+ppmm	4.015
+[figure]
+source	Data/US005161060_Figure01.png
+originX	272.98
+originY	563.77
+ppmm	23.423
+[notes]
+Bill: Early asphericals with non-standard equation. Fit patent coefficients to modern equation with Excel solve.

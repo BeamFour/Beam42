@@ -1,0 +1,38 @@
+[descriptive data]
+title	FR 1.233.449 Example 1 (Leica Summilux 35mm F1.4)
+[constants]
+Scaled	35	1
+[variable distances]
+Focal Length	35
+Angle of View	64
+F-Number	1.4
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf	19.1415
+[lens data]
+1	29.45985	3.50000	1.72341	30.82	50.10
+2	89.9115	0.0210		30.82
+3	13.4470	4.5395	1.78990	22.21	48.00
+4	30.2365	1.3090	1.70444	22.21	29.84
+5	8.9320	6.2690		15.92
+5AS	AS	1.8125		15.232
+6	-56.2695	1.9390	1.78990	15.74	48.00
+7	-30.2365	1.7290		15.12	
+8	-12.0680	1.3090	1.76167	15.12	27.34
+9	-47.9990	4.5990	1.78990	22.09	48.00
+10	-16.0125	0.5985		22.09
+11	-700.0000	4.7985	1.72056	28.97	47.69
+12	-29.4595	Bf		28.97
+[figure]
+source	Data/FR1233449_Figure01P.png
+originX	52.25
+originY	207.03
+ppmm	11.617
+[figure]
+source	Data/FR1233449_Figure01.png
+originX	61.72
+originY	353.92
+ppmm	20.813
+[notes]
+Bill: Note that required element heights far exceed the patent figure (but match the production figure).

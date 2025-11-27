@@ -37,7 +37,11 @@ public class GlassMapGenerator {
                 agf.get_refractive_index(SpectralLine.d),
                 agf.get_refractive_index(SpectralLine.C),
                 agf.get_refractive_index(SpectralLine.F),
+                agf.get_refractive_index(SpectralLine.e),
+                agf.get_refractive_index(SpectralLine.C_),
+                agf.get_refractive_index(SpectralLine.F_),
                 agf.get_abbe_vd(),
+                agf.get_abbe_ve(),
                 0.0);
     }
 
@@ -48,7 +52,12 @@ public class GlassMapGenerator {
         sb.append(decimalFormat.format(g.get_refractive_index(SpectralLine.d))).append(", ");
         sb.append(decimalFormat.format(g.get_refractive_index(SpectralLine.C))).append(", ");
         sb.append(decimalFormat.format(g.get_refractive_index(SpectralLine.F))).append(", ");
-        sb.append(decimalFormat2.format(g.get_abbe_vd())).append(",0.0));");
+        sb.append(decimalFormat.format(g.get_refractive_index(SpectralLine.e))).append(", ");
+        sb.append(decimalFormat.format(g.get_refractive_index(SpectralLine.C_))).append(", ");
+        sb.append(decimalFormat.format(g.get_refractive_index(SpectralLine.F_))).append(", ");
+        sb.append(decimalFormat2.format(g.get_abbe_vd())).append(", ");
+        sb.append(decimalFormat2.format(g.get_abbe_ve())).append(", ");
+        sb.append("0.0));");
         return sb.toString();
     }
 

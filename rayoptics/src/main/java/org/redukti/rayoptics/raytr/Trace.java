@@ -803,29 +803,15 @@ public class Trace {
 
         var grid = new ArrayList<GridItem>();
         // Below creates concentric rings of points that will be relative to pupil of radius 1.0
-        List<Vector2> points = new ArrayList<>();
-        double cx = grid_rng.cx, cy = grid_rng.cy;  // center of ring
-        points.add(new Vector2(cx,cy));
         int num_rings = grid_rng.num_rings;
         double max_radius = grid_rng.max_radius; // max radius
-        int num_points_in_ring_one = grid_rng.num_points_in_ring_one;
-        double angle_deg_ring_one = 360.0 / num_points_in_ring_one;
-        for (int ring=1; ring <= num_rings; ring++) {
-            // angular step
-            double daz = angle_deg_ring_one / ring;
-             // Odd rings offset by half-step
-            double offset = (ring % 2 == 0) ? 0.0 : 0.5*daz;
-            // Linear radius spacing
-            double r = ring * max_radius / num_rings;
-            // Number of points on this ring
-            int numPoints = num_points_in_ring_one * ring;
-            for (int jaz = 0; jaz < numPoints; jaz++) {
-                double angle_deg  = offset + jaz*daz;
-                double angle_rad = Math.toRadians(angle_deg);
-                double x = cx + r*Math.cos(angle_rad);
-                double y = cy + r*Math.sin(angle_deg);
-                points.add(new Vector2(x, y));
-            }
+
+        List<Vector2> points;
+        if (grid_rng.hexapolar) {
+            points = generate_hexapolar_points(grid_rng, max_radius, num_rings);
+        }
+        else {
+            points = generate_points(grid_rng, num_rings, max_radius);
         }
 
         for (int i = 0; i < points.size(); i++) {
@@ -852,6 +838,47 @@ public class Trace {
             }
         }
         return grid;
+    }
+
+    private static List<Vector2> generate_hexapolar_points(TraceRingsDef grid_rng, double max_radius, int num_rings) {
+        List<Vector2> points;
+        points = new ArrayList<>();
+        double cx = grid_rng.cx, cy = grid_rng.cy;  // center of ring
+        points.add(new Vector2(cx,cy));
+        double step = max_radius / num_rings;
+        for (double r = max_radius; r > 1e-8; r -= step) {
+            double astep = (step / r) * (Math.PI / 3);
+            for (double a = 0; a < 2 * Math.PI - 1e-8; a += astep)
+                points.add(new Vector2(cx + Math.sin(a) * r, cy + Math.cos(a) * r));
+        }
+        return points;
+    }
+
+    private static List<Vector2> generate_points(TraceRingsDef grid_rng, int num_rings, double max_radius) {
+        List<Vector2> points;
+        points = new ArrayList<>();
+        double cx = grid_rng.cx, cy = grid_rng.cy;  // center of ring
+        points.add(new Vector2(cx,cy));
+        int num_points_in_ring_one = grid_rng.num_points_in_ring_one;
+        double angle_deg_ring_one = 360.0 / num_points_in_ring_one;
+        for (int ring = 1; ring <= num_rings; ring++) {
+            // angular step
+            double daz = angle_deg_ring_one / ring;
+             // Odd rings offset by half-step
+            double offset = (ring % 2 == 0) ? 0.0 : 0.5*daz;
+            // Linear radius spacing
+            double r = ring * max_radius / num_rings;
+            // Number of points on this ring
+            int numPoints = num_points_in_ring_one * ring;
+            for (int jaz = 0; jaz < numPoints; jaz++) {
+                double angle_deg  = offset + jaz*daz;
+                double angle_rad = Math.toRadians(angle_deg);
+                double x = cx + r*Math.cos(angle_rad);
+                double y = cy + r*Math.sin(angle_rad);
+                points.add(new Vector2(x, y));
+            }
+        }
+        return points;
     }
 
 

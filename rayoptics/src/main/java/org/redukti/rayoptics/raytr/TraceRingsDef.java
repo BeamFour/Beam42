@@ -6,4 +6,5 @@ public class TraceRingsDef {
     public int num_rings = 21;
     public double max_radius = 1.0;
     public int num_points_in_ring_one = 6;
+    public boolean hexapolar = false;
 }

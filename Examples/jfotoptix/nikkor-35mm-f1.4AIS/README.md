@@ -62,9 +62,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 26.805 | 86.797|
- | 0.7 | 89.233 | 406.103|
- | 1.0 | 182.663 | 783.141|
+ | 0.0 | 26.804 | 86.627|
+ | 0.7 | 89.272 | 405.932|
+ | 1.0 | 182.696 | 782.982|
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./US003576360_Example01a.txt)
 * [Zemax file](./US003576360_Example01a.zmx)

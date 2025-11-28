@@ -1,5 +1,8 @@
 [descriptive data]
 title	US005161060 Example 1 (Leica Summilux-M 35mm F1.4 Asph v1)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US5161060A	EX 1	1990	Walter Watz	Leica Camera AG	https://patents.google.com/patent/US5161060A/en
+lens name	Leica Summilux-M 35mm F1.4 Asph v1
 [constants]
 [variable distances]
 Focal Length	35

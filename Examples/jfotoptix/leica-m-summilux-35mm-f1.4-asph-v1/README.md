@@ -1,3 +1,8 @@
+# Leica Summilux-M 35mm F1.4 Asph v1
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US5161060A | EX 1 | 1990 | Walter Watz | Leica Camera AG | [link](https://patents.google.com/patent/US5161060A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

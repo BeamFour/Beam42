@@ -8,7 +8,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 
 | ID  | Radius | Thickness | Diameter | nd  | vd  | Glass Make | Glass |
 | --- | ---    | ---       | ---      | --- | --- | ---        | ---   |
-| 1 | 44.452 | 5.09105 | 37.5 | 1.717 | 47.98 | Hoya | LAF3 |
+| 1 | 44.452 | 5.09105 | 37.5 | 1.717 | 47.96 | Schott | LAF3 |
 | 2 | 288.6605 | 0.05885 | 37.5 |  |  |  |
 | 3 | 21.8035 | 4.85565 | 32.71 | 1.788 | 47.49 | Schott | N-LAF21 |
 | 4 | 34.062 | 1.5891 | 32.71 |  |  |  |
@@ -59,9 +59,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 20.189 | 66.983|
- | 0.7 | 94.541 | 459.949|
- | 1.0 | 108.604 | 562.507|
+ | 0.0 | 20.115 | 66.784|
+ | 0.7 | 94.461 | 459.739|
+ | 1.0 | 108.543 | 562.332|
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./US003874771_Example05.txt)
 * [Zemax file](./US003874771_Example05.zmx)

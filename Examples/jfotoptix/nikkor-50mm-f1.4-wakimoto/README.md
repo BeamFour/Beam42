@@ -10,7 +10,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | --- | ---    | ---       | ---      | --- | --- | ---        | ---   |
 | 1 | 40.7 | 4.65 | 40.0 | 1.7495 | 34.95 | Schott | LAFN7 |
 | 2 | 132.56 | 0.095 | 40.0 |  |  |  |
-| 3 | 28.1 | 6.01 | 32.9 | 1.744 | 44.81 | Hikari | J-LAF2 |
+| 3 | 28.1 | 6.01 | 32.9 | 1.744 | 44.8 | Hikari | J-LAF2 |
 | 4 | 135.66 | 3.295 | 31.5 | 1.69895 | 30.13 | Hikari | J-SF15 |
 | 5 | 16.705 | 8.165 | 24.6 |  |  |  |
 | 6 | AS | 8.5 | 23.9 |  |  |  |
@@ -58,9 +58,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 33.645 | 123.018|
- | 0.7 | 77.615 | 391.606|
- | 1.0 | 105.726 | 509.825|
+ | 0.0 | 33.675 | 123.162|
+ | 0.7 | 77.617 | 391.749|
+ | 1.0 | 105.731 | 509.963|
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./US003560079_Example02.txt)
 * [Zemax file](./US003560079_Example02.zmx)

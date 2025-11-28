@@ -1,3 +1,8 @@
+# Leica Summilux-M 35mm f1.4 v1 Pre-asph
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US2975673A | EX 1 | 1959 | Walter Mandler | Ernst Leitz Canada Ltd   | [link](https://patents.google.com/patent/US2975673A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

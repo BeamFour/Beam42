@@ -1,5 +1,8 @@
 [descriptive data]
 title	FR 1.233.449 Example 1 (Leica Summilux 35mm F1.4)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US2975673A	EX 1	1959	Walter Mandler	Ernst Leitz Canada Ltd  	https://patents.google.com/patent/US2975673A/en
+lens name	Leica Summilux-M 35mm f1.4 v1 Pre-asph
 [constants]
 Scaled	35	1
 [variable distances]

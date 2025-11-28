@@ -78,7 +78,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ---   | ---              | ---             |
  | 0.0 | 4.386 | 12.071|
  | 0.7 | 9.336 | 35.295|
- | 1.0 | 20.691 | 58.3|
+ | 1.0 | 20.75 | 58.29|
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./US20160266350_Example01P.txt)
 * [Zemax file](./US20160266350_Example01P.zmx)

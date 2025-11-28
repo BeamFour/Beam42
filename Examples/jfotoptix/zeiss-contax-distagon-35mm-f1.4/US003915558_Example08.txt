@@ -1,0 +1,50 @@
+[descriptive data]
+title	US 3,915,558 Example 8 (Zeiss Distagon T f1.4 35mm Contax)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US3915558	EX 8	1973	Erhard Glatzel	Carl Zeiss AG	https://patents.google.com/patent/US3915558A/en
+lens name	Zeiss Contax Distagon 35mm f1.4 T* for Contax/Yashica
+[constants]
+Scaled	35	1
+[variable distances]
+Focal Length	35
+Angle of View	62
+F-Number	1.4
+Total Length	undefined
+Image Height	42
+Magnification	0
+d0	Infinity
+Bf(p)	undefined
+Bf	34.49
+[lens data]
+1	291.6375	2.21445	1.5827	45.24	46.5	N-BAF3
+2	32.4835	11.42890		39.44	
+3	46.5535	3.23505	1.5481	37.26	45.8	N-LLF1
+4	32.4835	11.72745		33.54	
+5	45.5560	6.49915	1.7130	39.93	53.9	N-LAK8
+6	-394.5550	2.90780		39.93
+7	-1664.7750	4.71800	1.7130	39.52	53.9	N-LAK8
+8	-73.2480	0.04830		39.52
+9	27.3315	6.43195	1.7130	34.62	53.9	N-LAK8
+10	29.1620	6.55760		30.31
+10AS	AS	1.69400		28.454
+11	-241.8500	2.36880	1.5481	28.08	45.8	N-LLF1
+12	39.4485	4.46775		26.49
+13	-41.4890	1.55015	1.8467	26.49	23.8
+14	48.9545	0.00000		28.24
+15	48.9545	6.97095	1.7883	28.78	47.4	LAFN21
+16	-32.9560	0.59710		28.78
+17	308.8750	3.68760	1.7883	28.21	47.4	LAFN21
+18	-52.60255	Bf		28.21
+[aspherical data]
+11	-241.8500	-1	-1.8505155E-05
+[figure]
+source	Data/US003915558_Figure04.png
+originX	130.30
+originY	285.66
+ppmm	10.035
+[figure]
+source	Data/US003915558_Figure04P.png
+originX	48.73
+originY	230.30
+ppmm	8.567
+[notes]

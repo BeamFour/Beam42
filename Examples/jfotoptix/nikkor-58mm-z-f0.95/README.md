@@ -9,7 +9,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ID  | Radius | Thickness | Diameter | nd  | vd  | Glass Make | Glass |
 | --- | ---    | ---       | ---      | --- | --- | ---        | ---   |
 | 1 | 108.488 | 7.65 | 66.5 | 1.90265 | 35.77 | Hikari | J-LASFH9A |
-| 2 | -848.55 | 2.8 | 65.3 | 1.552981 | 55.07 | Hikari | J-KZFH4 |
+| 2 | -848.55 | 2.8 | 65.3 | 1.55298 | 55.07 | Hikari | J-KZFH4 |
 | 3 | 50.252 | 18.12 | 58.3 |  |  |  |
 | 4 | -60.72 | 2.8 | 58.5 | 1.61266 | 44.46 | Hikari | J-KZFH1 |
 | 5 | 2497.5 | 9.15 | 65.3 | 1.59319 | 67.9 | Hikari | J-PSKH1 |
@@ -36,7 +36,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 26 | 55.281 | 9.11 | 38.5 | 1.883 | 40.69 | Hikari | J-LASF08A |
 | 27 | -144.041 | 3.0 | 38.0 | 1.76684 | 46.78 | Hikari | J-LASFH2 |
 | 28 | 52.858 | 14.5 | 38.0 |  |  |  |
-| 29 | 0.0 | 1.6 | 43.4 | 1.5168 | 64.14 | Hikari | J-BK7A |
+| 29 | 0.0 | 1.6 | 43.4 | 1.5168 | 64.13 | Hikari | J-BK7A |
 | 30 | 0.0 | 1.0 | 43.4 |  |  |  |
 ## Aspherical Data
 | ID  | k   | A4  | A6  | A8  | A10 | A12 | A14 | A16 | A18 |
@@ -71,7 +71,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | exp_dist_P' | -51.527
 | exp_radius | 26.802
 | m | 0
-| red | -1.6762659455600592E8
+| red | -1.6762660714810923E8
 | n_obj | 1
 | n_img | 1
 | img_ht | 21.69
@@ -81,9 +81,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 5.831 | 12.205|
- | 0.7 | 7.633 | 32.255|
- | 1.0 | 15.086 | 45.305|
+ | 0.0 | 5.792 | 11.841|
+ | 0.7 | 7.63 | 32.606|
+ | 1.0 | 14.986 | 45.025|
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./nikkor-z-58mmf0.95_ex1.txt)
 * [Zemax file](./nikkor-z-58mmf0.95_ex1.zmx)

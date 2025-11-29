@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP 1999-211978 Example 1 (Canon EF35mm f1.4L USM)
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP 1999-211978	EX 1	1998	MURATA YASUNORI, MITSUSAKA MAKOTO	Canon Inc	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-H11-211978/11/en
+lens name	Canon EF 35mm f1.4L USM
 [constants]
 [variable distances]
 Focal Length	34.3	undefined

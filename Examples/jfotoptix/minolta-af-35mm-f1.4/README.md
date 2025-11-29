@@ -26,7 +26,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 16 | -86.327 | 3.451 | 29.56 | 1.72 | 50.34 | Hoya | LAC10 |
 | 17 | -55.847 | 0.197 | 29.56 |  |  |  |
 | 18 | 403.961 | 6.704 | 32.52 | 1.72 | 50.34 | Hoya | LAC10 |
-| 19 | -34.154 | 36.74 | 32.52 |  |  |  |
+| 19 | -34.154 | 36.76 | 32.52 |  |  |  |
 ## Aspherical Data
 | ID  | k   | A4  | A6  | A8  | A10 | A12 | A14 | A16 | A18 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -47,7 +47,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | back_focal_length | 36.787
 | optical_invariant | 7.538
 | object_distance | 1.0E10
-| image_distance | 36.74
+| image_distance | 36.76
 | power | 0.029
 | pp1_H | 49.285
 | ppk_H' | -1.803
@@ -68,9 +68,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 17.805 | 49.434|
- | 0.7 | 31.679 | 130.375|
- | 1.0 | 75.316 | 254.262|
+ | 0.0 | 16.018 | 42.333|
+ | 0.7 | 29.443 | 123.89|
+ | 1.0 | 73.515 | 248.679|
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./US004806003_Example02.txt)
 * [Zemax file](./US004806003_Example02.zmx)

@@ -14,7 +14,8 @@ Total Length	80.352
 Magnification	0
 d0	Infinity
 Bf(p)	undefined
-Bf	36.74
+Bf(o)	36.74
+Bf	36.76
 [lens data]
 1	83.953	1.877	1.62280	45.14	56.98	S-BSM10
 2	28.356	10.056		42.83

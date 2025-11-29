@@ -23,7 +23,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 18 | -172.7 | 5.94 | 31.72 | 1.7725 | 49.6 | Ohara | S-LAH66 |
 | 19 | -30.321 | 0.2 | 31.72 |  |  |  |
 | 20 | -160.598 | 6.81 | 36.46 | 1.7725 | 49.6 | Ohara | S-LAH66 |
-| 21 | -32.418 | 38.65 | 36.46 |  |  |  |
+| 21 | -32.418 | 38.624 | 36.46 |  |  |  |
 ## Aspherical Data
 | ID  | k   | A4  | A6  | A8  | A10 | A12 | A14 | A16 | A18 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -44,7 +44,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | back_focal_length | 38.653
 | optical_invariant | 7.39
 | object_distance | 1.0E10
-| image_distance | 38.65
+| image_distance | 38.624
 | power | 0.029
 | pp1_H | 54.974
 | ppk_H' | -4.358
@@ -54,7 +54,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | enp_radius | 11.826
 | exp_dist_P' | -39.734
 | exp_radius | 27.03
-| m | 0
+| m | 0.001
 | red | -2.9158975230727E8
 | n_obj | 1
 | n_img | 1
@@ -65,9 +65,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 12.793 | 33.215|
- | 0.7 | 34.014 | 194.209|
- | 1.0 | 64.996 | 303.107|
+ | 0.0 | 14.401 | 42.55|
+ | 0.7 | 37.009 | 203.096|
+ | 1.0 | 67.921 | 310.557|
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./JP1999-211978_Example01.txt)
 * [Zemax file](./JP1999-211978_Example01.zmx)

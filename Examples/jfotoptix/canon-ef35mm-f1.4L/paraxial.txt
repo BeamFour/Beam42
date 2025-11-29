@@ -2,7 +2,7 @@ effective_focal_length 34.294758102956514
 back_focal_length      38.65325155783909
 optical_invariant      7.3895666558052255
 object_distance        1.0E10
-image_distance         38.65
+image_distance         38.624
 power                  0.02915897517042965
 pp1_H                  54.97358968560907
 ppk_H'                 -4.358493454882577
@@ -10,9 +10,9 @@ ffl_F                  20.678831582652556
 fno                    1.4500000000000004
 enp_dist_P             35.68300533107398
 enp_radius             11.825778673935506
-exp_dist_P'            -39.733632855842465
+exp_dist_P'            -39.73363285584245
 exp_radius             27.02996018320503
-m                      9.481209429518245E-5
+m                      8.529454487262722E-4
 red                    -2.9158975230727E8
 n_obj                  1.0
 n_img                  1.0

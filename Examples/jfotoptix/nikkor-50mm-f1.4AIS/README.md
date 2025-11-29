@@ -10,13 +10,13 @@ Note that where glass types are shown the refractive index and abbe number is as
 | --- | ---    | ---       | ---      | --- | --- | ---        | ---   |
 | 1 | 40.43 | 5.1 | 36.95 | 1.7945 | 45.39 | Hoya | TAF2 |
 | 2 | 242.25 | 0.1 | 36.95 |  |  |  |
-| 3 | 25.95 | 4.7 | 32.76 | 1.7725 | 49.63 | Hoya | TAF1 |
+| 3 | 25.95 | 4.7 | 32.76 | 1.7725 | 49.62 | Hoya | TAF1 |
 | 4 | 38.38 | 1.52 | 30.59 |  |  |  |
 | 5 | 71.28 | 1.2 | 30.59 | 1.6727 | 32.21 | Schott | SF5 |
 | 6 | 17.71 | 7.9 | 26.0 |  |  |  |
 | 7 | AS | 7.1 | 25.523 |  |  |  |
 | 8 | -17.75 | 1.0 | 25.19 | 1.74 | 28.28 | Ohara | PBH3 |
-| 9 | -1500.0 | 6.4 | 29.41 | 1.7725 | 49.63 | Hoya | TAF1 |
+| 9 | -1500.0 | 6.4 | 29.41 | 1.7725 | 49.62 | Hoya | TAF1 |
 | 10 | -30.47 | 0.2 | 30.96 |  |  |  |
 | 11 | -77.41 | 4.3 | 32.25 | 1.788 | 47.49 | Hoya | TAF4 |
 | 12 | -29.87 | 0.1 | 32.25 |  |  |  |
@@ -59,9 +59,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 17.923 | 55.161|
- | 0.7 | 54.635 | 282.182|
- | 1.0 | 88.462 | 399.822|
+ | 0.0 | 18.333 | 56.792|
+ | 0.7 | 54.827 | 283.586|
+ | 1.0 | 88.593 | 400.826|
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./US004448497_Example01a.txt)
 * [Zemax file](./US004448497_Example01a.zmx)

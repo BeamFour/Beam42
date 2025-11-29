@@ -90,7 +90,7 @@ public class LensTool {
     }
 
     public static AnalysisSpot outputSpotAnalysis(OpticalSystem system, Path output_file, int spot_density) throws Exception {
-        RendererSvg renderer = new RendererSvg(300, 300, Rgb.rgb_black);
+        RendererSvg renderer = new RendererSvg(640, 640, Rgb.rgb_black);
         AnalysisSpot spot = new AnalysisSpot(system, spot_density);
         spot.draw_diagram(renderer, true);
         if (output_file != null) {

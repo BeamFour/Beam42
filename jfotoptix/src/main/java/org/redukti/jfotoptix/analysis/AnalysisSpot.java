@@ -130,7 +130,8 @@ public class AnalysisSpot extends AnalysisPointImage {
 
         Vector3 center3 = _results.get_intercepted_center (_image);
         Vector2 center = new Vector2(center3.x(), center3.y());
-        Vector2 radius = new Vector2 (_useful_radius, _useful_radius);
+        //Vector2 radius = new Vector2 (_useful_radius, _useful_radius);
+        Vector2 radius = new Vector2 (.6, .6);
 
         renderer.set_window (new Vector2Pair(center.minus(radius), center.plus(radius)), true);
 

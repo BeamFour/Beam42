@@ -59,7 +59,7 @@ public class SpotAnalysisResult extends Analysis {
         public String plot() {
             RendererSvg r = new RendererSvg(640,480);
             r = new RendererSvg(640,640, Rgb.rgb_black);
-            r.set_window(new Vector2Pair(new Vector2(-300, -300), new Vector2(300, 300)), true);
+            r.set_window(new Vector2Pair(new Vector2(-600, -600), new Vector2(600, 600)), true);
             var axes = new PlotAxes();
             axes.set_show_axes (false, PlotAxes.AxisMask.XY);
             axes.set_label ("Sagittal distance", PlotAxes.AxisMask.X);

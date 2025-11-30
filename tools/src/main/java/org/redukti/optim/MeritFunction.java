@@ -22,7 +22,7 @@ public class MeritFunction implements LMLFunction {
             this.outs = outs;
             this.resid = new double[outs.length];
             this.point = new double[vars.length];
-            this.jac = new double[vars.length][vars.length];
+            this.jac = new double[outs.length][vars.length];
         }
 
         @Override

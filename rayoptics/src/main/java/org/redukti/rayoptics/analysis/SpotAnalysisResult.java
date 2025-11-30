@@ -1,5 +1,6 @@
 package org.redukti.rayoptics.analysis;
 
+import org.redukti.mathlib.M;
 import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector2Pair;
 import org.redukti.mathlib.Vector3;
@@ -12,10 +13,13 @@ import org.redukti.render.rendering.Renderer;
 import org.redukti.render.rendering.RendererSvg;
 import org.redukti.render.rendering.Rgb;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SpotAnalysisResult extends Analysis {
+
+    private static DecimalFormat decimalFormat = M.decimal_format();
 
     public static class SpotResultsByField {
         public Field fld;
@@ -53,8 +57,29 @@ public class SpotAnalysisResult extends Analysis {
 
         @Override
         public String toString() {
-            return "Field angle " + fld.y + "\n" + " mean radius " + mean_radius * 1000 + "\n" + "  max radius " + max_radius * 1000 + "\n";
+            return "Field " + fld + " mean radius " + get_mean_radius() + " max radius " + get_max_radius();
         }
+
+        private double get_max_radius() {
+            return max_radius * 1000;
+        }
+
+        private double get_mean_radius() {
+            return mean_radius * 1000;
+        }
+
+        public static StringBuilder toMarkdownTableHeader(StringBuilder sb) {
+            sb.append("| Field | Spot Mean Radius | Spot Max Radius |\n");
+            sb.append("| ---   | ---              | ---             |\n");
+            return sb;
+        }
+        public StringBuilder toMarkdownTableRow(StringBuilder sb) {
+            sb.append(" | ").append(fld)
+                .append(" | ").append(decimalFormat.format(get_mean_radius()))
+                .append(" | ").append(decimalFormat.format(get_max_radius()))
+                .append("|\n");
+        return sb;
+    }
 
         public String plot() {
             RendererSvg r = new RendererSvg(640,480);

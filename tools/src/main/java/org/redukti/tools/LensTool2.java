@@ -92,15 +92,15 @@ public class LensTool2 {
                 var spotFld = spotAnalysis.spot_results.get(i);
                 var outfile = Helper.getOutputPath(arguments.specfile,filenames[i],arguments.outdir);
                 outputSpotAnalysis(spotFld,outfile);
+                spotReport.append(spotFld).append("\n");
             }
-
+            Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"spot-report.txt",arguments.outdir), spotReport.toString());
             var rayAber = TransverseRayAberrationAnalysis.eval(opm, 21, new TraceOptions());
             for (var fan_results: rayAber.results) {
                 String filename = "rayabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag") + ".svg";
                 var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
                 Helper.createOutputFile(output_file, rayAber.plot(fan_results, 0));
             }
-
             var opdAber = WavefrontAberrationAnalysis.eval(opm, 21, new TraceOptions());
             for (var fan_results: opdAber.results) {
                 String filename = "opdabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag") + ".svg";

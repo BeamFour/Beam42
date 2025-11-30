@@ -58,12 +58,7 @@ public class AFSNikkor28mmOptim {
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 38.1031, 1.0)
                 });
         var lm = f.getSolver();
-        int istatus = 0;
-        while (istatus!= LMLSolver.BADITER &&
-                istatus!= LMLSolver.LEVELITER &&
-                istatus!= LMLSolver.MAXITER) {
-            istatus = lm.iLMiter();
-        }
+        var istatus = lm.solve();
         System.out.println("Status = " + istatus);
         System.out.println(f.toString());
         System.out.println(prescription.toString());

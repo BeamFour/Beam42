@@ -19,7 +19,7 @@ public class VarAsphCoeff extends Var {
         this.scalingFactor = scalingFactor;
     }
     @Override
-    public void shift(double delta) {
+    public void shift(double delta, boolean apply_scale) {
         if (delta != 0.0) {
             // The aspheric coefficients are very small numbers
             // We want to shift the significant number ignoring the
@@ -28,16 +28,35 @@ public class VarAsphCoeff extends Var {
             // optimize the values tend to stay in the exponential range
             // chosen as scaling factor
             // It seems that roughly the quartic term needs a factor of
-            // 1E6 and then it goes uo by power of 2.
-            double scaled = originalValue * scalingFactor;
-            double newValue = scaled + delta;
-            double unscaled = newValue / scalingFactor;
-            prescription._surfaces[surfaceId]._coeffs[index] = unscaled;
+            // 1E6 and then it goes uo by power of 2
+            if (apply_scale) {
+                double scaled = originalValue * scalingFactor;
+                double newValue = scaled + delta;
+                double unscaled = newValue / scalingFactor;
+                prescription._surfaces[surfaceId]._coeffs[index] = unscaled;
+            }
+            else
+                prescription._surfaces[surfaceId]._coeffs[index] = originalValue + delta;
         }
         else
             prescription._surfaces[surfaceId]._coeffs[index] = originalValue;
-
     }
+
+    @Override
+    public double scaling_factor() {
+        return scalingFactor;
+    }
+
+    @Override
+    public double get_value() {
+        return prescription._surfaces[surfaceId]._coeffs[index];
+    }
+
+    @Override
+    public void set_value(double value) {
+        prescription._surfaces[surfaceId]._coeffs[index] = value;
+    }
+
     @Override
     public String toString() {
         return "Surface ID: " + surfaceId + " Asph Coeff [" + index + "]: " + prescription._surfaces[surfaceId]._coeffs[index] + " scaling factor " + scalingFactor;

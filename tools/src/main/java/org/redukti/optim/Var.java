@@ -11,5 +11,10 @@ public abstract class Var {
         this.originalValue = originalValue;
         this.dDelta = dDelta;
     }
-    public abstract void shift(double delta);
+    public abstract void shift(double delta, boolean apply_scale);
+    public double scaling_factor() {
+        return 1.;
+    }
+    public abstract double get_value();
+    public abstract void set_value(double value);
 }

@@ -80,12 +80,7 @@ public class Noctilux50Optim2 {
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Enp_dist, 42.9, 1.0)
                 });
         var lm = f.getSolver();
-        int istatus = 0;
-        while (istatus!= LMLSolver.BADITER &&
-                istatus!= LMLSolver.LEVELITER &&
-                istatus!= LMLSolver.MAXITER) {
-            istatus = lm.iLMiter();
-        }
+        var istatus = lm.solve();
         System.out.println("Status = " + istatus);
         System.out.println(f.toString());
     }

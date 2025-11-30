@@ -66,14 +66,7 @@ public class NoctNikkor58Optim2 {
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Ppk, 20.2, 1.0)
                 });
         var lm = f.getSolver();
-        int istatus = 0;
-        int iterCount = 0;
-        while (istatus!= LMLSolver.BADITER &&
-                istatus!= LMLSolver.LEVELITER &&
-                istatus!= LMLSolver.MAXITER) {
-            istatus = lm.iLMiter();
-            iterCount++;
-        }
-        System.out.println(f.toString());
+        var istatus = lm.solve();
+        System.out.println("Status = " + istatus);
     }
 }

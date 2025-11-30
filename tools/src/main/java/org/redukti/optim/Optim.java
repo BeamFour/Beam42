@@ -9,13 +9,7 @@ public class Optim {
 
         var f = new MeritFunction(new Analysis(prescription), vars, outs);
         var solver = f.getSolver();
-        int istatus = 0;
-        while (istatus!= LMLSolver.BADITER &&
-                istatus!= LMLSolver.LEVELITER &&
-                istatus!= LMLSolver.MAXITER) {
-            istatus = solver.iLMiter();
-        }
-
+        solver.solve();
     }
 
 }

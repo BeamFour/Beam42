@@ -28,7 +28,7 @@ public class MeritFunction implements LMLFunction {
         @Override
         public double computeResiduals() {
             for (int i = 0; i < point.length; i++) {
-                vars[i].shift(point[i]);
+                vars[i].shift(point[i],true);
             }
             try {
                 analysis.compute();
@@ -127,8 +127,8 @@ public class MeritFunction implements LMLFunction {
             return computeResiduals();
         }
 
-        public LMLSolver getSolver() {
-            return new LMLSolver(this, tol, vars.length, outs.length);
+        public Solver getSolver() {
+            return new LMBeamSolver(new LMLSolver(this, tol, vars.length, outs.length));
         }
 
         @Override

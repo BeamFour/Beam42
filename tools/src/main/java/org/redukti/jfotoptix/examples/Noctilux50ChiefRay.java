@@ -42,12 +42,7 @@ public class Noctilux50ChiefRay {
                      new GoalRayInterceptImage(analysis, new Vector2(0.0,15.14), 1.0),
                 });
         var lm = f.getSolver();
-        int istatus = 0;
-        while (istatus!= LMLSolver.BADITER &&
-                istatus!= LMLSolver.LEVELITER &&
-                istatus!= LMLSolver.MAXITER) {
-            istatus = lm.iLMiter();
-        }
+        var istatus = lm.solve();
         System.out.println("Status = " + istatus);
         System.out.println(f.toString());
         System.out.println("Field 0.7 AOV = "  + prescription.fullAngleOfViewDegrees(0.7));

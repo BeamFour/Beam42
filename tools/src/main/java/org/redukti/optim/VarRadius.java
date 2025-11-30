@@ -9,9 +9,20 @@ public class VarRadius extends Var {
         this.surfaceId = surfaceId;
     }
     @Override
-    public void shift(double delta) {
+    public void shift(double delta, boolean apply_scale) {
         prescription._surfaces[surfaceId]._radius = originalValue + delta;
     }
+
+    @Override
+    public double get_value() {
+        return prescription._surfaces[surfaceId]._radius;
+    }
+
+    @Override
+    public void set_value(double value) {
+        prescription._surfaces[surfaceId]._radius = value;
+    }
+
     @Override
     public String toString() {
         return "Surface ID: " + surfaceId + " Radius: " + prescription._surfaces[surfaceId]._radius;

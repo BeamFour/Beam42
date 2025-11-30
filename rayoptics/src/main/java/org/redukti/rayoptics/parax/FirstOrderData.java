@@ -165,4 +165,9 @@ public class FirstOrderData {
         sb.append(String.format("optical invariant %12.4g", opt_inv)).append(System.lineSeparator());
         return sb;
     }
+
+    @Override
+    public String toString() {
+        return toString(new StringBuilder()).toString();
+    }
 }

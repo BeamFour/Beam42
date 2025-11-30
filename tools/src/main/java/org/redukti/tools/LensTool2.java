@@ -8,6 +8,7 @@ import org.redukti.rayoptics.analysis.SpotAnalysisResult;
 import org.redukti.rayoptics.analysis.TransverseRayAberrationAnalysis;
 import org.redukti.rayoptics.analysis.WavefrontAberrationAnalysis;
 import org.redukti.rayoptics.optical.OpticalModel;
+import org.redukti.rayoptics.parax.FirstOrderData;
 import org.redukti.rayoptics.raytr.TraceOptions;
 import org.redukti.spec.Prescription;
 import org.redukti.util.Args;
@@ -79,8 +80,8 @@ public class LensTool2 {
             OpticalBenchDataImporter.LensSpecifications specs = getSpecsFromFile(arguments.specfile);
             var prescription = createPrescription(specs,arguments.scenario,arguments.use_glass_types,arguments.only_d_line);
             var opm = createSystem(prescription,true);
-            //ParaxialFirstOrderInfo pfo = ParaxialFirstOrderInfo.compute(system);
-            //Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"paraxial.txt",arguments.outdir), pfo.toString());
+            FirstOrderData pfo = opm.optical_spec.parax_data.fod;
+            Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"paraxial.txt",arguments.outdir), pfo.toString());
 //            outputLayout(system,Helper.getOutputPath(arguments.specfile,"layoutonly.svg",arguments.outdir));
 //            outputLayoutWithRays(system,Helper.getOutputPath(arguments.specfile,"layout.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
 //            outputLayoutWithRays(semiSkewedSystem,Helper.getOutputPath(arguments.specfile,"layout-semi-skew.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);

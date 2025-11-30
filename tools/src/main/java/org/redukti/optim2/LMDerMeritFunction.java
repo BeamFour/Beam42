@@ -67,6 +67,38 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
         return 0;
     }
 
+    @Override
+    public int apply(int m, int n, double[] x, double[] fvec, int iflag) {
+        // m should be size of outs
+        // n should be size of vars
+        // x is current guess for vars
+        // fvec is the result of outs
+        // fjac is jacobian
+
+        assert m == functions.length;
+        assert n == vars.length;
+
+        // if the nprint parameter to lmder is positive, the function is
+        // called every nprint iterations with iflag=0, so that the
+        // function may perform special operations, such as printing
+        // residuals.
+        if (iflag == 0) return 0;
+        // compute residuals
+        for (int i = 0; i < x.length; i++) {
+            vars[i].set_value(x[i]);
+        }
+        boolean okay = true;
+        try {
+            analysis.compute();
+        } catch (Exception e) {
+            okay = false;
+        }
+        for (int i = 0; i < functions.length; i++) {
+            fvec[i] = okay ? (functions[i].value() * weights[i]) : BIGVAL;
+        }
+        return 0;
+    }
+
     public boolean buildJacobian(double[] x, double[] fjac, int ldfjac) {
         final int n = vars.length;
         final int m = functions.length;

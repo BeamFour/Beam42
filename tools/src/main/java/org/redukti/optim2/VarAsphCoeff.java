@@ -2,10 +2,14 @@ package org.redukti.optim2;
 
 import org.redukti.spec.Prescription;
 
+import static org.redukti.jm.minpack.MinPack.dpmpar;
+
 public class VarAsphCoeff extends Var {
     public final int surfaceId;
     public final int index;
     public final double scalingFactor;
+
+    private static double eps = Math.sqrt(dpmpar(1));
     public VarAsphCoeff(Prescription prescription, int surfaceId, int index,double scalingFactor) {
         super(prescription, prescription._surfaces[surfaceId]._coeffs[index],0.0001);
         this.surfaceId = surfaceId;
@@ -49,11 +53,20 @@ public class VarAsphCoeff extends Var {
     @Override
     public void set_value(double value, double delta) {
         double unscaled = value;
-        if (delta != 0.0) {
+        if (value == 0.0) {
             double scaled = value * scalingFactor;
             double newValue = scaled + delta;
             unscaled = newValue / scalingFactor;
         }
+        else if (delta != 0.0) {
+            delta = Math.abs(value)*eps * Math.signum(value);
+            unscaled = value + delta;
+        }
+//        if (delta != 0.0) {
+//            double scaled = value * scalingFactor;
+//            double newValue = scaled + delta;
+//            unscaled = newValue / scalingFactor;
+//        }
         prescription._surfaces[surfaceId]._coeffs[index] = unscaled;
     }
 

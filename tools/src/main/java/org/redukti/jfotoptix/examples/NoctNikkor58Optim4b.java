@@ -3,10 +3,9 @@ package org.redukti.jfotoptix.examples;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.optim2.*;
-//import org.redukti.optim.*;
 import org.redukti.spec.Prescription;
 
-public class NoctNikkor58Optim4 {
+public class NoctNikkor58Optim4b {
 
    public static Prescription getPrescription(String specfile) throws Exception {
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
@@ -16,7 +15,6 @@ public class NoctNikkor58Optim4 {
     public static void main(String[] args) throws Exception {
         var prescription = getPrescription(args[0]);
         var analysis = new Analysis(prescription, new double[]{0.0,0.1,0.3,0.5,0.7,1.0});
-        //var analysis = new Analysis(prescription, new double[]{0.1,0.3,0.5,0.7,1.0});
         var f = new LMDerMeritFunction(analysis,
                 //new MeritFunction(analysis,
                 new Var[] {

@@ -355,23 +355,28 @@ public class Prescription {
         return new Asphere(s.get_radius_of_curvature(), k, a4, a6, a8, a10, a12, a14, a16, a18, a20);
     }
 
-    public OpticalModel build_rayoptic_model(Prescription spec, boolean fov_angle) {
+    public OpticalModel build_rayoptic_model(boolean fov_angle) {
+        return build_rayoptic_model(fov_angle,null);
+    }
+    public OpticalModel build_rayoptic_model(boolean fov_angle, double[] fields) {
+        if (fields == null)
+            fields = new double[]{0., .707, 1.};
         OpticalModel opm = new OpticalModel();
         SequentialModel sm = opm.seq_model;
         OpticalSpecs osp = opm.optical_spec;
-        double half_angle_deg = spec._angle_of_view_in_degrees/2.0;
-        osp.pupil = new PupilSpec(osp, new Pair<>(ImageKey.Image, ValueKey.Fnum), spec._fno);
+        double half_angle_deg = _angle_of_view_in_degrees/2.0;
+        osp.pupil = new PupilSpec(osp, new Pair<>(ImageKey.Image, ValueKey.Fnum), _fno);
         if (fov_angle) {
-            osp.fov = new FieldSpec(osp, new Pair<>(ImageKey.Object, ValueKey.Angle), new double[]{0., .707, 1.});
+            osp.fov = new FieldSpec(osp, new Pair<>(ImageKey.Object, ValueKey.Angle), fields);
             osp.fov.value = half_angle_deg;
         }
         else {
-            osp.fov = new FieldSpec(osp, new Pair<>(ImageKey.Image, ValueKey.RealHeight), new double[]{0., .707, 1.});
-            osp.fov.value = spec._diameter_image_circle/2.0;
+            osp.fov = new FieldSpec(osp, new Pair<>(ImageKey.Image, ValueKey.RealHeight), fields);
+            osp.fov.value = _diameter_image_circle/2.0;
         }
         osp.fov.is_relative = true; // Fields are specified as 0, 0.7, 1.0 etc - without actual sizes
         osp.fov.is_wide_angle = half_angle_deg > 45.;
-        if (spec._generate_d_line_only) {
+        if (_generate_d_line_only) {
             osp.wvls = new WvlSpec(new WvlWt[]{
                 new WvlWt(587.5618, 1.0)}, 0);
         }
@@ -380,7 +385,7 @@ public class Prescription {
                 new WvlWt(587.5618, 1.0),
                 new WvlWt(656.2725, 0.5)}, 1);
         }
-        opm.system_spec.title = spec._title;
+        opm.system_spec.title = _title;
         opm.system_spec.dimensions = "MM";
         opm.radius_mode = true;
         sm.gaps.get(0).thi = 1e10;

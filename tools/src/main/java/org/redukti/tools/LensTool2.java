@@ -9,6 +9,7 @@ import org.redukti.rayoptics.analysis.TransverseRayAberrationAnalysis;
 import org.redukti.rayoptics.analysis.WavefrontAberrationAnalysis;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrderData;
+import org.redukti.rayoptics.parax.ThirdOrder;
 import org.redukti.rayoptics.raytr.TraceOptions;
 import org.redukti.spec.Prescription;
 import org.redukti.util.Args;
@@ -30,7 +31,7 @@ public class LensTool2 {
     }
 
     public static OpticalModel createSystem(Prescription prescription,boolean fov_angle) {
-        return prescription.build_rayoptic_model(prescription,fov_angle);
+        return prescription.build_rayoptic_model(fov_angle);
     }
 
     public static void outputSpotAnalysis(SpotAnalysisResult.SpotResultsByField result, Path output_file) throws Exception {
@@ -108,12 +109,9 @@ public class LensTool2 {
                 var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
                 Helper.createOutputFile(output_file, opdAber.plot(fan_results, 0));
             }
+            var thirdOrderData = ThirdOrder.compute_third_order(opm);
+            System.out.println(thirdOrderData.toString());
 
-
-//            spotReport.append(spot0).append("\n");
-//            spotReport.append(spot1).append("\n");
-//            spotReport.append(spot2).append("\n");
-//            Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"spot-report.txt",arguments.outdir), spotReport.toString());
 //            ZemaxExporter zemaxExporter = new ZemaxExporter();
 //            Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), zemaxExporter.generate(specs, arguments.scenario, arguments.only_d_line));
 //            createREADME(arguments.specfile,

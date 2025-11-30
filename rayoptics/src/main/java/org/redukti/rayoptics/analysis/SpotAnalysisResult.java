@@ -60,11 +60,11 @@ public class SpotAnalysisResult extends Analysis {
             return "Field " + fld + " mean radius " + get_mean_radius() + " max radius " + get_max_radius();
         }
 
-        private double get_max_radius() {
+        public double get_max_radius() {
             return max_radius * 1000;
         }
 
-        private double get_mean_radius() {
+        public double get_mean_radius() {
             return mean_radius * 1000;
         }
 

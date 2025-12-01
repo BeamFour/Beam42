@@ -63,8 +63,20 @@ public class FirstOrder {
                 var pr = osp.parax_data.pr_ray;
                 enp_dist = -pr.get(1).ht/(n_0*pr.get(0).slp);
             } else {
-                // temporarily set stop to surface 1
-                stop = 1;
+                // nothing pre-computed, assume 1st surface
+                enp_dist = 0;
+                if (M.isZero(sm.gaps.get(0).thi)) {
+                    for (int i = 0; i < sm.gaps.size(); i++) {
+                        var g = sm.gaps.get(i);
+                        if (!M.isZero(g.thi)) {
+                            stop = i+1;
+                            enp_dist += g.thi;
+                            break;
+                        }
+                    }
+                }
+                else
+                    stop = 1;
                 ybar1 = 0;
                 ubar1 = 1.0;
                 enp_dist = 0.0;

@@ -147,19 +147,22 @@ public class Wideangle {
      * Locate the z center of the real pupil for `fld`, wrt 1st ifc
      *
      *     This function implements a 2 step process to finding the chief ray
-     *     for `fld` and `wvl` for wide angle systems. `fld` should be of type ('object', 'angle'), even for finite object distances.
+     *     for `fld` and `wvl` for wide angle systems. `fld` should be of type
+     *     ('object', 'angle'), even for finite object distances.
      *
      *     The first phase searches for the window of pupil locations by sampling the
      *     z coordinate from the paraxial pupil location towards the first interface
      *     vertex. Failed rays are discarded until a range of z coordinates is found
-     *     where rays trace successfully. If only a single successful trace is in
-     *     hand, a second, more finely subdivided search is conducted about the
-     *     successful point.
+     *     where rays trace successfully. If the search forward is unsuccessful (i.e.
+     *     winds up missing the 1st surface), the search is restarted moving away from
+     *     the first interface. If only a single successful trace is in hand, a
+     *     second, more finely subdivided search is conducted about the successful
+     *     point.
      *
      *     The outcome is a range, start_z -> end_z, that is divided in 3 and a ray
-     *     iteration (using :func:`~.raytr.wideangle.find_z_enp`) to find the center of the stop surface is done. Sometimes the
-     *     start point doesn't produce a solution; use of the mid-point as a start is
-     *     a reliable second try.
+     *     iteration (using :func:`~.raytr.wideangle.find_z_enp`) to find the center
+     *     of the stop surface is done. Sometimes the start point doesn't produce a
+     *     solution; use of the mid-point as a start is a reliable second try.
      */
     public static Pair<Double,RayResult> find_real_enp(OpticalModel opm, Integer stop_idx, Field fld, double wvl) {
         var sm = opm.seq_model;
@@ -193,11 +196,12 @@ public class Wideangle {
         var del_z = -z_enp_0/16.0;
         var z_enp = z_enp_0;
         boolean keep_going = true;
+        int first_surf_misses = 0;
         // protect against infinite loops
         int trial = 0;
         // if the trace succeeds 5 times in a row, go on to the next phase
         int successes = 0;
-        while (keep_going && successes < 4 && trial < 64) {
+        while (keep_going && successes < 4 && trial < 64 && first_surf_misses < 2) {
             var coord_rr = enp_z_coordinate(z_enp,sm,stop_idx,dir0,fod.obj_dist,wvl);
             rr = coord_rr.second;
             if (rr.err == null) {
@@ -207,6 +211,11 @@ public class Wideangle {
                 end_z = z_enp;
             }
             else if (rr.err instanceof TraceMissedSurfaceException) {
+                if (rr.err.surf == 1) {
+                    del_z = -del_z;
+                    z_enp = z_enp_0;
+                    first_surf_misses++;
+                }
                 // if the first surface was missed, then exit
                 if (start_z != null)
                     keep_going = false;

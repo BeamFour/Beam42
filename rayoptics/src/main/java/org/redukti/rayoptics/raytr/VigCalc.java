@@ -267,13 +267,12 @@ public class VigCalc {
         if (max_iter_count == null) max_iter_count = 10;
 
         var rel_p1 = start_dir;
-        var still_iterating = true;
         Integer last_index = null;
         var iter_count = 0;
         var step_size = 1.0;
         RayPkg ray_pkg = null;
 
-        while (still_iterating && iter_count < max_iter_count) {
+        while (iter_count < max_iter_count) {
             iter_count++;
             try {
                 step_size /= 2.0;

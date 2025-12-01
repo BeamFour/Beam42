@@ -5,6 +5,7 @@ package org.redukti.rayoptics.specs;
 
 import org.redukti.mathlib.M;
 import org.redukti.mathlib.Matrix3;
+import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.Etendue;
@@ -12,6 +13,7 @@ import org.redukti.rayoptics.parax.FirstOrder;
 import org.redukti.rayoptics.parax.ParaxData;
 import org.redukti.rayoptics.raytr.PupilType;
 import org.redukti.rayoptics.raytr.Trace;
+import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.Pair;
 import org.redukti.rayoptics.util.Triple;
 
@@ -151,6 +153,16 @@ public class OpticalSpecs {
     }
 
     /**
+     * return the refractive indices in object and image space.
+     */
+    public Pair<Double,Double> obj_img_rindex() {
+        var seq_model = opt_model.seq_model;
+        var n_obj = Lists.get(seq_model.z_dir,0).value * seq_model.central_rndx(0);
+        var n_img = Lists.get(seq_model.z_dir,-1).value * seq_model.central_rndx(-1);
+        return new Pair<>(n_obj,n_img);
+    }
+
+    /**
      * turn pupil and field specs into ray start specification.
      *
      *         Args:
@@ -165,6 +177,9 @@ public class OpticalSpecs {
         var pupil_oi_key = this.pupil.key.imageKey;
         var pupil_value_key = this.pupil.key.valueKey;
         var pupil_value = this.pupil.value;
+        var obj_img_rindx = obj_img_rindex();
+        var n_obj = obj_img_rindx.first;
+        var n_img = obj_img_rindx.second;
         Coord coord = obj_coords(fld);
         var p0 = coord.pt;
         var d0 = coord.dir;
@@ -185,7 +200,8 @@ public class OpticalSpecs {
             else { // finite conjugate
                 if (Math.abs(fod.enp_dist) > 1e10) { // telecentric entrance pupil
                     pupil_value_key = ValueKey.NA;
-                    pupil_value = fod.obj_na;
+                    var slp0 = Etendue.na2slp_parax(fod.obj_na, n_obj);
+                    pupil_value = Etendue.slp2na(slp0, n_obj);
                 }
                 else {
                     pupil_value_key = ValueKey.EPD;
@@ -241,19 +257,25 @@ public class OpticalSpecs {
             }
             else {
                 double slope;
+                double[] pupil_dir;
                 if (pupil_value_key == ValueKey.NA) {
+                    double n;
+                    if (pupil_oi_key == ImageKey.Object)
+                        n = n_obj;
+                    else
+                        n = n_img;
                     var na = pupil_value;
-                    slope = Etendue.na2slp(na);
+                    var sin_ang = na / n;
+                    pupil_dir = new Vector2(pupil[0],pupil[1]).times(sin_ang).as_array();
                 }
                 else if (pupil_value_key == ValueKey.Fnum) {
                     var fno = pupil_value;
-                    slope = -1.0/(2.0*fno);
+                    slope = -1.0 / (2.0 * fno);
+                    var hypt = Math.sqrt(1.0 + (pupil[0] * slope) * (pupil[0] * slope) + (pupil[1] * slope) * (pupil[1] * slope));
+                    pupil_dir = new double[]{slope * pupil[0] / hypt, slope * pupil[1] / hypt};
                 }
                 else
-                    throw new IllegalArgumentException("Invalid pupil value key " + pupil_value_key);
-                var hypt = Math.sqrt(1.0 + (pupil[0]*slope)*(pupil[0]*slope) +  (pupil[1]*slope)*(pupil[1]*slope));
-                var pupil_dir = new double[] {slope*pupil[0]/hypt,
-                                      slope*pupil[1]/hypt};
+                    throw new IllegalArgumentException("Invalid pupil value: " + pupil_value_key);
                 pt0 = p0;
                 double[] cr_dir;
                 if (d0 != null) {

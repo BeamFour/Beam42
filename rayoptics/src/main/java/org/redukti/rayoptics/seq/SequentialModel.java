@@ -259,9 +259,7 @@ public class SequentialModel {
      */
     public double central_rndx(int i) {
         int central_wvl = opt_model.optical_spec.wvls.reference_wvl;
-        if (i < 0)
-            i += rndx.size();
-        return rndx.get(i)[central_wvl];
+        return Lists.get(rndx,i)[central_wvl];
     }
 
     public Pair<Interface,Gap> get_surface_and_gap(Integer srf) {

@@ -22,7 +22,7 @@ public class MeritFunction implements LMLFunction {
             this.outs = outs;
             this.resid = new double[outs.length];
             this.point = new double[vars.length];
-            this.jac = new double[vars.length][vars.length];
+            this.jac = new double[outs.length][vars.length];
         }
 
         @Override
@@ -59,6 +59,9 @@ public class MeritFunction implements LMLFunction {
                 final int ngoals = outs.length;
                 double delta[] = new double[nadj];
                 double d=0;
+                // The jacobian is populated column by column
+                // Each column evaluates the functions while perturbing
+                // only the jth variable
                 for (int j=0; j<nadj; j++)
                 {
                     for (int k=0; k<nadj; k++)
@@ -110,10 +113,14 @@ public class MeritFunction implements LMLFunction {
             return resid[i];
         }
 
+        /**
+         * Returns one element of the Jacobian matrix.
+         *
+         * @param i the output function
+         * @param j the variable
+         */
         @Override
         public double getJacobian(int i, int j)
-        // Returns one element of the Jacobian matrix.
-        // i=datapoint, j=whichparm.
         {
             return jac[i][j];
         }

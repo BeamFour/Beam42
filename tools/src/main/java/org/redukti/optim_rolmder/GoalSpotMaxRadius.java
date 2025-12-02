@@ -1,4 +1,4 @@
-package org.redukti.optim2;
+package org.redukti.optim_rolmder;
 
 public class GoalSpotMaxRadius extends Goal {
     public final int field;

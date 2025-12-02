@@ -1,4 +1,4 @@
-package org.redukti.optim2;
+package org.redukti.optim_rolmder;
 
 /**
  * Goal represents a target we would like to achieve

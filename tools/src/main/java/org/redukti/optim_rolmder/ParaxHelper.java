@@ -1,4 +1,4 @@
-package org.redukti.optim2;
+package org.redukti.optim_rolmder;
 
 import org.redukti.rayoptics.parax.FirstOrderData;
 

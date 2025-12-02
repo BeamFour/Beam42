@@ -1,13 +1,11 @@
-package org.redukti.optim2;
+package org.redukti.optim_rolmder;
 
 
-import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.rayoptics.analysis.SpotAnalysis;
 import org.redukti.rayoptics.analysis.SpotAnalysisResult;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.TraceOptions;
 import org.redukti.spec.Prescription;
-import org.redukti.util.Helper;
 
 public class Analysis {
 

@@ -33,7 +33,7 @@ public class NoctNikkor58Optim2 {
 
     public static void main(String[] args) {
         var prescription = getPrescription();
-        var analysis = new Analysis(prescription, new double[] {1.0});
+        var analysis = new Analysis(prescription, new double[]{0.1,0.3,0.5,0.7,1.0}).spotDensity(50);
         var f = new MeritFunction(analysis,
                 new Var[] {
                      new VarRadius(prescription, 0),
@@ -55,10 +55,18 @@ public class NoctNikkor58Optim2 {
                      new VarThickness(prescription, 13)
                 },
                 new Goal[] {
-                      new GoalSpotRMS(analysis, 1, 13.0, 5.0),
-                      new GoalSpotRMS(analysis, 2, 20.0, 2.0),
-                      new GoalSpotMaxRadius(analysis, 1, 25.0, 5.0),
-                      new GoalSpotMaxRadius(analysis, 2, 50.0, 2.0),
+                        new GoalSpotRMS(analysis, 1, 10.0, 7.0),
+                        new GoalSpotRMS(analysis, 2, 12.0, 5.0),
+                        new GoalSpotRMS(analysis, 3, 20.0, 2.0),
+                        new GoalSpotRMS(analysis, 4, 30.0, 2.0),
+                        new GoalSpotRMS(analysis, 5, 40.0, 2.0),
+                        new GoalSpotRMS(analysis, 6, 50.0, 3.0),
+                        new GoalSpotMaxRadius(analysis, 1, 30.0, 2.0),
+                        new GoalSpotMaxRadius(analysis, 2, 35.0, 2.0),
+                        new GoalSpotMaxRadius(analysis, 3, 40.0, 2.0),
+                        new GoalSpotMaxRadius(analysis, 4, 80.0, 2.0),
+                        new GoalSpotMaxRadius(analysis, 5, 120.0, 2.0),
+                        new GoalSpotMaxRadius(analysis, 6, 200.0, 2.0),
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,58.0, 1.0),
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Fno, 1.2, 1.0),
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 37.78, 1.0),
@@ -68,5 +76,7 @@ public class NoctNikkor58Optim2 {
         var lm = f.getSolver();
         var istatus = lm.solve();
         System.out.println("Status = " + istatus);
+        System.out.println(f.toString());
+        System.out.println(prescription.toString());
     }
 }

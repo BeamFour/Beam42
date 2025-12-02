@@ -5,7 +5,7 @@ import org.redukti.spec.Prescription;
 public class VarRadius extends Var {
     public final int surfaceId;
     public VarRadius(Prescription prescription, int surfaceId) {
-        super(prescription, prescription._surfaces[surfaceId]._radius, prescription._surfaces[surfaceId]._radius *0.001);
+        super(prescription, prescription._surfaces[surfaceId]._radius, prescription._surfaces[surfaceId]._radius * 0.000001);
         this.surfaceId = surfaceId;
     }
     @Override

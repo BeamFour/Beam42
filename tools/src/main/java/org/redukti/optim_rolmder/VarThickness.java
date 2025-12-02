@@ -5,7 +5,7 @@ import org.redukti.spec.Prescription;
 public class VarThickness extends Var {
     public final int surfaceId;
     public VarThickness(Prescription prescription, int surfaceId) {
-        super(prescription, prescription._surfaces[surfaceId]._thickness,0.001);
+        super(prescription, prescription._surfaces[surfaceId]._thickness,0.000001);
         this.surfaceId = surfaceId;
     }
     @Override

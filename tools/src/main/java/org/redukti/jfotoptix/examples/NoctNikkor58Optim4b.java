@@ -2,7 +2,7 @@ package org.redukti.jfotoptix.examples;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
-import org.redukti.optim2.*;
+import org.redukti.optim_rolmder.*;
 import org.redukti.spec.Prescription;
 
 public class NoctNikkor58Optim4b {

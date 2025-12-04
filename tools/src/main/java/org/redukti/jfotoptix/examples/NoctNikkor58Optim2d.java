@@ -71,7 +71,8 @@ public class NoctNikkor58Optim2d {
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 37.78, 1.0),
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Pp1, 51.8, 1.0),
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Ppk, 20.2, 1.0)
-                });
+                },
+                true);
         var lm = f.getSolver();
         var istatus = lm.solve();
         System.out.println("Status = " + istatus);

@@ -17,15 +17,11 @@ public class MinpackFFM {
     static final Linker LINKER = Linker.nativeLinker();
     static final SymbolLookup LIB = SymbolLookup.libraryLookup(Paths.get("minpack.dll"), Arena.global());
 
-    interface LMDerFunction {
-        void apply(int m, int n, double[] x, double[] fvec, double[] fjac, int ldfjac, int iflag);
-    }
-
     static class LMDerFunctionProxy {
 
-        final LMDerFunction fcn;
+        final MinPack.Lmder_Function fcn;
 
-        public LMDerFunctionProxy(LMDerFunction fcn) {
+        public LMDerFunctionProxy(MinPack.Lmder_Function fcn) {
             this.fcn = fcn;
         }
 
@@ -77,7 +73,7 @@ public class MinpackFFM {
         return LINKER.upcallStub(LMDerFunctionProxy.getHandle(fcn), fd, arena);
     }
 
-    public static int lmder(LMDerFunction fcn,int m,int n,double[] xinit,double[] diag_) throws Exception {
+    public static int lmder(MinPack.Lmder_Function fcn,int m,int n,double[] xinit,double[] diag_, int dmode) throws Exception {
         int iinfo = -99;
         if (m < n)
             throw new IllegalArgumentException("Number of goals must be >= number of variables");
@@ -144,7 +140,7 @@ public class MinpackFFM {
             mm.setAtIndex(JAVA_INT,0,m);
             nn.setAtIndex(JAVA_INT,0,n);
             for (int i = 0; i < xinit.length; i++)
-                x.setAtIndex(JAVA_DOUBLE,i,xinit[0]);
+                x.setAtIndex(JAVA_DOUBLE,i,xinit[i]);
             ldfjac.setAtIndex(JAVA_INT,0,m);
             ftol.setAtIndex(JAVA_DOUBLE,0,Math.sqrt(MinPack.dpmpar(1)));
             xtol.setAtIndex(JAVA_DOUBLE,0,Math.sqrt(MinPack.dpmpar(1)));
@@ -152,7 +148,7 @@ public class MinpackFFM {
             maxfev.setAtIndex(JAVA_INT,0,(n + 1) * 100);
             for (int i = 0; i < diag_.length; i++)
                 diag.setAtIndex(JAVA_DOUBLE,i,diag_[i]);
-            mode.setAtIndex(JAVA_INT,0,1);
+            mode.setAtIndex(JAVA_INT,0,dmode);
             factor.setAtIndex(JAVA_DOUBLE,0,100);
             nprint.setAtIndex(JAVA_INT,0,0);
             info.setAtIndex(JAVA_INT,0,0);
@@ -182,15 +178,15 @@ public class MinpackFFM {
         return iinfo;
     }
 
-    public static void main(String[] args) throws Throwable {
-
-            // Example callback
-        LMDerFunction fcn = (mm, nn, xx, ff, fj, ld, iflg) -> {
-            Arrays.fill(ff,0);
-            Arrays.fill(fj,0);
-        };
-        double[] x = {0.,0.,0.};
-        double[] diag = {1.,1.,1.};
-        lmder(fcn,3,3,x,diag);
-    }
+//    public static void main(String[] args) throws Throwable {
+//
+//            // Example callback
+//        LMDerFunction fcn = (mm, nn, xx, ff, fj, ld, iflg) -> {
+//            Arrays.fill(ff,0);
+//            Arrays.fill(fj,0);
+//        };
+//        double[] x = {0.,0.,0.};
+//        double[] diag = {1.,1.,1.};
+//        lmder(fcn,3,3,x,diag);
+//    }
 }

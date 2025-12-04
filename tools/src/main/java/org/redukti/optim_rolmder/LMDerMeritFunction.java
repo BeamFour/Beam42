@@ -10,12 +10,14 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
     private Analysis analysis;
     private Var[] vars;
     private Goal[] functions;
+    private boolean use_native;
 
-    public LMDerMeritFunction(Analysis analysis, Var[] vars, Goal[] functions) {
+    public LMDerMeritFunction(Analysis analysis, Var[] vars, Goal[] functions, boolean use_native) {
         this.analysis = analysis;
         this.vars = vars;
         this.functions = functions;
         this.weights = new double[functions.length];
+        this.use_native = use_native;
         // Weights are transformed to sqrt() because they are supplied to
         // lmder as diag vector and lmder will apply the weights
         // when computing least square
@@ -105,8 +107,10 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
         double[] resid = new double[m];
         double delta[] = new double[n];
         for (int j = 0; j < n; j++) {
+            //double dDelta = vars[j].dDelta;
+            double dDelta = vars[j].get_value()*0.000001;
             for (int k = 0; k < n; k++)
-                delta[k] = (k == j) ? vars[j].dDelta : 0.0;
+                delta[k] = (k == j) ? dDelta : 0.0;
             if (!nudge(x, delta, resid)) {
                 return false;
             }
@@ -114,7 +118,7 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
                 fjac[i + j * ldfjac] = resid[i];
 
             for (int k = 0; k < n; k++)
-                delta[k] = (k == j) ? -1.0 * vars[j].dDelta : 0.0;
+                delta[k] = (k == j) ? -1.0 * dDelta : 0.0;
             if (!nudge(x, delta, resid)) {
                 return false;
             }
@@ -122,7 +126,7 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
                 fjac[i + j * ldfjac] -= resid[i];
 
             for (int i = 0; i < m; i++)
-                fjac[i + j * ldfjac] /= (2.0 * vars[j].dDelta);
+                fjac[i + j * ldfjac] /= (2.0 * dDelta);
         }
         // Scale by weights
         for (int j = 0; j < n; j++) {
@@ -150,7 +154,7 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
     }
 
     public Solver getSolver() {
-        return new LMDerSolver(analysis, vars, functions);
+        return new LMDerSolver(analysis, vars, functions, use_native);
     }
 
     @Override

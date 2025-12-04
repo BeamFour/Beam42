@@ -40,7 +40,8 @@ public class NoctNikkor58Optim4b {
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,58.0, 2.0),
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Enp_dist, 35.7894, 1.0),
                       //new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 38.7, 1.0)
-                });
+                },
+                true);
         var lm = f.getSolver();
         var istatus = lm.solve();
         System.out.println("Status = " + istatus);

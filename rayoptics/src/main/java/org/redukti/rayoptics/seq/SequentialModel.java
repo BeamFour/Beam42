@@ -522,8 +522,11 @@ public class SequentialModel {
         }
     }
 
+    public void set_clear_apertures(List<Integer> avoid_ist, List<Integer> include_list) {
+        VigCalc.set_clear_apertures(opt_model,avoid_ist,include_list);
+    }
     public void set_clear_apertures() {
-        VigCalc.set_ape(opt_model);
+        VigCalc.set_clear_apertures(opt_model,null,null);
     }
 
     /**

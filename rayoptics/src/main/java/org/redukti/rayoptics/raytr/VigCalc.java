@@ -13,10 +13,69 @@ import org.redukti.rayoptics.specs.ImageKey;
 import org.redukti.rayoptics.specs.ValueKey;
 import org.redukti.rayoptics.util.Lists;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 // Vignetting and clear aperture setting operations
 public class VigCalc {
+
+    public static Double max_aperture_at_surf(List<List<RayPkg>> rayset, int i) {
+        double max_ap = -1.0e+10;
+        for (var f: rayset) {
+            for (var p: f) {
+                var ray = p.ray;
+                if (ray.size() > i) {
+                    var ap = Math.sqrt(ray.get(i).p.x*ray.get(i).p.x + ray.get(i).p.y*ray.get(i).p.y);
+                    if (ap > max_ap)
+                        max_ap = ap;
+                }
+                else
+                    return null;
+            }
+        }
+        return max_ap;
+    }
+
+    /**
+     * From existing fields and vignetting, calculate clear apertures.
+     *
+     *     Args:
+     *         avoid_list: list of surfaces to skip when setting apertures.
+     *         include_list: list of surfaces to include when setting apertures.
+     *
+     *     If specified, only one of either `avoid_list` or `include_list` should be specified. If neither is specified, all surfaces are set. If both are specified, the `avoid_list` is used.
+     *
+     *     If a surface is specified as the aperture stop, that surface's aperture is determined from the boundary rays of the first field.
+     *
+     *     The avoid_list idea and implementation was contributed by Quentin Bécar
+     */
+    public static void set_clear_apertures(OpticalModel opt_model,List<Integer> avoid_list, List<Integer> include_list) {
+        var sm = opt_model.seq_model;
+        var num_surfs = sm.get_num_surfaces();
+        if (avoid_list == null) {
+            if (include_list == null) {
+                include_list = IntStream.range(0, num_surfs).boxed().toList();
+            }
+        }
+        else {
+            include_list = IntStream.range(0,num_surfs).filter(i->!avoid_list.contains(i)).boxed().toList();
+        }
+        var rayset = Trace.trace_boundary_rays(opt_model,new TraceOptions());
+        var stop_surf = sm.stop_surface;
+        if (stop_surf != null && include_list.contains(stop_surf)) {
+            Double max_ap = max_aperture_at_surf(rayset,stop_surf);
+            if (max_ap != null)
+                sm.ifcs.get(stop_surf).set_max_aperture(max_ap);
+        }
+        for (var i: include_list) {
+            if (!Objects.equals(i,stop_surf)) {
+                Double max_ap = max_aperture_at_surf(rayset,i);
+                if (max_ap != null)
+                    sm.ifcs.get(i).set_max_aperture(max_ap);
+            }
+        }
+    }
 
     /**
      * From existing fields and vignetting, calculate clear apertures.
@@ -32,26 +91,7 @@ public class VigCalc {
      *     :meth:`~.elements.ElementModel.sync_to_seq`.
      */
     public static void set_ape(OpticalModel opm) {
-        var rayset = Trace.trace_boundary_rays(opm,new TraceOptions());
-        for (int i = 0; i < opm.seq_model.ifcs.size(); i++) {
-            var ifc = opm.seq_model.ifcs.get(i);
-            var max_ap = -1.0e+10;
-            boolean update = true;
-            for (var f: rayset) {
-                for (var p: f) {
-                    var ray = p.ray;
-                    if (ray.size() > i) {
-                        var ap = Math.sqrt(ray.get(i).p.x*ray.get(i).p.x + ray.get(i).p.y*ray.get(i).p.y);
-                        if (ap > max_ap)
-                            max_ap = ap;
-                    }
-                    else
-                        update = false;
-                }
-            }
-            if (update)
-                ifc.set_max_aperture(max_ap);
-        }
+        set_clear_apertures(opm,null,null);
     }
 
     /**
@@ -75,12 +115,13 @@ public class VigCalc {
      *     segments of this ray to update the pupil specification value
      *     e.g. EPD, NA or f/#.
      */
-    public static void set_pupil(OpticalModel opm) {
+    public static void set_pupil(OpticalModel opm, boolean use_parax) {
         var sm = opm.seq_model;
         if (sm.stop_surface == null) {
             System.out.println("floating stop surface");
             return;
         }
+        var idx_stop = sm.stop_surface;
         var osp = opm.optical_spec;
 
         // iterate the on-axis marginal ray thru the edge of the stop.
@@ -88,7 +129,7 @@ public class VigCalc {
         var fld = fld_foc.first;
         var wvl = fld_foc.second;
         var foc = fld_foc.third;
-        var stop_radius = Lists.get(sm.ifcs,sm.stop_surface).surface_od();
+        var stop_radius = Lists.get(sm.ifcs,idx_stop).surface_od();
         var start_coords = iterate_pupil_ray(opm,sm.stop_surface,1,1.0,stop_radius,fld,wvl);
 
         // trace the real axial marginal ray
@@ -105,38 +146,73 @@ public class VigCalc {
         var pupil_spec = osp.pupil.key.valueKey;
         var pupil_value_orig = osp.pupil.value;
 
-        if (obj_img_key == ImageKey.Object) {
-            if (pupil_spec == ValueKey.EPD) {
-                var rs1 = ray_pkg.ray.get(1);
-                var ht = rs1.p.y;
-                osp.pupil.value = 2.0 * ht;
-            }
-            else {
-                var rs0 = ray_pkg.ray.get(0);
-                var slp0 = rs0.d.y / rs0.d.z;
-                if (pupil_spec == ValueKey.NA) {
-                    var n0 = sm.central_rndx(0);
-                    osp.pupil.value = n0*rs0.d.y;
+        if (use_parax) {
+            var parax_data = opm.optical_spec.parax_data;
+            var ax_ray = parax_data.ax_ray;
+            var fod = parax_data.fod;
+            var scale_ratio = stop_radius/ax_ray.get(idx_stop).ht;
+            if (obj_img_key == ImageKey.Object) {
+                if (pupil_spec == ValueKey.EPD) {
+                    osp.pupil.value = scale_ratio * (2 * fod.enp_radius);
                 }
-                else if (pupil_spec == ValueKey.Fnum) {
-                    osp.pupil.value = 1.0/(2.0*slp0);
+                else {
+                    var slp0 = scale_ratio*ax_ray.get(0).slp;
+                    if (pupil_spec == ValueKey.NA) {
+                        var n0 = sm.central_rndx(0);
+                        var rs0 = ray_pkg.ray.get(0);
+                        osp.pupil.value = n0*rs0.d.y;
+                    }
+                    else if (pupil_spec == ValueKey.Fnum) {
+                        osp.pupil.value = 1.0/(2.0*slp0);
+                    }
+                }
+            }
+            else if (obj_img_key == ImageKey.Image) {
+                if (pupil_spec == ValueKey.EPD) {
+                    osp.pupil.value = scale_ratio*(2*fod.exp_radius);
+                }
+                else {
+                    var slpk = scale_ratio*Lists.get(ax_ray,-1).slp;
+                    if (pupil_spec == ValueKey.NA) {
+                        var nk = sm.central_rndx(-1);
+                        var rsm2 = Lists.get(ray_pkg.ray,-2);
+                        osp.pupil.value = -nk*rsm2.d.y;
+                    }
+                    else if (pupil_spec == ValueKey.Fnum) {
+                        osp.pupil.value = -1.0/(2.0*slpk);
+                    }
                 }
             }
         }
-        else if (obj_img_key == ImageKey.Image) {
-            var rsm2 = Lists.get(ray_pkg.ray,-2);
-            if (pupil_spec == ValueKey.EPD) {
-                var ht = rsm2.p.y;
-                osp.pupil.value = 2.0 * ht;
-            }
-            else {
-                var slpk = rsm2.d.y/rsm2.d.z;
-                if (pupil_spec == ValueKey.NA) {
-                    var nk = sm.central_rndx(0);
-                    osp.pupil.value = -nk * rsm2.d.y;
+        else {
+            if (obj_img_key == ImageKey.Object) {
+                if (pupil_spec == ValueKey.EPD) {
+                    var rs1 = ray_pkg.ray.get(1);
+                    var ht = rs1.p.y;
+                    osp.pupil.value = 2.0 * ht;
+                } else {
+                    var rs0 = ray_pkg.ray.get(0);
+                    var slp0 = rs0.d.y / rs0.d.z;
+                    if (pupil_spec == ValueKey.NA) {
+                        var n0 = sm.central_rndx(0);
+                        osp.pupil.value = n0 * rs0.d.y;
+                    } else if (pupil_spec == ValueKey.Fnum) {
+                        osp.pupil.value = 1.0 / (2.0 * slp0);
+                    }
                 }
-                else if (pupil_spec == ValueKey.Fnum) {
-                    osp.pupil.value = -1.0/(2.0 * slpk);
+            } else if (obj_img_key == ImageKey.Image) {
+                var rsm2 = Lists.get(ray_pkg.ray, -2);
+                if (pupil_spec == ValueKey.EPD) {
+                    var ht = rsm2.p.y;
+                    osp.pupil.value = 2.0 * ht;
+                } else {
+                    var slpk = rsm2.d.y / rsm2.d.z;
+                    if (pupil_spec == ValueKey.NA) {
+                        var nk = sm.central_rndx(0);
+                        osp.pupil.value = -nk * rsm2.d.y;
+                    } else if (pupil_spec == ValueKey.Fnum) {
+                        osp.pupil.value = -1.0 / (2.0 * slpk);
+                    }
                 }
             }
         }

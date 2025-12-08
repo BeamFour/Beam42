@@ -53,8 +53,17 @@ public class SpotAnalysisResult extends Analysis {
 
         @Override
         public String toString() {
-            return "Field angle " + fld.y + "\n" + " mean radius " + mean_radius * 1000 + "\n" + "  max radius " + max_radius * 1000 + "\n";
+            return "Field " + fld + " mean radius " + get_mean_radius() + " max radius " + get_max_radius();
         }
+
+        public double get_max_radius() {
+            return max_radius * 1000;
+        }
+
+        public double get_mean_radius() {
+            return mean_radius * 1000;
+        }
+
 
         public String plot() {
             RendererSvg r = new RendererSvg(640,480);

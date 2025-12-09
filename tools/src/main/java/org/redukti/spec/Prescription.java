@@ -381,7 +381,7 @@ public class Prescription {
                 new WvlWt(656.2725, 0.5)}, 1);
         }
         opm.system_spec.title = spec._title;
-        opm.system_spec.dimensions = "MM";
+        opm.system_spec.dimensions = "mm";
         opm.radius_mode = true;
         sm.gaps.get(0).thi = 1e10;
         for (int i = 0; i < _surfaces.length; i++) {

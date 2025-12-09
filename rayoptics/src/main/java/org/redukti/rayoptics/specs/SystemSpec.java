@@ -32,15 +32,15 @@ public class SystemSpec {
      * @return
      */
     public double nm_to_sys_units(double nm) {
-        if ("m".equals(dimensions))
+        if ("m".equalsIgnoreCase(dimensions))
             return 1e-9 * nm;
-        else if ("cm".equals(dimensions))
+        else if ("cm".equalsIgnoreCase(dimensions))
             return 1e-7 * nm;
-        else if ("mm".equals(dimensions))
+        else if ("mm".equalsIgnoreCase(dimensions))
             return 1e-6 * nm;
-        else if ("in".equals(dimensions))
+        else if ("in".equalsIgnoreCase(dimensions))
             return 1e-6 * nm / 25.4;
-        else if ("ft".equals(dimensions))
+        else if ("ft".equalsIgnoreCase(dimensions))
             return 1e-6 * nm / 304.8;
         else
             return nm;

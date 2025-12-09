@@ -222,9 +222,9 @@ public class Nikkor58mmTest {
         Assertions.assertEquals(-0.3119345075482975, transAber.fans.get(1).fan_y.get(19),1e-15);
 
         var waveAber = WavefrontAberrationAnalysis.eval_opd_fan(opm,1,1,21,new TraceOptions());
-        Assertions.assertEquals(-0.0002035451272355, waveAber.fans.get(1).fan_y.get(0),1e-15);
+        Assertions.assertEquals(-203.54512723546324, waveAber.fans.get(1).fan_y.get(0),1e-15);
         Assertions.assertEquals(0.0, waveAber.fans.get(1).fan_y.get(9),1e-15);
-        Assertions.assertEquals(0.0000240955091344, waveAber.fans.get(1).fan_y.get(19),1e-15);
+        Assertions.assertEquals(24.095509134410378, waveAber.fans.get(1).fan_y.get(19),1e-15);
 
         var spotAnal = SpotAnalysis.eval_grid(opm,1,1,21,new TraceOptions());
         var grids = spotAnal.get(0);

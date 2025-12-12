@@ -87,4 +87,15 @@ public class WvlSpec {
     public double central_wvl() {
         return wavelengths[reference_wvl];
     }
+
+    public void list_str(StringBuilder sb) {
+        sb.append(String.format("central wavelength=%10.4f\n",wavelengths[reference_wvl]));
+        sb.append("wavelength (weight) =");
+        for (int i = 0; i < wavelengths.length; i++) {
+            if (i > 0) sb.append(", ");
+            sb.append(String.format("%10.4f %5.3f", wavelengths[i], spectral_wts[i]));
+            if (i == reference_wvl) sb.append("*");
+        }
+        sb.append("\n");
+    }
 }

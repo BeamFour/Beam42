@@ -94,4 +94,9 @@ public class PupilSpec {
     public String toString() {
         return "PupilSpec(key=" + key + ", value=" +  value + ")";
     }
+
+    public void list_str(StringBuilder sb) {
+        sb.append(key.type).append(": ").append(key.imageKey).append(" ").append(key.valueKey).append(";")
+                .append(" value = ").append(value).append("\n");
+    }
 }

@@ -65,6 +65,12 @@ public class Field {
     public ReferenceSphere ref_sphere;
     public Map<String, RayPkg> pupil_rays;
 
+    public final FieldSpec fov;
+
+    public Field(FieldSpec fov) {
+        this.fov = fov;
+    }
+
     public void update() {
         aim_info = null;
         z_enp = null;
@@ -112,5 +118,74 @@ public class Field {
     @Override
     public String toString() {
         return "Field(x=" + x + ", y=" + y + ")";
+    }
+
+    public void list_str(StringBuilder sb, String fmtstr) {
+        switch (fmtstr) {
+            case "x"-> sb.append(String.format("x =%7.3f (%5.2f) vlx=%6.3f vux=%6.3f vly=%6.3f vuy=%6.3f\n",
+                        xv(), xf(), vlx, vux, vly, vuy));
+            case "y"-> sb.append(String.format("y =%7.3f (%5.2f) vlx=%6.3f vux=%6.3f vly=%6.3f vuy=%6.3f\n",
+                    yv(), yf(), vlx, vux, vly, vuy));
+            case ""-> sb.append(String.format("x,y=%5.2f vlx=%6.3f vux=%6.3f vly=%6.3f vuy=%6.3f\n",
+                    yv(), vlx, vux, vly, vuy));
+            default -> sb.append(String.format("xy=(%7.3f, %7.3f) (%5.2f, %5.2f) vlx=%6.3f vux=%6.3f vly=%6.3f vuy=%6.3f\n",
+                    xv(), yv(), xf(), yf(), vlx, vux, vly, vuy));
+        }
+    }
+
+    public boolean is_relative() {
+        if (fov != null)
+            return fov.is_relative;
+        return false;
+    }
+
+    /**
+     * the maximum field value used for the fractional field calculation.
+     */
+    public double max_field() {
+        if (fov != null)
+            return fov.value;
+        // omitted local max_field
+        return 1.;
+    }
+
+    public double xv() {
+        if (is_relative())
+            return _get_x_by_fref();
+        return x;
+    }
+
+    public double _get_x_by_fref() {
+        return x * max_field();
+    }
+
+    public double _get_y_by_fref() {
+        return y * max_field();
+    }
+
+    public double xf() {
+        if (is_relative())
+            return x;
+        return _get_x_by_vref();
+    }
+
+    private double _get_x_by_vref() {
+        return x / max_field();
+    }
+
+    private double _get_y_by_vref() {
+        return y / max_field();
+    }
+
+    public double yf() {
+        if (is_relative())
+            return _get_y_by_fref();
+        return y;
+    }
+
+    public double yv() {
+        if (is_relative())
+            return y;
+        return _get_y_by_vref();
     }
 }

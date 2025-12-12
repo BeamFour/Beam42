@@ -76,7 +76,7 @@ public class FieldSpec {
     private Field[] set_from_list(double[] flds) {
         fields = new Field[flds.length];
         for (int i = 0; i < flds.length; i++) {
-            fields[i] = new Field();
+            fields[i] = new Field(this);
             fields[i].y = flds[i];
         }
         value = max_field().first;
@@ -303,5 +303,33 @@ public class FieldSpec {
     @Override
     public String toString() {
         return "FieldSpec(key=" + key + ", max field=" + max_field().first + ", is wide angle=" + is_wide_angle + ")";
+    }
+
+    public void list_str(StringBuilder sb) {
+        sb.append(key.type).append(": ").append(key.imageKey).append(" ").append(key.valueKey).append(";")
+                .append(" value = ").append(value).append("\n");
+        boolean has_x = false;
+        boolean has_y = false;
+        String fmtstr = "";
+        for (var fld: fields) {
+            if (fld.x != 0. && fld.y != 0.) {
+                has_y = true;
+                has_x = true;
+            }
+            else if (fld.x == 0.0 && fld.y != 0.) {
+                has_y = true;
+                fmtstr = "y";
+            }
+            else if (fld.x != 0. && fld.y == 0.) {
+                has_x = true;
+                fmtstr = "x";
+            }
+        }
+        if (has_x && has_y)
+            fmtstr = "xy";
+        for (var fld: fields)
+            fld.list_str(sb,fmtstr);
+        sb.append("is_relative=").append(is_relative)
+                .append(", is_wideangle=").append(is_wide_angle).append("\n");
     }
 }

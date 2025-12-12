@@ -56,4 +56,11 @@ public class FocusRange {
         return focus_shift + fr * defocus_range;
     }
     public double get_focus() { return get_focus(0.0); }
+
+    public void list_str(StringBuilder sb) {
+        sb.append("focus shift=").append(focus_shift);
+        if (defocus_range != 0.)
+            sb.append(", defocus range=").append(defocus_range);
+        sb.append("\n");
+    }
 }

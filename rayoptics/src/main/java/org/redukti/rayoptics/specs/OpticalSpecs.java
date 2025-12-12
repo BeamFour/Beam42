@@ -303,4 +303,12 @@ public class OpticalSpecs {
     public FieldSpec field_of_view() {
         return fov;
     }
+
+    public StringBuilder list_str(StringBuilder sb) {
+        pupil.list_str(sb);
+        fov.list_str(sb);
+        wvls.list_str(sb);
+        focus.list_str(sb);
+        return sb;
+    }
 }

@@ -389,14 +389,15 @@ public class Prescription {
             add_rayoptic_surface(sm,s);
         }
         sm.do_apertures = false;
-        System.out.println(sm.list_surfaces(new StringBuilder()).toString());
-        System.out.println(sm.list_gaps(new StringBuilder()).toString());
         opm.update_model();
         if (osp.fov.is_wide_angle)
             VigCalc.set_vig(opm,true);
         else
             Trace.apply_paraxial_vignetting(opm);
         opm.update_model();
+        System.out.println(sm.list_surfaces(new StringBuilder()).toString());
+        System.out.println(sm.list_gaps(new StringBuilder()).toString());
+        System.out.println(osp.list_str(new StringBuilder()).toString());
         return opm;
     }
 

@@ -1,10 +1,10 @@
-package org.redukti.jfotoptix.examples;
+package org.redukti.examples;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.mathlib.LMLSolver;
-import org.redukti.optim.*;
 import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.spec.Prescription;
+import org.redukti.optim.*;
 
 public class Leica28mmOptim {
 

@@ -4,7 +4,6 @@ import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.mathlib.LMLSolver;
 import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
-import org.redukti.optim.*;
 import org.redukti.spec.Prescription;
 
 public class ChiefRayFinder {
@@ -44,39 +43,39 @@ public class ChiefRayFinder {
     }
 
     public static Results findChiefRayAngle(Prescription prescription, double y_intercept) {
-        var analysis = new Analysis(prescription);
-        var f = new MeritFunction(analysis,
-                new Var[] {
-                     new VarRayDist(prescription,0,0,0.01),
-                     new VarRayDist(prescription,1,0,0.01),
-                     new VarAoV(prescription,0,0.1)
-                },
-                new Goal[] {
-                     new GoalRayInterceptApertureStop(analysis, new Vector2(0,0), 1.0),
-                     new GoalRayInterceptImage(analysis, new Vector2(0.0, y_intercept), 1.0),
-                });
-        var lm = f.getSolver();
-        int istatus = 0;
-        while (istatus!= LMLSolver.BADITER &&
-                istatus!= LMLSolver.LEVELITER &&
-                istatus!= LMLSolver.MAXITER) {
-            istatus = lm.iLMiter();
-        }
-        System.out.println("Status = " + istatus);
-        System.out.println(f.toString());
-        if (istatus == LMLSolver.LEVELITER) {
-            // Get the ray from the point source, this is the first element
-            var seq = analysis.systems[0].get_sequence();
-            var tracedRay = analysis.singleRayTraceResults.get_generated(seq.get(0)).get(0);
-            // Origin is the start of the ray
-            var origin = tracedRay.get_position();
-            // Intercept is where it met the first optical surface
-            var intercept = tracedRay.get_intercept_point();
-            // Angle of view
-            var aov = prescription._var_angle_of_view;
-            var xy = prescription._distribution.get_user_defined_points().get(0);
-            return new Results(aov,xy,origin,intercept);
-        }
+//        var analysis = new Analysis(prescription);
+//        var f = new MeritFunction(analysis,
+//                new Var[] {
+//                     new VarRayDist(prescription,0,0,0.01),
+//                     new VarRayDist(prescription,1,0,0.01),
+//                     new VarAoV(prescription,0,0.1)
+//                },
+//                new Goal[] {
+//                     new GoalRayInterceptApertureStop(analysis, new Vector2(0,0), 1.0),
+//                     new GoalRayInterceptImage(analysis, new Vector2(0.0, y_intercept), 1.0),
+//                });
+//        var lm = f.getSolver();
+//        int istatus = 0;
+//        while (istatus!= LMLSolver.BADITER &&
+//                istatus!= LMLSolver.LEVELITER &&
+//                istatus!= LMLSolver.MAXITER) {
+//            istatus = lm.iLMiter();
+//        }
+//        System.out.println("Status = " + istatus);
+//        System.out.println(f.toString());
+//        if (istatus == LMLSolver.LEVELITER) {
+//            // Get the ray from the point source, this is the first element
+//            var seq = analysis.systems[0].get_sequence();
+//            var tracedRay = analysis.singleRayTraceResults.get_generated(seq.get(0)).get(0);
+//            // Origin is the start of the ray
+//            var origin = tracedRay.get_position();
+//            // Intercept is where it met the first optical surface
+//            var intercept = tracedRay.get_intercept_point();
+//            // Angle of view
+//            var aov = prescription._var_angle_of_view;
+//            var xy = prescription._distribution.get_user_defined_points().get(0);
+//            return new Results(aov,xy,origin,intercept);
+//        }
         throw new RuntimeException("Failed to find chief ray angle");
     }
 

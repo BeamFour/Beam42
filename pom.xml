@@ -16,6 +16,8 @@
         <module>mathlib</module>
         <module>render</module>
         <module>tools</module>
+        <module>optimj</module>
+        <module>optimr</module>
     </modules>
 
     <!-- Optionally define shared properties or dependency versions -->

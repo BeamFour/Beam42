@@ -1,10 +1,9 @@
-package org.redukti.jfotoptix.examples;
+package org.redukti.examples;
 
 import org.redukti.mathlib.LMLSolver;
 import org.redukti.mathlib.Vector2;
-import org.redukti.optim.*;
-import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.spec.Prescription;
+import org.redukti.optim.*;
 
 public class Noctilux50ChiefRay {
 

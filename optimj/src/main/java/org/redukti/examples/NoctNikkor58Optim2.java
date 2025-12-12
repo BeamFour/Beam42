@@ -1,4 +1,4 @@
-package org.redukti.jfotoptix.examples;
+package org.redukti.examples;
 
 import org.redukti.mathlib.LMLSolver;
 import org.redukti.optim.*;

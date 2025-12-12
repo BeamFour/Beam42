@@ -3,6 +3,8 @@ package org.redukti.tools;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.jfotoptix.analysis.AnalysisSpot;
 import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
+import org.redukti.plotter.RayAberrationPlot;
+import org.redukti.plotter.SpotDiagram;
 import org.redukti.rayoptics.analysis.SpotAnalysis;
 import org.redukti.rayoptics.analysis.SpotAnalysisResult;
 import org.redukti.rayoptics.analysis.TransverseRayAberrationAnalysis;
@@ -34,9 +36,9 @@ public class LensTool2 {
 
     public static void outputSpotAnalysis(SpotAnalysisResult.SpotResultsByField result, Path output_file) throws Exception {
         if (output_file != null) {
-            Helper.createOutputFile(output_file, result.plot());
+            Helper.createOutputFile(output_file, new SpotDiagram(result).plot());
         } else {
-            System.out.println(result.plot());
+            System.out.println(new SpotDiagram(result).plot());
         }
     }
 
@@ -98,14 +100,14 @@ public class LensTool2 {
             for (var fan_results: rayAber.results) {
                 String filename = "rayabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag") + ".svg";
                 var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
-                Helper.createOutputFile(output_file, rayAber.plot(fan_results, 0));
+                Helper.createOutputFile(output_file, new RayAberrationPlot(rayAber).plot(fan_results, 0));
             }
 
             var opdAber = WavefrontAberrationAnalysis.eval(opm, 21, new TraceOptions());
             for (var fan_results: opdAber.results) {
                 String filename = "opdabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag") + ".svg";
                 var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
-                Helper.createOutputFile(output_file, opdAber.plot(fan_results, 0));
+                Helper.createOutputFile(output_file, new RayAberrationPlot(opdAber).plot(fan_results, 0));
             }
 
 

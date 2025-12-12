@@ -37,18 +37,18 @@ public class SpotAnalysisResult extends Analysis {
             int count = 0;
             for (int wl = 0; wl < trace_results.size(); wl++) {
                 var grids = trace_results.get(wl);
-                for (var grid: grids.grid) {
+                for (var grid : grids.grid) {
                     //System.out.println("pupil = " + grid.pupil.toString());
                     var l = grid.pupil.len();
                     //System.out.println("len = " + l);
                     if (l > max_radius) {
                         max_radius = l;
                     }
-                    mean_radius += (l*l);
+                    mean_radius += (l * l);
                 }
                 count += grids.grid.size();
             }
-            mean_radius = Math.sqrt(mean_radius/count);
+            mean_radius = Math.sqrt(mean_radius / count);
         }
 
         @Override

@@ -78,8 +78,8 @@ public class WaveAbr {
      * Given the exiting interface and chief ray data, return exit pupil ray coords.
      *
      *     Args:
-     *         interface: the exiting :class:'~.Interface' for the path sequence
-     *         ray_seg: ray segment exiting from **interface**
+     *         interface: the exiting :class:'~.Interface' for the path sequence, the last surface before image plane
+     *         ray_seg: ray segment exiting from **interface**  - this is the ray from last surface to image plane
      *         exp_dst_parax: z distance to the paraxial exit pupil
      *
      *     Returns:
@@ -130,10 +130,6 @@ public class WaveAbr {
      * <p>
      * Returns:
      * float: distance along r from equally inclined chord point to p
-     *
-     * @param r
-     * @param r0
-     * @return
      */
     public static double eic_distance(RayData r, RayData r0) {
         // eq 3.9 Hopkins paper

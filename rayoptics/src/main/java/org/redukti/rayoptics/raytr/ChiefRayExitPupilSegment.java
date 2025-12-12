@@ -22,8 +22,17 @@ public final class ChiefRayExitPupilSegment {
      * distance from interface to the exit pupil point
      */
     public double exp_dst;
+    /**
+     * exiting interface for the path sequence, i.e. last surface before image plane
+     */
     public Interface ifc;
+    /**
+     * ray intersection pt wrt image gap coordinates
+     */
     public Vector3 b4_pt;
+    /**
+     * ray direction cosine wrt image gap coordinates
+     */
     public Vector3 b4_dir;
 
     public ChiefRayExitPupilSegment(Vector3 exp_pt, Vector3 exp_dir, double exp_dst, Interface ifc, Vector3 b4_pt, Vector3 b4_dir) {

@@ -1,8 +1,10 @@
 package org.redukti.optim;
 
 
+import org.redukti.rayoptics.analysis.RayAberrationResult;
 import org.redukti.rayoptics.analysis.SpotAnalysis;
 import org.redukti.rayoptics.analysis.SpotAnalysisResult;
+import org.redukti.rayoptics.analysis.TransverseRayAberrationAnalysis;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.TraceOptions;
 import org.redukti.spec.Prescription;
@@ -13,6 +15,7 @@ public class Analysis {
     public double[] fields;
     public double[] pfo;
     public SpotAnalysisResult.SpotResultsByField[] spots;
+    public RayAberrationResult ray_aberrations;
 
     /**
      * Systems and spot analysis setup for each field
@@ -35,5 +38,6 @@ public class Analysis {
         var spotAnalysis = SpotAnalysis.eval(system,21, new TraceOptions());
         spots = spotAnalysis.spot_results.toArray(new SpotAnalysisResult.SpotResultsByField[0]);
         pfo = ParaxHelper.asArray(system.optical_spec.parax_data.fod);
+        ray_aberrations = TransverseRayAberrationAnalysis.eval(system,10,new TraceOptions());
     }
 }

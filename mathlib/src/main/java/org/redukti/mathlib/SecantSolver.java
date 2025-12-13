@@ -8,7 +8,7 @@ public class SecantSolver {
 
     public static double find_root(ObjectiveFunction f, double x0, int maxiter, double tol) {
         double p0 = x0;
-        double eps = 1e-4;
+        double eps = Math.sqrt(MinPack.dpmpar(1));
         double p1 = x0 * (1 + eps);
         p1 += (p1 >= 0 ? eps : -eps);
         double q0 = f.eval(p0);

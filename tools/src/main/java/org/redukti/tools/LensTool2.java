@@ -31,7 +31,7 @@ public class LensTool2 {
     }
 
     public static OpticalModel createSystem(Prescription prescription,boolean fov_angle) {
-        return prescription.build_rayoptic_model(prescription,fov_angle);
+        return prescription.build_rayoptic_model(fov_angle,null,true);
     }
 
     public static void outputSpotAnalysis(SpotAnalysisResult.SpotResultsByField result, Path output_file) throws Exception {

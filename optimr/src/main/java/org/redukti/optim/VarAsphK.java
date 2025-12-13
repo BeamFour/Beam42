@@ -9,20 +9,9 @@ public class VarAsphK extends Var {
         this.surfaceId = surfaceId;
     }
     @Override
-    public void shift(double delta, boolean apply_scale) {
+    public void shift(double delta) {
         prescription._surfaces[surfaceId]._k = originalValue + delta;
     }
-
-    @Override
-    public double get_value() {
-        return prescription._surfaces[surfaceId]._k;
-    }
-
-    @Override
-    public void set_value(double value,double delta) {
-        prescription._surfaces[surfaceId]._k = value + delta;
-    }
-
     @Override
     public String toString() {
         return "Surface ID: " + surfaceId + " Asph k: " + prescription._surfaces[surfaceId]._k;

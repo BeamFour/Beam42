@@ -28,12 +28,13 @@ public class MeritFunction implements LMLFunction {
         @Override
         public double computeResiduals() {
             for (int i = 0; i < point.length; i++) {
-                vars[i].shift(point[i],true);
+                vars[i].shift(point[i]);
             }
             try {
                 analysis.compute();
             }
             catch (Exception e) {
+                e.printStackTrace();
                 return BIGVAL;
             }
             double sos = 0.0;

@@ -34,7 +34,6 @@ public class MeritFunction implements LMLFunction {
                 analysis.compute();
             }
             catch (Exception e) {
-                e.printStackTrace();
                 return BIGVAL;
             }
             double sos = 0.0;

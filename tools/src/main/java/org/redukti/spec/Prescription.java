@@ -399,9 +399,9 @@ public class Prescription {
                 Trace.apply_paraxial_vignetting(opm);
             opm.update_model();
         }
-        System.out.println(sm.list_surfaces(new StringBuilder()).toString());
-        System.out.println(sm.list_gaps(new StringBuilder()).toString());
-        System.out.println(osp.list_str(new StringBuilder()).toString());
+//        System.out.println(sm.list_surfaces(new StringBuilder()).toString());
+//        System.out.println(sm.list_gaps(new StringBuilder()).toString());
+//        System.out.println(osp.list_str(new StringBuilder()).toString());
         return opm;
     }
 

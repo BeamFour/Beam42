@@ -67,15 +67,27 @@ public class NoctNikkor58Optim2c {
                         new GoalSpotMaxRadius(analysis, 4, 80.0, 2.0),
                         new GoalSpotMaxRadius(analysis, 5, 120.0, 2.0),
                         new GoalSpotMaxRadius(analysis, 6, 200.0, 2.0),
+                        new GoalRayAberration(analysis,6,0,0,587.5618, 0,1),
+                        new GoalRayAberration(analysis,6,0,-1,587.5618, 0,1),
+                        new GoalRayAberration(analysis,6,0,0,486.1327, 0,1),
+                        new GoalRayAberration(analysis,6,0,-1,486.1327, 0,1),
+//                        new GoalRayAberration(analysis,6,1,0,587.5618, 0,1),
+//                        new GoalRayAberration(analysis,6,1,-1,587.5618, 0,1),
+//                        new GoalRayAberration(analysis,6,1,0,486.1327, 0,1),
+//                        new GoalRayAberration(analysis,6,1,-1,486.1327, 0,1),
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,58.0, 1.0),
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Fno, 1.2, 1.0),
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 37.78, 1.0),
                       //new GoalParax(analysis, ParaxialFirstOrderInfo.Pp1, 51.8, 1.0),
                       //new GoalParax(analysis, ParaxialFirstOrderInfo.Ppk, 20.2, 1.0)
                 });
+        analysis.compute();
         var lm = f.getSolver();
+        System.out.println("Before:\n");
+        System.out.println(f.toString());
         var istatus = lm.solve();
         System.out.println("Status = " + istatus);
+        System.out.println("After:\n");
         System.out.println(f.toString());
         System.out.println(prescription.toString());
     }

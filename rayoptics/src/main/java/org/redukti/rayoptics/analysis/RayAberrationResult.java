@@ -29,4 +29,30 @@ public class RayAberrationResult {
         }
         return null;
     }
+
+    public String generateReport() {
+        StringBuilder sb = new StringBuilder();
+        for (var result: results) {
+            sb.append(result.fld.toString()).append(" xy=").append(result.xy).append("\n");
+            for (int i = 0; i < result.fans.size(); i++) {
+                var fan = result.fans.get(i);
+                if (i > 0)
+                    sb.append(",");
+                sb.append(fan.wvl);
+            }
+            sb.append("\n");
+            int row_count = result.fans.get(0).fan_y.size();
+            for (int i = 0; i < row_count; i++) {
+                for (int j = 0; j < result.fans.size(); j++) {
+                    var fan = result.fans.get(j);
+                    if (j > 0)
+                        sb.append(",");
+                    sb.append(fan.fan_y.get(i));
+                }
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
+    }
+
 }

@@ -1,9 +1,11 @@
 package org.redukti.rayoptics.analysis;
 
+import org.redukti.mathlib.M;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.raytr.TraceGridByWvl;
 import org.redukti.rayoptics.specs.Field;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,8 +69,26 @@ public class SpotAnalysisResult {
     public String toString() {
         var sb = new StringBuilder();
         for (var result: spot_results) {
-            sb.append(result.toString());
+            sb.append(result.toString()).append("\n");
         }
         return sb.toString();
+    }
+
+    private static DecimalFormat decimalFormat = M.decimal_format();
+
+    public static StringBuilder toMarkdownTableHeader(StringBuilder sb) {
+        sb.append("| Field | Spot Mean Radius | Spot Max Radius |\n");
+        sb.append("| ---   | ---              | ---             |\n");
+        return sb;
+    }
+    public StringBuilder toMarkdownTable(StringBuilder sb) {
+        toMarkdownTableHeader(sb);
+        for (var result: spot_results) {
+            sb.append(" | ").append(result.fld)
+                    .append(" | ").append(decimalFormat.format(result.get_mean_radius()))
+                    .append(" | ").append(decimalFormat.format(result.get_max_radius()))
+                    .append("|\n");
+        }
+        return sb;
     }
 }

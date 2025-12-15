@@ -15,7 +15,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 5 | 13.852 | 5.869 | 22.37 |  |  |  |
 | 6 | 26.06 | 0.94 | 24.84 | 1.6968 | 55.52 | Hikari | J-LAK14 |
 | 7 | 9.86 | 4.696 | 15.62 |  |  |  |
-| 8 | 193.696 | 1.173 | 15.85 | 1.74443 | 49.4 |  |
+| 8 | 193.696 | 1.173 | 15.85 | 1.74429 | 50.77 | Schott | N-LAK28 |
 | 9 | 12.679 | 12.56 | 12.7 | 1.58144 | 40.98 | Hikari | J-LF5 |
 | 10 | -44.842 | 0.117 | 9.88 |  |  |  |
 | 11 | 28.644 | 2.7 | 11.12 | 1.62004 | 36.4 | Hikari | J-F2 |
@@ -43,34 +43,34 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
-| effective_focal_length |21.623
-| back_focal_length | 45.18
+| effective_focal_length |21.622
+| back_focal_length | 45.172
 | optical_invariant | 2.703
 | object_distance | 1.0E10
-| image_distance | 45.18
+| image_distance | 45.172
 | power | 0.046
-| pp1_H | 37.968
-| ppk_H' | 23.557
-| ffl_F | 16.344
+| pp1_H | 37.967
+| ppk_H' | 23.55
+| ffl_F | 16.345
 | fno | 4
 | enp_dist_P | 24.472
 | enp_radius | 2.703
-| exp_dist_P' | -12.14
-| exp_radius | 7.191
+| exp_dist_P' | -12.148
+| exp_radius | 7.19
 | m | -0
-| red | -4.62463483898781E8
+| red | -4.6249340229590607E8
 | n_obj | 1
 | n_img | 1
-| img_ht | 21.623
+| img_ht | 21.622
 | obj_ang | 45
 | obj_na | 0
 | img_na | -0.124|
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 22.686 | 76.414|
- | Field(x=0.0, y=0.707) | 38.429 | 171.365|
- | Field(x=0.0, y=1.0) | 59.462 | 272.805|
+ | Field(x=0.0, y=0.0) | 21.425 | 72.771|
+ | Field(x=0.0, y=0.707) | 37.388 | 167.952|
+ | Field(x=0.0, y=1.0) | 58.566 | 270.338|
 ## Ray Aberrations
 ### Field 0.0
 ![Tangential Ray Aberrations 0.0](./rayabbr-fld0-tan.svg)

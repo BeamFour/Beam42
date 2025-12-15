@@ -18,7 +18,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 8 | 14.29 | 3.2 | 24.19 |  |  |  |
 | 9 | 18.7 | 1.0 | 23.13 | 1.6968 | 55.52 | Hikari | J-LAK14 |
 | 10 | 12.87 | 6.3 | 20.18 |  |  |  |
-| 11 | 0.0 | 1.2 | 18.14 | 1.51743 | 52.3 |  |
+| 11 | 0.0 | 1.2 | 18.14 | 1.51742 | 52.2 | Schott | KF6 |
 | 12 | 0.0 | 0.7 | 18.14 |  |  |  |
 | 13 | -449.32 | 0.8 | 16.41 | 1.8485 | 43.79 | Hikari | J-LASFH22 |
 | 14 | 13.67 | 12.0 | 14.72 | 1.54814 | 45.51 | Hikari | J-LLF1 |
@@ -61,7 +61,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | exp_dist_P' | -19.755
 | exp_radius | 5.12
 | m | -0
-| red | -6.742566380731534E8
+| red | -6.742567491952435E8
 | n_obj | 1
 | n_img | 1
 | img_ht | 21.181

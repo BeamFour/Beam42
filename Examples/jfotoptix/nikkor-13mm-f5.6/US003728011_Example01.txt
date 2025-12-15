@@ -1,5 +1,8 @@
 [descriptive data]
 title	US 3,728,011 Example 1
+#patent	country	number	example	year	inventors	org	link
+patent	US	US3728011	EX 1	1971	Ikuo Mori	Nikon Corp	https://patents.google.com/patent/US3728011A/en
+lens name	Nikkor 13mm f8 Prototype
 [constants]
 [variable distances]
 Focal Length	13.2

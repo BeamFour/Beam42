@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP 2014-048488 Example 3 (Sigma 35mm F1.4 DG HSM Art)
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP 2014-048488	EX 3	2012	Ryo Shioda	Sigma Corp	https://patents.google.com/patent/JP2014048488A/en
+lens name	Sigma 35mm F1.4 DG HSM Art
 [constants]
 [variable distances]
 Focal Length	34.00	undefined

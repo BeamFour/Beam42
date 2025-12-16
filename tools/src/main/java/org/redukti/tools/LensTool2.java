@@ -124,6 +124,7 @@ public class LensTool2 {
             System.out.println(sm.list_surfaces(new StringBuilder()).toString());
             System.out.println(sm.list_gaps(new StringBuilder()).toString());
             System.out.println(osp.list_str(new StringBuilder()).toString());
+            Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"vig.txt",arguments.outdir), osp.list_str(new StringBuilder()).toString());
             Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"paraxial.txt",arguments.outdir), fod.toString());
             // can't do layout diagrams yet
 //            outputLayout(system,Helper.getOutputPath(arguments.specfile,"layoutonly.svg",arguments.outdir));

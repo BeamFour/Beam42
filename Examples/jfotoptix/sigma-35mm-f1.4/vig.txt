@@ -1,0 +1,9 @@
+Aperture: Image Fnum; value = 1.45
+Field: Object Angle; value = 32.745
+y =  0.000 ( 0.00) vlx= 0.000 vux= 0.000 vly= 0.000 vuy= 0.000
+y =  0.707 (23.15) vlx= 0.000 vux= 0.000 vly= 0.535 vuy= 0.316
+y =  1.000 (32.75) vlx= 0.000 vux= 0.000 vly= 0.792 vuy= 0.505
+is_relative=true, is_wideangle=false
+central wavelength=  587.5618
+wavelength (weight) =  486.1327 0.500,   587.5618 1.000*,   656.2725 0.500
+focus shift=0.0

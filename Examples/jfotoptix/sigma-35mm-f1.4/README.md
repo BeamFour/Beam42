@@ -44,9 +44,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 ![Layout Only](./layout-semi-skew.svg)
 ![Layout Only](./layout-skew.svg)
 ## Spot Diagrams
-![Layout Only](./spot.svg)
-![Layout Only](./spot-semi-skew.svg)
-![Layout Only](./spot-skew.svg)
+![Spot Diagram Field 0.0](./spot.svg)
+![Spot Diagram Field 0.7](./spot-semi-skew.svg)
+![Spot Diagram Field 1.0](./spot-skew.svg)
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
@@ -54,18 +54,18 @@ Note that where glass types are shown the refractive index and abbe number is as
 | back_focal_length | 39.201
 | optical_invariant | 7.54
 | object_distance | 1.0E10
-| image_distance | 39.2
+| image_distance | 39.201
 | power | 0.029
 | pp1_H | 53.385
-| ppk_H' | -5.201
+| ppk_H' | 5.201
 | ffl_F | 19.385
 | fno | 1.45
 | enp_dist_P | 34.909
 | enp_radius | 11.724
-| exp_dist_P' | -35.264
+| exp_dist_P' | -35.263
 | exp_radius | 25.677
-| m | 0
-| red | -2.941165850292297E8
+| m | -0
+| red | -2.941165850292295E8
 | n_obj | 1
 | n_img | 1
 | img_ht | 21.865
@@ -75,9 +75,19 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 9.664 | 27.687|
- | 0.7 | 15.171 | 76.691|
- | 1.0 | 34.19 | 140.488|
+ | Field(x=0.0, y=0.0) | 9.501 | 26.88|
+ | Field(x=0.0, y=0.707) | 15.767 | 77.496|
+ | Field(x=0.0, y=1.0) | 38.968 | 145.116|
+## Ray Aberrations
+### Field 0.0
+![Tangential Ray Aberrations 0.0](./rayabbr-fld0-tan.svg)
+![Sagittal Ray Aberrations 0.0](./rayabbr-fld0-sag.svg)
+### Field 0.7
+![Tangential Ray Aberrations 0.0](./rayabbr-fld1-tan.svg)
+![Sagittal Ray Aberrations 0.0](./rayabbr-fld1-sag.svg)
+### Field 1.0
+![Tangential Ray Aberrations 0.0](./rayabbr-fld2-tan.svg)
+![Sagittal Ray Aberrations 0.0](./rayabbr-fld2-sag.svg)
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./JP2014-048488_Example03P.txt)
 * [Zemax file](./JP2014-048488_Example03P.zmx)

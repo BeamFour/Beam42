@@ -3,6 +3,11 @@ package org.redukti.spec;
 import org.redukti.jfotoptix.medium.GlassMap;
 
 public class SurfaceType {
+
+    public final static int ASPH_EVEN = 1;
+    public final static int ASPH_EVEN_A2 = 2;
+    public final static int ASPH_ODD = 3;
+
     public String _id;
     public double _radius;
     public double _thickness;
@@ -13,7 +18,15 @@ public class SurfaceType {
     public double _vd;
     public String _glass_name;
     // Aspheric
+    public int _asph_type;
     public double _k;
+    /**
+     * Coefficients are stored in  a normalized way
+     * For Even polynomials, first coefficient is 0, as this is the A2 term
+     * For Odd polynomials first 2 coefficients are 0.
+     * But in OpticalBench the data is output so that
+     * these values are skipped
+     */
     public double[] _coeffs;
 
     public double[] _thickness_by_scenario;
@@ -28,6 +41,7 @@ public class SurfaceType {
         this._nd = nd;
         this._vd = vd;
         this._glass_name = glassName;
+        this._asph_type = 0;
     }
     public SurfaceType set_thickness_by_scenario(double[] thickness_by_scenario) {
         this._thickness_by_scenario = thickness_by_scenario;
@@ -55,7 +69,7 @@ public class SurfaceType {
     public double[] get_aspheric_coeffs() {
         return _coeffs;
     }
-    public double get_conic_k() {
+    public double get_cc() {
         return _k;
     }
     public double get_refractive_index() {
@@ -68,7 +82,13 @@ public class SurfaceType {
         return _glass_name;
     }
     public boolean is_aspheric() {
-        return _k != 0 || (_coeffs != null && _coeffs.length > 0);
+        return _asph_type != 0;
+    }
+    public boolean is_odd_asphere() {
+        return is_aspheric() && _asph_type == ASPH_ODD;
+    }
+    public boolean is_even_a2_asphere() {
+        return is_aspheric() && _asph_type == ASPH_EVEN_A2;
     }
     public StringBuilder toOptBenchStr(StringBuilder sb) {
         sb.append(_id).append("\t");
@@ -97,7 +117,13 @@ public class SurfaceType {
         sb.append(_id).append("\t");
         sb.append(_radius).append("\t");
         sb.append(_k).append("\t");
-        for (int i = 0; i < _coeffs.length; i++) {
+        int i = 0;
+        // Skip the unused params for optical bench format
+        if (_asph_type == ASPH_EVEN)
+            i = 1;
+        else if (_asph_type == ASPH_ODD)
+            i = 2;
+        for (; i < _coeffs.length; i++) {
             if (_coeffs[i] == 0.0)
                 break;
             sb.append(_coeffs[i]).append("\t");
@@ -107,14 +133,14 @@ public class SurfaceType {
     }
     public static StringBuilder asphericMarkdownTableHeader(StringBuilder sb) {
         sb.append("## Aspherical Data").append("\n");
-        sb.append("| ID  | k   | A4  | A6  | A8  | A10 | A12 | A14 | A16 | A18 |\n");
-        sb.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n");
+        sb.append("| ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |\n");
+        sb.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n");
         return sb;
     }
     public StringBuilder ashericToMarkdownTableRow(StringBuilder sb) {
         sb.append("| ").append(_id);
         sb.append(" | ").append(_k);
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 10; i++) {
             if (_coeffs != null && i < _coeffs.length)
                 sb.append(" | ").append(_coeffs[i]);
             else

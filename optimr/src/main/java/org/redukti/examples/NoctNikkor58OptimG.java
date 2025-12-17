@@ -23,10 +23,10 @@ public class NoctNikkor58OptimG {
                 new Var[] {
                      new VarRadius(prescription, 0),
                      new VarAsphK(prescription,0),
-                     new VarAsphCoeff(prescription,0,0,1E6),
-                     new VarAsphCoeff(prescription,0,1,1E9),
-                     new VarAsphCoeff(prescription,0,2,1E11),
-                     new VarAsphCoeff(prescription,0,3,1E14),
+                     new VarAsphCoeff(prescription,0,1,1E6),
+                     new VarAsphCoeff(prescription,0,2,1E9),
+                     new VarAsphCoeff(prescription,0,3,1E11),
+                     new VarAsphCoeff(prescription,0,4,1E14),
                      new VarRadius(prescription,2),
                      new VarRadius(prescription,3),
                      new VarRadius(prescription,4),
@@ -161,6 +161,8 @@ public class NoctNikkor58OptimG {
                 });
         analysis.compute();
         var lm = f.getSolver();
+        System.out.println("Aberrations:\n");
+        System.out.println(analysis.ray_aberrations.generateReport());
         System.out.println("Before:\n");
         System.out.println(f.toString());
         var istatus = lm.solve();

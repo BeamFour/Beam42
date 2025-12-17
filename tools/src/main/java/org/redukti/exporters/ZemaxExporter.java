@@ -121,7 +121,6 @@ public class ZemaxExporter {
 
     private void outputSurfaces(Prescription prescription, StringBuilder sb) {
         SurfaceType[] surfaces = prescription.get_surfaces();
-        boolean A2aspherical = false; // TODO system.has_constant("AsphericalA2");
         for (int i = 0; i < surfaces.length; i++) {
             SurfaceType s = surfaces[i];
             double thickness = 0.0;
@@ -132,7 +131,12 @@ public class ZemaxExporter {
             if (s.is_aperture_stop()) {
                 sb.append("  STOP\n");
             }
-            if (s.is_aspheric()) sb.append("  TYPE EVENASPH\n");
+            if (s.is_aspheric()) {
+                if (s.is_odd_asphere())
+                    sb.append("  TYPE ODDASPHE\n");
+                else
+                    sb.append("  TYPE EVENASPH\n");
+            }
             else sb.append("  TYPE STANDARD\n");
             double curvature = s.get_radius_of_curvature() == 0.0 ? 0 : 1.0 / s.get_radius_of_curvature();
             sb.append("  CURV ").append(curvature).append(" 0 0 0 0\n");
@@ -140,23 +144,16 @@ public class ZemaxExporter {
             sb.append("  MIRR 2 0\n");
             if (s.is_aspheric()) {
                 double[] aspherics = s.get_aspheric_coeffs();
-                if (!A2aspherical) {
-                    sb.append("  PARM 1 0\n");
-                    for (int a = 0; a < aspherics.length; a++) {
-                        sb.append("  PARM ").append(a+1).append(" ");
-                        sb.append(aspherics[a]).append("\n");
-                    }
+                for (int a = 1; a < 11; a++) {
+                    sb.append("  PARM ").append(a).append(" ");
+                    sb.append(aspherics[a-1]).append("\n");
                 }
-//                else {
-//                    for (int a = 1; a < 11; a++) {
-//                        sb.append("  PARM ").append(a).append(" ");
-//                        sb.append(aspherics.data(a+1)).append("\n");
-//                    }
-//                }
             }
             sb.append("  DISZ ").append(thickness).append("\n");
             if (s.is_aspheric()) {
-                sb.append("  CONI ").append(s.get_conic_k()).append("\n");
+                // For Odd aspheres we have to supply ec, for Even aspheres cc
+                double k = s.is_odd_asphere() ? s.get_cc()+1 : s.get_cc();
+                sb.append("  CONI ").append(k).append("\n");
             }
             if (s.get_refractive_index() != 0.0) {
                 sb.append("  GLAS ");
@@ -221,7 +218,6 @@ public class ZemaxExporter {
         OpticalBenchDataImporter.Variable view_angles = system.find_variable("Angle of View");
         OpticalBenchDataImporter.Variable image_heights = system.find_variable("Image Height");
         OpticalBenchDataImporter.Variable back_focus = system.find_variable("Bf");
-        boolean A2aspherical = system.has_constant("AsphericalA2");
         if (back_focus == null) back_focus = system.find_variable("Bf(m)");
         OpticalBenchDataImporter.Variable aperture_diameters = system.find_variable("Aperture Diameter");
         if (scenario >= view_angles.num_scenarios() || scenario >= image_heights.num_scenarios() || scenario >= back_focus.num_scenarios() || (aperture_diameters != null && scenario >= aperture_diameters.num_scenarios())) {
@@ -243,30 +239,28 @@ public class ZemaxExporter {
                 sb.append("  STOP\n");
             }
             OpticalBenchDataImporter.AsphericalData aspherics = s.get_aspherical_data();
-            if (aspherics != null) sb.append("  TYPE EVENASPH\n");
+            if (aspherics != null) {
+                if (aspherics.is_odd_asphere())
+                    sb.append("  TYPE ODDASPHE\n");
+                else
+                    sb.append("  TYPE EVENASPH\n");
+            }
             else sb.append("  TYPE STANDARD\n");
             double curvature = s.get_radius() == 0.0 ? 0 : 1.0 / s.get_radius();
             sb.append("  CURV ").append(curvature).append(" 0 0 0 0\n");
             sb.append("  HIDE 0 0 0 0 0 0 0 0 0 0\n");
             sb.append("  MIRR 2 0\n");
             if (aspherics != null) {
-                if (!A2aspherical) {
-                    sb.append("  PARM 1 0\n");
-                    for (int a = 2; a < 11; a++) {
-                        sb.append("  PARM ").append(a).append(" ");
-                        sb.append(aspherics.data(a)).append("\n");
-                    }
-                }
-                else {
-                    for (int a = 1; a < 11; a++) {
-                        sb.append("  PARM ").append(a).append(" ");
-                        sb.append(aspherics.data(a+1)).append("\n");
-                    }
+                double[] coefs = aspherics.get_coeffs();
+                for (int a = 0; a < coefs.length; a++) {
+                    sb.append("  PARM ").append(a+1).append(" ");
+                    sb.append(coefs[a]).append("\n");
                 }
             }
             sb.append("  DISZ ").append(thickness).append("\n");
             if (aspherics != null) {
-                sb.append("  CONI ").append(aspherics.data(1)).append("\n");
+                double k = aspherics.is_odd_asphere() ? aspherics.get_cc() + 1.0 : aspherics.get_cc();
+                sb.append("  CONI ").append(k).append("\n");
             }
             if (s.get_refractive_index() != 0.0) {
                 sb.append("  GLAS ");

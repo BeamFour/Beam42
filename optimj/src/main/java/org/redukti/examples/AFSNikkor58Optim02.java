@@ -4,13 +4,14 @@ import org.redukti.mathlib.LMLSolver;
 import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.spec.Prescription;
 import org.redukti.optim.*;
+import org.redukti.spec.SurfaceType;
 
 public class AFSNikkor58Optim02 {
 
    private static Prescription getPrescription() {
         Prescription prescription = new Prescription(58.0216,1.45,41.72,43.2,false)
                 .surf(52.8577, 6.0, 47.2, 1.74443, 49.53,	"N-LAK28")
-                .asph(-0.4279,new double[]{1.10084E-07,6.21998E-10,4.25694E-13,0.0})
+                .asph( SurfaceType.ASPH_EVEN,-0.4279,new double[]{0.,1.10084E-07,6.21998E-10,4.25694E-13,0.0})
                 .surf(229.3475,	0.1,	47.2)
                 .surf(40.3738,	6.0,	39.6,1.755,	52.34,	"J-LASKH2")
                 .surf( 354.9744, 1.5, 39.6, 1.48749, 70.31, "J-FK5")
@@ -25,7 +26,7 @@ public class AFSNikkor58Optim02 {
                 .surf(-44.2318,	1.5,		33.8,1.53172,	48.78,	"J-LLF6")
                 .surf(44.2683,	6.0, 	33.8, 1.7443, 49.53, "N-LAK28")
                 .surf(-77.2943, 38.7, 33.8)
-                .asph(13.1597,new double[]{8.65514E-06,4.15940E-09,1.25812E-11,1.22728E-14})
+                .asph(SurfaceType.ASPH_EVEN,13.1597,new double[]{0.,8.65514E-06,4.15940E-09,1.25812E-11,1.22728E-14})
                 .build();
         return prescription;
     }

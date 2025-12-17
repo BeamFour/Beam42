@@ -19,6 +19,7 @@ import org.redukti.jfotoptix.patterns.Pattern;
 import org.redukti.jfotoptix.shape.Disk;
 import org.redukti.jfotoptix.shape.Rectangle;
 import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
+import org.redukti.rayoptics.elem.profiles.RadialPolynomial;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.Trace;
 import org.redukti.rayoptics.raytr.VigCalc;
@@ -101,8 +102,13 @@ public class Prescription {
         _surface_list.add(surface);
         return this;
     }
-    public Prescription asph(double k, double[] coeffs) {
+    public Prescription asph(int asph_type, double k, double[] coeffs) {
+        if (asph_type == SurfaceType.ASPH_EVEN && coeffs[0] != 0.0)
+            throw new IllegalArgumentException("Even aspheres must have 0 as first coefficient");
+        else if (asph_type == SurfaceType.ASPH_ODD && (coeffs[0] != 0.0 || coeffs[1] != 0.0))
+            throw new IllegalArgumentException("Odd aspheres must have 0 as first and second coefficients");
         var lastSurface = _surface_list.get(_surface_list.size()-1);
+        lastSurface._asph_type = asph_type;
         lastSurface._k = k;
         lastSurface._coeffs = coeffs;
         return this;
@@ -162,18 +168,15 @@ public class Prescription {
         }
         OpticalBenchDataImporter.AsphericalData aspherical_data = surface.get_aspherical_data();
         if (aspherical_data != null) {
-            double k = aspherical_data.data(1);
-            double[] coeffs = new double[] {
-                    aspherical_data.data(2),
-                    aspherical_data.data(3),
-                    aspherical_data.data(4),
-                    aspherical_data.data(5),
-                    aspherical_data.data(6),
-                    aspherical_data.data(7),
-                    aspherical_data.data(8),
-                    aspherical_data.data(9),
-                    aspherical_data.data(10)};
-            asph(k,coeffs);
+            int asph_type = SurfaceType.ASPH_EVEN;
+            switch (aspherical_data.get_asphere_type()) {
+                case Even -> asph_type = SurfaceType.ASPH_EVEN;
+                case EvenA2 -> asph_type = SurfaceType.ASPH_EVEN_A2;
+                case Odd -> asph_type = SurfaceType.ASPH_ODD;
+            }
+            double k = aspherical_data.get_cc();
+            double[] coeffs = aspherical_data.get_coeffs();
+            asph(asph_type,k,coeffs);
         }
         return this;
     }
@@ -342,16 +345,16 @@ public class Prescription {
 
     private static Asphere build_asphere(SurfaceType s) {
         double[] coeffs = s.get_aspheric_coeffs();
-        double k = s.get_conic_k() + 1.0;
-        double a4 = coeffs.length > 0 ? coeffs[0] : 0.0;
-        double a6 = coeffs.length > 1 ? coeffs[1] : 0.0;
-        double a8 = coeffs.length > 2 ? coeffs[2] : 0.0;
-        double a10 = coeffs.length > 3 ? coeffs[3] : 0.0;
-        double a12 = coeffs.length > 4 ? coeffs[4] : 0.0;
-        double a14 = coeffs.length > 5 ? coeffs[5] : 0.0;
-        double a16 = coeffs.length > 6 ? coeffs[6] : 0.0;
-        double a18 = coeffs.length > 7 ? coeffs[7] : 0.0;
-        double a20 = coeffs.length > 8 ? coeffs[8] : 0.0;
+        double k = s.get_cc() + 1.0;
+        double a4 = coeffs.length > 1 ? coeffs[1] : 0.0;
+        double a6 = coeffs.length > 2 ? coeffs[2] : 0.0;
+        double a8 = coeffs.length > 3 ? coeffs[3] : 0.0;
+        double a10 = coeffs.length > 4 ? coeffs[4] : 0.0;
+        double a12 = coeffs.length > 5 ? coeffs[5] : 0.0;
+        double a14 = coeffs.length > 6 ? coeffs[6] : 0.0;
+        double a16 = coeffs.length > 7 ? coeffs[7] : 0.0;
+        double a18 = coeffs.length > 8 ? coeffs[8] : 0.0;
+        double a20 = coeffs.length > 9 ? coeffs[9] : 0.0;
         return new Asphere(s.get_radius_of_curvature(), k, a4, a6, a8, a10, a12, a14, a16, a18, a20);
     }
 
@@ -426,11 +429,10 @@ public class Prescription {
                         .max_aperture(ap_radius));
         }
         if (s.is_aspheric()) {
-            double[] coeffs = new double[s._coeffs.length + 1];
-            for (int i = 0; i < s._coeffs.length; i++) {
-                coeffs[i + 1] = s._coeffs[i];
-            }
-            sm.ifcs.get(sm.cur_surface).profile = new EvenPolynomial().r(s.get_radius_of_curvature()).cc(s.get_conic_k()).coefs(coeffs);
+            if (s.is_odd_asphere())
+                sm.ifcs.get(sm.cur_surface).profile = new RadialPolynomial().r(s.get_radius_of_curvature()).cc(s.get_cc()).coefs(s.get_aspheric_coeffs());
+            else
+                sm.ifcs.get(sm.cur_surface).profile = new EvenPolynomial().r(s.get_radius_of_curvature()).cc(s.get_cc()).coefs(s.get_aspheric_coeffs());
         }
         if (s.is_aperture_stop()) sm.set_stop();
     }
@@ -451,13 +453,33 @@ public class Prescription {
         return _surfaces;
     }
 
+    public boolean has_odd_aspheric() {
+        for (var s: _surfaces) {
+            if (s.is_odd_asphere())
+                return true;
+        }
+        return false;
+    }
+    public boolean has_even_a2_aspheric() {
+        for (var s: _surfaces) {
+            if (s.is_even_a2_asphere())
+                return true;
+        }
+        return false;
+    }
     public StringBuilder toOptBenchStr(StringBuilder sb) {
         sb.append("[descriptive data]\n");
+        sb.append("[constants]\n");
+        if (has_odd_aspheric())
+            sb.append("AsphericalOddCount\t1\n");
+        else if (has_even_a2_aspheric())
+            sb.append("AsphericalA2\n");
         sb.append("[variable distances]\n");
         sb.append("Focal Length\t").append(_focal_length).append("\n");
         sb.append("Angle of View\t").append(_angle_of_view_in_degrees).append("\n");
         sb.append("F-Number\t").append(_fno).append("\n");
         sb.append("Image Height\t").append(_diameter_image_circle).append("\n");
+        sb.append("Magnification\t0\n");
         sb.append("[lens data]\n");
         for (SurfaceType surface : _surface_list) {
             surface.toOptBenchStr(sb);

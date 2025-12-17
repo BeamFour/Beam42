@@ -145,6 +145,10 @@ public class OpticalBenchDataImporter {
             return _asphere_type;
         }
 
+        public boolean is_odd_asphere() {
+            return _asphere_type == AsphereType.Odd;
+        }
+
         public double[] get_coeffs() {
             double[] coeffs = new double[10];
             int a = 0;

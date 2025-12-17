@@ -117,6 +117,7 @@ public class LensTool2 {
         try {
             OpticalBenchDataImporter.LensSpecifications specs = getSpecsFromFile(arguments.specfile);
             var prescription = createPrescription(specs,arguments.scenario,arguments.use_glass_types,arguments.only_d_line);
+            System.out.println(prescription.toOptBenchStr(new StringBuilder()).toString());
             var opm = createSystem(prescription,true);
             var sm = opm.seq_model;
             var osp = opm.optical_spec;

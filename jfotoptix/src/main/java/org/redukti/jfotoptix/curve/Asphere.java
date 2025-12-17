@@ -9,6 +9,8 @@ import org.redukti.mathlib.Vector3;
 import org.redukti.mathlib.Vector3Pair;
 
 /**
+ * EvenPolynomial
+ *
  * Let
  * s^2 = x^2 + y^2
  *

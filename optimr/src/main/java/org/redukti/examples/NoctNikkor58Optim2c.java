@@ -3,6 +3,7 @@ package org.redukti.examples;
 import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.optim.*;
 import org.redukti.spec.Prescription;
+import org.redukti.spec.SurfaceType;
 
 // Takes too long to run for more than about 22 glasses (that takes 2 hrs as well)
 public class NoctNikkor58Optim2c {
@@ -12,7 +13,7 @@ public class NoctNikkor58Optim2c {
        private static Prescription getPrescription() {
         Prescription prescription = new Prescription(58.0,1.2,40.9,43.28,false)
                 .surf(79.9975, 6.885, 50.4875, 1.795, 45.31,	"J-LASF017")
-                .asph(0,new double[]{0.0,0.0,0.0,0.0})
+                .asph(SurfaceType.ASPH_EVEN, 0,new double[]{0.0,0.0,0.0,0.0,0.0})
                 .surf(0,	0.1,	50.4875)
                 .surf(33.737,	9.75,	44.832,1.8485,	43.79,	"J-LASFH22")
                 .surf( 70.18675, 1.56, 44.832)
@@ -37,10 +38,10 @@ public class NoctNikkor58Optim2c {
                 new Var[] {
                      new VarRadius(prescription, 0),
                      new VarAsphK(prescription,0),
-                     new VarAsphCoeff(prescription,0,0,1E6),
-                     new VarAsphCoeff(prescription,0,1,1E9),
-                     new VarAsphCoeff(prescription,0,2,1E11),
-                     new VarAsphCoeff(prescription,0,3,1E14),
+                     new VarAsphCoeff(prescription,0,1,1E6),
+                     new VarAsphCoeff(prescription,0,2,1E9),
+                     new VarAsphCoeff(prescription,0,3,1E11),
+                     new VarAsphCoeff(prescription,0,4,1E14),
                      new VarRadius(prescription,2),
                      new VarRadius(prescription,3),
                      new VarRadius(prescription,4),

@@ -74,6 +74,12 @@ public class RadialPolynomial extends SurfaceProfile {
         return this;
     }
 
+    @Override
+    public RadialPolynomial r(double radius) {
+        super.r(radius);
+        return this;
+    }
+
     public RadialPolynomial cc(double cc) {
         this.ec = cc + 1.0;
         return this;

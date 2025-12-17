@@ -7,15 +7,11 @@ import org.redukti.util.Args;
 import java.util.List;
 
 public class RayOpticsExporter {
-    double get_angle_of_view(OpticalBenchDataImporter.LensSpecifications system, int scenario) {
-        OpticalBenchDataImporter.Variable view_angles = system.find_variable("Angle of View");
-        return view_angles.get_value_as_double(scenario) / 2.0;
-    }
-
     void generate_preamble(OpticalBenchDataImporter.LensSpecifications system, int scenario, StringBuilder fp) {
         OpticalBenchDataImporter.DescriptiveData descriptive_data = system.get_descriptive_data();
         String title = descriptive_data.get_title();
         OpticalBenchDataImporter.Variable f_number = system.find_variable("F-Number");
+        var half_angle = system.get_half_angle_of_view_in_degrees(scenario);
         fp.append("%matplotlib inline\n")
                 .append("isdark = False\n")
                 .append("from rayoptics.environment import *\n")
@@ -26,27 +22,34 @@ public class RayOpticsExporter {
                 .append("# Obtained via https://www.photonstophotos.net/GeneralTopics/Lenses/OpticalBench/OpticalBenchHub.htm\n")
                 .append("\n")
                 .append("opm = OpticalModel()\n")
-                .append("sm  = opm.seq_model\n")
-                .append("osp = opm.optical_spec\n")
-                .append("pm = opm.parax_model\n")
+                .append("sm  = opm['seq_model']\n")
+                .append("osp = opm['optical_spec']\n")
+                .append("pm = opm['parax_model']\n")
+                .append("em = opm['ele_model']\n")
+                .append("pt = opm['part_tree']\n")
+                .append("ar = opm['analysis_results']\n")
                 .append("osp.pupil = PupilSpec(osp, key=['image', 'f/#'], value=").append(f_number.get_value_as_double(scenario)).append(")\n")
-                .append("osp.field_of_view = FieldSpec(osp, key=['object', 'angle'], flds=[0., ").append(get_angle_of_view(system, scenario)).append("])\n")
+                .append("osp.field_of_view = FieldSpec(osp, key=('object', 'angle'), value=").append(half_angle)
+                .append(", flds=[0.0,0.7,1.0]")
+                .append(", is_relative=True, is_wide_angle=").append(half_angle > 45. ? "True": "False").append(")\n")
                 .append("osp.spectral_region = WvlSpec([(486.1327, 0.5), (587.5618, 1.0), (656.2725, 0.5)], ref_wl=1)\n")
                 .append("opm.system_spec.title = \"").append(title).append("\"\n")
-                .append("opm.system_spec.dimensions = 'MM'\n")
+                .append("opm.system_spec.dimensions = 'mm'\n")
                 .append("opm.radius_mode = True\n");
     }
 
     void generate_aspherics(OpticalBenchDataImporter.AsphericalData asphere, StringBuilder fp) {
-        fp.append("sm.ifcs[sm.cur_surface].profile = EvenPolynomial(r=").append(asphere.data(0)).append(", cc=").append(asphere.data(1)).append(",\n");
-        fp.append("\tcoefs=[0.0,")
-                .append(asphere.data(2)).append(",")
-                .append(asphere.data(3)).append(",")
-                .append(asphere.data(4)).append(",")
-                .append(asphere.data(5)).append(",")
-                .append(asphere.data(6)).append(",")
-                .append(asphere.data(7)).append(",")
-                .append(asphere.data(8)).append("])\n");
+        if (asphere.get_asphere_type() != OpticalBenchDataImporter.AsphereType.Odd)
+            fp.append("sm.ifcs[sm.cur_surface].profile = EvenPolynomial(r=").append(asphere.get_r()).append(", cc=").append(asphere.get_cc()).append(",\n");
+        else
+            fp.append("sm.ifcs[sm.cur_surface].profile = RadialPolynomial(r=").append(asphere.get_r()).append(", cc=").append(asphere.get_cc()).append(",\n");
+        double[] coeffs = asphere.get_coeffs();
+        fp.append("\tcoefs=[");
+        for (int i = 0; i < coeffs.length; i++) {
+            if (i > 0) fp.append(",");
+            fp.append(coeffs[i]);
+        }
+        fp.append("])\n");
     }
 
     /* handling of Field Stop surface is problematic because it messes up the
@@ -69,24 +72,9 @@ public class RayOpticsExporter {
             System.exit(1);
         }
         fp.append("sm.gaps[0].thi=1e10\n");
-//        double Bf = back_focus.get_value_as_double(scenario);
         for (int i = 0; i < surfaces.size(); i++) {
             double thickness = 0.0;
             OpticalBenchDataImporter.LensSurface s = surfaces.get(i);
-//            if (i + 1 == surfaces.size() && s.is_cover_glass()) {
-//                // Oddity - override the Bf
-//                Bf = s.get_thickness(scenario);
-//            }
-            if (s.get_surface_type() == OpticalBenchDataImporter.SurfaceType.field_stop) {
-                continue;
-            }
-            if (i < surfaces.size()-1 && surfaces.get(i+1).get_surface_type() == OpticalBenchDataImporter.SurfaceType.field_stop) {
-                // Next surface is field stop
-                // we will add the thickess of field stop to the current surface
-                // FS will get 0 thickness as for now we skip it
-                // TODO allow option to retain field stop
-                thickness = surfaces.get(i+1).get_thickness(scenario);
-            }
             double diameter = s.get_diameter(scenario);
             if (s.get_surface_type() == OpticalBenchDataImporter.SurfaceType.aperture_stop && aperture_diameters != null) {
                 diameter = aperture_diameters.get_value_as_double(scenario);
@@ -101,20 +89,21 @@ public class RayOpticsExporter {
                                 .append(s.get_radius()).append(",")
                                 .append(thickness).append(",'")
                                 .append(glassMap.get_name()).append("','")
-                                .append(glassMap.get_manufacturer()).append("'])\n");
+                                .append(glassMap.get_manufacturer()).append("']");
                     }
                     else {
                         fp.append("sm.add_surface([")
                                 .append(s.get_radius()).append(",")
                                 .append(thickness).append(",")
                                 .append(s.get_refractive_index()).append(",")
-                                .append(s.get_abbe_vd()).append("])\n");
+                                .append(s.get_abbe_vd()).append("]");
                     }
                 } else {
                     fp.append("sm.add_surface([")
                             .append(s.get_radius()).append(",")
-                            .append(thickness).append("])\n");
+                            .append(thickness).append("]");
                 }
+                fp.append(",sd=").append(diameter / 2.0).append(")\n");
                 OpticalBenchDataImporter.AsphericalData aspherics = s.get_aspherical_data();
                 if (aspherics != null) {
                     generate_aspherics(aspherics, fp);
@@ -122,10 +111,15 @@ public class RayOpticsExporter {
             } else if (s.get_surface_type() == OpticalBenchDataImporter.SurfaceType.aperture_stop) {
                 fp.append("sm.add_surface([")
                         .append(s.get_radius()).append(",")
-                        .append(thickness).append("])\n")
+                        .append(thickness).append("]")
+                        .append(",sd=").append(diameter / 2.0).append(")\n")
                         .append("sm.set_stop()\n");
+            } else if (s.get_surface_type() == OpticalBenchDataImporter.SurfaceType.field_stop) {
+                fp.append("sm.add_surface([")
+                        .append(s.get_radius()).append(",")
+                        .append(thickness).append("]")
+                        .append(",sd=").append(diameter / 2.0).append(")\n");
             }
-            fp.append("sm.ifcs[sm.cur_surface].max_aperture = ").append(diameter / 2.0).append("\n");
         }
     }
     void generate_rest(StringBuilder fp) {
@@ -133,7 +127,9 @@ public class RayOpticsExporter {
                 .append("sm.list_gaps()\n")
                 .append("sm.do_apertures = False\n")
                 .append("opm.update_model()\n")
-                .append("apply_paraxial_vignetting(opm)\n")
+                .append("set_vignetting(opm)\n")
+                .append("print('')\n")
+                .append("listobj(osp)\n")
                 .append("layout_plt = plt.figure(FigureClass=InteractiveLayout, opt_model=opm, do_draw_rays=True, do_paraxial_layout=False,\n")
                 .append("                        is_dark=isdark).plot()\n")
                 .append("sm.list_model()\n")

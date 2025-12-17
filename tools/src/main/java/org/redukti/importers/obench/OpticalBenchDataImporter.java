@@ -109,10 +109,20 @@ public class OpticalBenchDataImporter {
         private List<String> _values;
     }
 
+    public enum AsphereType {
+        Even,
+        EvenA2,
+        Odd
+    }
+
     public static final class AsphericalData {
-        AsphericalData(int surface_number) {
+        AsphericalData(AsphereType asphere_type, int surface_number) {
+            this._asphere_type = asphere_type;
             this._surface_number = surface_number;
             this._data = new ArrayList<>();
+        }
+        AsphericalData(int surface_number) {
+            this(AsphereType.Even,surface_number);
         }
 
         void add_data(double d) {
@@ -131,6 +141,31 @@ public class OpticalBenchDataImporter {
             return _surface_number;
         }
 
+        public AsphereType get_asphere_type() {
+            return _asphere_type;
+        }
+
+        public double[] get_coeffs() {
+            double[] coeffs = new double[10];
+            int a = 0;
+            if (get_asphere_type() == OpticalBenchDataImporter.AsphereType.Odd)
+                a = 2;
+            else if (get_asphere_type() == OpticalBenchDataImporter.AsphereType.Even)
+                a = 1;
+            for (int i = 2; a < 10; i++, a++) {
+                coeffs[a] = data(i);
+            }
+            return coeffs;
+        }
+
+        public double get_cc() {
+            return data(1);
+        }
+        public double get_r() {
+            return data(0);
+        }
+
+        private AsphereType _asphere_type;
         private int _surface_number;
         private List<Double> _data;
     }
@@ -286,6 +321,7 @@ public class OpticalBenchDataImporter {
             int surface_id = 1; // We use numeric ids
             // OptBen uses string ids, so we need to map from string id to our id
             Map<String,Integer> surfaceIdMap = new HashMap<>();
+            AsphereType asphere_type = AsphereType.Even;
 
             for (String line : lines) {
                 String[] words = splitLine(line);
@@ -382,9 +418,15 @@ public class OpticalBenchDataImporter {
                     }
                     break;
                     case ASPHERICAL_DATA: {
+                        if (has_constant("AsphericalOddCount"))
+                            asphere_type = AsphereType.Odd;
+                        else if (has_constant("AsphericalA2"))
+                            asphere_type = AsphereType.EvenA2;
+                        else
+                            asphere_type = AsphereType.Even;
                         String optBenchID = words[0];
                         int id = surfaceIdMap.get(optBenchID);
-                        AsphericalData aspherical_data = new AsphericalData(id);
+                        AsphericalData aspherical_data = new AsphericalData(asphere_type,id);
                         for (int i = 1; i < words.length; i++) {
                             aspherical_data.add_data(parseDouble(words[i]));
                         }

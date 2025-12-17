@@ -5,7 +5,9 @@ package org.redukti.rayoptics.raytr;
 
 import org.redukti.mathlib.Vector2;
 import org.redukti.rayoptics.specs.Field;
+import org.redukti.rayoptics.specs.ReadOnlyField;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -15,30 +17,43 @@ public class RayPkg {
     /**
      * List of RaySegs
      */
-    public List<RaySeg> ray;
+    public final List<RaySeg> ray;
     /**
      * optical path length between pupils
      */
-    public double op_delta;
+    public final double op_delta;
     /**
      * wavelength (in nm) that the ray was traced in
      */
-    public double wvl;
-
-    public Field fld;
+    public final double wvl;
+    /**
+     *  readonly coy of the field as at the time of tracing
+     */
+    public final ReadOnlyField fld;
     /**
      * Input pupil
      */
-    public Vector2 input_pupil;
+    public final Vector2 input_pupil;
     /**
      * Vignetted pupil
      */
-    public Vector2 vig_pupil;
+    public final Vector2 vig_pupil;
 
     public RayPkg(List<RaySeg> ray, double op_delta, double wvl) {
-        this.ray = ray;
+        this(ray,op_delta,wvl,null,null,null);
+    }
+
+    public RayPkg(List<RaySeg> ray, double op_delta, double wvl,Field fld,Vector2 input_pupil,Vector2 vig_pupil) {
+        this.ray = Collections.unmodifiableList(ray);
         this.op_delta = op_delta;
         this.wvl = wvl;
+        this.fld = fld != null ? new ReadOnlyField(fld) : null; // Find ways to avoid making copies
+        this.input_pupil = input_pupil;
+        this.vig_pupil = vig_pupil;
+    }
+
+    public RayPkg with(Field fld,Vector2 input_pupil,Vector2 vig_pupil) {
+        return new RayPkg(this.ray,this.op_delta,this.wvl,fld,input_pupil,vig_pupil);
     }
 
     @Override

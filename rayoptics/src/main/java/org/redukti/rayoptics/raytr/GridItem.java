@@ -6,12 +6,13 @@ package org.redukti.rayoptics.raytr;
 import org.redukti.mathlib.Vector2;
 
 public class GridItem {
-    public Vector2 pupil;
-    public Double result = null;
-    public RayPkg ray_pkg = null;
+    public final Vector2 pupil;
+    public final Double result;
+    public final RayPkg ray_pkg;
 
     public GridItem(Vector2 pupil, RayPkg ray_pkg) {
         this.pupil = pupil;
+        this.result = null;
         this.ray_pkg = ray_pkg;
     }
     public GridItem(Vector2 pupil, RayPkg ray_pkg, double result) {
@@ -19,11 +20,6 @@ public class GridItem {
         this.result = result;
         this.ray_pkg = ray_pkg;
     }
-    public GridItem(Vector2 pupil, double result) {
-        this.pupil = pupil;
-        this.result = result;
-    }
-
     @Override
     public String toString() {
         return pupil.toString();

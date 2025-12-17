@@ -228,7 +228,9 @@ public class RayTrace {
                 if (b4_interact_mode == InteractMode.PHANTOM && options.filter_out_phantoms) {
                     // if a phantom interface, don't add intersection point
                     // but do add the path length.
-                    ray.get(ray.size()-1).dst += dst_b4;
+                    var pos = ray.size()-1;
+                    var prev_seg = ray.get(pos);
+                    ray.set(pos, new RaySeg(prev_seg,dst_b4));
                 }
                 else {
                     // add *previous* intersection point, direction, etc., to ray

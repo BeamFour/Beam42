@@ -236,10 +236,7 @@ public class Trace {
                 dir0 = dir0.negate();
         }
         var pkg = RayTrace.trace(opt_model.seq_model, pt0, dir0, wvl, options);
-        pkg.input_pupil = new Vector2(pupil[0], pupil[1]);
-        pkg.vig_pupil = new Vector2(pupil_coords[0], pupil_coords[1]);
-        pkg.fld = fld;
-        return pkg;
+        return pkg.with(fld,new Vector2(pupil[0], pupil[1]),new Vector2(pupil_coords[0], pupil_coords[1]));
     }
 
     static class BaseObjectiveFunction {

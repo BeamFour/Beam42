@@ -14,19 +14,19 @@ public class RaySeg {
     /**
      * the point of incidence
      */
-    public Vector3 p;
+    public final Vector3 p;
     /**
      * ray direction cosine following the interface
      */
-    public Vector3 d;
+    public final Vector3 d;
     /**
      * geometric distance to next point of incidence
      */
-    public double dst;
+    public final double dst;
     /**
      * surface normal vector at the point of incidence
      */
-    public Vector3 nrml;
+    public final Vector3 nrml;
 
     // TODO phase
 
@@ -36,6 +36,13 @@ public class RaySeg {
         this.d = d;
         this.dst = dst;
         this.nrml = nrml;
+    }
+
+    /**
+     * Clone and add dst_delta
+     */
+    public RaySeg(RaySeg other, double dst_delta) {
+        this(other.p,other.d,other.dst+dst_delta,other.nrml);
     }
 
     @Override

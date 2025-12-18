@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP 2019-197125 Example 6
+#patent	country	number	example	year	inventors	org	link
+patent	JP	2019-197125	EX 6	2018	Kenta Fujita	Sigma Corp	https://patents.google.com/patent/JP2019197125A/en
+lens name	Sigma ART 35mm F1.2 DG DN Prototype
 [constants]
 [variable distances]
 Focal Length	35.99	undefined

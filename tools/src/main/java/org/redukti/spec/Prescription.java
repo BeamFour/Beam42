@@ -358,7 +358,7 @@ public class Prescription {
         return new Asphere(s.get_radius_of_curvature(), k, a4, a6, a8, a10, a12, a14, a16, a18, a20);
     }
 
-    public OpticalModel build_rayoptic_model(boolean fov_angle, double[] fields, boolean apply_vignetting) {
+    public OpticalModel build_ray_optics_model(boolean fov_angle, double[] fields, boolean apply_vignetting, boolean use_wideangle_aiming) {
         if (fields == null)
             fields = new double[]{0., .707, 1.};
         OpticalModel opm = new OpticalModel();
@@ -375,7 +375,7 @@ public class Prescription {
             osp.fov.value = _diameter_image_circle/2.0;
         }
         osp.fov.is_relative = true; // Fields are specified as 0, 0.7, 1.0 etc - without actual sizes
-        osp.fov.is_wide_angle = half_angle_deg > 45.;
+        osp.fov.is_wide_angle = (half_angle_deg > 45.) || use_wideangle_aiming;
         if (_generate_d_line_only) {
             osp.wvls = new WvlSpec(new WvlWt[]{
                 new WvlWt(587.5618, 1.0)}, 0);
@@ -402,9 +402,6 @@ public class Prescription {
                 Trace.apply_paraxial_vignetting(opm);
             opm.update_model();
         }
-//        System.out.println(sm.list_surfaces(new StringBuilder()).toString());
-//        System.out.println(sm.list_gaps(new StringBuilder()).toString());
-//        System.out.println(osp.list_str(new StringBuilder()).toString());
         return opm;
     }
 

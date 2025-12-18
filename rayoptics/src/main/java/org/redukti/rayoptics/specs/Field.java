@@ -122,15 +122,20 @@ public class Field {
 
     public void list_str(StringBuilder sb, String fmtstr) {
         switch (fmtstr) {
-            case "x"-> sb.append(String.format("x =%7.3f (%5.2f) vlx=%6.3f vux=%6.3f vly=%6.3f vuy=%6.3f\n",
+            case "x"-> sb.append(String.format("x =%7.3f (%5.2f) vlx=%6.3f vux=%6.3f vly=%6.3f vuy=%6.3f",
                         xv(), xf(), vlx, vux, vly, vuy));
-            case "y"-> sb.append(String.format("y =%7.3f (%5.2f) vlx=%6.3f vux=%6.3f vly=%6.3f vuy=%6.3f\n",
+            case "y"-> sb.append(String.format("y =%7.3f (%5.2f) vlx=%6.3f vux=%6.3f vly=%6.3f vuy=%6.3f",
                     yv(), yf(), vlx, vux, vly, vuy));
-            case ""-> sb.append(String.format("x,y=%5.2f vlx=%6.3f vux=%6.3f vly=%6.3f vuy=%6.3f\n",
+            case ""-> sb.append(String.format("x,y=%5.2f vlx=%6.3f vux=%6.3f vly=%6.3f vuy=%6.3f",
                     yv(), vlx, vux, vly, vuy));
-            default -> sb.append(String.format("xy=(%7.3f, %7.3f) (%5.2f, %5.2f) vlx=%6.3f vux=%6.3f vly=%6.3f vuy=%6.3f\n",
+            default -> sb.append(String.format("xy=(%7.3f, %7.3f) (%5.2f, %5.2f) vlx=%6.3f vux=%6.3f vly=%6.3f vuy=%6.3f",
                     xv(), yv(), xf(), yf(), vlx, vux, vly, vuy));
         }
+        if (aim_info != null)
+            sb.append(" aim_info: [").append(aim_info[0]).append(",").append(aim_info[1]).append("]");
+        if (z_enp != null)
+            sb.append(" z_enp: ").append(z_enp);
+        sb.append("\n");
     }
 
     public boolean is_relative() {

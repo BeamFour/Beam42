@@ -34,7 +34,7 @@ public class Analysis {
         this.fields = fields;
     }
     public void compute() {
-        system = prescription.build_rayoptic_model(true,fields,true);
+        system = prescription.build_ray_optics_model(true,fields,true,true);
         var spotAnalysis = SpotAnalysis.eval(system,21, new TraceOptions());
         spots = spotAnalysis.spot_results.toArray(new SpotAnalysisResult.SpotResultsByField[0]);
         pfo = ParaxHelper.asArray(system.optical_spec.parax_data.fod);

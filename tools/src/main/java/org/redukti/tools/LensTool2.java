@@ -2,7 +2,6 @@ package org.redukti.tools;
 
 import org.redukti.exporters.ZemaxExporter;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
-import org.redukti.jfotoptix.analysis.AnalysisSpot;
 import org.redukti.mathlib.M;
 import org.redukti.plotter.RayAberrationPlot;
 import org.redukti.plotter.SpotDiagram;
@@ -33,8 +32,8 @@ public class LensTool2 {
         return p;
     }
 
-    public static OpticalModel createSystem(Prescription prescription,boolean fov_angle) {
-        return prescription.build_rayoptic_model(fov_angle,null,true);
+    public static OpticalModel createSystem(Prescription prescription,boolean fov_angle,boolean apply_vignetting,boolean use_wideangle_aiming) {
+        return prescription.build_ray_optics_model(fov_angle,null,apply_vignetting,use_wideangle_aiming);
     }
 
     public static void outputSpotAnalysis(SpotAnalysisResult.SpotResultsByField result, Path output_file) throws Exception {
@@ -118,7 +117,7 @@ public class LensTool2 {
             OpticalBenchDataImporter.LensSpecifications specs = getSpecsFromFile(arguments.specfile);
             var prescription = createPrescription(specs,arguments.scenario,arguments.use_glass_types,arguments.only_d_line);
             System.out.println(prescription.toOptBenchStr(new StringBuilder()).toString());
-            var opm = createSystem(prescription,true);
+            var opm = createSystem(prescription,true,true,true);
             var sm = opm.seq_model;
             var osp = opm.optical_spec;
             var fod = opm.optical_spec.parax_data.fod;
@@ -167,6 +166,7 @@ public class LensTool2 {
         }
         catch (Exception e) {
             System.err.println("Failed due to: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

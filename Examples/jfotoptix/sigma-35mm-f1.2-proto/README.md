@@ -2,7 +2,7 @@
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
-|JP | 2019-197125 | EX 6 | 2018 | Kenta Fujita | Sigma Corp | [link](https://patents.google.com/patent/JP2019197125A/en) |
+|JP | JP2019-197125 | EX 6 | 2018 | Kenta Fujita | Sigma Corp | [link](https://patents.google.com/patent/JP2019197125A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

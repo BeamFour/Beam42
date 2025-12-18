@@ -148,8 +148,6 @@ public class Nikkor14mmTest {
             new RaySeg(new Vector3(0., 20.362505270553246, 0.), new Vector3(0., 0.4476132717362105, 0.8942272412343552), 0.0, new Vector3(-0., -0., 1.))
         };
 
-        var old_eps = SecantSolver.eps;
-        SecantSolver.eps = 1e-4;
         for (int fi = 1; fi < osp.fov.fields.length; fi++) {
             var fld = osp.fov.fields[fi];
             var wvl = sm.central_wavelength();
@@ -161,7 +159,6 @@ public class Nikkor14mmTest {
             fld.chief_ray = t.chief_ray_pkg;
             fld.ref_sphere = t.ref_sphere;
         }
-        SecantSolver.eps = old_eps;
 
         var result = Wideangle.eval_real_image_ht(opm,osp.fov.fields[1],587.5618);
         var pt = new Vector3(0.0, -2866312975.4227800369262695,  419590299.1519107818603516);

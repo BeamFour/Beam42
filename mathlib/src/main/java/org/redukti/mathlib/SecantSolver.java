@@ -6,9 +6,8 @@ public class SecantSolver {
         double eval(double x);
     }
 
-    public static double eps = Math.sqrt(MinPack.dpmpar(1));
-
     public static double find_root(ObjectiveFunction f, double x0, int maxiter, double tol) {
+        final double eps = 1e-4;
         double p0 = x0;
         double p1 = x0 * (1 + eps);
         p1 += (p1 >= 0 ? eps : -eps);
@@ -24,7 +23,8 @@ public class SecantSolver {
         }
         for (int i = 0; i < maxiter; i++) {
             double p;
-            if (q1 == q0) {
+            double diff = Math.abs(q1 - q0);
+            if (diff < tol) {
                 return (p1 + p0) / 2.0;
             } else {
                 if (Math.abs(q1) > Math.abs(q0)) {

@@ -202,8 +202,6 @@ public class Nikkor58mmTest {
             new RaySeg(new Vector3(0., 21.70138483624297, 0.), new Vector3(0., 0.4434501309129979, 0.8962990468550369), 0.0, new Vector3(-0., -0., 1.))
         };
 
-        var old_eps = SecantSolver.eps;
-        SecantSolver.eps = 1e-4;
         for (int fi = 0; fi < osp.fov.fields.length; fi++) {
             var fld = osp.fov.fields[fi];
             var wvl = sm.central_wavelength();
@@ -215,7 +213,6 @@ public class Nikkor58mmTest {
             fld.chief_ray = t.chief_ray_pkg;
             fld.ref_sphere = t.ref_sphere;
         }
-        SecantSolver.eps = old_eps;
 
         var result = Trace.trace_boundary_rays(opm,new TraceOptions());
         System.out.println(result);

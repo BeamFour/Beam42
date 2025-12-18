@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP2004-101880 Example 2 (Cosina Voigtlander Nokton 35mm F1.2 Aspherical)
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP2004-101880	EX 2	2002	Yoshihisa Yomogida	Cosina Co Ltd	https://patents.google.com/patent/JP2004101880A/en
+lens name	Cosina Voigtlander Nokton 35mm F1.2 Aspherical I / II
 [constants]
 [variable distances]
 Focal Length	35.8
@@ -39,4 +42,3 @@ originX	10.64
 originY	225.55
 ppmm	9.181
 [notes]
---specfile Cosina-35mm-f1.2.txt --output spot --skew -o spot-skew.svg

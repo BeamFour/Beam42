@@ -1,3 +1,8 @@
+# Cosina Voigtlander Nokton 35mm F1.2 Aspherical I / II
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|JP | JP2004-101880 | EX 2 | 2002 | Yoshihisa Yomogida | Cosina Co Ltd | [link](https://patents.google.com/patent/JP2004101880A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

@@ -38,19 +38,16 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 28 | -430.037 | 4.6315 | 34.08 | 1.85135 | 40.1 | Hoya | M-TAFD305 |
 | 29 | -54.9865 | 39.0002 | 34.08 |  |  |  |
 ## Aspherical Data
-| ID  | k   | A4  | A6  | A8  | A10 | A12 | A14 | A16 | A18 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 28 | 0.0 | -2.73662E-6 | 3.07519E-9 | 3.90515E-11 | -1.94154E-14 | 0.0 | 0.0 | 0.0 | 0.0 |
-| 29 | 0.0 | 3.26804E-6 | 3.98767E-9 | 3.58258E-11 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
+| ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 28 | 0.0 | 0.0 | -2.73662E-6 | 3.07519E-9 | 3.90515E-11 | -1.94154E-14 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
+| 29 | 0.0 | 0.0 | 3.26804E-6 | 3.98767E-9 | 3.58258E-11 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
 ## Layouts
-![Layout Only](./layoutonly.svg)
 ![Layout Only](./layout.svg)
-![Layout Only](./layout-semi-skew.svg)
-![Layout Only](./layout-skew.svg)
 ## Spot Diagrams
-![Layout Only](./spot.svg)
-![Layout Only](./spot-semi-skew.svg)
-![Layout Only](./spot-skew.svg)
+![Spot Diagram Field 0.0](./spot.svg)
+![Spot Diagram Field 0.7](./spot-semi-skew.svg)
+![Spot Diagram Field 1.0](./spot-skew.svg)
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
@@ -58,18 +55,18 @@ Note that where glass types are shown the refractive index and abbe number is as
 | back_focal_length | 39.001
 | optical_invariant | 7.533
 | object_distance | 1.0E10
-| image_distance | 39
+| image_distance | 39.001
 | power | 0.024
 | pp1_H | 71.886
-| ppk_H' | 2.199
+| ppk_H' | -2.199
 | ffl_F | 30.686
 | fno | 1.45
 | enp_dist_P | 50.74
 | enp_radius | 14.207
-| exp_dist_P' | -45.642
+| exp_dist_P' | -45.641
 | exp_radius | 29.187
-| m | 0
-| red | -2.427156737125233E8
+| m | -0
+| red | -2.4271567371252346E8
 | n_obj | 1
 | n_img | 1
 | img_ht | 21.847
@@ -79,9 +76,19 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 4.105 | 7.102|
- | 0.7 | 6.234 | 36.536|
- | 1.0 | 8.493 | 44.468|
+ | Field(x=0.0, y=0.0) | 4.17 | 7.174|
+ | Field(x=0.0, y=0.707) | 6.249 | 33.354|
+ | Field(x=0.0, y=1.0) | 8.819 | 40.888|
+## Ray Aberrations
+### Field 0.0
+![Tangential Ray Aberrations 0.0](./rayabbr-fld0-tan.svg)
+![Sagittal Ray Aberrations 0.0](./rayabbr-fld0-sag.svg)
+### Field 0.7
+![Tangential Ray Aberrations 0.0](./rayabbr-fld1-tan.svg)
+![Sagittal Ray Aberrations 0.0](./rayabbr-fld1-sag.svg)
+### Field 1.0
+![Tangential Ray Aberrations 0.0](./rayabbr-fld2-tan.svg)
+![Sagittal Ray Aberrations 0.0](./rayabbr-fld2-sag.svg)
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./Sigma-40mmf1.4.txt)
 * [Zemax file](./Sigma-40mmf1.4.zmx)

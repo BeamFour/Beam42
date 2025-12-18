@@ -1,5 +1,8 @@
 [descriptive data]				
 title	US 7,663,816 Example 1
+#patent	country	number	example	year	inventors	org	link
+patent	US	US7663816	EX 1	2007	Haruo Sato	Nikon Corp	https://patents.google.com/patent/US7663816B2/en
+lens name	AFS Nikkor 35mm F1.4G
 [constants]
 AsphericalOddCount	1
 [variable distances]				

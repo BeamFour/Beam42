@@ -2,7 +2,6 @@ package org.redukti.rayoptics.integration;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.redukti.mathlib.SecantSolver;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.analysis.SpotAnalysis;
 import org.redukti.rayoptics.analysis.TransverseRayAberrationAnalysis;

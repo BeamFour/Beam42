@@ -5,6 +5,7 @@ package org.redukti.rayoptics.raytr;
 
 import org.redukti.mathlib.*;
 import org.redukti.rayoptics.exceptions.TraceException;
+import org.redukti.rayoptics.math.Tfm3d;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.seq.PathSeg;
 import org.redukti.rayoptics.seq.SequentialModel;
@@ -1106,6 +1107,29 @@ public class Trace {
             result.start_coords = xy_target;
             return result;
         }
+    }
+
+    public static StringBuilder list_ray(StringBuilder sb, RayPkg ray_pkg, Tfm3d tfrms, Integer start) {
+        if (start == null) start = 0;
+        var ray = ray_pkg.ray;
+        sb.append("            X            Y            Z           L            M            N               Len\n");
+        var colFormats = "%3d %12.5f %12.5f %12.5g %12.6f %12.6f %12.6f %12.5g\n";
+        for (int i = start; i < ray.size(); i++) {
+            var r = ray.get(i);
+            if (tfrms == null) {
+                sb.append(String.format(colFormats,i,r.p.x, r.p.y, r.p.z,
+                        r.d.x, r.d.y, r.d.z, r.dst));
+            }
+            else {
+                var rot = tfrms.rt;
+                var trns = tfrms.t;
+                var p = rot.multiply(r.p).plus(trns);
+                var d = rot.multiply(r.d);
+                sb.append(String.format(colFormats,i,p.x, p.y, p.z,
+                        d.x, d.y, d.z, r.dst));
+            }
+        }
+        return sb;
     }
 
 }

@@ -8,8 +8,8 @@ import org.redukti.mathlib.Vector2;
 public class Circular extends Aperture {
     public double radius = 1.0;
 
-    public Circular(double x_offset, double y_offset, double rotation, double radius) {
-        super(x_offset, y_offset, rotation);
+    public Circular(double x_offset, double y_offset, double rotation, double radius, boolean is_obscuration) {
+        super(x_offset, y_offset, rotation, is_obscuration);
         this.radius = radius;
     }
 
@@ -32,7 +32,8 @@ public class Circular extends Aperture {
     public boolean point_inside(double x, double y,Double fuzz) {
         if (fuzz == null) fuzz = 1e-5;
         Vector2 v = tform(x, y);
-        return Math.sqrt(v.x*v.x + v.y*v.y) <= radius + fuzz;
+        var ans = Math.sqrt(v.x*v.x + v.y*v.y) <= radius + fuzz;
+        return !is_obscuration ? ans : !ans;
     }
 
     /**

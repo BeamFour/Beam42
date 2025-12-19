@@ -87,6 +87,24 @@ public class Surface extends Interface {
     }
 
     @Override
+    public void set_optical_power(double pwr) {
+        profile.cv = delta_n != 0.0 ? pwr/delta_n : 0.0;
+    }
+
+    @Override
+    public void set_optical_power(double pwr, double n_before, double n_after) {
+        delta_n = n_after - n_before;
+        set_optical_power(pwr);
+    }
+
+    /**
+     * Filter obscurations out of the clear_aperture list.
+     */
+    public List<Aperture> get_ca_list() {
+       return clear_apertures.stream().filter(e->!e.is_obscuration).toList();
+    }
+
+    @Override
     public double surface_od() {
         double od = 0.0;
         if (!edge_apertures.isEmpty()) {
@@ -95,8 +113,8 @@ public class Surface extends Interface {
                 if (edg > od)
                     od = edg;
             }
-        } else if (!clear_apertures.isEmpty()) {
-            for (Aperture ca : clear_apertures) {
+        } else if (!get_ca_list().isEmpty()) {
+            for (Aperture ca : get_ca_list()) {
                 double ap = ca.max_dimension();
                 if (ap > od)
                     od = ap;
@@ -124,8 +142,8 @@ public class Surface extends Interface {
 
     @Override
     public Vector2 edge_pt_target(Vector2 rel_dir) {
-        if (clear_apertures.size() > 0)
-            return clear_apertures.get(0).edge_pt_target(rel_dir);
+        if (!get_ca_list().isEmpty())
+            return get_ca_list().get(0).edge_pt_target(rel_dir);
         else
             return super.edge_pt_target(rel_dir);
     }
@@ -133,7 +151,8 @@ public class Surface extends Interface {
     @Override
     public void set_max_aperture(double max_ap) {
         super.set_max_aperture(max_ap);
-        for (var ap: clear_apertures) {
+        var ca_list = get_ca_list();
+        for (var ap: ca_list) {
             ap.set_dimension(max_ap,max_ap);
         }
     }

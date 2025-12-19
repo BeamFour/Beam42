@@ -7,16 +7,16 @@ import org.redukti.mathlib.Vector2;
 import org.redukti.rayoptics.util.Pair;
 
 public abstract class Aperture {
-    public double x_offset;
-    public double y_offset;
-    public double rotation;
+    public double x_offset = 0.0;
+    public double y_offset = 0.0;
+    public double rotation = 0.0;
+    public boolean is_obscuration = false;
 
-    public Aperture() {}
-
-    public Aperture(double x_offset, double y_offset, double rotation) {
+    public Aperture(double x_offset, double y_offset, double rotation, boolean is_obscuration) {
         this.x_offset = x_offset;
         this.y_offset = y_offset;
         this.rotation = rotation;
+        this.is_obscuration = is_obscuration;
     }
 
     public abstract Vector2 dimension();

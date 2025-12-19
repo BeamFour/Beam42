@@ -36,10 +36,10 @@ import org.redukti.rayoptics.util.ZDir;
  */
 public class Interface {
 
-    public InteractMode interact_mode;
-    public double delta_n;
-    public DecenterData decenter;
-    public double max_aperture;
+    public InteractMode interact_mode = InteractMode.TRANSMIT;
+    public double delta_n = 0.0;
+    public DecenterData decenter = null;
+    public double max_aperture = 1.0;
     public SurfaceProfile profile;
 
     public Interface(InteractMode interact_mode, double delta_n,
@@ -60,8 +60,9 @@ public class Interface {
         return 0.0;
     }
 
-    public void set_optical_power(double pwr, double n_before, double n_after) {
-    }
+    public void set_optical_power(double pwr) {}
+
+    public void set_optical_power(double pwr, double n_before, double n_after) {}
 
     public double surface_od() {
         throw new UnsupportedOperationException();

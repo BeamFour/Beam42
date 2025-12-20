@@ -37,9 +37,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 ![Layout Only](./layout-semi-skew.svg)
 ![Layout Only](./layout-skew.svg)
 ## Spot Diagrams
-![Layout Only](./spot.svg)
-![Layout Only](./spot-semi-skew.svg)
-![Layout Only](./spot-skew.svg)
+![Spot Diagram Field 0.0](./spot.svg)
+![Spot Diagram Field 0.7](./spot-semi-skew.svg)
+![Spot Diagram Field 1.0](./spot-skew.svg)
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
@@ -47,18 +47,18 @@ Note that where glass types are shown the refractive index and abbe number is as
 | back_focal_length | 38.988
 | optical_invariant | 7.461
 | object_distance | 1.0E10
-| image_distance | 38.99
+| image_distance | 38.988
 | power | 0.029
 | pp1_H | 57.647
-| ppk_H' | -4.711
+| ppk_H' | 4.711
 | ffl_F | 23.369
 | fno | 1.45
 | enp_dist_P | 38.432
 | enp_radius | 11.82
-| exp_dist_P' | -39.014
+| exp_dist_P' | -39.016
 | exp_radius | 26.897
 | m | -0
-| red | -2.917367147907369E8
+| red | -2.9173671479073685E8
 | n_obj | 1
 | n_img | 1
 | img_ht | 21.636
@@ -68,9 +68,19 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 11.349 | 33.412|
- | 0.7 | 12.509 | 55.566|
- | 1.0 | 23.971 | 97.883|
+ | Field(x=0.0, y=0.0) | 11.158 | 32.348|
+ | Field(x=0.0, y=0.7) | 13.007 | 60.371|
+ | Field(x=0.0, y=1.0) | 29.012 | 107.79|
+## Ray Aberrations
+### Field 0.0
+![Tangential Ray Aberrations 0.0](./rayabbr-fld0-tan.svg)
+![Sagittal Ray Aberrations 0.0](./rayabbr-fld0-sag.svg)
+### Field 0.7
+![Tangential Ray Aberrations 0.0](./rayabbr-fld1-tan.svg)
+![Sagittal Ray Aberrations 0.0](./rayabbr-fld1-sag.svg)
+### Field 1.0
+![Tangential Ray Aberrations 0.0](./rayabbr-fld2-tan.svg)
+![Sagittal Ray Aberrations 0.0](./rayabbr-fld2-sag.svg)
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./JP2015-200845_Example03.txt)
 * [Zemax file](./JP2015-200845_Example03.zmx)

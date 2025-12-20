@@ -25,17 +25,14 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 20 | 91.538 | 7.63 | 33.36 | 1.59522 | 67.74 | Ohara | S-FPM2 |
 | 21 | -32.553 | 0.3 | 33.36 |  |  |  |
 | 22 | -94.707 | 4.45 | 35.14 | 1.854 | 40.39 | Ohara | L-LAH85 |
-| 23 | -40.988 | 38.99 | 35.68 |  |  |  |
+| 23 | -40.988 | 39.02 | 35.68 |  |  |  |
 ## Aspherical Data
 | ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 4 | 0.0 | 0.0 | -4.72094E-6 | -4.59421E-9 | 9.92671E-13 | -4.41856E-15 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
 | 22 | 0.0 | 0.0 | -7.55876E-6 | 4.60713E-9 | -4.19026E-11 | 1.07707E-13 | -1.18808E-16 | 0.0 | 0.0 | 0.0 | 0.0 |
 ## Layouts
-![Layout Only](./layoutonly.svg)
 ![Layout Only](./layout.svg)
-![Layout Only](./layout-semi-skew.svg)
-![Layout Only](./layout-skew.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew.svg)
@@ -55,7 +52,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | fno | 1.45
 | enp_dist_P | 38.432
 | enp_radius | 11.82
-| exp_dist_P' | -39.016
+| exp_dist_P' | -39.046
 | exp_radius | 26.897
 | m | -0
 | red | -2.9173671479073685E8
@@ -68,9 +65,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 11.158 | 32.348|
- | Field(x=0.0, y=0.7) | 13.007 | 60.371|
- | Field(x=0.0, y=1.0) | 29.012 | 107.79|
+ | Field(x=0.0, y=0.0) | 8.428 | 21.916|
+ | Field(x=0.0, y=0.7) | 13.98 | 50.706|
+ | Field(x=0.0, y=1.0) | 26.742 | 100.775|
 ## Ray Aberrations
 ### Field 0.0
 ![Tangential Ray Aberrations 0.0](./rayabbr-fld0-tan.svg)

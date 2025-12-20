@@ -1,5 +1,8 @@
 [descriptive data]
 title	US 2025/0334778 Example 2
+#patent	country	number	example	year	inventors	org	link
+patent	US	US 2025/0334778	EX 2	2024	Ryosuke Sato	Sigma Corp 	https://patents.google.com/patent/US20250334778A1/en
+lens name	Sigma 35mm f1.2 DG ART II
 [constants]
 [variable distances]
 Focal Length	34.60	34.14

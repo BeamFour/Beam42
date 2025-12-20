@@ -1,3 +1,8 @@
+# Sigma 35mm f1.2 DG ART II
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US 2025/0334778 | EX 2 | 2024 | Ryosuke Sato | Sigma Corp  | [link](https://patents.google.com/patent/US20250334778A1/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -51,9 +56,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 ![Layout Only](./layout-semi-skew.svg)
 ![Layout Only](./layout-skew.svg)
 ## Spot Diagrams
-![Layout Only](./spot.svg)
-![Layout Only](./spot-semi-skew.svg)
-![Layout Only](./spot-skew.svg)
+![Spot Diagram Field 0.0](./spot.svg)
+![Spot Diagram Field 0.7](./spot-semi-skew.svg)
+![Spot Diagram Field 1.0](./spot-skew.svg)
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
@@ -61,18 +66,18 @@ Note that where glass types are shown the refractive index and abbe number is as
 | back_focal_length | 17.498
 | optical_invariant | 8.674
 | object_distance | 1.0E10
-| image_distance | 17.497
+| image_distance | 17.498
 | power | 0.029
 | pp1_H | 51.359
-| ppk_H' | 17.103
+| ppk_H' | -17.103
 | ffl_F | 16.758
 | fno | 1.24
 | enp_dist_P | 35.195
 | enp_radius | 13.952
 | exp_dist_P' | -47.436
 | exp_radius | 26.183
-| m | 0
-| red | -2.8901255466617525E8
+| m | -0
+| red | -2.890125546661752E8
 | n_obj | 1
 | n_img | 1
 | img_ht | 21.512
@@ -82,9 +87,19 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 3.085 | 6.344|
- | 0.7 | 12.413 | 86.772|
- | 1.0 | 8.986 | 59.112|
+ | Field(x=0.0, y=0.0) | 3.969 | 15.61|
+ | Field(x=0.0, y=0.7) | 9.281 | 74.612|
+ | Field(x=0.0, y=1.0) | 9.029 | 58.819|
+## Ray Aberrations
+### Field 0.0
+![Tangential Ray Aberrations 0.0](./rayabbr-fld0-tan.svg)
+![Sagittal Ray Aberrations 0.0](./rayabbr-fld0-sag.svg)
+### Field 0.7
+![Tangential Ray Aberrations 0.0](./rayabbr-fld1-tan.svg)
+![Sagittal Ray Aberrations 0.0](./rayabbr-fld1-sag.svg)
+### Field 1.0
+![Tangential Ray Aberrations 0.0](./rayabbr-fld2-tan.svg)
+![Sagittal Ray Aberrations 0.0](./rayabbr-fld2-sag.svg)
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./US20250334778_Example02.txt)
 * [Zemax file](./US20250334778_Example02.zmx)

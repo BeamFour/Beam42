@@ -1,3 +1,8 @@
+# Canon EF 35mm f1.4L USM II
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|JP | JP 2015-200845 | EX 3 | 2014 | MIZUMA AKIRA | Canon Inc | [link](https://patentscope.wipo.int/search/en/detail.jsf?docId=JP273791941) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -32,7 +37,10 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 4 | 0.0 | 0.0 | -4.72094E-6 | -4.59421E-9 | 9.92671E-13 | -4.41856E-15 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
 | 22 | 0.0 | 0.0 | -7.55876E-6 | 4.60713E-9 | -4.19026E-11 | 1.07707E-13 | -1.18808E-16 | 0.0 | 0.0 | 0.0 | 0.0 |
 ## Layouts
+![Layout Only](./layoutonly.svg)
 ![Layout Only](./layout.svg)
+![Layout Only](./layout-semi-skew.svg)
+![Layout Only](./layout-skew.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew.svg)

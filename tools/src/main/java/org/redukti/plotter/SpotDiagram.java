@@ -28,9 +28,9 @@ public class SpotDiagram {
         axes.set_tics_count (3, PlotAxes.AxisMask.XY);
         var plotRenderer = new PlotRenderer();
         plotRenderer.draw_axes_2d (r, axes);
-        for (var ray: result.trace_results) {
-            for (var g: ray.grid) {
-                r.draw_point (new Vector2(g.pupil.x()*1000, g.pupil.y()*1000), Colors.get_wavelen_color(ray.wvl), Renderer.PointStyle.PointStyleDot);
+        for (var intercepts: result.intercepts) {
+            for (int i = 0; i < intercepts.x.length; i++) {
+                r.draw_point (new Vector2(intercepts.x[i]*1000, intercepts.y[i]*1000), Colors.get_wavelen_color(intercepts.wvl), Renderer.PointStyle.PointStyleDot);
             }
         }
         return r.write(new StringBuilder()).toString();

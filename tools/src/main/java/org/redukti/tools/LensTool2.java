@@ -146,7 +146,7 @@ public class LensTool2 {
 //            outputLayoutWithRays(semiSkewedSystem,Helper.getOutputPath(arguments.specfile,"layout-semi-skew.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
 //            outputLayoutWithRays(skewedSystem,Helper.getOutputPath(arguments.specfile,"layout-skew.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
 
-            var spotAnalysis = SpotAnalysis.eval(opm,21, new TraceOptions());
+            var spotAnalysis = SpotAnalysis.eval(opm,21, new TraceOptions(),false);
             Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"spot-report.txt",arguments.outdir), spotAnalysis.toString());
 
 //            StringBuilder buf = new StringBuilder();

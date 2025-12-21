@@ -35,7 +35,7 @@ public class Analysis {
     }
     public void compute() {
         system = prescription.build_ray_optics_model(true,fields,true,true);
-        var spotAnalysis = SpotAnalysis.eval(system,21, new TraceOptions());
+        var spotAnalysis = SpotAnalysis.eval(system,21, new TraceOptions(),true);
         spots = spotAnalysis.spot_results.toArray(new SpotAnalysisResult.SpotResultsByField[0]);
         pfo = ParaxHelper.asArray(system.optical_spec.parax_data.fod);
         ray_aberrations = TransverseRayAberrationAnalysis.eval(system,10,new TraceOptions());

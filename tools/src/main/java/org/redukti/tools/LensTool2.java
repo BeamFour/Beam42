@@ -32,8 +32,8 @@ public class LensTool2 {
         return p;
     }
 
-    public static OpticalModel createSystem(Prescription prescription,boolean fov_angle,boolean apply_vignetting,boolean use_wideangle_aiming) {
-        return prescription.build_ray_optics_model(fov_angle,null,apply_vignetting,use_wideangle_aiming);
+    public static OpticalModel createSystem(Prescription prescription,boolean fov_angle,boolean apply_vignetting,boolean use_wideangle_aiming,double[] fields) {
+        return prescription.build_ray_optics_model(fov_angle,fields,apply_vignetting,use_wideangle_aiming);
     }
 
     public static void outputSpotAnalysis(SpotAnalysisResult.SpotResultsByField result, Path output_file) throws Exception {
@@ -73,8 +73,19 @@ public class LensTool2 {
                 "|\n");
     }
 
+    public static StringBuilder spotResultsMarkdownTable(SpotAnalysisResult spotAnalysisResult, StringBuilder sb) {
+        sb.append("| Field | Spot Mean Radius | Spot Max Radius |\n");
+        sb.append("| ---   | ---              | ---             |\n");
+        for (var result: spotAnalysisResult.spot_results) {
+            sb.append(" | ").append(result.fld)
+                    .append(" | ").append(decimalFormat.format(result.get_mean_radius()))
+                    .append(" | ").append(decimalFormat.format(result.get_max_radius()))
+                    .append("|\n");
+        }
+        return sb;
+    }
 
-    public static void createREADME(String specFile, OpticalBenchDataImporter.LensSpecifications specs, FirstOrderData fod, double[] fields, SpotAnalysisResult spotAnalysisResult, Path output_file) throws Exception {
+    public static void createREADME(String specFile, OpticalBenchDataImporter.LensSpecifications specs, FirstOrderData fod, SpotAnalysisResult spotAnalysisResult, Path output_file) throws Exception {
         Prescription prescription = Prescription.buildPrescription(specs,true);
         StringBuilder sb = prescription.toMarkdownStr(new StringBuilder());
         sb.append("## Layouts\n");
@@ -86,7 +97,7 @@ public class LensTool2 {
         sb.append("## Paraxial Parameters\n");
         fodToMarkdown(fod,sb);
         sb.append("## Spot Analysis\n");
-        spotAnalysisResult.toMarkdownTable(sb);
+        spotResultsMarkdownTable(spotAnalysisResult,sb);
         String filename = Helper.getFilename(specFile);
         String zmxFilename = Helper.replaceExtension(filename, ".zmx");
         sb.append("## Ray Aberrations\n");
@@ -114,10 +125,12 @@ public class LensTool2 {
             System.exit(1);
         }
         try {
+            final double[] default_fields = {0.0, 0.7, 1.0};
             OpticalBenchDataImporter.LensSpecifications specs = getSpecsFromFile(arguments.specfile);
             var prescription = createPrescription(specs,arguments.scenario,arguments.use_glass_types,arguments.only_d_line);
             System.out.println(prescription.toOptBenchStr(new StringBuilder()).toString());
-            var opm = createSystem(prescription,true,true,true);
+            var fields = default_fields; // new double[]{0.0, 0.1, 0.3, 0.5, 0.7, 1.0};
+            var opm = createSystem(prescription,true,true,true,fields);
             var sm = opm.seq_model;
             var osp = opm.optical_spec;
             var fod = opm.optical_spec.parax_data.fod;
@@ -126,7 +139,8 @@ public class LensTool2 {
             System.out.println(osp.list_str(new StringBuilder()).toString());
             Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"vig.txt",arguments.outdir), osp.list_str(new StringBuilder()).toString());
             Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"paraxial.txt",arguments.outdir), fod.toString());
-            // can't do layout diagrams yet
+
+// can't do layout diagrams yet
 //            outputLayout(system,Helper.getOutputPath(arguments.specfile,"layoutonly.svg",arguments.outdir));
 //            outputLayoutWithRays(system,Helper.getOutputPath(arguments.specfile,"layout.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
 //            outputLayoutWithRays(semiSkewedSystem,Helper.getOutputPath(arguments.specfile,"layout-semi-skew.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
@@ -134,35 +148,42 @@ public class LensTool2 {
 
             var spotAnalysis = SpotAnalysis.eval(opm,21, new TraceOptions());
             Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"spot-report.txt",arguments.outdir), spotAnalysis.toString());
-            String[] filenames = {"spot.svg", "spot-semi-skew.svg", "spot-skew.svg"};
-            for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
-                var spotFld = spotAnalysis.spot_results.get(i);
-                var outfile = Helper.getOutputPath(arguments.specfile,filenames[i],arguments.outdir);
-                outputSpotAnalysis(spotFld,outfile);
-            }
 
-            var rayAber = TransverseRayAberrationAnalysis.eval(opm, 21, new TraceOptions());
-            for (var fan_results: rayAber.results) {
-                String filename = "rayabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag") + ".svg";
-                var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
-                Helper.createOutputFile(output_file, new RayAberrationPlot(rayAber).plot(fan_results, 0));
-            }
+//            StringBuilder buf = new StringBuilder();
+//            for (int i = 0; i < fields.length; i++) {
+//                Trace.list_ray(buf,osp.fov.fields[i].chief_ray.chief_ray,null,null);
+//            }
+//            System.out.println(buf.toString());
+//            buf = new StringBuilder();
+            //System.out.println(Trace.list_ray(buf,Trace.trace_ray(opm, Vector2.vector2_0,osp.fov.fields[4],sm.central_wavelength(),new TraceOptions()).pkg,null,null).toString());
 
-            var opdAber = WavefrontAberrationAnalysis.eval(opm, 21, new TraceOptions());
-            for (var fan_results: opdAber.results) {
-                String filename = "opdabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag") + ".svg";
-                var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
-                Helper.createOutputFile(output_file, new RayAberrationPlot(opdAber).plot(fan_results, 0));
+            if (fields == default_fields) {
+                String[] filenames = {"spot.svg", "spot-semi-skew.svg", "spot-skew.svg"};
+                for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
+                    var spotFld = spotAnalysis.spot_results.get(i);
+                    var outfile = Helper.getOutputPath(arguments.specfile, filenames[i], arguments.outdir);
+                    outputSpotAnalysis(spotFld, outfile);
+                }
+                var rayAber = TransverseRayAberrationAnalysis.eval(opm, 21, new TraceOptions());
+                for (var fan_results: rayAber.results) {
+                    String filename = "rayabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag") + ".svg";
+                    var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
+                    Helper.createOutputFile(output_file, new RayAberrationPlot(rayAber).plot(fan_results, 0));
+                }
+                var opdAber = WavefrontAberrationAnalysis.eval(opm, 21, new TraceOptions());
+                for (var fan_results: opdAber.results) {
+                    String filename = "opdabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag") + ".svg";
+                    var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
+                    Helper.createOutputFile(output_file, new RayAberrationPlot(opdAber).plot(fan_results, 0));
+                }
+                ZemaxExporter zemaxExporter = new ZemaxExporter();
+                Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), zemaxExporter.generate(specs, arguments.scenario, arguments.only_d_line));
+                createREADME(arguments.specfile,
+                        specs,
+                        fod,
+                        spotAnalysis,
+                        Helper.getOutputPath(arguments.specfile,"README.md",arguments.outdir));
             }
-
-            ZemaxExporter zemaxExporter = new ZemaxExporter();
-            Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), zemaxExporter.generate(specs, arguments.scenario, arguments.only_d_line));
-            createREADME(arguments.specfile,
-                    specs,
-                    fod,
-                    new double[] {0.0, 0.7, 1.0},
-                    spotAnalysis,
-                    Helper.getOutputPath(arguments.specfile,"README.md",arguments.outdir));
         }
         catch (Exception e) {
             System.err.println("Failed due to: " + e.getMessage());

@@ -37,10 +37,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 4 | 0.0 | 0.0 | -4.72094E-6 | -4.59421E-9 | 9.92671E-13 | -4.41856E-15 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
 | 22 | 0.0 | 0.0 | -7.55876E-6 | 4.60713E-9 | -4.19026E-11 | 1.07707E-13 | -1.18808E-16 | 0.0 | 0.0 | 0.0 | 0.0 |
 ## Layouts
-![Layout Only](./layoutonly.svg)
 ![Layout Only](./layout.svg)
-![Layout Only](./layout-semi-skew.svg)
-![Layout Only](./layout-skew.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew.svg)
@@ -73,9 +70,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 8.428 | 21.916|
- | Field(x=0.0, y=0.7) | 13.98 | 50.706|
- | Field(x=0.0, y=1.0) | 26.742 | 100.775|
+ | Field(x=0.0, y=0.0) | 8.608 | 22.016|
+ | Field(x=0.0, y=0.7) | 14.75 | 48.113|
+ | Field(x=0.0, y=1.0) | 24.665 | 92.371|
 ## Ray Aberrations
 ### Field 0.0
 ![Tangential Ray Aberrations 0.0](./rayabbr-fld0-tan.svg)

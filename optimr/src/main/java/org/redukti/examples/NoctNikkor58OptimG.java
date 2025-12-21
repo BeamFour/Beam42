@@ -162,7 +162,7 @@ public class NoctNikkor58OptimG {
         analysis.compute();
         var lm = f.getSolver();
         System.out.println("Aberrations:\n");
-        System.out.println(analysis.ray_aberrations.generateReport());
+        System.out.println(analysis.ray_aberrations.list_ray_fans());
         System.out.println("Before:\n");
         System.out.println(f.toString());
         var istatus = lm.solve();

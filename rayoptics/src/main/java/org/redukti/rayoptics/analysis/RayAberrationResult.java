@@ -30,7 +30,7 @@ public class RayAberrationResult {
         return null;
     }
 
-    public String generateReport() {
+    public String list_ray_fans() {
         StringBuilder sb = new StringBuilder();
         for (var result: results) {
             sb.append(result.fld.toString()).append(" xy=").append(result.xy).append("\n");

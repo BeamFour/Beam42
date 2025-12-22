@@ -3,12 +3,10 @@ package org.redukti.tools;
 import org.redukti.exporters.ZemaxExporter;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.mathlib.M;
+import org.redukti.plotter.GeoMTFPlot;
 import org.redukti.plotter.RayAberrationPlot;
 import org.redukti.plotter.SpotDiagram;
-import org.redukti.rayoptics.analysis.SpotAnalysis;
-import org.redukti.rayoptics.analysis.SpotAnalysisResult;
-import org.redukti.rayoptics.analysis.TransverseRayAberrationAnalysis;
-import org.redukti.rayoptics.analysis.WavefrontAberrationAnalysis;
+import org.redukti.rayoptics.analysis.*;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrderData;
 import org.redukti.rayoptics.raytr.TraceOptions;
@@ -146,7 +144,7 @@ public class LensTool2 {
 //            outputLayoutWithRays(semiSkewedSystem,Helper.getOutputPath(arguments.specfile,"layout-semi-skew.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
 //            outputLayoutWithRays(skewedSystem,Helper.getOutputPath(arguments.specfile,"layout-skew.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
 
-            var spotAnalysis = SpotAnalysis.eval(opm,21, new TraceOptions(),false);
+            var spotAnalysis = SpotAnalysis.eval(opm,21, new TraceOptions(),true);
             Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"spot-report.txt",arguments.outdir), spotAnalysis.toString());
 
 //            StringBuilder buf = new StringBuilder();
@@ -163,6 +161,12 @@ public class LensTool2 {
                     var spotFld = spotAnalysis.spot_results.get(i);
                     var outfile = Helper.getOutputPath(arguments.specfile, filenames[i], arguments.outdir);
                     outputSpotAnalysis(spotFld, outfile);
+                    for (var intercepts: spotFld.intercepts) {
+                        String filename = "mtf-fld" + i + "-" + (int)intercepts.wvl + ".svg";
+                        var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
+                        var mtf = new GeometricMTF(intercepts);
+                        Helper.createOutputFile(output_file,new GeoMTFPlot(spotFld.fld,mtf).plot());
+                    }
                 }
                 var rayAber = TransverseRayAberrationAnalysis.eval(opm, 21, new TraceOptions());
                 for (var fan_results: rayAber.results) {

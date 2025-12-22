@@ -42,9 +42,10 @@ public class SpotAnalysis {
     public static SpotAnalysisResult eval(OpticalModel opt_model, int num_rays, TraceOptions trace_options,boolean use_centroid) {
         SpotAnalysisResult result = new SpotAnalysisResult(use_centroid);
         var fov = opt_model.optical_spec.fov;
+        var ref_wvl = fov.optical_spec.wvls.central_wvl();
         for (int fi = 0; fi < fov.fields.length; fi++) {
             Field f = fov.fields[fi];
-            result.add(f, eval_rings(opt_model,fi,null,num_rays,trace_options));
+            result.add(f, eval_rings(opt_model,fi,null,num_rays,trace_options), ref_wvl);
         }
         return result;
     }

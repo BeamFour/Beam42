@@ -1,5 +1,6 @@
 package org.redukti.rayoptics.analysis;
 
+import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.raytr.TraceGridByWvl;
 import org.redukti.rayoptics.specs.Field;
@@ -24,12 +25,22 @@ public class SpotAnalysisResult {
         public double max_radius;
         public double mean_radius;
 
-        public SpotResultsByField(Field fld, List<TraceGridByWvl> trace_results, boolean use_centroid) {
+        public SpotResultsByField(Field fld, List<TraceGridByWvl> trace_results, double ref_wvl, boolean use_centroid) {
             this.fld = fld;
             this.image_pt = fld.ref_sphere.image_pt;
             this.trace_results = trace_results;
+            Vector2 centroid = null;
+            // To preserve chromatic aberration when applying centroid
+            // adjust to reference wvl
             for (var result: trace_results) {
-                intercepts.add(new SpotIntercepts(result,use_centroid));
+                var s = new SpotIntercepts(result);
+                if (result.wvl == ref_wvl && use_centroid)
+                    centroid = s.compute_centroid();
+                intercepts.add(s);
+            }
+            if (centroid != null) {
+                for (var intercept: intercepts)
+                    intercept.adjust_to_centroid(centroid);
             }
             computeMeanMax();
         }
@@ -66,8 +77,8 @@ public class SpotAnalysisResult {
         }
     }
 
-    public SpotAnalysisResult add(Field fld, List<TraceGridByWvl> trace_results) {
-        spot_results.add(new SpotResultsByField(fld, trace_results, use_centroid));
+    public SpotAnalysisResult add(Field fld, List<TraceGridByWvl> trace_results, double ref_wvl) {
+        spot_results.add(new SpotResultsByField(fld, trace_results, ref_wvl, use_centroid));
         return this;
     }
 

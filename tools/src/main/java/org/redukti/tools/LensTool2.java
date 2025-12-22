@@ -177,7 +177,7 @@ public class LensTool2 {
                 polyMtfForField.compute_mtfs();
                 mtfs.add(polyMtfForField);
             }
-            int[] freqs = {11,31,50};
+            int[] freqs = {10,30,50};
             var mtfResults = new ArrayList<MTFResultByFreq>();
             for (var freq: freqs)
                 mtfResults.add(new MTFResultByFreq(mtfs,freq));

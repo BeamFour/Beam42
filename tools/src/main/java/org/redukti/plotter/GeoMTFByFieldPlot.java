@@ -35,7 +35,7 @@ public class GeoMTFByFieldPlot {
             var mtf = mtfs_by_freq.get(i);
             for (int xy = 0; xy < 2; xy++) {
                 var set = new DiscreteSet();
-                set.set_interpolation(Interpolation.Linear);
+                set.set_interpolation(Interpolation.Cubic);
                 double[] mtf_data = (xy == 0) ? mtf.sag_mtf_by_field : mtf.tan_mtf_by_field;
                 for (int j = 0; j < mtf_data.length; j++) {
                     double x = x_data[j];

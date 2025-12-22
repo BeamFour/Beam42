@@ -3,6 +3,7 @@ package org.redukti.tools;
 import org.redukti.exporters.ZemaxExporter;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.mathlib.M;
+import org.redukti.plotter.GeoMTFByFieldPlot;
 import org.redukti.plotter.GeoMTFPlot;
 import org.redukti.plotter.RayAberrationPlot;
 import org.redukti.plotter.SpotDiagram;
@@ -16,6 +17,7 @@ import org.redukti.util.Helper;
 
 import java.nio.file.Path;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 public class LensTool2 {
 
@@ -157,17 +159,28 @@ public class LensTool2 {
 
             if (fields == default_fields) {
                 String[] filenames = {"spot.svg", "spot-semi-skew.svg", "spot-skew.svg"};
+                var mtfs = new ArrayList<PolyChromaticGeometricMTF>();
                 for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
                     var spotFld = spotAnalysis.spot_results.get(i);
+                    var polyMtfForField = new PolyChromaticGeometricMTF(spotFld.fld);
                     var outfile = Helper.getOutputPath(arguments.specfile, filenames[i], arguments.outdir);
                     outputSpotAnalysis(spotFld, outfile);
                     for (var intercepts: spotFld.intercepts) {
                         String filename = "mtf-fld" + i + "-" + (int)intercepts.wvl + ".svg";
                         var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
-                        var mtf = new GeometricMTF(intercepts);
+                        var mtf = new MonochromaticGeometricMTF(intercepts);
+                        polyMtfForField.add(mtf);
                         Helper.createOutputFile(output_file,new GeoMTFPlot(spotFld.fld,mtf).plot());
                     }
+                    polyMtfForField.compute_mtfs();
+                    mtfs.add(polyMtfForField);
                 }
+                int[] freqs = {11,31,50};
+                var mtfResults = new ArrayList<MTFResultByFreq>();
+                for (var freq: freqs)
+                    mtfResults.add(new MTFResultByFreq(mtfs,freq));
+                var mtffile = Helper.getOutputPath(arguments.specfile,"mtf.svg",arguments.outdir);
+                Helper.createOutputFile(mtffile,new GeoMTFByFieldPlot(mtfResults).plot(fields));
                 var rayAber = TransverseRayAberrationAnalysis.eval(opm, 21, new TraceOptions());
                 for (var fan_results: rayAber.results) {
                     String filename = "rayabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag") + ".svg";

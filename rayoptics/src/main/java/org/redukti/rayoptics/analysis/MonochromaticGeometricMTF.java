@@ -5,17 +5,14 @@ import org.jtransforms.fft.DoubleFFT_1D;
 /**
  * Input : Traced rays through the system for a given field point and wavelength. x and y intersections with the image plane.
  * <p>
- * 1. Bin these hits into a 2D intensity histogram → the geometric PSF.
+ * 1. Bin these hits into a 2D intensity histogram to build the geometric PSF.
  * 2. Integrate the PSF along the perpendicular axis -> generate LSF for each axis.
  * 3. Compute the 1D Fourier transform for each LSF, then compute magnitude and normalize.
  * 4. Compute the related frequencies.
  */
-public class GeometricMTF {
+public class MonochromaticGeometricMTF extends BaseGeometricMTF {
 
     public final SpotIntercepts intercepts;
-    public final int nbins = 512;
-    public final int mtf_size = 512 / 2 + 1;
-    public final double pixel_size = 0.001; // also dx, TODO this should be derived from dimension units? We assume lens dimension is in mm
     public final double hmin, hmax;
     // 2d histogram
     public double[][] h2d = new double[nbins][nbins];
@@ -28,10 +25,8 @@ public class GeometricMTF {
     // magnitudes
     public final double[] mag_x = new double[mtf_size];
     public final double[] mag_y = new double[mtf_size];
-    // frequencies
-    public final double[] freq = new double[mtf_size];
 
-    public GeometricMTF(SpotIntercepts intercepts) {
+    public MonochromaticGeometricMTF(SpotIntercepts intercepts) {
         this.intercepts = intercepts;
         var width = pixel_size * nbins;
         hmin = -width / 2;
@@ -40,10 +35,9 @@ public class GeometricMTF {
         build_lsfs();
         compute_mtfs();
         compute_freq();
-        discard_work_arrays();
     }
 
-    private void discard_work_arrays() {
+    public void discard_work_arrays() {
         h2d = null;
         lsf_x = null;
         lsf_y = null;
@@ -117,30 +111,24 @@ public class GeometricMTF {
     private void compute_mtf(int xy) {
         double[] lsf = xy == 0 ? lsf_x : lsf_y;
         double[] fft = xy == 0 ? fft_x : fft_y;
-        double[] mag = xy == 0 ? mag_x : mag_y;
         for (int i = 0; i < nbins; i++) {
             fft[2 * i] = lsf[i];
             fft[2 * i + 1] = 0.0;
         }
         var fft2d = new DoubleFFT_1D(nbins);
         fft2d.complexForward(fft);
-        // Only positive frequencies 0 … N/2
-        for (int i = 0; i < mag.length; i++)
-            mag[i] = Math.hypot(fft[2 * i], fft[2 * i + 1]);
-        // normalize
-        double dc = mag[0];
-        for (int k = 0; k < mag.length; k++) {
-            mag[k] = mag[k] / dc;
-        }
+    }
+
+    private void compute_magnitude(int xy) {
+        double[] fft = xy == 0 ? fft_x : fft_y;
+        double[] mag = xy == 0 ? mag_x : mag_y;
+        compute_magnitude(mag, fft);
     }
 
     private void compute_mtfs() {
         compute_mtf(0);
         compute_mtf(1);
-    }
-
-    private void compute_freq() {
-        for (int i = 0; i < freq.length; i++)
-            freq[i] = i / (nbins * pixel_size);
+        compute_magnitude(0);
+        compute_magnitude(1);
     }
 }

@@ -4,7 +4,7 @@ import org.redukti.data.DiscreteSet;
 import org.redukti.data.Interpolation;
 import org.redukti.data.Range;
 import org.redukti.mathlib.Vector3;
-import org.redukti.rayoptics.analysis.GeometricMTF;
+import org.redukti.rayoptics.analysis.MonochromaticGeometricMTF;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.render.plotting.Plot;
 import org.redukti.render.plotting.PlotAxes;
@@ -16,9 +16,9 @@ import org.redukti.render.rendering.Rgb;
 public class GeoMTFPlot {
 
     public final Field fld;
-    public final GeometricMTF mtf;
+    public final MonochromaticGeometricMTF mtf;
 
-    public GeoMTFPlot(Field fld, GeometricMTF mtf) {
+    public GeoMTFPlot(Field fld, MonochromaticGeometricMTF mtf) {
         this.fld = fld;
         this.mtf = mtf;
     }

@@ -23,13 +23,13 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 13 | -49.8 | 39.15 | 20.66 |  |  |  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
-![Layout Only](./layout.svg)
-![Layout Only](./layout-semi-skew.svg)
-![Layout Only](./layout-skew.svg)
+![Layout Field 0.0](./layout.svg)
+![Layout Field 0.7](./layout-semi-skew.svg)
+![Layout Field 1.0](./layout-skew.svg)
 ## Spot Diagrams
-![Layout Only](./spot.svg)
-![Layout Only](./spot-semi-skew.svg)
-![Layout Only](./spot-skew.svg)
+![Spot Diagram Field 0.0](./spot.svg)
+![Spot Diagram Field 0.7](./spot-semi-skew.svg)
+![Spot Diagram Field 1.0](./spot-skew.svg)
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
@@ -37,17 +37,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 | back_focal_length | 39.289
 | optical_invariant | 3.09
 | object_distance | 1.0E10
-| image_distance | 39.15
+| image_distance | 39.289
 | power | 0.035
 | pp1_H | 35.889
-| ppk_H' | -10.685
+| ppk_H' | 10.685
 | ffl_F | 7.285
 | fno | 3.5
 | enp_dist_P | 21.764
 | enp_radius | 4.086
-| exp_dist_P' | -17.221
+| exp_dist_P' | -17.082
 | exp_radius | 8.073
-| m | 0.005
+| m | -0
 | red | -3.4960181397592396E8
 | n_obj | 1
 | n_img | 1
@@ -58,9 +58,21 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 4.559 | 8.434|
- | 0.7 | 14.457 | 33.83|
- | 1.0 | 34.419 | 119.55|
+ | Field(x=0.0, y=0.0) | 4.915 | 10.962|
+ | Field(x=0.0, y=0.1) | 5.243 | 17.027|
+ | Field(x=0.0, y=0.2) | 5.933 | 16.854|
+ | Field(x=0.0, y=0.3) | 7.741 | 28.56|
+ | Field(x=0.0, y=0.4) | 9.472 | 28.849|
+ | Field(x=0.0, y=0.5) | 11.496 | 31.232|
+ | Field(x=0.0, y=0.6) | 13.53 | 35.424|
+ | Field(x=0.0, y=0.7) | 14.483 | 35.371|
+ | Field(x=0.0, y=0.8) | 15.422 | 43.52|
+ | Field(x=0.0, y=0.9) | 18.061 | 64.746|
+ | Field(x=0.0, y=1.0) | 33.96 | 115.297|
+## Geometric MTF
+![Geometrical MTF](./mtf.svg)
+* 10,30,50 cycles/mm
+* Black lines represent sagittal, blue tangential
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./US004099850_Example05.txt)
 * [Zemax file](./US004099850_Example05.zmx)

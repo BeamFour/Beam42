@@ -77,18 +77,20 @@ Note that where glass types are shown the refractive index and abbe number is as
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
  | Field(x=0.0, y=0.0) | 4.17 | 7.174|
- | Field(x=0.0, y=0.707) | 6.249 | 33.354|
- | Field(x=0.0, y=1.0) | 8.819 | 40.888|
-## Ray Aberrations
-### Field 0.0
-![Tangential Ray Aberrations 0.0](./rayabbr-fld0-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld0-sag.svg)
-### Field 0.7
-![Tangential Ray Aberrations 0.0](./rayabbr-fld1-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld1-sag.svg)
-### Field 1.0
-![Tangential Ray Aberrations 0.0](./rayabbr-fld2-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld2-sag.svg)
+ | Field(x=0.0, y=0.1) | 4.5 | 15.464|
+ | Field(x=0.0, y=0.2) | 5.365 | 19.602|
+ | Field(x=0.0, y=0.3) | 5.471 | 20.152|
+ | Field(x=0.0, y=0.4) | 5.086 | 22.541|
+ | Field(x=0.0, y=0.5) | 5.358 | 27.888|
+ | Field(x=0.0, y=0.6) | 5.72 | 42.609|
+ | Field(x=0.0, y=0.7) | 6.261 | 33.723|
+ | Field(x=0.0, y=0.8) | 6.35 | 40.047|
+ | Field(x=0.0, y=0.9) | 7.148 | 55.572|
+ | Field(x=0.0, y=1.0) | 8.51 | 41.648|
+## Geometric MTF
+![Geometrical MTF](./mtf.svg)
+* 10,30,50 cycles/mm
+* Black lines represent sagittal, blue tangential
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./Sigma-40mmf1.4.txt)
 * [Zemax file](./Sigma-40mmf1.4.zmx)

@@ -53,9 +53,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 32 | 0.0 | 0.0 | -6.15151E-6 | -3.25835E-10 | 1.0856E-11 | -5.9078E-14 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
-![Layout Only](./layout.svg)
-![Layout Only](./layout-semi-skew.svg)
-![Layout Only](./layout-skew.svg)
+![Layout Field 0.0](./layout.svg)
+![Layout Field 0.7](./layout-semi-skew.svg)
+![Layout Field 1.0](./layout-skew.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew.svg)
@@ -90,9 +90,14 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ---   | ---              | ---             |
  | Field(x=0.0, y=0.0) | 5.686 | 19.939|
  | Field(x=0.0, y=0.1) | 6.282 | 29.308|
+ | Field(x=0.0, y=0.2) | 6.188 | 27.841|
  | Field(x=0.0, y=0.3) | 5.813 | 29.345|
+ | Field(x=0.0, y=0.4) | 6.2 | 32.413|
  | Field(x=0.0, y=0.5) | 7.571 | 36.506|
+ | Field(x=0.0, y=0.6) | 9.259 | 43.389|
  | Field(x=0.0, y=0.7) | 10.884 | 51.077|
+ | Field(x=0.0, y=0.8) | 11.824 | 45.117|
+ | Field(x=0.0, y=0.9) | 12.114 | 54.587|
  | Field(x=0.0, y=1.0) | 12.884 | 44.008|
 ## Geometric MTF
 ![Geometrical MTF](./mtf.svg)

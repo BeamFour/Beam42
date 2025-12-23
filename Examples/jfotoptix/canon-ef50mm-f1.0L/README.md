@@ -27,53 +27,65 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 17 | -51.62 | 0.099 | 53.96 |  |  |  |
 | 18 | 1947.956 | 6.599 | 54.48 | 1.883 | 40.81 | Hoya | TAFD30 |
 | 19 | -72.602 | 0.499 | 54.48 |  |  |  |
-| 20 | 74.043 | 4.602 | 47.2 | 1.5596 | 61.17 | Ohara | BAL50 |
+| 20 | 74.043 | 4.602 | 47.2 | 1.55963 | 61.17 | Ohara | BAL50 |
 | 21 | 499.996 | 38.65 | 47.2 |  |  |  |
 ## Aspherical Data
-| ID  | k   | A4  | A6  | A8  | A10 | A12 | A14 | A16 | A18 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 5 | -1.0 | 4.638E-7 | 1.284E-9 | -1.638E-12 | 1.636E-15 | 0.0 | 0.0 | 0.0 | 0.0 |
-| 15 | -1.0 | 2.39E-7 | 2.218E-9 | -3.207E-12 | 1.925E-15 | 0.0 | 0.0 | 0.0 | 0.0 |
+| ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 5 | -1.0 | 0.0 | 4.638E-7 | 1.284E-9 | -1.638E-12 | 1.636E-15 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
+| 15 | -1.0 | 0.0 | 2.39E-7 | 2.218E-9 | -3.207E-12 | 1.925E-15 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
-![Layout Only](./layout.svg)
-![Layout Only](./layout-semi-skew.svg)
-![Layout Only](./layout-skew.svg)
+![Layout Field 0.0](./layout.svg)
+![Layout Field 0.7](./layout-semi-skew.svg)
+![Layout Field 1.0](./layout-skew.svg)
 ## Spot Diagrams
-![Layout Only](./spot.svg)
-![Layout Only](./spot-semi-skew.svg)
-![Layout Only](./spot-skew.svg)
+![Spot Diagram Field 0.0](./spot.svg)
+![Spot Diagram Field 0.7](./spot-semi-skew.svg)
+![Spot Diagram Field 1.0](./spot-skew.svg)
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
-| effective_focal_length |51.993
+| effective_focal_length |51.992
 | back_focal_length | 38.707
 | optical_invariant | 10.821
 | object_distance | 1.0E10
-| image_distance | 38.65
+| image_distance | 38.707
 | power | 0.019
 | pp1_H | 79.535
-| ppk_H' | 13.286
-| ffl_F | 27.542
+| ppk_H' | -13.286
+| ffl_F | 27.543
 | fno | 1
 | enp_dist_P | 36.309
 | enp_radius | 25.996
-| exp_dist_P' | -269.638
-| exp_radius | 154.173
-| m | 0.001
-| red | -1.9233361565152192E8
+| exp_dist_P' | -269.606
+| exp_radius | 154.185
+| m | -0
+| red | -1.923364232511164E8
 | n_obj | 1
 | n_img | 1
-| img_ht | 21.643
+| img_ht | 21.642
 | obj_ang | 22.6
 | obj_na | 0
 | img_na | -0.447|
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 19.845 | 54.779|
- | 0.7 | 40.85 | 190.313|
- | 1.0 | 95.396 | 346.314|
+ | Field(x=0.0, y=0.0) | 19.066 | 46.334|
+ | Field(x=0.0, y=0.1) | 24.803 | 110.338|
+ | Field(x=0.0, y=0.2) | 26.634 | 108.116|
+ | Field(x=0.0, y=0.3) | 28.083 | 115.461|
+ | Field(x=0.0, y=0.4) | 29.499 | 131.941|
+ | Field(x=0.0, y=0.5) | 30.164 | 138.772|
+ | Field(x=0.0, y=0.6) | 32.411 | 154.195|
+ | Field(x=0.0, y=0.7) | 39.329 | 188.183|
+ | Field(x=0.0, y=0.8) | 47.492 | 187.648|
+ | Field(x=0.0, y=0.9) | 52.119 | 168.981|
+ | Field(x=0.0, y=1.0) | 49.189 | 131.983|
+## Geometric MTF
+![Geometrical MTF](./mtf.svg)
+* 10,30,50 cycles/mm
+* Black lines represent sagittal, blue tangential
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./US004717245_Example02a.txt)
 * [Zemax file](./US004717245_Example02a.zmx)

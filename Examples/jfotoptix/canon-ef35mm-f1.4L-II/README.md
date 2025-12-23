@@ -37,7 +37,10 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 4 | 0.0 | 0.0 | -4.72094E-6 | -4.59421E-9 | 9.92671E-13 | -4.41856E-15 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
 | 22 | 0.0 | 0.0 | -7.55876E-6 | 4.60713E-9 | -4.19026E-11 | 1.07707E-13 | -1.18808E-16 | 0.0 | 0.0 | 0.0 | 0.0 |
 ## Layouts
-![Layout Only](./layout.svg)
+![Layout Only](./layoutonly.svg)
+![Layout Field 0.0](./layout.svg)
+![Layout Field 0.7](./layout-semi-skew.svg)
+![Layout Field 1.0](./layout-skew.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew.svg)
@@ -71,18 +74,20 @@ Note that where glass types are shown the refractive index and abbe number is as
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
  | Field(x=0.0, y=0.0) | 8.608 | 22.016|
- | Field(x=0.0, y=0.7) | 14.75 | 48.113|
- | Field(x=0.0, y=1.0) | 24.665 | 92.371|
-## Ray Aberrations
-### Field 0.0
-![Tangential Ray Aberrations 0.0](./rayabbr-fld0-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld0-sag.svg)
-### Field 0.7
-![Tangential Ray Aberrations 0.0](./rayabbr-fld1-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld1-sag.svg)
-### Field 1.0
-![Tangential Ray Aberrations 0.0](./rayabbr-fld2-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld2-sag.svg)
+ | Field(x=0.0, y=0.1) | 11.855 | 51.58|
+ | Field(x=0.0, y=0.2) | 12.763 | 58.84|
+ | Field(x=0.0, y=0.3) | 11.702 | 58.104|
+ | Field(x=0.0, y=0.4) | 11.871 | 50.474|
+ | Field(x=0.0, y=0.5) | 12.764 | 48.289|
+ | Field(x=0.0, y=0.6) | 13.626 | 48.876|
+ | Field(x=0.0, y=0.7) | 14.024 | 45.783|
+ | Field(x=0.0, y=0.8) | 14.298 | 52.134|
+ | Field(x=0.0, y=0.9) | 16.068 | 63.998|
+ | Field(x=0.0, y=1.0) | 20.113 | 84.878|
+## Geometric MTF
+![Geometrical MTF](./mtf.svg)
+* 10,30,50 cycles/mm
+* Black lines represent sagittal, blue tangential
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./JP2015-200845_Example03.txt)
 * [Zemax file](./JP2015-200845_Example03.zmx)

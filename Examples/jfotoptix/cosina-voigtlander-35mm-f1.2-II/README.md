@@ -33,7 +33,10 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 15 | 0.0 | 0.0 | 3.63823E-6 | -2.57284E-8 | 2.13341E-10 | -5.87072E-13 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
 | 16 | 0.0 | 0.0 | 1.17867E-5 | -3.91138E-8 | 2.32768E-10 | -5.55678E-13 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
 ## Layouts
-![Layout Only](./layout.svg)
+![Layout Only](./layoutonly.svg)
+![Layout Field 0.0](./layout.svg)
+![Layout Field 0.7](./layout-semi-skew.svg)
+![Layout Field 1.0](./layout-skew.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew.svg)
@@ -67,18 +70,20 @@ Note that where glass types are shown the refractive index and abbe number is as
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
  | Field(x=0.0, y=0.0) | 17.46 | 66.585|
- | Field(x=0.0, y=0.707) | 31.129 | 319.743|
- | Field(x=0.0, y=1.0) | 67.892 | 249.211|
-## Ray Aberrations
-### Field 0.0
-![Tangential Ray Aberrations 0.0](./rayabbr-fld0-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld0-sag.svg)
-### Field 0.7
-![Tangential Ray Aberrations 0.0](./rayabbr-fld1-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld1-sag.svg)
-### Field 1.0
-![Tangential Ray Aberrations 0.0](./rayabbr-fld2-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld2-sag.svg)
+ | Field(x=0.0, y=0.1) | 20.093 | 96.442|
+ | Field(x=0.0, y=0.2) | 30.085 | 246.905|
+ | Field(x=0.0, y=0.3) | 65.761 | 527|
+ | Field(x=0.0, y=0.4) | 64.284 | 399.757|
+ | Field(x=0.0, y=0.5) | 57.931 | 314.351|
+ | Field(x=0.0, y=0.6) | 40.682 | 314.37|
+ | Field(x=0.0, y=0.7) | 31.491 | 332.418|
+ | Field(x=0.0, y=0.8) | 27.78 | 327.229|
+ | Field(x=0.0, y=0.9) | 42.147 | 243.786|
+ | Field(x=0.0, y=1.0) | 67.616 | 245.654|
+## Geometric MTF
+![Geometrical MTF](./mtf.svg)
+* 10,30,50 cycles/mm
+* Black lines represent sagittal, blue tangential
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./Cosina-35mm-f1.2.txt)
 * [Zemax file](./Cosina-35mm-f1.2.zmx)

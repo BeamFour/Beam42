@@ -16,29 +16,29 @@ import org.redukti.render.rendering.Rgb;
 public class GeoMTFPlot {
 
     public final Field fld;
-    public final MonochromaticGeometricMTF mtf;
+    public final MonochromaticGeometricMTF geo_mtf;
 
-    public GeoMTFPlot(Field fld, MonochromaticGeometricMTF mtf) {
+    public GeoMTFPlot(Field fld, MonochromaticGeometricMTF geo_mtf) {
         this.fld = fld;
-        this.mtf = mtf;
+        this.geo_mtf = geo_mtf;
     }
 
     public String plot() {
         int count = 0;
-        for (int i = 0; i < mtf.freq.length; i++) {
-            if (mtf.freq[i] > 100.)
+        for (int i = 0; i < geo_mtf.mtf.freq.length; i++) {
+            if (geo_mtf.mtf.freq[i] > 100.)
                 break;
             count++;
         }
 
         Plot plot = new Plot();
-        plot.set_title("MTF for " + fld + " wvl " + mtf.intercepts.wvl);
+        plot.set_title("MTF for " + fld + " wvl " + geo_mtf.wvl);
         plot.get_axes().set_position(Vector3.vector3_0);
         plot.get_axes().set_range(new Range(0, 100.0), PlotAxes.AxisMask.X);
         plot.get_axes().set_range(new Range(0, 1.0), PlotAxes.AxisMask.Y);
         for (int xy = 0; xy < 2; xy++) {
-            var x_data = mtf.freq;
-            var y_data = xy == 0 ? mtf.mag_x : mtf.mag_y;
+            var x_data = geo_mtf.mtf.freq;
+            var y_data = xy == 0 ? geo_mtf.mtf.mag_x : geo_mtf.mtf.mag_y;
             var set = new DiscreteSet();
             set.set_interpolation(Interpolation.Linear);
             for (int i = 0; i < count; i++) {

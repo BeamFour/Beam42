@@ -3,10 +3,7 @@ package org.redukti.tools;
 import org.redukti.exporters.ZemaxExporter;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.mathlib.M;
-import org.redukti.plotter.GeoMTFByFieldPlot;
-import org.redukti.plotter.GeoMTFPlot;
-import org.redukti.plotter.RayAberrationPlot;
-import org.redukti.plotter.SpotDiagram;
+import org.redukti.plotter.*;
 import org.redukti.rayoptics.analysis.*;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrderData;
@@ -161,7 +158,7 @@ public class LensTool2 {
             var mtfs = new ArrayList<PolyChromaticGeometricMTF>();
             for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
                 var spotFld = spotAnalysis.spot_results.get(i);
-                var polyMtfForField = new PolyChromaticGeometricMTF(spotFld.fld);
+                var polyMtfForField = new PolyChromaticGeometricMTF();
                 if (filenames[i] != null) {
                     var outfile = Helper.getOutputPath(arguments.specfile, filenames[i], arguments.outdir);
                     outputSpotAnalysis(spotFld, outfile);
@@ -170,11 +167,11 @@ public class LensTool2 {
                     String filename = "mtf-fld" + i + "-" + (int)intercepts.wvl + ".svg";
                     var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
                     var mtf = new MonochromaticGeometricMTF(intercepts);
-                    polyMtfForField.add(mtf);
+                    polyMtfForField.add(intercepts, intercepts.wvl == 587.5618 ? 1.0: 0.5);
                     if (filenames[i] != null)
                         Helper.createOutputFile(output_file,new GeoMTFPlot(spotFld.fld,mtf).plot());
                 }
-                polyMtfForField.compute_mtfs();
+                polyMtfForField.compute();
                 mtfs.add(polyMtfForField);
             }
             int[] freqs = {10,30,50};

@@ -17,9 +17,17 @@ public class SpotDiagram {
         this.result = result;
     }
 
-    public String plot() {
+    /**
+     * Supply a radius for the plt - if not supplied this is set to
+     * 1000 * computed max_radius.
+     * Example value is 600. that covers most lenses, past and present
+     * but modern lenses tend to have much smaller spot diagrams.
+     */
+    public String plot(Double radius) {
         RendererSvg r = new RendererSvg(640,640, Rgb.rgb_black);
-        r.set_window(new Vector2Pair(new Vector2(-600, -600), new Vector2(600, 600)), true);
+        if (radius == null)
+            radius = result.max_radius*1000;
+        r.set_window(new Vector2Pair(new Vector2(-radius, -radius), new Vector2(radius, radius)), true);
         var axes = new PlotAxes();
         axes.set_show_axes (false, PlotAxes.AxisMask.XY);
         axes.set_label ("Sagittal distance", PlotAxes.AxisMask.X);

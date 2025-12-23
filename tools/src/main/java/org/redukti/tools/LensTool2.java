@@ -33,11 +33,11 @@ public class LensTool2 {
         return prescription.build_ray_optics_model(fov_angle,fields,apply_vignetting,use_wideangle_aiming);
     }
 
-    public static void outputSpotAnalysis(SpotAnalysisResult.SpotResultsByField result, Path output_file) throws Exception {
+    public static void outputSpotAnalysis(SpotAnalysisResult.SpotResultsByField result, Path output_file, Double radius) throws Exception {
         if (output_file != null) {
-            Helper.createOutputFile(output_file, new SpotDiagram(result).plot());
+            Helper.createOutputFile(output_file, new SpotDiagram(result).plot(radius));
         } else {
-            System.out.println(new SpotDiagram(result).plot());
+            System.out.println(new SpotDiagram(result).plot(radius));
         }
     }
 
@@ -97,20 +97,77 @@ public class LensTool2 {
         spotResultsMarkdownTable(spotAnalysisResult,sb);
         String filename = Helper.getFilename(specFile);
         String zmxFilename = Helper.replaceExtension(filename, ".zmx");
-        sb.append("## Ray Aberrations\n");
-        sb.append("### Field 0.0\n");
-        sb.append("![Tangential Ray Aberrations 0.0](./rayabbr-fld0-tan.svg)\n");
-        sb.append("![Sagittal Ray Aberrations 0.0](./rayabbr-fld0-sag.svg)\n");
-        sb.append("### Field 0.7\n");
-        sb.append("![Tangential Ray Aberrations 0.0](./rayabbr-fld1-tan.svg)\n");
-        sb.append("![Sagittal Ray Aberrations 0.0](./rayabbr-fld1-sag.svg)\n");
-        sb.append("### Field 1.0\n");
-        sb.append("![Tangential Ray Aberrations 0.0](./rayabbr-fld2-tan.svg)\n");
-        sb.append("![Sagittal Ray Aberrations 0.0](./rayabbr-fld2-sag.svg)\n");
+        sb.append("## Geometric MTF\n");
+        sb.append("![Geometrical MTF](./mtf.svg)\n");
+        sb.append("* 10,30,50 cycles/mm\n");
+        sb.append("* Black lines represent sagittal, blue tangential\n");
         sb.append("## Resources\n");
         sb.append("* [OpticalBench Compatible Data File, tab delimited](./" + filename + ")\n");
         sb.append("* [Zemax file](./" + zmxFilename + ")\n");
         Helper.createOutputFile(output_file,sb.toString());
+    }
+
+    private static SpotAnalysisResult generateSpotDiagrams(OpticalModel opm,Args arguments,boolean standardSize) throws Exception {
+        var spotAnalysis = SpotAnalysis.eval(opm,new SpotOptions());
+        Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"spot-report.txt",arguments.outdir), spotAnalysis.toString());
+        for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
+            var spotFld = spotAnalysis.spot_results.get(i);
+            String filename = null;
+            if (spotFld.fld.y == 0.0)
+                filename = "spot.svg";
+            else if (spotFld.fld.y == 0.7)
+                filename = "spot-semi-skew.svg";
+            else if (spotFld.fld.y == 1.0)
+                filename = "spot-skew.svg";
+            if (filename == null)
+                continue;
+            var outfile = Helper.getOutputPath(arguments.specfile, filename, arguments.outdir);
+            outputSpotAnalysis(spotFld, outfile,standardSize ? 600. : null);
+        }
+        return spotAnalysis;
+    }
+
+    private static void generateMTFs(OpticalModel opm, Args arguments, double[] fields) throws Exception {
+        var spotAnalysis = SpotAnalysis.eval(opm,new SpotOptions());
+        var mtfs = new ArrayList<PolyMTF>();
+        for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
+            var spotFld = spotAnalysis.spot_results.get(i);
+            PolyMTF polyMtfForField = null;
+            for (var intercepts: spotFld.intercepts) {
+                String filename = "mtf-fld" + i + "-" + (int)intercepts.wvl + ".svg";
+                var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
+                var mtf = new MonochromaticGeometricMTF(intercepts);
+                if (polyMtfForField == null)
+                    polyMtfForField = new PolyMTF(mtf.mtf.fft_size,mtf.h2d.pixel_size);
+                polyMtfForField.add(mtf.mtf, intercepts.wvl == 587.5618 ? 1.0: 0.5);
+                Helper.createOutputFile(output_file,new GeoMTFPlot(spotFld.fld,mtf).plot());
+            }
+            if (polyMtfForField != null) {
+                polyMtfForField.compute();
+                mtfs.add(polyMtfForField);
+            }
+        }
+        int[] freqs = {10,30,50};
+        var mtfResults = new ArrayList<MTFResultByFreq>();
+        for (var freq: freqs)
+            mtfResults.add(new MTFResultByFreq(mtfs,freq));
+        var mtffile = Helper.getOutputPath(arguments.specfile,"mtf.svg",arguments.outdir);
+        Helper.createOutputFile(mtffile,new GeoMTFByFieldPlot(mtfResults).plot(fields));
+    }
+
+    private static void generateRayAberrationPlots(OpticalModel opm, Args arguments) throws Exception {
+        var rayAber = TransverseRayAberrationAnalysis.eval(opm, 21, new TraceOptions());
+        for (var fan_results: rayAber.results) {
+            String filename = "rayabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag") + ".svg";
+            var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
+            Helper.createOutputFile(output_file, new RayAberrationPlot(rayAber).plot(fan_results, 0));
+        }
+        var opdAber = WavefrontAberrationAnalysis.eval(opm, 21, new TraceOptions());
+        for (var fan_results: opdAber.results) {
+            String filename = "opdabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag") + ".svg";
+            var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
+            Helper.createOutputFile(output_file, new RayAberrationPlot(opdAber).plot(fan_results, 0));
+        }
     }
 
     public static void main(String[] args) throws Exception {
@@ -123,7 +180,6 @@ public class LensTool2 {
         }
         try {
             final double[] fields = {0.0, 0.1, 0.3, 0.5, 0.7, 1.0};
-            String[] filenames = {"spot.svg",null,null,null,"spot-semi-skew.svg", "spot-skew.svg"};
 
             OpticalBenchDataImporter.LensSpecifications specs = getSpecsFromFile(arguments.specfile);
             var prescription = createPrescription(specs,arguments.scenario,arguments.use_glass_types,arguments.only_d_line);
@@ -144,9 +200,6 @@ public class LensTool2 {
 //            outputLayoutWithRays(semiSkewedSystem,Helper.getOutputPath(arguments.specfile,"layout-semi-skew.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
 //            outputLayoutWithRays(skewedSystem,Helper.getOutputPath(arguments.specfile,"layout-skew.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
 
-            var spotAnalysis = SpotAnalysis.eval(opm,21, new TraceOptions(),true);
-            Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"spot-report.txt",arguments.outdir), spotAnalysis.toString());
-
 //            StringBuilder buf = new StringBuilder();
 //            for (int i = 0; i < fields.length; i++) {
 //                Trace.list_ray(buf,osp.fov.fields[i].chief_ray.chief_ray,null,null);
@@ -155,47 +208,9 @@ public class LensTool2 {
 //            buf = new StringBuilder();
             //System.out.println(Trace.list_ray(buf,Trace.trace_ray(opm, Vector2.vector2_0,osp.fov.fields[4],sm.central_wavelength(),new TraceOptions()).pkg,null,null).toString());
 
-            var mtfs = new ArrayList<PolyMTF>();
-            for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
-                var spotFld = spotAnalysis.spot_results.get(i);
-                PolyMTF polyMtfForField = null;
-                if (filenames[i] != null) {
-                    var outfile = Helper.getOutputPath(arguments.specfile, filenames[i], arguments.outdir);
-                    outputSpotAnalysis(spotFld, outfile);
-                }
-                for (var intercepts: spotFld.intercepts) {
-                    String filename = "mtf-fld" + i + "-" + (int)intercepts.wvl + ".svg";
-                    var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
-                    var mtf = new MonochromaticGeometricMTF(intercepts);
-                    if (polyMtfForField == null)
-                        polyMtfForField = new PolyMTF(mtf.mtf.fft_size,mtf.h2d.pixel_size);
-                    polyMtfForField.add(mtf.mtf, intercepts.wvl == 587.5618 ? 1.0: 0.5);
-                    if (filenames[i] != null)
-                        Helper.createOutputFile(output_file,new GeoMTFPlot(spotFld.fld,mtf).plot());
-                }
-                if (polyMtfForField != null) {
-                    polyMtfForField.compute();
-                    mtfs.add(polyMtfForField);
-                }
-            }
-            int[] freqs = {10,30,50};
-            var mtfResults = new ArrayList<MTFResultByFreq>();
-            for (var freq: freqs)
-                mtfResults.add(new MTFResultByFreq(mtfs,freq));
-            var mtffile = Helper.getOutputPath(arguments.specfile,"mtf.svg",arguments.outdir);
-            Helper.createOutputFile(mtffile,new GeoMTFByFieldPlot(mtfResults).plot(fields));
-            var rayAber = TransverseRayAberrationAnalysis.eval(opm, 21, new TraceOptions());
-            for (var fan_results: rayAber.results) {
-                String filename = "rayabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag") + ".svg";
-                var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
-                Helper.createOutputFile(output_file, new RayAberrationPlot(rayAber).plot(fan_results, 0));
-            }
-            var opdAber = WavefrontAberrationAnalysis.eval(opm, 21, new TraceOptions());
-            for (var fan_results: opdAber.results) {
-                String filename = "opdabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag") + ".svg";
-                var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
-                Helper.createOutputFile(output_file, new RayAberrationPlot(opdAber).plot(fan_results, 0));
-            }
+            var spotAnalysis = generateSpotDiagrams(opm,arguments,true);
+            generateMTFs(opm,arguments,fields);
+            generateRayAberrationPlots(opm,arguments);
             ZemaxExporter zemaxExporter = new ZemaxExporter();
             Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), zemaxExporter.generate(specs, arguments.scenario, arguments.only_d_line));
             createREADME(arguments.specfile,

@@ -39,13 +39,18 @@ public class SpotAnalysis {
         return seq_model.trace_rings(SpotAnalysis::spot,fi,wl,num_rays,false,trace_options);
     }
 
-    public static SpotAnalysisResult eval(OpticalModel opt_model, int num_rays, TraceOptions trace_options,boolean use_centroid) {
-        SpotAnalysisResult result = new SpotAnalysisResult(use_centroid);
+    public static SpotAnalysisResult eval(OpticalModel opt_model, SpotOptions options) {
+        var num_rays = options.num_rays;
+        var trace_options = options.traceOptions;
+        SpotAnalysisResult result = new SpotAnalysisResult(options.use_centroid);
         var fov = opt_model.optical_spec.fov;
         var ref_wvl = fov.optical_spec.wvls.central_wvl();
         for (int fi = 0; fi < fov.fields.length; fi++) {
             Field f = fov.fields[fi];
-            result.add(f, eval_rings(opt_model,fi,null,num_rays,trace_options), ref_wvl);
+            if (options.use_grid)
+                result.add(f, eval_grid(opt_model,fi,null,num_rays,trace_options), ref_wvl);
+            else
+                result.add(f, eval_rings(opt_model,fi,null,num_rays,trace_options), ref_wvl);
         }
         return result;
     }

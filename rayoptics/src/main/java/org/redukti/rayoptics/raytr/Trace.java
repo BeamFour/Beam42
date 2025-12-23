@@ -810,6 +810,7 @@ public class Trace {
         }
         else {
             points = generate_points(grid_rng, num_rings, max_radius);
+            //points = generate_gaussian(grid_rng, num_rings, max_radius);
         }
 
         for (int i = 0; i < points.size(); i++) {
@@ -870,6 +871,30 @@ public class Trace {
             int numPoints = num_points_in_ring_one * ring;
             for (int jaz = 0; jaz < numPoints; jaz++) {
                 double angle_deg  = offset + jaz*daz;
+                double angle_rad = Math.toRadians(angle_deg);
+                double x = cx + r*Math.cos(angle_rad);
+                double y = cy + r*Math.sin(angle_rad);
+                points.add(new Vector2(x, y));
+            }
+        }
+        return points;
+    }
+
+    private static List<Vector2> generate_gaussian(TraceRingsDef grid_rng, int ncircles, double max_radius) {
+        List<Vector2> points;
+        points = new ArrayList<>();
+        double cx = grid_rng.cx, cy = grid_rng.cy;  // center of ring
+        points.add(new Vector2(cx,cy));
+        double sigma = max_radius/Math.sqrt(2.0*Math.log(1+ncircles));
+        for (int icirc=1; icirc<=ncircles; icirc++)
+        {
+            double daz = 60.0 / icirc;
+            double offset = (icirc%2 == 0) ? 0.0 : 0.5*daz;
+            double p = M.square(icirc)/(ncircles + M.square(ncircles));
+            double r = sigma*Math.sqrt(2.0*Math.log(1/(1-p)));
+            for (int jaz = 0; jaz<6*icirc; jaz++)
+            {
+                double angle_deg = offset + jaz*daz;
                 double angle_rad = Math.toRadians(angle_deg);
                 double x = cx + r*Math.cos(angle_rad);
                 double y = cy + r*Math.sin(angle_rad);

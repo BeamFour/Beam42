@@ -52,9 +52,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 31 | 0.0 | 0.0 | 4.31949E-5 | -2.72422E-7 | 7.46965E-10 | -4.3181E-13 | -6.05302E-16 | 0.0 | 0.0 | 0.0 | 0.0 |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
-![Layout Only](./layout.svg)
-![Layout Only](./layout-semi-skew.svg)
-![Layout Only](./layout-skew.svg)
+![Layout Field 0.0](./layout.svg)
+![Layout Field 0.7](./layout-semi-skew.svg)
+![Layout Field 1.0](./layout-skew.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew.svg)
@@ -87,19 +87,21 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 3.969 | 15.61|
- | Field(x=0.0, y=0.7) | 9.281 | 74.612|
- | Field(x=0.0, y=1.0) | 9.029 | 58.819|
-## Ray Aberrations
-### Field 0.0
-![Tangential Ray Aberrations 0.0](./rayabbr-fld0-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld0-sag.svg)
-### Field 0.7
-![Tangential Ray Aberrations 0.0](./rayabbr-fld1-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld1-sag.svg)
-### Field 1.0
-![Tangential Ray Aberrations 0.0](./rayabbr-fld2-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld2-sag.svg)
+ | Field(x=0.0, y=0.0) | 4.483 | 15.222|
+ | Field(x=0.0, y=0.1) | 4.052 | 19.236|
+ | Field(x=0.0, y=0.2) | 7.406 | 73.381|
+ | Field(x=0.0, y=0.3) | 9.341 | 102.822|
+ | Field(x=0.0, y=0.4) | 8.236 | 97.021|
+ | Field(x=0.0, y=0.5) | 10.933 | 85.242|
+ | Field(x=0.0, y=0.6) | 11.352 | 93.543|
+ | Field(x=0.0, y=0.7) | 11.814 | 83.683|
+ | Field(x=0.0, y=0.8) | 13.022 | 74.887|
+ | Field(x=0.0, y=0.9) | 10.806 | 67.717|
+ | Field(x=0.0, y=1.0) | 9.118 | 51.809|
+## Geometric MTF
+![Geometrical MTF](./mtf.svg)
+* 10,30,50 cycles/mm
+* Black lines represent sagittal, blue tangential
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./US20250334778_Example02.txt)
 * [Zemax file](./US20250334778_Example02.zmx)

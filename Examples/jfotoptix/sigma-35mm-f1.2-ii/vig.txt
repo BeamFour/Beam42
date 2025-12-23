@@ -1,9 +1,17 @@
 Aperture: Image Fnum; value = 1.24
 Field: Object Angle; value = 31.87
-y =  0.000 ( 0.00) vlx= 0.000 vux= 0.000 vly= 0.012 vuy= 0.012 aim_info: [0.0,0.0]
-y =  0.700 (22.31) vlx= 0.000 vux= 0.000 vly= 0.400 vuy= 0.510 aim_info: [0.0,-0.1016255741764967]
-y =  1.000 (31.87) vlx= 0.000 vux= 0.000 vly= 0.723 vuy= 0.950 aim_info: [0.0,-0.449979071719453]
-is_relative=true, is_wideangle=false
+y =  0.000 ( 0.00) vlx= 0.001 vux= 0.001 vly= 0.001 vuy= 0.001 z_enp: 35.19513888097737
+y =  0.100 ( 3.19) vlx= 0.001 vux= 0.001 vly=-0.001 vuy= 0.011 z_enp: 35.19867302750016
+y =  0.200 ( 6.37) vlx=-0.001 vux=-0.001 vly= 0.015 vuy= 0.046 z_enp: 35.209614461877905
+y =  0.300 ( 9.56) vlx=-0.001 vux=-0.001 vly= 0.042 vuy= 0.099 z_enp: 35.2290100143913
+y =  0.400 (12.75) vlx=-0.001 vux=-0.001 vly= 0.079 vuy= 0.163 z_enp: 35.25867361456345
+y =  0.500 (15.94) vlx=-0.003 vux=-0.003 vly= 0.128 vuy= 0.231 z_enp: 35.30134914886325
+y =  0.600 (19.12) vlx=-0.005 vux=-0.005 vly= 0.179 vuy= 0.302 z_enp: 35.36091755228929
+y =  0.700 (22.31) vlx= 0.011 vux= 0.011 vly= 0.231 vuy= 0.378 z_enp: 35.4428198288021
+y =  0.800 (25.50) vlx= 0.040 vux= 0.040 vly= 0.292 vuy= 0.456 z_enp: 35.55469977635829
+y =  0.900 (28.68) vlx= 0.077 vux= 0.077 vly= 0.392 vuy= 0.565 z_enp: 35.70769262333563
+y =  1.000 (31.87) vlx= 0.122 vux= 0.122 vly= 0.495 vuy= 0.726 z_enp: 35.91890385580257
+is_relative=true, is_wideangle=true
 central wavelength=  587.5618
 wavelength (weight) =  486.1327 0.500,   587.5618 1.000*,   656.2725 0.500
 focus shift=0.0

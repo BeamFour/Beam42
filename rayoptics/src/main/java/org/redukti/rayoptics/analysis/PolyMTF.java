@@ -5,7 +5,7 @@ package org.redukti.rayoptics.analysis;
  */
 public class PolyMTF extends BaseMTF {
 
-    public PolyMTF(int fft_size, int pixel_size) {
+    public PolyMTF(int fft_size, double pixel_size) {
         super(fft_size,pixel_size);
     }
     private void add(MTF mono_mtf, int xy, double wt) {
@@ -20,7 +20,7 @@ public class PolyMTF extends BaseMTF {
         add(mono_mtf,0,wt);
         add(mono_mtf,1,wt);
     }
-    public void compute_mtfs() {
+    public void compute() {
         compute_magnitude(0);
         compute_magnitude(1);
     }

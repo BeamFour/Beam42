@@ -155,10 +155,10 @@ public class LensTool2 {
 //            buf = new StringBuilder();
             //System.out.println(Trace.list_ray(buf,Trace.trace_ray(opm, Vector2.vector2_0,osp.fov.fields[4],sm.central_wavelength(),new TraceOptions()).pkg,null,null).toString());
 
-            var mtfs = new ArrayList<PolyChromaticGeometricMTF>();
+            var mtfs = new ArrayList<PolyMTF>();
             for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
                 var spotFld = spotAnalysis.spot_results.get(i);
-                var polyMtfForField = new PolyChromaticGeometricMTF();
+                PolyMTF polyMtfForField = null;
                 if (filenames[i] != null) {
                     var outfile = Helper.getOutputPath(arguments.specfile, filenames[i], arguments.outdir);
                     outputSpotAnalysis(spotFld, outfile);
@@ -167,12 +167,16 @@ public class LensTool2 {
                     String filename = "mtf-fld" + i + "-" + (int)intercepts.wvl + ".svg";
                     var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
                     var mtf = new MonochromaticGeometricMTF(intercepts);
-                    polyMtfForField.add(intercepts, intercepts.wvl == 587.5618 ? 1.0: 0.5);
+                    if (polyMtfForField == null)
+                        polyMtfForField = new PolyMTF(mtf.mtf.fft_size,mtf.h2d.pixel_size);
+                    polyMtfForField.add(mtf.mtf, intercepts.wvl == 587.5618 ? 1.0: 0.5);
                     if (filenames[i] != null)
                         Helper.createOutputFile(output_file,new GeoMTFPlot(spotFld.fld,mtf).plot());
                 }
-                polyMtfForField.compute();
-                mtfs.add(polyMtfForField);
+                if (polyMtfForField != null) {
+                    polyMtfForField.compute();
+                    mtfs.add(polyMtfForField);
+                }
             }
             int[] freqs = {10,30,50};
             var mtfResults = new ArrayList<MTFResultByFreq>();

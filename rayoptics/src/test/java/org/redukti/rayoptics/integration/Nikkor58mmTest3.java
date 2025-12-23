@@ -169,7 +169,7 @@ public class Nikkor58mmTest3 {
 //        plotRenderer.draw_plot(r,plot);
 //        //System.out.println(r.write(new StringBuilder()));
 
-        var spot = SpotAnalysis.eval(opm,21, new TraceOptions());
+        var spot = SpotAnalysis.eval(opm,21, new TraceOptions(),true);
 //        for (var byfld : spot.spot_results) {
 //            RendererSvg r = new RendererSvg(640,480);
 //            r = new RendererSvg(480,480);

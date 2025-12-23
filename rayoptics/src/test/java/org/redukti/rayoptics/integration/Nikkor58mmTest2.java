@@ -182,7 +182,7 @@ public class Nikkor58mmTest2 {
 //        plotRenderer.draw_plot(r,plot);
         //System.out.println(r.write(new StringBuilder()));
 
-        var spot = SpotAnalysis.eval(opm,21, new TraceOptions());
+        var spot = SpotAnalysis.eval(opm,21, new TraceOptions(),true);
 //        r = new RendererSvg(480,480);
 //        r.set_window(new Vec2Pair(new Vector2(-100, -100), new Vector2(100, 100)), true);
 //        var axes = new PlotAxes();

@@ -34,15 +34,15 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 24 | 83.8165 | 5.2749 | 31.96 | 1.7725 | 49.46 | Hoya | M-TAF1 |
 | 25 | -56.3959 | 39.2 | 34.26 |  |  |  |
 ## Aspherical Data
-| ID  | k   | A4  | A6  | A8  | A10 | A12 | A14 | A16 | A18 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 0.0 | 1.65056E-6 | 1.96288E-9 | -3.8208E-12 | 7.44465E-15 | -5.09935E-18 | 0.0 | 0.0 | 0.0 |
-| 25 | 0.0 | 4.3716E-6 | -2.8629E-10 | -4.07099E-13 | 7.96087E-15 | -7.28754E-18 | 0.0 | 0.0 | 0.0 |
+| ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 0.0 | 0.0 | 1.65056E-6 | 1.96288E-9 | -3.8208E-12 | 7.44465E-15 | -5.09935E-18 | 0.0 | 0.0 | 0.0 | 0.0 |
+| 25 | 0.0 | 0.0 | 4.3716E-6 | -2.8629E-10 | -4.07099E-13 | 7.96087E-15 | -7.28754E-18 | 0.0 | 0.0 | 0.0 | 0.0 |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
-![Layout Only](./layout.svg)
-![Layout Only](./layout-semi-skew.svg)
-![Layout Only](./layout-skew.svg)
+![Layout Field 0.0](./layout.svg)
+![Layout Field 0.7](./layout-semi-skew.svg)
+![Layout Field 1.0](./layout-skew.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew.svg)
@@ -75,19 +75,21 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 9.501 | 26.88|
- | Field(x=0.0, y=0.707) | 15.767 | 77.496|
- | Field(x=0.0, y=1.0) | 38.968 | 145.116|
-## Ray Aberrations
-### Field 0.0
-![Tangential Ray Aberrations 0.0](./rayabbr-fld0-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld0-sag.svg)
-### Field 0.7
-![Tangential Ray Aberrations 0.0](./rayabbr-fld1-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld1-sag.svg)
-### Field 1.0
-![Tangential Ray Aberrations 0.0](./rayabbr-fld2-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld2-sag.svg)
+ | Field(x=0.0, y=0.0) | 9.588 | 27.006|
+ | Field(x=0.0, y=0.1) | 10.137 | 32.117|
+ | Field(x=0.0, y=0.2) | 10.611 | 40.672|
+ | Field(x=0.0, y=0.3) | 10.344 | 44.21|
+ | Field(x=0.0, y=0.4) | 10.549 | 48.92|
+ | Field(x=0.0, y=0.5) | 11.491 | 47.49|
+ | Field(x=0.0, y=0.6) | 12.761 | 64.152|
+ | Field(x=0.0, y=0.7) | 14.881 | 76.493|
+ | Field(x=0.0, y=0.8) | 18.467 | 90.591|
+ | Field(x=0.0, y=0.9) | 23.011 | 105.789|
+ | Field(x=0.0, y=1.0) | 32.029 | 122.303|
+## Geometric MTF
+![Geometrical MTF](./mtf.svg)
+* 10,30,50 cycles/mm
+* Black lines represent sagittal, blue tangential
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./JP2014-048488_Example03P.txt)
 * [Zemax file](./JP2014-048488_Example03P.zmx)

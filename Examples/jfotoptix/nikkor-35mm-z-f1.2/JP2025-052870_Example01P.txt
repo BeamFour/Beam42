@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP2025-052870 Example 1 (Nikon Nikkor Z 35mm f/1.2 S)
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP2025-052870	EX 1	2021	Harada Masaki,Shimada Toshiyuki	Nikon Corp	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2025-052870/11/en
+lens name	Nikkor Z 35mm f/1.2 S
 [constants]
 [variable distances]
 Focal Length	34.4	undefined

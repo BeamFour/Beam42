@@ -33,7 +33,10 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 16 | 0.0 | 0.0 | 2.5689E-5 | -3.8791E-8 | 1.8226E-9 | -1.6532E-11 | 5.9212E-14 | -8.8416E-17 | 0.0 | 0.0 | 0.0 |
 | 17 | 0.0 | 0.0 | 5.5238E-5 | -2.2665E-7 | 5.2647E-9 | -3.9864E-11 | 1.4805E-13 | -2.29E-16 | 0.0 | 0.0 | 0.0 |
 ## Layouts
-![Layout Only](./layout.svg)
+![Layout Only](./layoutonly.svg)
+![Layout Field 0.0](./layout.svg)
+![Layout Field 0.7](./layout-semi-skew.svg)
+![Layout Field 1.0](./layout-skew.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew.svg)
@@ -67,18 +70,20 @@ Note that where glass types are shown the refractive index and abbe number is as
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
  | Field(x=0.0, y=0.0) | 14.804 | 37.327|
- | Field(x=0.0, y=0.707) | 14.983 | 55.411|
- | Field(x=0.0, y=1.0) | 18.213 | 64.534|
-## Ray Aberrations
-### Field 0.0
-![Tangential Ray Aberrations 0.0](./rayabbr-fld0-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld0-sag.svg)
-### Field 0.7
-![Tangential Ray Aberrations 0.0](./rayabbr-fld1-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld1-sag.svg)
-### Field 1.0
-![Tangential Ray Aberrations 0.0](./rayabbr-fld2-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld2-sag.svg)
+ | Field(x=0.0, y=0.1) | 15.822 | 48.95|
+ | Field(x=0.0, y=0.2) | 16.076 | 53.456|
+ | Field(x=0.0, y=0.3) | 14.996 | 48.783|
+ | Field(x=0.0, y=0.4) | 13.616 | 43.307|
+ | Field(x=0.0, y=0.5) | 13.513 | 40.217|
+ | Field(x=0.0, y=0.6) | 13.845 | 41.513|
+ | Field(x=0.0, y=0.7) | 13.712 | 48.253|
+ | Field(x=0.0, y=0.8) | 14.65 | 55.555|
+ | Field(x=0.0, y=0.9) | 17.244 | 62.927|
+ | Field(x=0.0, y=1.0) | 18.703 | 64.294|
+## Geometric MTF
+![Geometrical MTF](./mtf.svg)
+* 10,30,50 cycles/mm
+* Black lines represent sagittal, blue tangential
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./Cosina-35mm-f1.2.txt)
 * [Zemax file](./Cosina-35mm-f1.2.zmx)

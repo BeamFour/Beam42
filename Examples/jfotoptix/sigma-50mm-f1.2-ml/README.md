@@ -12,7 +12,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 2 | 61.93 | 2.47 | 48.22 |  |  |  |
 | 3 | 78.33 | 6.05 | 50.56 | 2.001 | 29.13 | Hoya | TAFD55 |
 | 4 | -489.3 | 9.35 | 50.56 |  |  |  |
-| 5 | 88.26 | 5.0 | 41.6 | 1.7645 | 49.09 | Ohara | L-LAH91 |
+| 5 | 88.26 | 5.0 | 41.6 | 1.7645 | 49.1 | Ohara | L-LAH91 |
 | 6 | -167.85 | 1.0 | 41.4 | 1.5927 | 35.45 | Hoya | FF5 |
 | 7 | 215.05 | 4.31 | 39.9 |  |  |  |
 | 8 | -287.49 | 2.97 | 40.12 | 2.001 | 29.13 | Hoya | TAFD55 |
@@ -21,14 +21,14 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 11 | 40.89 | 6.66 | 36.48 |  |  |  |
 | 12 | AS | 3.3 | 36.066 |  |  |  |
 | 13 | -97.6 | 1.01 | 40.12 | 1.85451 | 25.15 | Hoya | NBFD25 |
-| 14 | 39.17 | 10.58 | 40.12 | 1.755 | 52.3 | Ohara | S-LAH97 |
+| 14 | 39.17 | 10.58 | 40.12 | 1.755 | 52.32 | Ohara | S-LAH97 |
 | 15 | -68.52 | 0.2 | 40.96 |  |  |  |
-| 16 | 61.71 | 7.47 | 42.46 | 1.7645 | 49.09 | Ohara | L-LAH91 |
+| 16 | 61.71 | 7.47 | 42.46 | 1.7645 | 49.1 | Ohara | L-LAH91 |
 | 17 | -151.3 | 0.4 | 42.46 |  |  |  |
 | 18 | -487.97 | 5.04 | 40.96 | 1.98612 | 16.48 | Hoya | FDS16-W |
 | 19 | -52.2 | 1.0 | 40.54 | 1.85451 | 25.15 | Hoya | NBFD25 |
 | 20 | 80.81 | 6.69 | 38.84 |  |  |  |
-| 21 | 63.1 | 7.94 | 37.12 | 1.755 | 52.3 | Ohara | S-LAH97 |
+| 21 | 63.1 | 7.94 | 37.12 | 1.755 | 52.32 | Ohara | S-LAH97 |
 | 22 | -49.94 | 1.0 | 36.92 | 1.85451 | 25.15 | Hoya | NBFD25 |
 | 23 | 463.31 | 0.15 | 36.92 |  |  |  |
 | 24 | 96.76 | 5.31 | 36.92 | 1.8061 | 40.73 | Hoya | NBFD13 |
@@ -39,23 +39,23 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 29 | -300.0 | 1.0 | 32.64 | 1.85135 | 40.1 | Hoya | M-TAFD305 |
 | 30 | 267.11 | 17.4116 | 32.64 |  |  |  |
 ## Aspherical Data
-| ID  | k   | A4  | A6  | A8  | A10 | A12 | A14 | A16 | A18 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 5 | 0.0 | -2.1774E-6 | -8.5908E-10 | -3.9991E-13 | 4.2419E-16 | 0.0 | 0.0 | 0.0 | 0.0 |
-| 16 | 0.0 | -6.4826E-7 | 7.1294E-10 | -6.6137E-13 | 4.5967E-16 | 0.0 | 0.0 | 0.0 | 0.0 |
-| 17 | 0.0 | -4.3597E-7 | 3.0441E-10 | -7.5013E-13 | 5.3928E-16 | 0.0 | 0.0 | 0.0 | 0.0 |
-| 24 | 0.0 | -2.7523E-6 | -8.3384E-10 | 3.371E-13 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
-| 29 | 0.0 | 4.0914E-6 | -2.8321E-8 | 1.7934E-10 | -7.1336E-13 | 1.3086E-15 | -8.762E-19 | 0.0 | 0.0 |
-| 30 | 0.0 | 1.0591E-5 | -2.7395E-8 | 2.2115E-10 | -8.8172E-13 | 1.8537E-15 | -1.5758E-18 | 0.0 | 0.0 |
+| ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 5 | 0.0 | 0.0 | -2.1774E-6 | -8.5908E-10 | -3.9991E-13 | 4.2419E-16 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
+| 16 | 0.0 | 0.0 | -6.4826E-7 | 7.1294E-10 | -6.6137E-13 | 4.5967E-16 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
+| 17 | 0.0 | 0.0 | -4.3597E-7 | 3.0441E-10 | -7.5013E-13 | 5.3928E-16 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
+| 24 | 0.0 | 0.0 | -2.7523E-6 | -8.3384E-10 | 3.371E-13 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
+| 29 | 0.0 | 0.0 | 4.0914E-6 | -2.8321E-8 | 1.7934E-10 | -7.1336E-13 | 1.3086E-15 | -8.762E-19 | 0.0 | 0.0 | 0.0 |
+| 30 | 0.0 | 0.0 | 1.0591E-5 | -2.7395E-8 | 2.2115E-10 | -8.8172E-13 | 1.8537E-15 | -1.5758E-18 | 0.0 | 0.0 | 0.0 |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
-![Layout Only](./layout.svg)
-![Layout Only](./layout-semi-skew.svg)
-![Layout Only](./layout-skew.svg)
+![Layout Field 0.0](./layout.svg)
+![Layout Field 0.7](./layout-semi-skew.svg)
+![Layout Field 1.0](./layout-skew.svg)
 ## Spot Diagrams
-![Layout Only](./spot.svg)
-![Layout Only](./spot-semi-skew.svg)
-![Layout Only](./spot-skew.svg)
+![Spot Diagram Field 0.0](./spot.svg)
+![Spot Diagram Field 0.7](./spot-semi-skew.svg)
+![Spot Diagram Field 1.0](./spot-skew.svg)
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
@@ -66,15 +66,15 @@ Note that where glass types are shown the refractive index and abbe number is as
 | image_distance | 17.412
 | power | 0.021
 | pp1_H | 44.264
-| ppk_H' | 30.857
+| ppk_H' | -30.857
 | ffl_F | -4.006
 | fno | 1.24
 | enp_dist_P | 34.659
 | enp_radius | 19.464
 | exp_dist_P' | -42.848
 | exp_radius | 24.299
-| m | 0
-| red | -2.0716916260903573E8
+| m | -0
+| red | -2.0716916260903558E8
 | n_obj | 1
 | n_img | 1
 | img_ht | 21.441
@@ -84,9 +84,21 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 3.908 | 6.371|
- | 0.7 | 5.523 | 16.756|
- | 1.0 | 11.171 | 30.944|
+ | Field(x=0.0, y=0.0) | 3.878 | 6.265|
+ | Field(x=0.0, y=0.1) | 4.053 | 8.18|
+ | Field(x=0.0, y=0.2) | 4.209 | 8.201|
+ | Field(x=0.0, y=0.3) | 4.367 | 9.118|
+ | Field(x=0.0, y=0.4) | 4.671 | 9.476|
+ | Field(x=0.0, y=0.5) | 4.977 | 9.386|
+ | Field(x=0.0, y=0.6) | 5.152 | 10.459|
+ | Field(x=0.0, y=0.7) | 5.487 | 16.238|
+ | Field(x=0.0, y=0.8) | 6.592 | 22.736|
+ | Field(x=0.0, y=0.9) | 8.356 | 28.192|
+ | Field(x=0.0, y=1.0) | 10.597 | 29.352|
+## Geometric MTF
+![Geometrical MTF](./mtf.svg)
+* 10,30,50 cycles/mm
+* Black lines represent sagittal, blue tangential
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./US20250258361_Example01.txt)
 * [Zemax file](./US20250258361_Example01.zmx)

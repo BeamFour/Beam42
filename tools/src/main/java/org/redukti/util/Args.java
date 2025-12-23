@@ -13,6 +13,8 @@ public final class Args {
     public int spot_density = 50;
     public boolean include_lost_rays = true;
     public boolean only_d_line = false;
+    public boolean do_ray_aberrations = false;
+    public boolean do_mono_chrome_mtfs = false;
 
     public static Args parseArguments(String[] args) {
         Args arguments = new Args();

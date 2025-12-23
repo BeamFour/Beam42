@@ -86,7 +86,10 @@ public class LensTool2 {
         Prescription prescription = Prescription.buildPrescription(specs,true);
         StringBuilder sb = prescription.toMarkdownStr(new StringBuilder());
         sb.append("## Layouts\n");
-        sb.append("![Layout Only](./layout.svg)\n");
+        sb.append("![Layout Only](./layoutonly.svg)\n");
+        sb.append("![Layout Field 0.0](./layout.svg)\n");
+        sb.append("![Layout Field 0.7](./layout-semi-skew.svg)\n");
+        sb.append("![Layout Field 1.0](./layout-skew.svg)\n");
         sb.append("## Spot Diagrams\n");
         sb.append("![Spot Diagram Field 0.0](./spot.svg)\n");
         sb.append("![Spot Diagram Field 0.7](./spot-semi-skew.svg)\n");
@@ -128,7 +131,7 @@ public class LensTool2 {
     }
 
     private static void generateMTFs(OpticalModel opm, Args arguments, double[] fields) throws Exception {
-        var spotAnalysis = SpotAnalysis.eval(opm,new SpotOptions());
+        var spotAnalysis = SpotAnalysis.eval(opm,new SpotOptions().num_rays(64).use_grid(false));
         var mtfs = new ArrayList<PolyMTF>();
         for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
             var spotFld = spotAnalysis.spot_results.get(i);
@@ -140,7 +143,8 @@ public class LensTool2 {
                 if (polyMtfForField == null)
                     polyMtfForField = new PolyMTF(mtf.mtf.fft_size,mtf.h2d.pixel_size);
                 polyMtfForField.add(mtf.mtf, intercepts.wvl == 587.5618 ? 1.0: 0.5);
-                Helper.createOutputFile(output_file,new GeoMTFPlot(spotFld.fld,mtf).plot());
+                if (arguments.do_mono_chrome_mtfs)
+                    Helper.createOutputFile(output_file,new GeoMTFPlot(spotFld.fld,mtf).plot());
             }
             if (polyMtfForField != null) {
                 polyMtfForField.compute();
@@ -179,7 +183,7 @@ public class LensTool2 {
             System.exit(1);
         }
         try {
-            final double[] fields = {0.0, 0.1, 0.3, 0.5, 0.7, 1.0};
+            final double[] fields = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 
             OpticalBenchDataImporter.LensSpecifications specs = getSpecsFromFile(arguments.specfile);
             var prescription = createPrescription(specs,arguments.scenario,arguments.use_glass_types,arguments.only_d_line);
@@ -210,7 +214,8 @@ public class LensTool2 {
 
             var spotAnalysis = generateSpotDiagrams(opm,arguments,true);
             generateMTFs(opm,arguments,fields);
-            generateRayAberrationPlots(opm,arguments);
+            if (arguments.do_ray_aberrations)
+                generateRayAberrationPlots(opm,arguments);
             ZemaxExporter zemaxExporter = new ZemaxExporter();
             Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), zemaxExporter.generate(specs, arguments.scenario, arguments.only_d_line));
             createREADME(arguments.specfile,

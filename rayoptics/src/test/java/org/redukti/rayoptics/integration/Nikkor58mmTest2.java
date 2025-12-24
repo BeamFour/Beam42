@@ -15,6 +15,7 @@ import org.redukti.mathlib.Vector2Pair;
 //import org.redukti.render.rendering.RendererSvg;
 //import org.redukti.render.rendering.Rgb;
 import org.redukti.rayoptics.analysis.SpotAnalysis;
+import org.redukti.rayoptics.analysis.SpotOptions;
 import org.redukti.rayoptics.analysis.TransverseRayAberrationAnalysis;
 import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
 import org.redukti.rayoptics.optical.OpticalModel;
@@ -182,7 +183,7 @@ public class Nikkor58mmTest2 {
 //        plotRenderer.draw_plot(r,plot);
         //System.out.println(r.write(new StringBuilder()));
 
-        var spot = SpotAnalysis.eval(opm,21, new TraceOptions(),true);
+        var spot = SpotAnalysis.eval(opm,new SpotOptions());
 //        r = new RendererSvg(480,480);
 //        r.set_window(new Vec2Pair(new Vector2(-100, -100), new Vector2(100, 100)), true);
 //        var axes = new PlotAxes();

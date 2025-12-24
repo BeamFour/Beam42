@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP 2022-033487 Example 1 (Sigma 35mm F1.4 DG DN Art)
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP2022-033487	EX 1	2020	Ryo Shioda	Sigma Corp	https://patents.google.com/patent/JP2022033487A/en
+lens name	Sigma 35mm F1.4 DG DN Art
 [constants]
 [variable distances]
 Focal Length	33.72	undefined

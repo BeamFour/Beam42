@@ -48,7 +48,7 @@ public class GeoMTFByFieldPlot {
         plot.get_axes ().set_label (y_label, PlotAxes.AxisMask.Y);
         //plot.get_axes().set_unit("cycles/mm",false,false,0, PlotAxes.AxisMask.X);
         //plot.get_axes().set_unit("",true,false,0, PlotAxes.AxisMask.Y);
-        RendererSvg r = new RendererSvg(640,640);
+        RendererSvg r = new RendererSvg(1024,640);
         PlotRenderer plotRenderer = new PlotRenderer();
         plotRenderer.draw_plot(r,plot);
         return r.write(new StringBuilder()).toString();

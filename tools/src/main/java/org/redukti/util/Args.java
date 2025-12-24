@@ -11,10 +11,12 @@ public final class Args {
     public boolean use_glass_types = true;
     public int trace_density = 20;
     public int spot_density = 50;
-    public boolean include_lost_rays = true;
+    public boolean include_lost_rays = false;
     public boolean only_d_line = false;
     public boolean do_ray_aberrations = false;
     public boolean do_mono_chrome_mtfs = false;
+    public boolean use_grid_pattern = false;
+    public boolean auto_size_spots = false;
 
     public static Args parseArguments(String[] args) {
         Args arguments = new Args();
@@ -63,6 +65,18 @@ public final class Args {
             }
             else if (arg1.equals("--only-d-line")) {
                 arguments.only_d_line = true;
+            }
+            else if (arg1.equals("--output-ray-aberration-plots")) {
+                arguments.do_ray_aberrations = true;
+            }
+            else if (arg1.equals("--output-wavelength-mtfs")) {
+                arguments.do_mono_chrome_mtfs = true;
+            }
+            else if (arg1.equals("--use-grid-pattern-for-spot")) {
+                arguments.use_grid_pattern = true;
+            }
+            else if (arg1.equals("--auto-size-spot-diagrams")) {
+                arguments.auto_size_spots = true;
             }
         }
         return arguments;

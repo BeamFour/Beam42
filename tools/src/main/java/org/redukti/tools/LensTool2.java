@@ -248,7 +248,6 @@ public class LensTool2 {
         }
 
         public void doLayoutDiagrams(OpticalBenchDataImporter.LensSpecifications specs,Args arguments) throws Exception {
-            arguments.include_lost_rays = false;
             OpticalSystem system = createSystem(specs,arguments.scenario,arguments.use_glass_types,false,0,arguments.only_d_line);
             if (arguments.dumpSystem) {
                 System.out.println(system);
@@ -268,7 +267,8 @@ public class LensTool2 {
     public static void main(String[] args) throws Exception {
         Args arguments = Args.parseArguments(args);
         if (arguments.specfile == null) {
-            System.err.println("Usage: --specfile inputfile [--scenario num] [--dump-system] [--only-d-line] [-o outfilename] [--dont-use-glass-types]");
+            System.err.println("Usage: --specfile inputfile [--scenario num] [--dump-system] [--only-d-line] [-o outfilename] [--dont-use-glass-types] \\");
+            System.err.println("       [--output-ray-aberration-plots] [--output-wavelength-mtfs] [--use-grid-pattern-for-spot] [--auto-size-spot-diagrams]");
             System.err.println("       --scenario defaults to 0");
             System.err.println("       Output file will be created in the same location as the specfile");
             System.exit(1);
@@ -303,7 +303,7 @@ public class LensTool2 {
 //            buf = new StringBuilder();
             //System.out.println(Trace.list_ray(buf,Trace.trace_ray(opm, Vector2.vector2_0,osp.fov.fields[4],sm.central_wavelength(),new TraceOptions()).pkg,null,null).toString());
 
-            var spotAnalysis = generateSpotDiagrams(opm,arguments,true);
+            var spotAnalysis = generateSpotDiagrams(opm,arguments,!arguments.auto_size_spots);
             generateMTFs(opm,arguments,fields);
             if (arguments.do_ray_aberrations)
                 generateRayAberrationPlots(opm,arguments);

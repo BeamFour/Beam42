@@ -29,18 +29,18 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 19 | -20.3296 | 1.5 | 31.91 | 1.86074 | 23.08 | Hikari | J-SFH2 |
 | 20 | -27.783 | 38.1031 | 33.08 |  |  |  |
 ## Aspherical Data
-| ID  | k   | A4  | A6  | A8  | A10 | A12 | A14 | A16 | A18 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 17 | 0.2118473 | 1.6604838E-5 | 1.467171E-8 | 1.566542E-11 | -6.2829582E-14 | 0.0 | 0.0 | 0.0 | 0.0 |
+| ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 17 | 0.2118473 | 0.0 | 1.6604838E-5 | 1.467171E-8 | 1.566542E-11 | -6.2829582E-14 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
-![Layout Only](./layout.svg)
-![Layout Only](./layout-semi-skew.svg)
-![Layout Only](./layout-skew.svg)
+![Layout Field 0.0](./layout.svg)
+![Layout Field 0.7](./layout-semi-skew.svg)
+![Layout Field 1.0](./layout-skew.svg)
 ## Spot Diagrams
-![Layout Only](./spot.svg)
-![Layout Only](./spot-semi-skew.svg)
-![Layout Only](./spot-skew.svg)
+![Spot Diagram Field 0.0](./spot.svg)
+![Spot Diagram Field 0.7](./spot-semi-skew.svg)
+![Spot Diagram Field 1.0](./spot-skew.svg)
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
@@ -48,18 +48,18 @@ Note that where glass types are shown the refractive index and abbe number is as
 | back_focal_length | 38.09
 | optical_invariant | 7.834
 | object_distance | 1.0E10
-| image_distance | 38.103
+| image_distance | 38.09
 | power | 0.035
 | pp1_H | 49.341
-| ppk_H' | -9.491
+| ppk_H' | 9.491
 | ffl_F | 20.742
 | fno | 1.41
 | enp_dist_P | 30.356
 | enp_radius | 10.142
-| exp_dist_P' | -46.987
+| exp_dist_P' | -47
 | exp_radius | 30.169
 | m | -0
-| red | -3.4965961597653437E8
+| red | -3.496596159765343E8
 | n_obj | 1
 | n_img | 1
 | img_ht | 22.092
@@ -69,9 +69,21 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 11.677 | 44.116|
- | 0.7 | 31.024 | 90.515|
- | 1.0 | 74.43 | 195.864|
+ | Field(x=0.0, y=0.0) | 11.782 | 43.73|
+ | Field(x=0.0, y=0.1) | 11.99 | 73.431|
+ | Field(x=0.0, y=0.2) | 14.825 | 71.796|
+ | Field(x=0.0, y=0.3) | 16.104 | 73.183|
+ | Field(x=0.0, y=0.4) | 15.345 | 57.154|
+ | Field(x=0.0, y=0.5) | 17.143 | 66.898|
+ | Field(x=0.0, y=0.6) | 23.338 | 75.698|
+ | Field(x=0.0, y=0.7) | 31.741 | 91.594|
+ | Field(x=0.0, y=0.8) | 41.347 | 107.935|
+ | Field(x=0.0, y=0.9) | 54.322 | 147.423|
+ | Field(x=0.0, y=1.0) | 72.989 | 205.441|
+## Geometric MTF
+![Geometrical MTF](./mtf.svg)
+* 10,30,50 cycles/mm
+* Black lines represent sagittal, blue tangential
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./US005315441_Example01_a.txt)
 * [Zemax file](./US005315441_Example01_a.zmx)

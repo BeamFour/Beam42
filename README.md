@@ -1,65 +1,46 @@
 # Beam42 Optical Ray Tracer
 
-This project contains three different optical design and analysis software.
+This project is an attempt to create a basic optical analysis software. My interest is mostly in analysing photographic lens designs.
 
-* **BEAM FOUR** 
-* **JFotoptix** - a Java tool derived from [GNU Optical](https://github.com/dibyendumajumdar/goptical).  
+The project combines solutions from following open source projects:
 
-## BEAM FOUR
+* **BEAM FOUR** - incorporates [BeamFour](https://github.com/StellarSoftwareBerkeley/BeamFour), originally written by Late  [Michael Lampton](https://www.ssl.berkeley.edu/~mlampton/).
+* **JFotoptix** - a Java port of [GNU Optical](https://github.com/dibyendumajumdar/goptical).
+* **RayOptics** - a Java port of Michael Hayford's [Ray-Optics](https://github.com/mjhoptics/ray-optics).
 
-This is a fork of the BEAM FOUR Optical Ray Tracer, by www.StellarSoftware.com.
+## Features and Goals
 
-Original author is [Michael Lampton](https://www.ssl.berkeley.edu/~mlampton/).
+**Note: This is work-in-progress**
 
-Copyright (c) M.Lampton, 2003-2020, STELLAR SOFTWARE all rights reserved.
-
-### About BEAM FOUR
-
-From  www.StellarSoftware.com:
-
-There are three kinds of ray tracers out there...
-
-1. Graphical ray tracers make photo-realistic images of computed scenes, using geometrical methods. Beautiful artwork, but that's not us.
-
-2. Illumination ray tracers compute the sum of diffuse and discrete light sources and predict the intensity at any point in an enclosed space. These are non-sequential: you do not have to pre-specify your trace sequence. These are crucial for designing lighting systems; for light guides; for interior illumination; essential for stray light calculations in optical systems; but that's not us either.
-
-3. Optical ray tracing runs geometrical rays through lenses, gratings, irises, mirrors, prisms, etc and evaluates the image that a specified optical system delivers. Bingo!
-
-### Resources
-
-* [Introduction to BeamFour (YouTube)](https://youtu.be/-buXsCqEnq8)
-  
-### Changes / Development Plan
-
-* The original implementation made it difficult to use the ray tracing functions independently of the GUI. I am working on improving the de-coupling of the UI from the ray tracing functions.
-* The implementation assumed that there is a single workspace that a user is working in, and therefore used static data structures - this design is not as friendly to server side use cases where multiple simultaneous workspaces can be in use.
-
-## JFotoptix
-
-This started off as a Java port of [GNU Optical](https://github.com/dibyendumajumdar/goptical), but now has a different set of features
-
-### Features
-
-* Mainly focused on Photo Lenses.
+* Mainly focused on Photographic Lenses.
 * Can import lens specifications in the format supported by [PhotonsToPhotos Optical Bench](https://www.photonstophotos.net/GeneralTopics/Lenses/OpticalBench/OpticalBenchHub.htm).
 * Can export to Zemax, BEAM FOUR, MJH Ray Optics.
 * Features a command line tool that takes in the lens specification and generates following outputs:
-  * Spot diagrams (SVG)
-  * Layout diagrams (SVG)
-  * Spot report
-  * Paraxial report
-  * Zemax file
+    * Spot diagrams (SVG)
+    * Layout diagrams (SVG)
+    * Geometric MTF (SVG)
+    * Ray aberration plots
+    * OPD plots
+    * Paraxial report
+    * Zemax file
 * Features a Levenberg Marquardt Lampton solver based optimizer with following features
-  * Set variables on surface properties
-  * Fit to spot size goals
-  * Constrain by paraxial parameters
-  * This is still **work in progress**.
+    * Set variables on surface properties
+    * Fit to spot size or ray aberration goals
+    * Constrain by paraxial parameters
 
-## RayOptics
+## Examples
 
-This is an ongoing partial port of [MJH RayOptics](https://github.com/mjhoptics/ray-optics).
+* [Reverse Engineered Leica Noctilux M 50mm f1.0](https://github.com/BeamFour/Beam42/blob/main/Examples/jfotoptix/leica-m-noctilux-50mm-f1.0/README.md)
+* [Reverse Engineered Noct Nikkor 58mm f1.2](https://github.com/BeamFour/Beam42/blob/main/Examples/jfotoptix/nikkor-58mm-f1.2/README.md)
+* [Nikkor Z 58mm f0.95S Noct from Patent](https://github.com/BeamFour/Beam42/blob/main/Examples/jfotoptix/nikkor-58mm-z-f0.95/README.md)
+* [Leica R Summicron 50mm f2 from Patent](https://github.com/BeamFour/Beam42/blob/main/Examples/jfotoptix/leica-r-summicron-50mm-f2/README.md)
 
-## Literature
+
+## Resources
+
+* [Introduction to BeamFour (YouTube)](https://youtu.be/-buXsCqEnq8)
+  
+### Literature
 
 * Donald P. Feder, "Optical Calculations with Automatic Computing Machinery," J. Opt. Soc. Am. 41, 630-635 (1951). This short paper provides equations for ray tracing for rotationally symmetric surfaces, including aspherics. Equations are provided in a format suitable for computer programs. Additionally, this paper also covers calculation of image aberrations. Warren J. Smith: Modern Optical Engineering book has a description of the algorithms in this paper. 
 

@@ -1,0 +1,32 @@
+[descriptive data]
+title	Leica Summilux M 50mm f/1.4 ASPH
+[constants]
+[variable distances]
+Focal Length	52
+Angle of View	45.0
+F-Number	1.4
+Image Height	43.2
+d0	Infinity
+Bf	26.256
+Aperture Diameter	25.798
+[lens data]
+1	40.376	5.725	1.73430	37.93	28.19	N-SF10
+2	90.57	0.0		35.49	
+3	26.437	8.7	1.67133	33.05	41.64	J-BASF6
+4	-532.104	2.748	1.79190	31.217	25.55	N-SF11
+5	22.866	5.88		26.4
+6	AS	2.06		25.798
+7	-68.33	2.5187	1.5	25.722	40.0
+8	-155.056	3.05		25.722	
+9	-50.09	3.282	1.5	25.722	40.0
+10	70.145	6.869	1.5	27.63	40.0
+11	-33.546	0.534		27.63	
+12	47.987	6.716	1.5	25.722	40.0
+13	-42.666	5.037	1.5	25.722	40.0
+14	30.645	26.256		26.026	
+[figure]
+source	Data/US004123144_Figure02P.png
+originX	29
+originY	186.2
+ppmm	8.412
+[notes]

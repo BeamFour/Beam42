@@ -22,14 +22,14 @@ Note that where glass types are shown the refractive index and abbe number is as
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 7 | -3.597218355277422 | 0.0 | 6.661312905859716E-6 | -2.516750911152532E-7 | 7.694444188966551E-10 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
 ## Layouts
-![Layout Only](./layoutonly.svg)
-![Layout Field 0.0](./layout.svg)
-![Layout Field 0.7](./layout-semi-skew.svg)
-![Layout Field 1.0](./layout-skew.svg)
+![Layout Only](layoutonly.svg)
+![Layout Field 0.0](layout.svg)
+![Layout Field 0.7](layout-semi-skew.svg)
+![Layout Field 1.0](layout-skew.svg)
 ## Spot Diagrams
-![Spot Diagram Field 0.0](./spot.svg)
-![Spot Diagram Field 0.7](./spot-semi-skew.svg)
-![Spot Diagram Field 1.0](./spot-skew.svg)
+![Spot Diagram Field 0.0](spot.svg)
+![Spot Diagram Field 0.7](spot-semi-skew.svg)
+![Spot Diagram Field 1.0](spot-skew.svg)
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
@@ -70,9 +70,9 @@ Note that where glass types are shown the refractive index and abbe number is as
  | Field(x=0.0, y=0.9) | 223.896 | 724.957|
  | Field(x=0.0, y=1.0) | 242.725 | 639.274|
 ## Geometric MTF
-![Geometrical MTF](./mtf.svg)
+![Geometrical MTF](mtf.svg)
 * 10,30,50 cycles/mm
 * Black lines represent sagittal, blue tangential
 ## Resources
-* [OpticalBench Compatible Data File, tab delimited](./specs.txt)
-* [Zemax file](./specs.zmx)
+* [OpticalBench Compatible Data File, tab delimited](specs.txt)
+* [Zemax file](specs.zmx)

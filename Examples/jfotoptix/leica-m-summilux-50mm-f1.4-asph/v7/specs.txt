@@ -1,0 +1,52 @@
+[descriptive data]
+title	Leica Summilux M 50mm f/1.4 ASPH
+[constants]
+[variable distances]
+Focal Length	52
+Angle of View	45.0
+F-Number	1.4
+Image Height	43.2
+d0	Infinity
+Bf	26.256
+Aperture Diameter	25.798
+[lens data]
+1	45.527	5.419	2.0033	37.86	28.27	S-LAH79
+2	94.469	0.229		36.25
+3	25.619	7.86	1.497	33.2	81.55	S-FPL51
+4	-451.4844	3.13	1.755	33.2	52.32	S-LAH97
+5	22.769	5.724		26.56
+6	AS	2.06		26.1
+7	-83.844	2.67	1.59201	25.722	67.02	M-PCD51
+8	-180.816	3.05		25.722
+9	-46.063	3.13	1.64769	25.722	33.78	S-TIM22
+10	79.183	6.793	1.816	27.7	46.62	S-LAH59
+11	-37.255	0.382		27.7
+12	45.795	6.564	1.883	25.645	40.77	S-LAH58
+13	-44.038	4.961	1.62588	25.645	35.7	S-TIM1
+14	30.437	25.722		26.256
+[aspherical data]
+7	-83.844	0	0	0	0
+[figure]
+source	Data/US004123144_Figure02P.png
+originX	29
+originY	186.2
+ppmm	8.412
+[notes]
+L1=mid range of refractive index
+L2/L3=low dispersion
+
+N-SF10,S-FPL51,N-PK51,LAFN21,S-TIM22,S-LAH59,S-LAH59,S-TIH6
+
+N-LAF21,S-FPL51,N-SF10,N-LAF21,S-TIM22,S-LAH58,S-LAH58,S-TIH6
+4th Q-LASFH11S
+
+S-LAH58 = 77
+
+S-FPL51,S-LAH97 = -97
+N-FK51,N-LAK28,26.61 = -97
+
+S-TIM22
+S-LAH59 = 68
+
+S-LAH58
+S-TIM1 = 154

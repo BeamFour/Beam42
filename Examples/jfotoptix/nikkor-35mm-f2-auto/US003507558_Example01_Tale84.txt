@@ -1,0 +1,46 @@
+[descriptive data]
+title	Nikon AI Nikkor 35mm f/2S (US 3,507,558 Example 1)
+[constants]
+Scaled	36	1
+[variable distances]
+Focal Length	36
+Angle of View	62
+F-Number	2
+Image Height	43.2
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf	40.8132
+Aperture Diameter	17.946
+[lens data]
+1	115.621	3.8999	1.71300	46.58	53.9
+2	Infinity	0.1001		46.58
+3	50.000	2.2000	1.51680	39.20	64.2
+4	17.201	11.2000		29.08
+5	32.202	8.2001	1.66755	26.08	41.9
+6	-55.001	10.5001	1.51454	19.72	54.6
+7	33.998	2.0132		18.23
+7AS	AS	3.2867		17.946
+8	-21.571	1.0001	1.78470	18.57	26.1
+9	38.790	6.9998	1.74443	23.56	49.4
+10	-25.819	0.1001		23.56
+11	-110.002	2.9999	1.76684	23.52	46.2
+12	-38.488	0.1001		23.52
+13	130.000	2.4998	1.74400	26.52	44.9
+14	-79.049	Bf		26.52
+[figure]
+source	Data/US003507558_Figure01.png
+originX	72
+originY	567
+ppmm	17.666
+[figure]
+source	Data/US003507558_Figure01P.png
+originX	108.15
+originY	437.93
+ppmm	12.138
+[figure]
+source	Data/US003507558_Example01_Tale84-Fig1.png
+originX	25.88
+originY	311.33
+ppmm	12.599
+[notes]

@@ -1,3 +1,8 @@
+# Leica APO-Summicron-M 35mm f/2 Asph
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US2022006617 | EX 1 | 2018 |     Stefan Roth,Kathrin Keller | Leica Camera AG | [link](https://patents.google.com/patent/US20220066176A1/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

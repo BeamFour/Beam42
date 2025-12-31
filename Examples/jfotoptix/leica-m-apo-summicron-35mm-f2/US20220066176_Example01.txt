@@ -1,7 +1,7 @@
 [descriptive data]
 title	US 2022/0066176 Example 1 (Leica APO-Summicron-M 35mm f/2 Asph)
 #patent	country	number	example	year	inventors	org	link
-patent	US	US2022006617	EX 1	2018	    Stefan Roth,Kathrin Keller	Leica Camera AG	https://patents.google.com/patent/US20220066176A1/en
+patent	US	US12181644B2	EX 1	2018	    Stefan Roth,Kathrin Keller	Leica Camera AG	https://patents.google.com/patent/US12181644B2/en
 lens name	Leica APO-Summicron-M 35mm f/2 Asph
 [constants]
 Scaled	35	1

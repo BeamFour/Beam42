@@ -477,6 +477,7 @@ public class Prescription {
         sb.append("F-Number\t").append(_fno).append("\n");
         sb.append("Image Height\t").append(_diameter_image_circle).append("\n");
         sb.append("Magnification\t0\n");
+        sb.append("Bf\t").append(_surface_list.get(_surface_list.size()-1)._thickness).append("\n");
         sb.append("[lens data]\n");
         for (SurfaceType surface : _surface_list) {
             surface.toOptBenchStr(sb);
@@ -485,6 +486,8 @@ public class Prescription {
         for (SurfaceType surface : _surface_list) {
             surface.asphericsToOptBenchStr(sb);
         }
+        sb.append("[notes]\n");
+        sb.append("angle of view = ").append(fullAngleOfViewDegrees(1.0)).append("\n");
         return sb;
     }
     public StringBuilder toMarkdownStr(StringBuilder sb) {

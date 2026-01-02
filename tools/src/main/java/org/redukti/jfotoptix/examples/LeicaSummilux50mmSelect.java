@@ -19,9 +19,10 @@ import org.redukti.rayoptics.seq.Glass;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 // Takes too long to run for more than about 22 glasses (that takes 2 hrs as well)
-public class LeicaSummilux50mmSelect2 {
+public class LeicaSummilux50mmSelect {
 
     static final class GlassType {
         final String name;
@@ -121,21 +122,20 @@ public class LeicaSummilux50mmSelect2 {
     }
 
 
-    private static OpticalSystem.Builder buildSystem(GlassType[] glassTypes, boolean addPointSource, double field) {
+    private static OpticalSystem.Builder buildSystem(GlassType[] glassTypes, boolean addPointSource, boolean skew) {
         OpticalSystem.Builder sys = new OpticalSystem.Builder();
         double imageHeight = 43.28;
         double angleOfView = 45.0 / 2.0;
         double fNum = 1.4;
         if (addPointSource) {
             Vector3 direction = Vector3.vector3_001;
-            if (field != 0.0) {
+            if (skew) {
                 // Construct unit vector at an angle
                 //      double z1 = cos (angleOfView);
                 //      double y1 = sin (angleOfView);
                 //      unit_vector = math::Vector3 (0, y1, z1);
-                double effectiveAngle = 45.0 * field;
-                double aov = Math.toRadians(effectiveAngle) / 2.0;
-                Matrix3 r = Matrix3.get_rotation_matrix(0, aov);
+
+                Matrix3 r = Matrix3.get_rotation_matrix(0, angleOfView);
                 direction = r.multiply(direction);
             }
             PointSource.Builder ps = new PointSource.Builder(PointSource.SourceInfinityMode.SourceAtInfinity, direction)
@@ -169,126 +169,6 @@ public class LeicaSummilux50mmSelect2 {
         sys.half_angle_of_view_in_degrees(angleOfView);
         sys.f_number(fNum);
         return sys;
-    }
-
-    static GlassType[] getGlassTypes(int surface) {
-        switch (surface) {
-            case 0:
-                return new GlassType[]{
-                        new GlassType("TAFD65",2.0509,26.94),
-//                        new GlassType("S-LAH58", 1.883, 40.77),
-//                        new GlassType("S-LAH99", 2.001, 29.14),
-//                        new GlassType("N-LASF55",1.9538,30.56),
-//                        new GlassType("J-LASFH9A",1.90265,35.77),
-//                        new GlassType("N-LASF46B",1.90366,31.32),
-                };
-            case 5:
-            case 6:
-                return new GlassType[]{
-                        new GlassType("TAFD65",2.0509,26.94),
-                        new GlassType("S-LAH99", 2.001, 29.14),
-                        new GlassType("S-LAH58", 1.883, 40.77),
-                        new GlassType("S-LAH79", 2.0033, 28.27),
-                        new GlassType("S-LAH59", 1.816, 46.62),
-                        new GlassType("L-LAH85", 1.854, 40.39),
-                        new GlassType("S-TIH6", 1.80518, 25.43),
-                        new GlassType("S-LAH64",1.788,47.37),
-                        new GlassType("S-LAH66", 1.7725, 49.6),
-                        new GlassType("S-LAH65", 1.804, 46.57),
-                        new GlassType("S-LAH60", 1.834, 37.16),
-                        new GlassType("S-TIH53", 1.84666, 23.78),
-                        new GlassType("J-LASFH9A",1.90265,35.77),
-                        new GlassType("N-LAF33",1.78582,44.05),
-                        new GlassType("J-LAK9",1.691,54.93),
-                        new GlassType("N-LAK10",1.72003,50.62),
-                        new GlassType("N-LAK28",1.74429,50.77),
-                        new GlassType("N-LAF2",1.74397,44.85),
-                        new GlassType("N-LAF7",1.7495,34.82),
-                        new GlassType("N-LAK33B",1.755,52.3),
-                        new GlassType("N-LAK34",1.72916,54.5),
-                        new GlassType("N-LAK8",1.713,53.83),
-                        new GlassType("N-LASF40",1.83404,37.3),
-                        new GlassType("N-LASF41",1.83501,43.13),
-                        new GlassType("N-LASF55",1.9538,30.56),
-                        new GlassType("N-LASF9",1.85025,32.17)
-                };
-            case 1:
-                return new GlassType[]{
-//                        new GlassType("S-FPL51", 1.497, 81.55),
-//                        new GlassType("N-FK51", 1.48656, 84.47),
-//                        new GlassType("FCD515", 1.59282, 68.62),
-                        new GlassType("FCD705", 1.55032, 75.5),
-//                        new GlassType("FCD100", 1.437, 95.1),
-//                        new GlassType("N-FK58",1.456,90.9),
-                };
-            case 2:
-                return new GlassType[]{
-                        //new GlassType("NBFD26",1.83401,25.97),
-//                        new GlassType("N-SF6",1.80518,25.36),
-//                        new GlassType("N-SF11", 1.78472, 25.68),
-//                        new GlassType("N-SF4",1.75513,27.38),
-//                        new GlassType("N-SF14",1.76182,26.53),
-//                        new GlassType("N-SF10", 1.72828, 28.53),
-//                        new GlassType("N-SF1",1.71736,29.62),
-//                        new GlassType("S-LAH97",1.755,52.32),
-//                        new GlassType("S-LAH64",1.788,47.37),
-//                        new GlassType("S-LAH66", 1.7725, 49.6),
-//                        new GlassType("S-TIM22", 1.64769, 33.78),
-//                        new GlassType("S-TIM2", 1.62004, 29.57),
-//                        new GlassType("S-TIM1", 1.62588, 35.7),
-//                        new GlassType("N-SF2",1.64769,33.82),
-//                        new GlassType("N-SF5",1.67271,32.25),
-                        new GlassType("N-SF57",1.84666,23.78),
-//                        new GlassType("N-SF15",1.69892,30.2),
-//                        new GlassType("J-LAK9",1.691,54.93),
-//                        new GlassType("S-BAL42", 1.58313, 59.37),
-//                        new GlassType("S-TIH6", 1.80518, 25.43),
-//                        new GlassType("S-PHM53", 1.603, 65.44),
-//                        new GlassType("N-KZFS2",1.55836,54.01),
-//                        new GlassType("N-KZFS4",1.61336,44.49),
-//                        new GlassType("N-KZFS5",1.65412,39.7),
-//                        new GlassType("N-KZFS8",1.72047,34.7),
-//                        new GlassType("J-SF2",1.64769,33.72),
-                };
-            case 3:
-                return new GlassType[]{
-//                        new GlassType("M-FCD500",1.55332,71.68),
-//                        new GlassType("M-PCD4",1.61881,63.86),
-//                        new GlassType("M-BACD12",1.58313,59.46),
-//                        new GlassType("M-PCD51",1.59201,67.02),
-//                        new GlassType("M-BACD5N",1.58913,61.25),
-                        new GlassType("M-BACD15",1.62263,58.16),
-//                        new GlassType("M-LAC130",1.6935,53.2),
-//                        new GlassType("M-LAC14",1.6968,55.46),
-//                        new GlassType("M-TAC60",1.75501,51.16),
-//                        new GlassType("M-TAC80",1.72903,54.04),
-//                        new GlassType("M-TAF101",1.76802,49.24),
-//                        new GlassType("M-TAF401",1.77377,47.17),
-//                        new GlassType("M-TAF105",1.7725,49.5),
-//                        new GlassType("M-LAC8",1.713,53.94),
-//                        new GlassType("M-NBF1",1.7433,49.33),
-//                        new GlassType("M-FD80",1.68893,31.16)
-                };
-            case 4:
-            case 7:
-                return new GlassType[]{
-                        new GlassType("S-TIM22", 1.64769, 33.78),
-                        new GlassType("S-TIM1", 1.62588, 35.7),
-                        new GlassType("S-TIM2", 1.62004, 29.57),
-                        new GlassType("S-TIM3",1.61293,37.01),
-                        new GlassType("S-TIM5",1.60342,38.03),
-                        new GlassType("S-TIM6",1.63636,35.39),
-                        new GlassType("S-TIM8",1.59551,39.24),
-                        new GlassType("J-LAK9",1.691,54.93),
-                        new GlassType("S-NBH5", 1.65412, 39.68),
-                        new GlassType("N-KZFS2",1.55836,54.01),
-                        new GlassType("N-KZFS4",1.61336,44.49),
-                        new GlassType("N-KZFS5",1.65412,39.7),
-                        new GlassType("N-KZFS8",1.72047,34.7),
-                        new GlassType("N-SK4",1.61272,58.63),
-                };
-        }
-        throw new IllegalArgumentException();
     }
 
     static GlassType[] getGlassTypes() {
@@ -327,41 +207,48 @@ public class LeicaSummilux50mmSelect2 {
 
     static final class ProcessSystems implements Runnable {
 
-        GlassType[][] glassTypes;
+        int start;
+        int end;
+        GlassType[] glassTypes;
+        AtomicLong count;
 
-        public ProcessSystems(GlassType[][] glassTypes) {
+        public ProcessSystems(int start, int end, GlassType[] glassTypes, AtomicLong count) {
+            this.start = start;
+            this.end = end;
             this.glassTypes = glassTypes;
+            this.count = count;
         }
 
         public void run() {
             var glasses = new GlassType[8];
             double bestRMS = 999.00;
             String bestData = null;
-            for (int a = 0; a < glassTypes[0].length; a++) {
-                glasses[0] = glassTypes[0][a];
-                for (int b = 0; b < glassTypes[1].length; b++) {
-                    glasses[1] = glassTypes[1][b];
-                    for (int c = 0; c < glassTypes[2].length; c++) {
-                        glasses[2] = glassTypes[2][c];
-                        for (int d = 0; d < glassTypes[3].length; d++) {
-                            glasses[3] = glassTypes[3][d];
-                            for (int e = 0; e < glassTypes[4].length; e++) {
-                                glasses[4] = glassTypes[4][e];
-                                for (int f = 0; f < glassTypes[5].length; f++) {
-                                    glasses[5] = glassTypes[5][f];
-                                    for (int g = 0; g < glassTypes[6].length; g++) {
-                                        glasses[6] = glassTypes[6][g];
-                                        for (int h = 0; h < glassTypes[7].length; h++) {
-                                            glasses[7] = glassTypes[7][h];
-                                            var system = buildSystem(glasses, false, 0.0).build();
+            for (int a = start; a < end; a++) {
+                glasses[0] = glassTypes[a];
+                for (int b = 0; b < glassTypes.length; b++) {
+                    glasses[1] = glassTypes[b];
+                    for (int c = 0; c < glassTypes.length; c++) {
+                        glasses[2] = glassTypes[c];
+                        for (int d = 0; d < glassTypes.length; d++) {
+                            glasses[3] = glassTypes[d];
+                            for (int e = 0; e < glassTypes.length; e++) {
+                                glasses[4] = glassTypes[e];
+                                for (int f = 0; f < glassTypes.length; f++) {
+                                    glasses[5] = glassTypes[f];
+                                    for (int g = 0; g < glassTypes.length; g++) {
+                                        glasses[6] = glassTypes[g];
+                                        for (int h = 0; h < glassTypes.length; h++) {
+                                            glasses[7] = glassTypes[h];
+                                            var system = buildSystem(glasses, false, false).build();
                                             //System.out.println(system);
+                                            count.incrementAndGet();
                                             try {
                                                 var parax = ParaxialFirstOrderInfo.compute(system);
                                                 // Expected H' ppk = 37.5 from front-surface, 20.2 from last surface
                                                 // Expected H pp1 = 51.8
                                                 // expected H - H1 = 14.3
 
-                                                if (parax.effective_focal_length > 51.0 && parax.effective_focal_length < 52.0
+                                                if (parax.effective_focal_length > 51.0 && parax.effective_focal_length < 52.5
                                                         && parax.back_focal_length > 24.0 && parax.back_focal_length < 27.0) {
 
 //                                                    var sb1 = new StringBuilder();
@@ -369,15 +256,10 @@ public class LeicaSummilux50mmSelect2 {
 //                                                            .append(parax.back_focal_length).append("\t")
 //                                                            .append(parax.fno).append("\t");
                                                     //System.out.println(sb1);
-                                                    var system2 = buildSystem(glasses, true, 0.0).build();
-                                                    var spotAnalysis = new AnalysisSpot(system2, 30);
-                                                    try {
-                                                        spotAnalysis.process_analysis();
-                                                    }
-                                                    catch (Exception ign) {
-                                                        continue;
-                                                    }
-                                                    if (spotAnalysis.get_rms_radius() < 850.0) {
+                                                    var system2 = buildSystem(glasses, true, false).build();
+                                                    var spotAnalysis = new AnalysisSpot(system2, 10);
+                                                    spotAnalysis.process_analysis();
+                                                    if (spotAnalysis.get_rms_radius() < 2000.0) {
                                                         StringBuilder sb = new StringBuilder();
                                                         sb.append(spotAnalysis.get_rms_radius()).append("\t");
                                                         sb.append(parax.effective_focal_length).append("\t")
@@ -410,17 +292,32 @@ public class LeicaSummilux50mmSelect2 {
 
     public static void main(String[] args) throws Exception {
 
-        GlassType[][] glassTypes = new GlassType[][]{
-                getGlassTypes(0),
-                getGlassTypes(1),
-                getGlassTypes(2),
-                getGlassTypes(3),
-                getGlassTypes(4),
-                getGlassTypes(5),
-                getGlassTypes(6),
-                getGlassTypes(7),
-        };
-        var p = new ProcessSystems(glassTypes);
-        p.run();
+        var glassTypes = getGlassTypes();
+        System.out.println("Trying " + glassTypes.length + " glass types");
+
+        AtomicLong count = new AtomicLong();
+        int numThreads = glassTypes.length;
+        Thread[] threads = new Thread[numThreads];
+        int perThreadGlassCount = 1; //  (int) Math.round((double) glassTypes.length / (double) numThreads);
+        int start = 0;
+        for (int g = 0; g < numThreads; g++) {
+            int end = start + perThreadGlassCount;
+            if (start >= glassTypes.length) {
+                break;
+            }
+            if (end >= glassTypes.length) {
+                end = glassTypes.length;
+            }
+            System.out.println("Allocating " + start + " to " + end);
+            threads[g] = new Thread(new ProcessSystems(start, end, glassTypes, count));
+            start += perThreadGlassCount;
+            threads[g].start();
+        }
+
+        for (Thread thread : threads) {
+            if (thread != null)
+                thread.join();
+        }
+        System.out.println("Processed " + count + " systems");
     }
 }

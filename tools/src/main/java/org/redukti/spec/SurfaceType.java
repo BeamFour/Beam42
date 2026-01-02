@@ -99,14 +99,24 @@ public class SurfaceType {
         else
             sb.append(_radius);
         sb.append("\t").append(_thickness).append("\t");
-        if (_nd != 0.0)
-            sb.append(_nd);
+        GlassMap glass = null;
+        double nd = _nd;
+        double vd = _vd;
+        if (nd != 0.0 && _glass_name != null) {
+            glass = GlassMap.glassByName(_glass_name);
+            if (glass != null) {
+                nd = glass.nd;
+                vd = glass.vd;
+            }
+        }
+        if (nd != 0.0)
+            sb.append(nd);
         sb.append("\t");
         sb.append(_diameter).append("\t");
-        if (_nd != 0.0)
-            sb.append(_vd);
+        if (nd != 0.0)
+            sb.append(vd);
         sb.append("\t");
-        if (_nd != 0.0 && _glass_name != null)
+        if (glass != null)
             sb.append(_glass_name);
         sb.append("\n");
         return sb;

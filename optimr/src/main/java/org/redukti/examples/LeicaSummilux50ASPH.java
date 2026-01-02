@@ -18,7 +18,8 @@ public class LeicaSummilux50ASPH {
 
     public static void main(String[] args) throws Exception {
         var prescription = getPrescription(args[0]);
-        var analysis = new Analysis(prescription, new double[]{0.0,0.1,0.3,0.5,0.7,1.0});
+        prescription._generate_d_line_only = true;
+        var analysis = new Analysis(prescription, new double[]{0.0,0.25,0.75,1.0},new int[]{10,30});
         var f = new MeritFunction(analysis,
                 new Var[] {
                      new VarRadius(prescription, 6),
@@ -27,8 +28,8 @@ public class LeicaSummilux50ASPH {
                      new VarAsphCoeff(prescription,6,2,1E9),
                      new VarAsphCoeff(prescription,6,3,1E11),
                      new VarAsphCoeff(prescription,6,4,1E14),
-                        new VarAsphCoeff(prescription,6,5,1E16),
-                        new VarAsphCoeff(prescription,6,6,1E19),
+//                        new VarAsphCoeff(prescription,6,5,1E16),
+//                        new VarAsphCoeff(prescription,6,6,1E19),
                      new VarRadius(prescription, 7),
                      new VarRadius(prescription, 0),
                      new VarRadius(prescription, 1),
@@ -42,23 +43,39 @@ public class LeicaSummilux50ASPH {
                     new VarRadius(prescription, 12),
                     new VarRadius(prescription, 13),
 //                     new VarThickness(prescription, 13)
-                     //new VarThickness(prescription, 13)
+//                     new VarThickness(prescription, 13)
                 },
                 new Goal[] {
-                        new GoalSpotRMS(analysis, 1, 40.0, 3.0),
-                        new GoalSpotRMS(analysis, 2, 40.0, 1.0),
-                        new GoalSpotRMS(analysis, 3, 50.0, 1.0),
-                        new GoalSpotRMS(analysis, 4, 60.0, 1.0),
-                        new GoalSpotRMS(analysis, 5, 70.0, 1.0),
-                        new GoalSpotRMS(analysis, 6, 200.0, 1.0),
-                        new GoalSpotMaxRadius(analysis, 1, 60.0, 1.0),
-                        new GoalSpotMaxRadius(analysis, 2, 80.0, 1.0),
-                        new GoalSpotMaxRadius(analysis, 3, 100.0, 1.0),
-                        new GoalSpotMaxRadius(analysis, 4, 120.0, 1.0),
-                        new GoalSpotMaxRadius(analysis, 5, 140.0, 1.0),
-                        new GoalSpotMaxRadius(analysis, 6, 500.0, 1.0),
+//                        new GoalSpotRMS(analysis, 1, 40.0, 5.0),
+//                        new GoalSpotRMS(analysis, 2, 40.0, 2.0),
+//                        new GoalSpotRMS(analysis, 3, 50.0, 2.0),
+//                        new GoalSpotRMS(analysis, 4, 60.0, 2.0),
+//                        new GoalSpotRMS(analysis, 5, 70.0, 3.0),
+//                        new GoalSpotRMS(analysis, 6, 200.0, 1.0),
+//                        new GoalSpotMaxRadius(analysis, 1, 60.0, 1.0),
+//                        new GoalSpotMaxRadius(analysis, 2, 80.0, 1.0),
+//                        new GoalSpotMaxRadius(analysis, 3, 100.0, 1.0),
+//                        new GoalSpotMaxRadius(analysis, 4, 120.0, 1.0),
+//                        new GoalSpotMaxRadius(analysis, 5, 140.0, 1.0),
+//                        new GoalSpotMaxRadius(analysis, 6, 500.0, 1.0),
+                        new GeoMTF(analysis,1,0,10,0.7,2.0),
+                        new GeoMTF(analysis,1,1,10,0.7,2.0),
+                        new GeoMTF(analysis,2,0,10,0.5,1.0),
+                        new GeoMTF(analysis,2,1,10,0.5,1.0),
+                        new GeoMTF(analysis,3,0,10,0.6,1.0),
+                        new GeoMTF(analysis,3,1,10,0.6,1.0),
+                        new GeoMTF(analysis,4,0,10,0.2,1.0),
+                        new GeoMTF(analysis,4,1,10,0.2,1.0),
 
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,52.0, 1.0),
+                        new GeoMTF(analysis,1,0,30,0.5,2.0),
+                        new GeoMTF(analysis,1,1,30,0.5,2.0),
+                        new GeoMTF(analysis,2,0,30,0.4,1.0),
+                        new GeoMTF(analysis,2,1,30,0.4,1.0),
+                        new GeoMTF(analysis,3,0,30,0.5,1.0),
+                        new GeoMTF(analysis,3,1,30,0.5,1.0),
+                        new GeoMTF(analysis,4,0,30,0.1,1.0),
+                        new GeoMTF(analysis,4,1,30,0.1,1.0),
+                      new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,52.0, 2.0),
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Fno, 1.4, 1.0),
                       //new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 26.256, 1.0),
                       //new GoalParax(analysis, ParaxialFirstOrderInfo.Pp1, 51.8, 1.0),

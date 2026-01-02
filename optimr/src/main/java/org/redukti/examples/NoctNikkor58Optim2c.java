@@ -33,7 +33,7 @@ public class NoctNikkor58Optim2c {
 
     public static void main(String[] args) {
         var prescription = getPrescription();
-        var analysis = new Analysis(prescription, new double[]{0.0,0.1,0.3,0.5,0.7,1.0});
+        var analysis = new Analysis(prescription, new double[]{0.0,0.1,0.3,0.5,0.7,1.0},new int[]{30});
         var f = new MeritFunction(analysis,
                 new Var[] {
                      new VarRadius(prescription, 0),

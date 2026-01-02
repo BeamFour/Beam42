@@ -3,15 +3,16 @@ package org.redukti.optim;
 import org.redukti.rayoptics.util.Lists;
 
 /**
- * Ray aberration for a field / xy / pos / wvl.
+ * MTF proxy for a field / xy / pos / wvl.
+ * Based on Kidger paper.
  */
-public class GoalMTF extends Goal {
+public class GoalMTFProxy extends Goal {
     public final int field;
     public final int xy;
     public final int pos;
     public final double wvl;
     public final double freq;
-    public GoalMTF(Analysis analysis, int field, int xy, int pos, double wvl, double freq, double target, double weight) {
+    public GoalMTFProxy(Analysis analysis, int field, int xy, int pos, double wvl, double freq, double target, double weight) {
         super(analysis,target,weight);
         this.field = field-1;
         this.xy = xy;

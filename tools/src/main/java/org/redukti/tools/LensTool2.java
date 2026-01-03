@@ -169,7 +169,10 @@ public class LensTool2 {
         for (var freq: freqs)
             mtfResults.add(new MTFResultByFreq(mtfs,freq));
         var mtffile = Helper.getOutputPath(arguments.specfile,"mtf.svg",arguments.outdir);
-        Helper.createOutputFile(mtffile,new GeoMTFByFieldPlot(mtfResults).plot(fields));
+        var plot = new GeoMTFByFieldPlot(mtfResults,fields);
+        Helper.createOutputFile(mtffile,plot.plot());
+        var mtfdata = Helper.getOutputPath(arguments.specfile,"mtf.csv",arguments.outdir);
+        Helper.createOutputFile(mtfdata,plot.toString());
     }
 
     private static void generateRayAberrationPlots(OpticalModel opm, Args arguments) throws Exception {

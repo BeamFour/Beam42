@@ -1,12 +1,9 @@
 package org.redukti.optim;
 
-
 import org.redukti.rayoptics.analysis.*;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.TraceOptions;
 import org.redukti.spec.Prescription;
-
-import java.util.ArrayList;
 
 public class Analysis {
 

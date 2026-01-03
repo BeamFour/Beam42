@@ -1,0 +1,37 @@
+[descriptive data]
+title	US 2022/0066176 Example 1 (Leica APO-Summicron-M 35mm f/2 Asph)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US12181644B2	EX 1	2018	    Stefan Roth,Kathrin Keller	Leica Camera AG	https://patents.google.com/patent/US12181644B2/en
+lens name	Leica APO-Summicron-M 35mm f/2 Asph
+[constants]
+Scaled	35	1
+[variable distances]
+Focal Length	1
+Angle of View	62.2
+F-Number	2
+Image Height	1.2343
+Magnification	0
+d0	Infinity
+Bf	0.36
+[lens data]
+1	1.546	0.17	1.855	0.696	40	M-TAFD305	Hoya	L-LAH85V	Ohara
+2	-0.628	0.03	1.658	0.6674	39	S-NBH5	Ohara	N-KZFS5	Schott
+3	0.742	0.10		0.5014
+4	-0.790	0.06	1.658	0.468	39	S-NBH5	Ohara	N-KZFS5	Schott
+5	0.648	0.13	1.888	0.516	41	S-LAH58	Ohara
+6	-1.081	0.04		0.516
+7	AS	0.04		0.5034
+8	5.209	0.19	1.498	0.5014	81	FPL51	Ohara
+9	-0.876	0.03	1.658	0.5014	39	S-NBH5	Ohara	N-KZFS5	Schott
+10	0.641	0.15	1.498	0.5294	81	FPL51	Ohara
+11	-0.809	0.01		0.5411
+12	0.802	0.22	1.855	0.6677	40	M-TAFD305	Hoya	L-LAH85V	Ohara
+13	-0.616	0.03	1.658	0.6677	39	S-NBH5	Ohara	N-KZFS5	Schott
+14	0.653	0.19		0.6371
+15	-1.490	0.03	1.583	0.6651	59	L-BAL42	Ohara	Q-SK12S	Hikari
+16	-6.742	Bf		0.6931
+[aspherical data]
+1	1.546	0	0.1569E-4	-0.182035E+1	0.2404E-10
+12	0.802	0	0.1111E-5	-0.524051E+0	0.4762E-10
+15	-1.490	0	0.9390E-4	0.357335E+2	0.9081E-9	0.169936E+2	0.7799E-15
+16	-6.742	0	0.6674E-4	0.366574E+2	0.1080E-8

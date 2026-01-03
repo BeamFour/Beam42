@@ -155,7 +155,7 @@ public class LensTool2 {
                 var mtf = new MonochromaticGeometricMTF(intercepts);
                 if (polyMtfForField == null)
                     polyMtfForField = new PolyMTF(mtf.mtf.fft_size,mtf.h2d.pixel_size);
-                polyMtfForField.add(mtf.mtf, intercepts.wvl == 587.5618 ? 1.0: 0.5);
+                polyMtfForField.add(mtf.mtf, 1.0);
                 if (arguments.do_mono_chrome_mtfs)
                     Helper.createOutputFile(output_file,new GeoMTFPlot(spotFld.fld,mtf).plot());
             }

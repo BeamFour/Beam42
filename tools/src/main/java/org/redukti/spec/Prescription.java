@@ -381,9 +381,10 @@ public class Prescription {
                 new WvlWt(587.5618, 1.0)}, 0);
         }
         else {
-            osp.wvls = new WvlSpec(new WvlWt[]{new WvlWt(486.1327, 0.5),
+            osp.wvls = new WvlSpec(new WvlWt[]{
+                new WvlWt(486.1327, 1.0),
                 new WvlWt(587.5618, 1.0),
-                new WvlWt(656.2725, 0.5)}, 1);
+                new WvlWt(656.2725, 1.0)}, 1);
         }
         opm.system_spec.title = _title;
         opm.system_spec.dimensions = "mm";

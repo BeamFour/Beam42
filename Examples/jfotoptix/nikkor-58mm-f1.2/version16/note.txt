@@ -134,7 +134,7 @@ GeoMTF field=4, xy=1, freq=10, target=0.25, weight=1.0, value=0.2754785747803994
 GeoMTF field=1, xy=0, freq=30, target=0.4, weight=1.0, value=0.37361120533571446}
 GeoMTF field=1, xy=1, freq=30, target=0.4, weight=1.0, value=0.37391117329479134}
 GeoMTF field=2, xy=0, freq=30, target=0.35, weight=1.0, value=0.3601112507271525}
-GeoMTF field=2, xy=1, freq=30, target=0.35, weight=1.0, value=0.18870636611040087}
+GeoMTF field=2, xy=1, freq=30, target=0.35, weight=1.0, value=0.18870636611040087}	- problem
 GeoMTF field=3, xy=0, freq=30, target=0.3, weight=1.0, value=0.1421500080737443}
 GeoMTF field=3, xy=1, freq=30, target=0.2, weight=1.0, value=0.15245610203853344}
 GeoMTF field=4, xy=0, freq=30, target=0.2, weight=1.0, value=0.0823653236926936}

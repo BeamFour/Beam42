@@ -13,7 +13,7 @@ public class Analysis {
     public Prescription prescription;
     public double[] fields;
     public double[] pfo;
-    public SpotAnalysisResult.SpotResultsByField[] spots;
+    public SpotAnalysisResult.SpotResultsForField[] spots;
     public RayAberrationResult ray_aberrations;
     public MTFResultByFreq[] mtfs;
     public int[] freqs;
@@ -38,30 +38,9 @@ public class Analysis {
     public void compute() {
         system = prescription.build_ray_optics_model(true,fields,true,true);
         var spotAnalysis = SpotAnalysis.eval(system,new SpotOptions().num_rays(64).use_grid(false));
-        spots = spotAnalysis.spot_results.toArray(new SpotAnalysisResult.SpotResultsByField[0]);
+        spots = spotAnalysis.spot_results.toArray(new SpotAnalysisResult.SpotResultsForField[0]);
         pfo = ParaxHelper.asArray(system.optical_spec.parax_data.fod);
         ray_aberrations = TransverseRayAberrationAnalysis.eval(system,10,new TraceOptions());
-        computeMTFs(spotAnalysis);
-    }
-    private void computeMTFs(SpotAnalysisResult spotAnalysis) {
-        var mtfs = new ArrayList<PolyMTF>();
-        for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
-            var spotFld = spotAnalysis.spot_results.get(i);
-            PolyMTF polyMtfForField = null;
-            for (var intercepts: spotFld.intercepts) {
-                var mtf = new MonochromaticGeometricMTF(intercepts);
-                if (polyMtfForField == null)
-                    polyMtfForField = new PolyMTF(mtf.mtf.fft_size,mtf.h2d.pixel_size);
-                polyMtfForField.add(mtf.mtf, intercepts.wvl == 587.5618 ? 1.0: 0.5);
-            }
-            if (polyMtfForField != null) {
-                polyMtfForField.compute();
-                mtfs.add(polyMtfForField);
-            }
-        }
-        var mtfResults = new ArrayList<MTFResultByFreq>();
-        for (var freq: freqs)
-            mtfResults.add(new MTFResultByFreq(mtfs,freq));
-        this.mtfs = mtfResults.toArray(new MTFResultByFreq[0]);
+        mtfs = spotAnalysis.computeMTFs(freqs);
     }
 }

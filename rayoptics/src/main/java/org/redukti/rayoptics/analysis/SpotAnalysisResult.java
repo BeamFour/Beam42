@@ -11,13 +11,13 @@ import java.util.List;
 public class SpotAnalysisResult {
 
     public final boolean use_centroid;
-    public List<SpotResultsByField> spot_results = new ArrayList<>();
+    public List<SpotResultsForField> spot_results = new ArrayList<>();
 
     public SpotAnalysisResult(boolean use_centroid) {
         this.use_centroid = use_centroid;
     }
 
-    public static class SpotResultsByField {
+    public static class SpotResultsForField {
         public Field fld;
         public Vector3 image_pt;
         public List<TraceGridByWvl> trace_results;
@@ -25,7 +25,7 @@ public class SpotAnalysisResult {
         public double max_radius;
         public double mean_radius;
 
-        public SpotResultsByField(Field fld, List<TraceGridByWvl> trace_results, double ref_wvl, boolean use_centroid) {
+        public SpotResultsForField(Field fld, List<TraceGridByWvl> trace_results, double ref_wvl, boolean use_centroid) {
             this.fld = fld;
             this.image_pt = fld.ref_sphere.image_pt;
             this.trace_results = trace_results;
@@ -78,8 +78,41 @@ public class SpotAnalysisResult {
     }
 
     public SpotAnalysisResult add(Field fld, List<TraceGridByWvl> trace_results, double ref_wvl) {
-        spot_results.add(new SpotResultsByField(fld, trace_results, ref_wvl, use_centroid));
+        spot_results.add(new SpotResultsForField(fld, trace_results, ref_wvl, use_centroid));
         return this;
+    }
+
+    public double[] fields() {
+        // Here we assume that the y component of the field is set
+        double[] fields = new double[spot_results.size()];
+        for (int i = 0; i < spot_results.size(); i++)
+            fields[i] = spot_results.get(i).fld.y;
+        return fields;
+    }
+
+    /**
+     * Compute geometric MTF for given frequencies
+     */
+    public MTFResultByFreq[] computeMTFs(int[] freqs) {
+        var mtfs = new ArrayList<PolyMTF>();
+        for (int i = 0; i < spot_results.size(); i++) {
+            var spotFld = spot_results.get(i);
+            PolyMTF polyMtfForField = null;
+            for (var intercepts: spotFld.intercepts) {
+                var mtf = new MonochromaticGeometricMTF(intercepts);
+                if (polyMtfForField == null)
+                    polyMtfForField = new PolyMTF(mtf.mtf.fft_size,mtf.h2d.pixel_size);
+                polyMtfForField.add(mtf.mtf, intercepts.wvl == 587.5618 ? 1.0: 0.5);
+            }
+            if (polyMtfForField != null) {
+                polyMtfForField.compute();
+                mtfs.add(polyMtfForField);
+            }
+        }
+        var mtfResults = new ArrayList<MTFResultByFreq>();
+        for (var freq: freqs)
+            mtfResults.add(new MTFResultByFreq(mtfs,freq));
+        return mtfResults.toArray(new MTFResultByFreq[0]);
     }
 
     @Override

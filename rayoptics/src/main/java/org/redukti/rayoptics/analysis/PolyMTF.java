@@ -1,7 +1,7 @@
 package org.redukti.rayoptics.analysis;
 
 /**
- * Combines mono chromatic MTFs for a field
+ * Combines monochromatic MTFs for a field
  */
 public class PolyMTF extends BaseMTF {
 

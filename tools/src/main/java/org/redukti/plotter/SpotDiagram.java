@@ -11,9 +11,9 @@ import org.redukti.render.rendering.Rgb;
 
 public class SpotDiagram {
 
-    public final SpotAnalysisResult.SpotResultsByField result;
+    public final SpotAnalysisResult.SpotResultsForField result;
 
-    public SpotDiagram(SpotAnalysisResult.SpotResultsByField result) {
+    public SpotDiagram(SpotAnalysisResult.SpotResultsForField result) {
         this.result = result;
     }
 

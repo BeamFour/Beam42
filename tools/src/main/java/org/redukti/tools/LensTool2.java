@@ -6,7 +6,6 @@ import org.redukti.jfotoptix.layout.SystemLayout2D;
 import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.jfotoptix.model.OpticalSystem;
 import org.redukti.jfotoptix.model.PointSource;
-import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
 import org.redukti.jfotoptix.tracing.RayTraceParameters;
@@ -47,7 +46,7 @@ public class LensTool2 {
         return prescription.build_ray_optics_model(fov_angle,fields,apply_vignetting,use_wideangle_aiming);
     }
 
-    public static void outputSpotAnalysis(SpotAnalysisResult.SpotResultsByField result, Path output_file, Double radius) throws Exception {
+    public static void outputSpotAnalysis(SpotAnalysisResult.SpotResultsForField result, Path output_file, Double radius) throws Exception {
         if (output_file != null) {
             Helper.createOutputFile(output_file, new SpotDiagram(result).plot(radius));
         } else {

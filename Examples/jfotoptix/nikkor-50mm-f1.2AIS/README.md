@@ -24,13 +24,13 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 14 | -259.79 | 39.08 | 36.99 |  |  |  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
-![Layout Only](./layout.svg)
-![Layout Only](./layout-semi-skew.svg)
-![Layout Only](./layout-skew.svg)
+![Layout Field 0.0](./layout.svg)
+![Layout Field 0.7](./layout-semi-skew.svg)
+![Layout Field 1.0](./layout-skew.svg)
 ## Spot Diagrams
-![Layout Only](./spot.svg)
-![Layout Only](./spot-semi-skew.svg)
-![Layout Only](./spot-skew.svg)
+![Spot Diagram Field 0.0](./spot.svg)
+![Spot Diagram Field 0.7](./spot-semi-skew.svg)
+![Spot Diagram Field 1.0](./spot-skew.svg)
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
@@ -41,15 +41,15 @@ Note that where glass types are shown the refractive index and abbe number is as
 | image_distance | 39.08
 | power | 0.019
 | pp1_H | 55.86
-| ppk_H' | 12.52
+| ppk_H' | -12.52
 | ffl_F | 4.26
 | fno | 1.2
 | enp_dist_P | 32.309
 | enp_radius | 21.5
 | exp_dist_P' | -55.844
 | exp_radius | 39.552
-| m | 0
-| red | -1.9379826885676593E8
+| m | -0
+| red | -1.9379826885676596E8
 | n_obj | 1
 | n_img | 1
 | img_ht | 21.903
@@ -59,9 +59,21 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 14.724 | 36.173|
- | 0.7 | 90.599 | 404.094|
- | 1.0 | 113.805 | 482.687|
+ | Field(x=0.0, y=0.0) | 14.998 | 35.825|
+ | Field(x=0.0, y=0.1) | 23.651 | 124.766|
+ | Field(x=0.0, y=0.2) | 35.937 | 131.957|
+ | Field(x=0.0, y=0.3) | 51.031 | 205.007|
+ | Field(x=0.0, y=0.4) | 61.217 | 182.918|
+ | Field(x=0.0, y=0.5) | 70.144 | 224.683|
+ | Field(x=0.0, y=0.6) | 77.7 | 297.591|
+ | Field(x=0.0, y=0.7) | 88.526 | 370.577|
+ | Field(x=0.0, y=0.8) | 98.628 | 422.623|
+ | Field(x=0.0, y=0.9) | 105.121 | 437.751|
+ | Field(x=0.0, y=1.0) | 103.467 | 383.96|
+## Geometric MTF
+![Geometrical MTF](./mtf.svg)
+* 10,30,50 cycles/mm
+* Black lines represent sagittal, blue tangential
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./US003738736_Example01.txt)
 * [Zemax file](./US003738736_Example01.zmx)

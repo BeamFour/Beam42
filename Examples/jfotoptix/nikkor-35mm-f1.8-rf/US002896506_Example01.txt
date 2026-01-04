@@ -1,5 +1,8 @@
 [descriptive data]
 title	Nikon W-Nikkor 3.5cm f/1.8 (US 2,896,506 Example 1)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US2896506	EX 1	1956	Azuma Hideo	Nikon Corp	https://patents.google.com/patent/US2896506A
+lens name	W-Nikkor 3.5cm F1.8
 [constants]
 Scaled	35	1
 [variable distances]

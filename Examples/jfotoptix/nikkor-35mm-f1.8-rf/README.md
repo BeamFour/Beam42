@@ -1,3 +1,8 @@
+# W-Nikkor 3.5cm F1.8
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US2896506 | EX 1 | 1956 | Azuma Hideo | Nikon Corp | [link](https://patents.google.com/patent/US2896506A) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

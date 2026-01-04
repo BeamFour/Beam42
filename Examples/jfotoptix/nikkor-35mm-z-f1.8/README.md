@@ -36,7 +36,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 20 | -0.1889 | 0.0 | -1.0035E-5 | -2.6862E-8 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
 | 21 | 0.0 | 0.0 | -8.2164E-6 | -3.2481E-8 | 6.5393E-11 | -8.7828E-14 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
 ## Layouts
+![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
+![Layout Field 0.7](./layout-semi-skew.svg)
 ![Layout Field 1.0](./layout-skew.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot.svg)

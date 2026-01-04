@@ -141,6 +141,9 @@ public class LMLSolver {
             {
                 return LEVELITER;             // return to host: OUTER LOOP exit.
             }
+            System.out.println("niter = " + niter);
+            if (niter >= lmiter)
+                return MAXITER;
 
             lambda *= LMBOOST;               // UPITER:  apply more damping.
         } while (lambda<LAMBDAMAX);          // and stay in this INNER LOOP.

@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP 2019-090947 Example 4 (Nikon Nikkor Z 35mm f/1.8 S)
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP2019-090947	EX 4	2017	Keiko Yamada,Ryosuke Imajima,Wataru Tatsuno,Haruo Sato	Nikon Corp	https://patents.google.com/patent/JP2019090947A/en
+lens name	Nikkor Z 35mm f/1.8 S
 [constants]
 Scaled	35.325	1.57
 [variable distances]

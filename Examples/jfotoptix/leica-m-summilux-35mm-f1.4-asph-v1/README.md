@@ -24,19 +24,19 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 14 | -31.325 | 2.05 | 26.16 | 1.62004 | 36.26 | Ohara | S-TIM2 |
 | 15 | 31.325 | 19.659 | 26.16 |  |  |  |
 ## Aspherical Data
-| ID  | k   | A4  | A6  | A8  | A10 | A12 | A14 | A16 | A18 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 4 | 0.0 | -1.01662E-5 | -3.85859E-8 | -5.57379E-12 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
-| 13 | 0.0 | -5.31166E-6 | -6.51374E-9 | 3.61001E-11 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
+| ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 4 | 0.0 | 0.0 | -1.01662E-5 | -3.85859E-8 | -5.57379E-12 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
+| 13 | 0.0 | 0.0 | -5.31166E-6 | -6.51374E-9 | 3.61001E-11 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
-![Layout Only](./layout.svg)
-![Layout Only](./layout-semi-skew.svg)
-![Layout Only](./layout-skew.svg)
+![Layout Field 0.0](./layout.svg)
+![Layout Field 0.7](./layout-semi-skew.svg)
+![Layout Field 1.0](./layout-skew.svg)
 ## Spot Diagrams
-![Layout Only](./spot.svg)
-![Layout Only](./spot-semi-skew.svg)
-![Layout Only](./spot-skew.svg)
+![Spot Diagram Field 0.0](./spot.svg)
+![Spot Diagram Field 0.7](./spot-semi-skew.svg)
+![Spot Diagram Field 1.0](./spot-skew.svg)
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
@@ -44,18 +44,18 @@ Note that where glass types are shown the refractive index and abbe number is as
 | back_focal_length | 19.654
 | optical_invariant | 7.905
 | object_distance | 1.0E10
-| image_distance | 19.659
+| image_distance | 19.654
 | power | 0.028
 | pp1_H | 21.022
-| ppk_H' | 15.768
+| ppk_H' | -15.768
 | ffl_F | -14.4
 | fno | 1.4
 | enp_dist_P | 18.085
 | enp_radius | 12.651
-| exp_dist_P' | -18.971
+| exp_dist_P' | -18.976
 | exp_radius | 13.795
 | m | -0
-| red | -2.823059005664594E8
+| red | -2.8230590056645954E8
 | n_obj | 1
 | n_img | 1
 | img_ht | 22.134
@@ -65,9 +65,21 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | 0.0 | 11.715 | 30.057|
- | 0.7 | 33.086 | 159.629|
- | 1.0 | 63.891 | 245.291|
+ | Field(x=0.0, y=0.0) | 11.931 | 29.68|
+ | Field(x=0.0, y=0.1) | 17.594 | 88.45|
+ | Field(x=0.0, y=0.2) | 22.237 | 112.464|
+ | Field(x=0.0, y=0.3) | 23.464 | 104.591|
+ | Field(x=0.0, y=0.4) | 24.689 | 105.975|
+ | Field(x=0.0, y=0.5) | 26.726 | 116.319|
+ | Field(x=0.0, y=0.6) | 29.77 | 130.097|
+ | Field(x=0.0, y=0.7) | 33.011 | 148.973|
+ | Field(x=0.0, y=0.8) | 39.933 | 175.251|
+ | Field(x=0.0, y=0.9) | 50.753 | 231.001|
+ | Field(x=0.0, y=1.0) | 65.041 | 258.946|
+## Geometric MTF
+![Geometrical MTF](./mtf.svg)
+* 10,30,50 cycles/mm
+* Black lines represent sagittal, blue tangential
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./US005161060_Example01.txt)
 * [Zemax file](./US005161060_Example01.zmx)

@@ -34,11 +34,14 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 24 | 1429.106 | 2.884 | 23.8 | 1.804 | 46.58 | Ohara | S-LAH65V |
 | 25 | -35.294 | 36.875 | 23.8 |  |  |  |
 ## Aspherical Data
-| ID  | k   | A4  | A6  | A8  | A10 | A12 | A14 | A16 | A18 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 3 | 0.0 | 1.02E-5 | 3.22E-9 | -1.22E-11 | 2.54E-14 | 0.0 | 0.0 | 0.0 | 0.0 |
+| ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 3 | 0.0 | 0.0 | 1.02E-5 | 3.22E-9 | -1.22E-11 | 2.54E-14 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
 ## Layouts
-![Layout Only](./layout.svg)
+![Layout Only](./layoutonly.svg)
+![Layout Field 0.0](./layout.svg)
+![Layout Field 0.7](./layout-semi-skew.svg)
+![Layout Field 1.0](./layout-skew.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew.svg)
@@ -72,18 +75,20 @@ Note that where glass types are shown the refractive index and abbe number is as
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
  | Field(x=0.0, y=0.0) | 5.8 | 11.998|
- | Field(x=0.0, y=0.707) | 35.801 | 148.931|
- | Field(x=0.0, y=1.0) | 120.221 | 443.155|
-## Ray Aberrations
-### Field 0.0
-![Tangential Ray Aberrations 0.0](./rayabbr-fld0-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld0-sag.svg)
-### Field 0.7
-![Tangential Ray Aberrations 0.0](./rayabbr-fld1-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld1-sag.svg)
-### Field 1.0
-![Tangential Ray Aberrations 0.0](./rayabbr-fld2-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld2-sag.svg)
+ | Field(x=0.0, y=0.1) | 7.772 | 46.433|
+ | Field(x=0.0, y=0.2) | 11.975 | 73.822|
+ | Field(x=0.0, y=0.3) | 18.422 | 103.006|
+ | Field(x=0.0, y=0.4) | 24.295 | 107.536|
+ | Field(x=0.0, y=0.5) | 26.507 | 109.974|
+ | Field(x=0.0, y=0.6) | 28.932 | 120.182|
+ | Field(x=0.0, y=0.7) | 34.653 | 144.899|
+ | Field(x=0.0, y=0.8) | 46.262 | 214.743|
+ | Field(x=0.0, y=0.9) | 75.88 | 288.802|
+ | Field(x=0.0, y=1.0) | 104.57 | 398.519|
+## Geometric MTF
+![Geometrical MTF](./mtf.svg)
+* 10,30,50 cycles/mm
+* Black lines represent sagittal, blue tangential
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./JP1982-064716_Example01.txt)
 * [Zemax file](./JP1982-064716_Example01.zmx)

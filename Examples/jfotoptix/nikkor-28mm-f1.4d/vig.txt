@@ -13,5 +13,5 @@ y =  0.900 (33.92) vlx= 0.044 vux= 0.044 vly= 0.485 vuy= 0.374 z_enp: 30.9646726
 y =  1.000 (37.69) vlx= 0.075 vux= 0.075 vly= 0.640 vuy= 0.456 z_enp: 31.346153366668204
 is_relative=true, is_wideangle=true
 central wavelength=  587.5618
-wavelength (weight) =  486.1327 0.500,   587.5618 1.000*,   656.2725 0.500
+wavelength (weight) =  486.1327 1.000,   587.5618 1.000*,   656.2725 1.000
 focus shift=0.0

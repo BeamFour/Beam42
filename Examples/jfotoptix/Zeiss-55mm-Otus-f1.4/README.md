@@ -28,6 +28,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 22 | 127.953325269898 | 5.87378254218892 | 32.0 | 1.58313 | 59.39 | Ohara | L-BAL42 |
 | 23 | -33.15760489 | 36.66500040938 | 32.0 |  |  |  |
 | 24 | 0.0 | 2.0 | 44.0 | 1.51633 | 64.14 | Ohara | S-BSL7 |
+| 25 | 0.0 | 0.0 | 44.0 |  |  |  |
 ## Aspherical Data
 | ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -45,28 +46,28 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
-| effective_focal_length |81.748
-| back_focal_length | 2.031
+| effective_focal_length |53.912
+| back_focal_length | 0.021
 | optical_invariant | 7.514
 | object_distance | 1.0E10
-| image_distance | 2.031
+| image_distance | 0.021
 | power | 0.019
 | pp1_H | 66.297
-| ppk_H' | -79.717
+| ppk_H' | -53.891
 | ffl_F | 12.385
 | fno | 1.439
 | enp_dist_P | 50.791
 | enp_radius | 18.738
-| exp_dist_P' | -112.691
+| exp_dist_P' | -75.637
 | exp_radius | 26.303
 | m | -0
 | red | -1.854874778404831E8
 | n_obj | 1
-| n_img | 1.516
+| n_img | 1
 | img_ht | 21.618
 | obj_ang | 21.85
 | obj_na | 0
-| img_na | -0.339|
+| img_na | -0.328|
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |

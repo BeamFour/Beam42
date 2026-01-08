@@ -28,8 +28,7 @@ import org.redukti.rayoptics.seq.SurfaceData;
 import org.redukti.rayoptics.specs.*;
 import org.redukti.rayoptics.util.Pair;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 // A format for prescription that is easier to work with when
 // trying to optimize
@@ -44,8 +43,9 @@ public class Prescription {
     public final double _angle_of_view_in_degrees;
     // For 35mm this is sqrt(36^2 + 24^2) = 43.27
     public final double _diameter_image_circle;
-    public final boolean _generate_d_line_only;
 
+    public final double[] _wvls;
+    public final double[] _wts;
     // Used to build
     public List<SurfaceType> _surface_list = new ArrayList<SurfaceType>();
     public SurfaceType[] _surfaces;
@@ -76,10 +76,20 @@ public class Prescription {
         this._fno = fno;
         this._angle_of_view_in_degrees = angleOfViewDegrees;
         this._diameter_image_circle = diameterImageCircle;
-        this._generate_d_line_only = d_line;
+        // NOTE atm first wvl is made reference wvl
+        this._wvls = d_line ? new double[] {587.5618} : new double[] {587.5618, 486.1327, 656.2725};
+        this._wts = d_line ? new double[] {1.0} : new double[] {1.0, 1.0, 1.0};
         this._distribution = new Distribution(Pattern.UserDefined,10, 0.999);
     }
-
+    public Prescription(double focalLength, double fno, double angleOfViewDegrees, double diameterImageCircle, double[] wvls, double[] wts) {
+        this._focal_length = focalLength;
+        this._fno = fno;
+        this._angle_of_view_in_degrees = angleOfViewDegrees;
+        this._diameter_image_circle = diameterImageCircle;
+        this._wvls = wvls;
+        this._wts = wts;
+        this._distribution = new Distribution(Pattern.UserDefined,10, 0.999);
+    }
     public Prescription surf(double radius, double thickness, double diameter, double nd, double vd, String glassName) {
         _surface_list.add(new SurfaceType(Integer.toString(_surface_list.size()+1), false, radius, thickness, diameter, nd, vd, glassName));
         return this;
@@ -182,12 +192,16 @@ public class Prescription {
     }
 
     public static Prescription buildPrescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types) {
+        return buildPrescription(specs,use_glass_types,new double[] {587.5618, 486.1327, 656.2725},new double[] {1.0, 1.0, 1.0});
+    }
+    public static Prescription buildPrescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types,double[] wvls,double[] wts) {
         var prescription = new Prescription(
                 specs.get_focal_length(),
                 specs.get_f_number(0),  // default is scenario 0
                 specs.get_angle_of_view_in_degrees(0),  // default is scenario 0
                 specs.get_image_height(),
-                false);
+                wvls,
+                wts);
         prescription._title = specs.get_descriptive_data().get_title();
         var patentInfo = specs.get_descriptive_data().find_variable("patent");
         if (patentInfo != null) {
@@ -284,11 +298,9 @@ public class Prescription {
                 Matrix3 r = Matrix3.get_rotation_matrix(0, aov);
                 direction = r.multiply(direction);
             }
-            PointSource.Builder ps = new PointSource.Builder(PointSource.SourceInfinityMode.SourceAtInfinity, direction)
-                    .add_spectral_line(SpectralLine.d);
-            if (!_generate_d_line_only)
-                ps.add_spectral_line(SpectralLine.C)
-                    .add_spectral_line(SpectralLine.F);
+            PointSource.Builder ps = new PointSource.Builder(PointSource.SourceInfinityMode.SourceAtInfinity, direction);
+            for (double wvl: _wvls)
+                ps.add_spectral_line(wvl);
             sys.add(ps);
         }
         /* anchor lens */
@@ -376,16 +388,10 @@ public class Prescription {
         }
         osp.fov.is_relative = true; // Fields are specified as 0, 0.7, 1.0 etc - without actual sizes
         osp.fov.is_wide_angle = (half_angle_deg > 45.) || use_wideangle_aiming;
-        if (_generate_d_line_only) {
-            osp.wvls = new WvlSpec(new WvlWt[]{
-                new WvlWt(587.5618, 1.0)}, 0);
-        }
-        else {
-            osp.wvls = new WvlSpec(new WvlWt[]{
-                new WvlWt(486.1327, 1.0),
-                new WvlWt(587.5618, 1.0),
-                new WvlWt(656.2725, 1.0)}, 1);
-        }
+        var wvls = new ArrayList<WvlWt>();
+        for (int i = 0; i < _wvls.length; i++)
+            wvls.add(new WvlWt(_wvls[i], _wts[i]));
+        osp.wvls = new WvlSpec(wvls.toArray(new WvlWt[0]), 0);
         opm.system_spec.title = _title;
         opm.system_spec.dimensions = "mm";
         opm.radius_mode = true;
@@ -522,7 +528,12 @@ public class Prescription {
         }
         return sb;
     }
-
+    public Map<Double,Double> get_wvl_wts() {
+        var map = new LinkedHashMap<Double,Double>();
+        for (int i = 0; i < _wvls.length; i++)
+            map.put(_wvls[i],_wts[i]);
+        return map;
+    }
     @Override
     public String toString() {
         return toOptBenchStr(new StringBuilder()).toString();

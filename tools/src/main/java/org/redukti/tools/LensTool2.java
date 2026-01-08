@@ -28,6 +28,7 @@ import org.redukti.util.Helper;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class LensTool2 {
 
@@ -38,10 +39,16 @@ public class LensTool2 {
     }
 
     public static Prescription createPrescription(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean use_glass_types, boolean d_line) {
-        var p = Prescription.buildPrescription(specs,use_glass_types);
+        var wvls = d_line ? new double[] {587.5618} : new double[] {587.5618, 486.1327, 656.2725};
+        var wts = d_line ? new double[] {1.0} : new double[] {1.0, 1.0, 1.0};
+        var p = Prescription.buildPrescription(specs,use_glass_types,wvls,wts);
         return p;
     }
 
+    public static Prescription createPrescription(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean use_glass_types, double[] wvls, double[] wts) {
+        var p = Prescription.buildPrescription(specs,use_glass_types,wvls,wts);
+        return p;
+    }
     public static OpticalModel createSystem(Prescription prescription,boolean fov_angle,boolean apply_vignetting,boolean use_wideangle_aiming,double[] fields) {
         return prescription.build_ray_optics_model(fov_angle,fields,apply_vignetting,use_wideangle_aiming);
     }
@@ -117,6 +124,12 @@ public class LensTool2 {
         sb.append("![Geometrical MTF](./mtf.svg)\n");
         sb.append("* 10,30,50 cycles/mm\n");
         sb.append("* Black lines represent sagittal, blue tangential\n");
+        sb.append("* Wavelengths 587.5618(d), 486.1327(F), 656.2725(C) equal weight\n");
+        sb.append("## Geometric MTF (Weighted)\n");
+        sb.append("![Geometrical MTF](./mtf-w.svg)\n");
+        sb.append("* 10,30,50 cycles/mm\n");
+        sb.append("* Black lines represent sagittal, blue tangential\n");
+        sb.append("* Wavelengths 587.5618(d), 656.2725(C), 546.074(e), 486.1327(F), 435.8343(g) weighted 1.0,0.475,0.98,0.49,0.15\n");
         sb.append("## Resources\n");
         sb.append("* [OpticalBench Compatible Data File, tab delimited](./" + filename + ")\n");
         sb.append("* [Zemax file](./" + zmxFilename + ")\n");
@@ -143,7 +156,7 @@ public class LensTool2 {
         return spotAnalysis;
     }
 
-    private static void generateMTFs(OpticalModel opm, Args arguments, double[] fields) throws Exception {
+    private static void generateMTFs(OpticalModel opm, Args arguments, double[] fields, Map<Double,Double> wv_wts, String outname) throws Exception {
         var spotAnalysis = SpotAnalysis.eval(opm,new SpotOptions().num_rays(64).use_grid(false));
         var mtfs = new ArrayList<PolyMTF>();
         for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
@@ -155,7 +168,9 @@ public class LensTool2 {
                 var mtf = new MonochromaticGeometricMTF(intercepts);
                 if (polyMtfForField == null)
                     polyMtfForField = new PolyMTF(mtf.mtf.fft_size,mtf.h2d.pixel_size);
-                polyMtfForField.add(mtf.mtf, 1.0);
+                var wt = wv_wts.getOrDefault(intercepts.wvl,0.0);
+                if (wt != 0.0)
+                    polyMtfForField.add(mtf.mtf, wt);
                 if (arguments.do_mono_chrome_mtfs)
                     Helper.createOutputFile(output_file,new GeoMTFPlot(spotFld.fld,mtf).plot());
             }
@@ -168,10 +183,10 @@ public class LensTool2 {
         var mtfResults = new ArrayList<MTFResultByFreq>();
         for (var freq: freqs)
             mtfResults.add(new MTFResultByFreq(mtfs,freq));
-        var mtffile = Helper.getOutputPath(arguments.specfile,"mtf.svg",arguments.outdir);
+        var mtffile = Helper.getOutputPath(arguments.specfile,outname + ".svg",arguments.outdir);
         var plot = new GeoMTFByFieldPlot(mtfResults,fields);
         Helper.createOutputFile(mtffile,plot.plot());
-        var mtfdata = Helper.getOutputPath(arguments.specfile,"mtf.csv",arguments.outdir);
+        var mtfdata = Helper.getOutputPath(arguments.specfile,outname + ".csv",arguments.outdir);
         Helper.createOutputFile(mtfdata,plot.toString());
     }
 
@@ -306,7 +321,7 @@ public class LensTool2 {
             //System.out.println(Trace.list_ray(buf,Trace.trace_ray(opm, Vector2.vector2_0,osp.fov.fields[4],sm.central_wavelength(),new TraceOptions()).pkg,null,null).toString());
 
             var spotAnalysis = generateSpotDiagrams(opm,arguments,!arguments.auto_size_spots);
-            generateMTFs(opm,arguments,fields);
+            generateMTFs(opm,arguments,fields,prescription.get_wvl_wts(),"mtf");
             if (arguments.do_ray_aberrations)
                 generateRayAberrationPlots(opm,arguments);
             ZemaxExporter zemaxExporter = new ZemaxExporter();
@@ -316,6 +331,12 @@ public class LensTool2 {
                     fod,
                     spotAnalysis,
                     Helper.getOutputPath(arguments.specfile,"README.md",arguments.outdir));
+            // Generate MTF with weighted average across wavelengths
+            prescription = createPrescription(specs,arguments.scenario,arguments.use_glass_types,
+                    new double[]{587.5618,656.2725,546.074,486.1327,435.8343},
+                    new double[]{1.0,0.475,0.98,0.49,0.15});
+            opm = createSystem(prescription,true,true,true,fields);
+            generateMTFs(opm,arguments,fields,prescription.get_wvl_wts(),"mtf-w");
         }
         catch (Exception e) {
             System.err.println("Failed due to: " + e.getMessage());

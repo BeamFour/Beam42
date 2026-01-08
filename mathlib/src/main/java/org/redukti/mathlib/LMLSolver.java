@@ -39,7 +39,7 @@ public class LMLSolver {
 
     private LMLFunction myH = null;    // overwritten by constructor
     private double  lmtol = 1E-6;  // overwritten by constructor
-    private int     lmiter = 100;  // overwritten by constructor
+    private int     lmiter = 150;  // overwritten by constructor
     private int     nparms = 0;    // overwritten by constructor
     private int     npts = 0;      // overwritten by constructor
 

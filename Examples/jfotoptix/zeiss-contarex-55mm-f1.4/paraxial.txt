@@ -1,22 +1,24 @@
-effective_focal_length 55.00393808448037
-back_focal_length      36.471984855300136
-optical_invariant      7.149927253231421
-object_distance        1.0E10
-image_distance         36.35
-power                  0.018180516428916476
-pp1_H                  50.145597611326764
-ppk_H'                 18.53195322918023
-ffl_F                  -4.8583404731536035
-fno                    1.3999999999999997
-enp_dist_P             34.54064555217919
-enp_radius             19.64426367899654
-exp_dist_P'            -40.31763614804387
-exp_radius             27.424864752102607
-m                      0.0022177476658631345
-red                    -1.818051642008376E8
-n_obj                  1.0
-n_img                  1.0
-img_ht                 20.019796309047972
-obj_ang                20.0
-obj_na                 1.9644263611143987E-9
-img_na                 -0.33633639699815626
+efl               55.00
+f                 55.00
+f'                55.00
+ffl              -4.858
+pp1               50.15
+bfl               36.47
+ppk              -18.53
+pp sep           -15.62
+f/#               1.400
+m            -5.500e-09
+red          -1.818e+08
+obj_dist      1.000e+10
+obj_ang           20.00
+enp_dist          34.54
+enp_radius        19.64
+na obj        1.964e-09
+n obj             1.000
+img_dist          36.47
+img_ht            20.02
+exp_dist         -40.20
+exp_radius        27.42
+na img          -0.3363
+n img             1.000
+optical invariant        7.150

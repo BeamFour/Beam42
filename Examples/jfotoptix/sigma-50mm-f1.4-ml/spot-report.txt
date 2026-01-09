@@ -1,3 +1,11 @@
-Spot Result: RMS Radius 6.581126065443223 max radius 15.177848124144239
-Spot Result: RMS Radius 30.330057663588242 max radius 254.24388538992537
-Spot Result: RMS Radius 24.347599445139313 max radius 241.47290754469904
+Field Field(x=0.0, y=0.0) mean radius 6.667014672027534 max radius 15.406783699442236
+Field Field(x=0.0, y=0.1) mean radius 8.879891718151974 max radius 46.74955538340669
+Field Field(x=0.0, y=0.2) mean radius 14.14896020284476 max radius 86.46392966869645
+Field Field(x=0.0, y=0.3) mean radius 21.092933257992843 max radius 149.79757272112772
+Field Field(x=0.0, y=0.4) mean radius 30.892812086623355 max radius 242.725451027144
+Field Field(x=0.0, y=0.5) mean radius 32.48034472133894 max radius 198.11599029336213
+Field Field(x=0.0, y=0.6) mean radius 30.16670785135872 max radius 159.7638787286411
+Field Field(x=0.0, y=0.7) mean radius 20.920460816698395 max radius 110.50176261599384
+Field Field(x=0.0, y=0.8) mean radius 13.47685851142432 max radius 62.91820599397187
+Field Field(x=0.0, y=0.9) mean radius 11.06653167848453 max radius 47.276988534977555
+Field Field(x=0.0, y=1.0) mean radius 12.609454310189031 max radius 50.15658972635881

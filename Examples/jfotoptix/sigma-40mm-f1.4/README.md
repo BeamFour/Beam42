@@ -94,6 +94,12 @@ Note that where glass types are shown the refractive index and abbe number is as
 ![Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm
 * Black lines represent sagittal, blue tangential
+* Wavelengths 587.5618(d), 486.1327(F), 656.2725(C) equal weight
+## Geometric MTF (Weighted)
+![Geometrical MTF](./mtf-w.svg)
+* 10,30,50 cycles/mm
+* Black lines represent sagittal, blue tangential
+* Wavelengths 587.5618(d), 656.2725(C), 546.074(e), 486.1327(F), 435.8343(g) weighted 1.0,0.475,0.98,0.49,0.15
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./Sigma-40mmf1.4.txt)
 * [Zemax file](./Sigma-40mmf1.4.zmx)

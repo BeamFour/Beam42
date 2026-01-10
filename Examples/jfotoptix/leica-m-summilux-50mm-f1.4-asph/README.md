@@ -1,4 +1,8 @@
 # Leica Summilux M 50mm f/1.4 ASPH Reverse Engineered by [Zhong Fu](https://zhuanlan.zhihu.com/p/1993381678270415416)
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US7102834B2 | EX 2 | 2004 | Peter Karbe | Leica Camera AG | [link](https://patents.google.com/patent/US7102834B2/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

@@ -1,5 +1,7 @@
 [descriptive data]
 title	Leica Summilux M 50mm f/1.4 ASPH
+#patent	country	number	example	year	inventors	org	link
+patent	US	US7102834B2	EX 2	2004	Peter Karbe	Leica Camera AG	https://patents.google.com/patent/US7102834B2/en
 lens name	Leica Summilux M 50mm f/1.4 ASPH Reverse Engineered by [Zhong Fu](https://zhuanlan.zhihu.com/p/1993381678270415416)
 [constants]
 [variable distances]
@@ -27,11 +29,5 @@ Aperture Diameter	25.097
 14	31.182	27.086		25.2
 [aspherical data]
 7	-82.759	0	-1.421206138330734E-5	-1.084455811486651E-8	-4.952809894726529E-12
-[figure]
-source	Data/US004123144_Figure02P.png
-originX	29
-originY	186.2
-ppmm	8.412
 [notes]
-L1=mid range of refractive index
-L2/L3=low dispersion
+Reverse Engineered by [Zhong Fu](https://zhuanlan.zhihu.com/p/1993381678270415416)

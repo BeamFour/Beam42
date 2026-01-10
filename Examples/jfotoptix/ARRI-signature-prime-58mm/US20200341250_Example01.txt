@@ -1,5 +1,8 @@
 [descriptive data]
 title	US 2020/0341250 Example 1
+#patent	country	number	example	year	inventors	org	link
+patent	US	US20200341250	EX 1	2018	Keiichi Mochizuki	Nittoh Inc	https://patents.google.com/patent/US20200341250A1/en
+lens name	Nittoh ARRI Signature Prime 58mm T1.8
 [constants]
 [variable distances]
 Focal Length	57.99	57.44	53.71

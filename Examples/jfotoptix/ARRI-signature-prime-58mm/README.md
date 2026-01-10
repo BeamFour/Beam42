@@ -1,3 +1,8 @@
+# Nittoh ARRI Signature Prime 58mm T1.8
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US20200341250 | EX 1 | 2018 | Keiichi Mochizuki | Nittoh Inc | [link](https://patents.google.com/patent/US20200341250A1/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -87,10 +92,16 @@ Note that where glass types are shown the refractive index and abbe number is as
  | Field(x=0.0, y=0.8) | 5.26 | 14.448|
  | Field(x=0.0, y=0.9) | 5.433 | 14.681|
  | Field(x=0.0, y=1.0) | 5.788 | 15.805|
-## Geometric MTF
-![Geometrical MTF](./mtf.svg)
+## Polychromatic Geometric MTF
+![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm
 * Black lines represent sagittal, blue tangential
+* To generate above, MTFs for wavelengths 587.5618(d), 486.1327(F), 656.2725(C) were calculated across 10 fields, and then averaged
+## Polychromatic Geometric MTF (Weighted)
+![Polychromatic Geometrical MTF Weighted](./mtf-w.svg)
+* 10,30,50 cycles/mm
+* Black lines represent sagittal, blue tangential
+* To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./US20200341250_Example01.txt)
 * [Zemax file](./US20200341250_Example01.zmx)

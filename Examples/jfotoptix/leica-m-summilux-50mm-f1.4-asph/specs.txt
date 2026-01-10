@@ -31,3 +31,4 @@ Aperture Diameter	25.097
 7	-82.759	0	-1.421206138330734E-5	-1.084455811486651E-8	-4.952809894726529E-12
 [notes]
 Reverse Engineered by [Zhong Fu](https://zhuanlan.zhihu.com/p/1993381678270415416)
+Email think202057 at 163 dot com

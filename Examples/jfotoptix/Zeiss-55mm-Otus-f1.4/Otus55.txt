@@ -1,6 +1,6 @@
 [descriptive data]						
 title	Zeiss Otus 55mm f1.4
-lens name	Zeiss Otus 55mm f1.4 Reverse Engineered by Zhong Fu
+lens name	Zeiss Otus 55mm f1.4 Reverse Engineered by [Zhong Fu](https://zhuanlan.zhihu.com/p/21281774803)
 [constants]
 [variable distances]						
 Focal Length	54.48					

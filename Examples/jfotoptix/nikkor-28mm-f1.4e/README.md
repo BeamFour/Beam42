@@ -90,10 +90,16 @@ Note that where glass types are shown the refractive index and abbe number is as
  | Field(x=0.0, y=0.8) | 15.573 | 107.809|
  | Field(x=0.0, y=0.9) | 17.056 | 83.945|
  | Field(x=0.0, y=1.0) | 22.518 | 68.284|
-## Geometric MTF
-![Geometrical MTF](./mtf.svg)
+## Polychromatic Geometric MTF
+![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm
 * Black lines represent sagittal, blue tangential
+* To generate above, MTFs for wavelengths 587.5618(d), 486.1327(F), 656.2725(C) were calculated across 10 fields, and then averaged
+## Polychromatic Geometric MTF (Weighted)
+![Polychromatic Geometrical MTF Weighted](./mtf-w.svg)
+* 10,30,50 cycles/mm
+* Black lines represent sagittal, blue tangential
+* To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./nikkor-28mmf1.4-afs.txt)
 * [Zemax file](./nikkor-28mmf1.4-afs.zmx)

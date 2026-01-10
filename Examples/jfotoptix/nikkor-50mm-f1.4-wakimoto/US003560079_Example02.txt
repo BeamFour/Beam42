@@ -13,7 +13,7 @@ Image Height	43.2
 Total Length	99.21
 Magnification	0
 d0	Infinity
-Bf	37.21
+Bf	37.15
 [lens data]
 1	40.7	4.65	1.7495	40.0	35.0	LAFN7	Schott
 2	132.56	0.095		40.0
@@ -31,3 +31,4 @@ Bf	37.21
 [figure]
 [notes]
 Diameters based on Modern Lens Design
+Bf adjusted from 37.21 to 37.15

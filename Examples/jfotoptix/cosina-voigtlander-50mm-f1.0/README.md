@@ -24,7 +24,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 14 | -78.407 | 1.55 | 31.18 | 1.55298 | 55.07 | Hikari | J-KZFH4 |
 | 15 | 45.846 | 1.42 | 25.18 |  |  |  |
 | 16 | 3376.612 | 2.78 | 28.08 | 1.80835 | 40.55 | Ohara | L-LAH84 |
-| 17 | 120.496 | 18.74 | 25.76 |  |  |  |
+| 17 | 120.496 | 18.721 | 25.76 |  |  |  |
 ## Aspherical Data
 | ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -55,7 +55,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | fno | 1
 | enp_dist_P | 38.303
 | enp_radius | 24.999
-| exp_dist_P' | -23.316
+| exp_dist_P' | -23.297
 | exp_radius | 21.02
 | m | -0
 | red | -2.0000928296044186E8
@@ -68,17 +68,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 13.716 | 25.793|
- | Field(x=0.0, y=0.1) | 15.39 | 42.36|
- | Field(x=0.0, y=0.2) | 16.558 | 58.379|
- | Field(x=0.0, y=0.3) | 17.09 | 61.7|
- | Field(x=0.0, y=0.4) | 18.013 | 64.859|
- | Field(x=0.0, y=0.5) | 17.911 | 65.873|
- | Field(x=0.0, y=0.6) | 17.903 | 60.729|
- | Field(x=0.0, y=0.7) | 20.162 | 59.706|
- | Field(x=0.0, y=0.8) | 25.556 | 84.275|
- | Field(x=0.0, y=0.9) | 33.473 | 124.898|
- | Field(x=0.0, y=1.0) | 36.798 | 123.086|
+ | Field(x=0.0, y=0.0) | 16.141 | 34.336|
+ | Field(x=0.0, y=0.1) | 17.372 | 51.582|
+ | Field(x=0.0, y=0.2) | 17.282 | 51.959|
+ | Field(x=0.0, y=0.3) | 16.349 | 52.413|
+ | Field(x=0.0, y=0.4) | 16.126 | 55.951|
+ | Field(x=0.0, y=0.5) | 16.006 | 57.632|
+ | Field(x=0.0, y=0.6) | 16.675 | 53.62|
+ | Field(x=0.0, y=0.7) | 20.226 | 67.173|
+ | Field(x=0.0, y=0.8) | 26.466 | 92.531|
+ | Field(x=0.0, y=0.9) | 34.93 | 133.168|
+ | Field(x=0.0, y=1.0) | 38.242 | 130.087|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm

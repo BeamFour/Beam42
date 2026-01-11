@@ -11,7 +11,7 @@ F-Number	1
 Image Height	43.26
 Magnification	0
 d0	Infinity
-Bf	18.74
+Bf	18.721
 Aperture Diameter(m)	33.257
 [lens data]
 1	40.765	4.89	1.90525	48.12	35.04	S-LAH93

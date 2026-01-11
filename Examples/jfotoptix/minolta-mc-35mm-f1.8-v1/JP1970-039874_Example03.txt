@@ -1,0 +1,41 @@
+[descriptive data]
+title	JP 1970-039874 Example 3
+[constants]
+Scaled	35	1
+[variable distances]
+Focal Length	35
+Angle of view	64
+F-Number	1.8
+Total Length	69.4330
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf	36.75
+[lens data]
+1	225.1900	5.7750	1.7200	40.44	50.3
+2	-59.7625	1.2250	1.6176	40.44	52.7
+3	21.3325	19.0295		29.26	
+4	46.3400	17.0205	1.6775	30.81	55.4
+5	-50.6800	0.1715		30.81
+6	27.0235	2.9295	1.6775	28.32	55.4
+7	47.2255	3.1195		28.32	
+7AS	AS	3.24		26.650
+8	-60.9665	5.5580	1.6477	25.32	33.9
+9	27.3490	3.6400		23.08
+10	-135.3695	2.9155	1.7080	23.56	53.3
+11	-32.7390	0.1750		23.56	
+12	113.0850	0.9205	1.7557	23.50	27.2
+13	32.2175	3.7135	1.7080	23.50	53.3
+14	-88.4030	Bf		23.50	
+[figure]
+caption	Konica-Minolta 35mm f1.8 MC Rokkor
+source	Data/JP1970-039874_Figure03P.png
+originX	38.47
+originY	111.48
+ppmm	2.765
+[figure]
+source	Data/JP1970-039874_Figure03.png
+originX	137.27
+originY	470.59
+ppmm	19.362
+[notes]

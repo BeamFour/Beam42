@@ -1,0 +1,41 @@
+[descriptive data]
+title	US 4,174,886 Example 5
+[constants]
+Scaled	35	100
+[variable distances]
+Focal Length	35
+Angle of View	64
+F-Number	1.8
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf(p)	undefined
+Bf	36.14
+[lens data]
+1	34.8597	1.446	1.5699	29.46	48.0
+2	15.9796	12.544		24.58
+3	42.0791	12.229	1.7883	25.60	47.7
+4	-20.8415	2.765	1.5710	25.60	50.9
+5	-407.4858	0.147		25.60	
+6	46.4716	2.450	1.7570	23.50	48.0
+7	49.3651	3.098		23.50	
+7AS	AS	3.50		21.601
+8	-29.3867	1.750	1.7006	21.94	30.0
+9	56.3997	2.415		21.94	
+10	-49.8614	2.748	1.7883	22.28	47.7
+11	-23.7314	0.147		22.28	
+12	122.0282	1.050	1.8052	22.82	25.2
+13	36.0385	4.725	1.7725	22.82	50.1
+14	-42.8943	Bf		23.16	
+[figure]
+source	Data/US004174886_Figure09P.png
+caption	Konica Minolta 35mm F1.8 MD
+originX	47.01
+originY	379.22	433.39
+ppmm	22.190
+[figure]
+source	Data/US004174886_Figure09.png
+originX	168.50
+originY	459.60
+ppmm	19.369
+[notes]

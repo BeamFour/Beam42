@@ -10,7 +10,7 @@ Total Length	undefined
 Magnification	0
 d0	Infinity
 Bf(p)	undefined
-Bf	38.94	39.02
+Bf	38.93	39.02
 [lens data]
 1	42.6270	4.5200	1.804000	37.38	46.57	J-LASF015
 2	258.1500	0.1500		37.38	

@@ -19,7 +19,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 14 | -151.43 | 2.26 | 32.15 | 1.816 | 46.59 | Hikari | J-LASF09A |
 | 15 | -57.077 | 0.1 | 32.15 |  |  |  |
 | 16 | 100.548 | 2.33 | 31.44 | 1.72916 | 54.68 | Ohara | S-LAL18 |
-| 17 | -400.0 | 38.94 | 31.44 |  |  |  |
+| 17 | -400.0 | 38.93 | 31.44 |  |  |  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -44,7 +44,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | fno | 1.45
 | enp_dist_P | 20.837
 | enp_radius | 17.793
-| exp_dist_P' | -44.96
+| exp_dist_P' | -44.95
 | exp_radius | 28.984
 | m | -0
 | red | -1.9380349224759132E8
@@ -57,17 +57,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 16.013 | 39.714|
- | Field(x=0.0, y=0.1) | 19.374 | 65.318|
- | Field(x=0.0, y=0.2) | 25.339 | 87.656|
- | Field(x=0.0, y=0.3) | 27.602 | 91.824|
- | Field(x=0.0, y=0.4) | 30.604 | 114.855|
- | Field(x=0.0, y=0.5) | 34.281 | 140.853|
- | Field(x=0.0, y=0.6) | 38.91 | 186.192|
- | Field(x=0.0, y=0.7) | 43.64 | 207.817|
- | Field(x=0.0, y=0.8) | 49.076 | 215.651|
- | Field(x=0.0, y=0.9) | 50.646 | 203.083|
- | Field(x=0.0, y=1.0) | 47.045 | 159.827|
+ | Field(x=0.0, y=0.0) | 17.639 | 43.184|
+ | Field(x=0.0, y=0.1) | 21.051 | 68.819|
+ | Field(x=0.0, y=0.2) | 27.1 | 91.063|
+ | Field(x=0.0, y=0.3) | 29.3 | 95.359|
+ | Field(x=0.0, y=0.4) | 32.22 | 118.472|
+ | Field(x=0.0, y=0.5) | 35.81 | 144.503|
+ | Field(x=0.0, y=0.6) | 40.282 | 189.728|
+ | Field(x=0.0, y=0.7) | 44.875 | 211.203|
+ | Field(x=0.0, y=0.8) | 50.219 | 218.804|
+ | Field(x=0.0, y=0.9) | 51.704 | 205.91|
+ | Field(x=0.0, y=1.0) | 47.887 | 162.146|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm

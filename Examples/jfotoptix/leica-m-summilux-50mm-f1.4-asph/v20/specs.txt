@@ -1,5 +1,7 @@
 [descriptive data]
 title	Leica Summilux M 50mm f/1.4 ASPH
+#patent	country	number	example	year	inventors	org	link
+patent	US	US7102834B2	EX 2	2004	Peter Karbe	Leica Camera AG	https://patents.google.com/patent/US7102834B2/en
 lens name	Leica Summilux M 50mm f/1.4 ASPH Reverse Engineered by [Zhong Fu](https://zhuanlan.zhihu.com/p/1993381678270415416)
 [constants]
 [variable distances]
@@ -17,21 +19,16 @@ Aperture Diameter	25.097
 4	377.865	2.7	1.738	32.0	32.26	S-NBH53
 5	24.98	5.096		26.0
 6	AS	2.098		25.097
-7	-82.759	2.7	1.68948	25.2	31.02	L-TIM28
+7	-82.758	2.7	1.68948	25.2	31.02	L-TIM28
 8	-300.0	3.05		25.6
-9	-44.719	2.8	1.57501	25.6	41.51	S-TIL27
-10	79.409	6.4	1.883	28.0	40.77	S-LAH58
-11	-33.217	0.5		25.2
-12	42.759	6.4	1.883	25.2	40.77	S-LAH58
-13	-48.288	4.7	1.72151	25.2	29.23	S-TIH18
-14	31.182	27.086		25.2
+9	-44.718	2.8	1.57501	25.6	41.51	S-TIL27
+10	79.408	6.4	1.883	27.5	40.77	S-LAH58
+11	-33.217	0.5		28.0
+12	42.758	6.4	1.883	25.2	40.77	S-LAH58
+13	-48.287	4.7	1.72151	25.2	29.23	S-TIH18
+14	31.181	27.086		25.2
 [aspherical data]
-7	-82.759	0	-1.421206138330734E-5	-1.084455811486651E-8	-4.952809894726529E-12
-[figure]
-source	Data/US004123144_Figure02P.png
-originX	29
-originY	186.2
-ppmm	8.412
+7	-82.758	0	-1.421206138330734E-5	-1.084455811486651E-8	-4.952809894726529E-12
 [notes]
-L1=mid range of refractive index
-L2/L3=low dispersion
+Reverse Engineered by [Zhong Fu](https://zhuanlan.zhihu.com/p/1993381678270415416)
+Email think202057 at 163 dot com

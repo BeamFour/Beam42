@@ -22,7 +22,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 12 | -88.979 | 4.6475 | 31.1 | 1.78443 | 43.95 | Schott | LAFN10 |
 | 13 | -42.713 | 0.0935 | 32.0 |  |  |  |
 | 14 | 131.23 | 4.6475 | 33.22 | 1.717 | 47.96 | Schott | N-LAF3 |
-| 15 | -62.5405 | 36.35 | 33.22 |  |  |  |
+| 15 | -62.5405 | 36.33 | 33.22 |  |  |  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -47,7 +47,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | fno | 1.4
 | enp_dist_P | 34.541
 | enp_radius | 19.644
-| exp_dist_P' | -40.196
+| exp_dist_P' | -40.176
 | exp_radius | 27.425
 | m | -0
 | red | -1.8180516420083755E8
@@ -60,17 +60,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 24.759 | 78.042|
- | Field(x=0.0, y=0.1) | 30.656 | 104.318|
- | Field(x=0.0, y=0.2) | 43.081 | 159.763|
- | Field(x=0.0, y=0.3) | 56.423 | 251.018|
- | Field(x=0.0, y=0.4) | 69.496 | 287.879|
- | Field(x=0.0, y=0.5) | 74.118 | 274.25|
- | Field(x=0.0, y=0.6) | 70.236 | 301.517|
- | Field(x=0.0, y=0.7) | 69.168 | 328.951|
- | Field(x=0.0, y=0.8) | 69.68 | 346.367|
- | Field(x=0.0, y=0.9) | 71.546 | 370.685|
- | Field(x=0.0, y=1.0) | 69.926 | 338.136|
+ | Field(x=0.0, y=0.0) | 27.532 | 85.672|
+ | Field(x=0.0, y=0.1) | 33.756 | 112.158|
+ | Field(x=0.0, y=0.2) | 46.477 | 167.576|
+ | Field(x=0.0, y=0.3) | 59.911 | 258.815|
+ | Field(x=0.0, y=0.4) | 72.9 | 295.039|
+ | Field(x=0.0, y=0.5) | 77.493 | 281.316|
+ | Field(x=0.0, y=0.6) | 73.451 | 308.694|
+ | Field(x=0.0, y=0.7) | 72.135 | 336.13|
+ | Field(x=0.0, y=0.8) | 72.284 | 353.401|
+ | Field(x=0.0, y=0.9) | 73.765 | 377.556|
+ | Field(x=0.0, y=1.0) | 71.752 | 344.51|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm
@@ -81,9 +81,6 @@ Note that where glass types are shown the refractive index and abbe number is as
 * 10,30,50 cycles/mm
 * Black lines represent sagittal, blue tangential
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
-## Zeiss MTF
-Courtesy Marco Cavina:
-![Original Zeiss MTF](./Planar55mmMTF.jpg)
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./DE01170157_Example01.txt)
 * [Zemax file](./DE01170157_Example01.zmx)

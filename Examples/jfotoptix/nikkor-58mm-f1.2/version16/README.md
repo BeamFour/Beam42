@@ -16,7 +16,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 11 | -394.26508987025437 | 6.147 | 39.5 | 1.7725 | 49.62 | Hikari | J-LASF016 |
 | 12 | -56.94340780253313 | 0.0 | 39.5 |  |  |  |
 | 13 | 226.43187654820784 | 4.016 | 38.275 | 1.795 | 45.31 | Hikari | J-LASF017 |
-| 14 | -96.07135282405889 | 37.78 | 38.275 |  |  |  |
+| 14 | -96.07135282405889 | 37.75 | 38.275 |  |  |  |
 ## Aspherical Data
 | ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -45,7 +45,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | fno | 1.2
 | enp_dist_P | 35.345
 | enp_radius | 24.183
-| exp_dist_P' | -41.45
+| exp_dist_P' | -41.42
 | exp_radius | 32.987
 | m | -0
 | red | -1.7229840741555038E8
@@ -58,17 +58,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 19.435 | 82.693|
- | Field(x=0.0, y=0.1) | 25.608 | 151.558|
- | Field(x=0.0, y=0.2) | 39.198 | 184.745|
- | Field(x=0.0, y=0.3) | 33.963 | 194.1|
- | Field(x=0.0, y=0.4) | 35.745 | 202.51|
- | Field(x=0.0, y=0.5) | 40.049 | 219.043|
- | Field(x=0.0, y=0.6) | 43.251 | 256.521|
- | Field(x=0.0, y=0.7) | 44.899 | 248.605|
- | Field(x=0.0, y=0.8) | 52.784 | 284.004|
- | Field(x=0.0, y=0.9) | 65.052 | 326.721|
- | Field(x=0.0, y=1.0) | 82.164 | 373.594|
+ | Field(x=0.0, y=0.0) | 21.896 | 96.357|
+ | Field(x=0.0, y=0.1) | 29.1 | 165.47|
+ | Field(x=0.0, y=0.2) | 43.689 | 198.079|
+ | Field(x=0.0, y=0.3) | 38.259 | 207.674|
+ | Field(x=0.0, y=0.4) | 39.936 | 215.976|
+ | Field(x=0.0, y=0.5) | 44.122 | 232.452|
+ | Field(x=0.0, y=0.6) | 47.171 | 269.744|
+ | Field(x=0.0, y=0.7) | 48.773 | 260.524|
+ | Field(x=0.0, y=0.8) | 56.781 | 295.511|
+ | Field(x=0.0, y=0.9) | 69.252 | 337.726|
+ | Field(x=0.0, y=1.0) | 86.417 | 383.877|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm

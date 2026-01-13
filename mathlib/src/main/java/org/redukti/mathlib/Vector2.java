@@ -114,6 +114,16 @@ public class Vector2 {
         return new Vector2(x, y);
     }
 
+    public Vector2 normalize() {
+        double lengthsq = x * x + y * y;
+        if (M.isZero(lengthsq)) {
+            return this;
+        } else {
+            double denom = Math.sqrt(lengthsq);
+            return new Vector2(x / denom, y / denom);
+        }
+    }
+
     @Override
     public String toString() {
         return "[" + x() + ',' + y() + ']';

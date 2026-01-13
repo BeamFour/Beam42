@@ -435,7 +435,7 @@ public class VigCalc {
     public static Vector2 iterate_pupil_ray(OpticalModel opt_model, Integer indx, int xy, double start_r0, double r_target, Field fld, double wvl) {
         Vector2 start_coord = Vector2.vector2_0;
         double start_r = 0;
-        if (indx == null) {
+        if (indx != null) {
             var objective_fn = new R_Pupil_Coordinate(opt_model,indx,xy,fld,wvl,r_target);
             try {
                 start_r = SecantSolver.find_root(objective_fn, start_r0, 50, 1e-6);

@@ -28,6 +28,7 @@ public class GlassMapGenerator {
             new Cat("Hoya", "glassdata/HOYA20250623_include_obsolete.agf"),
             new Cat("Schott", "glassdata/SCHOTT.AGF"),
             new Cat("Ohara", "glassdata/OHARA.agf"),
+            new Cat("CDGM", "glassdata/CDGM.AGF"),
     };
 
 //    public static GlassMap toGlassMap(AGFBase agf) {

@@ -7,6 +7,7 @@ import org.redukti.mathlib.SecantSolver;
 import org.redukti.mathlib.Vector2;
 import org.redukti.rayoptics.exceptions.TraceException;
 import org.redukti.rayoptics.exceptions.TraceMissedSurfaceException;
+import org.redukti.rayoptics.exceptions.TraceRayBlockedException;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.specs.ImageKey;
@@ -103,7 +104,7 @@ public class VigCalc {
             var fld_wvl_foc = osp.lookup_fld_wvl_focus(fi);
             var fld = fld_wvl_foc.first;
             var wvl = fld_wvl_foc.second;
-            calc_vignetting_for_field(opm,fld,wvl,use_bisection);
+            calc_vignetting_for_field(opm,fld,wvl,use_bisection,null);
         }
     }
 
@@ -126,19 +127,19 @@ public class VigCalc {
 
         // iterate the on-axis marginal ray thru the edge of the stop.
         var fld_foc = osp.lookup_fld_wvl_focus(0);
-        var fld = fld_foc.first;
-        var wvl = fld_foc.second;
+        var fld_0 = fld_foc.first;
+        var cwl = fld_foc.second;
         var foc = fld_foc.third;
         var stop_radius = Lists.get(sm.ifcs,idx_stop).surface_od();
-        var start_coords = iterate_pupil_ray(opm,sm.stop_surface,1,1.0,stop_radius,fld,wvl);
+        var start_coords = iterate_pupil_ray(opm,sm.stop_surface,1,1.0,stop_radius,fld_0,cwl);
 
         // trace the real axial marginal ray
         var options = new TraceOptions();
         options.output_filter = null;
-        options.rayerr_filter = null;
+        options.rayerr_filter = "full";
         options.apply_vignetting = false;
         options.check_apertures = true;
-        var ray_result = Trace.trace_safe(opm,start_coords,fld,wvl,options);
+        var ray_result = Trace.trace_safe(opm,start_coords,fld_0,cwl,options);
         var ray_pkg = ray_result.pkg;
         var ray_err = ray_result.err;
 
@@ -146,11 +147,12 @@ public class VigCalc {
         var pupil_spec = osp.pupil.key.valueKey;
         var pupil_value_orig = osp.pupil.value;
 
+        var parax_data = opm.optical_spec.parax_data;
+        var ax_ray = parax_data.ax_ray;
+        var fod = parax_data.fod;
         if (use_parax) {
-            var parax_data = opm.optical_spec.parax_data;
-            var ax_ray = parax_data.ax_ray;
-            var fod = parax_data.fod;
             var scale_ratio = stop_radius/ax_ray.get(idx_stop).ht;
+            //logger.debug(f"{scale_ratio=:8.5f} (parax)")
             if (obj_img_key == ImageKey.Object) {
                 if (pupil_spec == ValueKey.EPD) {
                     osp.pupil.value = scale_ratio * (2 * fod.enp_radius);
@@ -185,11 +187,12 @@ public class VigCalc {
             }
         }
         else {
+            var scale_ratio = ray_pkg.ray.get(1).p.y/ax_ray.get(1).ht;
             if (obj_img_key == ImageKey.Object) {
                 if (pupil_spec == ValueKey.EPD) {
                     var rs1 = ray_pkg.ray.get(1);
                     var ht = rs1.p.y;
-                    osp.pupil.value = 2.0 * ht;
+                    osp.pupil.value *= scale_ratio;
                 } else {
                     var rs0 = ray_pkg.ray.get(0);
                     var slp0 = rs0.d.y / rs0.d.z;
@@ -206,7 +209,7 @@ public class VigCalc {
                     var ht = rsm2.p.y;
                     osp.pupil.value = 2.0 * ht;
                 } else {
-                    var slpk = rsm2.d.y / rsm2.d.z;
+                    var slpk = scale_ratio * Lists.get(ax_ray,-1).slp;
                     if (pupil_spec == ValueKey.NA) {
                         var nk = sm.central_rndx(0);
                         osp.pupil.value = -nk * rsm2.d.y;
@@ -215,6 +218,18 @@ public class VigCalc {
                     }
                 }
             }
+        }
+        // trace the real axial marginal ray with aperture clipping
+        var clipoptions = new TraceOptions();
+        clipoptions.output_filter = null;
+        clipoptions.rayerr_filter = "full";
+        clipoptions.apply_vignetting = false;
+        clipoptions.check_apertures = true;
+        var clipped_rr = Trace.trace_safe(opm, start_coords, fld_0, cwl,clipoptions);
+        var clipped_ray_err = clipped_rr.err;
+        if (clipped_ray_err != null) {
+            if (clipped_ray_err instanceof TraceRayBlockedException)
+                System.err.println("Axial bundle limited by surface " + clipped_ray_err.surf + " not stop surface.");
         }
         if (!Objects.equals(osp.pupil.value,pupil_value_orig)) {
             opm.update_model();
@@ -226,7 +241,8 @@ public class VigCalc {
             OpticalModel opm,
             Field fld,
             double wvl,
-            Boolean use_bisection) {
+            Boolean use_bisection,
+            Integer max_iter_count) {
         if (use_bisection == null)
             use_bisection = opm.optical_spec.fov.is_wide_angle;
         var pupil_starts = opm.optical_spec.pupil.pupil_rays;
@@ -237,81 +253,18 @@ public class VigCalc {
             var startv = new Vector2(start[0],start[1]);
             VigResult result;
             if (use_bisection) {
-                result = calc_vignetted_ray_by_bisection(opm,xy,startv,fld,wvl,null);
+                result = calc_vignetted_ray_by_bisection(opm,xy,startv,fld,wvl,max_iter_count);
             }
             else {
-                result = calc_vignetted_ray(opm,xy,startv,fld,wvl,null);
+                result = calc_vignetted_ray(opm,xy,startv,fld,wvl,max_iter_count);
             }
             vig_factors[i] = result.vig;
         }
-
         // update the field's vignetting factors
         fld.vux = vig_factors[0];
         fld.vlx = vig_factors[1];
         fld.vuy = vig_factors[2];
         fld.vly = vig_factors[3];
-    }
-
-    public static VigResult calc_vignetted_ray(
-            OpticalModel opm,
-            int xy,
-            Vector2 start_dir,
-            Field fld,
-            double wvl,
-            Integer max_iter_count) {
-        if (max_iter_count == null) max_iter_count = 10;
-
-        var rel_p1 = start_dir;
-        var sm = opm.seq_model;
-        var still_iterating = true;
-        Integer last_index = null;
-        Integer stop_indx = null;
-        var iter_count = 0;
-        RayPkg ray_pkg = null;
-
-        while (still_iterating && iter_count < max_iter_count) {
-            iter_count++;
-            try {
-                var options = new TraceOptions();
-                options.apply_vignetting = false;
-                options.check_apertures = true;
-                options.pt_inside_fuzz=1e-4;
-                ray_pkg = Trace.trace_base(opm,rel_p1.as_array(),fld,wvl,options);
-                //  ray successfully traced.
-                if (last_index != null)
-                    // fall through and exit
-                    still_iterating = false;
-                else {
-                    // this is the first time through
-                    // iterate to find the ray that goes through the edge
-                    // of the stop surface
-                    Integer indx;
-                    indx = stop_indx = sm.stop_surface;
-                    if (stop_indx != null) {
-                        var r_target = Lists.get(sm.ifcs,stop_indx).edge_pt_target(start_dir);
-                        rel_p1 = iterate_pupil_ray(opm,indx,xy,rel_p1.v(xy),r_target.v(xy),fld,wvl);
-                        still_iterating = true;
-                        last_index = indx;
-                    }
-                    else still_iterating = false;
-                }
-            }
-            catch (TraceException ray_error) {
-                ray_pkg = ray_error.ray_pkg;
-                Integer indx = ray_error.surf;
-                if (Objects.equals(indx,last_index)) {
-                    still_iterating = false;
-                }
-                else {
-                    var r_target = Lists.get(sm.ifcs,indx).edge_pt_target(start_dir);
-                    rel_p1 = iterate_pupil_ray(opm,indx,xy,rel_p1.v(xy),r_target.v(xy),fld,wvl);
-                    still_iterating = true;
-                    last_index = indx;
-                }
-            }
-        }
-        var vig = 1.0 - (rel_p1.v(xy)/start_dir.v(xy));
-        return new VigResult(vig,last_index,ray_pkg);
     }
 
     /**
@@ -327,10 +280,111 @@ public class VigCalc {
      *         max_iter_count: fail-safe limit on aperture search
      *
      *     Returns:
-     *         (**vig**, **last_indx**, **ray_pkg**)
+     *         (**vig**, **clip_indx**, **ray_pkg**)
      *
      *         - **vig** - vignetting factor
-     *         - **last_indx** - the index of the limiting interface
+     *         - **clip_indx** - the index of the limiting interface
+     *         - **ray_pkg** - the vignetting-limited ray
+     */
+    public static VigResult calc_vignetted_ray(
+            OpticalModel opm,
+            int xy,
+            Vector2 start_dir,
+            Field fld,
+            double wvl,
+            Integer max_iter_count) {
+        if (max_iter_count == null) max_iter_count = 50;
+
+        var rel_p1 = start_dir;
+        var sm = opm.seq_model;
+        var still_iterating = true;
+        Integer clip_indx = null;
+        Integer stop_indx = null;
+        var iter_count = 0;
+        RayPkg ray_pkg = null;
+
+        while (still_iterating && iter_count < max_iter_count) {
+            iter_count++;
+            try {
+                var options = new TraceOptions();
+                options.apply_vignetting = false;
+                options.check_apertures = true;
+                options.pt_inside_fuzz=1e-4;
+                ray_pkg = Trace.trace_base(opm,rel_p1.as_array(),fld,wvl,options);
+                //  ray successfully traced.
+                if (clip_indx != null) {
+                    // fall through and exit
+                    var r_target = Lists.get(sm.ifcs, clip_indx).edge_pt_target(start_dir);
+                    var p = Lists.get(ray_pkg.ray, clip_indx).p;
+                    var r_ray = Math.copySign(Math.sqrt(p.x * p.x + p.y * p.y), r_target.v(xy));
+                    var r_error = r_ray - r_target.v(xy);
+//                    logger.debug(f" C {xy_str[xy]} = {rel_p1[xy]:10.6f}:   "
+//                            f"blocked at {clip_indx}, del={r_error:8.1e}, "
+//                            "exiting")
+                    still_iterating = false;
+                }
+                else {
+                    // this is the first time through
+                    // iterate to find the ray that goes through the edge
+                    // of the stop surface
+                    Integer indx;
+                    indx = stop_indx = sm.stop_surface;
+                    if (stop_indx != null) {
+                        var r_target = Lists.get(sm.ifcs,stop_indx).edge_pt_target(start_dir);
+//                        logger.debug(f" D {xy_str[xy]} = {rel_p1[xy]:10.6f}:   "
+//                                f"passed first time, iterate to edge of stop, "
+//                                f"ifcs[{stop_indx}]")
+                        rel_p1 = iterate_pupil_ray(opm,indx,xy,rel_p1.v(xy),r_target.v(xy),fld,wvl);
+                        still_iterating = true;
+                        clip_indx = indx;
+                    }
+                    else still_iterating = false;
+                }
+            }
+            catch (TraceException ray_error) {
+                ray_pkg = ray_error.ray_pkg;
+                Integer indx = ray_error.surf;
+                if (Objects.equals(indx,clip_indx)) {
+                    var r_target = Lists.get(sm.ifcs,clip_indx).edge_pt_target(start_dir);
+                    var p = Lists.get(ray_pkg.ray,clip_indx).p;
+                    var r_ray = Math.copySign(Math.sqrt(p.x*p.x + p.y*p.y), r_target.v(xy));
+                    var r_error = r_ray - r_target.v(xy);
+//                    logger.debug(f" A {xy_str[xy]} = {rel_p1[xy]:10.6f}:   "
+//                            f"blocked at {clip_indx}, del={r_error:8.1e}, "
+//                            "exiting")
+                    still_iterating = false;
+                }
+                else {
+                    var r_target = Lists.get(sm.ifcs,indx).edge_pt_target(start_dir);
+                    rel_p1 = iterate_pupil_ray(opm,indx,xy,rel_p1.v(xy),r_target.v(xy),fld,wvl);
+                    still_iterating = true;
+                    clip_indx = indx;
+                }
+            }
+        }
+        var vig = 1.0 - (rel_p1.v(xy)/start_dir.v(xy));
+//        logger.info(f" ray: ({start_dir[0]:2.0f}, {start_dir[1]:2.0f}), "
+//                f"vig={vig:8.4f}, limited at ifcs[{clip_indx}]")
+        return new VigResult(vig,clip_indx,ray_pkg);
+    }
+
+    /**
+     * Find the limiting aperture and return the vignetting factor.
+     *
+     *     Args:
+     *         opm: :class:`~.OpticalModel` instance
+     *         xy: 0 or 1 depending on x or y axis as the pupil direction
+     *         start_dir: the unit length starting pupil coordinates, e.g [1., 0.].
+     *                    This establishes the radial direction of the ray iteration.
+     *         fld: :class:`~.Field` point for wave aberration calculation
+     *         wvl: wavelength of ray (nm)
+     *         max_iter_count: fail-safe limit on aperture search
+     *
+     *     Returns:
+     *         (**vig**, **clip_indx**, **ray_pkg**)
+     *
+     *         - **vig** - vignetting factor
+     *         - **clip_indx** - the index of the limiting interface
      *         - **ray_pkg** - the vignetting-limited ray
      */
     public static VigResult calc_vignetted_ray_by_bisection(
@@ -340,10 +394,12 @@ public class VigCalc {
             Field fld,
             double wvl,
             Integer max_iter_count) {
+//        logger.debug(f"fld={fld.yf:5.2f}, [{start_dir[0]:5.2f}, "
+//                f"{start_dir[1]:5.2f}]")
         if (max_iter_count == null) max_iter_count = 10;
 
         var rel_p1 = start_dir;
-        Integer last_index = null;
+        Integer clip_indx = null;
         var iter_count = 0;
         var step_size = 1.0;
         RayPkg ray_pkg = null;
@@ -361,12 +417,15 @@ public class VigCalc {
             }
             catch (TraceException ray_error) {
                 ray_pkg = ray_error.ray_pkg;
-                last_index = ray_error.surf;
+                clip_indx = ray_error.surf;
                 rel_p1 = start_dir.times(-step_size).plus(rel_p1);
+//                logger.debug(f"{xy_str[xy]} = {rel_p1[xy]:10.6f}: "
+//                        f"blocked at {clip_indx}")
             }
         }
         var vig = 1.0 - (rel_p1.v(xy)/start_dir.v(xy));
-        return new VigResult(vig,last_index,ray_pkg);
+//        logger.debug(f"   {vig=:7.4f}, {clip_indx=}")
+        return new VigResult(vig,clip_indx,ray_pkg);
     }
 
     static class R_Pupil_Coordinate implements SecantSolver.ObjectiveFunction {
@@ -400,15 +459,23 @@ public class VigCalc {
             catch (TraceException ray_err) {
                 ray_pkg = ray_err.ray_pkg;
                 if (ray_err instanceof TraceMissedSurfaceException) {
-                    if (ray_err.surf <= indx)
+                    if (ray_err.surf <= indx) {
+                        ray_err.rel_p1 = rel_p1;
                         throw ray_err;
+                    }
                 }
-                else if (ray_err.surf < indx)
+                else if (ray_err.surf < indx) {
+                    ray_err.rel_p1 = rel_p1;
                     throw ray_err;
+                }
             }
-            var ray = ray_pkg.ray;
-            var r_ray = Lists.get(ray,indx).p.v(xy);
-            return r_ray - r_target;
+            // compute the radial distance to the intersection point
+            var p = Lists.get(ray_pkg.ray,indx).p;
+            var r_ray = Math.copySign(Math.sqrt(p.x*p.x + p.y*p.y), r_target);
+            var delta = r_ray - r_target;
+//            logger.debug(f"  {xy_coord=:8.5f}   {r_ray=:8.5f}    "
+//                    f"delta={delta:9.2g}")
+            return delta;
         }
     }
 
@@ -440,8 +507,10 @@ public class VigCalc {
             try {
                 start_r = SecantSolver.find_root(objective_fn, start_r0, 50, 1e-6);
             }
-            catch (TraceException ray_err) {
-                start_r = 0;
+            catch (TraceException rt_err) {
+//                logger.debug(f"  {type(rt_err).__name__}: surf={rt_err.surf}    "
+//                        f"rel_p1={rt_err.rel_p1[xy]=:8.5f}   ")
+                start_r = 0.9*rt_err.rel_p1.v(xy);
             }
             start_coord.set(xy,start_r);
         }

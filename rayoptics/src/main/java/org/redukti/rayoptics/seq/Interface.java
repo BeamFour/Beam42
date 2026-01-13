@@ -85,7 +85,7 @@ public class Interface {
      *             edge_pt: intersection point of rel_dir with the aperture boundary
      */
     public Vector2 edge_pt_target(Vector2 rel_dir) {
-        return rel_dir.times(max_aperture);
+        return rel_dir.normalize().times(max_aperture);
     }
 
     /**

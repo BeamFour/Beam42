@@ -3,6 +3,7 @@
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.exceptions;
 
+import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.math.Tfm3d;
 import org.redukti.rayoptics.raytr.RayPkg;
@@ -15,7 +16,7 @@ public class TraceException extends RuntimeException {
     public Vector3 int_pt;
     public Tfm3d prev_tfrm;
     public RayPkg ray_pkg;
-
+    public Vector2 rel_p1;
 
     public TraceException() {
     }

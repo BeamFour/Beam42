@@ -41,7 +41,7 @@ public class Circular extends Aperture {
      */
     @Override
     public Vector2 edge_pt_target(Vector2 rel_dir) {
-        return new Vector2(radius*rel_dir.x, radius*rel_dir.y);
+        return rel_dir.normalize().times(radius);
     }
 
     @Override

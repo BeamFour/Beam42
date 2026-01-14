@@ -3,6 +3,7 @@
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.raytr;
 
+import org.redukti.mathlib.ScalarObjectiveFunction;
 import org.redukti.mathlib.SecantSolver;
 import org.redukti.mathlib.Vector2;
 import org.redukti.rayoptics.exceptions.TraceException;
@@ -428,7 +429,7 @@ public class VigCalc {
         return new VigResult(vig,clip_indx,ray_pkg);
     }
 
-    static class R_Pupil_Coordinate implements SecantSolver.ObjectiveFunction {
+    static class R_Pupil_Coordinate implements ScalarObjectiveFunction {
         OpticalModel opt_model;
         int indx;
         int xy;
@@ -446,7 +447,7 @@ public class VigCalc {
         }
 
         @Override
-        public double eval(double xy_coord) {
+        public Double eval(double xy_coord) {
             var rel_p1 = Vector2.vector2_0;
             rel_p1.set(xy, xy_coord);
             RayPkg ray_pkg;
@@ -505,7 +506,7 @@ public class VigCalc {
         if (indx != null) {
             var objective_fn = new R_Pupil_Coordinate(opt_model,indx,xy,fld,wvl,r_target);
             try {
-                start_r = SecantSolver.find_root(objective_fn, start_r0, 50, 1e-6);
+                start_r = SecantSolver.find_root(objective_fn, start_r0, 50, 1e-6).root;
             }
             catch (TraceException rt_err) {
 //                logger.debug(f"  {type(rt_err).__name__}: surf={rt_err.surf}    "

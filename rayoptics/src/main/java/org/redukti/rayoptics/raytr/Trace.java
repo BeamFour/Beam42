@@ -283,7 +283,7 @@ public class Trace {
     }
 
     /* 1D solver */
-    static class SecantFunction extends BaseObjectiveFunction implements SecantSolver.ObjectiveFunction {
+    static class SecantFunction extends BaseObjectiveFunction implements ScalarObjectiveFunction {
 
         final double y_target;
 
@@ -293,7 +293,7 @@ public class Trace {
         }
 
         @Override
-        public double eval(double y1) {
+        public Double eval(double y1) {
             RaySeg seg = eval(0., y1);
             double y_ray = seg.p.y;
             return y_ray - y_target;
@@ -403,7 +403,7 @@ public class Trace {
     public static IterationResult get_1d_solution(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double y_target, boolean not_wa) {
         IterationResult res = new IterationResult();
         SecantFunction fn = new SecantFunction(seq_model, ifcx, pt0, dist, wvl, y_target, not_wa, res.rr);
-        double start_y = SecantSolver.find_root(fn, 0., 50, 1.48e-8);
+        double start_y = SecantSolver.find_root(fn, 0., 50, 1.48e-8).root;
         res.start_coords = new double[]{0, start_y};
         return res;
     }
@@ -952,7 +952,7 @@ public class Trace {
     }
 
     /* 1D solver */
-    static class SecantFunctionRaw extends BaseObjectiveFunctionRaw implements SecantSolver.ObjectiveFunction {
+    static class SecantFunctionRaw extends BaseObjectiveFunctionRaw implements ScalarObjectiveFunction {
 
         final double y_target;
 
@@ -962,7 +962,7 @@ public class Trace {
         }
 
         @Override
-        public double eval(double y1) {
+        public Double eval(double y1) {
             RaySeg seg = eval(0., y1);
             double y_ray = seg.p.y;
             return y_ray - y_target;
@@ -1071,7 +1071,7 @@ public class Trace {
     public static IterationResult get_1d_solution_raw(List<PathSeg> pthlist, Integer ifcx, Vector3 pt0, double dist, double wvl, double y_target, boolean not_wa) {
         IterationResult res = new IterationResult();
         SecantFunctionRaw fn = new SecantFunctionRaw(pthlist, ifcx, pt0, dist, wvl, y_target, not_wa, res.rr);
-        double start_y = SecantSolver.find_root(fn, 0., 50, 1.48e-8);
+        double start_y = SecantSolver.find_root(fn, 0., 50, 1.48e-8).root;
         res.start_coords = new double[]{0, start_y};
         return res;
     }

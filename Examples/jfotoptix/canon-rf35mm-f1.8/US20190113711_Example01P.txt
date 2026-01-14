@@ -1,0 +1,75 @@
+[descriptive data]					
+title	US 2019/0113711 Example 1 (Canon RF35mm F1.8 Macro IS STM)
+[constants]					
+[variable distances]					
+Focal Length	36.00	undefined
+Angle of View	62.00	undefined
+F-Number	1.85	undefined
+Image Height	43.28	43.28
+Total Length	80.45	undefined
+Magnification	0	-0.5
+d0	Infinity	71.63
+d17	0.95	18.25
+Bf	11.66	11.66
+P	14.34	undefined
+P'	-45.98	undefined
+H	27.86	undefined
+H'	-24.34	undefined
+[lens data]					
+1	800.000	1.00	1.80810	27.80	22.8
+2	33.296	1.92		25.64	
+3	103.801	3.11	2.00100	25.57	29.1
+4	-86.901	4.09		25.07	
+5	-47.674	1.30	1.51742	20.44	52.4
+6	17.367	5.73	1.90043	21.60	37.4
+7	777.674	3.72		21.26	
+8	AS	3.62		20.16	
+9	64.497	2.12	1.69680	19.04	55.5
+10	-262.934	3.56		18.69	
+11	-35.963	1.30	1.58313	17.10	59.4
+12	-93.550	0.13		17.19	
+13	-84.988	6.26	1.88300	17.29	40.8
+14	-12.701	1.00	1.85478	18.97	24.8
+15	135.000	5.27		22.77	
+16	800.000	7.35	1.90043	31.72	37.4
+17	-28.799	d17		33.14	
+18	-109.518	2.86	1.69680	34.06	55.5
+19	-53.092	11.79		34.38	
+20	-29.766	1.70	1.59270	33.78	35.3
+21	-114.300	Bf		36.27	
+[aspherical data]					
+11	-35.963	0	-4.61997E-05	-9.22837E-08	-4.60687E-10	1.65555E-13
+[element data]
+1	-43.02
+2	47.64
+3	-24.44
+4	19.66
+5	74.53
+6	-101.03
+7	16.25
+8	-13.54
+9	31.00
+10	144.87
+11	-68.42
+[group data]
+L1	1	99.20	20.87	15.09	0.76
+L2	9	41.43	27.00	21.32	1.84
+L3	18	-148.84	16.35	24.66	8.68
+[figure]
+source	Data/US20190113711_Figure01.png
+originX	59.54
+originY	428.39
+ppmm	10.575
+[figure]
+caption	engineering
+source	Data/JP2020-034851_Figure01.png
+originX	122.59
+originY	239.46
+ppmm	3.357
+[figure]
+source	Data/US20190113711_Figure01P.png
+originX	23.42
+originY	123.85
+ppmm	3.171
+[notes]					
+Bill: Patent diameters. CLD d0 measured.

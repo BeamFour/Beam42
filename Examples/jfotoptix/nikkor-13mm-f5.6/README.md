@@ -39,9 +39,10 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 29 | -9.6 | 0.1 | 10.68 |  |  |  |
 | 30 | 900.0 | 0.8 | 10.68 | 1.8663 | 37.9 |  |
 | 31 | 30.7 | 5.7 | 17.26 | 1.48749 | 70.0 |  |
-| 32 | -14.901 | 37.52 | 17.26 |  |  |  |
+| 32 | -14.901 | 37.21 | 17.26 |  |  |  |
 ## Layouts
-![Layout Only](./layout.svg)
+![Layout Only](./layoutonly.svg)
+![Layout](./layout.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew.svg)
@@ -61,7 +62,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | fno | 8
 | enp_dist_P | 47.169
 | enp_radius | 0.822
-| exp_dist_P' | -19.454
+| exp_dist_P' | -19.144
 | exp_radius | 3.551
 | m | -0
 | red | -7.600567756934285E8
@@ -74,19 +75,27 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 14.614 | 27.246|
- | Field(x=0.0, y=0.707) | 22.891 | 44.135|
- | Field(x=0.0, y=1.0) | 29.073 | 80.413|
-## Ray Aberrations
-### Field 0.0
-![Tangential Ray Aberrations 0.0](./rayabbr-fld0-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld0-sag.svg)
-### Field 0.7
-![Tangential Ray Aberrations 0.0](./rayabbr-fld1-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld1-sag.svg)
-### Field 1.0
-![Tangential Ray Aberrations 0.0](./rayabbr-fld2-tan.svg)
-![Sagittal Ray Aberrations 0.0](./rayabbr-fld2-sag.svg)
+ | Field(x=0.0, y=0.0) | 3.768 | 7.646|
+ | Field(x=0.0, y=0.1) | 4.274 | 9.094|
+ | Field(x=0.0, y=0.2) | 5.59 | 11.265|
+ | Field(x=0.0, y=0.3) | 7.355 | 14.708|
+ | Field(x=0.0, y=0.4) | 9.388 | 17.9|
+ | Field(x=0.0, y=0.5) | 11.465 | 20.3|
+ | Field(x=0.0, y=0.6) | 13.253 | 23.485|
+ | Field(x=0.0, y=0.7) | 14.429 | 25.956|
+ | Field(x=0.0, y=0.8) | 14.636 | 30.422|
+ | Field(x=0.0, y=0.9) | 11.795 | 30.3|
+ | Field(x=0.0, y=1.0) | 22.568 | 62.884|
+## Polychromatic Geometric MTF
+![Polychromatic Geometrical MTF](./mtf.svg)
+* 10,30,50 cycles/mm
+* Black lines represent sagittal, blue tangential
+* To generate above, MTFs for wavelengths 587.5618(d), 486.1327(F), 656.2725(C) were calculated across 10 fields, and then averaged
+## Polychromatic Geometric MTF (Weighted)
+![Polychromatic Geometrical MTF Weighted](./mtf-w.svg)
+* 10,30,50 cycles/mm
+* Black lines represent sagittal, blue tangential
+* To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./US003728011_Example01.txt)
 * [Zemax file](./US003728011_Example01.zmx)

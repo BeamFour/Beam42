@@ -12,7 +12,7 @@ Image Height	43.2
 Total Length	undefined
 Magnification	0
 d0	Infinity
-Bf	37.52
+Bf	37.21
 Aperture Diameter	4.317
 [lens data]
 1	57.2	3.9	1.77279	106.62	49.5

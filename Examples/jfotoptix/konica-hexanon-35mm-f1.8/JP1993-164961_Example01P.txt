@@ -14,7 +14,7 @@ Magnification	0
 d0	Infinity
 Bf()	22.21
 Bf(p)	undefined
-Bf	13.79
+Bf	13.69
 [lens data]
 1	24.9025	3.91300	1.77250	27.16	49.6	S-LAH66	Ohara
 2	77.4900	0.19565		25.63

@@ -1,0 +1,45 @@
+[descriptive data]
+title	JP1993-164961 Example 1 (Konica Hexanon 35mm F2.0)
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP1993-164961	EX 1	1991	SHIMAZAKI YOSHIO	KONICA CORP	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-H05-164961/11/en
+lens name	Konica Hexanon 35mm F2.0
+[constants]
+Scaled	35	1
+[variable distances]
+Focal Length	35
+Angle of View	63
+F-Number	2
+Image Height	43.26
+Magnification	0
+d0	Infinity
+Bf()	22.21
+Bf(p)	undefined
+Bf	13.79
+[lens data]
+1	24.9025	3.91300	1.77250	27.16	49.6	S-LAH66	Ohara
+2	77.4900	0.19565		25.63
+3	12.1590	2.93475	1.74100	18.27	52.7	S-LAL61	Ohara
+4	16.0475	0.53795		15.56	
+5	20.4645	0.78260	1.71736	15.56	29.5	S-TIH1	Ohara
+6	8.9390	4.57		13.18	
+6AS	AS	5.70250		12.084
+7	-8.8305	0.88060	1.59270	13.23	35.3	S-FTM16	Ohara
+8	-12.7470	0.14665		14.63	
+9	-31.5245	4.06000	1.74100	16.68	52.7	S-LAL61	Ohara
+10	-13.1740	0.19565		19.09	
+11	140.1750	4.20700	1.77250	24.17	49.6	S-LAH66	Ohara
+12	-27.3910	0.97825	1.72825	24.17	28.5	S-TIH10	Ohara
+13	-174.3000	8.42		25.81	
+13FS	FS	Bf		32.09
+[figure]
+source	Data/JP1993-164961_Figure01.png
+originX	41.83
+originY	275.01
+ppmm	18.078
+[figure]
+source	Data/JP1993-164961_Figure01P.png
+originX	360.63
+originY	495.33
+ppmm	16.832
+[notes]
+Bill: Bf() is without FS.

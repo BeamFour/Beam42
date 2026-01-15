@@ -165,6 +165,15 @@ public class FieldSpec {
         this.index_labels = index_labels.toArray(new String[0]);
     }
 
+
+    public Field with_index_label(String label) {
+        for (int i = 0; i < index_labels.length; i++) {
+            if (index_labels[i].equals(label))
+                return fields[i];
+        }
+        return null;
+    }
+
     public void apply_scale_factor(double scale_factor) {
         ValueKey value_key = key.valueKey;
         if (value_key == ValueKey.Height) {

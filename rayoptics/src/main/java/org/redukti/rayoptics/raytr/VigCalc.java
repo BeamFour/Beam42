@@ -66,9 +66,11 @@ public class VigCalc {
         var rayset = Trace.trace_boundary_rays(opt_model,new TraceOptions());
         var stop_surf = sm.stop_surface;
         if (stop_surf != null && include_list.contains(stop_surf)) {
-            Double max_ap = max_aperture_at_surf(rayset,stop_surf);
-            if (max_ap != null)
+            Double max_ap = max_aperture_at_surf(List.of(rayset.get(0)),stop_surf);
+            if (max_ap != null) {
+                System.out.println("Setting stop aperture to " + max_ap);
                 sm.ifcs.get(stop_surf).set_max_aperture(max_ap);
+            }
         }
         for (var i: include_list) {
             if (!Objects.equals(i,stop_surf)) {
@@ -107,6 +109,13 @@ public class VigCalc {
             var wvl = fld_wvl_foc.second;
             calc_vignetting_for_field(opm,fld,wvl,use_bisection,null);
         }
+    }
+
+    public static void set_stop_aperture(OpticalModel opm) {
+        var sm = opm.seq_model;
+        opm.optical_spec.fov.with_index_label("axis").clear_vignetting();
+        set_clear_apertures(opm,null,List.of(sm.stop_surface));
+        set_vig(opm,false);
     }
 
     /**
@@ -448,8 +457,7 @@ public class VigCalc {
 
         @Override
         public Double eval(double xy_coord) {
-            var rel_p1 = Vector2.vector2_0;
-            rel_p1.set(xy, xy_coord);
+            var rel_p1 = Vector2.vector2_0.set(xy, xy_coord);
             RayPkg ray_pkg;
             try {
                 var options = new TraceOptions();
@@ -513,10 +521,9 @@ public class VigCalc {
 //                        f"rel_p1={rt_err.rel_p1[xy]=:8.5f}   ")
                 start_r = 0.9*rt_err.rel_p1.v(xy);
             }
-            start_coord.set(xy,start_r);
+            return start_coord.set(xy,start_r);
         }
         else
-            start_coord.set(xy,r_target);
-        return start_coord;
+            return start_coord.set(xy,r_target);
     }
 }

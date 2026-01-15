@@ -141,10 +141,10 @@ public class Nikkor14mmTest {
         Assertions.assertEquals(1.000, fod.n_img, 0.001);
         Assertions.assertEquals(2.849, fod.opt_inv, 0.001);
 
-        double cr_expected_op_delta[] = { 129.68211720000002, 144.5443500746337 };
+        double[] cr_expected_op_delta = { 129.68211720000002, 144.54435163923452 };
         RaySeg[] cr_expected_final_rayseg = {
             new RaySeg(new Vector3(0., 0., 0.), new Vector3(0., 0., 1.), 0.0, new Vector3(-0., -0., 1.)),
-            new RaySeg(new Vector3(0., 20.362505270553246, 0.), new Vector3(0., 0.4476132717362105, 0.8942272412343552), 0.0, new Vector3(-0., -0., 1.))
+            new RaySeg(new Vector3(0., 20.362505270545146, 0.), new Vector3(0., 0.4476133316595901, 0.8942272112391799), 0.0, new Vector3(-0., -0., 1.))
         };
 
         for (int fi = 1; fi < osp.fov.fields.length; fi++) {

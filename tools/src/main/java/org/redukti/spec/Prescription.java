@@ -404,7 +404,8 @@ public class Prescription {
         opm.update_model();
         if (apply_vignetting) {
             if (osp.fov.is_wide_angle)
-                VigCalc.set_vig(opm, true);
+                //VigCalc.set_vig(opm, true);
+                VigCalc.set_stop_aperture(opm);
             else
                 Trace.apply_paraxial_vignetting(opm);
             opm.update_model();

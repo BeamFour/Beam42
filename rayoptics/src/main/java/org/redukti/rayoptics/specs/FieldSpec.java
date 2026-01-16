@@ -72,6 +72,9 @@ public class FieldSpec {
     public FieldSpec(OpticalSpecs parent, Pair<ImageKey, ValueKey> key, double[] flds, boolean is_wide_angle) {
         this(parent, key, 0.0, flds, null, is_wide_angle, null);
     }
+    public FieldSpec(OpticalSpecs parent, Pair<ImageKey, ValueKey> key, double value, double[] flds, boolean is_relative, boolean is_wide_angle) {
+        this(parent, key, value, flds, is_relative, is_wide_angle, null);
+    }
 
     private Field[] set_from_list(double[] flds) {
         fields = new Field[flds.length];

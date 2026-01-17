@@ -15,7 +15,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 5 | 9.345 | 3.803 | 13.91 |  |  |  |
 | 6 | AS | 4.247 | 13.69 |  |  |  |
 | 7 | -10.395 | 1.925 | 13.35 | 1.62041 | 60.29 | Ohara | S-BSM16 |
-| 8 | -7.525 | 0.91 | 13.35 | 1.575 | 41.3 |  |
+| 8 | -7.525 | 0.91 | 13.35 | 1.57501 | 41.51 | Ohara | S-TIL27 |
 | 9 | -115.465 | 2.415 | 16.49 | 1.6779 | 55.34 | Ohara | S-LAL12 |
 | 10 | -14.77 | 0.035 | 16.49 |  |  |  |
 | 11 | 148.75 | 2.905 | 19.49 | 1.6935 | 53.21 | Ohara | S-LAL13 |
@@ -32,22 +32,22 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
-| effective_focal_length |35.034
-| back_focal_length | 24.264
+| effective_focal_length |35.035
+| back_focal_length | 24.265
 | optical_invariant | 5.612
 | object_distance | 1.0E10
-| image_distance | 24.264
+| image_distance | 24.265
 | power | 0.029
-| pp1_H | 16.656
+| pp1_H | 16.655
 | ppk_H' | -10.77
-| ffl_F | -18.378
+| ffl_F | -18.379
 | fno | 1.802
 | enp_dist_P | 12.654
 | enp_radius | 9.72
-| exp_dist_P' | -15.174
+| exp_dist_P' | -15.173
 | exp_radius | 10.973
 | m | -0
-| red | -2.8543900205420476E8
+| red | -2.854319836534197E8
 | n_obj | 1
 | n_img | 1
 | img_ht | 20.227
@@ -57,17 +57,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 14.013 | 45.479|
- | Field(x=0.0, y=0.1) | 9.814 | 41.809|
- | Field(x=0.0, y=0.2) | 18.939 | 92.172|
- | Field(x=0.0, y=0.3) | 39.451 | 173.384|
- | Field(x=0.0, y=0.4) | 60.114 | 236.431|
- | Field(x=0.0, y=0.5) | 72.747 | 262.231|
- | Field(x=0.0, y=0.6) | 86.638 | 270.319|
- | Field(x=0.0, y=0.7) | 94.897 | 303.862|
- | Field(x=0.0, y=0.8) | 107.46 | 433.095|
- | Field(x=0.0, y=0.9) | 128.899 | 541.2|
- | Field(x=0.0, y=1.0) | 100.124 | 344.564|
+ | Field(x=0.0, y=0.0) | 14.123 | 45.076|
+ | Field(x=0.0, y=0.1) | 9.956 | 41.413|
+ | Field(x=0.0, y=0.2) | 18.986 | 91.155|
+ | Field(x=0.0, y=0.3) | 39.471 | 173.716|
+ | Field(x=0.0, y=0.4) | 60.128 | 236.729|
+ | Field(x=0.0, y=0.5) | 72.769 | 262.485|
+ | Field(x=0.0, y=0.6) | 86.658 | 270.831|
+ | Field(x=0.0, y=0.7) | 94.911 | 304.601|
+ | Field(x=0.0, y=0.8) | 107.469 | 433.792|
+ | Field(x=0.0, y=0.9) | 128.901 | 541.791|
+ | Field(x=0.0, y=1.0) | 100.11 | 344.887|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm

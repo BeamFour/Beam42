@@ -22,6 +22,7 @@ import org.redukti.rayoptics.parax.FirstOrderData;
 import org.redukti.rayoptics.raytr.TraceOptions;
 import org.redukti.render.rendering.RendererSvg;
 import org.redukti.spec.Prescription;
+import org.redukti.spec.VigType;
 import org.redukti.util.Args;
 import org.redukti.util.Helper;
 
@@ -49,8 +50,8 @@ public class LensTool2 {
         var p = Prescription.buildPrescription(specs,use_glass_types,wvls,wts);
         return p;
     }
-    public static OpticalModel createSystem(Prescription prescription,boolean fov_angle,boolean apply_vignetting,boolean use_wideangle_aiming,double[] fields) {
-        return prescription.build_ray_optics_model(fov_angle,fields,apply_vignetting,use_wideangle_aiming);
+    public static OpticalModel createSystem(Prescription prescription, boolean fov_angle, VigType vig_type, boolean use_wideangle_aiming, double[] fields) {
+        return prescription.build_ray_optics_model(fov_angle,fields,false,vig_type,use_wideangle_aiming);
     }
 
     public static void outputSpotAnalysis(SpotAnalysisResult.SpotResultsForField result, Path output_file, Double radius) throws Exception {
@@ -296,7 +297,7 @@ public class LensTool2 {
             OpticalBenchDataImporter.LensSpecifications specs = getSpecsFromFile(arguments.specfile);
             var prescription = createPrescription(specs,arguments.scenario,arguments.use_glass_types,arguments.only_d_line);
             System.out.println(prescription.toOptBenchStr(new StringBuilder()).toString());
-            var opm = createSystem(prescription,true,true,true,fields);
+            var opm = createSystem(prescription,true,VigType.SetPupil,true,fields);
             var sm = opm.seq_model;
             var osp = opm.optical_spec;
             var fod = opm.optical_spec.parax_data.fod;
@@ -335,7 +336,7 @@ public class LensTool2 {
             prescription = createPrescription(specs,arguments.scenario,arguments.use_glass_types,
                     new double[]{587.5618,656.2725,546.074,486.1327,435.8343},
                     new double[]{1.0,0.475,0.98,0.49,0.15});
-            opm = createSystem(prescription,true,true,true,fields);
+            opm = createSystem(prescription,true,VigType.SetPupil,true,fields);
             generateMTFs(opm,arguments,fields,prescription.get_wvl_wts(),"mtf-w");
         }
         catch (Exception e) {

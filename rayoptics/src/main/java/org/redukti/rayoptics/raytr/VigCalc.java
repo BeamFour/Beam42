@@ -111,6 +111,11 @@ public class VigCalc {
         }
     }
 
+    /**
+     * Set the aperture on the stop surface to satisfy the pupil spec.
+     *
+     * The vignetting is recalculated after the stop aperture change.
+     */
     public static void set_stop_aperture(OpticalModel opm) {
         var sm = opm.seq_model;
         opm.optical_spec.fov.with_index_label("axis").clear_vignetting();
@@ -129,7 +134,7 @@ public class VigCalc {
     public static void set_pupil(OpticalModel opm, boolean use_parax) {
         var sm = opm.seq_model;
         if (sm.stop_surface == null) {
-            System.out.println("floating stop surface");
+            System.err.println("Floating stop surface");
             return;
         }
         var idx_stop = sm.stop_surface;
@@ -246,6 +251,9 @@ public class VigCalc {
             set_vig(opm,null);
         }
     }
+    public static void set_pupil(OpticalModel opm) {
+        set_pupil(opm,false);
+    }
 
     public static void calc_vignetting_for_field(
             OpticalModel opm,
@@ -254,7 +262,7 @@ public class VigCalc {
             Boolean use_bisection,
             Integer max_iter_count) {
         if (use_bisection == null)
-            use_bisection = opm.optical_spec.fov.is_wide_angle;
+            use_bisection = false; // opm.optical_spec.fov.is_wide_angle;
         var pupil_starts = opm.optical_spec.pupil.pupil_rays;
         var vig_factors = new double[4];
         for (int i = 0; i < vig_factors.length; i++) {
@@ -484,6 +492,7 @@ public class VigCalc {
             var delta = r_ray - r_target;
 //            logger.debug(f"  {xy_coord=:8.5f}   {r_ray=:8.5f}    "
 //                    f"delta={delta:9.2g}")
+            //System.out.println(String.format("   xy_coord=%8.5f   r_ray=%8.5f   delta=%9.2g",xy_coord,r_ray,delta));
             return delta;
         }
     }

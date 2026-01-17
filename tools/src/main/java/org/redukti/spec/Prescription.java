@@ -370,7 +370,7 @@ public class Prescription {
         return new Asphere(s.get_radius_of_curvature(), k, a4, a6, a8, a10, a12, a14, a16, a18, a20);
     }
 
-    public OpticalModel build_ray_optics_model(boolean fov_angle, double[] fields, boolean apply_vignetting, boolean use_wideangle_aiming) {
+    public OpticalModel build_ray_optics_model(boolean fov_angle, double[] fields, boolean do_apertures, VigType vig_type, boolean use_wideangle_aiming) {
         if (fields == null)
             fields = new double[]{0., .707, 1.};
         OpticalModel opm = new OpticalModel();
@@ -400,15 +400,21 @@ public class Prescription {
             var s = _surfaces[i];
             add_rayoptic_surface(sm,s);
         }
-        sm.do_apertures = false;
+        sm.do_apertures = do_apertures;
         opm.update_model();
-        if (apply_vignetting) {
-            if (osp.fov.is_wide_angle)
-                //VigCalc.set_vig(opm, true);
-                VigCalc.set_stop_aperture(opm);
-            else
+        switch (vig_type)  {
+            case Paraxial -> {
                 Trace.apply_paraxial_vignetting(opm);
-            opm.update_model();
+                opm.update_model();
+            }
+            case SetPupil -> {
+                VigCalc.set_pupil(opm);
+                opm.update_model();
+            }
+            case SetStopAperture -> {
+                VigCalc.set_stop_aperture(opm);
+                opm.update_model();
+            }
         }
         return opm;
     }

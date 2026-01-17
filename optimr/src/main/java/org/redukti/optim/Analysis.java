@@ -4,6 +4,7 @@ import org.redukti.rayoptics.analysis.*;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.TraceOptions;
 import org.redukti.spec.Prescription;
+import org.redukti.spec.VigType;
 
 public class Analysis {
 
@@ -33,7 +34,7 @@ public class Analysis {
         this.freqs = freqs;
     }
     public void compute() {
-        system = prescription.build_ray_optics_model(true,fields,true,true);
+        system = prescription.build_ray_optics_model(true,fields,false, VigType.SetPupil, true);
         var spotAnalysis = SpotAnalysis.eval(system,new SpotOptions().num_rays(64).use_grid(false));
         spots = spotAnalysis.spot_results.toArray(new SpotAnalysisResult.SpotResultsForField[0]);
         pfo = ParaxHelper.asArray(system.optical_spec.parax_data.fod);

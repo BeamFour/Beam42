@@ -1,0 +1,46 @@
+[descriptive data]
+title	US 3,748,022 Example 1 (Canon FD35mm f2)
+[constants]
+Scaled	35	1
+[variable distances]
+Focal Length	35	undefined
+Angle of View	64	undefined
+F-Number	2	undefined
+Image Height	43.2	43.2
+Magnification	0	-0.118
+d0	Infinity	294.55
+d10	5.3935	4.7075
+d10AS	1.8435	1.1575
+Bf(p)	38.7310	undefined
+Bf	37.96	42.47
+[lens data]
+1	-202.160	3.4125	1.69700	37.82	48.5
+2	-113.085	0.0980		37.82
+3	63.560	1.4630	1.51633	31.67	64.0
+4	17.304	12.1170		26.04
+5	-34.122	3.4020	1.70154	20.72	41.1
+6	-37.870	0.1015		24.87
+7	37.520	3.3600	1.70000	24.89	48.0
+8	554.050	1.4665		24.89
+9	46.655	10.1150	1.77370	24.89	49.2
+10	4343.500	d10AS		24.89
+10AS	AS	3.550		21.035
+11	-135.695	0.9765	1.76182	22.29	26.5
+12	29.939	3.1675		19.24
+13	-40.950	0.9800	1.80518	22.29	25.4
+14	488.600	4.2910	1.77370	22.29	49.2
+15	-24.462	0.1015		22.29
+16	68.950	2.8945	1.80610	26.30	40.8
+17	-114.730	Bf		26.30
+[figure]
+source	Data/US003748022_Figure01.png
+originX	109.21
+originY	476.38
+ppmm	13.235
+[figure]
+source	Data/US003748022_Figure01P.png
+originX	54.47
+originY	193.48
+ppmm	9.152
+[notes]
+Bill: d0 measured.

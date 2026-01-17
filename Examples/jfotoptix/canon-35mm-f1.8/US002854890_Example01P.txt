@@ -1,5 +1,8 @@
 [descriptive data]
 title	US 2,854,890 Example 1 (Canon 35mm f1.8)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US2854890	EX 1	1956	Mukai Jiro	Canon Inc	https://patents.google.com/patent/US2854890A/en
+lens name	Canon 35mm f1.8
 [constants]
 Scaled	35	1
 [variable distances]
@@ -9,19 +12,19 @@ F-Number	1.8
 Image Height	43.2
 Magnification	0
 d0	Infinity
-Bf	24.26
+Bf	24.15
 [lens data]
-1	20.2650	3.3950	1.6584	22.65	50.8
+1	20.2650	3.3950	1.6584	22.65	50.8	S-BSM25	Ohara
 2	62.5450	0.1750		22.65
-3	12.9150	2.7650	1.6584	17.41	50.8
-4	20.0550	1.1200	1.6987	17.41	30.1
+3	12.9150	2.7650	1.6584	17.41	50.8	S-BSM25	Ohara
+4	20.0550	1.1200	1.6987	17.41	30.1	S-TIM35	Ohara
 5	9.3450	3.8030		13.91
 5AS	AS	4.2470		13.690
-6	-10.3950	1.9250	1.6204	13.35	60.3
+6	-10.3950	1.9250	1.6204	13.35	60.3	S-BSM16	Ohara
 7	-7.5250	0.9100	1.5750	13.35	41.3
-8	-115.4650	2.4150	1.6779	16.49	55.3
+8	-115.4650	2.4150	1.6779	16.49	55.3	S-LAL12	Ohara
 9	-14.7700	0.0350		16.49
-10	148.7500	2.9050	1.6935	19.49	53.5
+10	148.7500	2.9050	1.6935	19.49	53.5	S-LAL13	Ohara
 11	-36.9950	Bf		19.49	
 [figure]
 source	Data/US002854890_Figure01.png
@@ -34,3 +37,4 @@ originX	131.23
 originY	136.40
 ppmm	9.760
 [notes]
+Back focus adjusted to improve MTF

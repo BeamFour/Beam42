@@ -2,40 +2,44 @@
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
-|JP | JP 2015-200845 | EX 3 | 2014 | MIZUMA AKIRA | Canon Inc | [link](https://patentscope.wipo.int/search/en/detail.jsf?docId=JP273791941) |
+|JP | JP 2015-200845 | EX 1 | 2014 | MIZUMA AKIRA | Canon Inc | [link](https://patentscope.wipo.int/search/en/detail.jsf?docId=JP273791941) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
 | ID  | Radius | Thickness | Diameter | nd  | vd  | Glass Make | Glass |
 | --- | ---    | ---       | ---      | --- | --- | ---        | ---   |
-| 1 | 57.537 | 3.0 | 54.2 | 1.64 | 60.08 | Ohara | S-BSM81 |
-| 2 | 26.533 | 11.82 | 44.77 |  |  |  |
-| 3 | 30275.72 | 3.0 | 44.06 | 1.58313 | 59.37 | Ohara | S-BAL42 |
-| 4 | 33.009 | 2.8 | 42.38 |  |  |  |
-| 5 | 62.337 | 7.05 | 42.38 | 1.91082 | 35.25 | Hoya | TAFD35 |
-| 6 | -100.178 | 5.49 | 42.38 |  |  |  |
-| 7 | -49.964 | 1.5 | 37.72 | 1.69895 | 30.13 | Ohara | S-TIM35 |
-| 8 | 41.962 | 6.69 | 37.72 | 1.91082 | 35.25 | Hoya | TAFD35 |
-| 9 | -163.205 | 8.1 | 37.72 |  |  |  |
-| 10 | 53.176 | 5.83 | 37.18 | 1.883 | 40.77 | Ohara | S-LAH58 |
-| 11 | -177.927 | 2.19 | 37.18 |  |  |  |
-| 12 | 68.697 | 5.71 | 33.42 | 1.59522 | 67.74 | Ohara | S-FPM2 |
-| 13 | -76.651 | 1.02 | 33.42 | 1.69934 | 26.4 |  |
-| 14 | -50.341 | 1.55 | 33.42 | 1.69895 | 30.13 | Ohara | S-TIM35 |
-| 15 | 31.098 | 5.62 | 27.96 |  |  |  |
-| 16 | AS | 6.96 | 26.596 |  |  |  |
-| 17 | -22.29 | 4.52 | 27.3 | 1.497 | 81.61 | Ohara | FPL51 |
-| 18 | -16.536 | 1.5 | 28.5 | 1.738 | 32.26 | Ohara | S-NBH53 |
-| 19 | -43.827 | 0.13 | 31.18 |  |  |  |
-| 20 | 91.538 | 7.63 | 33.36 | 1.59522 | 67.74 | Ohara | S-FPM2 |
-| 21 | -32.553 | 0.3 | 33.36 |  |  |  |
-| 22 | -94.707 | 4.45 | 35.14 | 1.854 | 40.39 | Ohara | L-LAH85 |
-| 23 | -40.988 | 39.02 | 35.68 |  |  |  |
+| 1 | 73.355 | 3.5 | 53.96 | 1.58313 | 59.37 | Ohara | S-BAL42 |
+| 2 | 27.7 | 11.46 | 44.58 |  |  |  |
+| 3 | -307.49 | 1.85 | 44.24 | 1.48749 | 70.24 | Ohara | S-FSL5 |
+| 4 | 52.694 | 5.39 | 42.28 |  |  |  |
+| 5 | -260.875 | 4.01 | 42.28 | 1.90366 | 31.34 | Ohara | S-LAH95 |
+| 6 | -73.913 | 3.89 | 42.28 |  |  |  |
+| 7 | -41.457 | 1.85 | 41.96 | 1.60342 | 38.03 | Ohara | S-TIM5 |
+| 8 | 110.769 | 0.2 | 43.16 |  |  |  |
+| 9 | 74.88 | 6.93 | 44.14 | 1.91082 | 35.25 | Hoya | TAFD35 |
+| 10 | -112.546 | 0.2 | 44.14 |  |  |  |
+| 11 | 90.943 | 10.39 | 41.84 | 1.59522 | 67.74 | Ohara | S-FPM2 |
+| 12 | -38.225 | 1.7 | 41.84 | 1.738 | 32.26 | Ohara | S-NBH53 |
+| 13 | -81.837 | 8.46 | 40.42 |  |  |  |
+| 14 | 47.083 | 5.24 | 36.94 | 1.91082 | 35.25 | Hoya | TAFD35 |
+| 15 | -1364.203 | 1.4 | 36.94 |  |  |  |
+| 16 | 196.395 | 4.08 | 33.66 | 1.59522 | 67.74 | Ohara | S-FPM2 |
+| 17 | -75.554 | 1.0 | 33.66 | 1.54493 | 25.3 |  |
+| 18 | -51.514 | 1.55 | 33.66 | 1.69895 | 30.13 | Ohara | S-TIM35 |
+| 19 | 29.651 | 5.83 | 27.92 |  |  |  |
+| 20 | AS | 6.96 | 26.611 |  |  |  |
+| 21 | -22.117 | 4.42 | 26.82 | 1.497 | 81.61 | Ohara | FPL51 |
+| 22 | -16.399 | 1.5 | 27.92 | 1.738 | 32.26 | Ohara | S-NBH53 |
+| 23 | -52.708 | 0.13 | 30.66 |  |  |  |
+| 24 | 123.246 | 7.39 | 32.98 | 1.59522 | 67.74 | Ohara | S-FPM2 |
+| 25 | -31.376 | 0.14 | 32.98 |  |  |  |
+| 26 | -103.187 | 4.35 | 35.56 | 1.854 | 40.39 | Ohara | L-LAH85 |
+| 27 | -38.56 | 38.99 | 35.56 |  |  |  |
 ## Aspherical Data
 | ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 4 | 0.0 | 0.0 | -4.72094E-6 | -4.59421E-9 | 9.92671E-13 | -4.41856E-15 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
-| 22 | 0.0 | 0.0 | -7.55876E-6 | 4.60713E-9 | -4.19026E-11 | 1.07707E-13 | -1.18808E-16 | 0.0 | 0.0 | 0.0 | 0.0 |
+| 2 | 0.0 | 0.0 | -8.44469E-7 | -1.40474E-9 | -1.12523E-12 | 9.45006E-16 | -3.55532E-18 | 0.0 | 0.0 | 0.0 | 0.0 |
+| 26 | 0.0 | 0.0 | -6.94362E-6 | -1.20811E-9 | 8.28446E-13 | -2.15964E-14 | 2.93999E-17 | 0.0 | 0.0 | 0.0 | 0.0 |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -48,42 +52,42 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
-| effective_focal_length |34.277
+| effective_focal_length |34.293
 | back_focal_length | 38.988
-| optical_invariant | 7.461
+| optical_invariant | 7.464
 | object_distance | 1.0E10
 | image_distance | 38.988
 | power | 0.029
-| pp1_H | 57.647
-| ppk_H' | 4.711
-| ffl_F | 23.369
-| fno | 1.45
-| enp_dist_P | 38.432
-| enp_radius | 11.82
-| exp_dist_P' | -39.046
-| exp_radius | 26.897
+| pp1_H | 58.033
+| ppk_H' | 4.695
+| ffl_F | 23.74
+| fno | 1.449
+| enp_dist_P | 38.935
+| enp_radius | 11.83
+| exp_dist_P' | -38.406
+| exp_radius | 26.698
 | m | -0
-| red | -2.9173671479073685E8
+| red | -2.916045321947517E8
 | n_obj | 1
 | n_img | 1
-| img_ht | 21.636
-| obj_ang | 32.26
+| img_ht | 21.637
+| obj_ang | 32.25
 | obj_na | 0
 | img_na | -0.326|
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 8.608 | 22.016|
- | Field(x=0.0, y=0.1) | 11.855 | 51.58|
- | Field(x=0.0, y=0.2) | 12.763 | 58.84|
- | Field(x=0.0, y=0.3) | 11.702 | 58.104|
- | Field(x=0.0, y=0.4) | 11.871 | 50.474|
- | Field(x=0.0, y=0.5) | 12.764 | 48.289|
- | Field(x=0.0, y=0.6) | 13.626 | 48.876|
- | Field(x=0.0, y=0.7) | 14.024 | 45.783|
- | Field(x=0.0, y=0.8) | 14.298 | 52.134|
- | Field(x=0.0, y=0.9) | 16.068 | 63.998|
- | Field(x=0.0, y=1.0) | 20.113 | 84.878|
+ | Field(x=0.0, y=0.0) | 7.486 | 25.491|
+ | Field(x=0.0, y=0.1) | 8.02 | 28.864|
+ | Field(x=0.0, y=0.2) | 7.62 | 30.691|
+ | Field(x=0.0, y=0.3) | 7.335 | 38.263|
+ | Field(x=0.0, y=0.4) | 7.402 | 48.14|
+ | Field(x=0.0, y=0.5) | 7.608 | 44.639|
+ | Field(x=0.0, y=0.6) | 8.114 | 39.026|
+ | Field(x=0.0, y=0.7) | 8.722 | 31.186|
+ | Field(x=0.0, y=0.8) | 9.487 | 27.368|
+ | Field(x=0.0, y=0.9) | 10.191 | 29.913|
+ | Field(x=0.0, y=1.0) | 10.574 | 35.834|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm
@@ -95,5 +99,5 @@ Note that where glass types are shown the refractive index and abbe number is as
 * Black lines represent sagittal, blue tangential
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
-* [OpticalBench Compatible Data File, tab delimited](./JP2015-200845_Example03.txt)
-* [Zemax file](./JP2015-200845_Example03.zmx)
+* [OpticalBench Compatible Data File, tab delimited](./JP2015-200845_Example01.txt)
+* [Zemax file](./JP2015-200845_Example01.zmx)

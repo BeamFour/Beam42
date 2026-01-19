@@ -17,6 +17,7 @@ public final class Args {
     public boolean do_mono_chrome_mtfs = false;
     public boolean use_grid_pattern = false;
     public boolean auto_size_spots = false;
+    public boolean do_wideangle_layout = false;
 
     public static Args parseArguments(String[] args) {
         Args arguments = new Args();
@@ -77,6 +78,9 @@ public final class Args {
             }
             else if (arg1.equals("--auto-size-spot-diagrams")) {
                 arguments.auto_size_spots = true;
+            }
+            else if (arg1.equals("--do-wideangle-layout")) {
+                arguments.do_wideangle_layout = true;
             }
         }
         return arguments;

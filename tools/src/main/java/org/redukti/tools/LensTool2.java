@@ -14,12 +14,15 @@ import org.redukti.jfotoptix.tracing.RayTraceResults;
 import org.redukti.jfotoptix.tracing.RayTracer;
 import org.redukti.mathlib.M;
 import org.redukti.mathlib.Matrix3;
+import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
 import org.redukti.plotter.*;
 import org.redukti.rayoptics.analysis.*;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrderData;
+import org.redukti.rayoptics.raytr.Trace;
 import org.redukti.rayoptics.raytr.TraceOptions;
+import org.redukti.rayoptics.util.Lists;
 import org.redukti.render.rendering.RendererSvg;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.VigType;
@@ -29,6 +32,7 @@ import org.redukti.util.Helper;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class LensTool2 {
@@ -265,6 +269,32 @@ public class LensTool2 {
             //result.report();
         }
 
+        /**
+         * The supplied points must be x/y coordinates on the first surface
+         */
+        private void outputLayoutWithUserRays(OpticalSystem system, Path output_file, List<Vector2> points, boolean dump_system, boolean include_lost_rays) throws Exception {
+            // draw 2d system layout
+            RendererSvg renderer = new RendererSvg(800, 400);
+            SystemLayout2D systemLayout2D = new SystemLayout2D();
+            systemLayout2D.layout2d(renderer, system);
+            RayTraceParameters parameters = new RayTraceParameters(system);
+            RayTracer rayTracer = new RayTracer();
+            parameters.set_default_distribution(
+                    new Distribution(Pattern.UserDefined, 10, 0.999)
+                            .set_user_defined_points(points));
+            if (dump_system) {
+                System.out.println(parameters.sequenceToString(new StringBuilder()).toString());
+            }
+            RayTraceResults result = rayTracer.trace(system, parameters);
+            RayTraceRenderer.draw_2d(renderer, result, !include_lost_rays, null);
+            if (output_file != null) {
+                Helper.createOutputFile(output_file, renderer.write(new StringBuilder()).toString());
+            } else {
+                System.out.println(renderer.write(new StringBuilder()).toString());
+            }
+            //result.report();
+        }
+
         public void doLayoutDiagrams(OpticalBenchDataImporter.LensSpecifications specs,Args arguments) throws Exception {
             OpticalSystem system = createSystem(specs,arguments.scenario,arguments.use_glass_types,false,0,arguments.only_d_line);
             if (arguments.dumpSystem) {
@@ -280,7 +310,44 @@ public class LensTool2 {
             outputLayoutWithRays(semiSkewedSystem,Helper.getOutputPath(arguments.specfile,"layout-semi-skew.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
             outputLayoutWithRays(skewedSystem,Helper.getOutputPath(arguments.specfile,"layout-skew.svg",arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
         }
+
+        // For a given field, compute ray targets
+        // that are on the first surface
+        List<Vector2> generate_ray_targets(OpticalModel opm, int field, double wvl, int surf) {
+            var osp = opm.optical_spec;
+            var fov = osp.fov;
+            var fld = fov.fields[field];
+            var list = new ArrayList<Vector2>();
+            var brays = Trace.trace_boundary_rays_at_field(opm,fld,wvl,new TraceOptions());
+            for (var raypkg: brays) {
+                var pt = Lists.get(raypkg.ray,surf);
+                list.add(pt.p.project_xy());
+            }
+            return list;
+        }
+
+        public void doLayoutDiagramsForWides(OpticalBenchDataImporter.LensSpecifications specs,Args arguments) throws Exception {
+            // First we use rayoptics to get ray starts
+            // For very wide angle lenses, blindly spraying rays doesn't work very well
+            final double[] fields = {0.0, 0.7, 1.0};
+            var prescription = createPrescription(specs,arguments.scenario,arguments.use_glass_types,arguments.only_d_line);
+            var opm = prescription.build_ray_optics_model(true,fields,false,VigType.SetPupil,true);
+
+            // On axis rays field 0
+            OpticalSystem system = createSystem(specs,arguments.scenario,arguments.use_glass_types,false,0,arguments.only_d_line);
+            var points = generate_ray_targets(opm,0,587.5618,1);
+            outputLayoutWithUserRays(system,Helper.getOutputPath(arguments.specfile,"layout.svg",arguments.outdir),points,arguments.dumpSystem,arguments.include_lost_rays);
+            // Skew rays field 0.7
+            OpticalSystem semiSkewedSystem = createSystem(specs,arguments.scenario,arguments.use_glass_types,true,0.7,arguments.only_d_line);
+            points = generate_ray_targets(opm,1,587.5618,1);
+            outputLayoutWithUserRays(semiSkewedSystem,Helper.getOutputPath(arguments.specfile,"layout-semi-skew.svg",arguments.outdir),points,arguments.dumpSystem,arguments.include_lost_rays);
+            // Skew rays field 1.0
+            points = generate_ray_targets(opm,2,587.5618,1);
+            OpticalSystem skewedSystem = createSystem(specs,arguments.scenario,arguments.use_glass_types,true,1.0,arguments.only_d_line);
+            outputLayoutWithUserRays(skewedSystem,Helper.getOutputPath(arguments.specfile,"layout-skew.svg",arguments.outdir),points,arguments.dumpSystem,arguments.include_lost_rays);
+        }
     }
+
 
     public static void main(String[] args) throws Exception {
         Args arguments = Args.parseArguments(args);
@@ -307,11 +374,10 @@ public class LensTool2 {
             Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"vig.txt",arguments.outdir), osp.list_str(new StringBuilder()).toString());
             Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"paraxial.txt",arguments.outdir), fod.toString());
 
-            // For layouts we use the old method which isn't very good with
-            // wide angle lenses.
-            // TODO we need to us rayoptics info re marginal and chief rays and
-            // use them in the layout diagrams
-            new Layout().doLayoutDiagrams(specs,arguments);
+            if (arguments.do_wideangle_layout)
+                new Layout().doLayoutDiagramsForWides(specs,arguments);
+            else
+                new Layout().doLayoutDiagrams(specs,arguments);
 
 //            StringBuilder buf = new StringBuilder();
 //            for (int i = 0; i < fields.length; i++) {

@@ -65,8 +65,9 @@ public class Distribution {
         this._scaling = scaling;
     }
 
-    public void set_user_defined_points(List<Vector2> points) {
+    public Distribution set_user_defined_points(List<Vector2> points) {
         this._user_defined_points = points;
+        return this;
     }
 
     public List<Vector2> get_user_defined_points() {

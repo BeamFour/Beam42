@@ -1,5 +1,8 @@
 [descriptive data]
 title	US 2015/0205081 Example 1 (Canon EF35mm f2 IS USM)
+#patent	country	number	example	year	inventors	org	link
+patent	US	US20150205081	EX 1	2012	Akira Mizuma	Canon Inc	https://patents.google.com/patent/US20150205081A1/en
+lens name	Canon EF 35mm f2 IS USM
 [constants]
 [variable distances]
 Focal Length	34.49

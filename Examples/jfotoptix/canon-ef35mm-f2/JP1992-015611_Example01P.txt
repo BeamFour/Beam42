@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP 1992-015611 Example 1 (Canon EF35mm f2)
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP,04-015611,A(1992)	EX 1	1990	TANAKA TSUNEFUMI	Canon Inc	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-H04-015611/11/en
+lens name	Canon EF 35mm f2
 [constants]
 [variable distances]
 Focal Length	35.51

@@ -1,0 +1,44 @@
+[descriptive data]
+title	JP2026-008235 Example 1
+[constants]
+[variable distances]
+Focal Length	87.28	undefined
+Angle of View	27.42	undefined
+F-Number	2.05	undefined
+Total Length	50.38	61.35
+Image Height	43.26	43.26
+Magnification	0	-0.126
+d0	Infinity	800
+Bf(p)	27.39997	38.36529
+Bf	27.38	38.38
+[lens data]
+1	87.907	4.04	1.60311	46.10	60.69
+2	534.257	0.20		46.10	
+3	32.865	6.68	1.49700	43.48	81.61
+4	90.480	0.30		39.45
+5	37.520	5.99	1.49700	39.78	81.61
+6	218.824	2.27		35.48	
+7	2532.276	1.60	1.68893	35.70	31.16
+8	83.415	2.56		32.74	
+9	270.511	4.56	1.92286	32.04	20.88
+10	-73.970	1.40	1.77047	32.04	29.74
+11	23.216	7.00		24.88	
+12	AS	9.01		23.860
+13	45.076	4.58	1.51823	24.50	58.82
+14	-45.076	8.95		24.50	
+15	-30.274	1.25	1.43700	23.70	95.10
+16	-300.000	Bf		25.02	
+[group data]
+G23	13	16	78.89
+[figure]
+caption	Cosina Voigtlander Apo-Ultron 90mm F2
+source	Data/JP2026-008235_Figure01P.png
+originX	35.57
+originY	311.54
+ppmm	13.193
+[figure]	
+source	Data/JP2026-008235_Figure01.png
+originX	201.59
+originY	537.60
+ppmm	13.683
+[notes]

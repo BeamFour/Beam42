@@ -1,3 +1,8 @@
+# Cosina Voigtlander Macro Apo-Ultron 35mm f2
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|JP | JP2026-008235 | EX 3 | 2024 | Shibata | Cosina Inc | [link](https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2026-008235/11/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -81,4 +86,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./JP2026-008235_Example03.txt)
 * [Zemax file](./JP2026-008235_Example03.zmx)
 
-This report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-01-21
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-01-21

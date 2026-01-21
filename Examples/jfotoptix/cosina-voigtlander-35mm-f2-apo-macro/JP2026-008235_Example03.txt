@@ -1,5 +1,8 @@
 [descriptive data]
 title	JP2026-008235 Example 3
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP2026-008235	EX 3	2024	Shibata	Cosina Inc	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2026-008235/11/en
+lens name	Cosina Voigtlander Macro Apo-Ultron 35mm f2
 [constants]
 [variable distances]
 Focal Length	36.08	undefined

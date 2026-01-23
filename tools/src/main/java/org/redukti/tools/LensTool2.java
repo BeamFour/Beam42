@@ -31,6 +31,7 @@ import org.redukti.util.Helper;
 
 import java.nio.file.Path;
 import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -137,7 +138,8 @@ public class LensTool2 {
         sb.append("* To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average\n");
         sb.append("## Resources\n");
         sb.append("* [OpticalBench Compatible Data File, tab delimited](./" + filename + ")\n");
-        sb.append("* [Zemax file](./" + zmxFilename + ")\n");
+        sb.append("* [Zemax file](./" + zmxFilename + ")\n\n");
+        sb.append("Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on " + LocalDate.now() + "\n");
         Helper.createOutputFile(output_file,sb.toString());
     }
 

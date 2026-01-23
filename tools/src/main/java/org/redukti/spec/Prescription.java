@@ -415,6 +415,10 @@ public class Prescription {
                 VigCalc.set_stop_aperture(opm);
                 opm.update_model();
             }
+            case SetVig -> {
+                VigCalc.set_vig(opm,false);
+                opm.update_model();
+            }
         }
         return opm;
     }

@@ -12,12 +12,12 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 7 | -26.4 | 2.01 | 33.36 | 1.49831 | 65.03 | Ohara | BSL3 |
 | 8 | 826.65 | 10.0 | 33.36 |  |  |  |
 | 9 | AS | 55.7 | 27.31 |  |  |  |
-| 10 | -40.95 | 1.5 | 21.12 | 1.7865 | 59.1 |  |
+| 10 | -40.95 | 1.5 | 21.12 | 1.7865 | 50.0 | Ohara | S-YGH52 |
 | 11 | 54.051 | 2.4 | 23.76 | 1.5927 | 35.31 | Ohara | S-FTM16 |
 | 12 | -1606.815 | 0.3 | 23.76 |  |  |  |
 | 13 | 49.5 | 6.51 | 24.74 | 1.5927 | 35.31 | Ohara | S-FTM16 |
 | 14 | -26.85 | 1.5 | 24.74 | 1.81554 | 44.36 | Ohara | S-LAH54 |
-| 15 | -321.579 | 52.1 | 24.74 |  |  |  |
+| 15 | -321.579 | 52.08 | 24.74 |  |  |  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -42,7 +42,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | fno | 6.303
 | enp_dist_P | 87.667
 | enp_radius | 23.807
-| exp_dist_P' | -36.498
+| exp_dist_P' | -36.478
 | exp_radius | 7.03
 | m | -0
 | red | -3.3321491793169256E7
@@ -55,17 +55,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 6.468 | 13.682|
- | Field(x=0.0, y=0.1) | 6.637 | 18.517|
- | Field(x=0.0, y=0.2) | 6.775 | 17.795|
- | Field(x=0.0, y=0.3) | 7.104 | 17.589|
- | Field(x=0.0, y=0.4) | 7.627 | 17.571|
- | Field(x=0.0, y=0.5) | 8.354 | 19.395|
- | Field(x=0.0, y=0.6) | 9.416 | 21.834|
- | Field(x=0.0, y=0.7) | 11.137 | 30.992|
- | Field(x=0.0, y=0.8) | 14.006 | 44.816|
- | Field(x=0.0, y=0.9) | 15.379 | 39.978|
- | Field(x=0.0, y=1.0) | 16.927 | 34.227|
+ | Field(x=0.0, y=0.0) | 6.342 | 15.433|
+ | Field(x=0.0, y=0.1) | 6.617 | 18.106|
+ | Field(x=0.0, y=0.2) | 7.394 | 21.086|
+ | Field(x=0.0, y=0.3) | 8.46 | 26.167|
+ | Field(x=0.0, y=0.4) | 9.658 | 31.511|
+ | Field(x=0.0, y=0.5) | 10.935 | 37.74|
+ | Field(x=0.0, y=0.6) | 12.346 | 45.674|
+ | Field(x=0.0, y=0.7) | 14.089 | 56.343|
+ | Field(x=0.0, y=0.8) | 16.594 | 71.061|
+ | Field(x=0.0, y=0.9) | 16.426 | 60.736|
+ | Field(x=0.0, y=1.0) | 15.746 | 47.142|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm

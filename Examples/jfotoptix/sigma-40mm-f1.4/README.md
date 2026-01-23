@@ -56,7 +56,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ---       | ---   |
 | effective_focal_length |41.2
 | back_focal_length | 39.001
-| optical_invariant | 7.533
+| optical_invariant | 7.532
 | object_distance | 1.0E10
 | image_distance | 39.001
 | power | 0.024
@@ -65,9 +65,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ffl_F | 30.686
 | fno | 1.45
 | enp_dist_P | 50.74
-| enp_radius | 14.207
+| enp_radius | 14.205
 | exp_dist_P' | -45.641
-| exp_radius | 29.187
+| exp_radius | 29.183
 | m | -0
 | red | -2.4271567371252346E8
 | n_obj | 1
@@ -79,17 +79,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 4.17 | 7.174|
- | Field(x=0.0, y=0.1) | 4.5 | 15.464|
- | Field(x=0.0, y=0.2) | 5.365 | 19.602|
- | Field(x=0.0, y=0.3) | 5.471 | 20.152|
- | Field(x=0.0, y=0.4) | 5.086 | 22.541|
- | Field(x=0.0, y=0.5) | 5.358 | 27.888|
- | Field(x=0.0, y=0.6) | 5.72 | 42.609|
- | Field(x=0.0, y=0.7) | 6.261 | 33.723|
- | Field(x=0.0, y=0.8) | 6.35 | 40.047|
- | Field(x=0.0, y=0.9) | 7.148 | 55.572|
- | Field(x=0.0, y=1.0) | 8.51 | 41.648|
+ | Field(x=0.0, y=0.0) | 4.243 | 7.173|
+ | Field(x=0.0, y=0.1) | 4.412 | 15.688|
+ | Field(x=0.0, y=0.2) | 5.396 | 19.904|
+ | Field(x=0.0, y=0.3) | 5.391 | 20.512|
+ | Field(x=0.0, y=0.4) | 5.1 | 22.444|
+ | Field(x=0.0, y=0.5) | 5.35 | 27.785|
+ | Field(x=0.0, y=0.6) | 5.822 | 42.269|
+ | Field(x=0.0, y=0.7) | 6.239 | 33.337|
+ | Field(x=0.0, y=0.8) | 6.335 | 39.849|
+ | Field(x=0.0, y=0.9) | 7.173 | 56.509|
+ | Field(x=0.0, y=1.0) | 8.553 | 42.261|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm
@@ -103,3 +103,5 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./Sigma-40mmf1.4.txt)
 * [Zemax file](./Sigma-40mmf1.4.zmx)
+
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-01-23

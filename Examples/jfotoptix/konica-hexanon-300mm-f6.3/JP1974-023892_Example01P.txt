@@ -1,0 +1,42 @@
+[descriptive data]
+title	JP 1974-023892 Example 1 (Konica Minolta FL-Hexanon AR 300mm F6.3)
+[constants]
+Scaled	300	1
+[variable distances]
+Focal Length	300
+F-Number	6.3
+Image Height	43.2
+Total Length	175.8
+Magnification	0
+d0	Infinity
+Bf(p)	52.08
+Bf	51.98
+[lens data]
+1	79.740	6.00	1.43389	48.64	94.7
+2	1141.935	0.30		48.64	
+3	41.205	7.50	1.43389	46.68	94.7
+4	156.816	14.40		46.68	
+5	1320.000	2.01	1.80440	37.40	39.6
+6	30.306	13.65	1.51118	33.36	50.9
+7	-26.400	2.01	1.49831	33.36	65.0
+8	826.650	10.00		33.36
+9AS	AS	55.70		27.310
+9	-40.950	1.50	1.78650	21.12	59.1
+10	54.051	2.40	1.59270	23.76	35.4
+11	-1606.815	0.30		23.76	
+12	49.500	6.51	1.59270	24.74	35.4
+13	-26.850	1.50	1.81554	24.74	44.5
+14	-321.579	Bf		24.74	
+[group data]
+f12	1	4	77.72
+[figure]
+source	Data/JP1974-023892_Figure01.png
+originX	93.69
+originY	327.17
+ppmm	11.964
+[figure]
+source	Data/JP1974-023892_Figure01P.png
+originX	55.43
+originY	166.38
+ppmm	5.549
+[notes]

@@ -10,7 +10,7 @@ Image Height	43.2
 Magnification	0
 d0	Infinity
 Bf(p)	undefined
-Bf	26.93
+Bf	26.88
 [lens data]
 1	61.2	3.9	1.62035	46.68	60.20
 2	149.4	0.06		46.68

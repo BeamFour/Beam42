@@ -1,3 +1,8 @@
+# Konica FL-Hexanon AR 300mm F6.3
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|JP | JP1974-023892 | EX 1 | 1970 | Masamichi Kitagawa | Konishiroku Photo Industry Co., Ltd. | [link](https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S49-023892/12/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

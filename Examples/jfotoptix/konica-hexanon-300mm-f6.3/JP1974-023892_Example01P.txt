@@ -1,6 +1,8 @@
 [descriptive data]
 title	JP 1974-023892 Example 1 (Konica Minolta FL-Hexanon AR 300mm F6.3)
-
+#patent	country	number	example	year	inventors	org	link
+patent	JP	JP1974-023892	EX 1	1970	Masamichi Kitagawa	Konishiroku Photo Industry Co., Ltd.	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S49-023892/12/en
+lens name	Konica FL-Hexanon AR 300mm F6.3
 [constants]
 Scaled	300	1
 [variable distances]

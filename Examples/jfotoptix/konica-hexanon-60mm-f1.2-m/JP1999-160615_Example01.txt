@@ -13,7 +13,7 @@ Magnification	0	-0.085
 d0	Infinity	717.02
 d9	6.70	7.90
 Bf(p)	undefined	undefined
-Bf	28.88	33.55
+Bf	28.84	33.55
 [lens data]
 1	82.212	3.50	1.77250	52.70	49.6	TAF1
 2	155.652	0.20		52.70	

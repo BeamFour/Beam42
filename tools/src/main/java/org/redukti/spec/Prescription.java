@@ -3,7 +3,6 @@ package org.redukti.spec;
 import org.redukti.jfotoptix.curve.Asphere;
 import org.redukti.jfotoptix.curve.Flat;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
-import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.mathlib.Matrix3;
 import org.redukti.mathlib.Vector3;
 import org.redukti.mathlib.Vector3Pair;
@@ -159,22 +158,23 @@ public class Prescription {
         double radius = surface.get_radius();
         double refractive_index = surface.get_refractive_index();
         double abbe_vd = surface.get_abbe_vd();
+        double diameter = surface.get_diameter(scenario);
         String glass_name = surface.get_glass_name();
         if (surface.get_surface_type() == OpticalBenchDataImporter.SurfaceType.aperture_stop) {
-            stop(thickness,surface.get_diameter(0));
+            stop(thickness,diameter);
             return this;
         }
         else if (surface.get_surface_type() == OpticalBenchDataImporter.SurfaceType.field_stop) {
-            field_stop(thickness,surface.get_diameter(0));
+            field_stop(thickness,diameter);
             return this;
         }
         if (use_glass_types && glass_name != null && GlassMap.glassByName(glass_name) != null) {
-            surf(radius,thickness,surface.get_diameter(0),refractive_index,abbe_vd,glass_name);
+            surf(radius,thickness,diameter,refractive_index,abbe_vd,glass_name);
         }
         else if (refractive_index != 0.0) {
-            surf(radius,thickness,surface.get_diameter(0),refractive_index, abbe_vd);
+            surf(radius,thickness,diameter,refractive_index, abbe_vd);
         } else {
-            surf(radius,thickness,surface.get_diameter(0));
+            surf(radius,thickness,diameter);
         }
         OpticalBenchDataImporter.AsphericalData aspherical_data = surface.get_aspherical_data();
         if (aspherical_data != null) {
@@ -192,13 +192,16 @@ public class Prescription {
     }
 
     public static Prescription buildPrescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types) {
-        return buildPrescription(specs,use_glass_types,new double[] {587.5618, 486.1327, 656.2725},new double[] {1.0, 1.0, 1.0});
+        return buildPrescription(specs,use_glass_types,new double[] {587.5618, 486.1327, 656.2725},new double[] {1.0, 1.0, 1.0},0);
     }
     public static Prescription buildPrescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types,double[] wvls,double[] wts) {
+        return buildPrescription(specs,use_glass_types,wvls,wts,0);
+    }
+    public static Prescription buildPrescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types,double[] wvls,double[] wts,int scenario) {
         var prescription = new Prescription(
                 specs.get_focal_length(),
-                specs.get_f_number(0),  // default is scenario 0
-                specs.get_angle_of_view_in_degrees(0),  // default is scenario 0
+                specs.get_f_number(scenario),  // default is scenario 0
+                specs.get_angle_of_view_in_degrees(scenario),  // default is scenario 0
                 specs.get_image_height(),
                 wvls,
                 wts);
@@ -220,7 +223,7 @@ public class Prescription {
         prescription.add_configurations(specs);
         List<OpticalBenchDataImporter.LensSurface> surfaces = specs.get_surfaces();
         for (int i = 0; i < surfaces.size(); i++) {
-            prescription.import_surface(surfaces.get(i),0,use_glass_types);
+            prescription.import_surface(surfaces.get(i),scenario,use_glass_types);
             if (prescription._configurations != null) {
                 prescription.add_configuration_data(surfaces.get(i));
             }

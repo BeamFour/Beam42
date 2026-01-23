@@ -47,7 +47,7 @@ public class LensTool2 {
     public static Prescription createPrescription(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean use_glass_types, boolean d_line) {
         var wvls = d_line ? new double[] {587.5618} : new double[] {587.5618, 486.1327, 656.2725};
         var wts = d_line ? new double[] {1.0} : new double[] {1.0, 1.0, 1.0};
-        var p = Prescription.buildPrescription(specs,use_glass_types,wvls,wts);
+        var p = Prescription.buildPrescription(specs,use_glass_types,wvls,wts,scenario);
         return p;
     }
 

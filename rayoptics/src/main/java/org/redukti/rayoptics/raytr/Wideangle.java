@@ -100,6 +100,22 @@ public class Wideangle {
         }
     }
 
+    static final class ZEnpStopHt {
+        final double z_enp;
+        final double ht_at_stop;
+        public ZEnpStopHt(double z_enp, double ht_at_stop) {
+            this.z_enp = z_enp;
+            this.ht_at_stop = ht_at_stop;
+        }
+        @Override
+        public String toString() {
+            return "{" +
+                    "z_enp=" + z_enp +
+                    ", ht_at_stop=" + ht_at_stop +
+                    '}';
+        }
+    }
+
     /**
      * Locate the z center of the real pupil for `fld`, wrt 1st ifc
      *
@@ -145,10 +161,10 @@ public class Wideangle {
             //logger.info(f"  axial chief {z_enp_0=:8.4f}  {rr.err is None}")
             return new Pair<>(z_enp_0,rr);
         }
-        Pair<Double,Double> start_z = null;
-        Pair<Double,Double> prev_z = null;
-        Pair<Double,Double> end_z = null;
-        var del_z = -z_enp_0/16.0;
+        ZEnpStopHt start_z = null;
+        ZEnpStopHt prev_z = null;
+        ZEnpStopHt end_z = null;
+        var del_z = -z_enp_0/16.0;  // step z
         var z_enp = z_enp_0;
         boolean keep_going = true;
         var direction = "first";
@@ -167,17 +183,17 @@ public class Wideangle {
                 //                         f"{ht_at_stop=:7.3f}")
                 successes++;
                 if (start_z == null)
-                    start_z = new Pair<>(z_enp, ht_at_stop);
+                    start_z = new ZEnpStopHt(z_enp, ht_at_stop);
                 prev_z = end_z;
-                end_z = new Pair<>(z_enp, ht_at_stop);
+                end_z = new ZEnpStopHt(z_enp, ht_at_stop);
                 if (successes > 1) {
                     // check for a zero crossing, if so, we're done
-                    if (prev_z.second * end_z.second < 0)
+                    if (prev_z.ht_at_stop * end_z.ht_at_stop < 0)
                         keep_going = false;
                 }
                 if (successes == 2 && check_direction) {
                     // check that we're searching in the right direction
-                    if (Math.abs(start_z.second) < Math.abs(end_z.second)) {
+                    if (Math.abs(start_z.ht_at_stop) < Math.abs(end_z.ht_at_stop)) {
                         if (Objects.equals(direction,"first")) {
                             // first time through, reverse direction and start on
                             // the other side of z_enp_0.
@@ -223,10 +239,10 @@ public class Wideangle {
             trial += 1;
         }
 
-        var z_enp_a = start_z.first;
-        var ht_at_stop_a = start_z.second;
-        var z_enp_b = end_z.first;
-        var ht_at_stop_b = end_z.second;
+        var z_enp_a = start_z.z_enp;
+        var ht_at_stop_a = start_z.ht_at_stop;
+        var z_enp_b = end_z.z_enp;
+        var ht_at_stop_b = end_z.ht_at_stop;
 
         Double a = null, b = null;
         // If start and end are equal, then only one ray was successful.
@@ -244,12 +260,12 @@ public class Wideangle {
                 if (rr.err == null) {
                     var ht_at_stop = final_coord.y;
                     if (start_z == null)
-                        start_z = new Pair<>(z_enp,ht_at_stop);
-                    end_z = new Pair<>(z_enp,ht_at_stop);
+                        start_z = new ZEnpStopHt(z_enp,ht_at_stop);
+                    end_z = new ZEnpStopHt(z_enp,ht_at_stop);
                 }
             }
-            a = start_z.first;
-            b = end_z.first;
+            a = start_z.z_enp;
+            b = end_z.z_enp;
         }
         // test for crossing between the end points
         else if (ht_at_stop_a * ht_at_stop_b < 0) {
@@ -260,8 +276,8 @@ public class Wideangle {
             if (prev_z != null) {
                 // if there's a previous sample, see if the crossing can be
                 //            # more tightly bracketed.
-                var z_enp_c = prev_z.first;
-                var ht_at_stop_c = prev_z.second;
+                var z_enp_c = prev_z.z_enp;
+                var ht_at_stop_c = prev_z.ht_at_stop;
                 if (ht_at_stop_c * ht_at_stop_b < 0) {
                     // set the smallest bracket using prev_z
                     var pt_a = prev_z;
@@ -279,13 +295,13 @@ public class Wideangle {
                     z_enp_b,
                     z_enp_b+del_z,
                     6);
-            var z_enp_edge_b = edge_b.first;
-            var ht_at_stop_edg_b = edge_b.second;
+            var z_enp_edge_b = edge_b.z_enp;
+            var ht_at_stop_edg_b = edge_b.ht_at_stop;
             //logger.debug(f"  edge_b found at at z_enp={z_enp_edge_b:10.5f},  "
             //                     f"{ht_at_stop_edg_b=:7.3f}")
             if (ht_at_stop_edg_b * ht_at_stop_b < 0) {
-                start_z = new Pair<>(z_enp_b, ht_at_stop_b);
-                end_z = new Pair<>(z_enp_edge_b, ht_at_stop_edg_b);
+                start_z = new ZEnpStopHt(z_enp_b, ht_at_stop_b);
+                end_z = new ZEnpStopHt(z_enp_edge_b, ht_at_stop_edg_b);
                 a = z_enp_b;
                 b = z_enp_edge_b;
             }
@@ -296,14 +312,14 @@ public class Wideangle {
                         z_enp_a,
                         z_enp_a-del_z,
                         6);
-                var z_enp_edge_a = edge_a.first;
-                var ht_at_stop_edg_a = edge_a.second;
+                var z_enp_edge_a = edge_a.z_enp;
+                var ht_at_stop_edg_a = edge_a.ht_at_stop;
                 // logger.debug(f"  edge_a found at at z_enp={z_enp_edge_a:10.5f},  "
                 //                         f"{ht_at_stop_edg_a=:7.3f}")
                 if (ht_at_stop_edg_a * ht_at_stop_a < 0) {
                     // found an interval containing a crossover point
-                    start_z = new Pair<>(z_enp_a, ht_at_stop_a);
-                    end_z = new Pair<>(z_enp_edge_a, ht_at_stop_edg_a);
+                    start_z = new ZEnpStopHt(z_enp_a, ht_at_stop_a);
+                    end_z = new ZEnpStopHt(z_enp_edge_a, ht_at_stop_edg_a);
                     a = z_enp_a;
                     b = z_enp_edge_a;
                 }
@@ -325,12 +341,12 @@ public class Wideangle {
         }
         // compute the straightline crossing pt given the interval
         double z_estimate;
-        if (M.isZero(end_z.second - start_z.second)) {
-            z_estimate = start_z.first;
+        if (M.isZero(end_z.ht_at_stop - start_z.ht_at_stop)) {
+            z_estimate = start_z.z_enp;
         }
         else {
-            z_estimate = start_z.first - ((end_z.first - start_z.first) /
-                    (end_z.second - start_z.second)) * start_z.second;
+            z_estimate = start_z.z_enp - ((end_z.z_enp      - start_z.z_enp) /
+                                          (end_z.ht_at_stop - start_z.ht_at_stop)) * start_z.ht_at_stop;
         }
 
         //    logger.debug(f"  trials: {trial},   {successes=}")
@@ -349,7 +365,7 @@ public class Wideangle {
         return new Pair<>(z_enp,rr);
     }
 
-    static Pair<Double,Double> find_edge(ScalarObjectiveFunction f, double a, double b, Integer max_iter) {
+    static ZEnpStopHt find_edge(ScalarObjectiveFunction f, double a, double b, Integer max_iter) {
         // use binary search to find the edge of the fct's range.
         if (max_iter == null) max_iter = 3;
         var fa = f.eval(a);
@@ -367,9 +383,9 @@ public class Wideangle {
             }
         }
         if (fb == null)
-            return new Pair<>(a,fa);
+            return new ZEnpStopHt(a,fa);
         else
-            return new Pair<>(b,fb);
+            return new ZEnpStopHt(b,fb);
     }
 
     static final class Eval_Z_Enp_Function implements ScalarObjectiveFunction {

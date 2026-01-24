@@ -324,8 +324,14 @@ public class Wideangle {
             }
         }
         // compute the straightline crossing pt given the interval
-        var z_estimate = start_z.first - ((end_z.first - start_z.first)/
-                (end_z.second - start_z.second))*start_z.second;
+        double z_estimate;
+        if (M.isZero(end_z.second - start_z.second)) {
+            z_estimate = start_z.first;
+        }
+        else {
+            z_estimate = start_z.first - ((end_z.first - start_z.first) /
+                    (end_z.second - start_z.second)) * start_z.second;
+        }
 
         //    logger.debug(f"  trials: {trial},   {successes=}")
         //    logger.debug(f"  z_enp: start_z={a:10.5f} z_estimate={z_estimate:10.5f}  "

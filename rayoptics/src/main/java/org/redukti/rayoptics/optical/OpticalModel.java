@@ -62,7 +62,7 @@ public class OpticalModel {
      */
     public void update_optical_properties() {
         // OpticalSpec maintains first order and ray aiming for fields
-        optical_spec.update_optical_properies();
+        optical_spec.update_optical_properties();
         // Update the ParaxialModel as needed
         parax_model.update_model();
         // Update surface apertures, if requested (do_apertures=True)

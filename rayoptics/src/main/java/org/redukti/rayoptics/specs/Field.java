@@ -48,10 +48,13 @@ public class Field {
     /**
      * Populated for non wide-angle system
      * x, y chief ray coords on the paraxial entrance pupil plane
+     * When this is populated z_enp should be null.
      */
     public double[] aim_info;
     /**
+     * The z center of the real pupil for `fld`, wrt 1st ifc
      * Populated for wide-angle system
+     * When this is populated aim_info should be null;
      */
     public Double z_enp;
     /**

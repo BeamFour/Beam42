@@ -28,8 +28,11 @@ public class Wideangle {
      *         dir0:       direction cosine vector in object space
      *         obj_dist:   object distance to first interface
      *         wvl:        wavelength of raytrace (nm)
+     *
+     * Returns the intercept coord on the stop surface on success
+     * Along with the ray tracing results
      */
-    public static Pair<Vector3,RayResult> enp_z_coordinate(double z_enp, SequentialModel seq_model, int stop_idx, Vector3 dir0, double obj_dist, double wvl) {
+    public static RayResultWithStopCoord enp_z_coordinate(double z_enp, SequentialModel seq_model, int stop_idx, Vector3 dir0, double obj_dist, double wvl) {
         var obj2enp_dist = -(obj_dist + z_enp);
         var pt1 = new Vector3(0., 0., obj2enp_dist);
         var rot_mat = Matrix3.rot_v1_into_v2(Vector3.vector3_001, dir0);
@@ -51,21 +54,22 @@ public class Wideangle {
             //f'{ray_error.surf=}')
             ray_pkg = ray_error.ray_pkg;
             rr = new RayResult(ray_pkg,ray_error);
+            // FIXME should below be null?
             final_coord = Vector3.ZERO;
         }
-        return new Pair<>(final_coord,rr);
+        return new RayResultWithStopCoord(final_coord,rr,stop_idx);
     }
 
     /**
      * Locate the z center of the real pupil for `fld`
      */
-    public static Pair<Double,RayResult> find_real_enp(OpticalModel opm, Integer stop_idx, Field fld, double wvl, String selector) {
+    public static RayResultWithZEnp find_real_enp(OpticalModel opm, Integer stop_idx, Field fld, double wvl, String selector) {
         if (Objects.equals(selector,"rev1"))
             return find_real_enp_rev1(opm, stop_idx, fld, wvl, null);
         else
             return find_real_enp_orig(opm, stop_idx, fld, wvl);
     }
-    public static Pair<Double,RayResult> find_real_enp(OpticalModel opm, Integer stop_idx, Field fld, double wvl) {
+    public static RayResultWithZEnp find_real_enp(OpticalModel opm, Integer stop_idx, Field fld, double wvl) {
         return find_real_enp(opm,stop_idx,fld,wvl,"rev1");
     }
 
@@ -89,14 +93,30 @@ public class Wideangle {
         }
         public Double eval(double z_enp) {
             var coord_rr = enp_z_coordinate(z_enp,seq_model,stop_idx,dir0,obj_dist,wvl);
-            var final_coord = coord_rr.first;
-            var rr = coord_rr.second;
+            var final_coord = coord_rr.stop_coord;
+            var rr = coord_rr.rr;
             if (rr.err == null) {
                 var ht_at_stop = final_coord.y;
                 return ht_at_stop;
             }
             else
                 return null;
+        }
+    }
+
+    static final class ZEnpStopHt {
+        final double z_enp;
+        final double ht_at_stop;
+        public ZEnpStopHt(double z_enp, double ht_at_stop) {
+            this.z_enp = z_enp;
+            this.ht_at_stop = ht_at_stop;
+        }
+        @Override
+        public String toString() {
+            return "{" +
+                    "z_enp=" + z_enp +
+                    ", ht_at_stop=" + ht_at_stop +
+                    '}';
         }
     }
 
@@ -112,7 +132,7 @@ public class Wideangle {
      *
      *     The outcome is a range, start_z -> end_z, an estimate of where the crossing point is (z_estimate), and a ray iteration (using :func:`~.raytr.wideangle.find_z_enp_on_interval`) to find the center of the stop surface.
      */
-    public static Pair<Double,RayResult> find_real_enp_rev1(OpticalModel opm, Integer stop_idx, Field fld, double wvl, Boolean check_direction) {
+    public static RayResultWithZEnp find_real_enp_rev1(OpticalModel opm, Integer stop_idx, Field fld, double wvl, Boolean check_direction) {
         if (check_direction == null) check_direction = true;
         var sm = opm.seq_model;
         var osp = opm.optical_spec;
@@ -128,11 +148,11 @@ public class Wideangle {
         if (fld.z_enp != null) {
             var z_enp = fld.z_enp;
             var coord_rr = enp_z_coordinate(z_enp,sm,stop_idx,dir0,fod.obj_dist,wvl);
-            var final_coord = coord_rr.first;
-            var rr = coord_rr.second;
+            var final_coord = coord_rr.stop_coord;
+            var rr = coord_rr.rr;
             var tol = 1.48e-08;
             if (Math.abs(final_coord.y)<tol)
-                return new Pair<>(z_enp,rr);
+                return new RayResultWithZEnp(z_enp,rr);
         }
 
         // filter on-axis chief ray. z_enp is the paraxial result.
@@ -140,15 +160,15 @@ public class Wideangle {
         if (dir0.z == 1.) {
             // axial chief ray
             var coord_rr = enp_z_coordinate(z_enp_0,sm,stop_idx,dir0,fod.obj_dist,wvl);
-            var final_coord = coord_rr.first;
-            var rr = coord_rr.second;
+            var final_coord = coord_rr.stop_coord;
+            var rr = coord_rr.rr;
             //logger.info(f"  axial chief {z_enp_0=:8.4f}  {rr.err is None}")
-            return new Pair<>(z_enp_0,rr);
+            return new RayResultWithZEnp(z_enp_0,rr);
         }
-        Pair<Double,Double> start_z = null;
-        Pair<Double,Double> prev_z = null;
-        Pair<Double,Double> end_z = null;
-        var del_z = -z_enp_0/16.0;
+        ZEnpStopHt start_z = null;
+        ZEnpStopHt prev_z = null;
+        ZEnpStopHt end_z = null;
+        var del_z = -z_enp_0/16.0;  // step z
         var z_enp = z_enp_0;
         boolean keep_going = true;
         var direction = "first";
@@ -159,25 +179,25 @@ public class Wideangle {
         int successes = 0;
         while (keep_going && trial < 64 && first_surf_misses < 2) {
             var coord_rr = enp_z_coordinate(z_enp,sm,stop_idx,dir0,fod.obj_dist,wvl);
-            var rr = coord_rr.second;
-            var final_coord = coord_rr.first;
+            var rr = coord_rr.rr;
+            var final_coord = coord_rr.stop_coord;
             if (rr.err == null) {
                 var ht_at_stop = final_coord.y;
                 //            logger.debug(f"  ray passed at z_enp={z_enp:10.5f},  "
                 //                         f"{ht_at_stop=:7.3f}")
                 successes++;
                 if (start_z == null)
-                    start_z = new Pair<>(z_enp, ht_at_stop);
+                    start_z = new ZEnpStopHt(z_enp, ht_at_stop);
                 prev_z = end_z;
-                end_z = new Pair<>(z_enp, ht_at_stop);
+                end_z = new ZEnpStopHt(z_enp, ht_at_stop);
                 if (successes > 1) {
                     // check for a zero crossing, if so, we're done
-                    if (prev_z.second * end_z.second < 0)
+                    if (prev_z.ht_at_stop * end_z.ht_at_stop < 0)
                         keep_going = false;
                 }
                 if (successes == 2 && check_direction) {
                     // check that we're searching in the right direction
-                    if (Math.abs(start_z.second) < Math.abs(end_z.second)) {
+                    if (Math.abs(start_z.ht_at_stop) < Math.abs(end_z.ht_at_stop)) {
                         if (Objects.equals(direction,"first")) {
                             // first time through, reverse direction and start on
                             // the other side of z_enp_0.
@@ -223,10 +243,10 @@ public class Wideangle {
             trial += 1;
         }
 
-        var z_enp_a = start_z.first;
-        var ht_at_stop_a = start_z.second;
-        var z_enp_b = end_z.first;
-        var ht_at_stop_b = end_z.second;
+        var z_enp_a = start_z.z_enp;
+        var ht_at_stop_a = start_z.ht_at_stop;
+        var z_enp_b = end_z.z_enp;
+        var ht_at_stop_b = end_z.ht_at_stop;
 
         Double a = null, b = null;
         // If start and end are equal, then only one ray was successful.
@@ -239,17 +259,17 @@ public class Wideangle {
             for (var x: linspace(start_new,end_new,8)) {
                 z_enp = x;
                 var coord_rr = enp_z_coordinate(z_enp,sm,stop_idx,dir0,fod.obj_dist,wvl);
-                var final_coord = coord_rr.first;
-                var rr = coord_rr.second;
+                var final_coord = coord_rr.stop_coord;
+                var rr = coord_rr.rr;
                 if (rr.err == null) {
                     var ht_at_stop = final_coord.y;
                     if (start_z == null)
-                        start_z = new Pair<>(z_enp,ht_at_stop);
-                    end_z = new Pair<>(z_enp,ht_at_stop);
+                        start_z = new ZEnpStopHt(z_enp,ht_at_stop);
+                    end_z = new ZEnpStopHt(z_enp,ht_at_stop);
                 }
             }
-            a = start_z.first;
-            b = end_z.first;
+            a = start_z.z_enp;
+            b = end_z.z_enp;
         }
         // test for crossing between the end points
         else if (ht_at_stop_a * ht_at_stop_b < 0) {
@@ -260,8 +280,8 @@ public class Wideangle {
             if (prev_z != null) {
                 // if there's a previous sample, see if the crossing can be
                 //            # more tightly bracketed.
-                var z_enp_c = prev_z.first;
-                var ht_at_stop_c = prev_z.second;
+                var z_enp_c = prev_z.z_enp;
+                var ht_at_stop_c = prev_z.ht_at_stop;
                 if (ht_at_stop_c * ht_at_stop_b < 0) {
                     // set the smallest bracket using prev_z
                     var pt_a = prev_z;
@@ -279,13 +299,13 @@ public class Wideangle {
                     z_enp_b,
                     z_enp_b+del_z,
                     6);
-            var z_enp_edge_b = edge_b.first;
-            var ht_at_stop_edg_b = edge_b.second;
+            var z_enp_edge_b = edge_b.z_enp;
+            var ht_at_stop_edg_b = edge_b.ht_at_stop;
             //logger.debug(f"  edge_b found at at z_enp={z_enp_edge_b:10.5f},  "
             //                     f"{ht_at_stop_edg_b=:7.3f}")
             if (ht_at_stop_edg_b * ht_at_stop_b < 0) {
-                start_z = new Pair<>(z_enp_b, ht_at_stop_b);
-                end_z = new Pair<>(z_enp_edge_b, ht_at_stop_edg_b);
+                start_z = new ZEnpStopHt(z_enp_b, ht_at_stop_b);
+                end_z = new ZEnpStopHt(z_enp_edge_b, ht_at_stop_edg_b);
                 a = z_enp_b;
                 b = z_enp_edge_b;
             }
@@ -296,14 +316,14 @@ public class Wideangle {
                         z_enp_a,
                         z_enp_a-del_z,
                         6);
-                var z_enp_edge_a = edge_a.first;
-                var ht_at_stop_edg_a = edge_a.second;
+                var z_enp_edge_a = edge_a.z_enp;
+                var ht_at_stop_edg_a = edge_a.ht_at_stop;
                 // logger.debug(f"  edge_a found at at z_enp={z_enp_edge_a:10.5f},  "
                 //                         f"{ht_at_stop_edg_a=:7.3f}")
                 if (ht_at_stop_edg_a * ht_at_stop_a < 0) {
                     // found an interval containing a crossover point
-                    start_z = new Pair<>(z_enp_a, ht_at_stop_a);
-                    end_z = new Pair<>(z_enp_edge_a, ht_at_stop_edg_a);
+                    start_z = new ZEnpStopHt(z_enp_a, ht_at_stop_a);
+                    end_z = new ZEnpStopHt(z_enp_edge_a, ht_at_stop_edg_a);
                     a = z_enp_a;
                     b = z_enp_edge_a;
                 }
@@ -313,24 +333,24 @@ public class Wideangle {
                     System.err.println(String.format("chief ray trace failed at field %3.1f",fld.yv()));
                     var z_enp_cntr = z_enp_edge_a + (z_enp_edge_b - z_enp_edge_a)/2;
                     var coord_rr = enp_z_coordinate(z_enp_cntr,sm,stop_idx,dir0,fod.obj_dist,wvl);
-                    var final_coord = coord_rr.first;
-                    var rr = coord_rr.second;
+                    var final_coord = coord_rr.stop_coord;
+                    var rr = coord_rr.rr;
                     var ht_at_stop = final_coord.y;
                     // logger.debug(f"  fld: {fld.yv:3.1f}:   {z_enp_edge_a=:8.4f}  "
                     //                    f"{z_enp_edge_b=:8.4f}  {z_enp_cntr=:8.4f}  "
                     //                    f"{ht_at_stop=:10.2e}")
-                    return new Pair<>(z_enp_b, rr);
+                    return new RayResultWithZEnp(z_enp_b, rr);
                 }
             }
         }
         // compute the straightline crossing pt given the interval
         double z_estimate;
-        if (M.isZero(end_z.second - start_z.second)) {
-            z_estimate = start_z.first;
+        if (M.isZero(end_z.ht_at_stop - start_z.ht_at_stop)) {
+            z_estimate = start_z.z_enp;
         }
         else {
-            z_estimate = start_z.first - ((end_z.first - start_z.first) /
-                    (end_z.second - start_z.second)) * start_z.second;
+            z_estimate = start_z.z_enp - ((end_z.z_enp      - start_z.z_enp) /
+                                          (end_z.ht_at_stop - start_z.ht_at_stop)) * start_z.ht_at_stop;
         }
 
         //    logger.debug(f"  trials: {trial},   {successes=}")
@@ -346,10 +366,10 @@ public class Wideangle {
         var final_coord = Lists.get(rr.pkg.ray,stop_idx).p;
         var ht_at_stop = final_coord.y;
         //logger.info(f"fld: {fld.yv:3.1f}:   {z_enp=:8.4f}  {ht_at_stop=:10.2e}")
-        return new Pair<>(z_enp,rr);
+        return new RayResultWithZEnp(z_enp,rr);
     }
 
-    static Pair<Double,Double> find_edge(ScalarObjectiveFunction f, double a, double b, Integer max_iter) {
+    static ZEnpStopHt find_edge(ScalarObjectiveFunction f, double a, double b, Integer max_iter) {
         // use binary search to find the edge of the fct's range.
         if (max_iter == null) max_iter = 3;
         var fa = f.eval(a);
@@ -367,9 +387,9 @@ public class Wideangle {
             }
         }
         if (fb == null)
-            return new Pair<>(a,fa);
+            return new ZEnpStopHt(a,fa);
         else
-            return new Pair<>(b,fb);
+            return new ZEnpStopHt(b,fb);
     }
 
     static final class Eval_Z_Enp_Function implements ScalarObjectiveFunction {
@@ -393,8 +413,8 @@ public class Wideangle {
         @Override
         public Double eval(double z_enp) {
             var coord_rr = enp_z_coordinate(z_enp,seq_model,stop_idx,dir0,obj_dist,wvl);
-            var final_coord = coord_rr.first;
-            rr = coord_rr.second;
+            var final_coord = coord_rr.stop_coord;
+            rr = coord_rr.rr;
             return final_coord.y - y_target;
         }
     }
@@ -509,7 +529,7 @@ public class Wideangle {
      *     of the stop surface is done. Sometimes the start point doesn't produce a
      *     solution; use of the mid-point as a start is a reliable second try.
      */
-    public static Pair<Double,RayResult> find_real_enp_orig(OpticalModel opm, Integer stop_idx, Field fld, double wvl) {
+    public static RayResultWithZEnp find_real_enp_orig(OpticalModel opm, Integer stop_idx, Field fld, double wvl) {
         var sm = opm.seq_model;
         var osp = opm.optical_spec;
         var fod = osp.parax_data.fod;
@@ -526,14 +546,14 @@ public class Wideangle {
             var z_enp = fld.z_enp;
             var coord_rr = enp_z_coordinate(z_enp,sm,stop_idx,dir0,fod.obj_dist,wvl);
             double tol = 1.48e-8;
-            if (Math.abs(coord_rr.first.y)<tol)
-                return new Pair<>(z_enp,coord_rr.second);
+            if (Math.abs(coord_rr.stop_coord.y)<tol)
+                return new RayResultWithZEnp(z_enp,coord_rr.rr);
         }
 
         var z_enp_0 = fod.enp_dist;
         if (dir0.z == 1.0) { // axial chief ray
             var coord_rr = enp_z_coordinate(z_enp_0,sm,stop_idx,dir0,fod.obj_dist,wvl);
-            return new Pair<>(z_enp_0,coord_rr.second);
+            return new RayResultWithZEnp(z_enp_0,coord_rr.rr);
         }
 
         Double start_z = null;
@@ -548,7 +568,7 @@ public class Wideangle {
         int successes = 0;
         while (keep_going && successes < 4 && trial < 64 && first_surf_misses < 2) {
             var coord_rr = enp_z_coordinate(z_enp,sm,stop_idx,dir0,fod.obj_dist,wvl);
-            rr = coord_rr.second;
+            rr = coord_rr.rr;
             if (rr.err == null) {
                 successes++;
                 if (start_z == null)
@@ -581,7 +601,7 @@ public class Wideangle {
             for (var x: linspace(start_new,end_new,8)) {
                 z_enp = x;
                 var coord_rr = enp_z_coordinate(z_enp,sm,stop_idx,dir0,fod.obj_dist,wvl);
-                rr = coord_rr.second;
+                rr = coord_rr.rr;
                 if (rr.err == null) {
                     if (start_z == null)
                         start_z = z_enp;
@@ -592,19 +612,16 @@ public class Wideangle {
         // Now that candidate z_enps have been identified that trace without
         // ray failures, iterate to find the ray thru the stop center
         double[] starting_pts = {start_z, (start_z + end_z)/2.0, end_z};
-        Vector3 start_coord = null;
         for (var init_z: starting_pts) {
             var result = find_z_enp(opm,stop_idx,init_z,fld,wvl);
-            rr = result.second;
-            start_coord = result.first;
+            rr = result.rr;
+            z_enp = result.z_enp;
             if (rr.err == null)
                 break;
         }
-        z_enp = start_coord.z;
-
         var final_coord = Lists.get(rr.pkg.ray,stop_idx).p;
         var y_ht = final_coord.y;
-        return new Pair<>(z_enp,rr);
+        return new RayResultWithZEnp(z_enp,rr);
     }
 
     /**
@@ -626,7 +643,7 @@ public class Wideangle {
      *
      *     If the iteration fails, a TraceError will be raised
      */
-    public static Pair<Vector3,RayResult> find_z_enp(OpticalModel opt_model, Integer stop_idx, double z_enp_0, Field fld, double wvl) {
+    public static RayResultWithZEnp find_z_enp(OpticalModel opt_model, Integer stop_idx, double z_enp_0, Field fld, double wvl) {
         RayResult rr = null;
         var seq_model = opt_model.seq_model;
         var osp = opt_model.optical_spec;
@@ -638,7 +655,6 @@ public class Wideangle {
         var pt0 = coord.pt;
         var dir0 = coord.dir;
         double y_target = 0.;
-        Vector3 start_coords = null;
 
         if (stop_idx != null) {
             // do 1D iteration if field and target points are zero in x
@@ -651,11 +667,10 @@ public class Wideangle {
             catch (TraceException ray_err) {
                 z_enp = 0.0;
             }
-            start_coords = new Vector3(0.,0.,z_enp);
         }
         else
-            start_coords = new Vector3(0., 0., fod.enp_dist);
-        return new Pair<>(start_coords,rr);
+            z_enp = fod.enp_dist;
+        return new RayResultWithZEnp(z_enp,rr);
     }
 
     /**

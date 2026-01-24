@@ -400,16 +400,16 @@ public class Trace {
     }
 
 
-    public static IterationResult get_1d_solution(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double y_target, boolean not_wa) {
-        IterationResult res = new IterationResult();
+    public static RayResultWithStartCoord get_1d_solution(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double y_target, boolean not_wa) {
+        RayResultWithStartCoord res = new RayResultWithStartCoord();
         SecantFunction fn = new SecantFunction(seq_model, ifcx, pt0, dist, wvl, y_target, not_wa, res.rr);
         double start_y = SecantSolver.find_root(fn, 0., 50, 1.48e-8).root;
         res.start_coords = new double[]{0, start_y};
         return res;
     }
 
-    public static IterationResult get_2d_mike_lampton_lavenberg_marquardt_solution(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target, boolean not_wa) {
-        IterationResult res = new IterationResult();
+    public static RayResultWithStartCoord get_2d_mike_lampton_lavenberg_marquardt_solution(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target, boolean not_wa) {
+        RayResultWithStartCoord res = new RayResultWithStartCoord();
         ObjectiveFunction fn = new ObjectiveFunction(seq_model, ifcx, pt0, dist, wvl, Arrays.copyOf(xy_target, xy_target.length), not_wa, res.rr);
         LMLSolver lm = new LMLSolver(fn, 1e-12, 2, 2);
         int istatus = 0;
@@ -491,7 +491,7 @@ public class Trace {
      * @param wvl
      * @return
      */
-    public static IterationResult iterate_ray(final OpticalModel opt_model, Integer ifcx, double[] xy_target, Field fld, double wvl) {
+    public static RayResultWithStartCoord iterate_ray(final OpticalModel opt_model, Integer ifcx, double[] xy_target, Field fld, double wvl) {
         var seq_model = opt_model.seq_model;
         var osp = opt_model.optical_spec;
         var fod = osp.parax_data.fod;
@@ -516,7 +516,7 @@ public class Trace {
             }
         } else {
             // floating stop surface - use entrance pupil for aiming
-            var result = new IterationResult();
+            var result = new RayResultWithStartCoord();
             result.start_coords = xy_target;
             return result;
         }
@@ -672,12 +672,12 @@ public class Trace {
         ChiefRayPkg chief_ray_pkg;
         if (fld.chief_ray == null) {
             var res = aim_chief_ray(opt_model, fld, wvl);
-            if (res.first != null) {
-                fld.aim_info = res.first;
+            if (res.aim_pt != null) {
+                fld.aim_info = res.aim_pt;
                 fld.z_enp = null;
             }
             else {
-                fld.z_enp = res.second;
+                fld.z_enp = res.z_enp;
                 fld.aim_info = null;
             }
             chief_ray_pkg = trace_chief_ray(opt_model, fld, wvl, foc);
@@ -713,21 +713,21 @@ public class Trace {
         return new RefSphereCR(ref_sphere, chief_ray_pkg);
     }
 
-    public static Pair<double[],Double> aim_chief_ray(OpticalModel opt_model, Field fld, Double wvl) {
+    public static AimInfo aim_chief_ray(OpticalModel opt_model, Field fld, Double wvl) {
         // aim chief ray at center of stop surface and save results on **fld**
         var seq_model = opt_model.seq_model;
         var osp = opt_model.optical_spec;
         if (wvl == null)
             wvl = seq_model.central_wavelength();
         Integer stop = seq_model.stop_surface;
-        Pair<double[],Double> rvalue;
+        AimInfo rvalue;
         if (osp.fov.is_wide_angle) {
             var res = Wideangle.find_real_enp(opt_model, stop, fld, wvl);
-            rvalue = new Pair<>(null,res.first);
+            rvalue = new AimInfo(null,res.z_enp);
         }
         else {
             var res = iterate_ray(opt_model, stop, new double[]{0., 0.}, fld, wvl);
-            rvalue = new Pair<>(res.start_coords,null);
+            rvalue = new AimInfo(res.start_coords,null);
         }
         return rvalue;
     }
@@ -1072,16 +1072,16 @@ public class Trace {
         }
     }
 
-    public static IterationResult get_1d_solution_raw(List<PathSeg> pthlist, Integer ifcx, Vector3 pt0, double dist, double wvl, double y_target, boolean not_wa) {
-        IterationResult res = new IterationResult();
+    public static RayResultWithStartCoord get_1d_solution_raw(List<PathSeg> pthlist, Integer ifcx, Vector3 pt0, double dist, double wvl, double y_target, boolean not_wa) {
+        RayResultWithStartCoord res = new RayResultWithStartCoord();
         SecantFunctionRaw fn = new SecantFunctionRaw(pthlist, ifcx, pt0, dist, wvl, y_target, not_wa, res.rr);
         double start_y = SecantSolver.find_root(fn, 0., 50, 1.48e-8).root;
         res.start_coords = new double[]{0, start_y};
         return res;
     }
 
-    public static IterationResult get_2d_mike_lampton_lavenberg_marquardt_solution_raw(List<PathSeg> pthlist, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target, boolean not_wa) {
-        IterationResult res = new IterationResult();
+    public static RayResultWithStartCoord get_2d_mike_lampton_lavenberg_marquardt_solution_raw(List<PathSeg> pthlist, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target, boolean not_wa) {
+        RayResultWithStartCoord res = new RayResultWithStartCoord();
         ObjectiveFunctionRaw fn = new ObjectiveFunctionRaw(pthlist, ifcx, pt0, dist, wvl, Arrays.copyOf(xy_target, xy_target.length), not_wa, res.rr);
         LMLSolver lm = new LMLSolver(fn, 1e-12, 2, 2);
         int istatus = 0;
@@ -1104,8 +1104,8 @@ public class Trace {
      *
      *     If the iteration fails, a TraceError will be raised
      */
-    public static IterationResult iterate_ray_raw(List<PathSeg> pthlist, Integer ifcx, double[] xy_target, Vector3 pt0, Vector3 d0, double obj2pup_dist,
-                                                  double eprad, double wvl, boolean not_wa) {
+    public static RayResultWithStartCoord iterate_ray_raw(List<PathSeg> pthlist, Integer ifcx, double[] xy_target, Vector3 pt0, Vector3 d0, double obj2pup_dist,
+                                                          double eprad, double wvl, boolean not_wa) {
         if (ifcx != null) {
             if (pt0.x == 0.0 && xy_target[0] == 0.0) {
                 // do 1D iteration if field and target points are zero in x
@@ -1114,7 +1114,7 @@ public class Trace {
                     return get_1d_solution_raw(pthlist, ifcx, pt0, obj2pup_dist, wvl, y_target, not_wa);
                 }
                 catch (TraceException ray_err) {
-                    var result = new IterationResult();
+                    var result = new RayResultWithStartCoord();
                     result.start_coords = new double[]{0,0};
                     result.rr = new RayResult(ray_err.ray_pkg,ray_err);
                     return result;
@@ -1125,14 +1125,14 @@ public class Trace {
                     //return get_2d_minpack_lavenberg_marquardt_solution(seq_model, ifcx, pt0, dist, wvl, xy_target, fod);
                 }
                 catch (TraceException ray_err) {
-                    var result = new IterationResult();
+                    var result = new RayResultWithStartCoord();
                     result.start_coords = new double[]{0,0};
                     return result;
                 }
             }
         } else {
             // floating stop surface - use entrance pupil for aiming
-            var result = new IterationResult();
+            var result = new RayResultWithStartCoord();
             result.start_coords = xy_target;
             return result;
         }

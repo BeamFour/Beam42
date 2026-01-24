@@ -65,6 +65,15 @@ public class OpticalBenchDataImporter {
             }
             return null;
         }
+        public String get_text(String name) {
+            var variable = find_variable(name);
+            if (variable != null)
+                return variable.get_value(0);
+            return "";
+        }
+        public int count() {
+            return variables_.size();
+        }
     }
 
     public static final class Variable {
@@ -375,6 +384,24 @@ public class OpticalBenchDataImporter {
                             variables_.add(var);
                         }
                         break;
+                    case PATENT_INFO:
+                        if (words.length >= 2) {
+                            Variable var = new Variable(words[0]);
+                            for (int i = 1; i < words.length; i++) {
+                                var.add_value(words[i]);
+                            }
+                            patent_info_.add_variable(var);
+                        }
+                        break;
+                    case REPORT_DATA:
+                        if (words.length >= 2) {
+                            Variable var = new Variable(words[0]);
+                            for (int i = 1; i < words.length; i++) {
+                                var.add_value(words[i]);
+                            }
+                            report_data_.add_variable(var);
+                        }
+                        break;
                     case LENS_DATA: {
                         if (words.length < 2)
                             break;
@@ -578,12 +605,20 @@ public class OpticalBenchDataImporter {
         List<AsphericalData> get_aspherical_data() {
             return aspherical_data_;
         }
+        public DescriptiveData get_patent_info() {
+            return patent_info_;
+        }
+        public DescriptiveData get_report_data() {
+            return report_data_;
+        }
 
         private DescriptiveData descriptive_data_ = new DescriptiveData();
         private List<Variable> variables_ = new ArrayList<>();
         private List<LensSurface> surfaces_ = new ArrayList<>();
         private List<AsphericalData> aspherical_data_ = new ArrayList<>();
         private List<Variable> constants_ = new ArrayList<>();
+        private DescriptiveData patent_info_ = new DescriptiveData();
+        private DescriptiveData report_data_ = new DescriptiveData();
     }
 
     enum Section {
@@ -591,7 +626,9 @@ public class OpticalBenchDataImporter {
         CONSTANTS,
         VARIABLE_DISTANCES,
         LENS_DATA,
-        ASPHERICAL_DATA;
+        ASPHERICAL_DATA,
+        PATENT_INFO,
+        REPORT_DATA;
     }
 
     static final class SectionMapping {
@@ -609,7 +646,9 @@ public class OpticalBenchDataImporter {
             new SectionMapping("[constants]", Section.CONSTANTS),
             new SectionMapping("[variable distances]", Section.VARIABLE_DISTANCES),
             new SectionMapping("[lens data]", Section.LENS_DATA),
-            new SectionMapping("[aspherical data]", Section.ASPHERICAL_DATA)
+            new SectionMapping("[aspherical data]", Section.ASPHERICAL_DATA),
+            new SectionMapping("[patent info]", Section.PATENT_INFO),
+            new SectionMapping("[report data]", Section.REPORT_DATA),
     };
 
     static Section find_section(String name) {

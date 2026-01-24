@@ -206,8 +206,21 @@ public class Prescription {
                 wvls,
                 wts);
         prescription._title = specs.get_descriptive_data().get_title();
-        var patentInfo = specs.get_descriptive_data().find_variable("patent");
-        if (patentInfo != null) {
+        var patent_info_n = specs.get_patent_info();
+        if (patent_info_n.count() > 0) {
+            prescription._patent_country = patent_info_n.get_text("country");
+            prescription._patent_number = patent_info_n.get_text("number");
+            prescription._patent_example = patent_info_n.get_text("example");
+            prescription._application_year = patent_info_n.get_text("year applied");
+            prescription._inventors = patent_info_n.get_text("inventors");
+            prescription._organization = patent_info_n.get_text("original assignee");
+            if (prescription._organization.isEmpty())
+                prescription._organization = patent_info_n.get_text("current assignee");
+            prescription._patent_link = patent_info_n.get_text("link");
+        }
+        else if (specs.get_descriptive_data().find_variable("patent") != null) {
+            // old style to be deleted
+            var patentInfo = specs.get_descriptive_data().find_variable("patent");
             prescription._patent_country = patentInfo.get_value(0);
             prescription._patent_number = patentInfo.get_value(1);
             prescription._patent_example = patentInfo.get_value(2);
@@ -216,9 +229,19 @@ public class Prescription {
             prescription._organization = patentInfo.get_value(5);
             prescription._patent_link = patentInfo.get_value(6);
         }
-        var lensName = specs.get_descriptive_data().find_variable("lens name");
+        var report_data = specs.get_report_data();
+        String lensName = null;
+        if (report_data.count() > 0) {
+            lensName = report_data.get_text("lens name");
+        }
+        if (lensName == null) {
+            // try old way
+            var variable = specs.get_descriptive_data().find_variable("lens name");
+            if (variable != null)
+                lensName = variable.get_value(0);
+        }
         if (lensName != null) {
-            prescription._lens_name = lensName.get_value(0);
+            prescription._lens_name = lensName;
         }
         prescription.add_configurations(specs);
         List<OpticalBenchDataImporter.LensSurface> surfaces = specs.get_surfaces();
@@ -260,17 +283,17 @@ public class Prescription {
     }
 
     private Prescription add_configurations(OpticalBenchDataImporter.LensSpecifications specs) {
-        OpticalBenchDataImporter.Variable configurations = specs.get_descriptive_data().find_variable("configurations");
-        if (configurations != null && configurations.num_values() >= 2) {
-            _configurations = new int[configurations.num_values()/2];
-            _configuration_names = new String[configurations.num_values()/2];
-            for (int i = 0, j = 0; i < configurations.num_values(); i += 2, j++) {
-                int scenario = configurations.get_value_as_integer(i,-1);
-                if (scenario == -1)
-                    break;
-                String name = configurations.get_value(i+1);
-                _configurations[j] = scenario;
-                _configuration_names[j] = name;
+        OpticalBenchDataImporter.Variable configurations = specs.get_report_data().find_variable("scenarios");
+        OpticalBenchDataImporter.Variable names = specs.get_report_data().find_variable("names");
+        if (configurations != null && configurations.num_values() > 0 &&
+            names != null && names.num_values() == configurations.num_values()) {
+            _configurations = new int[configurations.num_values()];
+            _configuration_names = new String[names.num_values()];
+            for (int i = 0; i < configurations.num_values(); i++) {
+                int scenario = configurations.get_value_as_integer(i,0);
+                String name = names.get_value(i);
+                _configurations[i] = scenario;
+                _configuration_names[i] = name;
             }
             _focal_length_by_scenario = new double[_configurations.length];
             _f_number_by_scenario = new double[_configurations.length];

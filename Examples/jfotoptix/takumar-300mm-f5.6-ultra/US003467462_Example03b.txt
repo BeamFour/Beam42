@@ -1,0 +1,43 @@
+[descriptive data]
+title	US 3,467,462 Example 3
+[constants]
+Scaled	300	100
+[variable distances]
+Focal Length	293
+Angle of View	8.2
+F-Number	4.5
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf	99.781
+[lens data]
+1	124.068	15.0	1.4339	80.04	94.7	NICF-A	Hikari
+2	-8546.635	9.0		80.04
+3	-244.086	4.5	1.6200	74.04	36.3	F11	Hoya
+4	518.557	0.6		74.04
+5	93.990	12.0	1.4339	74.16	94.7	NICF-A	Hikari
+6	372.250	75.0		74.16
+7	120.699	12.0	1.5601	57.12	47.0	FEL3	Hoya
+8	Inf	1.5		57.12
+8AS	AS	38.1		44.654
+9	-59.701	3.0	1.5891	33.30	61.2	BACD5	Hoya
+10	-379.058	Bf		33.30
+[figure]
+source	Data/US003467462_Figure05.png
+originX	147.71
+originY	254.86
+ppmm	1.843
+[notes]
+reoptimized 24 Jan 2026
+[patent info]
+country	US
+number	US3467462A
+example	3
+year applied	1965
+inventors	Tomokazu Kazamaki, Tohru Matsumoto
+current assignee	Pentax Corp
+original assignee	Asahi Kogaku Kogyo Co Ltd
+link	https://patents.google.com/patent/US3467462A/en
+[report data]
+lens name	Asahi Pentax Ultra-Achromatic-Takumar 300mm f5.6
+

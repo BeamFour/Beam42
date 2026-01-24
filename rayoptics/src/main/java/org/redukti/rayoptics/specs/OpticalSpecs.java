@@ -81,12 +81,12 @@ public class OpticalSpecs {
                     Field fld = fov.fields[i];
                     try {
                         var res = Trace.aim_chief_ray(opt_model, fld, wvl);
-                        if (res.first != null) {
-                            fld.aim_info = res.first;
+                        if (res.aim_pt != null) {
+                            fld.aim_info = res.aim_pt;
                             fld.z_enp = null;
                         }
                         else {
-                            fld.z_enp = res.second;
+                            fld.z_enp = res.z_enp;
                             fld.aim_info = null;
                         }
                     }

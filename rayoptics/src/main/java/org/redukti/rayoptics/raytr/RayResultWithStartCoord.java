@@ -3,7 +3,7 @@
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.raytr;
 
-public class IterationResult {
+public class RayResultWithStartCoord {
     public double[] start_coords;
     public RayResult rr = new RayResult();
 }

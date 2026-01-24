@@ -672,10 +672,14 @@ public class Trace {
         ChiefRayPkg chief_ray_pkg;
         if (fld.chief_ray == null) {
             var res = aim_chief_ray(opt_model, fld, wvl);
-            if (res.first != null)
+            if (res.first != null) {
                 fld.aim_info = res.first;
-            else
+                fld.z_enp = null;
+            }
+            else {
                 fld.z_enp = res.second;
+                fld.aim_info = null;
+            }
             chief_ray_pkg = trace_chief_ray(opt_model, fld, wvl, foc);
         }
         else if (fld.chief_ray.chief_ray.wvl != wvl) {

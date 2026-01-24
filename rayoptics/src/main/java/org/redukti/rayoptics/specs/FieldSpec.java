@@ -3,6 +3,7 @@
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.specs;
 
+import org.redukti.mathlib.M;
 import org.redukti.mathlib.Matrix3;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.parax.Etendue;
@@ -225,7 +226,25 @@ public class FieldSpec {
                     var pkg = Wideangle.eval_real_image_ht(opt_model,fld,wvl);
                     obj_pt = pkg.ray_data.pt;
                     obj_dir = pkg.ray_data.dir;
-                    fld.z_enp = pkg.z_enp;
+                    if (is_wide_angle) {
+                        fld.z_enp = pkg.z_enp;
+                        fld.aim_info = null;
+                    }
+                    else {
+                        // compute offset at paraxial entrance pupil
+                        var del_z = fod.enp_dist - pkg.z_enp;
+                        double[] aim_pt;
+                        if (M.isZero(obj_dir.z)) {
+                            aim_pt = new double[2];
+                        }
+                        else {
+                            aim_pt = new double[] {
+                                    (obj_dir.x/obj_dir.z) * del_z,
+                                    (obj_dir.y/obj_dir.z) * del_z};
+                        }
+                        fld.aim_info = aim_pt;
+                        fld.z_enp = null;
+                    }
                     return new Coord(obj_pt,obj_dir);
                 }
                 else {

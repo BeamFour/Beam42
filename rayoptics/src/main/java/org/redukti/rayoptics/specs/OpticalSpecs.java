@@ -68,7 +68,7 @@ public class OpticalSpecs {
         fov.update_model();
     }
 
-    public void update_optical_properies() {
+    public void update_optical_properties() {
         var opm = opt_model;
         var sm = opm.seq_model;
         if (sm.get_num_surfaces() > 2) {
@@ -79,11 +79,20 @@ public class OpticalSpecs {
             if (do_aiming) {
                 for (int i = 0; i < fov.fields.length; i++) {
                     Field fld = fov.fields[i];
-                    var res = Trace.aim_chief_ray(opt_model, fld, wvl);
-                    if (res.first != null)
-                        fld.aim_info = res.first;
-                    else
-                        fld.z_enp = res.second;
+                    try {
+                        var res = Trace.aim_chief_ray(opt_model, fld, wvl);
+                        if (res.first != null) {
+                            fld.aim_info = res.first;
+                            fld.z_enp = null;
+                        }
+                        else {
+                            fld.z_enp = res.second;
+                            fld.aim_info = null;
+                        }
+                    }
+                    catch (Exception e) {
+                        System.err.println("OpticalSpecs aim_chief_ray failure at field " + i);
+                    }
                 }
             }
         }

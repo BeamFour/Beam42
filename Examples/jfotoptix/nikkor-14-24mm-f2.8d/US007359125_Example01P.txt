@@ -58,3 +58,16 @@ ppmm	5.642
 [notes]
 Bill: Maximum Magnification measured.
 Dibyendu: assigned glass types. Adjusted back focus at 14mm
+[patent info]
+country	US
+number	US7359125
+example	1
+year applied	2005
+inventors	Yoko Kimura,Haruo Sato
+current assignee	Nikon Corp
+original assignee	Nikon Corp
+link	https://patents.google.com/patent/US7359125B2/en
+[report data]
+lens name	AF-S Nikkor 14-24mm f/2.8G ED
+scenarios	0	2
+names	14mm f2.8	24mm f2.8

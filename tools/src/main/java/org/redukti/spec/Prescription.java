@@ -29,37 +29,58 @@ import org.redukti.rayoptics.util.Pair;
 
 import java.util.*;
 
-// A format for prescription that is easier to work with when
-// trying to optimize
+/**
+ * A format for prescription that is easier to work with when trying to optimize.
+ * Supports both single and multiple configurations - a multi configuration setup is
+ * required for zoom lenses where thicknesses, focal lengths, diameters, fnumbers can
+ * vary by zoom setting.
+ * There is always a default scenario configuration.
+ */
 public class Prescription {
 
-    // Focal length of default scenario, in multi config this is defined by _focal_length_by_scenario
+    /** Focal length of default scenario, in multi config this is defined by _focal_length_by_scenario */
     public final double _focal_length;
-    // F-number of default scenario, in multi config this is defined by _f_number_by_scenario
+    /** F-number of default scenario, in multi config this is defined by _f_number_by_scenario */
     public final double _fno;
-    // The quoted angle of view - e.g. 47 degrees for 50mm; this is the full angle of view
-    // This is defined by _angle_of_views_by_scenario in multi config
+    /** The quoted angle of view - e.g. 47 degrees for 50mm; this is the full angle of view
+     * This is defined by _angle_of_views_by_scenario in multi config
+     */
     public final double _angle_of_view_in_degrees;
-    // For 35mm this is sqrt(36^2 + 24^2) = 43.27
+    /** For 35mm this is sqrt(36^2 + 24^2) = 43.27 */
     public final double _diameter_image_circle;
 
+    /** wavelengths to use,
+     * NOTE atm first wvl is made reference wvl
+     */
     public final double[] _wvls;
+    /** wavelength weights - mainly used when computing spot and MTFs */
     public final double[] _wts;
-    // Used to build
+    /** when building we use a list */
     public List<SurfaceType> _surface_list = new ArrayList<SurfaceType>();
+    /** After construction this is the list of surfaces */
     public SurfaceType[] _surfaces;
 
-    // Maps our config id to scenario number in the OpticalBench specs
+    /** Maps our config id to scenario number in the OpticalBench specs
+     * The scenario in OBench corresponds to how it is defined in
+     * source patent data
+     */
     public int[] _configurations;
+    /** Each config is given a name */
     public String[] _configuration_names;
+    /** Each config has its own angle of view */
     public double[] _angle_of_views_by_scenario;
+    /** Each config has its own focal length */
     public double[] _focal_length_by_scenario;
+    /** Each config has its own fnumber */
     public double[] _f_number_by_scenario;
 
     public Distribution _distribution;   // FIXME rename, used for ray finding only
+
     public double _var_angle_of_view = 0.0;
 
-    // Following are optional values for information only
+    /** Following are optional values for information only, used to generate
+     * lens report.
+     */
     public String _title;
     public String _lens_name;
     public String _patent_country = "";
@@ -71,14 +92,9 @@ public class Prescription {
     public String _patent_link = "";
 
     public Prescription(double focalLength, double fno, double angleOfViewDegrees, double diameterImageCircle, boolean d_line) {
-        this._focal_length = focalLength;
-        this._fno = fno;
-        this._angle_of_view_in_degrees = angleOfViewDegrees;
-        this._diameter_image_circle = diameterImageCircle;
-        // NOTE atm first wvl is made reference wvl
-        this._wvls = d_line ? new double[] {587.5618} : new double[] {587.5618, 486.1327, 656.2725};
-        this._wts = d_line ? new double[] {1.0} : new double[] {1.0, 1.0, 1.0};
-        this._distribution = new Distribution(Pattern.UserDefined,10, 0.999);
+        this(focalLength,fno,angleOfViewDegrees,diameterImageCircle,
+            d_line ? new double[] {587.5618} : new double[] {587.5618, 486.1327, 656.2725},
+            d_line ? new double[] {1.0} : new double[] {1.0, 1.0, 1.0});
     }
     public Prescription(double focalLength, double fno, double angleOfViewDegrees, double diameterImageCircle, double[] wvls, double[] wts) {
         this._focal_length = focalLength;
@@ -111,6 +127,11 @@ public class Prescription {
         _surface_list.add(surface);
         return this;
     }
+
+    /** Sets up the last added surface as an asphere.
+     * @param asph_type 1=EVEN,2=EVEN_A2,3=ODD
+     * @param coeffs for EVEN first param is not used and should be 0, for ODD first 2 must be 0
+     */
     public Prescription asph(int asph_type, double k, double[] coeffs) {
         if (asph_type == SurfaceType.ASPH_EVEN && coeffs[0] != 0.0)
             throw new IllegalArgumentException("Even aspheres must have 0 as first coefficient");
@@ -123,15 +144,17 @@ public class Prescription {
         return this;
     }
     /**
-     * The diameter for given field
+     * Derive diameter for given field.
+     * @param field fields are relative, 0 for axis to 1 for edge.
      */
     public double imageDiameterForField(double field) {
         assert field >= 0 && field <= 1.0;
-        return _diameter_image_circle *field;
+        return _diameter_image_circle * field;
     }
 
     /**
-     * Full angle of view in degrees for given field
+     * Full angle of view in degrees for given field for default configuration
+     * @param field fields are relative, 0 for axis to 1 for edge.
      */
     public double fullAngleOfViewDegrees(double field) {
         if (field == 0.0) return 0.0;
@@ -142,11 +165,13 @@ public class Prescription {
         }
         else throw new IllegalArgumentException("Field must be between 0 and 1.");
     }
+    /** Get angle of view for default configuration */
     public double getHalfAngleOfViewInDegrees() {
-        return _angle_of_view_in_degrees /2.0;
+        return _angle_of_view_in_degrees/2.0;
     }
+    /** Get angle of view for default configuration */
     public double getHalfAngleOfViewInRadians() {
-        return Math.toRadians(_angle_of_view_in_degrees /2.0);
+        return Math.toRadians(_angle_of_view_in_degrees/2.0);
     }
     public Prescription build() {
         this._surfaces = _surface_list.toArray(new SurfaceType[_surface_list.size()]);
@@ -197,26 +222,39 @@ public class Prescription {
     public static Prescription buildPrescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types,double[] wvls,double[] wts) {
         return buildPrescription(specs,use_glass_types,wvls,wts,0);
     }
-    public static Prescription buildPrescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types,double[] wvls,double[] wts,int scenario) {
+
+    /**
+     * Helper to build a Prescription from OpticalBench file.
+     *
+     * @param specs Specs obtained from OpticalBench format
+     * @param use_glass_types If true will use glass types if glass names are provided
+     * @param wvls Wavelengths to use
+     * @param wts Wavelength weights - mainly used for Spot diagrams and MTFs
+     * @param default_scenario Default scenario - use 0 if input has no scenarios
+     */
+    public static Prescription buildPrescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types,double[] wvls,double[] wts,int default_scenario) {
+        // We use default values variables that can change in a multi-configuration setup.
+        // The defaults are useful as they are the ones that are manipulated during optimization
         var prescription = new Prescription(
                 specs.get_focal_length(),
-                specs.get_f_number(scenario),  // default is scenario 0
-                specs.get_angle_of_view_in_degrees(scenario),  // default is scenario 0
+                specs.get_f_number(default_scenario),
+                specs.get_angle_of_view_in_degrees(default_scenario),
                 specs.get_image_height(),
                 wvls,
                 wts);
         prescription._title = specs.get_descriptive_data().get_title();
         var patent_info_n = specs.get_patent_info();
         if (patent_info_n.count() > 0) {
-            prescription._patent_country = patent_info_n.get_text("country");
-            prescription._patent_number = patent_info_n.get_text("number");
-            prescription._patent_example = patent_info_n.get_text("example");
-            prescription._application_year = patent_info_n.get_text("year applied");
-            prescription._inventors = patent_info_n.get_text("inventors");
-            prescription._organization = patent_info_n.get_text("original assignee");
+            // New style
+            prescription._patent_country = patent_info_n.get_value("country");
+            prescription._patent_number = patent_info_n.get_value("number");
+            prescription._patent_example = patent_info_n.get_value("example");
+            prescription._application_year = patent_info_n.get_value("year applied");
+            prescription._inventors = patent_info_n.get_value("inventors");
+            prescription._organization = patent_info_n.get_value("original assignee");
             if (prescription._organization.isEmpty())
-                prescription._organization = patent_info_n.get_text("current assignee");
-            prescription._patent_link = patent_info_n.get_text("link");
+                prescription._organization = patent_info_n.get_value("current assignee");
+            prescription._patent_link = patent_info_n.get_value("link");
         }
         else if (specs.get_descriptive_data().find_variable("patent") != null) {
             // old style to be deleted
@@ -232,10 +270,11 @@ public class Prescription {
         var report_data = specs.get_report_data();
         String lensName = null;
         if (report_data.count() > 0) {
-            lensName = report_data.get_text("lens name");
+            // new style
+            lensName = report_data.get_value("lens name");
         }
         if (lensName == null) {
-            // try old way
+            // old style - to be removed
             var variable = specs.get_descriptive_data().find_variable("lens name");
             if (variable != null)
                 lensName = variable.get_value(0);
@@ -243,10 +282,12 @@ public class Prescription {
         if (lensName != null) {
             prescription._lens_name = lensName;
         }
+        // If the input file defines a configuration section
+        // then we import the configurations
         prescription.add_configurations(specs);
         List<OpticalBenchDataImporter.LensSurface> surfaces = specs.get_surfaces();
         for (int i = 0; i < surfaces.size(); i++) {
-            prescription.import_surface(surfaces.get(i),scenario,use_glass_types);
+            prescription.import_surface(surfaces.get(i),default_scenario,use_glass_types);
             if (prescription._configurations != null) {
                 prescription.add_configuration_data(surfaces.get(i));
             }
@@ -283,15 +324,15 @@ public class Prescription {
     }
 
     private Prescription add_configurations(OpticalBenchDataImporter.LensSpecifications specs) {
-        OpticalBenchDataImporter.Variable configurations = specs.get_report_data().find_variable("scenarios");
-        OpticalBenchDataImporter.Variable names = specs.get_report_data().find_variable("names");
+        var configurations = specs.get_report_data().find_variable("scenarios");
+        var configuration_names = specs.get_report_data().find_variable("names");
         if (configurations != null && configurations.num_values() > 0 &&
-            names != null && names.num_values() == configurations.num_values()) {
+            configuration_names != null && configuration_names.num_values() == configurations.num_values()) {
             _configurations = new int[configurations.num_values()];
-            _configuration_names = new String[names.num_values()];
+            _configuration_names = new String[configuration_names.num_values()];
             for (int i = 0; i < configurations.num_values(); i++) {
                 int scenario = configurations.get_value_as_integer(i,0);
-                String name = names.get_value(i);
+                String name = configuration_names.get_value(i);
                 _configurations[i] = scenario;
                 _configuration_names[i] = name;
             }
@@ -519,15 +560,79 @@ public class Prescription {
         else if (has_even_a2_aspheric())
             sb.append("AsphericalA2\n");
         sb.append("[variable distances]\n");
-        sb.append("Focal Length\t").append(_focal_length).append("\n");
-        sb.append("Angle of View\t").append(_angle_of_view_in_degrees).append("\n");
-        sb.append("F-Number\t").append(_fno).append("\n");
-        sb.append("Image Height\t").append(_diameter_image_circle).append("\n");
-        sb.append("Magnification\t0\n");
-        sb.append("Bf\t").append(_surface_list.get(_surface_list.size()-1)._thickness).append("\n");
+        sb.append("Focal Length");
+        if (_configurations == null)
+            sb.append("\t").append(_focal_length);
+        else {
+            for (double v : _focal_length_by_scenario) sb.append("\t").append(v);
+        }
+        sb.append("\n");
+        sb.append("Angle of View");
+        if (_configurations== null)
+            sb.append("\t").append(_angle_of_view_in_degrees);
+        else {
+            for (double v : _angle_of_views_by_scenario) sb.append("\t").append(v);
+        }
+        sb.append("\n");
+        sb.append("F-Number");
+        if (_configurations == null)
+            sb.append("\t").append(_fno);
+        else {
+            for (double v : _f_number_by_scenario) sb.append("\t").append(v);
+        }
+        sb.append("\n");
+        sb.append("Image Height");
+        if (_configurations == null)
+            sb.append("\t").append(_diameter_image_circle);
+        else {
+            for (int i = 0; i < _configurations.length; i++)
+                sb.append("\t").append(_diameter_image_circle);
+        }
+        sb.append("\n");
+        sb.append("Magnification");
+        if (_configurations == null)
+            sb.append("\t0");
+        else {
+            for (int i = 0; i < _configurations.length; i++)
+                sb.append("\t0");
+        }
+        sb.append("\n");
+        var last_surf = _surface_list.get(_surface_list.size()-1);
+        sb.append("Bf");
+        if (_configurations == null)
+            sb.append("\t").append(last_surf._thickness);
+        else {
+            if (last_surf._thickness_by_scenario == null) {
+                for (int i = 0; i < _configurations.length; i++)
+                    sb.append("\t").append(last_surf._thickness);
+            }
+            else {
+                for (double v: last_surf._thickness_by_scenario)
+                    sb.append("\t").append(v);
+            }
+        }
+        sb.append("\n");
+        for (int i = 0; i < _surface_list.size(); i++) {
+            var surf = _surface_list.get(i);
+            if (i < _surface_list.size()-1 && surf._thickness_by_scenario != null) {
+                // last surface already dealt with above
+                sb.append("d").append(surf._id);
+                for (int j = 0; j < surf._thickness_by_scenario.length; j++)
+                    sb.append("\t").append(surf._thickness_by_scenario[j]);
+                sb.append("\n");
+            }
+            if (surf._diameter_by_scenario != null && surf._is_aperture_stop) {
+                sb.append("Aperture Diameter");
+                for (int j = 0; j < surf._diameter_by_scenario.length; j++)
+                    sb.append("\t").append(surf._diameter_by_scenario[j]);
+                sb.append("\n");
+            }
+        }
         sb.append("[lens data]\n");
-        for (SurfaceType surface : _surface_list) {
-            surface.toOptBenchStr(sb);
+        for (int i = 0; i < _surface_list.size(); i++) {
+            var surface = _surface_list.get(i);
+            var is_last = i == _surface_list.size()-1;
+            surface.toOptBenchStr(sb,is_last);
         }
         sb.append("[aspherical data]\n");
         for (SurfaceType surface : _surface_list) {

@@ -65,7 +65,7 @@ public class OpticalBenchDataImporter {
             }
             return null;
         }
-        public String get_text(String name) {
+        public String get_value(String name) {
             var variable = find_variable(name);
             if (variable != null)
                 return variable.get_value(0);

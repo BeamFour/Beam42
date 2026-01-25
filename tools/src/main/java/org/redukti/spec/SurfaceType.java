@@ -100,7 +100,7 @@ public class SurfaceType {
     public boolean is_even_a2_asphere() {
         return is_aspheric() && _asph_type == ASPH_EVEN_A2;
     }
-    public StringBuilder toOptBenchStr(StringBuilder sb) {
+    public StringBuilder toOptBenchStr(StringBuilder sb, boolean is_last) {
         sb.append(_id).append("\t");
         if (_is_aperture_stop)
             sb.append("AS");
@@ -108,7 +108,13 @@ public class SurfaceType {
             sb.append("FS");
         else
             sb.append(_radius);
-        sb.append("\t").append(_thickness).append("\t");
+        sb.append("\t");
+        if (_thickness_by_scenario != null) {
+            if (is_last) sb.append("Bf");
+            else sb.append("d").append(_id);
+        }
+        else sb.append(_thickness);
+        sb.append("\t");
         GlassMap glass = null;
         double nd = _nd;
         double vd = _vd;
@@ -238,6 +244,7 @@ public class SurfaceType {
     }
 
     public String toString() {
-        return toOptBenchStr(new StringBuilder()).toString();
+        // FIXME is last
+        return toOptBenchStr(new StringBuilder(),false).toString();
     }
 }

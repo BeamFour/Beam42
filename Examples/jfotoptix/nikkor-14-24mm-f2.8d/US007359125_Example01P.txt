@@ -11,7 +11,7 @@ Magnification	0	0	0	-0.025	-0.025	-0.025	-0.08768	-0.10454	-0.13500
 d0	Infinity	Infinity	Infinity	536.77	682.52	916.19	125	134.71	140.46
 d11	31.93	16.37	1.2	33.18	17.33	1.95	36.36	20.38	5.21
 d14	5.86	5.86	5.86	4.61	4.9	5.11	1.43	1.85	1.85
-Bf	38.58	44.55	53.97	38.7	44.55	53.97	38.7	44.55	53.97
+Bf	38.59	44.55	53.93	38.7	44.55	53.97	38.7	44.55	53.97
 Aperture Diameter	18.329	19.780	22.290	18.329	19.780	22.290	18.329	19.780	22.290
 [lens data]
 1	60.3937	3.5000	1.80400	82.82	46.58	J-LASF015
@@ -57,7 +57,7 @@ originY	307
 ppmm	5.642
 [notes]
 Bill: Maximum Magnification measured.
-Dibyendu: assigned glass types. Adjusted back focus at 14mm
+Dibyendu: assigned glass types. Adjusted back focus at 14mm and 24mm
 [patent info]
 country	US
 number	US7359125

@@ -60,7 +60,17 @@ public class SurfaceType {
     public double get_diameter() {
         return _diameter;
     }
+    public double get_diameter_by_scenario(int scenario) {
+        if (_diameter_by_scenario != null)
+            return _diameter_by_scenario[scenario];
+        return _diameter;
+    }
     public double get_thickness() {
+        return _thickness;
+    }
+    public double get_thickness_by_scenario(int scenario) {
+        if (_thickness_by_scenario != null)
+            return _thickness_by_scenario[scenario];
         return _thickness;
     }
     public double get_radius_of_curvature() {
@@ -159,6 +169,23 @@ public class SurfaceType {
         sb.append(" |\n");
         return sb;
     }
+    public StringBuilder variablesToMarkdownTableRow(StringBuilder sb) {
+        if (_diameter_by_scenario != null) {
+            sb.append("| a").append(_id).append(" |");
+            for (int i = 0; i < _diameter_by_scenario.length; i++) {
+                sb.append(" ").append(_diameter_by_scenario[i]).append(" |");
+            }
+            sb.append("\n");
+        }
+        if (_thickness_by_scenario != null) {
+            sb.append("| d").append(_id).append(" |");
+            for (int i = 0; i < _thickness_by_scenario.length; i++) {
+                sb.append(" ").append(_thickness_by_scenario[i]).append(" |");
+            }
+            sb.append("\n");
+        }
+        return sb;
+    }
 
     public static StringBuilder toMarkdownTableHeader(StringBuilder sb) {
         sb.append("## Surface Data").append("\n");
@@ -175,8 +202,17 @@ public class SurfaceType {
             sb.append("FS");
         else
             sb.append(_radius);
-        sb.append(" | ").append(_thickness).append(" | ");
-        sb.append(_diameter).append(" | ");
+        sb.append(" | ");
+        if (_thickness_by_scenario != null)
+            sb.append("d").append(_id);
+        else
+            sb.append(_thickness);
+        sb.append(" | ");
+        if (_diameter_by_scenario != null)
+            sb.append("a").append(_id);
+        else
+            sb.append(_diameter);
+        sb.append(" | ");
         String glassMaker = "";
         if (_nd != 0.0 && _glass_name != null) {
             GlassMap glass = GlassMap.glassByName(_glass_name);

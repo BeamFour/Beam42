@@ -396,14 +396,16 @@ public class Prescription {
         return new Asphere(s.get_radius_of_curvature(), k, a4, a6, a8, a10, a12, a14, a16, a18, a20);
     }
 
-    public OpticalModel build_ray_optics_model(boolean fov_angle, double[] fields, boolean do_apertures, VigType vig_type, boolean use_wideangle_aiming) {
+    public OpticalModel build_ray_optics_model(boolean fov_angle, double[] fields, boolean do_apertures, VigType vig_type, boolean use_wideangle_aiming, int config) {
         if (fields == null)
             fields = new double[]{0., .707, 1.};
         OpticalModel opm = new OpticalModel();
         SequentialModel sm = opm.seq_model;
         OpticalSpecs osp = opm.optical_spec;
-        double half_angle_deg = _angle_of_view_in_degrees/2.0;
-        osp.pupil = new PupilSpec(osp, new Pair<>(ImageKey.Image, ValueKey.Fnum), _fno);
+        var angle_of_view_deg = config == 0 ? _angle_of_view_in_degrees : _angle_of_views_by_scenario[config];
+        double half_angle_deg =  angle_of_view_deg/2.0;
+        var fno = config == 0 ? _fno : _f_number_by_scenario[config];
+        osp.pupil = new PupilSpec(osp, new Pair<>(ImageKey.Image, ValueKey.Fnum), fno);
         if (fov_angle) {
             osp.fov = new FieldSpec(osp, new Pair<>(ImageKey.Object, ValueKey.Angle), fields);
             osp.fov.value = half_angle_deg;
@@ -424,7 +426,7 @@ public class Prescription {
         sm.gaps.get(0).thi = 1e10;
         for (int i = 0; i < _surfaces.length; i++) {
             var s = _surfaces[i];
-            add_rayoptic_surface(sm,s);
+            add_rayoptic_surface(sm,s,config);
         }
         sm.do_apertures = do_apertures;
         opm.update_model();
@@ -449,9 +451,10 @@ public class Prescription {
         return opm;
     }
 
-    private void add_rayoptic_surface(SequentialModel sm, SurfaceType s) {
-        double ap_radius = s.get_diameter() / 2.0;
-        double thickness = s.get_thickness();
+    private void add_rayoptic_surface(SequentialModel sm, SurfaceType s, int config) {
+        var diameter = s.get_diameter_by_scenario(config);
+        double ap_radius = diameter / 2.0;
+        double thickness = s.get_thickness_by_scenario(config);
 
         if (s.get_refractive_index() != 0.0) {
             var glass = GlassMap.glassByName(s.get_glass_name());
@@ -561,6 +564,37 @@ public class Prescription {
             for (SurfaceType surface : _surface_list) {
                 if (surface.is_aspheric())
                     surface.ashericToMarkdownTableRow(sb);
+            }
+        }
+        if (get_num_configurations() > 1) {
+            sb.append("## Variables\n");
+            sb.append("| Variable |");
+            for (int i = 0; i < get_num_configurations(); i++) {
+                sb.append(" ").append(_configuration_names[i]).append(" |");
+            }
+            sb.append("\n");
+            sb.append("| --- |");
+            for (int i = 0; i < get_num_configurations(); i++) {
+                sb.append(" --- |");
+            }
+            sb.append("\n");
+            sb.append("| Focal length |");
+            for (int i = 0; i < get_num_configurations(); i++) {
+                sb.append(_focal_length_by_scenario[i]).append(" |");
+            }
+            sb.append("\n");
+            sb.append("| F-Number |");
+            for (int i = 0; i < get_num_configurations(); i++) {
+                sb.append(_f_number_by_scenario[i]).append(" |");
+            }
+            sb.append("\n");
+            sb.append("| Angle of View |");
+            for (int i = 0; i < get_num_configurations(); i++) {
+                sb.append(_angle_of_views_by_scenario[i]).append(" |");
+            }
+            sb.append("\n");
+            for (SurfaceType surface : _surface_list) {
+                surface.variablesToMarkdownTableRow(sb);
             }
         }
         return sb;

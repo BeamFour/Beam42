@@ -34,7 +34,8 @@ public class Analysis {
         this.freqs = freqs;
     }
     public void compute() {
-        system = prescription.build_ray_optics_model(true,fields,false, VigType.SetPupil, true);
+        // TODO support scenarios
+        system = prescription.build_ray_optics_model(true,fields,false, VigType.SetPupil, true,0);
         var spotAnalysis = SpotAnalysis.eval(system,new SpotOptions().num_rays(64).use_grid(false));
         spots = spotAnalysis.spot_results.toArray(new SpotAnalysisResult.SpotResultsForField[0]);
         pfo = ParaxHelper.asArray(system.optical_spec.parax_data.fod);

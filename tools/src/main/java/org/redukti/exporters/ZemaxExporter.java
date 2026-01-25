@@ -32,6 +32,7 @@ public class ZemaxExporter {
         outputObject(prescription, sb);
         outputSurfaces(prescription, sb);
         outputImagePlane(prescription, sb);
+        outputConfigurations(prescription, sb);
         return sb.toString();
     }
 
@@ -186,6 +187,25 @@ public class ZemaxExporter {
                   POPS 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0
                 TOL TOFF   0   0              0              0   0 0 0 0
                 """);
+    }
+
+    private void outputConfigurations(Prescription prescription, StringBuilder sb) {
+        if (prescription.get_num_configurations() <= 1)
+            return;
+        sb.append("MNUM ").append(prescription.get_num_configurations()).append(" 1\n");
+        for (int i = 0; i < prescription._surfaces.length; i++) {
+            var surface = prescription._surfaces[i];
+            if (surface._diameter_by_scenario != null) {
+                for (int j = 0; j < surface._diameter_by_scenario.length; j++) {
+                    sb.append("SDIA    ").append(i+1).append("   ").append(j+1).append(" ").append(surface._diameter_by_scenario[j]).append("  0 0 0 1 1 1 0 0\n");
+                }
+            }
+            if (surface._thickness_by_scenario != null) {
+                for (int j = 0; j < surface._thickness_by_scenario.length; j++) {
+                    sb.append("THIC    ").append(i+1).append("   ").append(j+1).append(" ").append(surface._thickness_by_scenario[j]).append("  0 0 0 1 1 1 0 0\n");
+                }
+            }
+        }
     }
 
     public String generate(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean dlineOnly) {

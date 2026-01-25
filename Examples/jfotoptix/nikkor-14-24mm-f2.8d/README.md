@@ -170,7 +170,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 * Black lines represent sagittal, blue tangential
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
-* [OpticalBench Compatible Data File, tab delimited](./US007359125_Example01P.txt)
+* [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./US007359125_Example01P.zmx)
 
 Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-01-25

@@ -2,7 +2,7 @@
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
-|JP | JP2019-090947 | EX 4 | 2017 | Keiko Yamada,Ryosuke Imajima,Wataru Tatsuno,Haruo Sato | Nikon Corp | [link](https://patents.google.com/patent/JP2019090947A/en) |
+|JP | JP2019-090947 | EX 4 | 2017 | Keiko Yamada,Ryosuke Imajima,Wataru Tatsuno,Haruo Sato | Nikon Corp, Konica Minolta Inc | [link](https://patents.google.com/patent/JP2019090947A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -102,4 +102,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./JP2019-090947_Example04P.txt)
 * [Zemax file](./JP2019-090947_Example04P.zmx)
 
-This report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-01-19
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-01-25

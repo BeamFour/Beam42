@@ -554,24 +554,24 @@ public class Prescription {
     }
     private void add_patent_section(StringBuilder sb) {
         sb.append("[patent info]\n");
-        if (_patent_country != null)
+        if (_patent_country != null && !_patent_country.isEmpty())
             sb.append("country\t").append(_patent_country).append("\n");
-        if (_patent_number != null)
+        if (_patent_number != null && !_patent_number.isEmpty())
             sb.append("number\t").append(_patent_number).append("\n");
-        if (_patent_example != null)
+        if (_patent_example != null && !_patent_example.isEmpty())
             sb.append("example\t").append(_patent_example).append("\n");
-        if (_application_year != null)
+        if (_application_year != null && !_application_year.isEmpty())
             sb.append("year applied\t").append(_application_year).append("\n");
-        if (_inventors != null)
+        if (_inventors != null && !_inventors.isEmpty())
             sb.append("inventors\t").append(_inventors).append("\n");
-        if (_organization != null)
+        if (_organization != null && !_organization.isEmpty())
             sb.append("current assignee\t").append(_organization).append("\n");
-        if (_patent_link != null)
+        if (_patent_link != null && !_patent_link.isEmpty())
             sb.append("link\t").append(_patent_link).append("\n");
     }
     private void add_report_section(StringBuilder sb) {
         sb.append("[report data]\n");
-        if (_lens_name != null)
+        if (_lens_name != null && !_lens_name.isEmpty())
             sb.append("lens name\t").append(_lens_name).append("\n");
         if (_configurations != null) {
             sb.append("scenarios");
@@ -585,6 +585,7 @@ public class Prescription {
     }
     public StringBuilder toOptBenchStr(StringBuilder sb) {
         sb.append("[descriptive data]\n");
+        sb.append("title\t").append(_title).append("\n");
         sb.append("[constants]\n");
         if (has_odd_aspheric())
             sb.append("AsphericalOddCount\t1\n");

@@ -160,7 +160,7 @@ public class LensTool2 {
         String filename = Helper.getFilename(specFile);
         String zmxFilename = Helper.replaceExtension(filename, ".zmx");
         sb.append("## Resources\n");
-        sb.append("* [OpticalBench Compatible Data File, tab delimited](./" + filename + ")\n");
+        sb.append("* [OpticalBench Compatible Data File, tab delimited](./prescription.txt)\n");
         sb.append("* [Zemax file](./" + zmxFilename + ")\n\n");
         sb.append("Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on " + LocalDate.now() + "\n");
         Helper.createOutputFile(output_file,sb.toString());
@@ -392,7 +392,8 @@ public class LensTool2 {
 
             OpticalBenchDataImporter.LensSpecifications specs = getSpecsFromFile(arguments.specfile);
             var prescription = createPrescription(specs,arguments.use_glass_types,arguments.only_d_line);
-            System.out.println(prescription.toOptBenchStr(new StringBuilder()).toString());
+            String prescription_output = prescription.toOptBenchStr(new StringBuilder()).toString();
+            Helper.createOutputFile(Helper.getOutputPath(arguments.specfile, "prescription.txt", arguments.outdir), prescription_output);
             StringBuilder SB = startREADME(specs);
             for (int config = 0; config < Math.max(prescription.get_num_configurations(),1); config++) {
                 var scenario = prescription.get_num_configurations() > 0 ? prescription._configurations[config] : 0;
@@ -409,7 +410,7 @@ public class LensTool2 {
                 Helper.createOutputFile(Helper.getOutputPath(arguments.specfile, suffixed_name("vig", scenario_filesuffix, ".txt"), arguments.outdir), osp.list_str(new StringBuilder()).toString());
                 Helper.createOutputFile(Helper.getOutputPath(arguments.specfile, suffixed_name("paraxial", scenario_filesuffix, ".txt"), arguments.outdir), fod.toString());
 
-                if (arguments.do_wideangle_layout)
+                if (arguments.do_wideangle_layout || osp.fov.is_wide_angle)
                     new Layout().doLayoutDiagramsForWides(specs, arguments, config, scenario, scenario_filesuffix);
                 else
                     new Layout().doLayoutDiagrams(specs, arguments, scenario, scenario_filesuffix);

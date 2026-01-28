@@ -174,6 +174,6 @@ Note that where glass types are shown the refractive index and abbe number is as
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
-* [Zemax file](./US20240255740_Example08.zmx)
+* [Zemax file](./US20250060572_Example08.zmx)
 
 Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-01-28

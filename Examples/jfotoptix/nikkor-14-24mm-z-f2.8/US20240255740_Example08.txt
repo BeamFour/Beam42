@@ -11,7 +11,7 @@ d0	Infinity	Infinity
 d8	19.3279	1.5
 d12	8.5296	5.941
 d30	20.4803	33.4872
-Bf	1.0688	1.0688
+Bf	0.945	0.945
 Aperture Diameter	15.956	18.010
 [lens data]
 1	342.7914	3.00	1.588870	66.44	61.13	Q-SK55S
@@ -53,3 +53,16 @@ Aperture Diameter	15.956	18.010
 29	-60.3503	0.0	-2.04742E-05	-5.87424E-08	2.99693E-10	-3.41851E-12	7.3793E-15
 [figure]
 [notes]
+[patent info]
+country	US
+number	US20240255740
+example	8
+year applied	2019
+inventors	Fumiaki OHTAKE, Azuna NONAKA
+current assignee	Nikon Corp
+original assignee	Nikon Corp
+link	https://patents.google.com/patent/US20250060572A1/en
+[report data]
+lens name	Z Nikkor 14-24mm f/2.8S
+scenarios	0	1
+names	14mm f2.8	24mm f2.8

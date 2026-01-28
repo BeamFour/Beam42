@@ -1,5 +1,5 @@
 [descriptive data]
-title	US20240255740 Example 8 (Nikon Nikkor Z 14-24mm f/2.8 S)
+title	US20250060572A1 Example 8 (Nikon Nikkor Z 14-24mm f/2.8 S)
 [constants]
 [variable distances]
 Focal Length	14.4	23.3
@@ -55,7 +55,7 @@ Aperture Diameter	15.956	18.010
 [notes]
 [patent info]
 country	US
-number	US20240255740
+number	US20250060572
 example	8
 year applied	2019
 inventors	Fumiaki OHTAKE, Azuna NONAKA

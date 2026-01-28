@@ -2,7 +2,7 @@
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
-|US | US20240255740 | 8 | 2019 | Fumiaki OHTAKE, Azuna NONAKA | Nikon Corp | [link](https://patents.google.com/patent/US20250060572A1/en) |
+|US | US20250060572 | 8 | 2019 | Fumiaki OHTAKE, Azuna NONAKA | Nikon Corp | [link](https://patents.google.com/patent/US20250060572A1/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

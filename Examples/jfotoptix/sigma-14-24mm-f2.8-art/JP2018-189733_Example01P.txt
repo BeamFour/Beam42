@@ -12,7 +12,7 @@ Magnification	0	0	0
 d0	Infinity	Infinity	Infinity
 d11	29.2621	15.3732	2.3000
 d17	8.4844	9.0291	9.7754
-Bf	38.8500	44.5092	53.0211
+Bf	38.80	44.5092	53.0211
 Aperture Diameter	17.266	18.870	21.377
 [lens data]
 1	103.2579	3.9000	1.69350	77.78	53.18	M-LAC130

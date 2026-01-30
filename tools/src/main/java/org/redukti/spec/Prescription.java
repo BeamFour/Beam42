@@ -700,10 +700,15 @@ public class Prescription {
                 sawAsph = true;
         }
         if (sawAsph) {
-            SurfaceType.asphericMarkdownTableHeader(sb);
+            var max_coeffs = 0;
+            for (SurfaceType surface : _surface_list) {
+                if (surface._coeffs != null && surface._coeffs.length > max_coeffs)
+                    max_coeffs = surface._coeffs.length;
+            }
+            SurfaceType.asphericMarkdownTableHeader(sb,max_coeffs);
             for (SurfaceType surface : _surface_list) {
                 if (surface.is_aspheric())
-                    surface.ashericToMarkdownTableRow(sb);
+                    surface.ashericToMarkdownTableRow(sb,max_coeffs);
             }
         }
         if (get_num_configurations() > 1) {

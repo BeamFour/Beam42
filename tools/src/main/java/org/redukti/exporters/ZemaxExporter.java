@@ -145,7 +145,7 @@ public class ZemaxExporter {
             sb.append("  MIRR 2 0\n");
             if (s.is_aspheric()) {
                 double[] aspherics = s.get_aspheric_coeffs();
-                for (int a = 1; a < 11; a++) {
+                for (int a = 1; a <= aspherics.length; a++) {
                     sb.append("  PARM ").append(a).append(" ");
                     sb.append(aspherics[a-1]).append("\n");
                 }
@@ -197,7 +197,7 @@ public class ZemaxExporter {
             var surface = prescription._surfaces[i];
             if (surface._diameter_by_scenario != null) {
                 for (int j = 0; j < surface._diameter_by_scenario.length; j++) {
-                    sb.append("SDIA    ").append(i+1).append("   ").append(j+1).append(" ").append(surface._diameter_by_scenario[j]).append("  0 0 0 1 1 1 0 0\n");
+                    sb.append("SDIA    ").append(i+1).append("   ").append(j+1).append(" ").append(surface._diameter_by_scenario[j]/2.0).append("  0 0 0 1 1 1 0 0\n");
                 }
             }
             if (surface._thickness_by_scenario != null) {

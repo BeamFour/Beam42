@@ -410,7 +410,7 @@ public class LensTool2 {
                 Helper.createOutputFile(Helper.getOutputPath(arguments.specfile, suffixed_name("vig", scenario_filesuffix, ".txt"), arguments.outdir), osp.list_str(new StringBuilder()).toString());
                 Helper.createOutputFile(Helper.getOutputPath(arguments.specfile, suffixed_name("paraxial", scenario_filesuffix, ".txt"), arguments.outdir), fod.toString());
 
-                if (arguments.do_wideangle_layout || osp.fov.is_wide_angle)
+                if (arguments.do_wideangle_layout /* || osp.fov.is_wide_angle */)
                     new Layout().doLayoutDiagramsForWides(specs, arguments, config, scenario, scenario_filesuffix);
                 else
                     new Layout().doLayoutDiagrams(specs, arguments, scenario, scenario_filesuffix);

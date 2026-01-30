@@ -159,13 +159,13 @@ public class OpticalBenchDataImporter {
         }
 
         public double[] get_coeffs() {
-            double[] coeffs = new double[10];
             int a = 0;
             if (get_asphere_type() == OpticalBenchDataImporter.AsphereType.Odd)
                 a = 2;
             else if (get_asphere_type() == OpticalBenchDataImporter.AsphereType.Even)
                 a = 1;
-            for (int i = 2; a < 10; i++, a++) {
+            double[] coeffs = new double[_data.size()-2+a];
+            for (int i = 2; a < _data.size(); i++, a++) {
                 coeffs[a] = data(i);
             }
             return coeffs;

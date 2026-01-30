@@ -150,23 +150,42 @@ public class SurfaceType {
         else if (_asph_type == ASPH_ODD)
             i = 2;
         for (; i < _coeffs.length; i++) {
-            if (_coeffs[i] == 0.0)
-                break;
             sb.append(_coeffs[i]).append("\t");
         }
         sb.append("\n");
         return sb;
     }
-    public static StringBuilder asphericMarkdownTableHeader(StringBuilder sb) {
+    public static StringBuilder asphericMarkdownTableHeader(StringBuilder sb, int max_coeffs) {
         sb.append("## Aspherical Data").append("\n");
-        sb.append("| ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |\n");
-        sb.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n");
+        sb.append("| ID  | Type | k   |");
+        for (int i = 0; i < max_coeffs; i++) {
+            sb.append(" P").append(i+1).append(" |");
+        }
+        sb.append("\n");
+        sb.append("| --- | --- | --- |");
+        for (int i = 0; i < max_coeffs; i++) {
+            sb.append(" --- |");
+        }
+        sb.append("\n");
         return sb;
     }
-    public StringBuilder ashericToMarkdownTableRow(StringBuilder sb) {
+    private String asphere_type() {
+        switch (_asph_type) {
+            case ASPH_EVEN:
+            case ASPH_EVEN_A2: {
+                return "EVEN";
+            }
+            case ASPH_ODD: {
+                return "ODD";
+            }
+        }
+        return "";
+    }
+    public StringBuilder ashericToMarkdownTableRow(StringBuilder sb, int max_coeffs) {
         sb.append("| ").append(_id);
+        sb.append("| ").append(asphere_type());
         sb.append(" | ").append(_k);
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < max_coeffs; i++) {
             if (_coeffs != null && i < _coeffs.length)
                 sb.append(" | ").append(_coeffs[i]);
             else

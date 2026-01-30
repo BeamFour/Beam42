@@ -65,6 +65,15 @@ originX	11.57
 originY	117.90
 ppmm	2.742
 [notes]
+[patent info]
+country	JP
+number	JP2018-189733
+example	1
+year applied	2017
+inventors	Ryo Shioda
+current assignee	Sigma Corp
+original assignee	Sigma Corp
+link	https://patents.google.com/patent/JP2018189733A/en
 [report data]
 lens name	Sigma 14-24mm F2.8 DG HSM Art
 scenarios	0	2

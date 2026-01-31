@@ -67,10 +67,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | d33 | 15.5 | 31.21 |
 # 12mm f2.8
 ## Layouts
-![Layout Only](./layoutonly-0.svg)
 ![Layout Field 0.0](./layout-0.svg)
-![Layout Field 0.7](./layout-semi-skew-0.svg)
-![Layout Field 1.0](./layout-skew-0.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot-0.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew-0.svg)

@@ -165,7 +165,7 @@ public class OpticalBenchDataImporter {
             else if (get_asphere_type() == OpticalBenchDataImporter.AsphereType.Even)
                 a = 1;
             double[] coeffs = new double[_data.size()-2+a];
-            for (int i = 2; a < _data.size(); i++, a++) {
+            for (int i = 2; i < _data.size(); i++, a++) {
                 coeffs[a] = data(i);
             }
             return coeffs;

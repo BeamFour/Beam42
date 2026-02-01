@@ -1,7 +1,6 @@
 package org.redukti.tools;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
-import org.redukti.mathlib.LMLSolver;
 import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
 import org.redukti.spec.Prescription;
@@ -34,7 +33,7 @@ public class ChiefRayFinder {
     public static Prescription getPrescription(String specfile) throws Exception {
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(specfile);
-        return Prescription.buildPrescription(specs,true);
+        return Prescription.build_prescription(specs,true);
     }
 
     public static Results findChiefRayAngle(String specFile, double y_intercept) throws Exception {

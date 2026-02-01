@@ -110,7 +110,7 @@ public class Glass extends Medium {
         return sb;
     }
 
-    public static Glass glassByName(String name) {
+    public static Glass glass_by_name(String name) {
         return glasses.get(name);
     }
     public static Map<String, Glass> glasses = new HashMap<>();

@@ -14,6 +14,7 @@ import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
 import org.redukti.render.rendering.RendererSvg;
 import org.redukti.render.rendering.Rgb;
+import org.redukti.spec.FotoptixSystemBuilder;
 import org.redukti.spec.Prescription;
 import org.redukti.jfotoptix.tracing.RayTraceParameters;
 import org.redukti.jfotoptix.tracing.RayTraceRenderer;
@@ -33,7 +34,7 @@ public class LensTool {
     }
 
     public static OpticalSystem createSystem(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean use_glass_types, boolean skew_rays, double percent_skew,  boolean d_line) {
-        OpticalSystem.Builder systemBuilder = OpticalBenchDataImporter.build_system(specs, scenario, use_glass_types);
+        OpticalSystem.Builder systemBuilder = FotoptixSystemBuilder.build_system(specs, scenario, use_glass_types);
         double half_angle_of_view_in_radians = specs.get_half_angle_of_view_in_radians(scenario);
         Vector3 direction = Vector3.vector3_001;
         if (skew_rays) {
@@ -102,8 +103,8 @@ public class LensTool {
     }
 
     public static void createREADME(String specFile, OpticalBenchDataImporter.LensSpecifications specs, ParaxialFirstOrderInfo pfo, double[] fields, AnalysisSpot[] spots, Path output_file) throws Exception {
-        Prescription prescription = Prescription.buildPrescription(specs,true);
-        StringBuilder sb = prescription.toMarkdownStr(new StringBuilder());
+        Prescription prescription = Prescription.build_prescription(specs,true);
+        StringBuilder sb = prescription.to_markdown_str(new StringBuilder());
         sb.append("## Layouts\n");
         sb.append("![Layout Only](./layoutonly.svg)\n");
         sb.append("![Layout Only](./layout.svg)\n");

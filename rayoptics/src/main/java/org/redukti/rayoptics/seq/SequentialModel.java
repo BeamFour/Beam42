@@ -653,7 +653,7 @@ public class SequentialModel {
         ZDir z_dir = ZDir.PROPAGATE_RIGHT;
 
         if (surf_data.refractive_index != null) {
-            Glass g = surf_data.glass_name != null ? Glass.glassByName(surf_data.glass_name) : null;
+            Glass g = surf_data.glass_name != null ? Glass.glass_by_name(surf_data.glass_name) : null;
             if (surf_data.v_number == null) {
                 if (surf_data.refractive_index == 1.0)
                     mat = new Air();

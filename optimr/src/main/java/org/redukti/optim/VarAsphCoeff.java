@@ -3,20 +3,20 @@ package org.redukti.optim;
 import org.redukti.spec.Prescription;
 
 public class VarAsphCoeff extends Var {
-    public final int surfaceId;
-    public final int index;
-    public final double scalingFactor;
+    public final int _surface_id;
+    public final int _index;
+    public final double _scaling_factor;
     public VarAsphCoeff(Prescription prescription, int surfaceId, int index) {
         super(prescription, prescription._surfaces[surfaceId]._coeffs[index],0.0001);
-        this.surfaceId = surfaceId;
-        this.index = index;
-        this.scalingFactor = Math.pow(10.0,4+index);
+        this._surface_id = surfaceId;
+        this._index = index;
+        this._scaling_factor = Math.pow(10.0,4+index);
     }
     public VarAsphCoeff(Prescription prescription, int surfaceId, int index,double scalingFactor) {
         super(prescription, prescription._surfaces[surfaceId]._coeffs[index],0.0001);
-        this.surfaceId = surfaceId;
-        this.index = index;
-        this.scalingFactor = scalingFactor;
+        this._surface_id = surfaceId;
+        this._index = index;
+        this._scaling_factor = scalingFactor;
     }
     @Override
     public void shift(double delta) {
@@ -29,17 +29,17 @@ public class VarAsphCoeff extends Var {
             // chosen as scaling factor
             // It seems that roughly the quartic term needs a factor of
             // 1E6 and then it goes uo by power of 2.
-            double scaled = originalValue * scalingFactor;
+            double scaled = _original_value * _scaling_factor;
             double newValue = scaled + delta;
-            double unscaled = newValue / scalingFactor;
-            prescription._surfaces[surfaceId]._coeffs[index] = unscaled;
+            double unscaled = newValue / _scaling_factor;
+            _prescription._surfaces[_surface_id]._coeffs[_index] = unscaled;
         }
         else
-            prescription._surfaces[surfaceId]._coeffs[index] = originalValue;
+            _prescription._surfaces[_surface_id]._coeffs[_index] = _original_value;
 
     }
     @Override
     public String toString() {
-        return "Surface ID: " + surfaceId + " Asph Coeff [" + index + "]: " + prescription._surfaces[surfaceId]._coeffs[index] + " scaling factor " + scalingFactor;
+        return "Surface ID: " + _surface_id + " Asph Coeff [" + _index + "]: " + _prescription._surfaces[_surface_id]._coeffs[_index] + " scaling factor " + _scaling_factor;
     }
 }

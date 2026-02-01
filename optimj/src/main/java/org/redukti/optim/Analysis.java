@@ -4,6 +4,7 @@ import org.redukti.jfotoptix.analysis.AnalysisRayFinder;
 import org.redukti.jfotoptix.analysis.AnalysisSpot;
 import org.redukti.jfotoptix.model.OpticalSystem;
 import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
+import org.redukti.spec.FotoptixSystemBuilder;
 import org.redukti.spec.Prescription;
 import org.redukti.jfotoptix.tracing.RayTraceResults;
 
@@ -67,7 +68,7 @@ public class Analysis {
         systems = new OpticalSystem[fields.length];
         spots = new AnalysisSpot[fields.length];
         for (int i = 0; i < fields.length; i++) {
-            systems[i] = prescription.buildSystem(true,fields[i]).build();
+            systems[i] = new FotoptixSystemBuilder(prescription).buildSystem(true,fields[i]).build();
             spots[i] = new AnalysisSpot(systems[i],spotDensity).process_analysis();
         }
         pfo = ParaxialFirstOrderInfo.compute(systems[0]).asArray();

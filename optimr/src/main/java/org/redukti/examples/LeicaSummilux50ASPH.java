@@ -1,7 +1,6 @@
 package org.redukti.examples;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
-import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.optim.*;
 import org.redukti.spec.Prescription;
 
@@ -13,7 +12,7 @@ public class LeicaSummilux50ASPH {
     private static Prescription getPrescription(String specfile) throws Exception {
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(specfile);
-        return Prescription.buildPrescription(specs, true);
+        return Prescription.build_prescription(specs, true);
     }
 
     public static void main(String[] args) throws Exception {
@@ -95,7 +94,7 @@ public class LeicaSummilux50ASPH {
         analysis.compute();
         var lm = f.getSolver();
         System.out.println("Aberrations:\n");
-        System.out.println(analysis.ray_aberrations.list_ray_fans());
+        System.out.println(analysis._ray_aberrations.list_ray_fans());
         System.out.println("Before:\n");
         System.out.println(f.toString());
         var istatus = lm.solve();

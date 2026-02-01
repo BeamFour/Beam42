@@ -13,7 +13,7 @@ public class LeicaSummicron35APO {
     private static Prescription getPrescription(String specfile) throws Exception {
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(specfile);
-        return Prescription.buildPrescription(specs, true);
+        return Prescription.build_prescription(specs, true);
     }
 
     public static void main(String[] args) throws Exception {
@@ -371,7 +371,7 @@ public class LeicaSummicron35APO {
         analysis.compute();
         var lm = f.getSolver();
         System.out.println("Aberrations:\n");
-        System.out.println(analysis.ray_aberrations.list_ray_fans());
+        System.out.println(analysis._ray_aberrations.list_ray_fans());
         System.out.println("Before:\n");
         System.out.println(f.toString());
         var istatus = lm.solve();

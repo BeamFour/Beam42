@@ -24,7 +24,9 @@ import org.redukti.rayoptics.raytr.Trace;
 import org.redukti.rayoptics.raytr.TraceOptions;
 import org.redukti.rayoptics.util.Lists;
 import org.redukti.render.rendering.RendererSvg;
+import org.redukti.spec.FotoptixSystemBuilder;
 import org.redukti.spec.Prescription;
+import org.redukti.spec.RayOpticsModelBuilder;
 import org.redukti.spec.VigType;
 import org.redukti.util.Args;
 import org.redukti.util.Helper;
@@ -47,13 +49,13 @@ public class LensTool2 {
     public static Prescription createPrescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types, boolean d_line) {
         var wvls = d_line ? new double[] {587.5618} : new double[] {587.5618, 486.1327, 656.2725};
         var wts = d_line ? new double[] {1.0} : new double[] {1.0, 1.0, 1.0};
-        return Prescription.buildPrescription(specs,use_glass_types,wvls,wts,0);
+        return Prescription.build_prescription(specs,use_glass_types,wvls,wts,0);
     }
     public static Prescription createPrescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types, double[] wvls, double[] wts) {
-        return Prescription.buildPrescription(specs,use_glass_types,wvls,wts);
+        return Prescription.build_prescription(specs,use_glass_types,wvls,wts);
     }
     public static OpticalModel createSystem(Prescription prescription, boolean fov_angle, VigType vig_type, boolean use_wideangle_aiming, double[] fields, int config) {
-        return prescription.build_ray_optics_model(fov_angle,fields,false,vig_type,use_wideangle_aiming,config);
+        return new RayOpticsModelBuilder(prescription).build_optical_model(fov_angle,fields,false,vig_type,use_wideangle_aiming,config);
     }
 
     public static void outputSpotAnalysis(SpotAnalysisResult.SpotResultsForField result, Path output_file, Double radius) throws Exception {
@@ -106,8 +108,8 @@ public class LensTool2 {
     }
 
     public static StringBuilder startREADME(OpticalBenchDataImporter.LensSpecifications specs) {
-        Prescription prescription = Prescription.buildPrescription(specs,true);
-        StringBuilder sb = prescription.toMarkdownStr(new StringBuilder());
+        Prescription prescription = Prescription.build_prescription(specs,true);
+        StringBuilder sb = prescription.to_markdown_str(new StringBuilder());
         return sb;
     }
 
@@ -239,7 +241,7 @@ public class LensTool2 {
     static class Layout {
 
         private OpticalSystem createSystem(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean use_glass_types, boolean skew_rays, double percent_skew, boolean d_line) {
-            OpticalSystem.Builder systemBuilder = OpticalBenchDataImporter.build_system(specs, scenario, use_glass_types);
+            OpticalSystem.Builder systemBuilder = FotoptixSystemBuilder.build_system(specs, scenario, use_glass_types);
             double half_angle_of_view_in_radians = specs.get_half_angle_of_view_in_radians(scenario);
             Vector3 direction = Vector3.vector3_001;
             if (skew_rays) {
@@ -357,7 +359,7 @@ public class LensTool2 {
             // For very wide angle lenses, blindly spraying rays doesn't work very well
             final double[] fields = {0.0, 0.7, 1.0};
             var prescription = createPrescription(specs,arguments.use_glass_types,arguments.only_d_line);
-            var opm = prescription.build_ray_optics_model(true,fields,false,VigType.SetPupil,true, config);
+            var opm = new RayOpticsModelBuilder(prescription).build_optical_model(true,fields,false,VigType.SetPupil,true, config);
 
             // On axis rays field 0
             OpticalSystem system = createSystem(specs,scenario,arguments.use_glass_types,false,0,arguments.only_d_line);
@@ -392,7 +394,7 @@ public class LensTool2 {
 
             OpticalBenchDataImporter.LensSpecifications specs = getSpecsFromFile(arguments.specfile);
             var prescription = createPrescription(specs,arguments.use_glass_types,arguments.only_d_line);
-            String prescription_output = prescription.toOptBenchStr(new StringBuilder()).toString();
+            String prescription_output = prescription.to_opt_bench_str(new StringBuilder()).toString();
             Helper.createOutputFile(Helper.getOutputPath(arguments.specfile, "prescription.txt", arguments.outdir), prescription_output);
             StringBuilder SB = startREADME(specs);
             for (int config = 0; config < Math.max(prescription.get_num_configurations(),1); config++) {

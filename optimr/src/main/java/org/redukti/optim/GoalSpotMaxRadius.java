@@ -1,19 +1,19 @@
 package org.redukti.optim;
 
 public class GoalSpotMaxRadius extends Goal {
-    public final int field;
+    public final int _field;
     public GoalSpotMaxRadius(Analysis analysis, int field, double target, double weight) {
         super(analysis,target,weight);
-        this.field = field;
+        this._field = field;
     }
 
     @Override
     public double value() {
-        return analysis.spots[field-1].get_max_radius();
+        return _analysis._spots[_field -1].get_max_radius();
     }
 
     @Override
     public String toString() {
-        return "SpotMaxRadius field=" + field + ", target=" + target + ", weight=" + weight + " = " + value();
+        return "SpotMaxRadius field=" + _field + ", target=" + _target + ", weight=" + _weight + " = " + value();
     }
 }

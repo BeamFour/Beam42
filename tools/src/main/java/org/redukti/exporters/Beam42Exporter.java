@@ -12,6 +12,7 @@ import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.Pattern;
 import org.redukti.jfotoptix.patterns.PatternGenerator;
 import org.redukti.jfotoptix.shape.Round;
+import org.redukti.spec.FotoptixSystemBuilder;
 import org.redukti.spec.Prescription;
 import org.redukti.tools.ChiefRayFinder;
 import org.redukti.util.Args;
@@ -307,7 +308,7 @@ public class Beam42Exporter {
 //        Vector2 v = results.xy;
 //        double z = curve.sagitta(v);
         double distance = 10 + z;
-        double obj_angle = prescription.getHalfAngleOfViewInRadians();
+        double obj_angle = prescription.get_half_angle_of_view_in_radians();
         // tan(distance) tells us height of the triangle where tan(angle) = ht/distance.
         double height_adjustment = obj_angle != 0 ? Math.tan(obj_angle) * distance : 1.0;
         // Adjust y
@@ -335,7 +336,7 @@ public class Beam42Exporter {
         }
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(arguments.specfile);
-        OpticalSystem.Builder systemBuilder = OpticalBenchDataImporter.build_system(specs, arguments.scenario, arguments.use_glass_types);
+        OpticalSystem.Builder systemBuilder = FotoptixSystemBuilder.build_system(specs, arguments.scenario, arguments.use_glass_types);
         OpticalSystem system = systemBuilder.build();
         Beam42Exporter exporter = new Beam42Exporter();
 
@@ -350,6 +351,6 @@ public class Beam42Exporter {
         Helper.createOutputFile(Helper.getOutputPath(arguments, ".RAY"), generate_rays_table(s1, 0.0));
         //Helper.createOutputFile(Helper.getOutputPath(arguments, "-SKEW.RAY"), generate_rays_table(s1, angleOfView));
         // FIXME scenario
-        Helper.createOutputFile(Helper.getOutputPath(arguments, "-SKEW.RAY"), generate_skew_ray(Prescription.buildPrescription(specs,true),21.63));
+        Helper.createOutputFile(Helper.getOutputPath(arguments, "-SKEW.RAY"), generate_skew_ray(Prescription.build_prescription(specs,true),21.63));
     }
 }

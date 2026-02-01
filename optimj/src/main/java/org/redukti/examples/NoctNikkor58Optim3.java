@@ -11,7 +11,7 @@ public class NoctNikkor58Optim3 {
    public static Prescription getPrescription(String specfile) throws Exception {
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(specfile);
-        return Prescription.buildPrescription(specs,true);
+        return Prescription.build_prescription(specs,true);
    }
     public static void main(String[] args) throws Exception {
         var prescription = getPrescription(args[0]);

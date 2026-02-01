@@ -20,7 +20,7 @@ public class ZemaxExporter {
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(arguments.specfile);
         ZemaxExporter zemaxExporter = new ZemaxExporter();
-        Prescription prescription = Prescription.buildPrescription(specs,true);
+        Prescription prescription = Prescription.build_prescription(specs,true);
         String output = zemaxExporter.generate(prescription,arguments.only_d_line);
         String old = zemaxExporter.generate(specs, arguments.scenario, arguments.only_d_line);
         Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), output);

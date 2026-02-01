@@ -9,9 +9,9 @@ import java.util.Objects;
  * Constant refractive index medium.
  */
 public class Medium {
-    String label;
-    double nd;
-    String catalog_name;
+    public final String label;
+    public final double nd;
+    public final String catalog_name;
 
     public Medium(String label, double nd, String catalog_name) {
         this.label = label;

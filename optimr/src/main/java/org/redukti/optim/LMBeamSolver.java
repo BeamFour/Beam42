@@ -4,9 +4,9 @@ import org.redukti.mathlib.LMLSolver;
 
 public class LMBeamSolver implements Solver {
 
-    LMLSolver solver;
+    LMLSolver _solver;
     public LMBeamSolver(LMLSolver solver) {
-        this.solver = solver;
+        this._solver = solver;
     }
 
     public int solve() {
@@ -14,7 +14,7 @@ public class LMBeamSolver implements Solver {
         while (istatus!= LMLSolver.BADITER &&
                 istatus!= LMLSolver.LEVELITER &&
                 istatus!= LMLSolver.MAXITER) {
-            istatus = solver.iLMiter();
+            istatus = _solver.iLMiter();
         }
         return istatus;
     }

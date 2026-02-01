@@ -4,19 +4,6 @@ Copyright (c) 2021 Dibyendu Majumdar
 */
 package org.redukti.importers.obench;
 
-import org.redukti.jfotoptix.curve.Asphere;
-import org.redukti.jfotoptix.curve.Flat;
-import org.redukti.mathlib.Vector3;
-import org.redukti.mathlib.Vector3Pair;
-import org.redukti.jfotoptix.medium.Abbe;
-import org.redukti.jfotoptix.medium.Air;
-import org.redukti.jfotoptix.medium.GlassMap;
-import org.redukti.jfotoptix.model.Image;
-import org.redukti.jfotoptix.model.Lens;
-import org.redukti.jfotoptix.model.OpticalSystem;
-import org.redukti.jfotoptix.shape.Disk;
-import org.redukti.jfotoptix.shape.Rectangle;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.util.*;
@@ -662,93 +649,4 @@ public class OpticalBenchDataImporter {
         return section;
     }
 
-    private static double add_surface(Lens.Builder lens, LensSurface surface,
-                       int scenario, boolean use_glass_types) {
-        double thickness = surface.get_thickness(scenario);
-        double radius = surface.get_radius();
-        double aperture_radius = surface.get_diameter(scenario) / 2.0;
-        double refractive_index = surface.get_refractive_index();
-        double abbe_vd = surface.get_abbe_vd();
-        String glass_name = surface.get_glass_name();
-        if (surface.get_surface_type() == SurfaceType.aperture_stop) {
-            lens.add_stop(aperture_radius, thickness, true);
-            return thickness;
-        }
-        else if (surface.get_surface_type() == SurfaceType.field_stop) {
-            lens.add_stop(aperture_radius, thickness, false);
-            return thickness;
-        }
-        AsphericalData aspherical_data = surface.get_aspherical_data();
-        if (aspherical_data == null) {
-            if (use_glass_types && glass_name != null && GlassMap.glassByName(glass_name) != null) {
-                lens.add_surface(
-                        radius, aperture_radius, thickness,
-                        GlassMap.glassByName(glass_name));
-            }
-            else if (refractive_index != 0.0) {
-                if (abbe_vd == 0.0) {
-                    return -1.0;
-                }
-                lens.add_surface(
-                        radius, aperture_radius, thickness,
-                        new Abbe(Abbe.AbbeFormula.AbbeVd, refractive_index, abbe_vd, 0.0));
-            } else {
-                lens.add_surface(radius, aperture_radius, thickness);
-            }
-            return thickness;
-        }
-        double k = aspherical_data.data(1) + 1.0;
-        double a4 = aspherical_data.data(2);
-        double a6 = aspherical_data.data(3);
-        double a8 = aspherical_data.data(4);
-        double a10 = aspherical_data.data(5);
-        double a12 = aspherical_data.data(6);
-        double a14 = aspherical_data.data(7);
-        double a16 = aspherical_data.data(8);
-        double a18 = aspherical_data.data(9);
-        double a20 = aspherical_data.data(10);
-
-        if (use_glass_types && glass_name != null && GlassMap.glassByName(glass_name) != null) {
-            lens.add_surface(
-                    new Asphere(radius, k, a4, a6, a8, a10, a12,
-                            a14, a16, a18, a20),
-                    new Disk(aperture_radius), thickness,
-                    GlassMap.glassByName(glass_name));
-        }
-        else if (refractive_index > 0.0) {
-            lens.add_surface(
-                    new Asphere(radius, k, a4, a6, a8, a10, a12,
-                            a14, a16, a18, a20),
-                    new Disk(aperture_radius), thickness,
-                    new Abbe(Abbe.AbbeFormula.AbbeVd, refractive_index, abbe_vd, 0.0));
-        } else {
-            lens.add_surface(new Asphere(radius, k, a4, a6,
-                            a8, a10, a12, a14, a16, a18, a20),
-                    new Disk(aperture_radius),
-                    thickness, Air.air);
-        }
-        return thickness;
-    }
-
-    public static OpticalSystem.Builder build_system(LensSpecifications specs, int scenario,
-        boolean use_glass_types) {
-        OpticalSystem.Builder sys = new OpticalSystem.Builder();
-        /* anchor lens */
-        Lens.Builder lens = new Lens.Builder().position(Vector3Pair.position_000_001);
-        double image_pos = 0.0;
-        List<LensSurface> surfaces = specs.get_surfaces();
-        for (int i = 0; i < surfaces.size(); i++) {
-            double thickness = add_surface(lens, surfaces.get(i), scenario, use_glass_types);
-            image_pos += thickness;
-        }
-        sys.add(lens);
-        Image.Builder image = new Image.Builder().position(
-                new Vector3Pair(new Vector3(0, 0, image_pos), Vector3.vector3_001))
-                .curve(Flat.flat)
-                .shape(new Rectangle(specs.get_image_height() * 2.));
-        sys.add(image);
-        sys.half_angle_of_view_in_degrees(specs.get_half_angle_of_view_in_degrees(scenario));
-        sys.f_number(specs.get_f_number(scenario));
-        return sys;
-    }
 }

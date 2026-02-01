@@ -38,7 +38,7 @@ public class MeritFunction implements LMLFunction {
             }
             double sos = 0.0;
             for (int i = 0; i < outs.length; i++) {
-                resid[i] = (outs[i].target - outs[i]. value())*outs[i].weight;
+                resid[i] = (outs[i]._target - outs[i]. value())*outs[i]._weight;
                 sos += M.square(resid[i]);
             }
             return Math.sqrt(sos / outs.length);
@@ -62,7 +62,7 @@ public class MeritFunction implements LMLFunction {
                 for (int j=0; j<nadj; j++)
                 {
                     for (int k=0; k<nadj; k++)
-                        delta[k] = (k==j) ? vars[j].dDelta : 0.0;
+                        delta[k] = (k==j) ? vars[j]._d_delta : 0.0;
 
                     d = nudge(delta); // resid at pplus
                     if (d== BIGVAL)
@@ -74,7 +74,7 @@ public class MeritFunction implements LMLFunction {
                         jac[i][j] = getResidual(i);
 
                     for (int k=0; k<nadj; k++)
-                        delta[k] = (k==j) ? -2.0*vars[j].dDelta : 0.0;
+                        delta[k] = (k==j) ? -2.0*vars[j]._d_delta : 0.0;
 
                     d = nudge(delta); // resid at pminus
                     if (d== BIGVAL)
@@ -87,10 +87,10 @@ public class MeritFunction implements LMLFunction {
                         jac[i][j] -= getResidual(i);
 
                     for (int i=0; i<ngoals; i++)
-                        jac[i][j] /= (2.0*vars[j].dDelta);
+                        jac[i][j] /= (2.0*vars[j]._d_delta);
 
                     for (int k=0; k<nadj; k++)
-                        delta[k] = (k==j) ? vars[j].dDelta : 0.0;
+                        delta[k] = (k==j) ? vars[j]._d_delta : 0.0;
 
                     d = nudge(delta);  // back to starting value.
 

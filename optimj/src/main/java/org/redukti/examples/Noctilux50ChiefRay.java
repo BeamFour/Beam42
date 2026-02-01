@@ -49,7 +49,7 @@ public class Noctilux50ChiefRay {
         }
         System.out.println("Status = " + istatus);
         System.out.println(f.toString());
-        System.out.println("Field 0.7 AOV = "  + prescription.fullAngleOfViewDegrees(0.7));
+        System.out.println("Field 0.7 AOV = "  + prescription.full_angle_of_view_degrees(0.7));
     }
 
 }

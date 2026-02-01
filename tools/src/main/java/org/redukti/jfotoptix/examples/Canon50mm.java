@@ -18,6 +18,7 @@ import org.redukti.jfotoptix.tracing.RayTraceParameters;
 import org.redukti.jfotoptix.tracing.RayTraceRenderer;
 import org.redukti.jfotoptix.tracing.RayTraceResults;
 import org.redukti.jfotoptix.tracing.SequentialRayTracer;
+import org.redukti.spec.FotoptixSystemBuilder;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class Canon50mm {
 
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(args[0]);
-        OpticalSystem.Builder systemBuilder = OpticalBenchDataImporter.build_system(specs, 0, false);
+        OpticalSystem.Builder systemBuilder = FotoptixSystemBuilder.build_system(specs, 0, false);
         double half_angle_of_view_in_radians = specs.get_half_angle_of_view_in_radians(0);
         Vector3 direction = Vector3.vector3_001;
         boolean skew = true;

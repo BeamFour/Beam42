@@ -2,7 +2,6 @@ package org.redukti.examples;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
-import org.redukti.mathlib.LMLSolver;
 import org.redukti.optim.*;
 import org.redukti.spec.Prescription;
 
@@ -11,7 +10,7 @@ public class AFSNikkor58Optim01 {
    public static Prescription getPrescription(String specfile) throws Exception {
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(specfile);
-       return Prescription.buildPrescription(specs, true,
+       return Prescription.build_prescription(specs, true,
                new double[]{587.5618,656.2725,546.074,486.1327,435.8343},
                new double[]{1.0,0.475,0.98,0.49,0.15});
    }
@@ -87,7 +86,7 @@ public class AFSNikkor58Optim01 {
         analysis.compute();
         var lm = f.getSolver();
         System.out.println("Aberrations:\n");
-        System.out.println(analysis.ray_aberrations.list_ray_fans());
+        System.out.println(analysis._ray_aberrations.list_ray_fans());
         System.out.println("Before:\n");
         System.out.println(f.toString());
         var istatus = lm.solve();

@@ -1,6 +1,6 @@
 package org.redukti.spec;
 
-import org.redukti.jfotoptix.medium.GlassMap;
+import org.redukti.rayoptics.seq.Glass;
 
 public class SurfaceType {
 
@@ -32,15 +32,15 @@ public class SurfaceType {
     public double[] _thickness_by_scenario;
     public double[] _diameter_by_scenario;
 
-    public SurfaceType(String id, boolean isStop, double radius, double thickness, double diameter, double nd, double vd, String glassName) {
+    public SurfaceType(String id, boolean is_aperture_stop, double radius, double thickness, double diameter, double nd, double vd, String glass_name) {
         this._id = id;
         this._radius = radius;
         this._thickness = thickness;
         this._diameter = diameter;
-        this._is_aperture_stop = isStop;
+        this._is_aperture_stop = is_aperture_stop;
         this._nd = nd;
         this._vd = vd;
-        this._glass_name = glassName;
+        this._glass_name = glass_name;
         this._asph_type = 0;
     }
     public SurfaceType set_thickness_by_scenario(double[] thickness_by_scenario) {
@@ -100,7 +100,7 @@ public class SurfaceType {
     public boolean is_even_a2_asphere() {
         return is_aspheric() && _asph_type == ASPH_EVEN_A2;
     }
-    public StringBuilder toOptBenchStr(StringBuilder sb, boolean is_last) {
+    public StringBuilder to_opt_bench_str(StringBuilder sb, boolean is_last) {
         sb.append(_id).append("\t");
         if (_is_aperture_stop)
             sb.append("AS");
@@ -115,11 +115,11 @@ public class SurfaceType {
         }
         else sb.append(_thickness);
         sb.append("\t");
-        GlassMap glass = null;
+        Glass glass = null;
         double nd = _nd;
         double vd = _vd;
         if (nd != 0.0 && _glass_name != null) {
-            glass = GlassMap.glassByName(_glass_name);
+            glass = Glass.glass_by_name(_glass_name);
             if (glass != null) {
                 nd = glass.nd;
                 vd = glass.vd;
@@ -137,7 +137,7 @@ public class SurfaceType {
         sb.append("\n");
         return sb;
     }
-    public StringBuilder asphericsToOptBenchStr(StringBuilder sb) {
+    public StringBuilder aspherics_to_opt_bench_str(StringBuilder sb) {
         if (_k == 0 && (_coeffs == null || _coeffs.length == 0))
             return sb;
         sb.append(_id).append("\t");
@@ -155,7 +155,7 @@ public class SurfaceType {
         sb.append("\n");
         return sb;
     }
-    public static StringBuilder asphericMarkdownTableHeader(StringBuilder sb, int max_coeffs) {
+    public static StringBuilder aspheric_markdown_table_header(StringBuilder sb, int max_coeffs) {
         sb.append("## Aspherical Data").append("\n");
         sb.append("| ID  | Type | k   |");
         for (int i = 0; i < max_coeffs; i++) {
@@ -181,7 +181,7 @@ public class SurfaceType {
         }
         return "";
     }
-    public StringBuilder ashericToMarkdownTableRow(StringBuilder sb, int max_coeffs) {
+    public StringBuilder asherics_to_markdown_table_row(StringBuilder sb, int max_coeffs) {
         sb.append("| ").append(_id);
         sb.append("| ").append(asphere_type());
         sb.append(" | ").append(_k);
@@ -194,7 +194,7 @@ public class SurfaceType {
         sb.append(" |\n");
         return sb;
     }
-    public StringBuilder variablesToMarkdownTableRow(StringBuilder sb) {
+    public StringBuilder variables_to_markdown_table_row(StringBuilder sb) {
         if (_diameter_by_scenario != null) {
             sb.append("| a").append(_id).append(" |");
             for (int i = 0; i < _diameter_by_scenario.length; i++) {
@@ -212,14 +212,14 @@ public class SurfaceType {
         return sb;
     }
 
-    public static StringBuilder toMarkdownTableHeader(StringBuilder sb) {
+    public static StringBuilder to_markdown_table_header(StringBuilder sb) {
         sb.append("## Surface Data").append("\n");
         sb.append("Note that where glass types are shown the refractive index and abbe number is as per assigned glass type\n\n");
         sb.append("| ID  | Radius | Thickness | Diameter | nd  | vd  | Glass Make | Glass |\n");
         sb.append("| --- | ---    | ---       | ---      | --- | --- | ---        | ---   |\n");
         return sb;
     }
-    public StringBuilder toMarkdownTableRow(StringBuilder sb) {
+    public StringBuilder to_markdown_table_row(StringBuilder sb) {
         sb.append("| ").append(_id).append(" | ");
         if (_is_aperture_stop)
             sb.append("AS");
@@ -240,11 +240,11 @@ public class SurfaceType {
         sb.append(" | ");
         String glassMaker = "";
         if (_nd != 0.0 && _glass_name != null) {
-            GlassMap glass = GlassMap.glassByName(_glass_name);
+            Glass glass = Glass.glass_by_name(_glass_name);
             if (glass != null) {
                 _nd = glass.nd;
                 _vd = glass.vd;
-                glassMaker = glass.get_manufacturer();
+                glassMaker = glass.catalog_name;
             }
         }
         if (_nd != 0.0)
@@ -264,6 +264,6 @@ public class SurfaceType {
 
     public String toString() {
         // FIXME is last
-        return toOptBenchStr(new StringBuilder(),false).toString();
+        return to_opt_bench_str(new StringBuilder(),false).toString();
     }
 }

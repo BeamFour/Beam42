@@ -11,7 +11,7 @@ Image Height	43.2
 Magnification	0
 d0	Infinity
 Bf(p)	15.40
-Bf	15.10
+Bf	15.16
 [lens data]
 1	-82.425	1.75	1.608	34.36	38	S-TIM5
 2	24.465	7.35	2.007	30.26	28	S-LAH99	S-LAH79

@@ -363,10 +363,10 @@ public class VigCalc {
                 ray_pkg = ray_error.ray_pkg;
                 Integer indx = ray_error.surf;
                 if (Objects.equals(indx,clip_indx)) {
-                    var r_target = Lists.get(sm.ifcs,clip_indx).edge_pt_target(start_dir);
-                    var p = Lists.get(ray_pkg.ray,clip_indx).p;
-                    var r_ray = Math.copySign(Math.sqrt(p.x*p.x + p.y*p.y), r_target.v(xy));
-                    var r_error = r_ray - r_target.v(xy);
+//                    var r_target = Lists.get(sm.ifcs,clip_indx).edge_pt_target(start_dir);
+//                    var p = Lists.get(ray_pkg.ray,clip_indx).p;
+//                    var r_ray = Math.copySign(Math.sqrt(p.x*p.x + p.y*p.y), r_target.v(xy));
+//                    var r_error = r_ray - r_target.v(xy);
 //                    logger.debug(f" A {xy_str[xy]} = {rel_p1[xy]:10.6f}:   "
 //                            f"blocked at {clip_indx}, del={r_error:8.1e}, "
 //                            "exiting")

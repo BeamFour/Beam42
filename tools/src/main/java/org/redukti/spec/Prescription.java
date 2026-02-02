@@ -232,7 +232,7 @@ public class Prescription {
                 specs.get_image_height(),
                 wvls,
                 wts);
-        prescription._title = specs.get_descriptive_data().get_title();
+        prescription._title = specs.get_descriptive_data().get_value("title");
         var patent_info_n = specs.get_patent_info();
         if (patent_info_n.count() > 0) {
             // New style

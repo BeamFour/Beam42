@@ -6,8 +6,6 @@ import org.redukti.spec.SurfaceType;
 import org.redukti.util.Args;
 import org.redukti.util.Helper;
 
-import java.util.List;
-
 public class ZemaxExporter {
 
 
@@ -19,24 +17,22 @@ public class ZemaxExporter {
         }
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(arguments.specfile);
-        ZemaxExporter zemaxExporter = new ZemaxExporter();
         Prescription prescription = Prescription.build_prescription(specs,true);
-        String output = zemaxExporter.generate(prescription,arguments.only_d_line);
-        String old = zemaxExporter.generate(specs, arguments.scenario, arguments.only_d_line);
+        String output = new ZemaxExporter().generate(prescription,arguments.only_d_line);
         Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), output);
     }
 
-    public String generate(Prescription prescription, boolean dlineOnly) {
+    public String generate(Prescription prescription, boolean d_line_only) {
         StringBuilder sb = new StringBuilder();
-        outputHeading(prescription, dlineOnly, sb);
-        outputObject(prescription, sb);
-        outputSurfaces(prescription, sb);
-        outputImagePlane(prescription, sb);
-        outputConfigurations(prescription, sb);
+        outputHeading(prescription, d_line_only, sb);
+        output_object(prescription, sb);
+        output_surfaces(prescription, sb);
+        output_image_plane(prescription, sb);
+        output_configurations(prescription, sb);
         return sb.toString();
     }
 
-    private void outputHeading(Prescription prescription, boolean dLineOnly, StringBuilder sb) {
+    private void outputHeading(Prescription prescription, boolean d_line_only, StringBuilder sb) {
         sb.append("VERS 161019 507 33785\n");
         sb.append("MODE SEQ\n");
         sb.append("NAME ").append(prescription.get_title()).append("\n");
@@ -45,10 +41,11 @@ public class ZemaxExporter {
             sb.append("FNUM ").append(prescription.get_f_number()).append("\n");
         else
             sb.append("FLOA\n");
-        sb.append("""
+        var img_ht = prescription._diameter_image_circle/2.0;
+        sb.append(String.format("""
                 ENVD 20 1 0
                 GFAC 0 0
-                GCAT SCHOTT LACROIX HOYA HIKARI OHARA NIKON-HIKARI NIKON CORNING SUMITA
+                GCAT SCHOTT LACROIX HOYA HIKARI OHARA NIKON-HIKARI NIKON SUMITA
                 RAIM 0 2 1 1 0 1 0 0 0
                 SDMA 0 1 0
                 FTYP 3 0 9 3 0 0 0 9
@@ -56,15 +53,15 @@ public class ZemaxExporter {
                 HYPR 0
                 PICB 1
                 XFLN 0 0 0 0 0 0 0 0 0 0 0 0
-                YFLN 0 2.16 4.33 6.5 8.65 10.8 12.98 15.14 21.63 0 0 0 0 0 0 0 0
+                YFLN 0 2.16 4.33 6.5 8.65 10.8 12.98 15.14 %f 0 0 0 0 0 0 0 0
                 FWGN 1 1 1 1 1 1 1 1 1 1 1 1
                 VDXN 0 0 0 0 0 0 0 0 0 0 0 0
                 VDYN 0 0 0 0 0 0 0 0 0 0 0 0
                 VCXN 0 0 0 0 0 0 0 0 0 0 0 0
                 VCYN 0 0 0 0 0 0 0 0 0 0 0 0
                 VANN 0 0 0 0 0 0 0 0 0 0 0 0
-                """);
-        if (dLineOnly) {
+                """, img_ht));
+        if (d_line_only) {
             sb.append("""
                     WAVM 1 0.5875618 1
                     WAVM 2 0.550 0
@@ -107,7 +104,7 @@ public class ZemaxExporter {
                 """);
     }
 
-    private void outputObject(Prescription prescription, StringBuilder sb) {
+    private void output_object(Prescription prescription, StringBuilder sb) {
         sb.append("""
                 SURF 0
                   TYPE STANDARD
@@ -120,7 +117,7 @@ public class ZemaxExporter {
                 """);
     }
 
-    private void outputSurfaces(Prescription prescription, StringBuilder sb) {
+    private void output_surfaces(Prescription prescription, StringBuilder sb) {
         SurfaceType[] surfaces = prescription.get_surfaces();
         for (int i = 0; i < surfaces.length; i++) {
             SurfaceType s = surfaces[i];
@@ -174,22 +171,23 @@ public class ZemaxExporter {
         }
     }
 
-    private void outputImagePlane(Prescription prescription, StringBuilder sb) {
+    private void output_image_plane(Prescription prescription, StringBuilder sb) {
         int sid = prescription.get_surfaces().length + 1;
         sb.append("SURF ").append(sid).append("\n");
-        sb.append("""
+        var img_ht = prescription._diameter_image_circle/2.0;
+        sb.append(String.format("""
                   TYPE STANDARD
                   CURV 0.0 0 0 0 0 ""
                   HIDE 0 0 0 0 0 0 0 0 0 0
                   MIRR 2 0
                   DISZ 0
-                  DIAM 21.63 1 0 0 1 ""
+                  DIAM %f 1 0 0 1 ""
                   POPS 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0
                 TOL TOFF   0   0              0              0   0 0 0 0
-                """);
+                """, img_ht));
     }
 
-    private void outputConfigurations(Prescription prescription, StringBuilder sb) {
+    private void output_configurations(Prescription prescription, StringBuilder sb) {
         if (prescription.get_num_configurations() <= 1)
             return;
         sb.append("MNUM ").append(prescription.get_num_configurations()).append(" 1\n");
@@ -206,178 +204,5 @@ public class ZemaxExporter {
                 }
             }
         }
-    }
-
-    public String generate(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean dlineOnly) {
-        StringBuilder sb = new StringBuilder();
-
-        outputHeading(specs, scenario, dlineOnly, sb);
-        outputObject(specs, scenario, sb);
-        outputSurfaces(specs, scenario, sb);
-        outputImagePlane(specs, scenario, sb);
-        return sb.toString();
-    }
-
-    private void outputImagePlane(OpticalBenchDataImporter.LensSpecifications specs, int scenario, StringBuilder sb) {
-        int sid = specs.get_surfaces().size() + 1;
-        sb.append("SURF ").append(sid).append("\n");
-        sb.append("""
-                  TYPE STANDARD
-                  CURV 0.0 0 0 0 0 ""
-                  HIDE 0 0 0 0 0 0 0 0 0 0
-                  MIRR 2 0
-                  DISZ 0
-                  DIAM 21.63 1 0 0 1 ""
-                  POPS 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0
-                TOL TOFF   0   0              0              0   0 0 0 0
-                """);
-    }
-
-    private void outputSurfaces(OpticalBenchDataImporter.LensSpecifications system, int scenario, StringBuilder sb) {
-        List<OpticalBenchDataImporter.LensSurface> surfaces = system.get_surfaces();
-        OpticalBenchDataImporter.Variable view_angles = system.find_variable("Angle of View");
-        OpticalBenchDataImporter.Variable image_heights = system.find_variable("Image Height");
-        OpticalBenchDataImporter.Variable back_focus = system.find_variable("Bf");
-        if (back_focus == null) back_focus = system.find_variable("Bf(m)");
-        OpticalBenchDataImporter.Variable aperture_diameters = system.find_variable("Aperture Diameter");
-        if (scenario >= view_angles.num_scenarios() || scenario >= image_heights.num_scenarios() || scenario >= back_focus.num_scenarios() || (aperture_diameters != null && scenario >= aperture_diameters.num_scenarios())) {
-            System.err.println("Scenario %u has missing data " + scenario);
-            System.exit(1);
-        }
-        int surfaceNum = 1;
-        for (int i = 0; i < surfaces.size(); i++) {
-            OpticalBenchDataImporter.LensSurface s = surfaces.get(i);
-            double thickness = 0.0;
-            double diameter = s.get_diameter(scenario);
-            if (s.get_surface_type() == OpticalBenchDataImporter.SurfaceType.aperture_stop && aperture_diameters != null) {
-                diameter = aperture_diameters.get_value_as_double(scenario);
-            }
-            diameter /= 2.0;
-            thickness += s.get_thickness(scenario);
-            sb.append("SURF ").append(surfaceNum++).append("\n");
-            if (s.get_surface_type() == OpticalBenchDataImporter.SurfaceType.aperture_stop) {
-                sb.append("  STOP\n");
-            }
-            OpticalBenchDataImporter.AsphericalData aspherics = s.get_aspherical_data();
-            if (aspherics != null) {
-                if (aspherics.is_odd_asphere())
-                    sb.append("  TYPE ODDASPHE\n");
-                else
-                    sb.append("  TYPE EVENASPH\n");
-            }
-            else sb.append("  TYPE STANDARD\n");
-            double curvature = s.get_radius() == 0.0 ? 0 : 1.0 / s.get_radius();
-            sb.append("  CURV ").append(curvature).append(" 0 0 0 0\n");
-            sb.append("  HIDE 0 0 0 0 0 0 0 0 0 0\n");
-            sb.append("  MIRR 2 0\n");
-            if (aspherics != null) {
-                double[] coefs = aspherics.get_coeffs();
-                for (int a = 0; a < coefs.length; a++) {
-                    sb.append("  PARM ").append(a+1).append(" ");
-                    sb.append(coefs[a]).append("\n");
-                }
-            }
-            sb.append("  DISZ ").append(thickness).append("\n");
-            if (aspherics != null) {
-                double k = aspherics.is_odd_asphere() ? aspherics.get_cc() + 1.0 : aspherics.get_cc();
-                sb.append("  CONI ").append(k).append("\n");
-            }
-            if (s.get_refractive_index() != 0.0) {
-                sb.append("  GLAS ");
-                String glassName = s.get_glass_name();
-                if (glassName != null) {
-                    sb.append(glassName).append(" 0 0 ");
-                } else {
-                    sb.append("___BLANK 1 0 ");
-                }
-                sb.append(s.get_refractive_index()).append(" ").append(s.get_abbe_vd()).append(" 0 0 0 0 0 0\n");
-            }
-            sb.append("  DIAM ").append(diameter).append(" 1 0 0 1 \"\"\n");
-            if (s.get_surface_type() == OpticalBenchDataImporter.SurfaceType.field_stop) {
-                sb.append("  CLAP 0 ").append(diameter).append(" 0\n");
-            }
-            sb.append("  POPS 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0\n");
-        }
-    }
-
-    private void outputObject(OpticalBenchDataImporter.LensSpecifications specs, int scenario, StringBuilder sb) {
-        sb.append("""
-                SURF 0
-                  TYPE STANDARD
-                  CURV 0.0 0 0 0 0 ""
-                  HIDE 0 0 0 0 0 0 0 0 0 0
-                  MIRR 2 0
-                  DISZ INFINITY
-                  DIAM 0 1 0 0 1 ""
-                  POPS 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0
-                """);
-    }
-
-    private void outputHeading(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean dLineOnly, StringBuilder sb) {
-        sb.append("VERS 161019 507 33785\n");
-        sb.append("MODE SEQ\n");
-        sb.append("NAME ").append(specs.get_descriptive_data().get_title()).append("\n");
-        sb.append("PFIL 0 0 0\n").append("LANG 0\n").append("UNIT MM X W X CM MR CPMM\n");
-        sb.append("FNUM ").append(specs.find_variable("F-Number").get_value(scenario)).append("\n");
-        sb.append("""
-                ENVD 20 1 0
-                GFAC 0 0
-                GCAT SCHOTT LACROIX HOYA HIKARI OHARA NIKON-HIKARI NIKON CORNING SUMITA
-                RAIM 0 2 1 1 0 1 0 0 0
-                SDMA 0 1 0
-                FTYP 3 0 9 3 0 0 0 9
-                ROPD 2
-                HYPR 0
-                PICB 1
-                XFLN 0 0 0 0 0 0 0 0 0 0 0 0
-                YFLN 0 2.16 4.33 6.5 8.65 10.8 12.98 15.14 21.63 0 0 0 0 0 0 0 0
-                FWGN 1 1 1 1 1 1 1 1 1 1 1 1
-                VDXN 0 0 0 0 0 0 0 0 0 0 0 0
-                VDYN 0 0 0 0 0 0 0 0 0 0 0 0
-                VCXN 0 0 0 0 0 0 0 0 0 0 0 0
-                VCYN 0 0 0 0 0 0 0 0 0 0 0 0
-                VANN 0 0 0 0 0 0 0 0 0 0 0 0
-                """);
-        if (dLineOnly) {
-            sb.append("""
-                    WAVM 1 0.5875618 1
-                    WAVM 2 0.550 0
-                    WAVM 3 0.550 0
-                    """);
-        } else {
-            sb.append("""
-                WAVM 1 0.4861327 1
-                WAVM 2 0.5875618 1
-                WAVM 3 0.6562725 1
-                    """);
-        }
-
-        sb.append("""
-                WAVM 4 0.550 0
-                WAVM 5 0.550 0
-                WAVM 6 0.550 0
-                WAVM 7 0.550 0
-                WAVM 8 0.550 0
-                WAVM 9 0.550 0
-                WAVM 10 0.550 0
-                WAVM 11 0.550 0
-                WAVM 12 0.550 0
-                WAVM 13 0.550 0
-                WAVM 14 0.550 0
-                WAVM 15 0.550 0
-                WAVM 16 0.550 0
-                WAVM 17 0.550 0
-                WAVM 18 0.550 0
-                WAVM 19 0.550 0
-                WAVM 20 0.550 0
-                WAVM 21 0.550 0
-                WAVM 22 0.550 0
-                WAVM 23 0.550 0
-                WAVM 24 0.550 0
-                PWAV 2
-                POLS 1 0 1 0 0 1 0
-                GSTD 0 100 100 100 100 100 100 0 1 1 0 0 1 1 1 1 1 1
-                NSCD 100 500 0 1.0E-3 5 1.0E-6 0 0 0 0 0 0 1000000 0 2
-                """);
     }
 }

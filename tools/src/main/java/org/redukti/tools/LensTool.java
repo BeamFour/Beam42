@@ -1,6 +1,5 @@
 package org.redukti.tools;
 
-import org.redukti.exporters.ZemaxExporter;
 import org.redukti.jfotoptix.analysis.AnalysisSpot;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.jfotoptix.layout.SystemLayout2D;
@@ -166,8 +165,8 @@ public class LensTool {
             spotReport.append(spot1).append("\n");
             spotReport.append(spot2).append("\n");
             Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,"spot-report.txt",arguments.outdir), spotReport.toString());
-            ZemaxExporter zemaxExporter = new ZemaxExporter();
-            Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), zemaxExporter.generate(specs, arguments.scenario, arguments.only_d_line));
+            //ZemaxExporter zemaxExporter = new ZemaxExporter();
+            //Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), zemaxExporter.generate(specs, arguments.scenario, arguments.only_d_line));
             createREADME(arguments.specfile,
                     specs,
                     pfo,

@@ -8,6 +8,12 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.*;
 
+/**
+ * Imports optical prescriptions from a file in optical bench
+ * (https://www.photonstophotos.net/GeneralTopics/Lenses/OpticalBench/OpticalBenchHub.htm)
+ * format. This is tab delimited text file. Many examples can be seen in
+ * the Examples/jfotopix folder.
+ */
 public class OpticalBenchDataImporter {
 
     static double parseDouble(String s) {
@@ -31,19 +37,13 @@ public class OpticalBenchDataImporter {
         }
     }
 
-    public static final class DescriptiveData {
-        public String get_title() {
-            return _title;
-        }
-
-        void set_title(String title) {
-            _title = title;
-        }
-
-        String _title;
+    public static final class VarSet {
         List<Variable> variables_ = new ArrayList<>();
-
-        public void add_variable(Variable v) {variables_.add(v);}
+        public Variable add_variable(String name) {
+            var v = new Variable(name);
+            variables_.add(v);
+            return v;
+        }
         public Variable find_variable(String name) {
             for (int i = 0; i < variables_.size(); i++) {
                 if (name.equals(variables_.get(i).name())) {
@@ -52,6 +52,10 @@ public class OpticalBenchDataImporter {
             }
             return null;
         }
+
+        /**
+         * Shortcut for finding a variable and extracting 1st value from it
+         */
         public String get_value(String name) {
             var variable = find_variable(name);
             if (variable != null)
@@ -117,10 +121,6 @@ public class OpticalBenchDataImporter {
             this._surface_number = surface_number;
             this._data = new ArrayList<>();
         }
-        AsphericalData(int surface_number) {
-            this(AsphereType.Even,surface_number);
-        }
-
         void add_data(double d) {
             _data.add(d);
         }
@@ -343,50 +343,42 @@ public class OpticalBenchDataImporter {
 
                 switch (current_section) {
                     case DESCRIPTIVE_DATA:
-                        if (words.length >= 2 && words[0].equals("title")) {
-                            descriptive_data_.set_title(words[1]);
-                        }
-                        else if (words.length >= 2) {
-                            Variable var = new Variable(words[0]);
+                        if (words.length >= 2) {
+                            Variable var = descriptive_data_.add_variable(words[0]);
                             for (int i = 1; i < words.length; i++) {
                                 var.add_value(words[i]);
                             }
-                            descriptive_data_.add_variable(var);
                         }
                         break;
                     case CONSTANTS: {
-                            Variable var = new Variable(words[0]);
+                            Variable var = constants_.add_variable(words[0]);
                             for (int i = 1; i < words.length; i++) {
                                 var.add_value(words[i]);
                             }
-                            constants_.add(var);
                         }
                         break;
                     case VARIABLE_DISTANCES:
                         if (words.length >= 2) {
-                            Variable var = new Variable(words[0]);
+                            Variable var = variables_.add_variable(words[0]);
                             for (int i = 1; i < words.length; i++) {
                                 var.add_value(words[i]);
                             }
-                            variables_.add(var);
                         }
                         break;
                     case PATENT_INFO:
                         if (words.length >= 2) {
-                            Variable var = new Variable(words[0]);
+                            Variable var = patent_info_.add_variable(words[0]);
                             for (int i = 1; i < words.length; i++) {
                                 var.add_value(words[i]);
                             }
-                            patent_info_.add_variable(var);
                         }
                         break;
                     case REPORT_DATA:
                         if (words.length >= 2) {
-                            Variable var = new Variable(words[0]);
+                            Variable var = report_data_.add_variable(words[0]);
                             for (int i = 1; i < words.length; i++) {
                                 var.add_value(words[i]);
                             }
-                            report_data_.add_variable(var);
                         }
                         break;
                     case LENS_DATA: {
@@ -414,22 +406,22 @@ public class OpticalBenchDataImporter {
                         }
                         surface_data.set_surface_type(type);
                         /* thickness */
-                        if (words.length >= 3 && words[2].length() > 0) {
+                        if (words.length >= 3 && !words[2].isEmpty()) {
                             parse_thickness(words[2], surface_data);
                         }
                         /* refractive index */
-                        if (words.length >= 4 && words[3].length() > 0) {
+                        if (words.length >= 4 && !words[3].isEmpty()) {
                             surface_data.set_refractive_index(parseDouble(words[3]));
                         }
                         /* diameter */
-                        if (words.length >= 5 && words[4].length() > 0) {
+                        if (words.length >= 5 && !words[4].isEmpty()) {
                             parse_diameter(words[4], type == SurfaceType.aperture_stop, surface_data);
                         }
                         /* abbe vd */
-                        if (words.length >= 6 && words[5].length() > 0) {
+                        if (words.length >= 6 && !words[5].isEmpty()) {
                             surface_data.set_abbe_vd(parseDouble(words[5]));
                         }
-                        if (words.length >= 7 && words[6].length() > 0) {
+                        if (words.length >= 7 && !words[6].isEmpty()) {
                             surface_data.set_glass_name(words[6]);
                         }
                         surfaces_.add(surface_data);
@@ -465,12 +457,7 @@ public class OpticalBenchDataImporter {
         }
 
         public Variable find_variable(String name) {
-            for (int i = 0; i < variables_.size(); i++) {
-                if (name.equals(variables_.get(i).name())) {
-                    return variables_.get(i);
-                }
-            }
-            return null;
+            return variables_.find_variable(name);
         }
 
         LensSurface find_surface(int id) {
@@ -482,12 +469,7 @@ public class OpticalBenchDataImporter {
         }
 
         public boolean has_constant(String c) {
-            for (int i = 0; i < constants_.size(); i++) {
-                if (c.equals(constants_.get(i).name())) {
-                    return true;
-                }
-            }
-            return false;
+            return constants_.find_variable(c) != null;
         }
 
         public double get_image_height() {
@@ -580,11 +562,8 @@ public class OpticalBenchDataImporter {
             }
         }
 
-        public DescriptiveData get_descriptive_data() {
+        public VarSet get_descriptive_data() {
             return descriptive_data_;
-        }
-        List<Variable> get_variables() {
-            return variables_;
         }
         public List<LensSurface> get_surfaces() {
             return surfaces_;
@@ -592,20 +571,20 @@ public class OpticalBenchDataImporter {
         List<AsphericalData> get_aspherical_data() {
             return aspherical_data_;
         }
-        public DescriptiveData get_patent_info() {
+        public VarSet get_patent_info() {
             return patent_info_;
         }
-        public DescriptiveData get_report_data() {
+        public VarSet get_report_data() {
             return report_data_;
         }
 
-        private DescriptiveData descriptive_data_ = new DescriptiveData();
-        private List<Variable> variables_ = new ArrayList<>();
-        private List<LensSurface> surfaces_ = new ArrayList<>();
-        private List<AsphericalData> aspherical_data_ = new ArrayList<>();
-        private List<Variable> constants_ = new ArrayList<>();
-        private DescriptiveData patent_info_ = new DescriptiveData();
-        private DescriptiveData report_data_ = new DescriptiveData();
+        private final VarSet descriptive_data_ = new VarSet();
+        private final VarSet variables_ = new VarSet();
+        private final List<LensSurface> surfaces_ = new ArrayList<>();
+        private final List<AsphericalData> aspherical_data_ = new ArrayList<>();
+        private final VarSet constants_ = new VarSet();
+        private final VarSet patent_info_ = new VarSet();
+        private final VarSet report_data_ = new VarSet();
     }
 
     enum Section {
@@ -648,5 +627,4 @@ public class OpticalBenchDataImporter {
         }
         return section;
     }
-
 }

@@ -8,8 +8,8 @@ import java.util.List;
 
 public class RayOpticsExporter {
     void generate_preamble(OpticalBenchDataImporter.LensSpecifications system, int scenario, StringBuilder fp) {
-        OpticalBenchDataImporter.DescriptiveData descriptive_data = system.get_descriptive_data();
-        String title = descriptive_data.get_title();
+        OpticalBenchDataImporter.VarSet descriptive_data = system.get_descriptive_data();
+        String title = descriptive_data.get_value("title");
         OpticalBenchDataImporter.Variable f_number = system.find_variable("F-Number");
         var half_angle = system.get_half_angle_of_view_in_degrees(scenario);
         fp.append("%matplotlib inline\n")

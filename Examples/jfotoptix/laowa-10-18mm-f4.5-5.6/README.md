@@ -54,10 +54,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | d26 | 16.0 | 28.0319 |
 # 10mm f4.5
 ## Layouts
-![Layout Only](./layoutonly-0.svg)
 ![Layout Field 0.0](./layout-0.svg)
-![Layout Field 0.7](./layout-semi-skew-0.svg)
-![Layout Field 1.0](./layout-skew-0.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot-0.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew-0.svg)
@@ -113,10 +110,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 # 18mm f5.6
 ## Layouts
-![Layout Only](./layoutonly-1.svg)
 ![Layout Field 0.0](./layout-1.svg)
-![Layout Field 0.7](./layout-semi-skew-1.svg)
-![Layout Field 1.0](./layout-skew-1.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot-1.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew-1.svg)

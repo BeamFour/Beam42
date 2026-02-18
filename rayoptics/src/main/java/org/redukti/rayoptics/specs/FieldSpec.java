@@ -277,10 +277,33 @@ public class FieldSpec {
         }
         else if (obj_conj == ConjugateType.FINITE) {
             if (obj_img_key == ImageKey.Image) {
-                var max_field_ht = pr.get(0).ht;
-                obj_pt = rel_fld_coord.times(max_field_ht);
+                if (value_key == ValueKey.RealHeight) {
+                    var wvl = optical_spec.wvls.central_wvl();
+                    var pkg = Wideangle.eval_real_image_ht(opt_model, fld, wvl);
+                    obj_pt = pkg.ray_data.pt;
+                    obj_dir = pkg.ray_data.dir;
+                    var z_enp = pkg.z_enp;
+                    if (is_wide_angle) {
+                        fld.z_enp = z_enp;
+                    } else { // compute offset at paraxial entrance pupil
+                        var del_z = fod.enp_dist - z_enp;
+                        double[] aim_pt;
+                        if (M.isZero(obj_dir.z))
+                            aim_pt = new double[]{0., 0.};
+                        else {
+                            aim_pt = new double[]{del_z * obj_dir.x / obj_dir.z,
+                                                  del_z * obj_dir.y / obj_dir.z};
+                        }
+                        fld.aim_info = aim_pt;
+                    }
+                    return new Coord(obj_pt,obj_dir);
+                }
+                else {
+                    var max_field_ht = pr.get(0).ht;
+                    obj_pt = rel_fld_coord.times(max_field_ht);
+                }
             }
-            else {
+            else { // obj_img_key == 'object'
                 if (value_key == ValueKey.Angle) {
                     var fld_angle = fld_coord.deg2rad();
                     obj_dir = fld_angle.sin();

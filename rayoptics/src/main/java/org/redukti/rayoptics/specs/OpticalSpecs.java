@@ -240,11 +240,15 @@ public class OpticalSpecs {
                     if (fld.z_enp != null)
                         z_enp = fld.z_enp;
                     var obj2enp_dist = -(fod.obj_dist + z_enp);
-                    // rotate the on-axis object pt into the incident direction
-                    // and then position wrt z_enp
-                    var enp_pt = new Vector3(0.0, 0.0, obj2enp_dist);
-                    var rot_mat_s2d = Matrix3.rot_v1_into_v2(Vector3.vector3_001, d0);
-                    pt0 = rot_mat_s2d.multiply(enp_pt).minus(enp_pt);
+                    if (conjugate_type(ImageKey.Object) == ConjugateType.INFINITE) {
+                        // rotate the on-axis object pt into the incident direction
+                        // and then position wrt z_enp
+                        var enp_pt = new Vector3(0.0, 0.0, obj2enp_dist);
+                        var rot_mat_s2d = Matrix3.rot_v1_into_v2(Vector3.vector3_001, d0);
+                        pt0 = rot_mat_s2d.multiply(enp_pt).minus(enp_pt);
+                    }
+                    else
+                        pt0 = p0;
                     pt1 = new Vector3(pt1.x, pt1.y, pt1.z - obj2enp_dist);
                 }
                 else {

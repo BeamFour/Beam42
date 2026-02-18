@@ -8,7 +8,9 @@ import org.redukti.rayoptics.exceptions.TraceException;
 import org.redukti.rayoptics.exceptions.TraceMissedSurfaceException;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.seq.SequentialModel;
+import org.redukti.rayoptics.specs.ConjugateType;
 import org.redukti.rayoptics.specs.Field;
+import org.redukti.rayoptics.specs.ImageKey;
 import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.Pair;
 
@@ -711,9 +713,12 @@ public class Wideangle {
             z_enp = fod.enp_dist;
         else
             z_enp = p_k.z + p_k01 * d_o.z / d_k01;
-        var obj2enp_dist = fod.obj_dist + z_enp;
-        var enp_pt = new Vector3(0,0,obj2enp_dist);
-        var p_o = enp_pt.plus(d_k.times(obj2enp_dist));
+        var p_o = Lists.get(rrev_cr.pkg.ray,-1).p;
+        if (osp.conjugate_type(ImageKey.Object) == ConjugateType.INFINITE) {
+            var obj2enp_dist = fod.obj_dist + z_enp;
+            var enp_pt = new Vector3(0,0,obj2enp_dist);
+            p_o = enp_pt.plus(d_k.times(obj2enp_dist));
+        }
         return new RayDataWithZ_Enp(new RayData(p_o,d_o),z_enp);
     }
 }

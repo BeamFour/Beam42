@@ -26,7 +26,9 @@ Original GNU Optical License and Authors are as follows:
 
 package org.redukti.jfotoptix.model;
 
+import org.redukti.jfotoptix.curve.Asphere;
 import org.redukti.jfotoptix.curve.Curve;
+import org.redukti.jfotoptix.curve.Sphere;
 import org.redukti.mathlib.*;
 import org.redukti.jfotoptix.patterns.Distribution;
 import org.redukti.jfotoptix.patterns.PatternGenerator;
@@ -77,7 +79,13 @@ public class Surface extends Element {
 
         // FIXME we assume curve is symmetric here
         double z = 0;
-        double ms = _curve.sagitta(new Vector2(_shape.max_radius()));
+        double ms;
+        if (_curve instanceof Asphere asph) {
+            var sphere = new Sphere(asph.get_radius());
+            ms = sphere.sagitta(new Vector2(_shape.max_radius()));
+        }
+        else
+            ms = _curve.sagitta(new Vector2(_shape.max_radius()));
         if (Double.isNaN(ms)) {
             //System.err.println("Invalid sagitta at " + _shape.max_radius());
             return null;

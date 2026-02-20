@@ -118,6 +118,8 @@ public class Asphere extends ConicBase {
         return _A20;
     }
 
+    public double get_radius() { return _r; }
+
     /* computes intersection using Feder's equations - code is taken from
      * https://github.com/dibyendumajumdar/ray.
      * Note that Feder's paper uses x-axis rather than z-axis as the

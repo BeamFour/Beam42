@@ -363,6 +363,7 @@ public class LensTool2 {
 
             // On axis rays field 0
             OpticalSystem system = createSystem(specs,scenario,arguments.use_glass_types,false,0,arguments.only_d_line);
+            outputLayout(system,Helper.getOutputPath(arguments.specfile,suffixed_name("layoutonly",filename_suffix,".svg"),arguments.outdir));
             var points = generate_ray_targets(opm,0,587.5618,1);
             outputLayoutWithUserRays(system,Helper.getOutputPath(arguments.specfile,suffixed_name("layout",filename_suffix,".svg"),arguments.outdir),points,arguments.dumpSystem,arguments.include_lost_rays);
             // Skew rays field 0.7

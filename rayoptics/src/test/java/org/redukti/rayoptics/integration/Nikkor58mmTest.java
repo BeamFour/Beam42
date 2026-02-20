@@ -195,10 +195,10 @@ public class Nikkor58mmTest {
         Assertions.assertTrue(compare(expected[14], raypkg.ray.get(14)));
         Assertions.assertTrue(compare(expected[31], raypkg.ray.get(31)));
 
-        double cr_expected_op_delta[] = { 239.18720860000005, 245.3448599476832 };
+        double cr_expected_op_delta[] = { 239.18720860000005, 245.42786553914095 };
         RaySeg[] cr_expected_final_rayseg = {
             new RaySeg(new Vector3(0., 0., 0.), new Vector3(0., 0., 1.), 0.0, new Vector3(-0., -0., 1.)),
-            new RaySeg(new Vector3(0., 21.70138483624297, 0.), new Vector3(0., 0.4434501309129979, 0.8962990468550369), 0.0, new Vector3(-0., -0., 1.))
+            new RaySeg(new Vector3(0., 21.700962096587503, 0.), new Vector3(0., 0.45176068917799633, 0.8921391593879401), 0.0, new Vector3(-0., -0., 1.))
         };
 
         for (int fi = 0; fi < osp.fov.fields.length; fi++) {
@@ -217,14 +217,14 @@ public class Nikkor58mmTest {
         System.out.println(result);
 
         var transAber = TransverseRayAberrationAnalysis.eval_abr_fan(opm,1,1,21,new TraceOptions());
-        Assertions.assertEquals(-3.2620548349684384, transAber.fans.get(1).fan_y.get(0),1e-15);
+        Assertions.assertEquals(-4.144356838869442, transAber.fans.get(1).fan_y.get(0),1e-15);
         Assertions.assertEquals(0.0, transAber.fans.get(1).fan_y.get(9),1e-15);
-        Assertions.assertEquals(-0.3119345075482975, transAber.fans.get(1).fan_y.get(19),1e-15);
+        Assertions.assertEquals(-0.2623536967447677, transAber.fans.get(1).fan_y.get(19),1e-15);
 
         var waveAber = WavefrontAberrationAnalysis.eval_opd_fan(opm,1,1,21,new TraceOptions());
-        Assertions.assertEquals(-203.54512723546324, waveAber.fans.get(1).fan_y.get(0),1e-15);
+        Assertions.assertEquals(-282.95809933311193, waveAber.fans.get(1).fan_y.get(0),1e-15);
         Assertions.assertEquals(0.0, waveAber.fans.get(1).fan_y.get(9),1e-15);
-        Assertions.assertEquals(24.095509134410378, waveAber.fans.get(1).fan_y.get(19),1e-15);
+        Assertions.assertEquals(18.760971968134037, waveAber.fans.get(1).fan_y.get(19),1e-15);
 
         var spotAnal = SpotAnalysis.eval_grid(opm,1,1,21,new TraceOptions());
         var grids = spotAnal.get(0);
@@ -239,8 +239,8 @@ public class Nikkor58mmTest {
             mean += (l*l);
         }
         mean = Math.sqrt(mean/grids.grid.size());
-        Assertions.assertEquals(mean*1000,10.636873278679923,1e-15);
-        Assertions.assertEquals(max*1000,26.879611127471307,1e-15);
+        Assertions.assertEquals(10.84849886586341, mean*1000, 1e-15);
+        Assertions.assertEquals(27.321726749416865, max*1000, 1e-15);
     }
 
     static boolean compare(RaySeg s1, RaySeg s2) {

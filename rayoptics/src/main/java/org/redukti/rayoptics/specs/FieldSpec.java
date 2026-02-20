@@ -19,7 +19,7 @@ import java.util.List;
  * Field of view specification
  *
  *     Attributes:
- *         key: 'object'|'image', 'height'|'angle'
+ *         key: 'object'|'image', 'height'|'real height'|'angle'
  *         value: maximum field, per the key
  *         fields: list of Field instances
  *         is_relative: if True, `fields` are relative to max field
@@ -213,7 +213,7 @@ public class FieldSpec {
         Vector3 obj_pt = null;
         Vector3 obj_dir = null;
 
-        var obj2enp_dist = -(fod.obj_dist + fod.enp_dist);
+        var obj2enp_dist = fod.obj_dist + fod.enp_dist;
         var pt1 = new Vector3(0.0, 0.0, obj2enp_dist);
         ConjugateType obj_conj = optical_spec.conjugate_type(ImageKey.Object);
         if (obj_conj == ConjugateType.INFINITE) {
@@ -262,12 +262,14 @@ public class FieldSpec {
                     return new Coord(obj_pt,obj_dir);
                 }
             }
-            var dir_cos = fld_angle.sin();
-            var z = Math.sqrt(1.0 - dir_cos.x * dir_cos.x - dir_cos.y * dir_cos.y);
-            dir_cos = new Vector3(dir_cos.x, dir_cos.y, z);
+            var ang_x = fld_angle.x;
+            var ang_y = fld_angle.y;
+            var dir_cos = new Vector3(Math.sin(ang_x) * Math.cos(ang_y),
+                                         Math.sin(ang_y),
+                                      Math.cos(ang_x) * Math.cos(ang_y));
             if (is_wide_angle) {
                 var rot_mat = Matrix3.rot_v1_into_v2(Vector3.vector3_001,dir_cos);
-                obj_pt = rot_mat.multiply(pt1).minus(pt1);
+                obj_pt = rot_mat.multiply(pt1.negate()).plus(pt1);
             }
             else {
                 obj_pt = new Vector3(dir_cos.x/dir_cos.z,
@@ -328,7 +330,7 @@ public class FieldSpec {
      *             magnitude of maximum field, maximum Field instance
      */
     public Pair<Double, Integer> max_field() {
-        Integer max_fld = null;
+        int max_fld = 0;
         double max_fld_sqrd = -1.0;
         for (int i = 0; i < fields.length; i++) {
             Field f = fields[i];

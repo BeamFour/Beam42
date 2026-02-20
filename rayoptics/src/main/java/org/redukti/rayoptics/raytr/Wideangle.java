@@ -35,10 +35,10 @@ public class Wideangle {
      * Along with the ray tracing results
      */
     public static RayResultWithStopCoord enp_z_coordinate(double z_enp, SequentialModel seq_model, int stop_idx, Vector3 dir0, double obj_dist, double wvl) {
-        var obj2enp_dist = -(obj_dist + z_enp);
+        var obj2enp_dist = (obj_dist + z_enp);
         var pt1 = new Vector3(0., 0., obj2enp_dist);
         var rot_mat = Matrix3.rot_v1_into_v2(Vector3.vector3_001, dir0);
-        var pt0 = rot_mat.multiply(pt1).minus(pt1);
+        var pt0 = rot_mat.multiply(pt1.negate()).plus(pt1);
         RayPkg ray_pkg = null;
         RayResult rr = null;
         Vector3 final_coord = null;
@@ -242,6 +242,12 @@ public class Wideangle {
                 }
             }
             z_enp += del_z;
+            if (M.isZero(z_enp)) {
+                // if we sample directly at z_enp = 0, i.e. the vertex of the first
+                // surface, the surface intersection method won't find the right
+                // root.Perturb the sample point slightly away from zero to avoid this problem
+                z_enp = del_z / 10.0;
+            }
             trial += 1;
         }
 

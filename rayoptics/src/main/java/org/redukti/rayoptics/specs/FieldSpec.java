@@ -265,7 +265,7 @@ public class FieldSpec {
             var ang_x = fld_angle.x;
             var ang_y = fld_angle.y;
             var dir_cos = new Vector3(Math.sin(ang_x) * Math.cos(ang_y),
-                                         Math.sin(ang_y),
+                                      Math.sin(ang_y),
                                       Math.cos(ang_x) * Math.cos(ang_y));
             if (is_wide_angle) {
                 var rot_mat = Matrix3.rot_v1_into_v2(Vector3.vector3_001,dir_cos);

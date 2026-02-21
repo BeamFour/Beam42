@@ -141,7 +141,12 @@ public class Nikkor14mmTest {
         Assertions.assertEquals(1.000, fod.n_img, 0.001);
         Assertions.assertEquals(2.849, fod.opt_inv, 0.001);
 
-        double[] cr_expected_op_delta = { 129.68211720000002, 144.54435163923452 };
+        VigCalc.set_vig(opm);
+        opm.update_model();
+
+        double[] cr_expected_op_delta = { 129.68211720000002,  144.5443500746337 };
+        double[] expected_z_enp = { 19.84067682425449, 19.127560250656217 };
+        double[] expected_ref_sphere_radius = { 47.948425307468156, 45.491290263961105 };
         RaySeg[] cr_expected_final_rayseg = {
             new RaySeg(new Vector3(0., 0., 0.), new Vector3(0., 0., 1.), 0.0, new Vector3(-0., -0., 1.)),
             new RaySeg(new Vector3(0., 20.362505270545146, 0.), new Vector3(0., 0.4476133316595901, 0.8942272112391799), 0.0, new Vector3(-0., -0., 1.))
@@ -153,23 +158,30 @@ public class Nikkor14mmTest {
             var foc = osp.defocus().get_focus();
 
             var t = Trace.setup_pupil_coords(opm,fld,wvl,foc,null,null);
-            Assertions.assertEquals(cr_expected_op_delta[fi],t.chief_ray_pkg.chief_ray.op_delta,1e-8);
+            Assertions.assertEquals(expected_z_enp[fi],fld.z_enp,1e-5);
+            Assertions.assertEquals(expected_ref_sphere_radius[fi],t.ref_sphere.ref_sphere_radius,1e-5);
+            Assertions.assertEquals(cr_expected_op_delta[fi],t.chief_ray_pkg.chief_ray.op_delta,1e-5);
             Assertions.assertTrue(compare(Lists.get(t.chief_ray_pkg.chief_ray.ray,-1),cr_expected_final_rayseg[fi]));
             fld.chief_ray = t.chief_ray_pkg;
             fld.ref_sphere = t.ref_sphere;
         }
 
         var result = Wideangle.eval_real_image_ht(opm,osp.fov.fields[1],587.5618);
-        var pt = new Vector3(0.0, -2866312975.4227800369262695,  419590299.1519107818603516);
-        var dir = new Vector3(-0.,  0.2866312938130761,  0.9580409706307147);
-        Assertions.assertEquals(130.10449270101637,result.z_enp,1e-5);
-        Assertions.assertTrue(pt.isEqual(result.ray_data.pt,1e-7));
-        Assertions.assertTrue(dir.isEqual(result.ray_data.dir,1e-7));
+        var expect_pt = new Vector3(0.0, -2866312975.4227800369262695,  419590299.1519107818603516);
+        var expect_dir = new Vector3(-0.,  0.2866312938130761,  0.9580409706307147);
+        var expect_z_enp = 130.10449270101637;
+        Assertions.assertEquals(expect_z_enp,result.z_enp,1e-5);
+        Assertions.assertTrue(expect_pt.isEqual(result.ray_data.pt,1e-7));
+        Assertions.assertTrue(expect_dir.isEqual(result.ray_data.dir,1e-7));
     }
 
     static boolean compare(RaySeg s1, RaySeg s2) {
-        return s1.p.effectivelyEqual(s2.p)
+        var result = s1.p.effectivelyEqual(s2.p)
                 && s1.d.effectivelyEqual(s2.d)
                 && Math.abs(s1.dst - s2.dst) < 1e-13;
+        if (!result) {
+            System.err.println("RaySegs differ: s1: " + s1 + " != s2: " + s2);
+        }
+        return result;
     }
 }

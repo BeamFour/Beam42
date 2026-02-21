@@ -110,6 +110,9 @@ public class VigCalc {
             calc_vignetting_for_field(opm,fld,wvl,use_bisection,null);
         }
     }
+    public static void set_vig(OpticalModel opm) {
+        set_vig(opm,null);
+    }
 
     /**
      * Set the aperture on the stop surface to satisfy the pupil spec.

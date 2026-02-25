@@ -2067,10 +2067,15 @@ public class Glass extends Medium {
         glasses.put("TF3", new Glass("CDGM", "TF3", 1.61242, 1.60825, 1.62214, 1.61572, 1.60891, 1.62295, 1.62996, 44.09, 43.86, 0.0));
         glasses.put("H-TF8", new Glass("CDGM", "H-TF8", 1.72046, 1.71437, 1.7351, 1.72537, 1.71533, 1.73634, 1.74723, 34.76, 34.52, 0.0));
     }
+    static void add_schott_1968_glasses() {
+        glasses.put("BAF12-Old", new Glass("Schott", "BAF12-Old", 1.6393, 1.63507, 1.64928, 1.64266, 1.63574, 1.65011, 1.65734, 45.0, 45.0, 0));
+        glasses.put("FK50", new Glass("Schott", "FK50", 1.48606, 1.48424, 1.49021, 1.48749, 1.48453, 1.49054, 1.49342, 81.49, 81.09, 0.031));
+    }
     static {
         add_hikari_glasses();
         add_hoya_glasses();
         add_schott_glasses();
         add_ohara_glasses();
         add_cdgm_glasses();
+        add_schott_1968_glasses();
     }}

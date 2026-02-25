@@ -56,27 +56,29 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 2.9 | 8.889|
- | Field(x=0.0, y=0.1) | 3.107 | 11.223|
- | Field(x=0.0, y=0.2) | 3.235 | 10.545|
- | Field(x=0.0, y=0.3) | 3.149 | 9.537|
- | Field(x=0.0, y=0.4) | 3.271 | 8.312|
- | Field(x=0.0, y=0.5) | 3.777 | 8.737|
- | Field(x=0.0, y=0.6) | 4.586 | 10.449|
- | Field(x=0.0, y=0.7) | 5.692 | 14.609|
- | Field(x=0.0, y=0.8) | 6.958 | 17.249|
- | Field(x=0.0, y=0.9) | 8.386 | 19.718|
- | Field(x=0.0, y=1.0) | 9.908 | 22.6|
-## Geometric MTF
-![Geometrical MTF](./mtf.svg)
+ | Field(x=0.0, y=0.0) | 3.185 | 9.985|
+ | Field(x=0.0, y=0.1) | 3.161 | 9.983|
+ | Field(x=0.0, y=0.2) | 3.044 | 9.444|
+ | Field(x=0.0, y=0.3) | 3.046 | 8.594|
+ | Field(x=0.0, y=0.4) | 3.277 | 7.382|
+ | Field(x=0.0, y=0.5) | 3.82 | 8.872|
+ | Field(x=0.0, y=0.6) | 4.66 | 11.814|
+ | Field(x=0.0, y=0.7) | 5.712 | 14.616|
+ | Field(x=0.0, y=0.8) | 6.99 | 17.244|
+ | Field(x=0.0, y=0.9) | 8.424 | 19.606|
+ | Field(x=0.0, y=1.0) | 10.012 | 22.231|
+## Polychromatic Geometric MTF
+![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm
 * Black lines represent sagittal, blue tangential
-* Wavelengths 587.5618(d), 486.1327(F), 656.2725(C) equal weight
-## Geometric MTF (Weighted)
-![Geometrical MTF](./mtf-w.svg)
+* To generate above, MTFs for wavelengths 587.5618(d), 486.1327(F), 656.2725(C) were calculated across 10 fields, and then averaged
+## Polychromatic Geometric MTF (Weighted)
+![Polychromatic Geometrical MTF Weighted](./mtf-w.svg)
 * 10,30,50 cycles/mm
 * Black lines represent sagittal, blue tangential
-* Wavelengths 587.5618(d), 656.2725(C), 546.074(e), 486.1327(F), 435.8343(g) weighted 1.0,0.475,0.98,0.49,0.15
+* To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
-* [OpticalBench Compatible Data File, tab delimited](./US3774991_Example01a.txt)
+* [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./US3774991_Example01a.zmx)
+
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-02-25

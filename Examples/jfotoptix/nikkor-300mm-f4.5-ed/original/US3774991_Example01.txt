@@ -25,3 +25,14 @@ Bf(m)	70.05
 10	-104.82	Bf		29.20
 [notes]
 Related patent US 4154508
+[patent info]
+country	US
+number	US3774991
+example	EX 1
+year applied	1971
+inventors	Y Shimizu
+current assignee	Nikon Corp
+original assignee	Nikon Corp
+link	https://patents.google.com/patent/US3774991A/en
+[report data]
+lens name	Nikkor 300mm f4.5 ED

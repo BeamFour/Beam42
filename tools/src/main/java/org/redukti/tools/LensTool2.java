@@ -436,11 +436,11 @@ public class LensTool2 {
                 if (arguments.do_ray_aberrations)
                     generateRayAberrationPlots(opm, arguments, scenario_filesuffix);
                 // Generate MTF with weighted average across wavelengths
-                var prescription2 = createPrescription(specs, arguments.use_glass_types,
-                        new double[]{587.5618, 656.2725, 546.074, 486.1327, 435.8343},
-                        new double[]{1.0, 0.475, 0.98, 0.49, 0.15});
-                opm = createSystem(prescription2, true, VigType.SetPupil, true, fields, config);
-                generateMTFs(opm, arguments, fields, prescription2.get_wvl_wts(), "mtf-w", scenario_filesuffix);
+                var wvls = arguments.only_d_line ? new double[] {587.5618} : new double[]{587.5618, 656.2725, 546.074, 486.1327, 435.8343};
+                var wts = arguments.only_d_line ? new double[] {1.0} : new double[]{1.0, 0.475, 0.98, 0.49, 0.15};
+                var prescriptionForMTF = createPrescription(specs, arguments.use_glass_types, wvls, wts);
+                opm = createSystem(prescriptionForMTF, true, VigType.SetPupil, true, fields, config);
+                generateMTFs(opm, arguments, fields, prescriptionForMTF.get_wvl_wts(), "mtf-w", scenario_filesuffix);
             }
             ZemaxExporter zemaxExporter = new ZemaxExporter();
             Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), zemaxExporter.generate(prescription, arguments.only_d_line));

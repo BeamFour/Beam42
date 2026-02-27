@@ -1,0 +1,36 @@
+[descriptive data]
+title	JP 1976-043920 Example 1 (Nikon Nikkor 1200mm F/11 ED)
+[constants]
+[variable distances]
+Focal Length	1200
+Angle of View(p)	5
+Angle of View	2.1
+F-Number	11
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf(p)	240.2
+Bf	240.06
+[lens data]
+1	412.0	13	1.50032	112.06	81.9
+2	-435.3	8		112.06	
+3	-403.2	8	1.74400	112.06	44.9
+4	445.2	2		112.06	
+5	396.7	10	1.62374	112.06	47.0
+6	-873.9	590		112.06	
+6AS	AS	69		30.988
+7	-195.0	2	1.51632	47.70	64.2
+8	439.2	7	1.66854	47.70	39.2
+9	-927.5	Bf		47.70	
+[figure]
+source	Data/JP1976-043920_Figure01.png
+originX	86.17
+originY	375.64
+ppmm	4.510
+[figure]
+source	Data/JP1976-043920_Figure01P.png
+originX	162.58
+originY	62.55
+ppmm	0.853
+[notes]
+Bill: Patent Angle of View is clearly doubled.

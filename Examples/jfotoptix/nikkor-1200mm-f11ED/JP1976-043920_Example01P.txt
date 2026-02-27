@@ -9,8 +9,9 @@ F-Number	11
 Image Height	43.2
 Magnification	0
 d0	Infinity
-Bf(p)	240.2
-Bf	240.06
+Bf	239.96
+Bf(b)	240.06
+Bf(o)	240.2
 [lens data]
 1	412.0	13	1.50032	112.06	81.9
 2	-435.3	8		112.06	

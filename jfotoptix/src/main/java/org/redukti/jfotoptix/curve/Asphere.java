@@ -51,7 +51,7 @@ public class Asphere extends ConicBase {
                    double A12, double A14, double A16, double A18, double A20) {
         super(r, k - 1);
         _r = r;
-        _c = 1.0 / r;
+        _c = _r != 0.0 ? 1.0 / r : 0;
         _k = k;
         _A4 = A4;
         _A6 = A6;

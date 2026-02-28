@@ -2,7 +2,7 @@
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
-|US | US3743384 | EX 1 | 1970 | S Nakamura | Nikon Corp | [link](https://patents.google.com/patent/US3743384A) |
+|US | US3743384 | EX 1 | 1970 | Soichi Nakamura | Nikon Corp | [link](https://patents.google.com/patent/US3743384A) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -174,4 +174,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./US003743384_Example01.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-02-27
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-02-28

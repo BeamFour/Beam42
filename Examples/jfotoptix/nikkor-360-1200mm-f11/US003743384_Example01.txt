@@ -67,7 +67,7 @@ country	US
 number	US3743384
 example	EX 1
 year applied	1970
-inventors	S Nakamura
+inventors	Soichi Nakamura
 current assignee	Nikon Corp
 original assignee	Nikon Corp
 link	https://patents.google.com/patent/US3743384A

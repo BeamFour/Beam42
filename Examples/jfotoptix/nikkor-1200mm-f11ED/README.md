@@ -1,3 +1,8 @@
+# Nikkor 1200mm f11 ED
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|JP | JP1976-043920 | EX 1 | 1974 | SHIMIZU YOSHUKI | Nikon Corp | [link](https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S51-043920/11/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

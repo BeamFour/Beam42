@@ -1,4 +1,4 @@
-# Zeiss Otus 85mm f1.4 Reverse Engineered by [Zhong Fu](https://zhuanlan.zhihu.com/p/21281774803)
+# Zeiss Otus 85mm f1.4 Reverse Engineered by [Zhong Fu](https://zhuanlan.zhihu.com/p/2005716764328219465)
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -94,4 +94,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./Otus85.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-02-27
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-03-01

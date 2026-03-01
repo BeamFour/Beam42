@@ -1,6 +1,6 @@
 [descriptive data]						
 title	Zeiss Otus 85mm f1.4
-lens name	Zeiss Otus 85mm f1.4 Reverse Engineered by [Zhong Fu](https://zhuanlan.zhihu.com/p/21281774803)
+lens name	Zeiss Otus 85mm f1.4 Reverse Engineered by [Zhong Fu](https://zhuanlan.zhihu.com/p/2005716764328219465)
 [constants]
 [variable distances]						
 Focal Length	85.0

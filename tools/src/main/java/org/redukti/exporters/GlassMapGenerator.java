@@ -25,9 +25,10 @@ public class GlassMapGenerator {
 
     public static Cat[] catalogs = new Cat[] {
             new Cat("Hikari", "glassdata/NIKON-HIKARI20220701_MD_BD_added_HG.agf"),
-            new Cat("Hoya", "glassdata/HOYA20250623_include_obsolete.agf"),
+            new Cat("Hoya", "glassdata/HOYA20260126_include_obsolete.agf"),
             new Cat("Schott", "glassdata/SCHOTT.AGF"),
-            new Cat("Ohara", "glassdata/OHARA.agf"),
+            new Cat("Ohara", "glassdata/OHARA_240131.AGF"),
+            new Cat("SUMITA", "glassdata/sumita-032026-include-discont-zemax.agf"),
             new Cat("CDGM", "glassdata/CDGM.AGF"),
     };
 

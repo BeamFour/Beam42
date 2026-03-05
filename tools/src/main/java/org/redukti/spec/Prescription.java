@@ -206,6 +206,12 @@ public class Prescription {
         return this;
     }
 
+    public static Prescription build_prescription_d_line(OpticalBenchDataImporter.LensSpecifications specs) {
+        return build_prescription(specs,true,new double[] {587.5618},new double[] {1.0},0);
+    }
+    public static Prescription build_prescription_e_line(OpticalBenchDataImporter.LensSpecifications specs) {
+        return build_prescription(specs,true,new double[] {546.074},new double[] {1.0},0);
+    }
     public static Prescription build_prescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types) {
         return build_prescription(specs,use_glass_types,new double[] {587.5618, 486.1327, 656.2725},new double[] {1.0, 1.0, 1.0},0);
     }

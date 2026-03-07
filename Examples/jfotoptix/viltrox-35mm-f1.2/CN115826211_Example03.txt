@@ -1,0 +1,68 @@
+[descriptive data]				
+title	CN 115826211 A Example 3
+[constants]
+[variable distances]				
+Focal Length	35.1	36.1
+Angle of View	64.2	undefined	
+F-Number	1.2	undefined
+Image Height	43.2	43.2
+Magnification	0	-0.17663
+S	Infinity	206
+d0	Infinity	194.17
+d7	1.780	8.316
+d10	15.420	8.884
+d14	7.997	2.868
+d19	1.761	6.890
+Bf	0.5	0
+[lens data]
+1	200.020	1.800	1.487	55.24	70.440	H-QK3L
+2	31.800	16.495		46.02	
+3	-44.412	1.500	1.847	46.02	23.785	H-ZF52
+4	148.932	10.100	1.883	49.30	40.805	H-ZLAF68C
+5	-49.499	1.500		49.30	
+6	42.046	8.000	1.810	44.56	40.993	D-ZLAF52LA
+7	759.330	d7		44.56
+8	81.153	4.400	1.946	41.88	17.942	H-ZF88
+9	-441.620	1.200	1.603	41.88	38.011	F1
+10	26.862	d10		35.88
+11	-102.562	9.300	1.593	35.37	68.624	FCD505
+12	-21.887	1.500	1.689	37.70	31.161	H-ZF10
+13	-193.498	1.000		37.70
+14	AS	d14		38.034
+15	130.776	4.790	1.593	40.62	68.624	FCD505
+16	-131.175	0.150		40.62
+17	66.379	9.800	1.569	39.93	71.304	D-ZPK7
+18	-35.952	1.300	1.847	39.93	23.785	H-ZF52
+19	-55.714	d19		39.93
+20	78.018	3.300	1.946	37.10	17.942	H-ZF88
+21	548.812	0.200		37.10	
+22	32.435	4.800	1.593	34.48	68.624	FCD505
+23	109.667	1.200	1.741	34.48	27.760	H-ZF50
+24	23.600	7.090		31.02	
+25	-167.594	2.000	1.810	31.02	40.993	D-ZLAF52LA
+26	500.000	15.738		31.80	
+27	CG	1.500	1.517	43.18	64.199	H-K9L
+28	CG	0.500		43.18	
+[aspherical data]
+6	42.046	0	-9.769E-07	7.982E-11	-2.968E-12	6.815E-15	-6.766E-18
+7	759.330	0	6.910E-07	-3.248E-10	-1.017E-12	3.036E-15	-3.887E-18
+25	-167.594	0	-1.661E-05	4.159E-08	2.431E-11	-3.065E-13	4.467E-16
+26	500.000	0	-7.023E-06	5.133E-08	3.740E-11	-2.549E-13	4.573E-16
+[figure]
+source	Data/CN115826211_Figure03.png
+originX	56.16
+originY	376.74
+ppmm	10.376
+[notes]
+[patent info]
+country	CN
+number	CN115826211
+example	3
+year applied	2023
+inventors	Chen Baofeng
+current assignee	Shenzhen Weizhuoshi Technology Co ltd
+original assignee	Shenzhen Weizhuoshi Technology Co ltd
+link	https://patents.google.com/patent/CN115826211A/en
+[report data]
+lens name	Viltrox 35mm F1.2 Lab
+[report data]

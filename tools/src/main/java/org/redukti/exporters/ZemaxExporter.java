@@ -54,7 +54,7 @@ public class ZemaxExporter {
                 PICB 1
                 XFLN 0 0 0 0 0 0 0 0 0 0 0 0
                 YFLN 0 2.16 4.33 6.5 8.65 10.8 12.98 15.14 %f 0 0 0 0 0 0 0 0
-                FWGN 1 1 1 1 1 1 1 1 1 1 1 1
+                FWGN 10 9 9 8 8 7 7 7 3 1 1 1
                 VDXN 0 0 0 0 0 0 0 0 0 0 0 0
                 VDYN 0 0 0 0 0 0 0 0 0 0 0 0
                 VCXN 0 0 0 0 0 0 0 0 0 0 0 0

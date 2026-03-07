@@ -1,3 +1,8 @@
+# Leica Noctilux-M 35 f/1.2 ASPH (Reoptimized)
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US 20250271647 | 2 | 2023 | Stefan Roth | Leica Camera AG | [link](https://patents.google.com/patent/US20250271647A1/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

@@ -1,0 +1,69 @@
+[descriptive data]				
+title	CN 115826211 A Example 2[NG]
+[constants]
+NG	Asphericals
+[variable distances]				
+Focal Length	34.5	35.5
+Angle of View	64.2	undefined	
+F-Number	1.2	undefined
+Image Height	43.2	43.2
+Magnification	0	-0.15461
+S	Infinity	206
+d0	Infinity	222.81
+d7	2.332	8.483
+d10	14.868	8.717
+d14	7.857	2.791
+d19	1.901	6.967
+Bf	0.5	0
+[lens data]
+1	170.905	1.800	1.487	55.22	70.440	H-QK3L
+2	30.399	17.095		45.94	
+3	-46.402	1.500	1.847	45.94	23.785	H-ZF52
+4	120.719	11.000	1.883	49.54	40.805	H-ZLAF68C
+5	-50.344	0.150		49.54	
+6	41.470	8.000	1.810	43.99	40.993	D-ZLAF52LA
+7	381.033	d7		43.99
+8	83.207	4.400	1.946	41.33	17.942	H-ZF88
+9	-311.913	1.200	1.603	41.33	38.011	F1
+10	26.372	d10		35.58
+11	-75.964	8.300	1.593	35.40	68.624	FCD505
+12	-21.663	1.500	1.689	35.40	31.161	H-ZF10
+13	-124.836	1.000		38.16
+14	AS	d14		38.493
+15	200.542	4.790	1.593	41.17	68.624	FCD505
+16	-108.635	0.150		41.17
+17	62.205	9.800	1.569	40.66	71.304	D-ZPK7
+18	-35.565	1.300	1.847	40.66	23.785	H-ZF52
+19	-55.362	d19		40.66
+20	67.585	3.300	1.946	36.94	17.942	H-ZF88
+21	268.402	0.200		36.94	
+22	34.254	5.400	1.593	34.48	68.624	FCD505
+23	72.811	1.200	1.847	34.48	23.785	H-ZF50
+24	24.934	6.850		31.34	
+25	-190.270	1.600	1.810	31.54	40.993	D-ZLAF52LA
+26	637.275	15.575		31.54	
+27	CG	2.500	1.517	42.94	64.199	H-K9L
+28	CG	0.500		42.94	
+[aspherical data]
+6	41.470	0	-8.851E-07	-3.047E-10	-2.722E-12	7.196E-15	-9.418E-18
+7	381.033	0	6.952E-07	-1.170E-09	1.399E-12	-1.855E-15	-1.948E-18
+25	-190.270	0	-1.477E-05	7.957E-08	-1.838E-10	2.647E-13	-2.700E-16
+26	637.275	0	-5.075E-06	8.786E-08	-1.546E-10	2.816E-13	-2.239E-16
+[figure]
+source	Data/CN115826211_Figure02.png
+originX	64.09
+originY	369.42
+ppmm	10.421
+[notes]
+[patent info]
+country	CN
+number	CN115826211
+example	2
+year applied	2023
+inventors	Chen Baofeng
+current assignee	Shenzhen Weizhuoshi Technology Co ltd
+original assignee	Shenzhen Weizhuoshi Technology Co ltd
+link	https://patents.google.com/patent/CN115826211A/en
+[report data]
+lens name	Viltrox 35mm F1.2 Lab
+[report data]

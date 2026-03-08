@@ -62,8 +62,11 @@ public class MeritFunction implements LMLFunction {
                 double[] delta = new double[nadj];
                 for (int j=0; j<nadj; j++)
                 {
+                    double dDelta = vars[j]._d_delta;
+                    if (dDelta <= 0.0)
+                        throw new IllegalArgumentException("DDelta is invalid at " + vars[j]);
                     for (int k=0; k<nadj; k++)
-                        delta[k] = (k==j) ? vars[j]._d_delta : 0.0;
+                        delta[k] = (k==j) ? dDelta : 0.0;
 
                     double d = nudge(delta); // resid at pplus
                     if (d == BIGVAL)
@@ -75,7 +78,7 @@ public class MeritFunction implements LMLFunction {
                         jac[i][j] = getResidual(i);
 
                     for (int k=0; k<nadj; k++)
-                        delta[k] = (k==j) ? -2.0*vars[j]._d_delta : 0.0;
+                        delta[k] = (k==j) ? -2.0*dDelta : 0.0;
 
                     d = nudge(delta); // resid at pminus
                     if (d == BIGVAL)
@@ -88,18 +91,14 @@ public class MeritFunction implements LMLFunction {
                         jac[i][j] -= getResidual(i);
 
                     for (int i=0; i<ngoals; i++) {
-                        double hh = (2.0 * vars[j]._d_delta);
                         if (Double.isNaN(jac[i][j]))
                             throw new IllegalStateException("Detected NaN in Jacobian");
-                        if (M.isZero(jac[i][j]))
-                            jac[i][j] = 0.0;
-                        else if (!M.isZero(hh)) {
-                            jac[i][j] /= hh;
-                        }
+                        double hh = (2.0 * dDelta);
+                        jac[i][j] /= hh;
                     }
 
                     for (int k=0; k<nadj; k++)
-                        delta[k] = (k==j) ? vars[j]._d_delta : 0.0;
+                        delta[k] = (k==j) ? dDelta : 0.0;
 
                     d = nudge(delta);  // back to starting value.
 

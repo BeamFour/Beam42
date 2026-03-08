@@ -24,6 +24,8 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
 //        for (int i = 0; i < functions.length; i++) {
 //            weights[i] = Math.sqrt(functions[i].weight);
 //        }
+        for (int i = 0; i < vars.length; i++)
+            vars[i].read_from_prescription();
     }
 
     @Override

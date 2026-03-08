@@ -31,6 +31,7 @@ public class LMDerSolver implements Solver {
         // the prescription
         double[] x  = new double[n];
         for (int i = 0; i < x.length; i++) {
+            // x[] will be scaled values
             x[i] = vars[i].read_from_prescription();
         }
         double[] diag = new double[n];

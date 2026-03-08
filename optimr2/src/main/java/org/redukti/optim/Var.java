@@ -11,10 +11,14 @@ public abstract class Var {
         this._prescription = prescription;
     }
     public void set_unscaled_value(double d) {
+        if (Double.isNaN(d))
+            throw new IllegalArgumentException("NaN value supplied");
         _unscaled_value = d;
         _scaled_value = d * get_scaling_factor();
     }
     public void set_scaled_value(double d) {
+        if (Double.isNaN(d))
+            throw new IllegalArgumentException("NaN value supplied");
         _scaled_value = d;
         _unscaled_value = M.isZero(d) ? 0.0 : (d / get_scaling_factor());
     }

@@ -9,7 +9,7 @@ public abstract class Var {
     public Var(Prescription prescription, double originalValue, double dDelta) {
         this._prescription = prescription;
         this._original_value = originalValue;
-        this._d_delta = dDelta;
+        this._d_delta = Math.abs(dDelta);
     }
     public abstract void shift(double delta);
 }

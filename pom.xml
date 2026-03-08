@@ -18,6 +18,7 @@
         <module>tools</module>
         <module>optimj</module>
         <module>optimr</module>
+        <module>optimr2</module>
     </modules>
 
     <!-- Optionally define shared properties or dependency versions -->

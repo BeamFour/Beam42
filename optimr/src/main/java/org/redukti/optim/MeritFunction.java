@@ -41,6 +41,8 @@ public class MeritFunction implements LMLFunction {
                 resid[i] = (outs[i]._target - outs[i]. value())*outs[i]._weight;
                 sos += M.square(resid[i]);
             }
+            if (M.isZero(sos))
+                return sos;
             return Math.sqrt(sos / outs.length);
         }
 
@@ -57,15 +59,14 @@ public class MeritFunction implements LMLFunction {
             {
                 final int nadj = vars.length;
                 final int ngoals = outs.length;
-                double delta[] = new double[nadj];
-                double d=0;
+                double[] delta = new double[nadj];
                 for (int j=0; j<nadj; j++)
                 {
                     for (int k=0; k<nadj; k++)
                         delta[k] = (k==j) ? vars[j]._d_delta : 0.0;
 
-                    d = nudge(delta); // resid at pplus
-                    if (d== BIGVAL)
+                    double d = nudge(delta); // resid at pplus
+                    if (d == BIGVAL)
                     {
                         //badray = true;
                         return false;
@@ -77,7 +78,7 @@ public class MeritFunction implements LMLFunction {
                         delta[k] = (k==j) ? -2.0*vars[j]._d_delta : 0.0;
 
                     d = nudge(delta); // resid at pminus
-                    if (d== BIGVAL)
+                    if (d == BIGVAL)
                     {
                         //badray = true;
                         return false;
@@ -86,15 +87,23 @@ public class MeritFunction implements LMLFunction {
                     for (int i=0; i<ngoals; i++)
                         jac[i][j] -= getResidual(i);
 
-                    for (int i=0; i<ngoals; i++)
-                        jac[i][j] /= (2.0*vars[j]._d_delta);
+                    for (int i=0; i<ngoals; i++) {
+                        double hh = (2.0 * vars[j]._d_delta);
+                        if (Double.isNaN(jac[i][j]))
+                            throw new IllegalStateException("Detected NaN in Jacobian");
+                        if (M.isZero(jac[i][j]))
+                            jac[i][j] = 0.0;
+                        else if (!M.isZero(hh)) {
+                            jac[i][j] /= hh;
+                        }
+                    }
 
                     for (int k=0; k<nadj; k++)
                         delta[k] = (k==j) ? vars[j]._d_delta : 0.0;
 
                     d = nudge(delta);  // back to starting value.
 
-                    if (d== BIGVAL)
+                    if (d == BIGVAL)
                     {
                         //badray = true;
                         return false;

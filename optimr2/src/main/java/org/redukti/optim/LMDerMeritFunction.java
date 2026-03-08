@@ -18,12 +18,8 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
         this.functions = functions;
         this.weights = new double[functions.length];
         this.use_native = use_native;
-        // Weights are transformed to sqrt() because they are supplied to
-        // lmder as diag vector and lmder will apply the weights
-        // when computing least square
-//        for (int i = 0; i < functions.length; i++) {
-//            weights[i] = Math.sqrt(functions[i].weight);
-//        }
+        for (int i = 0; i < functions.length; i++)
+            weights[i] = functions[i]._weight;
         for (int i = 0; i < vars.length; i++)
             vars[i].read_from_prescription();
     }

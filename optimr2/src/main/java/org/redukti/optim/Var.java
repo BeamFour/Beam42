@@ -1,5 +1,6 @@
 package org.redukti.optim;
 
+import org.redukti.mathlib.M;
 import org.redukti.spec.Prescription;
 
 public abstract class Var {
@@ -15,7 +16,7 @@ public abstract class Var {
     }
     public void set_scaled_value(double d) {
         _scaled_value = d;
-        _unscaled_value = d / get_scaling_factor();
+        _unscaled_value = M.isZero(d) ? 0.0 : (d / get_scaling_factor());
     }
     public double get_unscaled_value() { return _unscaled_value; }
     public double get_scaled_value() { return _scaled_value; }

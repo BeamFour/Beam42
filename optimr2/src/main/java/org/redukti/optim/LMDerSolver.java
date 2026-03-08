@@ -54,9 +54,9 @@ public class LMDerSolver implements Solver {
             double xtol = Math.sqrt(MinPack.dpmpar(1));
             double gtol = 0.;
             int maxfev = (n + 1) * 100;
-            int mode = 2; // scale using diag
+            int mode = 2; // 1=scale internally 2=scale using diag
             double factor = 100;
-            int nprint = 0;
+            int nprint = 1;
 
             int[] nfev = new int[1], njev = new int[1];
             int[] ipvt = new int[n];

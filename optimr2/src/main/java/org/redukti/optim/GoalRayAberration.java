@@ -21,9 +21,9 @@ public class GoalRayAberration extends Goal {
     @Override
     public double value() {
         var fans = _analysis._ray_aberrations.get_fans(_field, _xy, _wvl);
-        if (fans != null)
+        if (fans != null && _pos < fans.fan_x.size())
             return Lists.get(fans.fan_y, _pos);
-        throw new IllegalArgumentException("Invalid field, xy or position");
+        return LMDerMeritFunction.BIGVAL;
     }
 
     @Override

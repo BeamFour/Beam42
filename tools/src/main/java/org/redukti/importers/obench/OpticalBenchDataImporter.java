@@ -314,9 +314,15 @@ public class OpticalBenchDataImporter {
             }
             return words.toArray(new String[words.size()]);
         }
-
         public boolean parse_file(String file_name) throws Exception {
-            List<String> lines = Files.readAllLines(new File(file_name).toPath());
+            var lines = Files.readAllLines(new File(file_name).toPath()).toArray(new String[0]);
+            return parse_lines(lines);
+        }
+        public boolean parse_buffer(String buffer) throws Exception {
+            String[] lines = buffer.split("\\r?\\n");
+            return parse_lines(lines);
+        }
+        public boolean parse_lines(String[] lines) throws Exception {
             Section current_section = null;         // Current section
             int surface_id = 1; // We use numeric ids
             // OptBen uses string ids, so we need to map from string id to our id

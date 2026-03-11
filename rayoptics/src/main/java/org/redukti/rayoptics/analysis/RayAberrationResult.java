@@ -47,7 +47,10 @@ public class RayAberrationResult {
                     var fan = result.fans.get(j);
                     if (j > 0)
                         sb.append(",");
-                    sb.append(fan.fan_y.get(i));
+                    if (fan.fan_y.size() >= row_count)
+                        sb.append(fan.fan_y.get(i));
+                    else
+                        sb.append("ERR");
                 }
                 sb.append("\n");
             }

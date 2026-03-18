@@ -1,0 +1,49 @@
+[descriptive data]
+title	US 4,732,459 Example 4 (Nikon Nikkor 300mm f/2 ED-IF)
+[constants]
+[variable distances]
+Focal Length	300	undefined
+Angle of View	8.17	undefined
+F-Number	2	undefined
+Image Height	43.2	43.2
+Total Length	undefined	undefined
+Magnification	0	-0.086
+d0	Infinity	3755.62
+d8	102.701	123.701
+d13	28.388	7.388
+d13AS	27.388	6.388
+Bf	112.223	112.223
+Aperture Diameter	60.292	60.292
+[lens data]
+1	443.373	14.500	1.49782	160.70	82.3
+2	-745.663	0.500		160.70	
+3	235.410	21.000	1.49782	154.86	82.3
+4	-599.816	6.850		154.86	
+5	-527.848	6.000	1.74950	151.54	35.2
+6	473.787	1.700		151.54	
+7	176.900	15.000	1.49782	143.20	82.3
+8	558.189	d8		143.20	
+9	749.672	8.000	1.79504	77.78	28.6
+10	-189.496	3.650	1.51454	76.12	54.6
+11	125.271	12.000		67.78	
+12	-148.765	4.800	1.46450	66.12	65.8
+13	97.985	d13AS		66.12	
+13AS	AS	1.000		60.292
+14	-1754.216	1.500	1.68893	65.70	31.1
+15	110.000	7.750	1.69350	65.70	53.8
+16	-317.940	2.000		65.70	
+17	169.454	2.400	1.69895	64.44	30.1
+18	113.525	8.000	1.69680	62.78	55.6
+19	-254.060	Bf		62.78	
+[figure]
+source	Data/US004732459_Figure04.png
+originX	21
+originY	450
+ppmm	3.838
+[figure]
+source	Data/US004732459_Figure04P.png
+originX	31
+originY	74.5
+ppmm	0.7828
+[notes]
+Bill: d0 at CLD computed.

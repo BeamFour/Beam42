@@ -1,0 +1,33 @@
+[descriptive data]
+title	US 3,868,174 Example 1 (Canon FD300mm f2.8 SSC Fluorite)
+[constants]
+[variable distances]
+Focal Length	300
+Angle of View	8.24
+F-Number	2.8
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf	71.19
+[lens data]
+1	121.7580	22.4934	1.43387	107.20	95.1
+2	-192.7860	15.1896		107.20
+3	-144.6156	5.3787	1.78590	95.81	44.2
+4	808.3908	10.4040		95.81
+5	114.2982	16.7088	1.48749	95.21	70.1
+6	-524.3616	93.3017		95.21
+6AS	AS	30.10		42.188
+7	-47.8584	2.0808	1.51633	27.18	64.1
+8	-189.3528	3.7452	1.72151	27.18	29.2
+9	-104.4663	Bf		27.18
+[figure]
+source	Data/US003868174_Figure01.png
+originX	119.04
+originY	478.21
+ppmm	5.920
+[figure]
+source	Data/US003868174_Figure01P.png
+originX	73.83
+originY	284.43
+ppmm	3.752
+[notes]

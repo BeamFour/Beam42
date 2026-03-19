@@ -31,3 +31,12 @@ originX	73.83
 originY	284.43
 ppmm	3.752
 [notes]
+[patent info]
+country	US
+number	US3868174
+example	1
+year applied	1972
+inventors	Hideo Yakota
+current assignee	Canon Inc
+original assignee	Canon Inc
+link	https://patents.google.com/patent/US3868174A/en

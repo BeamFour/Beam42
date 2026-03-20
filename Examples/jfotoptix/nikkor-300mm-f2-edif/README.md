@@ -1,3 +1,7 @@
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US4732459 | 4 | 1983 | Kiyoshi Hayashi | Nikon Corp | [link](https://patents.google.com/patent/US4732459A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

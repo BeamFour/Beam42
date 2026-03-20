@@ -47,3 +47,12 @@ originY	74.5
 ppmm	0.7828
 [notes]
 Bill: d0 at CLD computed.
+[patent info]
+country	US
+number	US4732459
+example	4
+year applied	1983
+inventors	Kiyoshi Hayashi
+current assignee	Nikon Corp
+original assignee	Nikon Corp
+link	https://patents.google.com/patent/US4732459A/en

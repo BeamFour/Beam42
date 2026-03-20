@@ -41,6 +41,7 @@ originX	53.30
 originY	89.99
 ppmm	1.318
 [notes]
+[patent info]
 country	US
 number	US4348084
 example	4

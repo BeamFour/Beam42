@@ -10,7 +10,7 @@ Image Height	43.2
 Total Length	269.682
 Magnification	0
 d0	Infinity
-Bf	115.785
+Bf	115.811
 [lens data]
 1	128.457	18.369	1.49700	107.25	81.6	FPL51
 2	-495.336	0.510		107.25

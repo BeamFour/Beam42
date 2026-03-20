@@ -1,0 +1,43 @@
+[descriptive data]
+title	JP 1981-159613 Example 1 (Canon New FD300mm f2.8L)
+[constants]
+Scaled	300	100
+[variable distances]
+Focal Length	300.00
+Angle of View	8.24
+F-Number	2.8
+Image Height	43.2
+Total Length	269.682
+Magnification	0
+d0	Infinity
+Bf	115.785
+[lens data]
+1	128.457	18.369	1.49700	107.25	81.6
+2	-495.336	0.510		107.25
+3	107.397	17.349	1.43387	97.44	95.1
+4	-489.807	2.940		97.44
+5	-358.803	5.100	1.72047	92.31	34.6
+6	269.067	32.745		92.31
+7	47.634	6.123	1.58913	62.22	61.1
+8	41.397	14.386		56.67
+8AS	AS	2.210		53.091
+9	-215.490	6.123	1.80518	53.04	25.4
+10	-74.019	2.550	1.61340	53.04	43.8
+11	86.451	34.764		53.04	
+12	181.689	2.550	1.69680	44.12	55.5
+13	59.304	8.163	1.61800	44.12	63.4
+14	-272.862	Bf		44.12	
+[group data]
+I-III	1	11	693.09
+III	9	11	-120.33
+[figure]
+source	Data/JP1981-159613_Figure01.png
+originX	92.28
+originY	533.74
+ppmm	6.398
+[figure]
+source	Data/JP1981-159613_Figure01P.png
+originX	53.30
+originY	89.99
+ppmm	1.318
+[notes]

@@ -15,16 +15,16 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 10 | -9945.0 | 6.6 | 51.1 | 1.80384 | 33.89 | Hikari | E-LAFH2 |
 | 11 | -80.453 | 2.3 | 50.3 | 1.58913 | 61.22 | Hikari | J-SK5 |
 | 12 | 119.561 | 5.1 | 50.3 |  |  |  |
-| 13 | -172.119 | 2.3 | 43.64 | 1.671 | 57.28 | SUMITA | LAKN4 |
+| 13 | -172.119 | 2.3 | 43.64 | 1.67 | 57.31 | Hoya | LACL7 |
 | 14 | 65.626 | 15.8406 | 43.64 |  |  |  |
 | 15 | 153.713 | 7.6 | 42.58 | 1.49782 | 82.57 | Hikari | J-FKH1 |
 | 16 | -70.534 | 2.5 | 42.58 |  |  |  |
-| 17 | -54.182 | 2.3 | 43.1 | 1.80458 | 25.5 |  |
+| 17 | -54.182 | 2.3 | 43.1 | 1.80518 | 25.45 | Hikari | J-SF6 |
 | 18 | -174.411 | 9.4 | 43.1 |  |  |  |
 | 19 | -280.977 | 5.4 | 43.64 | 1.74 | 28.2 | Schott | SF3 |
 | 20 | -67.273 | 14.0 | 43.64 |  |  |  |
 | 21 | AS | 62.18 | 34.781 |  |  |  |
-| 22 | FS | 37.43 | 34.96 |  |  |  |
+| 22 | FS | 37.2337 | 34.96 |  |  |  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -37,42 +37,42 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
-| effective_focal_length |294.345
-| back_focal_length | 37.47
-| optical_invariant | 3.665
+| effective_focal_length |294.047
+| back_focal_length | 37.272
+| optical_invariant | 3.669
 | object_distance | 1.0E10
-| image_distance | 37.47
+| image_distance | 37.272
 | power | 0.003
-| pp1_H | -0.635
-| ppk_H' | -256.874
-| ffl_F | -294.979
-| fno | 2.906
-| enp_dist_P | 574.45
-| enp_radius | 50.639
-| exp_dist_P' | -62.14
-| exp_radius | 17.144
+| pp1_H | -0.52
+| ppk_H' | -256.775
+| ffl_F | -294.566
+| fno | 2.901
+| enp_dist_P | 574.831
+| enp_radius | 50.687
+| exp_dist_P' | -62.142
+| exp_radius | 17.143
 | m | -0
-| red | -3.397378914249555E7
+| red | -3.400821123267761E7
 | n_obj | 1
 | n_img | 1
-| img_ht | 21.305
+| img_ht | 21.284
 | obj_ang | 4.14
 | obj_na | 0
 | img_na | -0.17|
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 6.627 | 19.525|
- | Field(x=0.0, y=0.1) | 6.348 | 27.176|
- | Field(x=0.0, y=0.2) | 6.798 | 30.214|
- | Field(x=0.0, y=0.3) | 7.037 | 30.98|
- | Field(x=0.0, y=0.4) | 6.94 | 30.636|
- | Field(x=0.0, y=0.5) | 6.905 | 29.402|
- | Field(x=0.0, y=0.6) | 6.908 | 27.225|
- | Field(x=0.0, y=0.7) | 7.166 | 27.762|
- | Field(x=0.0, y=0.8) | 7.196 | 26.398|
- | Field(x=0.0, y=0.9) | 7.737 | 24.618|
- | Field(x=0.0, y=1.0) | 8.35 | 21.783|
+ | Field(x=0.0, y=0.0) | 5.509 | 16.065|
+ | Field(x=0.0, y=0.1) | 5.402 | 23.73|
+ | Field(x=0.0, y=0.2) | 6.009 | 26.938|
+ | Field(x=0.0, y=0.3) | 6.383 | 27.904|
+ | Field(x=0.0, y=0.4) | 6.399 | 27.632|
+ | Field(x=0.0, y=0.5) | 6.47 | 26.648|
+ | Field(x=0.0, y=0.6) | 6.583 | 24.318|
+ | Field(x=0.0, y=0.7) | 6.953 | 25.066|
+ | Field(x=0.0, y=0.8) | 7.092 | 24.107|
+ | Field(x=0.0, y=0.9) | 7.742 | 22.563|
+ | Field(x=0.0, y=1.0) | 8.409 | 20.314|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm

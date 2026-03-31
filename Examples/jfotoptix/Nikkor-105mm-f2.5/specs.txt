@@ -1,0 +1,23 @@
+[descriptive data]
+lens name	Nikkor 105mm f2.5
+[constants]
+[variable distances]
+Focal Length	105
+Angle of View	23.2
+F-Number	2.5
+Image Height	43.2
+Magnification	0
+Bf	44.0
+[lens data]
+1	58.0	8.2	1.6968	57	55.53	S-LAL14
+2	247.78	0.3		50.0
+3	35.27	22.47	1.51633	50.0	64.14	S-BSL7
+4	-772.2	2.25	1.68893	50.0	31.08	PBM28
+5	22.15	6.5		23.4
+6	AS	21.27		22.3792301464
+8	-27.7436835537	5.84	1.72151	26.0	29.24	PBH18
+9	-44.2	0.05		36.0
+10	169.92	7.32	1.804	40.0	46.58	S-LAH65V
+11	-58.0	Bf		40.0
+[notes]
+Source https://www.dpreview.com/forums/threads/patents-related-to-photo-lenses-part-9.4789196/post-68190920

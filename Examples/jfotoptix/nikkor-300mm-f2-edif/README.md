@@ -1,3 +1,4 @@
+# Ai Nikkor ED-IF 300mm F2 (re-optimized HBO vol 1)
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
@@ -7,26 +8,26 @@ Note that where glass types are shown the refractive index and abbe number is as
 
 | ID  | Radius | Thickness | Diameter | nd  | vd  | Glass Make | Glass |
 | --- | ---    | ---       | ---      | --- | --- | ---        | ---   |
-| 1 | 443.373 | 14.5 | 160.7 | 1.49782 | 82.57 | Hikari | J-FKH1 |
-| 2 | -745.663 | 0.5 | 160.7 |  |  |  |
-| 3 | 235.41 | 21.0 | 154.86 | 1.49782 | 82.57 | Hikari | J-FKH1 |
-| 4 | -599.816 | 6.85 | 154.86 |  |  |  |
-| 5 | -527.848 | 6.0 | 151.54 | 1.7495 | 35.25 | Hikari | J-LAF7 |
-| 6 | 473.787 | 1.7 | 151.54 |  |  |  |
-| 7 | 176.9 | 15.0 | 143.2 | 1.49782 | 82.57 | Hikari | J-FKH1 |
-| 8 | 558.189 | 102.701 | 143.2 |  |  |  |
-| 9 | 749.672 | 8.0 | 77.78 | 1.79504 | 28.69 | Hikari | J-LAFH3 |
-| 10 | -189.496 | 3.65 | 76.12 | 1.51454 | 54.7 | Schott | KF3 |
-| 11 | 125.271 | 12.0 | 67.78 |  |  |  |
-| 12 | -148.765 | 4.8 | 66.12 | 1.4645 | 65.77 | Schott | FK3 |
-| 13 | 97.985 | 27.388 | 66.12 |  |  |  |
-| 14 | AS | 1.0 | 60.292 |  |  |  |
-| 15 | -1754.216 | 1.5 | 65.7 | 1.68893 | 31.16 | Hikari | J-SF8 |
-| 16 | 110.0 | 7.75 | 65.7 | 1.6935 | 53.2 | Hikari | J-LAK13 |
-| 17 | -317.94 | 2.0 | 65.7 |  |  |  |
-| 18 | 169.454 | 2.4 | 64.44 | 1.69895 | 30.13 | Hikari | J-SF15 |
-| 19 | 113.525 | 8.0 | 62.78 | 1.6968 | 55.52 | Hikari | J-LAK14 |
-| 20 | -254.06 | 112.10174 | 62.78 |  |  |  |
+| 1 | 347.3147 | 14.5 | 144.36 | 1.48656 | 84.47 | Schott | FK51 |
+| 2 | -676.9427 | 0.5 | 143.96 |  |  |  |
+| 3 | 211.6868 | 21.0 | 138.88 | 1.48656 | 84.47 | Schott | FK51 |
+| 4 | -617.2755 | 6.85 | 138.48 |  |  |  |
+| 5 | -507.9452 | 6.0 | 131.3 | 1.7495 | 35.04 | Hoya | LAF7 |
+| 6 | 424.9446 | 1.7 | 126.6 |  |  |  |
+| 7 | 155.4412 | 15.0 | 123.47 | 1.48656 | 84.47 | Schott | FK51 |
+| 8 | 471.3897 | 98.22286 | 120.47 |  |  |  |
+| 9 | 1138.076 | 8.0 | 62.21 | 1.79504 | 28.39 | Schott | LAF9 |
+| 10 | -152.3715 | 3.65 | 60.59 | 1.51454 | 54.63 | Hoya | CF3 |
+| 11 | 87.7789 | 12.0 | 54.89 |  |  |  |
+| 12 | -143.0608 | 4.8 | 52.6 | 1.4645 | 65.77 | Schott | FK3 |
+| 13 | 86.2639 | 14.26022 | 50.71 |  |  |  |
+| 14 | AS | 2.0 | 60.292 |  |  |  |
+| 15 | 2181.6631 | 1.5 | 51.13 | 1.68893 | 31.16 | Hoya | FD8 |
+| 16 | 89.0852 | 7.75 | 51.18 | 1.6935 | 53.34 | Hoya | LAC13 |
+| 17 | -313.2137 | 2.0 | 51.2 |  |  |  |
+| 18 | 129.3435 | 2.4 | 50.63 | 1.69894 | 30.05 | Hoya | FD15 |
+| 19 | 100.0 | 8.0 | 50.22 | 1.6968 | 55.46 | Hoya | LAC14 |
+| 20 | -312.7342 | 96.67715 | 50.01 |  |  |  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -39,42 +40,42 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
-| effective_focal_length |300.001
-| back_focal_length | 112.222
-| optical_invariant | 5.356
+| effective_focal_length |296.016
+| back_focal_length | 96.717
+| optical_invariant | 6.028
 | object_distance | 1.0E10
-| image_distance | 112.222
+| image_distance | 96.717
 | power | 0.003
-| pp1_H | 220.349
-| ppk_H' | -187.778
-| ffl_F | -79.652
-| fno | 2
-| enp_dist_P | 624.243
-| enp_radius | 75.001
-| exp_dist_P' | -15.518
-| exp_radius | 31.965
+| pp1_H | 147.018
+| ppk_H' | -199.299
+| ffl_F | -148.998
+| fno | 1.754
+| enp_dist_P | 622.574
+| enp_radius | 84.404
+| exp_dist_P' | -16.81
+| exp_radius | 32.382
 | m | -0
-| red | -3.3333258442158017E7
+| red | -3.378197323496399E7
 | n_obj | 1
 | n_img | 1
-| img_ht | 21.425
+| img_ht | 21.141
 | obj_ang | 4.085
 | obj_na | 0
-| img_na | -0.243|
+| img_na | -0.274|
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 15.491 | 40.119|
- | Field(x=0.0, y=0.1) | 15.874 | 48.206|
- | Field(x=0.0, y=0.2) | 16.107 | 51.373|
- | Field(x=0.0, y=0.3) | 14.543 | 49.922|
- | Field(x=0.0, y=0.4) | 13.186 | 48.114|
- | Field(x=0.0, y=0.5) | 12.076 | 42.358|
- | Field(x=0.0, y=0.6) | 11.347 | 39.568|
- | Field(x=0.0, y=0.7) | 11.273 | 34.188|
- | Field(x=0.0, y=0.8) | 12.089 | 25.548|
- | Field(x=0.0, y=0.9) | 13.767 | 29.608|
- | Field(x=0.0, y=1.0) | 16.052 | 35.952|
+ | Field(x=0.0, y=0.0) | 13.83 | 33.296|
+ | Field(x=0.0, y=0.1) | 13.963 | 35.156|
+ | Field(x=0.0, y=0.2) | 13.934 | 35.169|
+ | Field(x=0.0, y=0.3) | 13.589 | 34.902|
+ | Field(x=0.0, y=0.4) | 13.134 | 34.461|
+ | Field(x=0.0, y=0.5) | 12.613 | 33.889|
+ | Field(x=0.0, y=0.6) | 12.126 | 33.199|
+ | Field(x=0.0, y=0.7) | 11.666 | 32.368|
+ | Field(x=0.0, y=0.8) | 11.291 | 31.378|
+ | Field(x=0.0, y=0.9) | 11.06 | 30.158|
+ | Field(x=0.0, y=1.0) | 10.916 | 28.636|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm
@@ -87,6 +88,6 @@ Note that where glass types are shown the refractive index and abbe number is as
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
-* [Zemax file](./US004732459_Example04P.zmx)
+* [Zemax file](./US004732459_Example04A.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-03-20
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-04-01

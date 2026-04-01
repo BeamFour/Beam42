@@ -21,11 +21,11 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 11 | 87.7789 | 12.0 | 54.89 |  |  |  |
 | 12 | -143.0608 | 4.8 | 52.6 | 1.4645 | 65.77 | Schott | FK3 |
 | 13 | 86.2639 | 14.26022 | 50.71 |  |  |  |
-| 14 | AS | 2.0 | 60.292 |  |  |  |
+| 14 | AS | 2.0 | 51.06 |  |  |  |
 | 15 | 2181.6631 | 1.5 | 51.13 | 1.68893 | 31.16 | Hoya | FD8 |
 | 16 | 89.0852 | 7.75 | 51.18 | 1.6935 | 53.34 | Hoya | LAC13 |
 | 17 | -313.2137 | 2.0 | 51.2 |  |  |  |
-| 18 | 129.3435 | 2.4 | 50.63 | 1.69894 | 30.05 | Hoya | FD15 |
+| 18 | 129.3435 | 2.4 | 50.65 | 1.69894 | 30.05 | Hoya | FD15 |
 | 19 | 100.0 | 8.0 | 50.22 | 1.6968 | 55.46 | Hoya | LAC14 |
 | 20 | -312.7342 | 96.67715 | 50.01 |  |  |  |
 ## Layouts
@@ -42,18 +42,18 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ---       | ---   |
 | effective_focal_length |296.016
 | back_focal_length | 96.717
-| optical_invariant | 6.028
+| optical_invariant | 5.154
 | object_distance | 1.0E10
 | image_distance | 96.717
 | power | 0.003
 | pp1_H | 147.018
 | ppk_H' | -199.299
 | ffl_F | -148.998
-| fno | 1.754
+| fno | 2.051
 | enp_dist_P | 622.574
-| enp_radius | 84.404
+| enp_radius | 72.166
 | exp_dist_P' | -16.81
-| exp_radius | 32.382
+| exp_radius | 27.687
 | m | -0
 | red | -3.378197323496399E7
 | n_obj | 1
@@ -61,14 +61,14 @@ Note that where glass types are shown the refractive index and abbe number is as
 | img_ht | 21.141
 | obj_ang | 4.085
 | obj_na | 0
-| img_na | -0.274|
+| img_na | -0.237|
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 13.83 | 33.296|
- | Field(x=0.0, y=0.1) | 13.963 | 35.156|
- | Field(x=0.0, y=0.2) | 13.934 | 35.169|
- | Field(x=0.0, y=0.3) | 13.589 | 34.902|
+ | Field(x=0.0, y=0.0) | 13.83 | 33.298|
+ | Field(x=0.0, y=0.1) | 14.04 | 35.191|
+ | Field(x=0.0, y=0.2) | 13.936 | 35.173|
+ | Field(x=0.0, y=0.3) | 13.591 | 34.904|
  | Field(x=0.0, y=0.4) | 13.134 | 34.461|
  | Field(x=0.0, y=0.5) | 12.613 | 33.889|
  | Field(x=0.0, y=0.6) | 12.126 | 33.199|

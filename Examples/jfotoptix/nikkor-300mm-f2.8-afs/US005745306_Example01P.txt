@@ -56,3 +56,14 @@ originX	14.64
 originY	71.69
 ppmm	1.127
 [notes]
+[patent info]
+country	US
+number	US5745306
+example	1
+year applied	1995
+inventors	Susumu Sato
+current assignee	Nikon Corp
+original assignee	Nikon Corp
+link	https://patents.google.com/patent/US5745306A/en
+[report data]
+lens name	AF-S Nikkor 300mm f/2.8D IF-ED

@@ -1,3 +1,8 @@
+# AF-S Nikkor 300mm f/2.8D IF-ED
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US5745306 | 1 | 1995 | Susumu Sato | Nikon Corp | [link](https://patents.google.com/patent/US5745306A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

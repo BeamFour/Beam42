@@ -1,0 +1,39 @@
+[descriptive data]
+title	US 5,388,006 Example FR1F01 (Leica APO-Telyt-R 280mm F2.8)
+[constants]
+[variable distances]
+Focal Length	279.2543
+Angle of View	undefined
+F-Number	2.8
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf	69.29
+[lens data]
+1	145.575	17.50	1.48747	110.44	81.41
+2	-253.984	22.34		110.44
+3	-171.552	7.00	1.61669	97.66	44.07
+4	342.012	1.40		92.61
+5	145.575	8.00	1.48747	92.33	81.41
+6	622.693	104.00		92.33
+7	73.518	12.75	1.55413	55.64	66.66
+8	-73.518	4.00	1.69030	55.64	42.62
+9	-831.400	5.00		52.63
+10	201.034	4.00	1.61669	48.13	44.07
+11	70.365	10.40		44.18
+12	-154.315	5.80	1.79180	38.79	25.87
+13	-72.386	7.20		42.65
+14	AS	9.55		31.487
+15	-49.563	4.00	1.65391	26.45	55.62
+16	-181.867	Bf		32.45
+[figure]
+source	Data/US005388006_Figure01a.png
+originX	131.55
+originY	418.25
+ppmm	5.311
+[figure]
+source	Data/US005388006_Figure01aP.png
+originX	26.73
+originY	106.97
+ppmm	1.779
+[notes]

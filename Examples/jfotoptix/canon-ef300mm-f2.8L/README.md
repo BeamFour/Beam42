@@ -19,7 +19,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 14 | 166.488 | 2.5 | 44.78 | 1.713 | 53.85 | Ohara | LAL8 |
 | 15 | 56.556 | 8.0 | 44.78 | 1.618 | 63.39 | Ohara | PHM52 |
 | 16 | -276.571 | 3.0 | 44.78 |  |  |  |
-| 17 | AS | 112.23 | 39.273 |  |  |  |
+| 17 | AS | 112.22 | 39.273 |  |  |  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -44,7 +44,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | fno | 2.901
 | enp_dist_P | 437.324
 | enp_radius | 50.589
-| exp_dist_P' | -0.008
+| exp_dist_P' | 0.002
 | exp_radius | 19.345
 | m | -0
 | red | -3.40747647080962E7
@@ -57,17 +57,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 7.321 | 26.389|
- | Field(x=0.0, y=0.1) | 5.997 | 27.572|
- | Field(x=0.0, y=0.2) | 5.638 | 26.567|
- | Field(x=0.0, y=0.3) | 5.543 | 25.66|
- | Field(x=0.0, y=0.4) | 5.519 | 24.991|
- | Field(x=0.0, y=0.5) | 5.383 | 25.344|
- | Field(x=0.0, y=0.6) | 5.533 | 24.427|
- | Field(x=0.0, y=0.7) | 6.064 | 23.856|
- | Field(x=0.0, y=0.8) | 7.095 | 23.197|
- | Field(x=0.0, y=0.9) | 8.658 | 27.785|
- | Field(x=0.0, y=1.0) | 10.859 | 33.603|
+ | Field(x=0.0, y=0.0) | 6.84 | 24.637|
+ | Field(x=0.0, y=0.1) | 5.646 | 25.832|
+ | Field(x=0.0, y=0.2) | 5.355 | 24.817|
+ | Field(x=0.0, y=0.3) | 5.313 | 23.926|
+ | Field(x=0.0, y=0.4) | 5.323 | 23.369|
+ | Field(x=0.0, y=0.5) | 5.228 | 23.728|
+ | Field(x=0.0, y=0.6) | 5.357 | 22.834|
+ | Field(x=0.0, y=0.7) | 5.816 | 22.301|
+ | Field(x=0.0, y=0.8) | 6.745 | 22.017|
+ | Field(x=0.0, y=0.9) | 8.209 | 26.695|
+ | Field(x=0.0, y=1.0) | 10.342 | 32.602|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm
@@ -82,4 +82,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./US006288845_Example01P.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-04-04
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-04-05

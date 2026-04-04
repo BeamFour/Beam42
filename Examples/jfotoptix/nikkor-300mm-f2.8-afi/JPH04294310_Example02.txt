@@ -1,0 +1,65 @@
+[descriptive data]
+title	JPH04294310A Example 2 (Nikon AF-I Nikkor 300mm f/2.8D ED-IF)
+[constants]
+[variable distances]
+Focal Length	294.0	undefined
+Angle of View	8.28	undefined
+F-Number	2.9	undefined
+Image Height	43.20	43.20
+Total Length	undefined	undefined
+Magnification	0	-0.1418
+d0	Infinity	2229.1145
+d6	33.5998	33.5998
+d9	5.0165	15.9030
+d14	15.8316	4.9451
+Bf	114.9362	114.9363
+BfAS	100.1141	100.1141
+BfFS	38.7562	38.7563
+[lens data]
+1	117.164	14.40	1.49782	105.78	82.6	J-FKH1
+2	13032.974	1.8		101.50
+3	116.641	16.80	1.49782	100.44	82.6	J-FKH1
+4	-416.673	4.10		100.44
+5	-336.065	4.70	1.74950	93.78	35.2	J-LAF7
+6	424.016	d6		93.78
+7	83.576	3.50	1.69680	67.10	55.6	J-LAK14
+8	39.318	13.9	1.48749	57.78	70.4	J-FK5
+9	184.818	d9		57.78
+10	-9945.000	6.60	1.80384	51.10	33.9	E-LAFH2
+11	-79.352	2.30	1.56384	50.30	60.7	J-SK11
+12	101.693	4.6		50.30
+13	-144.133	2.30	1.65160	43.64	58.5	J-LAK7
+14	69.797	d14		43.64
+15	153.126	7.60	1.51860	42.58	69.9	J-PKH1
+16	-63.142	2.50		42.58
+17	-50.501	2.30	1.80518	43.10	25.4	J-SF6
+18	-260.388	8.7		43.10
+19	-512.873	5.40	1.74077	43.64	27.6	J-SF13
+20	-67.461	14.00		43.64
+20AS	AS	62.18		34.781
+20FS	FS	BfFS		34.96
+[group data]
+G1	1	9	150.216
+[figure]	
+source	Data/US005323270_Figure08.png
+originX	22
+originY	477
+ppmm	4.619
+[figure]	
+source	Data/US005323270_Figure08P.png
+originX	90.65
+originY	259.60
+ppmm	3.740
+[notes]
+Bill: Move AS slighly to match production lens. Also added FS to restrict as per the production figure.
+[patent info]
+country	JP
+number	JPH04294310A
+example	8
+year applied	1991
+inventors	Susumu Sato
+current assignee	Nikon Corp
+original assignee	Nippon Kogaku KK
+link	https://worldwide.espacenet.com/patent/search?q=pn%3DJPH04294310A
+[report data]
+lens name	AF-I Nikkor 300mm f/2.8D ED-IF

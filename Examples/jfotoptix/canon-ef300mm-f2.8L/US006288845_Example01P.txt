@@ -1,0 +1,44 @@
+[descriptive data]
+title	US 6,288,845 B1 Example 1 (Canon EF300mm f2.8L USM)
+[constants]
+[variable distances]
+Focal Length	293.44373	undefined
+Angle of View	8.4	undefined
+F-Number	2.9	undefined
+Image Height	43.2	43.2
+Magnification	0	-0.11316
+d0	Infinity	2715.39
+d10	17.08	32.08
+d13	33.20	18.20
+Bf(p)	undefined	undefined
+Bf	112.20	112.20
+[lens data]
+1	3000.000	6.00	1.51633	105.29	64.2
+2	3000.000	1.00		105.29
+3	131.223	15.50	1.43387	103.54	95.1
+4	-456.958	0.69		103.54
+5	109.758	18.23	1.49700	98.30	81.6
+6	-503.471	3.45		98.30
+7	-366.505	5.55	1.72047	92.88	34.7
+8	272.539	31.30		82.38	
+9	46.737	6.10	1.58913	64.38	61.2
+10	41.176	d10		55.92	
+11	-209.801	6.00	1.80518	54.20	25.4
+12	-72.597	2.50	1.61340	54.20	43.8
+13	84.880	d13		46.77	
+14	166.488	2.50	1.71300	44.78	53.9
+15	56.556	8.00	1.61800	44.78	63.4
+16	-276.571	3.00		44.78
+16AS	AS	Bf		39.273
+[figure]
+source	Data/US006288845_Figure01.png
+originX	63.07
+originY	507.89
+ppmm	6.538
+[figure]
+source	Data/US006288845_Figure01P.png
+originX	250.33
+originY	319.69
+ppmm	4.008
+[notes]
+Bill: Added close focus scenario based on the engineering drawing.

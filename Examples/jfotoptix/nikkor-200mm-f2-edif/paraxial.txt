@@ -2,10 +2,10 @@ efl               200.0
 f                 200.0
 f'                200.0
 ffl              -116.5
-pp1               83.54
+pp1               83.53
 bfl               64.19
 ppk              -135.8
-pp sep           -37.96
+pp sep           -37.95
 f/#               2.195
 m            -2.000e-08
 red          -5.000e+07
@@ -17,7 +17,7 @@ na obj        4.556e-09
 n obj             1.000
 img_dist          64.19
 img_ht            21.59
-exp_dist         -18.56
+exp_dist         -18.55
 exp_radius        18.86
 na img          -0.2221
 n img             1.000

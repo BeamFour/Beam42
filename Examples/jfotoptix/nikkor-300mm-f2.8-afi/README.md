@@ -1,3 +1,8 @@
+# AF-I Nikkor 300mm f/2.8D ED-IF
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US 5323270 | 8 | 1991 | Susumu Sato | Nippon Kogaku KK | [link](https://patents.google.com/patent/US5323270A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -87,4 +92,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./US005323270_Example08P.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-03-20
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-04-04

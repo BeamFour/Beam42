@@ -52,3 +52,14 @@ originY	259.60
 ppmm	3.740
 [notes]
 Bill: Move AS slighly to match production lens. Also added FS to restrict as per the production figure.
+[patent info]
+country	US
+number	US 5323270
+example	8
+year applied	1991
+inventors	Susumu Sato
+current assignee	Nikon Corp
+original assignee	Nippon Kogaku KK
+link	https://patents.google.com/patent/US5323270A/en
+[report data]
+lens name	AF-I Nikkor 300mm f/2.8D ED-IF

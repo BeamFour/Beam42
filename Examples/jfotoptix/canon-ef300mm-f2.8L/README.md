@@ -1,3 +1,8 @@
+# Canon EF300mm f2.8L USM
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US6288845 | 1 | 1998 | Akira Harada | CANON KABUSHIKI KAISHA | [link](https://patents.google.com/patent/US6288845B1/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -82,4 +87,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./US006288845_Example01P.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-04-05
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-04-06

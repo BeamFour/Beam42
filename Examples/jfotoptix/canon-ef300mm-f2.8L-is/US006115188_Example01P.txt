@@ -10,7 +10,7 @@ Total Length	undefined
 Magnification	0
 d0	Infinity
 Bf(p)	undefined
-Bf	59.32
+Bf	59.29
 [lens data]
 1	130.154	16.56	1.496999	102.9	81.5	S-FPL51
 2	-352.589	14.11		102.9	

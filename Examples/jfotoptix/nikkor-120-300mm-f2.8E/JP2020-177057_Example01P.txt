@@ -67,3 +67,7 @@ originX	20.4
 originY	165.47					
 ppmm	2.105					
 [notes]						
+[report data]
+lens name	AF-S Nikkor 120-300mm f/2.8E FL ED SR VR
+scenarios	0	2
+names	120mm f2.8	300mm f2.8

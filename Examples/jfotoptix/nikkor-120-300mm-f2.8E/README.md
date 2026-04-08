@@ -183,4 +183,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./JP2020-177057_Example01P.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-04-06
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-04-08

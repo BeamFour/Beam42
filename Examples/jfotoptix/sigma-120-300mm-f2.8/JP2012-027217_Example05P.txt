@@ -68,7 +68,16 @@ originY	119.43
 ppmm	1.971
 [notes]
 Bill: Patent supplies diameters including AD.
+[patent info]
+country	JP
+number	JP2012-027217
+example	5
+year applied	2010
+inventors	Tomoki Kono
+current assignee	SIGMA CORP
+original assignee	SIGMA CORP
+link	https://patents.google.com/patent/JP2012027217A/en
 [report data]
-lens name	Sigma 120-300mm F2.8 DG OS HSM Sport
+lens name	APO 120–300mm F2.8 EX DG OS HSM
 scenarios	0	2
 names	120mm f2.8	300mm f2.8

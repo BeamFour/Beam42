@@ -1,4 +1,8 @@
-# Sigma 120-300mm F2.8 DG OS HSM Sport
+# APO 120–300mm F2.8 EX DG OS HSM
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|JP | JP2012-027217 | 5 | 2010 | Tomoki Kono | SIGMA CORP | [link](https://patents.google.com/patent/JP2012027217A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -178,4 +182,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./JP2012-027217_Example05P.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-04-08
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-04-10

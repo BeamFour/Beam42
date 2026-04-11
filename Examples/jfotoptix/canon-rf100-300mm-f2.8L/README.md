@@ -1,4 +1,8 @@
 # Canon RF100-300mm F2.8L IS USM
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US 2026/0009984 | 4 | 2022 | Masato Katayose | Canon Inc | [link](https://patents.google.com/patent/US20260009984A1/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -185,4 +189,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./US20260009984_Example04P.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-04-08
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-04-11

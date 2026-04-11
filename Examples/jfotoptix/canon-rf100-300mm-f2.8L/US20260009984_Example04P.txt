@@ -84,7 +84,16 @@ source	Data/US20260009984_Figure07P.png
 originX	39.51
 originY	72.51
 ppmm	0.979
-[notes]			
+[notes]
+[patent info]
+country	US
+number	US 2026/0009984
+example	4
+year applied	2022
+inventors	Masato Katayose
+current assignee	Canon Inc
+original assignee	Canon Inc
+link	https://patents.google.com/patent/US20260009984A1/en
 [report data]
 lens name	Canon RF100-300mm F2.8L IS USM
 scenarios	0	2

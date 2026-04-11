@@ -1,4 +1,8 @@
 # AF-S Nikkor 120-300mm f/2.8E FL ED SR VR
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|JP | JP2020-177057 | 1 | 2019 | Take Toshinori,Yamashita Masafumi | Nikon Corp | [link](https://patents.google.com/patent/JP2020177057A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -183,4 +187,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./JP2020-177057_Example01P.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-04-08
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-04-11

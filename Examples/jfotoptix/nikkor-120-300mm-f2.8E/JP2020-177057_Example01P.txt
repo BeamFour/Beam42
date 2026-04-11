@@ -66,7 +66,16 @@ source	Data/JP2020-177057_Figure01WP.png
 originX	20.4					
 originY	165.47					
 ppmm	2.105					
-[notes]						
+[notes]
+[patent info]
+country	JP
+number	JP2020-177057
+example	1
+year applied	2019
+inventors	Take Toshinori,Yamashita Masafumi
+current assignee	Nikon Corp
+original assignee	Nikon Corp
+link	https://patents.google.com/patent/JP2020177057A/en
 [report data]
 lens name	AF-S Nikkor 120-300mm f/2.8E FL ED SR VR
 scenarios	0	2

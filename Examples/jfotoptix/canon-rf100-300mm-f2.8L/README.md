@@ -27,7 +27,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 17 | 139.669 | 5.94 | 57.68 | 1.497 | 81.55 | Ohara | S-FPL51 |
 | 18 | -250.111 | 0.5 | 57.68 |  |  |  |
 | 19 | 79.286 | 9.55 | 53.42 | 1.497 | 81.55 | Ohara | S-FPL51 |
-| 20 | -110.681 | 1.8 | 53.42 | 1.7859 | 44.2 |  |
+| 20 | -110.681 | 1.8 | 53.42 | 1.7859 | 44.2 | Ohara | S-LAH51 |
 | 21 | 168.957 | 0.5 | 53.42 |  |  |  |
 | 22 | 67.931 | 6.88 | 53.42 | 1.497 | 81.55 | Ohara | S-FPL51 |
 | 23 | 8851.483 | 3.89 | 53.42 |  |  |  |
@@ -105,17 +105,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 6.047 | 14.679|
- | Field(x=0.0, y=0.1) | 5.839 | 18.642|
- | Field(x=0.0, y=0.2) | 6.003 | 22.68|
- | Field(x=0.0, y=0.3) | 6.949 | 25.932|
- | Field(x=0.0, y=0.4) | 6.905 | 26.332|
- | Field(x=0.0, y=0.5) | 6.823 | 26.238|
- | Field(x=0.0, y=0.6) | 6.404 | 27.32|
- | Field(x=0.0, y=0.7) | 6.52 | 29.104|
- | Field(x=0.0, y=0.8) | 7.273 | 31.262|
- | Field(x=0.0, y=0.9) | 8.47 | 35.121|
- | Field(x=0.0, y=1.0) | 9.43 | 37.289|
+ | Field(x=0.0, y=0.0) | 6.573 | 14.679|
+ | Field(x=0.0, y=0.1) | 6.416 | 18.642|
+ | Field(x=0.0, y=0.2) | 6.563 | 22.68|
+ | Field(x=0.0, y=0.3) | 7.471 | 25.932|
+ | Field(x=0.0, y=0.4) | 7.383 | 26.332|
+ | Field(x=0.0, y=0.5) | 7.259 | 26.238|
+ | Field(x=0.0, y=0.6) | 6.799 | 27.32|
+ | Field(x=0.0, y=0.7) | 6.823 | 29.104|
+ | Field(x=0.0, y=0.8) | 7.526 | 31.517|
+ | Field(x=0.0, y=0.9) | 8.723 | 36.039|
+ | Field(x=0.0, y=1.0) | 9.608 | 38.059|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf-0.svg)
 * 10,30,50 cycles/mm
@@ -164,17 +164,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 2.394 | 5.653|
- | Field(x=0.0, y=0.1) | 2.242 | 6.16|
- | Field(x=0.0, y=0.2) | 2.134 | 6.024|
- | Field(x=0.0, y=0.3) | 2.206 | 6.579|
- | Field(x=0.0, y=0.4) | 2.485 | 7.391|
- | Field(x=0.0, y=0.5) | 2.867 | 8.429|
- | Field(x=0.0, y=0.6) | 3.275 | 9.605|
- | Field(x=0.0, y=0.7) | 3.657 | 10.712|
- | Field(x=0.0, y=0.8) | 4.081 | 11.407|
- | Field(x=0.0, y=0.9) | 4.438 | 11.267|
- | Field(x=0.0, y=1.0) | 4.243 | 10.131|
+ | Field(x=0.0, y=0.0) | 1.66 | 4.28|
+ | Field(x=0.0, y=0.1) | 1.514 | 4.873|
+ | Field(x=0.0, y=0.2) | 1.516 | 4.663|
+ | Field(x=0.0, y=0.3) | 1.758 | 5.234|
+ | Field(x=0.0, y=0.4) | 2.19 | 6.071|
+ | Field(x=0.0, y=0.5) | 2.69 | 7.147|
+ | Field(x=0.0, y=0.6) | 3.176 | 8.375|
+ | Field(x=0.0, y=0.7) | 3.636 | 10.501|
+ | Field(x=0.0, y=0.8) | 4.147 | 12.587|
+ | Field(x=0.0, y=0.9) | 4.565 | 11.565|
+ | Field(x=0.0, y=1.0) | 4.352 | 9.086|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf-1.svg)
 * 10,30,50 cycles/mm

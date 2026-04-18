@@ -30,6 +30,7 @@ public class GlassMapGenerator {
             new Cat("Ohara", "glassdata/OHARA_240131.AGF"),
             new Cat("SUMITA", "glassdata/sumita-032026-include-discont-zemax.agf"),
             new Cat("CDGM", "glassdata/CDGM.AGF"),
+            new Cat("CORNING", "glassdata/CORNING.AGF")
     };
 
 //    public static GlassMap toGlassMap(AGFBase agf) {

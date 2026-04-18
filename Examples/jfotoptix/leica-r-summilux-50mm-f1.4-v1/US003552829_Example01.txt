@@ -15,19 +15,19 @@ Total Length	undefined
 Magnification	0
 d0	Infinity
 Bf(p)	undefined
-Bf	36.165
+Bf	36.412	36.415
 [lens data]
 1	56.6550	5.2400	1.81500	38.50	45.2	S-LAH59
 2	600.0000	0.5650		38.50	
-3	25.6800	6.5600	1.69400	33.50	54.6	N-LAK9
+3	25.6800	6.5600	1.69400	33.50	54.6	C90-55	N-LAK9
 4	51.8750	0.8000		28.716
-5	84.6000	2.2550	1.63003	34.00	35.4	J-F1
+5	84.6000	2.2550	1.63003	34.00	35.4	S-TIM1	J-F1
 6	17.2950	5.865		24.50	
 6AS	AS	5.565		24.100	
 7	-19.4750	2.8550	1.79180	24.00	25.9	SF56A
-8	246.0200	6.1850	1.80040	31.00	42.7	S-LAH52
+8	246.0200	6.1850	1.80040	31.00	42.7	D96-43	S-LAH52
 9	-35.9650	0.0950		31.00	
-10	-125.8950	4.0500	1.80040	31.50	42.7	S-LAH52
+10	-125.8950	4.0500	1.80040	31.50	42.7	D96-43	S-LAH52
 11	-37.6250	0.0950		31.50	
 12	198.1300	4.0500	1.71615	31.50	53.7	N-LAK8
 13	-63.0250	Bf		31.50	
@@ -43,3 +43,14 @@ originY	552.40
 ppmm	20.391
 [notes]
 Bill: s4 constrains F-Number. Angle in patent very rough; adjusted. Close to but not really Leica Summilux-R 50mm f/1.4 (I)
+[patent info]
+country	US
+number	US3552829
+example	EX 1
+year applied	1967
+inventors	Heinz Marquardt
+current assignee	Ernst Leitz Wetzlar GmbH
+original assignee	Ernst Leitz Wetzlar GmbH
+link	https://patents.google.com/patent/US3552829A/en
+[report data]
+lens name	Leitz / Leica Summilux-R 50mm f1.4 v1

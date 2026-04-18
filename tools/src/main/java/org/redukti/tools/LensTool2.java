@@ -397,6 +397,8 @@ public class LensTool2 {
             var prescription = createPrescription(specs,arguments.use_glass_types,arguments.only_d_line);
             String prescription_output = prescription.to_opt_bench_str(new StringBuilder()).toString();
             Helper.createOutputFile(Helper.getOutputPath(arguments.specfile, "prescription.txt", arguments.outdir), prescription_output);
+            ZemaxExporter zemaxExporter = new ZemaxExporter();
+            Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), zemaxExporter.generate(prescription, arguments.only_d_line));
             StringBuilder SB = startREADME(specs);
             for (int config = 0; config < Math.max(prescription.get_num_configurations(),1); config++) {
                 var scenario = prescription.get_num_configurations() > 0 ? prescription._configurations[config] : 0;
@@ -442,8 +444,6 @@ public class LensTool2 {
                 opm = createSystem(prescriptionForMTF, true, VigType.SetPupil, true, fields, config);
                 generateMTFs(opm, arguments, fields, prescriptionForMTF.get_wvl_wts(), "mtf-w", scenario_filesuffix);
             }
-            ZemaxExporter zemaxExporter = new ZemaxExporter();
-            Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), zemaxExporter.generate(prescription, arguments.only_d_line));
             createREADME(SB,
                     arguments.specfile,
                     Helper.getOutputPath(arguments.specfile, "README.md", arguments.outdir));

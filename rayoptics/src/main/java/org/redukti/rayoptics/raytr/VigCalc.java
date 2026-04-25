@@ -6,6 +6,7 @@ package org.redukti.rayoptics.raytr;
 import org.redukti.mathlib.ScalarObjectiveFunction;
 import org.redukti.mathlib.SecantSolver;
 import org.redukti.mathlib.Vector2;
+import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.exceptions.TraceException;
 import org.redukti.rayoptics.exceptions.TraceMissedSurfaceException;
 import org.redukti.rayoptics.exceptions.TraceRayBlockedException;
@@ -366,13 +367,20 @@ public class VigCalc {
                 ray_pkg = ray_error.ray_pkg;
                 Integer indx = ray_error.surf;
                 if (Objects.equals(indx,clip_indx)) {
-//                    var r_target = Lists.get(sm.ifcs,clip_indx).edge_pt_target(start_dir);
-//                    var p = Lists.get(ray_pkg.ray,clip_indx).p;
-//                    var r_ray = Math.copySign(Math.sqrt(p.x*p.x + p.y*p.y), r_target.v(xy));
-//                    var r_error = r_ray - r_target.v(xy);
-//                    logger.debug(f" A {xy_str[xy]} = {rel_p1[xy]:10.6f}:   "
-//                            f"blocked at {clip_indx}, del={r_error:8.1e}, "
-//                            "exiting")
+                    var r_target = Lists.get(sm.ifcs,clip_indx).edge_pt_target(start_dir);
+                    try {
+                        var p = Lists.get(ray_pkg.ray, clip_indx).p;
+                        var r_ray = Math.copySign(Math.sqrt(p.x*p.x + p.y*p.y), r_target.v(xy));
+                        var r_error = r_ray - r_target.v(xy);
+//                        logger.debug(f" A {xy_str[xy]} = {rel_p1[xy]:10.6f}:   "
+//                                f"blocked at {clip_indx}, del={r_error:8.1e}, "
+//                                "exiting")
+                    }
+                    catch (IndexOutOfBoundsException e) {
+//                        logger.debug(f" A' {xy_str[xy]} = {rel_p1[xy]:10.6f}:   "
+//                                f"blocked at {clip_indx}, "
+//                                "exiting")
+                    }
                     still_iterating = false;
                 }
                 else {

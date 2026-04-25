@@ -107,10 +107,14 @@ public class Spherical extends SurfaceProfile {
         double cx2 = cv * p.dot(p) - 2.0 * p.z;
         double b = cv * d.dot(p) - d.z;
         double s = 0.0;
-        double tmp = b * b - ax2 * cx2;
-        if (tmp < 0)
-            throw new TraceMissedSurfaceException();
-        s = cx2 / (z_dir.value * Math.sqrt(tmp) - b);
+        if ((b != 0) || (cx2 != 0) || (ax2 != 0)) {
+            double tmp = b * b - ax2 * cx2;
+            if (tmp < 0)
+                throw new TraceMissedSurfaceException();
+            s = cx2 / (z_dir.value * Math.sqrt(tmp) - b);
+        }
+        // else
+        // ax2 = cx2 = b = 0, i.e. ray is tangent to the sphere at p
         Vector3 p1 = p.add(d.times(s));
         return new IntersectionResult(s, p1);
     }

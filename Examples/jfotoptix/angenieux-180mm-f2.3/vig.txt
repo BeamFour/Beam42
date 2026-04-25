@@ -1,4 +1,4 @@
-Aperture: Image Fnum; value = 2.2999069224578905
+Aperture: Image Fnum; value = 2.299991657224427
 Field: Object Angle; value = 6.18
 y =  0.000 ( 0.00) vlx= 0.000 vux= 0.000 vly= 0.000 vuy= 0.000 z_enp: 137.87750861062733
 y =  0.100 ( 0.62) vlx=-0.000 vux=-0.000 vly= 0.025 vuy=-0.005 z_enp: 137.9124330270667

@@ -27,7 +27,7 @@ Bf	80.622	97.97
 9	-57.2148	7.992	1.8060	39.36	40.9	S-LAH53
 10	-24.6060	2.502	1.7720	39.08	49.7	N-LAF34
 11	-66.5946	d11		41.00	
-12	94.4082	2.502	1.7280	41.26	28.4	S-TIH10
+12	94.4082	2.502	1.7280	41.26	28.4	D28-28	S-TIH10
 13	51.0804	5.994	1.7720	41.26	49.7	N-LAF34
 14	-678.5694	Bf		41.26	
 [group data]
@@ -46,3 +46,14 @@ originY	245.48
 ppmm	3.746
 [notes]
 Bill: Measured d0.
+[patent info]
+country	US
+number	US4726669
+example	1
+year applied	1985
+inventors	Pierre Angenieux
+current assignee	Pierre Angenieux
+original assignee	Pierre Angenieux
+link	https://patents.google.com/patent/US4726669A/en
+[report data]
+lens name	Angenieux DEM 180mm F2.3 APO

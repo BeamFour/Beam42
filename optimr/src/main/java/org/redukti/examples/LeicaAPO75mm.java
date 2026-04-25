@@ -47,8 +47,8 @@ public class LeicaAPO75mm {
 
                         new GeoMTF(analysis,1,0,10,0.95,1.0),
                         new GeoMTF(analysis,1,1,10,0.95,1.0),
-                        new GeoMTF(analysis,2,0,10,0.91,1.0),
-                        new GeoMTF(analysis,2,1,10,0.91,1.0),
+                        new GeoMTF(analysis,2,0,10,0.91,1.1),
+                        new GeoMTF(analysis,2,1,10,0.91,1.1),
                         new GeoMTF(analysis,3,0,10,0.85,1.0),
                         new GeoMTF(analysis,3,1,10,0.85,1.0),
 //                        new GeoMTF(analysis,4,0,10,0.8,1.0),
@@ -56,8 +56,8 @@ public class LeicaAPO75mm {
                         // below are figures from patent
                         new GeoMTF(analysis,1,0,20,0.85,1.1),
                         new GeoMTF(analysis,1,1,20,0.85,1.1),
-                        new GeoMTF(analysis,2,0,20,0.80,1.0),
-                        new GeoMTF(analysis,2,1,20,0.80,1.0),
+                        new GeoMTF(analysis,2,0,20,0.80,1.1),
+                        new GeoMTF(analysis,2,1,20,0.80,1.1),
                         new GeoMTF(analysis,3,0,20,0.70, 1.0),
                         new GeoMTF(analysis,3,1,20,0.70,1.0),
 //                        new GeoMTF(analysis,4,0,20,0.6,1.0),
@@ -65,8 +65,8 @@ public class LeicaAPO75mm {
 
                         new GeoMTF(analysis,1,0,40,0.65,1.0),
                         new GeoMTF(analysis,1,1,40,0.65,1.0),
-                        new GeoMTF(analysis,2,0,40,0.64,1.0),
-                        new GeoMTF(analysis,2,1,40,0.64,1.0),
+                        new GeoMTF(analysis,2,0,40,0.64,1.1),
+                        new GeoMTF(analysis,2,1,40,0.64,1.1),
                         new GeoMTF(analysis,3,0,40,0.40,1.0),
                         new GeoMTF(analysis,3,1,40,0.40,1.0),
 //                        new GeoMTF(analysis,4,0,40,0.4,1.0),

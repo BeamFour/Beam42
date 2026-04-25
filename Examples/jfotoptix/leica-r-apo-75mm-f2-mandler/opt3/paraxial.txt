@@ -1,0 +1,24 @@
+efl               74.85
+f                 74.85
+f'                74.85
+ffl              -27.82
+pp1               47.03
+bfl               39.42
+ppk              -35.43
+pp sep           -24.06
+f/#               2.033
+m            -7.485e-09
+red          -1.336e+08
+obj_dist      1.000e+10
+obj_ang           16.00
+enp_dist          45.89
+enp_radius        18.41
+na obj        1.841e-09
+n obj             1.000
+img_dist          39.42
+img_ht            21.46
+exp_dist         -36.54
+exp_radius        18.69
+na img          -0.2388
+n img             1.000
+optical invariant        5.279

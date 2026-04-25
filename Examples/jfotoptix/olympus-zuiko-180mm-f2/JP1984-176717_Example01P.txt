@@ -1,0 +1,50 @@
+[descriptive data]
+title	JP 1984-176717 Example 1 (Olympus Zuiko Auto-T 180mm F2)
+[constants]
+Scaled	180	100
+[variable distances]
+Focal Length	180	undefined	undefined
+Angle of View	13.7	undefined	undefined
+F-Number	2	undefined	undefined
+Image Height	43.272	43.272	43.272
+Magnification	0	-0.03357	-0.10259
+S	Infinity	5490	1854
+d0	Infinity	5458.98	1850.66
+d8	17.586	21.654	30.114
+d10	8.244	8.622	10.152
+d13	39.708	35.64	25.632
+d13AS	30.708	26.64	16.632
+Bf(p)	undefined	undefined	undefined
+Bf	56.63	56.63	56.63
+[lens data]
+1	88.299	18.59	1.49700	90.03	81.61
+2	-549.108	0.36		90.03
+3	82.825	11.99	1.61700	83.38	62.79
+4	313.580	5.38		83.38	
+5	-1059.646	4.99	1.65412	74.38	39.70
+6	54.621	5.00		66.04	
+7	71.240	11.12	1.49700	66.72	81.61
+8	503.651	d8		66.72	
+9	-289.939	5.58	1.50378	56.72	66.81
+10	180.621	d10		56.72	
+11	522.949	7.00	1.68893	48.38	31.08
+12	-88.452	3.01	1.52682	48.38	51.12
+13	55.249	9.00		45.72	
+13AS	AS	d13AS		39.753
+14	124.349	6.61	1.78800	40.04	47.43
+15	-76.223	2.54		40.04	
+16	-70.630	2.90	1.60342	41.04	38.01
+17	46.449	7.20	1.67790	41.04	55.33
+18	-2749.059	Bf		41.04	
+[figure]
+source	Data/JP1984-176717_Figure01.png
+originX	70.30
+originY	390.86
+ppmm	8.208
+[figure]
+source	Data/JP1984-176717_Figure01P.png
+originX	33.45
+originY	200.03
+ppmm	3.366
+[notes]
+Bill: d0 and Magnification measured. 

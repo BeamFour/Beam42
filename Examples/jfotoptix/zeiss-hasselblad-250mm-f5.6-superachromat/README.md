@@ -1,3 +1,8 @@
+# Zeiss Sonnar Superachromat f5.6 250mm CFE
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US3883229 | 2 | 1972 | Fritz Determann, Heinz Zajadatz | Carl Zeiss AG | [link](https://patents.google.com/patent/US3883229A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -15,7 +20,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 10 | 554.705 | 10.14275 | 32.8 |  |  |  |
 | 11 | AS | 10.172 | 27.054 |  |  |  |
 | 12 | -52.37 | 2.0515 | 24.44 | 1.56444 | 43.75 | Schott | LF8 |
-| 13 | 208.4625 | 123.36 | 24.44 |  |  |  |
+| 13 | 208.4625 | 123.389 | 24.44 |  |  |  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -40,7 +45,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | fno | 5.642
 | enp_dist_P | 111.895
 | enp_radius | 22.204
-| exp_dist_P' | -10.074
+| exp_dist_P' | -10.103
 | exp_radius | 11.846
 | m | -0
 | red | -3.991351966842376E7
@@ -53,17 +58,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 16.34 | 46.13|
- | Field(x=0.0, y=0.1) | 16.06 | 54.825|
- | Field(x=0.0, y=0.2) | 16.879 | 54.633|
- | Field(x=0.0, y=0.3) | 17.566 | 61.031|
- | Field(x=0.0, y=0.4) | 17.675 | 64.09|
- | Field(x=0.0, y=0.5) | 17.985 | 67.454|
- | Field(x=0.0, y=0.6) | 18.347 | 70.601|
- | Field(x=0.0, y=0.7) | 18.729 | 72.896|
- | Field(x=0.0, y=0.8) | 18.459 | 73.167|
- | Field(x=0.0, y=0.9) | 17.719 | 70.714|
- | Field(x=0.0, y=1.0) | 16.403 | 64.938|
+ | Field(x=0.0, y=0.0) | 15.286 | 43.682|
+ | Field(x=0.0, y=0.1) | 15.096 | 52.297|
+ | Field(x=0.0, y=0.2) | 15.905 | 52.087|
+ | Field(x=0.0, y=0.3) | 16.573 | 58.49|
+ | Field(x=0.0, y=0.4) | 16.68 | 61.593|
+ | Field(x=0.0, y=0.5) | 16.97 | 65.018|
+ | Field(x=0.0, y=0.6) | 17.326 | 68.242|
+ | Field(x=0.0, y=0.7) | 17.716 | 70.633|
+ | Field(x=0.0, y=0.8) | 17.482 | 71.022|
+ | Field(x=0.0, y=0.9) | 16.798 | 68.712|
+ | Field(x=0.0, y=1.0) | 15.56 | 63.104|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm

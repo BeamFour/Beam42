@@ -13,20 +13,20 @@ Image Height	79.90
 Magnification	0
 d0	Infinity
 Bf(p)	123.150
-Bf	123.36
+Bf	123.389
 [lens data]
-1	51.2500	4.55325	1.735197	45.24	41.5909	LAFN8	LaFN 8
+1	51.2500	4.55325	1.735197	45.24	41.5909	LAFN8		LaFN 8
 2	41.8975	1.70125		42.78		
-3	43.1225	11.05800	1.43493	43.24	95.23	LITHOTEC-CAF2	Fluorspar
+3	43.1225	11.05800	1.43493	43.24	95.23	LITHOTEC-CAF2		Fluorspar
 4	-81.8075	2.00150		43.24		
-5	-73.9700	3.35250	1.682476	43.90	48.200977	LAF20	LaF 20
+5	-73.9700	3.35250	1.682476	43.90	48.200977	LAF20		LaF 20
 6	370.8200	34.62525		43.90		
-7	-453.4700	7.70550	1.6205	37.19	38.081	F9	F 11 -> F 9
+7	-453.4700	7.70550	1.6205	37.19	38.081	F9		F 11 -> F 9
 8	-77.2375	3.15225		37.60		
-9	129.6550	8.20600	1.682476	35.48	48.200977	LAF20	LaF 20
+9	129.6550	8.20600	1.682476	35.48	48.200977	LAF20		LaF 20
 10	554.705	10.14275		32.80		
 10AS	AS	10.172		27.054
-11	-52.3700	2.05150	1.564435	24.44	43.75028	LF8	LF 8
+11	-52.3700	2.05150	1.564435	24.44	43.75028	LF8		LF 8
 12	208.4625	Bf		24.44		
 [figure]
 source	Data/US003883229_Figure02.png
@@ -40,3 +40,14 @@ originY	171.88
 ppmm	5.532
 [notes]
 Bill: Glass nd and vd not provided. Specifications say 249.6mm 18 degrees
+[patent info]
+country	US
+number	US3883229
+example	2
+year applied	1972
+inventors	Fritz Determann, Heinz Zajadatz
+current assignee	Carl Zeiss AG
+original assignee	Carl Zeiss AG
+link	https://patents.google.com/patent/US3883229A/en
+[report data]
+lens name	Zeiss Sonnar Superachromat f5.6 250mm CFE

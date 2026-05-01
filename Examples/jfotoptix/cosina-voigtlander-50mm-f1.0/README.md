@@ -24,13 +24,13 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 14 | -78.407 | 1.55 | 31.18 | 1.55298 | 55.07 | Hikari | J-KZFH4 |
 | 15 | 45.846 | 1.42 | 25.18 |  |  |  |
 | 16 | 3376.612 | 2.78 | 28.08 | 1.80835 | 40.55 | Ohara | L-LAH84 |
-| 17 | 120.496 | 18.721 | 25.76 |  |  |  |
+| 17 | 120.496 | 18.722 | 25.76 |  |  |  |
 ## Aspherical Data
-| ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | -0.02238 | 0.0 | -1.0281E-6 | 6.04388E-10 | -4.31143E-12 | 5.62572E-15 | -3.29805E-18 | -5.97602E-23 | 0.0 | 0.0 | 0.0 |
-| 16 | -20.0 | 0.0 | 2.4371E-5 | -9.23649E-8 | 1.14851E-9 | -1.18851E-11 | 5.37423E-14 | -9.17045E-17 | 0.0 | 0.0 | 0.0 |
-| 17 | 20.0 | 0.0 | 3.37528E-5 | -2.40831E-8 | -1.16539E-10 | 1.9524E-13 | -7.7965E-16 | 2.20734E-18 | 0.0 | 0.0 | 0.0 |
+| ID  | Type | k   | P1 | P2 | P3 | P4 | P5 | P6 | P7 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1| EVEN | -0.02238 | 0.0 | -1.0281E-6 | 6.04388E-10 | -4.31143E-12 | 5.62572E-15 | -3.29805E-18 | -5.97602E-23 |
+| 16| EVEN | -20.0 | 0.0 | 2.4371E-5 | -9.23649E-8 | 1.14851E-9 | -1.18851E-11 | 5.37423E-14 | -9.17045E-17 |
+| 17| EVEN | 20.0 | 0.0 | 3.37528E-5 | -2.40831E-8 | -1.16539E-10 | 1.9524E-13 | -7.7965E-16 | 2.20734E-18 |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -45,18 +45,18 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ---       | ---   |
 | effective_focal_length |49.998
 | back_focal_length | 18.732
-| optical_invariant | 10.712
+| optical_invariant | 10.27
 | object_distance | 1.0E10
 | image_distance | 18.732
 | power | 0.02
 | pp1_H | 28.84
 | ppk_H' | -31.265
 | ffl_F | -21.158
-| fno | 1
+| fno | 1.043
 | enp_dist_P | 38.303
-| enp_radius | 24.999
-| exp_dist_P' | -23.297
-| exp_radius | 21.02
+| enp_radius | 23.966
+| exp_dist_P' | -23.298
+| exp_radius | 20.152
 | m | -0
 | red | -2.0000928296044186E8
 | n_obj | 1
@@ -64,21 +64,21 @@ Note that where glass types are shown the refractive index and abbe number is as
 | img_ht | 21.424
 | obj_ang | 23.195
 | obj_na | 0
-| img_na | -0.447|
+| img_na | -0.432|
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 16.141 | 34.336|
- | Field(x=0.0, y=0.1) | 17.372 | 51.582|
- | Field(x=0.0, y=0.2) | 17.282 | 51.959|
- | Field(x=0.0, y=0.3) | 16.349 | 52.413|
- | Field(x=0.0, y=0.4) | 16.126 | 55.951|
- | Field(x=0.0, y=0.5) | 16.006 | 57.632|
- | Field(x=0.0, y=0.6) | 16.675 | 53.62|
- | Field(x=0.0, y=0.7) | 20.226 | 67.173|
- | Field(x=0.0, y=0.8) | 26.466 | 92.531|
- | Field(x=0.0, y=0.9) | 34.93 | 133.168|
- | Field(x=0.0, y=1.0) | 38.242 | 130.087|
+ | Field(x=0.0, y=0.0) | 15.946 | 33.891|
+ | Field(x=0.0, y=0.1) | 17.213 | 51.13|
+ | Field(x=0.0, y=0.2) | 17.057 | 51.527|
+ | Field(x=0.0, y=0.3) | 16.165 | 53.179|
+ | Field(x=0.0, y=0.4) | 16.104 | 56.571|
+ | Field(x=0.0, y=0.5) | 15.935 | 58.228|
+ | Field(x=0.0, y=0.6) | 16.726 | 55.275|
+ | Field(x=0.0, y=0.7) | 20.174 | 66.731|
+ | Field(x=0.0, y=0.8) | 26.614 | 92.611|
+ | Field(x=0.0, y=0.9) | 35.752 | 132.056|
+ | Field(x=0.0, y=1.0) | 40.727 | 135.262|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm
@@ -90,5 +90,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 * Black lines represent sagittal, blue tangential
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
-* [OpticalBench Compatible Data File, tab delimited](./JP2023-063766_Example01P.txt)
+* [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./JP2023-063766_Example01P.zmx)
+
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-05-01

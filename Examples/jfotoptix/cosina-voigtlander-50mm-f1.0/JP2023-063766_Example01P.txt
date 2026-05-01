@@ -27,7 +27,7 @@ Aperture Diameter(m)	33.257
 11	78.611	5.05	1.88300	36.44	40.69	TAFD30
 12	-125.199	0.31		36.44	
 13	53.736	9.47	1.88300	31.18	40.69	TAFD30
-14	-78.407	1.55	1.55298	31.18	59.07	J-KZFH4
+14	-78.407	1.55	1.55298	31.18	55.07	J-KZFH4
 15	45.846	1.42		25.18	
 16	3376.612	2.78	1.80835	28.08	40.55	L-LAH84
 17	120.496	Bf		25.76	
@@ -42,3 +42,14 @@ originY	347.19
 ppmm	9.376
 [notes]
 Bill: s8 limits F-Number to f/1.04
+[patent info]
+country	JP
+number	JP2023-063766
+example	EX 1
+year applied	2021
+inventors	Kazuhiro Ogino
+current assignee	Cosina Co Ltd
+original assignee	Cosina Co Ltd
+link	https://patents.google.com/patent/JP2023063766A/en
+[report data]
+lens name	Voigtlander NOKTON 50mm f1.0 Aspherical

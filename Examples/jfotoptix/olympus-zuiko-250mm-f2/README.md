@@ -1,3 +1,8 @@
+# Olympus Zuiko 250mm f2
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US4534626 | 1 | 1982 | Shin-ichi Mihara | Olympus Optical Co Ltd | [link](https://patents.google.com/patent/US4534626A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -87,4 +92,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./US004534626_Example01.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-05-02
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-05-03

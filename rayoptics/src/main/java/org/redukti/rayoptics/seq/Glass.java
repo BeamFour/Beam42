@@ -508,6 +508,12 @@ public class Glass extends Medium {
         glasses.put("SSK1", new Glass("Hikari", "SSK1", 1.6172, 1.61375, 1.62519, 1.61992, 1.6143, 1.62585, 1.6315, 53.96, 53.67, 0.0));
         glasses.put("SSK2", new Glass("Hikari", "SSK2", 1.6223, 1.61877, 1.6305, 1.62509, 1.61933, 1.63118, 1.63699, 53.06, 52.76, 0.0));
         glasses.put("SSK8", new Glass("Hikari", "SSK8", 1.61772, 1.614, 1.62641, 1.62067, 1.61459, 1.62713, 1.63336, 49.78, 49.49, 0.0));
+        // Following is an attempt to reconstruct Nikon PC102 glass based on vd,nd and offset from FKH1
+        //glasses.put("PC102", new Glass("Hikari", "PC102", 1.50032, 1.49848, 1.50451, 1.50176, 1.49877, 1.50485, 1.50776, 81.9, 81.48, 0.0));
+        //glasses.put("PC102", new Glass("Hikari", "PC102", 1.50032, 1.49838, 1.50449, 1.50175, 1.49878, 1.50483, 1.50772, 81.89, 81.48, 0.0));
+        glasses.put("PC102", new Glass("Hikari", "PC102", 1.50032, 1.49846, 1.50457, 1.50178, 1.49876, 1.50492, 1.50786, 81.9, 81.48, 0.0));
+
+        //glasses.put("PC102A", new Glass("Hikari", "PC102A", 1.50032, 1.4985, 1.50447, 1.50175, 1.49879, 1.5048, 1.50768, 81.9, 81.48, 0.0));
     }
     static void add_hoya_glasses() {
 // Hoya
@@ -2597,9 +2603,9 @@ public class Glass extends Medium {
         add_sumita_glasses();
         add_hikari_glasses();
         add_hoya_glasses();
-        add_schott_glasses();
         add_ohara_glasses();
         add_cdgm_glasses();
         add_schott_1968_glasses();
         add_corning_glasses();
+        add_schott_glasses();
     }}

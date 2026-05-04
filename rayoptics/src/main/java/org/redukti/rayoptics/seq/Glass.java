@@ -512,6 +512,8 @@ public class Glass extends Medium {
         glasses.put("PC102", new Glass("Hikari", "PC102", 1.50032, 1.498459, 1.504567, 1.50178, 1.498757, 1.504917, 1.507858, 81.9, 81.48, 0.0));
         // Following is an attempt to reconstruct Nikon PC102 glass based on vd,nd and offset from FKH1
         glasses.put("PC102B", new Glass("Hikari", "PC102B", 1.50032, 1.498456, 1.504565, 1.501779, 1.49875, 1.504909, 1.507857, 81.9, 81.48, 0.0));
+        // Following is an attempt to reconstruct Nikon PC102 glass based on vd,nd and offset from FK50
+        glasses.put("PC102C", new Glass("Hikari", "PC102C", 1.50032, 1.498458, 1.504567, 1.501783, 1.498754, 1.504904, 1.507851, 81.9, 81.48, 0.0));
     }
     static void add_hoya_glasses() {
 // Hoya

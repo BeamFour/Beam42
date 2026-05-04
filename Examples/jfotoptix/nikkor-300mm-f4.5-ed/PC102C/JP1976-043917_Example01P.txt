@@ -1,0 +1,35 @@
+[descriptive data]
+title	JP 1976-043917 Example 1 (Nikon Nikkor 300mm ED f/4.5)
+[constants]
+[variable distances]
+Focal Length	300
+Angle of View	9
+F-Number	4.5
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf(p)	77.3
+Bf	77.14
+[lens data]
+1	133.00	12.0	1.50032	67.60	81.9	PC102C
+2	-140.00	4.0		67.60	
+3	-128.00	3.0	1.61266	65.36	44.3	KZFH1
+4	70.00	9.0	1.63930	65.36	45.0	BAF12-Old
+5	316.30	1.0		65.36
+6	82.75	7.7	1.50032	65.43	81.9	PC102C
+7	322.40	80.0		65.43
+7AS	AS	35.0		30.635
+8	-42.56	1.0	1.62041	30.15	60.3	E-SK16
+9	220.00	3.5	1.62004	30.15	36.3	E-F2	Hoya
+10	-91.10	Bf		30.15
+[figure]
+source	Data/JP1976-043917_Figure01.png
+originX	77.89
+originY	285.71
+ppmm	5.315
+[figure]
+source	Data/JP1976-043917_Figure01P.png
+originX	88.54
+originY	89.53
+ppmm	2.456
+[notes]

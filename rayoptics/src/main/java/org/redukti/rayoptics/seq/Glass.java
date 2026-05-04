@@ -508,12 +508,10 @@ public class Glass extends Medium {
         glasses.put("SSK1", new Glass("Hikari", "SSK1", 1.6172, 1.61375, 1.62519, 1.61992, 1.6143, 1.62585, 1.6315, 53.96, 53.67, 0.0));
         glasses.put("SSK2", new Glass("Hikari", "SSK2", 1.6223, 1.61877, 1.6305, 1.62509, 1.61933, 1.63118, 1.63699, 53.06, 52.76, 0.0));
         glasses.put("SSK8", new Glass("Hikari", "SSK8", 1.61772, 1.614, 1.62641, 1.62067, 1.61459, 1.62713, 1.63336, 49.78, 49.49, 0.0));
+        // Following is an attempt to reconstruct Nikon PC102 glass based on vd,nd and offset from FK52
+        glasses.put("PC102", new Glass("Hikari", "PC102", 1.50032, 1.498459, 1.504567, 1.50178, 1.498757, 1.504917, 1.507858, 81.9, 81.48, 0.0));
         // Following is an attempt to reconstruct Nikon PC102 glass based on vd,nd and offset from FKH1
-        //glasses.put("PC102", new Glass("Hikari", "PC102", 1.50032, 1.49848, 1.50451, 1.50176, 1.49877, 1.50485, 1.50776, 81.9, 81.48, 0.0));
-        //glasses.put("PC102", new Glass("Hikari", "PC102", 1.50032, 1.49838, 1.50449, 1.50175, 1.49878, 1.50483, 1.50772, 81.89, 81.48, 0.0));
-        glasses.put("PC102", new Glass("Hikari", "PC102", 1.50032, 1.49846, 1.50457, 1.50178, 1.49876, 1.50492, 1.50786, 81.9, 81.48, 0.0));
-
-        //glasses.put("PC102A", new Glass("Hikari", "PC102A", 1.50032, 1.4985, 1.50447, 1.50175, 1.49879, 1.5048, 1.50768, 81.9, 81.48, 0.0));
+        glasses.put("PC102B", new Glass("Hikari", "PC102B", 1.50032, 1.498456, 1.504565, 1.501779, 1.49875, 1.504909, 1.507857, 81.9, 81.48, 0.0));
     }
     static void add_hoya_glasses() {
 // Hoya
@@ -2075,6 +2073,9 @@ public class Glass extends Medium {
         glasses.put("TF3", new Glass("CDGM", "TF3", 1.61242, 1.60825, 1.62214, 1.61572, 1.60891, 1.62295, 1.62996, 44.09, 43.86, 0.0));
         glasses.put("H-TF8", new Glass("CDGM", "H-TF8", 1.72046, 1.71437, 1.7351, 1.72537, 1.71533, 1.73634, 1.74723, 34.76, 34.52, 0.0));
     }
+    static void add_schott_1960_glasses() {
+        glasses.put("F16", new Glass("Schott", "F16", 1.5995, 1.59455, 1.61157, 1.60354, 1.59534, 1.61261, 1.62170, 35.2, 45.0, 0));
+    }
     static void add_schott_1968_glasses() {
         glasses.put("BAF12-Old", new Glass("Schott", "BAF12-Old", 1.6393, 1.63507, 1.64928, 1.64266, 1.63574, 1.65011, 1.65734, 45.0, 45.0, 0));
         glasses.put("FK50", new Glass("Schott", "FK50", 1.48606, 1.48424, 1.49021, 1.48749, 1.48453, 1.49054, 1.49342, 81.49, 81.09, 0.031));
@@ -2606,6 +2607,7 @@ public class Glass extends Medium {
         add_ohara_glasses();
         add_cdgm_glasses();
         add_schott_1968_glasses();
+        add_schott_1960_glasses();
         add_corning_glasses();
         add_schott_glasses();
     }}

@@ -51,17 +51,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 8.768 | 22.363|
- | Field(x=0.0, y=0.1) | 9.042 | 28.434|
- | Field(x=0.0, y=0.2) | 8.853 | 28.464|
- | Field(x=0.0, y=0.3) | 8.514 | 27.302|
- | Field(x=0.0, y=0.4) | 7.847 | 23.145|
- | Field(x=0.0, y=0.5) | 7.373 | 19.618|
- | Field(x=0.0, y=0.6) | 7.306 | 15.898|
- | Field(x=0.0, y=0.7) | 7.552 | 13.79|
- | Field(x=0.0, y=0.8) | 8.086 | 14.696|
- | Field(x=0.0, y=0.9) | 8.731 | 16.874|
- | Field(x=0.0, y=1.0) | 8.971 | 16.971|
+ | Field(x=0.0, y=0.0) | 8.761 | 22.464|
+ | Field(x=0.0, y=0.1) | 9.038 | 28.535|
+ | Field(x=0.0, y=0.2) | 8.844 | 28.558|
+ | Field(x=0.0, y=0.3) | 8.499 | 27.39|
+ | Field(x=0.0, y=0.4) | 7.821 | 23.245|
+ | Field(x=0.0, y=0.5) | 7.339 | 19.72|
+ | Field(x=0.0, y=0.6) | 7.273 | 16|
+ | Field(x=0.0, y=0.7) | 7.526 | 13.593|
+ | Field(x=0.0, y=0.8) | 8.073 | 14.696|
+ | Field(x=0.0, y=0.9) | 8.738 | 16.874|
+ | Field(x=0.0, y=1.0) | 9.012 | 16.971|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm
@@ -76,4 +76,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./US004514051_ExampleML01P.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-05-03
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-05-04

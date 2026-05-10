@@ -1,19 +1,24 @@
+# AI Nikkor 180mm f/2.8 ED
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US4338001 | 2 | 1979 | Sei Matsui | Nippon Kogaku KK | [link](https://patents.google.com/patent/US4338001A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
 | ID  | Radius | Thickness | Diameter | nd  | vd  | Glass Make | Glass |
 | --- | ---    | ---       | ---      | --- | --- | ---        | ---   |
-| 1 | 99.021 | 11.5 | 65.93 | 1.50032 | 81.9 | Hikari | PC102 |
-| 2 | -140.839 | 2.1 | 65.93 |  |  |  |
-| 3 | -138.056 | 3.7 | 62.88 | 1.7495 | 35.04 | Hoya | E-LAF7 |
-| 4 | 373.0 | 6.3 | 62.88 |  |  |  |
-| 5 | 77.774 | 9.2 | 61.38 | 1.65844 | 50.84 | Hikari | J-SSK5 |
-| 6 | 240.0 | 58.1 | 61.38 |  |  |  |
-| 7 | AS | 32.8 | 31.503 |  |  |  |
-| 8 | -35.5 | 1.8 | 22.48 | 1.51454 | 54.63 | Hoya | CF3 |
-| 9 | -550.0 | 0.5 | 22.48 |  |  |  |
-| 10 | 220.0 | 5.0 | 22.14 | 1.795 | 45.31 | Hikari | J-LASF017 |
-| 11 | -162.193 | 41.215 | 22.14 |  |  |  |
+| 1 | 99.021 | 11.5 | 66.132 | 1.50032 | 81.9 | Hikari | PC102 |
+| 2 | -140.839 | 2.1 | 66.132 |  |  |  |
+| 3 | -138.056 | 3.7 | 65.52 | 1.7495 | 35.04 | Hoya | E-LAF7 |
+| 4 | 373.0 | 6.3 | 65.52 |  |  |  |
+| 5 | 77.774 | 9.2 | 61.452 | 1.65844 | 50.84 | Hikari | J-SSK5 |
+| 6 | 240.0 | 49.21 | 61.452 |  |  |  |
+| 7 | AS | 41.69 | 31.7372 |  |  |  |
+| 8 | -35.5 | 1.8 | 30.708 | 1.51454 | 54.63 | Hoya | CF3 |
+| 9 | -550.0 | 0.5 | 30.708 |  |  |  |
+| 10 | 220.0 | 5.0 | 30.888 | 1.795 | 45.31 | Hikari | J-LASF017 |
+| 11 | -162.193 | 41.215 | 30.888 |  |  |  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -28,18 +33,18 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ---       | ---   |
 | effective_focal_length |180.138
 | back_focal_length | 41.29
-| optical_invariant | 3.833
+| optical_invariant | 3.431
 | object_distance | 1.0E10
 | image_distance | 41.29
 | power | 0.006
 | pp1_H | -80.549
 | ppk_H' | -138.847
 | ffl_F | -260.687
-| fno | 2.802
-| enp_dist_P | 166.78
-| enp_radius | 32.145
-| exp_dist_P' | -34.545
-| exp_radius | 13.546
+| fno | 3.13
+| enp_dist_P | 131.749
+| enp_radius | 28.772
+| exp_dist_P' | -41.322
+| exp_radius | 13.207
 | m | -0
 | red | -5.551308068801841E7
 | n_obj | 1
@@ -47,21 +52,21 @@ Note that where glass types are shown the refractive index and abbe number is as
 | img_ht | 21.48
 | obj_ang | 6.8
 | obj_na | 0
-| img_na | -0.176|
+| img_na | -0.158|
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 8.761 | 22.464|
- | Field(x=0.0, y=0.1) | 9.038 | 28.535|
- | Field(x=0.0, y=0.2) | 8.844 | 28.558|
- | Field(x=0.0, y=0.3) | 8.499 | 27.39|
- | Field(x=0.0, y=0.4) | 7.821 | 23.245|
- | Field(x=0.0, y=0.5) | 7.339 | 19.72|
- | Field(x=0.0, y=0.6) | 7.273 | 16|
- | Field(x=0.0, y=0.7) | 7.526 | 13.593|
- | Field(x=0.0, y=0.8) | 8.073 | 14.696|
- | Field(x=0.0, y=0.9) | 8.738 | 16.874|
- | Field(x=0.0, y=1.0) | 9.012 | 16.971|
+ | Field(x=0.0, y=0.0) | 7.579 | 15.978|
+ | Field(x=0.0, y=0.1) | 7.805 | 18.893|
+ | Field(x=0.0, y=0.2) | 7.696 | 18.92|
+ | Field(x=0.0, y=0.3) | 7.529 | 18.246|
+ | Field(x=0.0, y=0.4) | 7.45 | 17.201|
+ | Field(x=0.0, y=0.5) | 7.449 | 16.258|
+ | Field(x=0.0, y=0.6) | 7.552 | 15.264|
+ | Field(x=0.0, y=0.7) | 7.87 | 14.659|
+ | Field(x=0.0, y=0.8) | 8.358 | 16.26|
+ | Field(x=0.0, y=0.9) | 9.065 | 19.017|
+ | Field(x=0.0, y=1.0) | 9.791 | 19.439|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm
@@ -74,6 +79,6 @@ Note that where glass types are shown the refractive index and abbe number is as
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
-* [Zemax file](./US004514051_ExampleML01P.zmx)
+* [Zemax file](./US004338001_Example02.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-05-04
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-05-10

@@ -2,27 +2,27 @@
 title	US 4,338,001 Example 2 (Nikon AI Nikkor 180mm f/2.8 ED)
 [constants]		
 [variable distances]				
-Focal Length	100			
+Focal Length	180
 Angle of View	13.6			
 F-Number	2.8			
-Image Height	24			
+Image Height	43.2
 Total Length	95.7
 Magnification	0			
 d0	Infinity			
 Bf(p)	undefined	undefined	undefined	undefined
-Bf	22.92			
+Bf	42.65
 [lens data]				
-1	55.012	6.389	1.50032	36.74	81.9
-2	-78.244	1.167		36.74
-3	-76.698	2.056	1.74950	36.4	35.0
-4	207.222	3.5		36.4
-5	43.208	5.111	1.65844	34.14	50.8
-6	133.333	27.339		34.14
-6AS	AS	23.161		19.854
-7	-19.722	1	1.51454	17.06	54.6
-8	-305.556	0.278		17.06
-9	122.222	2.778	1.79668	17.16	45.4
-10	-90.107	Bf		17.16
+1	99.021	11.5	1.50032	66.132	81.9	J-FKH1
+2	-140.839	2.1		66.132
+3	-138.056	3.7	1.74950	65.52	35.0	E-LAF7
+4	373.000	6.3		65.52
+5	77.774	9.2	1.65844	61.452	50.8	J-SSK5
+6	240.000	49.21		61.452
+6AS	AS	41.69		31.7372
+7	-35.500	1.8	1.51454	30.708	54.6	CF3
+8	-550.000	0.5		30.708
+9	220.000	5.0	1.79668	30.888	45.4	J-LASF017
+10	-162.193	Bf		30.888
 [group data]
 L1-L3	1	80.383
 L4-L5	7	-118.959
@@ -33,3 +33,14 @@ originX	164
 originY	610			
 [notes]
 Bill: IH from AOV and Bf from paraxial F'
+[patent info]
+country	US
+number	US4338001
+example	2
+year applied	1979
+inventors	Sei Matsui
+current assignee	Nikon Corp
+original assignee	Nippon Kogaku KK
+link	https://patents.google.com/patent/US4338001A/en
+[report data]
+lens name	AI Nikkor 180mm f/2.8 ED

@@ -1,0 +1,51 @@
+[descriptive data]
+title	JP 1989-102413 Example 1 (Canon EF200mm f1.8L USM)
+[constants]
+[variable distances]
+Focal Length	200.00000	undefined
+Angle of View	12.3	undefined
+F-Number	1.86	undefined
+Image Height	43.2	43.2
+Magnification	0	-0.09090
+S	Infinity	2500
+d0	Infinity	2264.99
+d10	21.00	35.49
+d13	32.20	17.71
+d13AS	25.50	11.01
+Bf(p)	undefined	undefined
+Bf	72.09	72.09
+[lens data]
+1	123.120	19.00	1.49700	107.81	81.6
+2	-430.590	0.72		107.81
+3	89.981	13.20	1.49700	95.60	81.6
+4	255.652	6.00		92.56
+5	-704.106	4.70	1.65412	92.64	39.7
+6	110.405	18.00		84.70
+7	67.274	15.55	1.49700	77.05	61.6
+8	502.839	0.50		73.92
+9	44.766	4.50	1.69680	62.44	55.5
+10	34.941	d10		55.45
+11	-1069.676	6.00	1.84666	50.06	23.9
+12	-106.363	2.50	1.61340	49.03	43.8
+13	57.199	d13AS		44.86
+14AS	AS	6.7		38.501
+14	-35.135	4.40	1.65412	38.84	39.7
+15	-475.931	8.49	1.65160	42.08	58.6
+16	-42.493	0.15		42.98
+17	96.893	5.50	1.61800	41.62	63.4
+18	-241.315	Bf		41.62
+[group data]
+f1	1	10	160.660060
+f2	11	13	-107.284380	
+[figure]
+source	Data/JP1989-102413_Figure01.png
+originX	85.86
+originY	430.79
+ppmm	4.751
+[figure]
+source	Data/JP1989-102413_Figure01P.png
+originX	152.59
+originY	307.28
+ppmm	3.899
+[notes]
+Bill: Measured d0 and Magnification.

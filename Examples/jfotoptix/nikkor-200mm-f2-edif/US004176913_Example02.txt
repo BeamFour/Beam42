@@ -12,7 +12,7 @@ d0	Infinity	2086.03
 d6	41.201	58.201
 d11	22.912	5.912
 Bf(p)	undefined	undefined
-Bf	64.81	63.60
+Bf	66.115	63.60
 [lens data]					
 1	200.0	14.0	1.50032	102.05	81.9	J-FKH1
 2	-540.0	0.3		102.05	
@@ -27,7 +27,7 @@ Bf	64.81	63.60
 11	67.815	d11		53.21
 12	171.0	6.5	1.69350	53.71	53.6	E-LAK13
 13	-131.975	2.0		53.71
-14	-213.0	2.0	1.59507	52.37	35.6	TIFN5
+14	-213.0	2.0	1.59507	52.37	35.6	F16
 15	61.0	11.0	1.69680	50.69	55.6	J-LAK14
 16	-193.237	11.2		50.69
 16AS	AS	10.8		39.998
@@ -49,3 +49,14 @@ originX	4
 originY	190.5
 [notes]
 Bill: This is the production lens.
+[patent info]
+country	US
+number	US4176913
+example	2
+year applied	1977
+inventors	Soichi Nakamura,Kiyoshi Hayashi
+current assignee	Nikon Corp
+original assignee	Nippon Kogaku KK
+link	https://patents.google.com/patent/US4176913A/en
+[report data]
+lens name	Ai Nikkor ED-IF 200mm F2S

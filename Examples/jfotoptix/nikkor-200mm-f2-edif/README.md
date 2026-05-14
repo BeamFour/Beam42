@@ -11,22 +11,22 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 1 | 200.0 | 14.0 | 102.05 | 1.49782 | 82.57 | Hikari | J-FKH1 |
 | 2 | -540.0 | 0.3 | 102.05 |  |  |  |
 | 3 | 112.869 | 15.5 | 97.66 | 1.49782 | 82.57 | Hikari | J-FKH1 |
-| 4 | -600.0 | 0.4365 | 97.66 |  |  |  |
+| 4 | -600.0 | 0.65 | 97.66 |  |  |  |
 | 5 | -480.0 | 5.0 | 95.69 | 1.7552 | 27.51 | Hikari | E-SF4 |
-| 6 | 431.735 | 42.609 | 95.69 |  |  |  |
+| 6 | 431.735 | 41.201 | 95.69 |  |  |  |
 | 7 | -386.0 | 7.5 | 70.05 | 1.79504 | 28.54 | Hikari | E-LAF9 |
 | 8 | -125.0 | 2.6 | 69.05 | 1.4645 | 65.77 | Hoya | FC3 |
-| 9 | 286.185 | 20.1732 | 69.05 |  |  |  |
-| 10 | -161.181 | 3.4 | 55.9 | 1.4645 | 65.77 | Hoya | FC3 |
-| 11 | 67.815 | 22.727 | 53.21 |  |  |  |
-| 12 | 171.0 | 6.5 | 53.71 | 1.6935 | 53.2 | Hikari | J-LAK13 |
+| 9 | 286.185 | 21.5 | 69.05 |  |  |  |
+| 10 | -161.2 | 3.4 | 55.9 | 1.4645 | 65.77 | Hoya | FC3 |
+| 11 | 67.815 | 22.912 | 53.21 |  |  |  |
+| 12 | 171.0 | 6.5 | 53.71 | 1.6935 | 53.2 | Hikari | E-LAK13 |
 | 13 | -131.975 | 2.0 | 53.71 |  |  |  |
-| 14 | -213.0 | 2.0 | 52.37 | 1.59355 | 35.51 | Schott | TIFN5 |
+| 14 | -213.0 | 2.0 | 52.37 | 1.5995 | 35.2 | Schott | F16 |
 | 15 | 61.0 | 11.0 | 50.69 | 1.6968 | 55.52 | Hikari | J-LAK14 |
-| 16 | -193.237 | 5.637 | 50.69 |  |  |  |
-| 17 | AS | 17.0252 | 39.998 |  |  |  |
+| 16 | -193.237 | 11.2 | 50.69 |  |  |  |
+| 17 | AS | 10.8 | 39.998 |  |  |  |
 | 18 | -130.0 | 3.0 | 38.64 | 1.4645 | 65.77 | Hoya | FC3 |
-| 19 | -311.705 | 64.142 | 35.74 |  |  |  |
+| 19 | -311.705 | 66.115 | 35.74 |  |  |  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -39,42 +39,42 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
-| effective_focal_length |200.018
-| back_focal_length | 64.19
-| optical_invariant | 4.917
+| effective_focal_length |202.941
+| back_focal_length | 66.111
+| optical_invariant | 5.307
 | object_distance | 1.0E10
-| image_distance | 64.19
+| image_distance | 66.111
 | power | 0.005
-| pp1_H | 83.535
-| ppk_H' | -135.827
-| ffl_F | -116.483
-| fno | 2.195
-| enp_dist_P | 366.757
-| enp_radius | 45.559
-| exp_dist_P' | -18.551
-| exp_radius | 18.857
+| pp1_H | 81.831
+| ppk_H' | -136.83
+| ffl_F | -121.11
+| fno | 2.064
+| enp_dist_P | 401.587
+| enp_radius | 49.172
+| exp_dist_P' | -12.687
+| exp_radius | 19.092
 | m | -0
-| red | -4.99955810094428E7
+| red | -4.9275453923074216E7
 | n_obj | 1
 | n_img | 1
-| img_ht | 21.588
+| img_ht | 21.903
 | obj_ang | 6.16
 | obj_na | 0
-| img_na | -0.222|
+| img_na | -0.235|
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 16.748 | 43.187|
- | Field(x=0.0, y=0.1) | 17.104 | 50.651|
- | Field(x=0.0, y=0.2) | 16.285 | 48.923|
- | Field(x=0.0, y=0.3) | 14.838 | 46.51|
- | Field(x=0.0, y=0.4) | 13.338 | 43.497|
- | Field(x=0.0, y=0.5) | 12.041 | 39.945|
- | Field(x=0.0, y=0.6) | 11.103 | 35.954|
- | Field(x=0.0, y=0.7) | 10.69 | 27.37|
- | Field(x=0.0, y=0.8) | 11.297 | 24.591|
- | Field(x=0.0, y=0.9) | 12.879 | 25.254|
- | Field(x=0.0, y=1.0) | 15.539 | 35.641|
+ | Field(x=0.0, y=0.0) | 14.909 | 42.84|
+ | Field(x=0.0, y=0.1) | 15.807 | 56.57|
+ | Field(x=0.0, y=0.2) | 15.045 | 55.501|
+ | Field(x=0.0, y=0.3) | 14.429 | 51.792|
+ | Field(x=0.0, y=0.4) | 13.404 | 43.971|
+ | Field(x=0.0, y=0.5) | 12.829 | 38.834|
+ | Field(x=0.0, y=0.6) | 13.304 | 36.509|
+ | Field(x=0.0, y=0.7) | 13.927 | 35.852|
+ | Field(x=0.0, y=0.8) | 14.112 | 33.466|
+ | Field(x=0.0, y=0.9) | 13.521 | 35.679|
+ | Field(x=0.0, y=1.0) | 12.085 | 36.06|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm
@@ -87,6 +87,6 @@ Note that where glass types are shown the refractive index and abbe number is as
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
-* [Zemax file](./US004176913_Example02h.zmx)
+* [Zemax file](./US004176913_Example02.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-04-04
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-05-14

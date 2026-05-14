@@ -1,0 +1,54 @@
+[descriptive data]
+title	US 7,411,745 Example 1
+[constants]
+[variable distances]
+Focal Length	195	undefined
+Angle of View	12.59	undefined
+F-Number	2	undefined
+Image Height	43.2	43.2
+Total Length	undefined	undefined
+Magnification	0	-0.1239
+d0	Infinity	1680
+d10	19	26.8726
+d16	15.541	7.6684
+Bf	64.7048	64.7583
+[lens data]
+1	127.7528	13.00	1.49782	109.62	82.5
+2	611.7092	0.30		109.62	
+3	95.4761	21.00	1.49782	102.96	82.6
+4	-551.5251	4.00	1.73350	100.40	51.1
+5	172.3337	1.00		94.00	
+6	85.7595	10.00	1.49782	91.44	82.5
+7	227.7262	1.00		91.44	
+8	84.0750	3.00	1.77279	84.02	49.5
+9	40.7485	22.00	1.49782	72.76	82.5
+10	718.7147	d10		72.76	
+11	-280.3560	4.00	1.80384	45.84	33.9
+12	-88.3062	3.00	1.67025	44.56	57.5
+13	65.1793	4.00		40.10
+14	-240.8586	7.00	1.84042	40.10	43.4
+15	-40.6610	3.00	1.64000	40.48	60.1
+16	48.0239	d16		36.12	
+17	AS	1.20		35.136
+18	87.9799	5.00	1.74810	36.84	52.3
+19	-135.7440	2.60		36.84	
+20	-45.0000	3.00	1.79504	35.00	28.6
+21	-107.1007	3.00		36.68	
+22	-362.7077	4.50	1.67025	39.30	57.5
+23	-52.8708	Bf		39.30	
+[group data]
+G1	1	10	111.15
+G2	11	16	-39.839
+[figure]
+caption	AFS Nikkor 200mm f/2 G VR
+source	Data/US007411745_Figure01P.png
+originX	21
+originY	79
+ppmm	1.282
+[figure]
+source	Data/US007411745_Figure01.png
+ppmm	20.09444456
+originX	71
+originY	1557
+[notes]
+Bill: Close fit but not the production AFS Nikkor 200mm f/2 G VR lens.

@@ -13,7 +13,7 @@ d10	21.00	35.49
 d13	32.20	17.71
 d13AS	25.50	11.01
 Bf(p)	undefined	undefined
-Bf	72.09	72.09
+Bf	72.085	72.09
 [lens data]
 1	123.120	19.00	1.49700	107.81	81.6	FPL51
 2	-430.590	0.72		107.81
@@ -26,7 +26,7 @@ Bf	72.09	72.09
 9	44.766	4.50	1.69680	62.44	55.5	S-LAL14
 10	34.941	d10		55.45
 11	-1069.676	6.00	1.84666	50.06	23.9	S-NPH53
-12	-106.363	2.50	1.61340	49.03	43.8	KZFS4
+12	-106.363	2.50	1.61340	49.03	43.8	BPM4
 13	57.199	d13AS		44.86
 14AS	AS	6.7		38.501
 14	-35.135	4.40	1.65412	38.84	39.7	S-NBH5
@@ -49,3 +49,14 @@ originY	307.28
 ppmm	3.899
 [notes]
 Bill: Measured d0 and Magnification.
+[patent info]
+country	JP
+number	JP-H01-102413
+example	1
+year applied	1987
+inventors	Ogawa Hideki, Takahashi Sadatoshi
+current assignee	Canon Inc
+original assignee	Canon Inc
+link	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-H01-102413/11/en
+[report data]
+lens name	Canon EF200mm f1.8L USM

@@ -1,3 +1,8 @@
+# Canon EF200mm f1.8L USM
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|JP | JP-H01-102413 | 1 | 1987 | Ogawa Hideki, Takahashi Sadatoshi | Canon Inc | [link](https://www.j-platpat.inpit.go.jp/c1801/PU/JP-H01-102413/11/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -14,14 +19,14 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 9 | 44.766 | 4.5 | 62.44 | 1.6968 | 55.53 | Ohara | S-LAL14 |
 | 10 | 34.941 | 21.0 | 55.45 |  |  |  |
 | 11 | -1069.676 | 6.0 | 50.06 | 1.84666 | 23.88 | Ohara | S-NPH53 |
-| 12 | -106.363 | 2.5 | 49.03 | 1.6134 | 44.29 | Hikari | KZFS4 |
+| 12 | -106.363 | 2.5 | 49.03 | 1.6134 | 43.84 | Ohara | BPM4 |
 | 13 | 57.199 | 25.5 | 44.86 |  |  |  |
 | 14 | AS | 6.7 | 38.501 |  |  |  |
 | 15 | -35.135 | 4.4 | 38.84 | 1.65412 | 39.68 | Ohara | S-NBH5 |
 | 16 | -475.931 | 8.49 | 42.08 | 1.6516 | 58.55 | Ohara | S-LAL7 |
 | 17 | -42.493 | 0.15 | 42.98 |  |  |  |
 | 18 | 96.893 | 5.5 | 41.62 | 1.618 | 63.39 | Ohara | PHM52 |
-| 19 | -241.315 | 72.09 | 41.62 |  |  |  |
+| 19 | -241.315 | 72.085 | 41.62 |  |  |  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -46,7 +51,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | fno | 1.86
 | enp_dist_P | 379.097
 | enp_radius | 53.765
-| exp_dist_P' | -24.675
+| exp_dist_P' | -24.67
 | exp_radius | 26.01
 | m | -0
 | red | -4.999586866625641E7
@@ -59,17 +64,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 7.819 | 17.237|
- | Field(x=0.0, y=0.1) | 7.521 | 20.052|
- | Field(x=0.0, y=0.2) | 7.248 | 20.355|
- | Field(x=0.0, y=0.3) | 6.967 | 20.171|
- | Field(x=0.0, y=0.4) | 6.469 | 19.736|
- | Field(x=0.0, y=0.5) | 5.999 | 18.983|
- | Field(x=0.0, y=0.6) | 5.562 | 17.882|
- | Field(x=0.0, y=0.7) | 5.245 | 16.386|
- | Field(x=0.0, y=0.8) | 5.208 | 16.867|
- | Field(x=0.0, y=0.9) | 5.855 | 18.843|
- | Field(x=0.0, y=1.0) | 7.542 | 22.15|
+ | Field(x=0.0, y=0.0) | 5.901 | 16.877|
+ | Field(x=0.0, y=0.1) | 5.806 | 19.699|
+ | Field(x=0.0, y=0.2) | 5.631 | 20.036|
+ | Field(x=0.0, y=0.3) | 5.442 | 19.848|
+ | Field(x=0.0, y=0.4) | 5.051 | 19.407|
+ | Field(x=0.0, y=0.5) | 4.649 | 18.648|
+ | Field(x=0.0, y=0.6) | 4.264 | 17.53|
+ | Field(x=0.0, y=0.7) | 4.003 | 16.023|
+ | Field(x=0.0, y=0.8) | 4.099 | 14.937|
+ | Field(x=0.0, y=0.9) | 4.981 | 18.187|
+ | Field(x=0.0, y=1.0) | 6.933 | 21.59|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm

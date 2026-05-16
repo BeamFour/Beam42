@@ -1,3 +1,8 @@
+# AF-S NIKKOR 200MM F/2G ED VR Prototype
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US7411745 | 3 | 2004 | Mitsuaki Wada | Nikon Corp | [link](https://patents.google.com/patent/US7411745) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

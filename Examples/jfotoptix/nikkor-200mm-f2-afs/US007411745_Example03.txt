@@ -1,5 +1,5 @@
 [descriptive data]
-title	US 7,411,745 Example 3
+title	US 7,411,745 Example 3 (AF-S NIKKOR 200MM F/2G ED VR Prototype)
 [constants]
 [variable distances]
 Focal Length	195	undefined
@@ -52,3 +52,14 @@ originX	30
 originY	1453
 [notes]
 Bill: Closest fit but not the production AFS Nikkor 200mm f/2 G VR lens.
+[patent info]
+country	US
+number	US7411745
+example	3
+year applied	2004
+inventors	Mitsuaki Wada
+current assignee	Nikon Corp
+original assignee	Nikon Corp
+link	https://patents.google.com/patent/US7411745
+[report data]
+lens name	AF-S NIKKOR 200MM F/2G ED VR Prototype

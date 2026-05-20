@@ -3,8 +3,8 @@ f                 51.96
 f'                51.96
 ffl               17.74
 pp1               69.71
-bfl              0.8753
-ppk              -51.09
+bfl              0.8453
+ppk              -51.12
 pp sep            20.41
 f/#               1.440
 m            -5.196e-09
@@ -15,9 +15,9 @@ enp_dist          46.73
 enp_radius        18.04
 na obj        1.804e-09
 n obj             1.000
-img_dist         0.8753
+img_dist         0.8453
 img_ht            21.64
-exp_dist         -92.21
+exp_dist         -92.27
 exp_radius        32.35
 na img          -0.3280
 n img             1.000

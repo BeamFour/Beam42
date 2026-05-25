@@ -8,7 +8,7 @@ F-Number	2.05
 Image Height	43.2
 Magnification	0
 d0	Infinity
-Bf	60.36
+Bf	60.37
 [lens data]
 1	469.673	6.23	1.48749	109.62	70.2	FSL5
 2	-105940.000	0.52		109.62	
@@ -58,3 +58,14 @@ originX	47.57
 originY	117.54
 ppmm	1.622
 [notes]
+[patent info]
+country	JP
+number	JP 2008-145584
+example	1
+year applied	2006
+inventors	YOKOYAMA TAKAYOSHI
+current assignee	Canon Inc
+original assignee	Canon Inc
+link	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2008-145584/11/en
+[report data]
+lens name	Canon EF200mm f2L IS USM

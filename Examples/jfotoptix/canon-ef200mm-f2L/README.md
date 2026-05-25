@@ -1,3 +1,8 @@
+# Canon EF200mm f2L IS USM
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|JP | JP 2008-145584 | 1 | 2006 | YOKOYAMA TAKAYOSHI | Canon Inc | [link](https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2008-145584/11/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -32,7 +37,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 27 | 72.365 | 3.73 | 42.3 | 1.804 | 46.57 | Ohara | S-LAH65 |
 | 28 | 518.348 | 3.27 | 42.3 |  |  |  |
 | 29 | 0.0 | 2.0 | 41.62 | 1.51633 | 64.14 | Ohara | S-BSL7 |
-| 30 | 0.0 | 60.36 | 41.62 |  |  |  |
+| 30 | 0.0 | 60.37 | 41.62 |  |  |  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -57,7 +62,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | fno | 2.05
 | enp_dist_P | 276.162
 | enp_radius | 47.556
-| exp_dist_P' | -51.77
+| exp_dist_P' | -51.78
 | exp_radius | 27.361
 | m | -0
 | red | -5.1283209372512065E7
@@ -70,17 +75,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 3.205 | 5.817|
- | Field(x=0.0, y=0.1) | 3.927 | 15.952|
- | Field(x=0.0, y=0.2) | 5.124 | 21.064|
- | Field(x=0.0, y=0.3) | 6.018 | 22.578|
- | Field(x=0.0, y=0.4) | 6.212 | 24.032|
- | Field(x=0.0, y=0.5) | 5.959 | 23.421|
- | Field(x=0.0, y=0.6) | 5.618 | 22.319|
- | Field(x=0.0, y=0.7) | 5.325 | 21.095|
- | Field(x=0.0, y=0.8) | 5.335 | 20.211|
- | Field(x=0.0, y=0.9) | 6.201 | 20.556|
- | Field(x=0.0, y=1.0) | 8.526 | 22.901|
+ | Field(x=0.0, y=0.0) | 2.952 | 8.331|
+ | Field(x=0.0, y=0.1) | 3.412 | 18.455|
+ | Field(x=0.0, y=0.2) | 4.653 | 23.436|
+ | Field(x=0.0, y=0.3) | 5.583 | 24.487|
+ | Field(x=0.0, y=0.4) | 5.87 | 23.288|
+ | Field(x=0.0, y=0.5) | 5.592 | 22.9|
+ | Field(x=0.0, y=0.6) | 5.207 | 20.216|
+ | Field(x=0.0, y=0.7) | 4.799 | 19.014|
+ | Field(x=0.0, y=0.8) | 4.615 | 18.166|
+ | Field(x=0.0, y=0.9) | 5.333 | 18.582|
+ | Field(x=0.0, y=1.0) | 7.673 | 21.021|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm

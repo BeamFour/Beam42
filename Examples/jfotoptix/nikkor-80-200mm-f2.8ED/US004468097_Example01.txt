@@ -3,7 +3,7 @@ title	US 4,468,097 Example 1
 [constants]
 [variable distances]
 Focal Length	80	140	200
-Angle of View	undefined	undefined	undefined
+Angle of View	31.24	17.43	12.14
 F-Number	2.8	2.8	2.8
 Image Height	43.2	43.2	43.2
 Total Length	undefined	undefined	undefined
@@ -50,3 +50,7 @@ originX	59
 originY	476
 ppmm	8.183
 [notes]
+[report data]
+lens name	Nikkor 80-200mm f/2.8ED
+scenarios	0	2
+names	80mm f2.8	200mm f2.8

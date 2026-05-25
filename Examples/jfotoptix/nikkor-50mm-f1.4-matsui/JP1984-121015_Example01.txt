@@ -1,0 +1,38 @@
+[descriptive data]
+title	JP1984-121015 Example 1
+[constants]
+[variable distances]
+Focal Length	51.6	undefined
+Angle of View	46	undefined
+F-Number	1.4	undefined
+Image Height	43.2	43.2
+Magnification	0	-0.1
+d0	Infinity	516.92
+d2	1.0	0.1
+d6	17.1	18.0
+d6AS	7.8	8.7
+Bf(p)	undefined	undefined
+Bf	38.48	43.93
+[lens data]
+1	51.000	4.0	1.744	39.22	45.0	LAF2
+2	397.820	d2		39.22	
+3	30.300	5.7	1.80454	36.38	39.5	NBFD3
+4	56.891	1.3		36.38	
+5	85.900	2.7	1.71736	33.06	29.5	FD1
+6	19.700	d6AS		27.08	
+6AS	AS	9.3		25.517
+7	-16.900	2.4	1.74077	25.34	27.7	SF13
+8	300.000	7.8	1.79621	34.14	40.8	D96-43
+9	-24.410	0.1		34.14	
+10	-140.000	3.5	1.6968	34.60	55.6	J-LAK14	LAK14
+11	-43.126	0.1		34.60	
+12	79.000	3.0	1.6968	35.72	55.6	J-LAK14	LAK14
+13	-547.717	Bf		35.72	
+[figure]
+source	Data/JP1984-121015_Figure01.png
+originX	90.25
+originY	494.66
+ppmm	20.853
+[notes]
+Bill: Measured d0.
+https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S59-121015/11/en

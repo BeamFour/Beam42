@@ -1,5 +1,5 @@
 [descriptive data]
-title	US 2025/0321401 Example 1
+title	US 2025/0321401 Example 1 (Sigma SPORTS 200mm F2 DG OS Prototype)
 [constants]
 [variable distances]
 Focal Length	194.3
@@ -56,4 +56,4 @@ current assignee	Sigma Corp
 original assignee	Sigma Corp
 link	https://patents.google.com/patent/US20250321401A1/en
 [report data]
-lens name	Sigma SPORTS 200mm F2 DG OS
+lens name	Sigma SPORTS 200mm F2 DG OS Prototype

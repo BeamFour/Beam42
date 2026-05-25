@@ -1,4 +1,4 @@
-# Sigma SPORTS 200mm F2 DG OS
+# Sigma SPORTS 200mm F2 DG OS Prototype
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |

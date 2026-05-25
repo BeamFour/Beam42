@@ -1,3 +1,8 @@
+# Sigma SPORTS 200mm F2 DG OS
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US20250321401 | 1 | 2024 | Daichi TANOUE | Sigma Corp | [link](https://patents.google.com/patent/US20250321401A1/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -36,7 +41,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 31 | -60.9006 | 0.9 | 33.82 | 1.57144 | 71.62 | Hoya | FCD615 |
 | 32 | 78.9803 | 7.3037 | 31.9 |  |  |  |
 | 33 | -26.3842 | 0.9 | 31.9 | 1.98612 | 16.48 | Hoya | FDS16-W |
-| 34 | -42.1224 | 22.4456 | 34.22 |  |  |  |
+| 34 | -42.1224 | 22.4457 | 34.22 |  |  |  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -74,17 +79,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 2.479 | 5.347|
- | Field(x=0.0, y=0.1) | 2.582 | 7.025|
- | Field(x=0.0, y=0.2) | 2.803 | 7.422|
- | Field(x=0.0, y=0.3) | 3.002 | 7.69|
- | Field(x=0.0, y=0.4) | 3.177 | 9.491|
- | Field(x=0.0, y=0.5) | 3.472 | 17.143|
- | Field(x=0.0, y=0.6) | 3.738 | 20.059|
- | Field(x=0.0, y=0.7) | 3.885 | 18.178|
- | Field(x=0.0, y=0.8) | 3.998 | 14.214|
- | Field(x=0.0, y=0.9) | 3.951 | 9.253|
- | Field(x=0.0, y=1.0) | 3.733 | 9.263|
+ | Field(x=0.0, y=0.0) | 2.468 | 5.326|
+ | Field(x=0.0, y=0.1) | 2.571 | 7.05|
+ | Field(x=0.0, y=0.2) | 2.793 | 7.401|
+ | Field(x=0.0, y=0.3) | 2.992 | 7.67|
+ | Field(x=0.0, y=0.4) | 3.168 | 9.514|
+ | Field(x=0.0, y=0.5) | 3.464 | 17.165|
+ | Field(x=0.0, y=0.6) | 3.729 | 20.08|
+ | Field(x=0.0, y=0.7) | 3.876 | 18.199|
+ | Field(x=0.0, y=0.8) | 3.989 | 14.234|
+ | Field(x=0.0, y=0.9) | 3.944 | 9.238|
+ | Field(x=0.0, y=1.0) | 3.73 | 9.251|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm

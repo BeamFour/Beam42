@@ -12,7 +12,7 @@ S	Infinity	1700
 d0	Infinity	1488.0000
 d12	3.4000	17.9678
 d14	20.9224	6.3545
-Bf	22.4456	22.4457
+Bf	22.4457	22.4457
 [lens data]
 1	212.8145	7.4926	1.48749	99.84	70.44	FC5
 2	-3741.0747	1.9000		99.84	
@@ -70,3 +70,14 @@ ppmm	6.227
 [notes]
 Bill: Measured Magnification.
 https://www.photonstophotos.net/GeneralTopics/Lenses/OpticalBench/OpticalBench.htm#Data/US20250321401_Example01.txt,figureOpacity=0.25,AxisO,OffAxis
+[patent info]
+country	US
+number	US20250321401
+example	1
+year applied	2024
+inventors	Daichi TANOUE
+current assignee	Sigma Corp
+original assignee	Sigma Corp
+link	https://patents.google.com/patent/US20250321401A1/en
+[report data]
+lens name	Sigma SPORTS 200mm F2 DG OS

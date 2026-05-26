@@ -15,13 +15,13 @@ d5	3.014	34.034	50.952	3.014	34.034	50.952
 d13	50.598	19.577	2.660	50.598	19.577	2.660
 d25	16.922	14.105	16.921	14.966	7.506	2.928
 d30	1.903	4.720	1.903	3.858	11.318	15.890
-Bf	54.0	54.0	54.0	54.0	54.0	54.0
+Bf	53.89	54.0	53.91	54.0	54.0	54.0
 Aperture Diameter	38.970	38.868	38.523	38.970	38.868	38.523
 [lens data]
 1	127.304	2.800	1.950000	72.98	29.37	J-LASFH15
 2	89.338	9.900	1.497820	70.86	82.57	J-FKH1
 3	-998.249	0.100		70.86	
-4	92.013	7.700	1.433852	68.06	95.25	CaF2
+4	92.013	7.700	1.433852	68.06	95.25	NICF-A
 5	696.987	d5		68.06	
 6	67.306	2.400	1.719990	44.32	50.27	J-LAK10
 7	33.224	10.250		39.56	
@@ -65,6 +65,7 @@ originX	41
 originY	336
 ppmm	7.101
 [notes]
--o f200-layout.svg --trace-density 10 --scenario 2 --output layout --specfile  Examples/jfotoptix/nikkor-70-200mm-f2.8/WO2019-097669_Example01P.txt
--o f200-spot.svg --trace-density 10 --scenario 2 --output spot --specfile Examples/jfotoptix/nikkor-70-200mm-f2.8/WO2019-097669_Example01P.txt
---skew -o f200-spot-skew.svg --trace-density 10 --scenario 2 --output spot --specfile Examples/jfotoptix/nikkor-70-200mm-f2.8/WO2019-097669_Example01P.txt
+[report data]
+lens name	AF-S Nikkor 70-200mm f/2.8 E FL ED VR
+scenarios	0	2
+names	70mm f2.8	200mm f2.8

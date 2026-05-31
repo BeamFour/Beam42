@@ -1,0 +1,42 @@
+[descriptive data]
+title	US 4,247,171 Example 6
+[constants]
+Scaled	50	1
+[variable distances]
+Focal Length	50
+Angle of View	46
+F-Number	1.4
+Total Length	43.4490
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf	35.4075
+P	25.1715
+[lens data]
+1	35.6910	5.5105	1.7725	38.98	49.6
+2	158.5815	0.0930		38.98	
+3	23.7660	3.9565	1.6935	33.48	53.2
+4	36.9405	1.0860		29.00
+5	56.6405	2.7855	1.6398	33.96	34.5
+6	15.1815	7.0815		24.75
+6AS	AS	8.4700		23.010
+7	-15.6530	1.2730	1.7552	24.80	27.5
+8	-122.5355	5.6710	1.7725	30.90	49.6
+9	-25.1610	0.2015		30.90	
+10	-95.5065	4.5235	1.7725	31.94	49.6
+11	-27.9235	0.1455		31.94	
+12	133.7355	2.6520	1.7725	30.00	49.6
+13	-211.5875	Bf		30.00	
+[figure]
+caption	Canon New FD50mm f1.4
+source	Data/JP1995-151965_Figure09P.png
+originX	29.53
+originY	88.58
+ppmm	2.718
+[figure]
+source	Data/US004247171_Figure01.png
+originX	93.59
+originY	472.30
+ppmm	19.838
+[notes]	
+Bill: F-Number limited to 1.443 by s4/s5. Also JP 1978-122423

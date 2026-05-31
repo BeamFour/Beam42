@@ -13,7 +13,7 @@ d5	4.2245	51.0442	69.7720
 d11	50.4250	25.6435	0.8618
 d14	25.3180	3.2800	9.3340
 d14AS	22.9280	0.8900	6.9440
-Bf	40.54	40.7	40.54
+Bf	40.49	40.7	40.54
 Aperture Diameter	41.181	41.213	41.146
 [lens data]
 1	164.000	2.70	1.7552	71.71	27.6	SF4
@@ -57,7 +57,16 @@ originX	77
 originY	482
 ppmm	8.177
 [notes]
+[patent info]
+country	US
+number	US4468097
+example	2
+year applied	1981
+inventors	Yoshinari Hamanishi
+current assignee	Nikon Corp
+original assignee	Nippon Kogaku KK
+link	https://patents.google.com/patent/US4468097A/en
 [report data]
-lens name	Nikkor 80-200mm f/2.8ED
+lens name	Nikkor 80-200mm f/2.8 ED
 scenarios	0	2
 names	80mm f2.8	200mm f2.8

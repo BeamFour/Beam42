@@ -1,4 +1,8 @@
-# Nikkor 80-200mm f/2.8ED
+# Nikkor 80-200mm f/2.8 ED
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US4468097 | 2 | 1981 | Yoshinari Hamanishi | Nippon Kogaku KK | [link](https://patents.google.com/patent/US4468097A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -41,7 +45,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | d11 | 50.425 | 0.8618 |
 | d14 | 22.928 | 6.944 |
 | a15 | 41.181 | 41.146 |
-| d27 | 40.54 | 40.54 |
+| d27 | 40.49 | 40.54 |
 # 80mm f2.8
 ## Layouts
 ![Layout Only](./layoutonly-0.svg)
@@ -67,7 +71,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | fno | 2.802
 | enp_dist_P | 86.562
 | enp_radius | 14.282
-| exp_dist_P' | -63.582
+| exp_dist_P' | -63.532
 | exp_radius | 18.637
 | m | -0
 | red | -1.2494827258334088E8
@@ -80,17 +84,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 9.607 | 17.164|
- | Field(x=0.0, y=0.1) | 10.866 | 38.92|
- | Field(x=0.0, y=0.2) | 11.847 | 39.52|
- | Field(x=0.0, y=0.3) | 13.243 | 45.857|
- | Field(x=0.0, y=0.4) | 14.842 | 53.847|
- | Field(x=0.0, y=0.5) | 16.695 | 63.746|
- | Field(x=0.0, y=0.6) | 17.646 | 67.37|
- | Field(x=0.0, y=0.7) | 19.074 | 75.007|
- | Field(x=0.0, y=0.8) | 20.144 | 83.598|
- | Field(x=0.0, y=0.9) | 23.122 | 92.171|
- | Field(x=0.0, y=1.0) | 27.579 | 106.449|
+ | Field(x=0.0, y=0.0) | 12.622 | 25.789|
+ | Field(x=0.0, y=0.1) | 13.686 | 47.692|
+ | Field(x=0.0, y=0.2) | 13.972 | 47.678|
+ | Field(x=0.0, y=0.3) | 14.91 | 54.014|
+ | Field(x=0.0, y=0.4) | 16.259 | 61.956|
+ | Field(x=0.0, y=0.5) | 18.039 | 71.858|
+ | Field(x=0.0, y=0.6) | 18.858 | 75.608|
+ | Field(x=0.0, y=0.7) | 20.493 | 83.154|
+ | Field(x=0.0, y=0.8) | 22.499 | 91.48|
+ | Field(x=0.0, y=0.9) | 26.12 | 99.76|
+ | Field(x=0.0, y=1.0) | 30.901 | 113.658|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf-0.svg)
 * 10,30,50 cycles/mm
@@ -164,4 +168,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./US004468097_Example02.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-05-26
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-05-31

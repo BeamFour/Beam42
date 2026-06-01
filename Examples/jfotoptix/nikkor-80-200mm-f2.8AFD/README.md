@@ -25,7 +25,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 19 | 50.319 | 5.8 | 40.96 | 1.49782 | 82.57 | Hikari | J-FKH1 |
 | 20 | 885.62 | 0.2 | 40.96 |  |  |  |
 | 21 | 43.598 | 6.4 | 38.92 | 1.48749 | 70.32 | Hikari | J-FK5 |
-| 22 | -29900.0 | 1.8 | 38.92 | 1.80518 | 25.45 | Hikari | J-SF6 |
+| 22 | -29900.0 | 1.7 | 38.92 | 1.80518 | 25.45 | Hikari | J-SF6 |
 | 23 | 292.52 | 9.2 | 38.92 |  |  |  |
 | 24 | AS | 2.2 | 28.662 |  |  |  |
 | 25 | 567.53 | 1.5 | 28.5 | 1.744 | 44.8 | Hikari | J-LAF2 |
@@ -41,7 +41,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | d5 | 1.834 | 42.435 |
 | d13 | 26.536 | 1.891 |
 | d18 | 18.005 | 2.049 |
-| d28 | 66.0 | 66.16 |
+| d28 | 66.32 | 66.485 |
 # 80mm f2.8
 ## Layouts
 ![Layout Only](./layoutonly-0.svg)
@@ -55,42 +55,42 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
-| effective_focal_length |79.997
-| back_focal_length | 66.139
-| optical_invariant | 3.824
+| effective_focal_length |80.108
+| back_focal_length | 66.424
+| optical_invariant | 3.819
 | object_distance | 1.0E10
-| image_distance | 66.139
-| power | 0.013
-| pp1_H | 96.81
-| ppk_H' | -13.858
-| ffl_F | 16.814
-| fno | 2.879
-| enp_dist_P | 85.24
-| enp_radius | 13.893
-| exp_dist_P' | -27.246
-| exp_radius | 16.243
+| image_distance | 66.424
+| power | 0.012
+| pp1_H | 96.878
+| ppk_H' | -13.684
+| ffl_F | 16.77
+| fno | 2.887
+| enp_dist_P | 85.178
+| enp_radius | 13.873
+| exp_dist_P' | -27.281
+| exp_radius | 16.245
 | m | -0
-| red | -1.2500534623373938E8
+| red | -1.2483084151572154E8
 | n_obj | 1
 | n_img | 1
-| img_ht | 22.02
+| img_ht | 22.05
 | obj_ang | 15.39
 | obj_na | 0
 | img_na | -0.171|
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 10.031 | 36.012|
- | Field(x=0.0, y=0.1) | 9.953 | 40.156|
- | Field(x=0.0, y=0.2) | 8.864 | 39.823|
- | Field(x=0.0, y=0.3) | 8.713 | 38.66|
- | Field(x=0.0, y=0.4) | 8.78 | 37.29|
- | Field(x=0.0, y=0.5) | 9.058 | 37.483|
- | Field(x=0.0, y=0.6) | 10.165 | 41.403|
- | Field(x=0.0, y=0.7) | 12.581 | 46.104|
- | Field(x=0.0, y=0.8) | 17.16 | 61.313|
- | Field(x=0.0, y=0.9) | 24.273 | 82.002|
- | Field(x=0.0, y=1.0) | 32.194 | 102.315|
+ | Field(x=0.0, y=0.0) | 10.273 | 39.348|
+ | Field(x=0.0, y=0.1) | 10.127 | 42.822|
+ | Field(x=0.0, y=0.2) | 8.858 | 42.994|
+ | Field(x=0.0, y=0.3) | 8.588 | 41.782|
+ | Field(x=0.0, y=0.4) | 8.791 | 42.158|
+ | Field(x=0.0, y=0.5) | 9.349 | 41.014|
+ | Field(x=0.0, y=0.6) | 10.954 | 49.418|
+ | Field(x=0.0, y=0.7) | 13.312 | 52.55|
+ | Field(x=0.0, y=0.8) | 17.508 | 66.296|
+ | Field(x=0.0, y=0.9) | 24.072 | 85.451|
+ | Field(x=0.0, y=1.0) | 31.689 | 104.465|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf-0.svg)
 * 10,30,50 cycles/mm
@@ -114,42 +114,42 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
-| effective_focal_length |195.925
-| back_focal_length | 66.15
-| optical_invariant | 3.626
+| effective_focal_length |196.199
+| back_focal_length | 66.436
+| optical_invariant | 3.62
 | object_distance | 1.0E10
-| image_distance | 66.15
+| image_distance | 66.436
 | power | 0.005
-| pp1_H | 55.762
-| ppk_H' | -129.775
-| ffl_F | -140.162
-| fno | 2.885
-| enp_dist_P | 270.235
-| enp_radius | 33.954
-| exp_dist_P' | -27.395
-| exp_radius | 16.21
+| pp1_H | 55.774
+| ppk_H' | -129.763
+| ffl_F | -140.425
+| fno | 2.894
+| enp_dist_P | 269.868
+| enp_radius | 33.903
+| exp_dist_P' | -27.434
+| exp_radius | 16.212
 | m | -0
-| red | -5.1040020997932576E7
+| red | -5.096876634646422E7
 | n_obj | 1
 | n_img | 1
-| img_ht | 20.921
+| img_ht | 20.95
 | obj_ang | 6.095
 | obj_na | 0
-| img_na | -0.171|
+| img_na | -0.17|
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 4.373 | 11.841|
- | Field(x=0.0, y=0.1) | 6.938 | 28.189|
- | Field(x=0.0, y=0.2) | 9.976 | 41.191|
- | Field(x=0.0, y=0.3) | 13.01 | 51.287|
- | Field(x=0.0, y=0.4) | 14.649 | 57.678|
- | Field(x=0.0, y=0.5) | 15.815 | 59.616|
- | Field(x=0.0, y=0.6) | 17.039 | 57.268|
- | Field(x=0.0, y=0.7) | 17.793 | 51.038|
- | Field(x=0.0, y=0.8) | 17.295 | 57.427|
- | Field(x=0.0, y=0.9) | 16.099 | 59.734|
- | Field(x=0.0, y=1.0) | 13.993 | 56.524|
+ | Field(x=0.0, y=0.0) | 4.694 | 14.61|
+ | Field(x=0.0, y=0.1) | 7.044 | 29.524|
+ | Field(x=0.0, y=0.2) | 9.33 | 40.745|
+ | Field(x=0.0, y=0.3) | 12.068 | 49.592|
+ | Field(x=0.0, y=0.4) | 13.586 | 55.204|
+ | Field(x=0.0, y=0.5) | 14.861 | 56.754|
+ | Field(x=0.0, y=0.6) | 16.456 | 54.328|
+ | Field(x=0.0, y=0.7) | 17.367 | 57.165|
+ | Field(x=0.0, y=0.8) | 16.905 | 62.673|
+ | Field(x=0.0, y=0.9) | 15.697 | 63.7|
+ | Field(x=0.0, y=1.0) | 13.548 | 59.235|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf-1.svg)
 * 10,30,50 cycles/mm
@@ -164,4 +164,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./JP1987-108218_Example03P.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-05-26
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-06-01

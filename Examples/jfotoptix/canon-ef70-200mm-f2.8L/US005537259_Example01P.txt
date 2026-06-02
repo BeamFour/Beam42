@@ -63,6 +63,15 @@ originY	78.10
 ppmm	1.774
 [notes]
 Bill: Added FS based on diagram
+[patent info]
+country	US
+number	US5537259
+example	1
+year applied	1994
+inventors	Hideki Ogawa
+current assignee	Canon Inc
+original assignee	Canon Inc
+link	https://patents.google.com/patent/US5537259A/en
 [report data]
 lens name	Canon EF70-200mm f2.8L USM
 scenarios	0	2

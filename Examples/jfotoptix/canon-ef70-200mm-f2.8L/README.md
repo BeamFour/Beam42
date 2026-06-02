@@ -1,4 +1,8 @@
 # Canon EF70-200mm f2.8L USM
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US5537259 | 1 | 1994 | Hideki Ogawa | Canon Inc | [link](https://patents.google.com/patent/US5537259A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

@@ -14,7 +14,7 @@ d5	17.08501	8.48886	17.08501	8.48886	17.08501	8.48886
 d9	1.99906	10.60231	16.04981	24.65306	22.87155	31.4748
 d16	32.0553	32.0553	18.13596	18.13596	1.61457	1.61457
 d21	3.43076	3.43076	3.29935	3.29935	12.99901	12.99901
-Bf	57.47	57.01947	57.01947	57.01947	58.41	57.01947
+Bf	57.47	57.01947	57.01947	57.01947	58.408	57.01947
 Aperture Diameter	38.414	38.414	38.432	38.432	38.032	38.032
 [lens data]
 1	97.0939	3.8	1.805182	71.5	25.41	E-SF6		Patent diameter
@@ -75,7 +75,16 @@ originX	7
 originY	147.5
 [notes]
 Bill: Production lens.
+[patent info]
+country	JP
+number	JP-2000-019398
+example	1
+year applied	1998
+inventors	Susumu Sato
+current assignee	Nikon Corp
+original assignee	Nippon Corp
+link	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2000-019398/11/en
 [report data]
-lens name	Nikkor 80-200mm f/2.8 ED
+lens name	AF-S Zoom Nikkor ED 80-200mm F2.8D
 scenarios	0	4
 names	80mm f2.8	200mm f2.8

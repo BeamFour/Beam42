@@ -1,4 +1,8 @@
-# Nikkor 80-200mm f/2.8 ED
+# AF-S Zoom Nikkor ED 80-200mm F2.8D
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|JP | JP-2000-019398 | 1 | 1998 | Susumu Sato | Nippon Corp | [link](https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2000-019398/11/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -48,7 +52,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | d16 | 32.0553 | 1.61457 |
 | d21 | 3.43076 | 12.99901 |
 | a22 | 38.414 | 38.032 |
-| d33 | 57.47 | 58.41 |
+| d33 | 57.47 | 58.408 |
 # 80mm f2.8
 ## Layouts
 ![Layout Only](./layoutonly-0.svg)
@@ -133,7 +137,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | fno | 2.939
 | enp_dist_P | 252.155
 | enp_radius | 33.547
-| exp_dist_P' | -75.359
+| exp_dist_P' | -75.357
 | exp_radius | 22.761
 | m | -0
 | red | -5.072067616453358E7
@@ -146,17 +150,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 3.004 | 8.141|
- | Field(x=0.0, y=0.1) | 2.689 | 8.028|
- | Field(x=0.0, y=0.2) | 3.369 | 9.125|
- | Field(x=0.0, y=0.3) | 5.33 | 20.009|
- | Field(x=0.0, y=0.4) | 7.94 | 32.734|
- | Field(x=0.0, y=0.5) | 9.121 | 37.41|
- | Field(x=0.0, y=0.6) | 9.273 | 36.688|
- | Field(x=0.0, y=0.7) | 9.277 | 29.792|
- | Field(x=0.0, y=0.8) | 11.764 | 33.497|
- | Field(x=0.0, y=0.9) | 18.916 | 49.924|
- | Field(x=0.0, y=1.0) | 30.335 | 64.559|
+ | Field(x=0.0, y=0.0) | 2.949 | 7.795|
+ | Field(x=0.0, y=0.1) | 2.711 | 7.682|
+ | Field(x=0.0, y=0.2) | 3.474 | 9.46|
+ | Field(x=0.0, y=0.3) | 5.475 | 20.328|
+ | Field(x=0.0, y=0.4) | 8.089 | 33.044|
+ | Field(x=0.0, y=0.5) | 9.254 | 37.699|
+ | Field(x=0.0, y=0.6) | 9.373 | 36.957|
+ | Field(x=0.0, y=0.7) | 9.311 | 30.039|
+ | Field(x=0.0, y=0.8) | 11.714 | 33.323|
+ | Field(x=0.0, y=0.9) | 18.828 | 49.781|
+ | Field(x=0.0, y=1.0) | 30.245 | 64.447|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf-1.svg)
 * 10,30,50 cycles/mm

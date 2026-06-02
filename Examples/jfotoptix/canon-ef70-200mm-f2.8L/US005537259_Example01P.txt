@@ -13,7 +13,7 @@ d10	1.64	12.89	17.23
 d17	30.32	15.72	1.32
 d22	14.70	0.69	4.05
 Bf(p)	undefined	undefined	undefined
-Bf	52.50	52.50	52.50
+Bf	52.37	52.50	52.50
 Aperture Diameter(m)	35.863	35.854	35.844
 [lens data]
 1	311.919	2.80	1.74950	73.05	35.0	E-LAF7
@@ -63,3 +63,7 @@ originY	78.10
 ppmm	1.774
 [notes]
 Bill: Added FS based on diagram
+[report data]
+lens name	Canon EF70-200mm f2.8L USM
+scenarios	0	2
+names	70mm f2.8	200mm f2.8

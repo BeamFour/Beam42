@@ -3,7 +3,7 @@ title	Nikon AI AF-S Zoom-Nikkor 80-200mm f/2.8D IF-ED (JP 2000-019398 Example 1)
 [constants]
 [variable distances]						
 Focal Length	81.55	undefined	135	undefined	194	undefined
-Angle of View	undefined	undefined	undefined	undefined	undefined	undefined
+Angle of View	30.81	undefined	18.16	undefined	12.41	undefined
 F-Number	2.88	undefined	2.88	undefined	2.88	undefined
 NA	undefined	0.17	undefined	0.17	undefined	0.15
 Image Height	43.28	43.28	43.28	43.28	43.28	43.28
@@ -75,3 +75,7 @@ originX	7
 originY	147.5
 [notes]
 Bill: Production lens.
+[report data]
+lens name	Nikkor 80-200mm f/2.8 ED
+scenarios	0	4
+names	80mm f2.8	200mm f2.8

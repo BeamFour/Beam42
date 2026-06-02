@@ -1,0 +1,11 @@
+Field Field(x=0.0, y=0.0) mean radius 10.954166729383806 max radius 19.968383323010396
+Field Field(x=0.0, y=0.1) mean radius 11.433623025601799 max radius 22.262422627636678
+Field Field(x=0.0, y=0.2) mean radius 12.436555585728685 max radius 25.638669494064807
+Field Field(x=0.0, y=0.3) mean radius 14.167302010452275 max radius 33.669698383951754
+Field Field(x=0.0, y=0.4) mean radius 15.740649420133042 max radius 44.4667327606955
+Field Field(x=0.0, y=0.5) mean radius 15.96497270086852 max radius 47.13260089220567
+Field Field(x=0.0, y=0.6) mean radius 14.88898634983994 max radius 44.97604012975994
+Field Field(x=0.0, y=0.7) mean radius 12.701044791007078 max radius 37.15809492249387
+Field Field(x=0.0, y=0.8) mean radius 11.216168711905237 max radius 28.636839148096094
+Field Field(x=0.0, y=0.9) mean radius 15.306457957100061 max radius 42.77306476726186
+Field Field(x=0.0, y=1.0) mean radius 25.888021071871737 max radius 58.491286060580926

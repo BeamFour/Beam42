@@ -62,6 +62,15 @@ originY	142.54
 ppmm	3.375
 [notes]
 Bill: Measured d0. All Focal Lengths are a little long.
+[patent info]
+country	JP
+number	JP,06-051202
+example	1
+year applied	1992
+inventors	MINATO ATSUO
+current assignee	Sigma Corp
+original assignee	Sigma Corp
+link	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-H06-051202/11/en
 [report data]
 lens name	Sigma APO Zoom 70-210mm F2.8
 scenarios	0	2

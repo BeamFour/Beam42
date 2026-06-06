@@ -1,4 +1,8 @@
 # Sigma APO Zoom 70-210mm F2.8
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|JP | JP,06-051202 | 1 | 1992 | MINATO ATSUO | Sigma Corp | [link](https://www.j-platpat.inpit.go.jp/c1801/PU/JP-H06-051202/11/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

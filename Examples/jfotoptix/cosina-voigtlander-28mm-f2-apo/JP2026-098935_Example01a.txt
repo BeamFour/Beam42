@@ -1,0 +1,61 @@
+[descriptive data]
+title	JP 2026-098935 Example 1[NG]
+[constants]
+NG	Something wrong between s6 and s10
+[variable distances]
+Focal Length	28.84	undefined
+Angle of View	74.00	undefined
+F-Number	2.06	undefined
+Total Length	71.25	undefined
+Image Height	43.26	43.26
+Magnification	0	-0.15335
+d0	Infinity	204.80
+d11	4.89	3.78
+Bf	18.62	22.73
+[lens data]
+1	125.894	1.20	1.51680	22.78	64.20	BSC7
+2	18.861	5.17		19.60	
+3	-27.573	3.15	1.76385	18.80	48.49	S-LAH96
+4	-17.550	1.00	1.77047	18.80	29.74	NBFD29
+5	-46.060	0.30		18.80	
+6	37.274	3.32	2.00100	18.76	29.13	TAFD55
+7	-351.499	0.25		18.76	
+8	50.074	3.91	1.88300	18.26	40.18	TAFD30
+9	-50.074	1.00	1.78880	18.26	28.43	S-NBH58
+10	85.847	2.32		18.26	
+11	AS	d11		16.727
+12	-19.573	1.00	1.72047	16.84	34.71	S-NBH8
+13	17.542	6.05	1.62846	18.09	59.14	J-PSKH8
+14	-33.858	0.25		18.09
+15	36.867	4.88	1.90525	20.40	35.04	S-LAH93
+16	-36.867	0.15		20.40	
+17	175.405	6.00	1.55032	20.88	75.50	FCD705
+18	-19.400	1.00	1.72047	20.88	34.71	S-NBH8
+19	85.713	5.05		20.88	
+20	-145.641	2.10	1.80610	22.02	40.73	NBFD13
+21	1000.000	Bf		23.60	
+[aspherical data]
+1	125.894	0	2.0224E-05	-2.3758E-07	2.0808E-09	-1.0332E-11	2.1614E-14
+2	18.861	1.199	1.5538E-06	-3.9504E-07	2.5250E-09	-1.6498E-11	
+20	-145.641	88.638	-3.5111E-05				
+21	1000.000	0	2.1066E-06	4.0810E-08	9.9222E-12	8.7513E-13	-4.3204E-15
+[group data]
+G1	1	10	58.09
+G2	12	21	54.10
+G1a-G1b	1	5	-29.62
+L5f	12	13	-12.70
+L5	12	14	-49.26
+L6	15	16	21.02
+[figure]
+caption	Cosina Voigtlander APO-Lanthar 28mm F2.0 Aspherical VM
+source	Data/JP2026-098935_Figure01P.png
+originX	104.51
+originY	301.66
+ppmm	14.979
+[figure]
+source	Data/JP2026-098935_Figure01.png
+originX	78.47
+originY	416.75
+ppmm	18.793
+[notes]
+Bill: Something wrong between s6 and s10. Magnification measured.

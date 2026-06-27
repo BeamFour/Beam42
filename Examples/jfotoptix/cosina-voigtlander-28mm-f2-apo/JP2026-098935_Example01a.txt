@@ -59,3 +59,15 @@ originY	416.75
 ppmm	18.793
 [notes]
 Bill: Something wrong between s6 and s10. Magnification measured.
+[patent info]
+country	JP
+number	JP2026-098935
+example	1
+year applied	2024
+inventors	Nozomu Mishima
+current assignee	Cosina Inc
+original assignee	Cosina Inc
+link	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2026-098935/11/en
+[report data]
+lens name	Cosina Voigtlander APO-Lanthar 28mm F2.0
+[report data]

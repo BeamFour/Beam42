@@ -10,7 +10,7 @@ Image Height	43.26	43.26
 Magnification	0	-0.13413
 d0	Infinity	394.90
 d10	7.56	0.70
-Bf	18.69	25.55
+Bf	18.665	25.55
 [lens data]
 1	-74.952	2.00	1.72047	46.38	34.71	S-NBH8
 2	60.086	3.96		44.22	
@@ -64,7 +64,7 @@ ppmm	8.522
 Bill: Magnification measured. r26 is Infinity
 [patent info]
 country	JP
-number	JP2026-098935
+number	JP2026-105585
 example	1
 year applied	2024
 inventors	Tatsuya Moriyama

@@ -2,7 +2,7 @@
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
-|JP | JP2026-098935 | 1 | 2024 | Tatsuya Moriyama | Cosina Inc | [link](https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2026-105585/11/en) |
+|JP | JP2026-105585 | 1 | 2024 | Tatsuya Moriyama | Cosina Inc | [link](https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2026-105585/11/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -33,7 +33,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 23 | -26.533 | 1.0 | 25.16 | 1.77047 | 29.74 | Hoya | NBFD29 |
 | 24 | 40.707 | 6.08 | 23.14 |  |  |  |
 | 25 | -113.598 | 2.11 | 24.18 | 1.80835 | 40.55 | Ohara | L-LAH84 |
-| 26 | 0.0 | 18.69 | 26.28 |  |  |  |
+| 26 | 0.0 | 18.665 | 26.28 |  |  |  |
 ## Aspherical Data
 | ID  | Type | k   | P1 | P2 | P3 | P4 | P5 | P6 | P7 | P8 | P9 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -64,7 +64,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | fno | 1.435
 | enp_dist_P | 38.146
 | enp_radius | 17.475
-| exp_dist_P' | -21.247
+| exp_dist_P' | -21.222
 | exp_radius | 13.921
 | m | -0
 | red | -1.9945535128432494E8
@@ -77,17 +77,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 11.775 | 32.415|
- | Field(x=0.0, y=0.1) | 13.152 | 47.411|
- | Field(x=0.0, y=0.2) | 14.298 | 49.004|
- | Field(x=0.0, y=0.3) | 16.72 | 51.646|
- | Field(x=0.0, y=0.4) | 20.382 | 61.219|
- | Field(x=0.0, y=0.5) | 24.871 | 70.323|
- | Field(x=0.0, y=0.6) | 30.855 | 85.544|
- | Field(x=0.0, y=0.7) | 39.883 | 130.49|
- | Field(x=0.0, y=0.8) | 53.396 | 152.114|
- | Field(x=0.0, y=0.9) | 65.384 | 176.409|
- | Field(x=0.0, y=1.0) | 81.734 | 213.621|
+ | Field(x=0.0, y=0.0) | 8.211 | 23.606|
+ | Field(x=0.0, y=0.1) | 9.509 | 38.488|
+ | Field(x=0.0, y=0.2) | 10.389 | 39.809|
+ | Field(x=0.0, y=0.3) | 12.523 | 42.504|
+ | Field(x=0.0, y=0.4) | 15.913 | 53.775|
+ | Field(x=0.0, y=0.5) | 20.252 | 63.341|
+ | Field(x=0.0, y=0.6) | 26.283 | 79.042|
+ | Field(x=0.0, y=0.7) | 35.595 | 124.465|
+ | Field(x=0.0, y=0.8) | 49.519 | 146.911|
+ | Field(x=0.0, y=0.9) | 61.979 | 171.893|
+ | Field(x=0.0, y=1.0) | 78.866 | 209.859|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm
@@ -102,4 +102,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./JP2026-105585_Example01.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-06-29
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-06-30

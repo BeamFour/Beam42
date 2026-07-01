@@ -354,12 +354,12 @@ public class LensTool2 {
             return list;
         }
 
-        public void doLayoutDiagramsForWides(OpticalBenchDataImporter.LensSpecifications specs,Args arguments, int config, int scenario, String filename_suffix) throws Exception {
+        public void doLayoutDiagramsForWides(OpticalBenchDataImporter.LensSpecifications specs,Args arguments, int config, int scenario, String filename_suffix, VigType vigType) throws Exception {
             // First we use rayoptics to get ray starts
             // For very wide angle lenses, blindly spraying rays doesn't work very well
             final double[] fields = {0.0, 0.7, 1.0};
             var prescription = createPrescription(specs,arguments.use_glass_types,arguments.only_d_line);
-            var opm = new RayOpticsModelBuilder(prescription).build_optical_model(true,fields,false,VigType.SetPupil,true, config);
+            var opm = new RayOpticsModelBuilder(prescription).build_optical_model(true,fields,false,vigType,true, config);
 
             // On axis rays field 0
             OpticalSystem system = createSystem(specs,scenario,arguments.use_glass_types,false,0,arguments.only_d_line);
@@ -392,7 +392,7 @@ public class LensTool2 {
         }
         try {
             final double[] fields = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
-
+            VigType vigType = VigType.SetPupil;
             OpticalBenchDataImporter.LensSpecifications specs = getSpecsFromFile(arguments.specfile);
             var prescription = createPrescription(specs,arguments.use_glass_types,arguments.only_d_line);
             String prescription_output = prescription.to_opt_bench_str(new StringBuilder()).toString();
@@ -405,7 +405,7 @@ public class LensTool2 {
                 if (prescription.get_num_configurations() > 0)
                     addConfigLabelToREADME(SB,prescription._configuration_names[config]);
                 var scenario_filesuffix = prescription.get_num_configurations() > 0 ? ("-"+config) : "";
-                var opm = createSystem(prescription, true, VigType.SetPupil, true, fields, config);
+                var opm = createSystem(prescription, true, vigType, true, fields, config);
                 var sm = opm.seq_model;
                 var osp = opm.optical_spec;
                 var fod = opm.optical_spec.parax_data.fod;
@@ -416,7 +416,7 @@ public class LensTool2 {
                 Helper.createOutputFile(Helper.getOutputPath(arguments.specfile, suffixed_name("paraxial", scenario_filesuffix, ".txt"), arguments.outdir), fod.toString());
 
                 if (arguments.do_wideangle_layout /* || osp.fov.is_wide_angle */)
-                    new Layout().doLayoutDiagramsForWides(specs, arguments, config, scenario, scenario_filesuffix);
+                    new Layout().doLayoutDiagramsForWides(specs, arguments, config, scenario, scenario_filesuffix, vigType);
                 else
                     new Layout().doLayoutDiagrams(specs, arguments, scenario, scenario_filesuffix);
 
@@ -440,9 +440,9 @@ public class LensTool2 {
                 // Generate MTF with weighted average across wavelengths
                 var wvls = arguments.only_d_line ? new double[] {587.5618} : new double[]{587.5618, 656.2725, 546.074, 486.1327, 435.8343};
                 var wts = arguments.only_d_line ? new double[] {1.0} : new double[]{1.0, 0.475, 0.98, 0.49, 0.15};
-                var prescriptionForMTF = createPrescription(specs, arguments.use_glass_types, wvls, wts);
-                opm = createSystem(prescriptionForMTF, true, VigType.SetPupil, true, fields, config);
-                generateMTFs(opm, arguments, fields, prescriptionForMTF.get_wvl_wts(), "mtf-w", scenario_filesuffix);
+                var prescriptionForWeightedMTF = createPrescription(specs, arguments.use_glass_types, wvls, wts);
+                opm = createSystem(prescriptionForWeightedMTF, true, vigType, true, fields, config);
+                generateMTFs(opm, arguments, fields, prescriptionForWeightedMTF.get_wvl_wts(), "mtf-w", scenario_filesuffix);
             }
             createREADME(SB,
                     arguments.specfile,

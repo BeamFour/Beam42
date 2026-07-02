@@ -13,7 +13,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 3 | -27.573 | 3.15 | 18.8 | 1.76385 | 48.49 | Ohara | S-LAH96 |
 | 4 | -17.55 | 1.0 | 18.8 | 1.77047 | 29.74 | Hoya | NBFD29 |
 | 5 | -46.06 | 0.3 | 18.8 |  |  |  |
-| 6 | 37.274 | 3.32 | 18.76 | 2.001 | 29.13 | Hoya | TAFD55 |
+| 6 | 37.2924 | 3.32 | 18.76 | 2.001 | 29.13 | Hoya | TAFD55 |
 | 7 | -351.499 | 0.25 | 18.76 |  |  |  |
 | 8 | 50.074 | 3.91 | 18.26 | 1.883 | 40.81 | Hoya | TAFD30 |
 | 9 | -50.074 | 1.0 | 18.26 | 1.7888 | 28.43 | Ohara | S-NBH58 |
@@ -28,7 +28,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 18 | -19.4 | 1.0 | 20.88 | 1.72047 | 34.71 | Ohara | S-NBH8 |
 | 19 | 85.713 | 5.05 | 20.88 |  |  |  |
 | 20 | -145.641 | 2.1 | 22.02 | 1.8061 | 40.73 | Hoya | NBFD13 |
-| 21 | 1000.0 | 18.62 | 23.6 |  |  |  |
+| 21 | 1000.0 | 18.6268 | 23.6 |  |  |  |
 ## Aspherical Data
 | ID  | Type | k   | P1 | P2 | P3 | P4 | P5 | P6 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -48,42 +48,42 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
-| effective_focal_length |28.996
-| back_focal_length | 18.591
+| effective_focal_length |29.005
+| back_focal_length | 18.609
 | optical_invariant | 5.338
 | object_distance | 1.0E10
-| image_distance | 18.591
+| image_distance | 18.609
 | power | 0.034
-| pp1_H | 21.148
-| ppk_H' | -10.405
-| ffl_F | -7.847
+| pp1_H | 21.153
+| ppk_H' | -10.396
+| ffl_F | -7.852
 | fno | 2.047
 | enp_dist_P | 12.017
-| enp_radius | 7.084
-| exp_dist_P' | -23.763
+| enp_radius | 7.083
+| exp_dist_P' | -23.752
 | exp_radius | 10.34
 | m | -0
-| red | -3.448764271073942E8
+| red | -3.4476734701179224E8
 | n_obj | 1
 | n_img | 1
-| img_ht | 21.85
+| img_ht | 21.857
 | obj_ang | 37
 | obj_na | 0
 | img_na | -0.237|
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 5.502 | 12.6|
- | Field(x=0.0, y=0.1) | 5.314 | 14.345|
- | Field(x=0.0, y=0.2) | 5.364 | 14.032|
- | Field(x=0.0, y=0.3) | 5.79 | 17.173|
- | Field(x=0.0, y=0.4) | 6.503 | 20.585|
- | Field(x=0.0, y=0.5) | 7.397 | 23.168|
- | Field(x=0.0, y=0.6) | 8.39 | 24.791|
- | Field(x=0.0, y=0.7) | 9.504 | 26.13|
- | Field(x=0.0, y=0.8) | 10.42 | 28.883|
- | Field(x=0.0, y=0.9) | 10.325 | 30.684|
- | Field(x=0.0, y=1.0) | 8.323 | 28.983|
+ | Field(x=0.0, y=0.0) | 6.234 | 16.527|
+ | Field(x=0.0, y=0.1) | 5.704 | 18.248|
+ | Field(x=0.0, y=0.2) | 5.423 | 17.8|
+ | Field(x=0.0, y=0.3) | 5.546 | 18.697|
+ | Field(x=0.0, y=0.4) | 6.03 | 18.629|
+ | Field(x=0.0, y=0.5) | 6.832 | 21.834|
+ | Field(x=0.0, y=0.6) | 7.869 | 24.975|
+ | Field(x=0.0, y=0.7) | 9.146 | 28.93|
+ | Field(x=0.0, y=0.8) | 10.274 | 33.078|
+ | Field(x=0.0, y=0.9) | 10.471 | 34.917|
+ | Field(x=0.0, y=1.0) | 8.091 | 25.344|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10,30,50 cycles/mm
@@ -98,4 +98,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./JP2026-098935_Example01a.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-06-27
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-07-02

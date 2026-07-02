@@ -46,7 +46,7 @@ public class GeoMTFPlot {
                 double y = y_data[i];
                 set.add_data(x, y);
             }
-            plot.add_plot_data(set, xy==0 ? Rgb.rgb_black : Rgb.rgb_blue, xy== 0? "Sagittal" : "Tangential", PlotStyleMask.InterpolatePlot.value());
+            plot.add_plot_data(set, xy==0 ? Rgb.rgb_black : Rgb.rgb_blue, xy == 0 ? "Sagittal" : "Tangential", PlotStyleMask.InterpolatePlot.value());
         }
         String x_label = "Spatial Frequency";
         String y_label = "Modulation";

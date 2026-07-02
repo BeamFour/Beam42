@@ -37,6 +37,8 @@ public class GeoMTFByFieldPlot {
         // for each freq
         for (var i = 0; i < mtfs_by_freq.size(); i++) {
             var mtf = mtfs_by_freq.get(i);
+            // xy == 0 sagittal
+            // xy == 1 tangential
             for (int xy = 0; xy < 2; xy++) {
                 var set = new DiscreteSet();
                 set.set_interpolation(Interpolation.Cubic);

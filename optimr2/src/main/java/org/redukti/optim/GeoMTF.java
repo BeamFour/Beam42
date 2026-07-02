@@ -18,7 +18,7 @@ public class GeoMTF extends Goal {
     public double value() {
         for (int i = 0; i < _analysis._mtfs.length; i++) {
             if (_analysis._mtfs[i].freq == _freq)
-                return _xy == 0 ? _analysis._mtfs[i].tan_mtf_by_field[_field -1] : _analysis._mtfs[i].sag_mtf_by_field[_field -1];
+                return _xy == 1 ? _analysis._mtfs[i].tan_mtf_by_field[_field -1] : _analysis._mtfs[i].sag_mtf_by_field[_field -1];
         }
         throw new IllegalArgumentException();
     }

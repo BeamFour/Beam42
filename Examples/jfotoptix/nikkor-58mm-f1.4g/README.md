@@ -26,10 +26,10 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 16 | 0.0 | 2.0 | 45.0 | 1.5168 | 64.13 | Hikari | J-BK7A |
 | 17 | 0.0 | 0.496 | 45.0 |  |  |  |
 ## Aspherical Data
-| ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 5 | 0.20442695317246995 | 0.0 | 1.4071557982130364E-6 | -3.991069378846381E-9 | 3.2865377407921236E-11 | -3.910661708839268E-14 | -3.3074005306060934E-16 | 9.5281E-19 | 0.0 | 0.0 | 0.0 |
-| 15 | 16.104813328668346 | 0.0 | 9.2224002378996E-6 | 5.476509864245342E-9 | 1.4212668394859673E-11 | 1.9995334129212448E-14 | -5.385605504993855E-17 | 2.0086E-19 | 0.0 | 0.0 | 0.0 |
+| ID  | Type | k   | P1 | P2 | P3 | P4 | P5 | P6 | P7 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 5| EVEN | 0.20442695317246995 | 0.0 | 1.4071557982130364E-6 | -3.991069378846381E-9 | 3.2865377407921236E-11 | -3.910661708839268E-14 | -3.3074005306060934E-16 | 9.5281E-19 |
+| 15| EVEN | 16.104813328668346 | 0.0 | 9.2224002378996E-6 | 5.476509864245342E-9 | 1.4212668394859673E-11 | 1.9995334129212448E-14 | -5.385605504993855E-17 | 2.0086E-19 |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -89,7 +89,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 * Black lines represent sagittal, blue tangential
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
-* [OpticalBench Compatible Data File, tab delimited](./JP2013-019993_Example01a.txt)
+* [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./JP2013-019993_Example01a.zmx)
 
-This report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-01-20
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-07-03

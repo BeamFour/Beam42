@@ -23,10 +23,11 @@ The project combines solutions from following open source projects:
     * OPD plots
     * Paraxial report
     * Zemax file
+    * A markdown README that brings together all of above
 * Features a Levenberg Marquardt Lampton solver based optimizer with following features
     * Set variables on surface properties
     * Fit to spot size or ray aberration goals or MTF targets
-    * Constrain by paraxial parameters 
+    * Constrain by paraxial parameters
     * The optimization functions above are available only via Java API calls. There is no UI for this. 
     * Note: There are some optimization functions in BeamFour that do have a UI; but BeamFour is a more general ray tracing and
       analysis software that doesn't do many things that are typical of photographic lenses.

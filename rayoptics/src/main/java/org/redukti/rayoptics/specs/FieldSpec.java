@@ -24,6 +24,7 @@ import java.util.List;
  *         fields: list of Field instances
  *         is_relative: if True, `fields` are relative to max field
  *         is_wide_angle: if True, aim at real entrance pupil
+ *
  */
 public class FieldSpec {
 
@@ -43,10 +44,19 @@ public class FieldSpec {
     public boolean is_wide_angle;
     /**
      * list of Field instances
+     * Fields are placed on the y axis, so x is sagittal and y is tangential.
      */
     public Field[] fields;
     public String[] index_labels;
 
+    /**
+     * @param key   Specifies whether the field is in image space or object space and the value type (Angle, Height, RealHeight)
+     * @param value Value used to define the field, interpretation depends on key
+     * @param flds  Fields are placed on the y axis, so x is sagittal and y is tangential.
+     * @param is_relative   Defaults to false
+     * @param is_wide_angle Defaults to false
+     * @param do_init Defaults to true
+     */
     public FieldSpec(OpticalSpecs parent, Pair<ImageKey, ValueKey> key, Double value, double[] flds,
                      Boolean is_relative, Boolean is_wide_angle, Boolean do_init) {
         if (key == null) key = new Pair<>(ImageKey.Object, ValueKey.Angle);

@@ -6,7 +6,7 @@ import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.SurfaceType;
 
-public class TestOptim {
+public class TestOptimLMder {
 
     /**
      * Prescript based off measurements from Nikkor tale
@@ -36,7 +36,7 @@ public class TestOptim {
     public void testNikkor58mmNoct() {
         var prescription = getPrescription();
         var analysis = new Analysis(prescription, new double[]{0.0,0.1,0.3,0.5,0.7,1.0},new int[]{30});
-        var f = new MeritFunction(analysis,
+        var f = new LMDerMeritFunction(analysis,
                 new Var[] {
                         new VarRadius(prescription, 0),
                         new VarAsphK(prescription,0),
@@ -77,7 +77,7 @@ public class TestOptim {
                         new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,58.0, 1.0),
                         new GoalParax(analysis, ParaxialFirstOrderInfo.Fno, 1.2, 1.0),
                         new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 37.78, 1.0),
-                });
+                },false);
         analysis.compute();
         var lm = f.getSolver();
         System.out.println("Aberrations:\n");

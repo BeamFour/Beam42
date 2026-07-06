@@ -148,6 +148,25 @@ public class MeritFunction implements LMLFunction {
             sb.append("Values:\n");
             for (int i = 0; i < outs.length; i++)
                 sb.append(outs[i].toString()).append('\n');
+            sb.append("RMS: ").append(getRMS()).append('\n');
             return sb.toString();
+        }
+
+        public Goal[] goals() {
+            return outs;
+        }
+        public Var[] variables() {
+            return vars;
+        }
+        public double getRMS() {
+            double sos = 0.0;
+            double[] resid = new double[outs.length];
+            for (int i = 0; i < outs.length; i++) {
+                resid[i] = (outs[i]._target - outs[i]. value())*outs[i]._weight;
+                sos += M.square(resid[i]);
+            }
+            if (M.isZero(sos))
+                return sos;
+            return Math.sqrt(sos / outs.length);
         }
 }

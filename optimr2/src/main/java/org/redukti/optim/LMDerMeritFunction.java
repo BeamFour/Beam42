@@ -1,5 +1,6 @@
 package org.redukti.optim;
 
+import org.redukti.mathlib.M;
 import org.redukti.mathlib.MinPack;
 
 public class LMDerMeritFunction implements MinPack.Lmder_Function {
@@ -173,6 +174,25 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
         sb.append("Values:\n");
         for (int i = 0; i < functions.length; i++)
             sb.append(functions[i].toString()).append('\n');
+        sb.append("RMS: ").append(getRMS()).append('\n');
         return sb.toString();
+    }
+
+    public Goal[] goals() {
+        return functions;
+    }
+    public Var[] variables() {
+        return vars;
+    }
+    public double getRMS() {
+        double sos = 0.0;
+        double[] resid = new double[functions.length];
+        for (int i = 0; i < functions.length; i++) {
+            resid[i] = (functions[i]._target - functions[i]. value())*functions[i]._weight;
+            sos += M.square(resid[i]);
+        }
+        if (M.isZero(sos))
+            return sos;
+        return Math.sqrt(sos / functions.length);
     }
 }

@@ -15,6 +15,8 @@ public class MeritFunction implements LMLFunction {
         private Var[] vars;
         private Goal[] outs;
         private double tol = 1E-6;
+        private int nfev = 0;
+        private int njev = 0;
 
         public MeritFunction(Analysis analysis, Var[] vars, Goal[] outs) {
             this.analysis = analysis;
@@ -30,6 +32,7 @@ public class MeritFunction implements LMLFunction {
             for (int i = 0; i < point.length; i++) {
                 vars[i].shift(point[i]);
             }
+            nfev++;
             try {
                 analysis.compute();
             }
@@ -60,6 +63,7 @@ public class MeritFunction implements LMLFunction {
                 final int nadj = vars.length;
                 final int ngoals = outs.length;
                 double[] delta = new double[nadj];
+                njev++;
                 for (int j=0; j<nadj; j++)
                 {
                     double dDelta = vars[j]._d_delta;
@@ -149,6 +153,7 @@ public class MeritFunction implements LMLFunction {
             for (int i = 0; i < outs.length; i++)
                 sb.append(outs[i].toString()).append('\n');
             sb.append("RMS: ").append(getRMS()).append('\n');
+            sb.append("nfev=" + nfev + " njev=" + njev).append('\n');
             return sb.toString();
         }
 

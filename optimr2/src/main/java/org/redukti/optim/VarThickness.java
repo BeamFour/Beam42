@@ -7,6 +7,7 @@ public class VarThickness extends Var {
     public VarThickness(Prescription prescription, int surfaceId) {
         super(prescription);
         this._surface_id = surfaceId;
+        this._d_delta = 1.0e-3; // matches optimr's VarThickness
     }
 
     @Override

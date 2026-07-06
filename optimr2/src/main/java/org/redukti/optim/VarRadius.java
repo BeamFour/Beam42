@@ -7,6 +7,8 @@ public class VarRadius extends Var {
     public VarRadius(Prescription prescription, int surfaceId) {
         super(prescription);
         this._surface_id = surfaceId;
+        // same step as optimr's VarRadius, with a floor for flat/near-flat surfaces
+        this._d_delta = Math.max(Math.abs(prescription._surfaces[surfaceId]._radius) * 0.001, 1.0e-3);
     }
 
     @Override

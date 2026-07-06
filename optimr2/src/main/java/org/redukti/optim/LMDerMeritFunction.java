@@ -47,28 +47,37 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
         // residuals.
         if (iflag == 0) return 0;
         if (iflag != 2) {
-            //compute residuals
-            for (int i = 0; i < x.length; i++) {
-                vars[i].set_scaled_value(x[i]);
-            }
-            boolean okay = true;
-            try {
-                for (int i = 0; i < x.length; i++) {
-                    vars[i].write_to_prescription();
-                }
-                analysis.compute();
-            } catch (Exception e) {
-                okay = false;
-            }
-            for (int i = 0; i < functions.length; i++) {
-                fvec[i] = okay ? (functions[i].value() * weights[i]) : BIGVAL;
-            }
+            computeResiduals(x, fvec);
         } else {
             // compute jacobian
             if (!buildJacobian(x, fjac, ldfjac))
                 return -99;
         }
         return 0;
+    }
+
+    /**
+     * Evaluates the weighted residuals (value - target)*weight at x.
+     * On any failure (killed ray, NaN in x, exception in the analysis)
+     * all residuals are set to BIGVAL so that lmder rejects the trial step.
+     * lmder minimizes ||fvec||^2, so fvec must be the deviation from target:
+     * using the raw goal value would drive EFL/Fno/MTF towards zero.
+     */
+    private void computeResiduals(double[] x, double[] fvec) {
+        boolean okay = true;
+        try {
+            for (int i = 0; i < x.length; i++) {
+                vars[i].set_scaled_value(x[i]);
+                vars[i].write_to_prescription();
+            }
+            analysis.compute();
+        } catch (Exception e) {
+            okay = false;
+        }
+        for (int i = 0; i < functions.length; i++) {
+            double r = okay ? (functions[i].value() - functions[i]._target) * weights[i] : BIGVAL;
+            fvec[i] = Double.isFinite(r) ? r : BIGVAL;
+        }
     }
 
     @Override
@@ -87,22 +96,7 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
         // function may perform special operations, such as printing
         // residuals.
         if (iflag == 0) return 0;
-        // compute residuals
-        for (int i = 0; i < x.length; i++) {
-            vars[i].set_scaled_value(x[i]);
-        }
-        boolean okay = true;
-        try {
-            for (int i = 0; i < x.length; i++) {
-                vars[i].write_to_prescription();
-            }
-            analysis.compute();
-        } catch (Exception e) {
-            okay = false;
-        }
-        for (int i = 0; i < functions.length; i++) {
-            fvec[i] = okay ? (functions[i].value() * weights[i]) : BIGVAL;
-        }
+        computeResiduals(x, fvec);
         return 0;
     }
 
@@ -112,8 +106,12 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
         double[] resid = new double[m];
         double delta[] = new double[n];
         for (int j = 0; j < n; j++) {
-            //double dDelta = vars[j].dDelta;
-            double dDelta = vars[j].get_scaled_value() * 0.000001;
+            // Fixed absolute step per variable (scaled units). A step relative
+            // to the current value is zero for zero-valued parameters (fresh
+            // aspheric coefficients, conic k) and yields 0/0 = NaN columns.
+            double dDelta = vars[j]._d_delta;
+            if (!Double.isFinite(dDelta) || dDelta <= 0.0)
+                return false;
             for (int k = 0; k < n; k++)
                 delta[k] = (k == j) ? dDelta : 0.0;
             if (!nudge(x, delta, resid)) {
@@ -130,8 +128,11 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
             for (int i = 0; i < m; i++)
                 fjac[i + j * ldfjac] -= resid[i];
 
-            for (int i = 0; i < m; i++)
+            for (int i = 0; i < m; i++) {
                 fjac[i + j * ldfjac] /= (2.0 * dDelta);
+                if (!Double.isFinite(fjac[i + j * ldfjac]))
+                    return false;
+            }
         }
         // Scale by weights
         for (int j = 0; j < n; j++) {
@@ -139,26 +140,32 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
                 fjac[i + j * ldfjac] = fjac[i + j * ldfjac] * weights[i];
             }
         }
-        return true;
+        // Restore the prescription and analysis to the unperturbed point x
+        for (int k = 0; k < n; k++)
+            delta[k] = 0.0;
+        return nudge(x, delta, resid);
     }
 
     public boolean nudge(double[] x, double[] delta, double[] resid) {
-        for (int i = 0; i < delta.length; i++) {
-            vars[i].set_scaled_value(x[i] + delta[i]);
-        }
         boolean okay = true;
         try {
-            for (int i = 0; i < x.length; i++) {
+            for (int i = 0; i < delta.length; i++) {
+                vars[i].set_scaled_value(x[i] + delta[i]);
                 vars[i].write_to_prescription();
             }
             analysis.compute();
         } catch (Exception e) {
             okay = false;
         }
+        if (!okay)
+            // A killed ray during Jacobian evaluation: differencing BIGVAL
+            // residuals would poison the Jacobian, so report failure instead
+            // (buildJacobian returns false, lmder terminates with info < 0).
+            return false;
         for (int i = 0; i < functions.length; i++) {
-            resid[i] = okay ? functions[i].value() : BIGVAL;
+            resid[i] = functions[i].value();
         }
-        return true;
+        return okay;
     }
 
     public Solver getSolver() {

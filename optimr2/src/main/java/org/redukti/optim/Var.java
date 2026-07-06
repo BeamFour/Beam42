@@ -7,6 +7,13 @@ public abstract class Var {
     public final Prescription _prescription;
     public double _unscaled_value;
     public double _scaled_value;
+    /**
+     * Finite-difference step in scaled units, used when building the Jacobian.
+     * Must be a fixed absolute step: a step proportional to the current value
+     * degenerates to zero for parameters that start at (or cross) zero,
+     * e.g. aspheric coefficients, producing NaN Jacobian columns.
+     */
+    public double _d_delta = 1.0e-4;
     public Var(Prescription prescription) {
         this._prescription = prescription;
     }

@@ -51,10 +51,10 @@ public class LMDerSolver implements Solver {
             double[] fjac = new double[m * n];    // Space for jacobian
             int ldfjac = m;
             double ftol = Math.sqrt(MinPack.dpmpar(1));
-            double xtol = Math.sqrt(MinPack.dpmpar(1));
-            double gtol = 0.;
+            double xtol = 0.;      // don't stop on step size; ray-trace noise makes late steps tiny
+            double gtol = 1.0e-12; // stop when the gradient is genuinely flat
             int maxfev = (n + 1) * 100;
-            int mode = 2; // 1=scale internally 2=scale using diag
+            int mode = 1; // 1=scale internally 2=scale using diag
             double factor = 100;
             int nprint = 1;
 
@@ -70,6 +70,8 @@ public class LMDerSolver implements Solver {
             info = MinPack.lmder(fcn, m, n, x, fvec, fjac, ldfjac,
                     ftol, xtol, gtol, maxfev, diag, mode, factor, nprint,
                     nfev, njev, ipvt, qtf, wa1, wa2, wa3, wa4, epsfcn);
+            System.out.println("lmder: info=" + info + " nfev=" + nfev[0] + " njev=" + njev[0]
+                    + " (each njev costs 2n=" + (2 * n) + " evaluations via central differences)");
         }
 
         // Set final solution vector

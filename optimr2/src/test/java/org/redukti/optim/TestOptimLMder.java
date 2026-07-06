@@ -6,6 +6,8 @@ import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.SurfaceType;
 
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+
 public class TestOptimLMder {
 
     /**
@@ -34,6 +36,9 @@ public class TestOptimLMder {
 
     @Test
     public void testNikkor58mmNoct() {
+        assumeTrue(Boolean.getBoolean("optimization.runSlowTests"),
+                "Enable with -Doptimization.runSlowTests=true");
+
         var prescription = getPrescription();
         var analysis = new Analysis(prescription, new double[]{0.0,0.1,0.3,0.5,0.7,1.0},new int[]{30});
         var f = new LMDerMeritFunction(analysis,
@@ -92,6 +97,7 @@ public class TestOptimLMder {
         System.out.println(f.toString());
         System.out.println(prescription.toString());
         Assertions.assertTrue(finalRMS < initialRMS);
+        Assertions.assertEquals(34.591,finalRMS,1e-3);
     }
 
 }

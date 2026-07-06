@@ -1,7 +1,5 @@
 package org.redukti.optim;
 
-import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
-
 /**
  * Paraxial goals are helpful in anchoring the system so that
  * the optimixer does not make massive changes to focal length etc.
@@ -18,6 +16,6 @@ public class GoalParax extends Goal {
     }
     @Override
     public String toString() {
-        return ParaxialFirstOrderInfo.Names[_parax_id] + " = " + value();
+        return ParaxHelper.Names[_parax_id] + " = " + value();
     }
 }

@@ -13,8 +13,9 @@ public class NoctNikkor58OptimG {
     private static Prescription getPrescription(String specfile) throws Exception {
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(specfile);
-        return Prescription.build_prescription(specs, true, new double[]{587.5618,656.2725,546.074,486.1327,435.8343},
-                new double[]{1.0,0.475,0.98,0.49,0.15});
+        return Prescription.build_prescription(specs, true);
+//        return Prescription.build_prescription(specs, true, new double[]{587.5618,656.2725,546.074,486.1327,435.8343},
+//                new double[]{1.0,0.475,0.98,0.49,0.15});
     }
 
     public static void main(String[] args) throws Exception {

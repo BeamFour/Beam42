@@ -1,11 +1,12 @@
 package org.redukti.optim;
 
+import org.redukti.mathlib.LMLSolver;
 import org.redukti.mathlib.M;
 import org.redukti.mathlib.MinPack;
 
 public class LMDerMeritFunction implements MinPack.Lmder_Function {
 
-    public static final double BIGVAL = 9.876543e+99;
+    private static final double BIGVAL = LMLSolver.BIGVAL;
 
     private double weights[];
     private Analysis analysis;

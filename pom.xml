@@ -17,6 +17,7 @@
         <module>render</module>
         <module>tools</module>
         <module>optimj</module>
+        <module>optimcommon</module>
         <module>optimr</module>
         <module>optimr2</module>
     </modules>

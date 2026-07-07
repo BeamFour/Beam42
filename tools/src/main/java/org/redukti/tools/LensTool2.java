@@ -148,13 +148,13 @@ public class LensTool2 {
     public static void addMTFsToREADME(StringBuilder sb,  String scenario_filesuffix) {
         sb.append("## Polychromatic Geometric MTF\n");
         sb.append(String.format("![Polychromatic Geometrical MTF](./mtf%s.svg)\n", scenario_filesuffix));
-        sb.append("* 10,30,50 cycles/mm\n");
-        sb.append("* Black lines represent sagittal, blue tangential\n");
+        sb.append("* 10=red,30=blue,50=black cycles/mm\n");
+        sb.append("* Solid lines represent sagittal, dashed lines tangential\n");
         sb.append("* To generate above, MTFs for wavelengths 587.5618(d), 486.1327(F), 656.2725(C) were calculated across 10 fields, and then averaged\n");
         sb.append("## Polychromatic Geometric MTF (Weighted)\n");
         sb.append(String.format("![Polychromatic Geometrical MTF Weighted](./mtf-w%s.svg)\n", scenario_filesuffix));
-        sb.append("* 10,30,50 cycles/mm\n");
-        sb.append("* Black lines represent sagittal, blue tangential\n");
+        sb.append("* 10=red,30=blue,50=black cycles/mm\n");
+        sb.append("* Solid lines represent sagittal, dashed lines tangential\n");
         sb.append("* To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average\n");
     }
 

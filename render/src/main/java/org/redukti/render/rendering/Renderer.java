@@ -120,6 +120,28 @@ public abstract class Renderer {
     Rgb[] _styles_color = new Rgb[Style.StyleLast.value];
     RayColorMode _ray_color_mode;
     IntensityMode _intensity_mode;
+
+    /**
+     * Current line dash pattern applied to subsequently drawn segments,
+     * expressed as an SVG-style stroke-dasharray value (e.g. "6,4").
+     * A null or empty value means a solid line.
+     */
+    protected String _stroke_dasharray = null;
+
+    /**
+     * Set the dash pattern used for subsequently drawn line segments.
+     * Pass null (or an empty string) for a solid line. The value follows
+     * the SVG stroke-dasharray convention, e.g. "6,4" for dashes or
+     * "2,3" for a dotted line. Renderers that do not support dashing
+     * simply ignore this setting.
+     */
+    public void set_stroke_dasharray(String dasharray) {
+        this._stroke_dasharray = dasharray;
+    }
+
+    public String get_stroke_dasharray() {
+        return _stroke_dasharray;
+    }
     //double _max_intensity; // max ray intensity updated on
 
     public Renderer()

@@ -29,10 +29,33 @@ import org.redukti.data.DataSet;
 import org.redukti.render.rendering.Rgb;
 
 public class PlotData {
+
+    /**
+     * Line pattern used when drawing curves/lines for this data set.
+     * The associated value is an SVG stroke-dasharray string (null = solid).
+     */
+    public enum LineStyle {
+        Solid(null),
+        Dashed("6,4"),
+        Dotted("2,3"),
+        DashDot("6,3,2,3");
+
+        final String _dasharray;
+
+        LineStyle(String dasharray) {
+            this._dasharray = dasharray;
+        }
+
+        public String dasharray() {
+            return _dasharray;
+        }
+    }
+
     DataSet _set;
     Rgb _color;
     int _style;
     String _label;
+    LineStyle _line_style = LineStyle.Solid;
 
     /**
      * Create a new data plot descriptor which describe the
@@ -106,6 +129,20 @@ public class PlotData {
      */
     public int get_style() {
         return _style;
+    }
+
+    /**
+     * Set the line pattern (solid, dashed, ...) used for this data set.
+     */
+    public void set_line_style(LineStyle line_style) {
+        this._line_style = line_style;
+    }
+
+    /**
+     * Get the line pattern used for this data set.
+     */
+    public LineStyle get_line_style() {
+        return _line_style;
     }
 
 }

@@ -8,6 +8,7 @@ import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.analysis.MTFResultByFreq;
 import org.redukti.render.plotting.Plot;
 import org.redukti.render.plotting.PlotAxes;
+import org.redukti.render.plotting.PlotData;
 import org.redukti.render.plotting.PlotRenderer;
 import org.redukti.render.plotting.PlotStyleMask;
 import org.redukti.render.rendering.RendererSvg;
@@ -27,16 +28,29 @@ public class GeoMTFByFieldPlot {
         this.mtfs_by_freq = mtfs_by_freq;
         this.fields = fields.clone();
     }
+    // Distinct colors cycled per frequency (10, 30, 50, ...)
+    static final Rgb[] FREQ_COLORS = {
+            Rgb.rgb_red,
+            Rgb.rgb_blue,
+            Rgb.rgb_black,
+            Rgb.rgb_magenta,
+            Rgb.rgb_cyan,
+            Rgb.rgb_green,
+    };
+
     public String plot() {
         Plot plot = new Plot();
         plot.set_title("MTF");
         plot.get_axes().set_position(Vector3.vector3_0);
         plot.get_axes().set_range(new Range(0, 1.0), PlotAxes.AxisMask.X);
-        plot.get_axes().set_range(new Range(0, 1.0), PlotAxes.AxisMask.Y);
+        // MTF is plotted as a percentage on a 0-100 scale
+        plot.get_axes().set_range(new Range(0, 100.0), PlotAxes.AxisMask.Y);
         double[] x_data = fields.clone();
         // for each freq
         for (var i = 0; i < mtfs_by_freq.size(); i++) {
             var mtf = mtfs_by_freq.get(i);
+            // color encodes the frequency
+            Rgb color = FREQ_COLORS[i % FREQ_COLORS.length];
             // xy == 0 sagittal
             // xy == 1 tangential
             for (int xy = 0; xy < 2; xy++) {
@@ -45,17 +59,22 @@ public class GeoMTFByFieldPlot {
                 double[] mtf_data = (xy == 0) ? mtf.sag_mtf_by_field : mtf.tan_mtf_by_field;
                 for (int j = 0; j < mtf_data.length; j++) {
                     double x = x_data[j];
-                    set.add_data(x, mtf_data[j]);
+                    // scale 0..1 MTF to a 0..100 percentage
+                    set.add_data(x, mtf_data[j] * 100.0);
                 }
-                plot.add_plot_data(set, xy == 0 ? Rgb.rgb_black : Rgb.rgb_blue, xy == 0 ? "Sagittal" : "Tangential", PlotStyleMask.InterpolatePlot.value());
+                String label = df.format(mtf.freq) + (xy == 0 ? " Sagittal" : " Tangential");
+                PlotData pd = plot.add_plot_data(set, color, label, PlotStyleMask.InterpolatePlot.value());
+                // line pattern encodes sagittal vs tangential
+                pd.set_line_style(xy == 0 ? PlotData.LineStyle.Solid : PlotData.LineStyle.Dashed);
             }
         }
         String x_label = "Fields";
         String y_label = "MTF";
         plot.get_axes ().set_label (x_label, PlotAxes.AxisMask.X);
         plot.get_axes ().set_label (y_label, PlotAxes.AxisMask.Y);
-        //plot.get_axes().set_unit("cycles/mm",false,false,0, PlotAxes.AxisMask.X);
-        //plot.get_axes().set_unit("",true,false,0, PlotAxes.AxisMask.Y);
+        // keep both axes on a plain scale (no x10^n factor)
+        plot.get_axes().set_unit("", false, false, 0, PlotAxes.AxisMask.Y);
+        plot.get_axes().set_unit("", false, false, 0, PlotAxes.AxisMask.X);
         RendererSvg r = new RendererSvg(1024,640);
         PlotRenderer plotRenderer = new PlotRenderer();
         plotRenderer.draw_plot(r,plot);

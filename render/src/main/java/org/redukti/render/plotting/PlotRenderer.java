@@ -32,7 +32,9 @@ import org.redukti.render.rendering.Renderer;
 import org.redukti.render.rendering.RendererViewport;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 
 import static org.redukti.render.rendering.Renderer.PointStyle.PointStyleCross;
 import static org.redukti.render.rendering.Renderer.Style.StyleForeground;
@@ -43,7 +45,10 @@ public class PlotRenderer {
     final DecimalFormat _decimal_format;
 
     public PlotRenderer() {
-        _decimal_format = M.decimal_format(0);
+        // Up to 2 fraction digits (trailing zeros suppressed) so fractional
+        // axes such as 0, 0.2, 0.4 ... render correctly while integer axes
+        // (0, 20, 40 ...) still print without a decimal point.
+        _decimal_format = M.decimal_format(2);
     }
 
     public void draw_plot(RendererViewport r, Plot plot) {
@@ -81,43 +86,40 @@ public class PlotRenderer {
         Vector2Pair _window2d_fit = r.get_window2d_fit();
         Vector2Pair _window2d = r.get_window2d();
         Vector2 _2d_output_res = r.get_2d_output_res();
+
+        // apply the requested line pattern (dashed/dotted) for the curve
+        r.set_stroke_dasharray(style.get_line_style().dasharray());
+
         if ((style.get_style() & PlotStyleMask.InterpolatePlot.value()) != 0) {
             final double x_step = (_window2d.v1.x() - _window2d.v0.x()) / _2d_output_res.x();
             Range xr = data.get_x_range(0);
             double x_low = Math.max(_window2d_fit.v0.x(), xr.first);
             double x_high = Math.min(_window2d_fit.v1.x(), xr.second);
-            double y1 = data.interpolate(x_low);
 
+            // Build the interpolated curve as a single polyline. Drawing it as
+            // many separate one-pixel segments would restart the dash pattern
+            // on every segment, so dashed/dotted styles would always look
+            // solid. A single polyline lets the dash run across the curve.
+            List<Vector2> pts = new ArrayList<>();
+            pts.add(new Vector2(x_low, data.interpolate(x_low)));
             for (double x = x_low + x_step; x < x_high + x_step / 2; x += x_step) {
-                double y2 = data.interpolate(x);
-
-                r.draw_segment(new Vector3Pair(
-                                new Vector3(x - x_step, y1, 0),
-                                new Vector3(x, y2, 0)),
-                        style.get_color());
-
-                y1 = y2;
+                pts.add(new Vector2(x, data.interpolate(x)));
             }
+            draw_polyline(r, pts, style.get_color());
         }
 
         // line plot
 
         if ((style.get_style() & PlotStyleMask.LinePlot.value()) != 0) {
-            Range p1 = new Range(data.get_x_value(0),
-                    data.get_y_value(0));
-
-            for (int j = 1; j < data.get_count(); j++) {
-                Range p2 = new Range(data.get_x_value(j),
-                        data.get_y_value(j));
-
-                r.draw_segment(
-                        new Vector3Pair(new Vector3(p1.first, p1.second, 0),
-                                new Vector3(p2.first, p2.second, 0)),
-                        style.get_color());
-
-                p1 = p2;
+            List<Vector2> pts = new ArrayList<>();
+            for (int j = 0; j < data.get_count(); j++) {
+                pts.add(new Vector2(data.get_x_value(j), data.get_y_value(j)));
             }
+            draw_polyline(r, pts, style.get_color());
         }
+
+        // restore solid lines for point markers and subsequent drawing
+        r.set_stroke_dasharray(null);
 
         // draw cross tic for each point
 
@@ -160,6 +162,18 @@ public class PlotRenderer {
                         s, a, 12, style.get_color());
             }
         }
+    }
+
+    // Draw a connected sequence of points as a single polyline so that the
+    // renderer's current line pattern (solid/dashed/dotted) is honoured across
+    // the whole curve. Falls back to a plain segment for very short curves.
+    private void draw_polyline(RendererViewport r, List<Vector2> pts, org.redukti.render.rendering.Rgb color) {
+        if (pts.size() < 2)
+            return;
+        if (pts.size() >= 3)
+            r.draw_polygon(pts.toArray(new Vector2[0]), color, false, false);
+        else
+            r.draw_segment(new Vector2Pair(pts.get(0), pts.get(1)), color);
     }
 
     void draw_frame_2d(RendererViewport r) {

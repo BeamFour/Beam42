@@ -56,8 +56,15 @@ originY	391
 ppmm	6.033
 [notes]
 Bill: Related to Sigma 40mm Art
--o layout.svg --trace-density 10 --scenario 0 --output layout --specfile C:\work\github\jfotoptix\examples\sigma-40mm-f1.4\Sigma-40mmf1.4.txt
--o layout-skew.svg --trace-density 10 --skew --scenario 0 --output layout --specfile C:\work\github\jfotoptix\examples\sigma-40mm-f1.4\Sigma-40mmf1.4.txt
--o spot.svg --spot-density 50 --scenario 0 --output spot --specfile C:\work\github\jfotoptix\examples\sigma-40mm-f1.4\Sigma-40mmf1.4.txt
--o spot-skew.svg --spot-density 50 --skew --scenario 0 --output spot --specfile C:\work\github\jfotoptix\examples\sigma-40mm-f1.4\Sigma-40mmf1.4.txt
+[patent info]
+country	JP
+number	JP2020-012952
+example	1
+year applied	2018
+inventors	Takeshi Yamanaka
+current assignee	Sigma Corp
+original assignee	Sigma Corp
+link	https://patents.google.com/patent/JP2020012952A/en
+[report data]
+lens name	Sigma 40mm f1.4 DG ART
 

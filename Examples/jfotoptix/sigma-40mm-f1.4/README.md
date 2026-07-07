@@ -2,7 +2,7 @@
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
-|JP | JP2020-012952 | EX 1 | 2018 | Takeshi Yamanaka | Sigma Corp | [link](https://patents.google.com/patent/JP2020012952A/en) |
+|JP | JP2020-012952 | 1 | 2018 | Takeshi Yamanaka | Sigma Corp | [link](https://patents.google.com/patent/JP2020012952A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -38,10 +38,10 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 28 | -430.037 | 4.6315 | 34.08 | 1.85135 | 40.1 | Hoya | M-TAFD305 |
 | 29 | -54.9865 | 39.0002 | 34.08 |  |  |  |
 ## Aspherical Data
-| ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 28 | 0.0 | 0.0 | -2.73662E-6 | 3.07519E-9 | 3.90515E-11 | -1.94154E-14 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
-| 29 | 0.0 | 0.0 | 3.26804E-6 | 3.98767E-9 | 3.58258E-11 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
+| ID  | Type | k   | P1 | P2 | P3 | P4 | P5 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 28| EVEN | 0.0 | 0.0 | -2.73662E-6 | 3.07519E-9 | 3.90515E-11 | -1.94154E-14 |
+| 29| EVEN | 0.0 | 0.0 | 3.26804E-6 | 3.98767E-9 | 3.58258E-11 | 0  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -92,16 +92,16 @@ Note that where glass types are shown the refractive index and abbe number is as
  | Field(x=0.0, y=1.0) | 8.553 | 42.261|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d), 486.1327(F), 656.2725(C) were calculated across 10 fields, and then averaged
 ## Polychromatic Geometric MTF (Weighted)
 ![Polychromatic Geometrical MTF Weighted](./mtf-w.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
-* [OpticalBench Compatible Data File, tab delimited](./Sigma-40mmf1.4.txt)
+* [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./Sigma-40mmf1.4.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-01-23
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-07-07

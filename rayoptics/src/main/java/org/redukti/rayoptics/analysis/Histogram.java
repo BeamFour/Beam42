@@ -26,6 +26,86 @@ public class Histogram {
         lsf_y = new double[num_bins];
     }
 
+    public Histogram(Config cfg) {
+        this(cfg.num_bins, cfg.pixel_size);
+    }
+
+    // Default grid used when no spot extent is available: a 0.512 mm window
+    // (+/-0.256 mm) sampled at 1 micron. This reproduces the historical fixed grid.
+    public static final double DEFAULT_PIXEL_SIZE = 0.001;
+    public static final int DEFAULT_NUM_BINS = 512;
+
+    /**
+     * Bin count and bin size for the spot histogram. All monochromatic MTFs that
+     * are combined into a single polychromatic {@link PolyMTF} for one field MUST
+     * share the same Config, otherwise their FFT sizes and frequency axes differ
+     * and the complex-OTF summation in {@link PolyMTF#add} is invalid.
+     */
+    public static final class Config {
+        public final int num_bins;
+        public final double pixel_size;
+
+        public Config(int num_bins, double pixel_size) {
+            this.num_bins = num_bins;
+            this.pixel_size = pixel_size;
+        }
+    }
+
+    /**
+     * Adaptive grid sized to contain the geometric spot with margin, using the
+     * default bin size and limits. See the overload for the meaning of the tuning
+     * parameters.
+     *
+     * @param max_radius maximum spot radius (in lens units, i.e. mm) for the field,
+     *                   taken across all wavelengths so every wavelength shares one grid
+     */
+    public static Config adaptiveConfig(double max_radius) {
+        return adaptiveConfig(max_radius, DEFAULT_PIXEL_SIZE, 2.0,
+                DEFAULT_PIXEL_SIZE * DEFAULT_NUM_BINS, 2048);
+    }
+
+    /**
+     * Choose a histogram grid that:
+     * <ul>
+     *   <li>keeps {@code pixel_size} fine enough to reach the desired maximum
+     *       spatial frequency (Nyquist = 1/(2*pixel_size)),</li>
+     *   <li>makes the window wide enough to contain the spot (radius * margin), so
+     *       rays are not clipped by {@link #accumulate} and the LSF tapers to zero,</li>
+     *   <li>never shrinks the window below {@code min_window}, so the MTF frequency
+     *       step (1/(2*window)) stays small enough to sample low frequencies, and</li>
+     *   <li>caps the bin count at {@code max_bins} to bound the O(num_bins^2) memory,
+     *       coarsening the bin size instead if the spot is very large.</li>
+     * </ul>
+     * When the spot is small this returns the historical default grid unchanged.
+     *
+     * @param max_radius maximum spot radius (mm) across all wavelengths of the field
+     * @param pixel_size preferred bin size (mm)
+     * @param margin     window half-width as a multiple of max_radius (>= 1)
+     * @param min_window minimum full window width (mm)
+     * @param max_bins   upper bound on bin count (power of two recommended)
+     */
+    public static Config adaptiveConfig(double max_radius, double pixel_size,
+                                        double margin, double min_window, int max_bins) {
+        if (!Double.isFinite(max_radius) || max_radius < 0)
+            max_radius = 0;
+        double half_width = Math.max(max_radius * margin, min_window / 2.0);
+        double window = 2.0 * half_width;
+        int bins = nextPow2((int) Math.ceil(window / pixel_size));
+        if (bins > max_bins) {
+            bins = max_bins;
+            // keep the whole spot in the window by coarsening the bin size
+            pixel_size = window / bins;
+        }
+        return new Config(bins, pixel_size);
+    }
+
+    private static int nextPow2(int n) {
+        int p = 1;
+        while (p < n)
+            p <<= 1;
+        return p;
+    }
+
     public void accumulate(SpotIntercepts intercepts,double wt) {
         for (int i = 0; i < intercepts.x.length; i++) {
             var x = intercepts.x[i];

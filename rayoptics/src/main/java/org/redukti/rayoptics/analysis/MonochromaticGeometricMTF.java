@@ -15,9 +15,19 @@ public class MonochromaticGeometricMTF {
     public final Histogram h2d;
     public final MTF mtf;
 
+    /**
+     * Uses the default fixed grid. Prefer {@link #MonochromaticGeometricMTF(SpotIntercepts, Histogram.Config)}
+     * with a field-level {@link Histogram.Config} so the window adapts to the spot
+     * size and so all wavelengths of a field share one grid (required when the
+     * results are combined into a {@link PolyMTF}).
+     */
     public MonochromaticGeometricMTF(SpotIntercepts intercepts) {
+        this(intercepts, new Histogram.Config(Histogram.DEFAULT_NUM_BINS, Histogram.DEFAULT_PIXEL_SIZE));
+    }
+
+    public MonochromaticGeometricMTF(SpotIntercepts intercepts, Histogram.Config cfg) {
         wvl = intercepts.wvl;
-        h2d = new Histogram(512,0.001);
+        h2d = new Histogram(cfg);
         h2d.accumulate(intercepts,1.0);
         h2d.compute();
         mtf = new MTF(h2d);

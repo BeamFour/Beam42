@@ -75,6 +75,15 @@ public class SpotAnalysisResult {
         public double get_mean_radius() {
             return mean_radius * 1000;
         }
+
+        /**
+         * Histogram grid for this field's geometric MTF, sized to the field's spot
+         * extent (across all wavelengths). Shared by every wavelength so the
+         * monochromatic MTFs can be combined into a {@link PolyMTF}.
+         */
+        public Histogram.Config mtfHistogramConfig() {
+            return Histogram.adaptiveConfig(max_radius);
+        }
     }
 
     public SpotAnalysisResult add(Field fld, List<TraceGridByWvl> trace_results, double ref_wvl) {
@@ -97,9 +106,10 @@ public class SpotAnalysisResult {
         var mtfs = new ArrayList<PolyMTF>();
         for (int i = 0; i < spot_results.size(); i++) {
             var spotFld = spot_results.get(i);
+            var cfg = spotFld.mtfHistogramConfig();
             PolyMTF polyMtfForField = null;
             for (var intercepts: spotFld.intercepts) {
-                var mtf = new MonochromaticGeometricMTF(intercepts);
+                var mtf = new MonochromaticGeometricMTF(intercepts, cfg);
                 if (polyMtfForField == null)
                     polyMtfForField = new PolyMTF(mtf.mtf.fft_size,mtf.h2d.pixel_size);
                 polyMtfForField.add(mtf.mtf, 1.0);

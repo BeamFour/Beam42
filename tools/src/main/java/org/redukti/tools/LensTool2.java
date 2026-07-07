@@ -194,11 +194,12 @@ public class LensTool2 {
         var mtfs = new ArrayList<PolyMTF>();
         for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
             var spotFld = spotAnalysis.spot_results.get(i);
+            var cfg = spotFld.mtfHistogramConfig();
             PolyMTF polyMtfForField = null;
             for (var intercepts: spotFld.intercepts) {
                 String filename = suffixed_name("mtf-fld" + i + "-" + (int)intercepts.wvl, filename_suffix,  ".svg");
                 var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
-                var mtf = new MonochromaticGeometricMTF(intercepts);
+                var mtf = new MonochromaticGeometricMTF(intercepts, cfg);
                 if (polyMtfForField == null)
                     polyMtfForField = new PolyMTF(mtf.mtf.fft_size,mtf.h2d.pixel_size);
                 var wt = wv_wts.getOrDefault(intercepts.wvl,0.0);

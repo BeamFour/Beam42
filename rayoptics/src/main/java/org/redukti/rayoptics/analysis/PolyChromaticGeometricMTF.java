@@ -9,7 +9,11 @@ public class PolyChromaticGeometricMTF {
     public MTF mtf;
 
     public PolyChromaticGeometricMTF() {
-        h2d = new Histogram(512,0.001);
+        this(new Histogram.Config(Histogram.DEFAULT_NUM_BINS, Histogram.DEFAULT_PIXEL_SIZE));
+    }
+
+    public PolyChromaticGeometricMTF(Histogram.Config cfg) {
+        h2d = new Histogram(cfg);
     }
 
     public void add(SpotIntercepts intercepts, double wt) {

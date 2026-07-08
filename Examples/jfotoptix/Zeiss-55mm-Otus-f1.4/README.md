@@ -30,10 +30,10 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 24 | 0.0 | 2.0 | 44.0 | 1.51633 | 64.14 | Ohara | S-BSL7 |
 | 25 | 0.0 | 0.0 | 44.0 |  |  |  |
 ## Aspherical Data
-| ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 22 | 0.0 | 0.0 | -6.06936532178685E-6 | 4.5567704355776E-9 | -3.19548147113261E-11 | 4.29902435086771E-14 | -5.0E-18 | 0.0 | 0.0 | 0.0 | 0.0 |
-| 23 | 0.0 | 0.0 | 3.39691207913842E-6 | 1.4343503783496E-9 | -1.27723154320818E-11 | 1.37648185236955E-14 | -1.0E-18 | 0.0 | 0.0 | 0.0 | 0.0 |
+| ID  | Type | k   | P1 | P2 | P3 | P4 | P5 | P6 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 22| EVEN | 0.0 | 0.0 | -6.06936532178685E-6 | 4.5567704355776E-9 | -3.19548147113261E-11 | 4.29902435086771E-14 | -5.0E-18 |
+| 23| EVEN | 0.0 | 0.0 | 3.39691207913842E-6 | 1.4343503783496E-9 | -1.27723154320818E-11 | 1.37648185236955E-14 | -1.0E-18 |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -48,18 +48,18 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ---       | ---   |
 | effective_focal_length |53.912
 | back_focal_length | 0.021
-| optical_invariant | 7.514
+| optical_invariant | 7.503
 | object_distance | 1.0E10
 | image_distance | 0.021
 | power | 0.019
 | pp1_H | 66.297
 | ppk_H' | -53.891
 | ffl_F | 12.385
-| fno | 1.439
+| fno | 1.441
 | enp_dist_P | 50.791
-| enp_radius | 18.738
+| enp_radius | 18.711
 | exp_dist_P' | -75.637
-| exp_radius | 26.303
+| exp_radius | 26.265
 | m | -0
 | red | -1.854874778404831E8
 | n_obj | 1
@@ -71,27 +71,29 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 5.905 | 15.794|
- | Field(x=0.0, y=0.1) | 5.736 | 16.517|
- | Field(x=0.0, y=0.2) | 5.802 | 16.771|
- | Field(x=0.0, y=0.3) | 6.372 | 21.727|
- | Field(x=0.0, y=0.4) | 7.075 | 28.605|
- | Field(x=0.0, y=0.5) | 7.667 | 34.137|
- | Field(x=0.0, y=0.6) | 8.315 | 34.647|
- | Field(x=0.0, y=0.7) | 9.44 | 37.663|
- | Field(x=0.0, y=0.8) | 10.764 | 39.077|
- | Field(x=0.0, y=0.9) | 13.275 | 50.04|
- | Field(x=0.0, y=1.0) | 18.195 | 63.655|
+ | Field(x=0.0, y=0.0) | 5.796 | 15.783|
+ | Field(x=0.0, y=0.1) | 5.741 | 16.539|
+ | Field(x=0.0, y=0.2) | 5.803 | 16.763|
+ | Field(x=0.0, y=0.3) | 6.36 | 21.879|
+ | Field(x=0.0, y=0.4) | 7.063 | 28.345|
+ | Field(x=0.0, y=0.5) | 7.651 | 34.003|
+ | Field(x=0.0, y=0.6) | 8.319 | 34.832|
+ | Field(x=0.0, y=0.7) | 9.43 | 37.497|
+ | Field(x=0.0, y=0.8) | 10.753 | 39.077|
+ | Field(x=0.0, y=0.9) | 13.261 | 50.051|
+ | Field(x=0.0, y=1.0) | 18.255 | 63.617|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d), 486.1327(F), 656.2725(C) were calculated across 10 fields, and then averaged
 ## Polychromatic Geometric MTF (Weighted)
 ![Polychromatic Geometrical MTF Weighted](./mtf-w.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
-* [OpticalBench Compatible Data File, tab delimited](./Otus55.txt)
+* [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./Otus55.zmx)
+
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-07-08

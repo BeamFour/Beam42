@@ -67,3 +67,14 @@ originY	370.99
 ppmm	10.663
 [notes]
 Bill: Measured d0 and Magnification.
+[patent info]
+country	US
+number	US20250251576
+example	1
+year applied	2025
+inventors	INO TOMOHIRO
+current assignee	Canon Inc
+original assignee	canon Inc
+link	https://worldwide.espacenet.com/patent/search?q=pn%3DUS2025251576A1
+[report data]
+lens name	Canon RF 50mm F1.4L VCM

@@ -70,6 +70,6 @@ year applied	2025
 inventors	Natsuki Abe
 current assignee	Canon Inc
 original assignee	canon Inc
-link	tbc
+link	https://worldwide.espacenet.com/patent/search?q=pn%3DUS20260194735A1
 [report data]
 lens name	Canon RF 45mm F1.2 STM

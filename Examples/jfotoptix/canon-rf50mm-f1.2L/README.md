@@ -1,8 +1,8 @@
-# Canon RF 50mm f1.2L
+# Canon RF 50mm F1.2 L USM
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
-|US | US2019/0265441 | EX 2 | 2018 | Masato Katayose | Canon Inc  | [link](https://patents.google.com/patent/US20190265441A1/en) |
+|US | US20190265441 | 2 | 2018 | Masato Katayose | canon Inc | [link](https://patents.google.com/patent/US20190265441A1/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -34,11 +34,11 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 24 | 105.985 | 5.08 | 36.1 | 1.804 | 46.58 | Ohara | S-LAH65V |
 | 25 | -216.191 | 14.6 | 36.1 |  |  |  |
 ## Aspherical Data
-| ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 0.0 | 0.0 | -1.44652E-6 | -1.02693E-9 | 1.91678E-12 | -3.07794E-15 | 2.00476E-18 | 0.0 | 0.0 | 0.0 | 0.0 |
-| 18 | 0.0 | 0.0 | -2.17027E-6 | 4.00496E-9 | -1.90948E-11 | 4.86536E-14 | -4.89586E-17 | 0.0 | 0.0 | 0.0 | 0.0 |
-| 25 | 0.0 | 0.0 | 3.50064E-6 | -5.9867E-10 | 1.34319E-11 | -2.56798E-14 | 2.5993E-17 | 0.0 | 0.0 | 0.0 | 0.0 |
+| ID  | Type | k   | P1 | P2 | P3 | P4 | P5 | P6 | P7 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1| EVEN | 0.0 | 0.0 | -1.44652E-6 | -1.02693E-9 | 1.91678E-12 | -3.07794E-15 | 2.00476E-18 | 0  |
+| 18| EVEN | 0.0 | 0.0 | -2.17027E-6 | 4.00496E-9 | -1.90948E-11 | 4.86536E-14 | -4.89586E-17 | 0.0 |
+| 25| EVEN | 0.0 | 0.0 | 3.50064E-6 | -5.9867E-10 | 1.34319E-11 | -2.56798E-14 | 2.5993E-17 | 0  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -76,27 +76,29 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 7.421 | 14.944|
- | Field(x=0.0, y=0.1) | 7.03 | 17.325|
- | Field(x=0.0, y=0.2) | 6.877 | 24.719|
- | Field(x=0.0, y=0.3) | 6.701 | 27.31|
- | Field(x=0.0, y=0.4) | 6.745 | 30.92|
- | Field(x=0.0, y=0.5) | 7.26 | 35.652|
- | Field(x=0.0, y=0.6) | 8.341 | 41.313|
- | Field(x=0.0, y=0.7) | 9.884 | 48.068|
- | Field(x=0.0, y=0.8) | 11.757 | 54.751|
- | Field(x=0.0, y=0.9) | 13.45 | 59.196|
- | Field(x=0.0, y=1.0) | 14.287 | 57.254|
+ | Field(x=0.0, y=0.0) | 7.332 | 14.949|
+ | Field(x=0.0, y=0.1) | 7.001 | 17.349|
+ | Field(x=0.0, y=0.2) | 6.835 | 17.84|
+ | Field(x=0.0, y=0.3) | 6.695 | 27.05|
+ | Field(x=0.0, y=0.4) | 6.741 | 30.916|
+ | Field(x=0.0, y=0.5) | 7.259 | 35.851|
+ | Field(x=0.0, y=0.6) | 8.353 | 41.461|
+ | Field(x=0.0, y=0.7) | 9.89 | 48.029|
+ | Field(x=0.0, y=0.8) | 11.73 | 54.666|
+ | Field(x=0.0, y=0.9) | 13.437 | 59.111|
+ | Field(x=0.0, y=1.0) | 14.257 | 57.055|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d), 486.1327(F), 656.2725(C) were calculated across 10 fields, and then averaged
 ## Polychromatic Geometric MTF (Weighted)
 ![Polychromatic Geometrical MTF Weighted](./mtf-w.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
-* [OpticalBench Compatible Data File, tab delimited](./canon-rf-50mmf1.2.txt)
+* [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./canon-rf-50mmf1.2.zmx)
+
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-07-12

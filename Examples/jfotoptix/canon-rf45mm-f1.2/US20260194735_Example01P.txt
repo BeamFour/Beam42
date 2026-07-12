@@ -72,5 +72,4 @@ current assignee	Canon Inc
 original assignee	canon Inc
 link	tbc
 [report data]
-lens name	Canon RF45mm F1.2 STM
-[report data]
+lens name	Canon RF 45mm F1.2 STM

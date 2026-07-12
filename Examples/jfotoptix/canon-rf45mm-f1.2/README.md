@@ -1,4 +1,4 @@
-# Canon RF45mm F1.2 STM
+# Canon RF 45mm F1.2 STM
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |

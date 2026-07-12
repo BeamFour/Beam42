@@ -15,7 +15,7 @@ public class Leica28mmOptim {
    }
     public static void main(String[] args) throws Exception {
         var prescription = getPrescription(args[0]);
-        var analysis = new Analysis(prescription, new double[]{0.3,0.7,1.0}).spotDensity(50);
+        var analysis = new Analysis(prescription, new double[]{0.3,0.7,1.0}, new int[]{20});
         var f = new MeritFunction(analysis,
                 new Var[] {
                      new VarRadius(prescription,0),
@@ -55,14 +55,15 @@ public class Leica28mmOptim {
                       //new GoalParax(analysis, ParaxialFirstOrderInfo.Enp_dist, 28.745, 1.0),
                       //new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 38.1031, 1.0)
                 });
+        analysis.compute();
         var lm = f.getSolver();
-        int istatus = 0;
-        while (istatus!= LMLSolver.BADITER &&
-                istatus!= LMLSolver.LEVELITER &&
-                istatus!= LMLSolver.MAXITER) {
-            istatus = lm.iLMiter();
-        }
+        System.out.println("Aberrations:\n");
+        System.out.println(analysis._ray_aberrations.list_ray_fans());
+        System.out.println("Before:\n");
+        System.out.println(f.toString());
+        var istatus = lm.solve();
         System.out.println("Status = " + istatus);
+        System.out.println("After:\n");
         System.out.println(f.toString());
         System.out.println(prescription.toString());
     }

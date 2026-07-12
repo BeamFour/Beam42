@@ -5,10 +5,7 @@ import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.optim.*;
 import org.redukti.spec.Prescription;
 
-// Takes too long to run for more than about 22 glasses (that takes 2 hrs as well)
 public class Leica35NoctiluxLMDer {
-
-    // Measured by DM - off 1001 tale 16
 
     private static Prescription getPrescription(String specfile) throws Exception {
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();

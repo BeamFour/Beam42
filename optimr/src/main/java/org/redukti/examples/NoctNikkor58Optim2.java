@@ -33,7 +33,7 @@ public class NoctNikkor58Optim2 {
 
     public static void main(String[] args) {
         var prescription = getPrescription();
-        var analysis = new Analysis(prescription, new double[] {1.0});
+        var analysis = new Analysis(prescription, new double[] {1.0}, new int[]{20});
         var f = new MeritFunction(analysis,
                 new Var[] {
                      new VarRadius(prescription, 0),
@@ -65,15 +65,16 @@ public class NoctNikkor58Optim2 {
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Pp1, 51.8, 1.0),
                       new GoalParax(analysis, ParaxialFirstOrderInfo.Ppk, 20.2, 1.0)
                 });
+        analysis.compute();
         var lm = f.getSolver();
-        int istatus = 0;
-        int iterCount = 0;
-        while (istatus!= LMLSolver.BADITER &&
-                istatus!= LMLSolver.LEVELITER &&
-                istatus!= LMLSolver.MAXITER) {
-            istatus = lm.iLMiter();
-            iterCount++;
-        }
+        System.out.println("Aberrations:\n");
+        System.out.println(analysis._ray_aberrations.list_ray_fans());
+        System.out.println("Before:\n");
         System.out.println(f.toString());
+        var istatus = lm.solve();
+        System.out.println("Status = " + istatus);
+        System.out.println("After:\n");
+        System.out.println(f.toString());
+        System.out.println(prescription.toString());
     }
 }

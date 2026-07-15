@@ -1,8 +1,5 @@
 [descriptive data]
 title	US 3,635,546 Example 2
-#patent	country	number	example	year	inventors	org	link
-patent	US	US 3635546	EX 2	1970	Ikuo Mori	Nikon Corp	https://patents.google.com/patent/US3635546A
-lens name	AI Nikkor 28mm f/2.8 (v1)
 [constants]
 Scaled	28	100
 [variable distances]
@@ -42,3 +39,14 @@ originX	52
 originY	321
 ppmm	10.661
 [notes]
+[patent info]
+country	US
+number	US3635546
+example	2
+year applied	1970
+inventors	Ikuo Mori
+current assignee	Nikon Corp
+original assignee	Nippon Kogaku
+link	https://patents.google.com/patent/US3635546A
+[report data]
+lens name	AI Nikkor 28mm f/2.8 (v1)

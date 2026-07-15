@@ -1,8 +1,8 @@
-# Nikkor-H 2.8cm Auto f/3.5
+# Nikkor-H 2.8cm f/3.5
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
-|JP | JP-S38-026133(1963) | EX 1 | 1958 | Zenji Wakimoto | Nikon Corp | [link](https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S38-026133/12/en) |
+|JP | JP-S38-026133(1963) | 1 | 1958 | Zenji Wakimoto | Nippon Kogaku | [link](https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S38-026133/12/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -35,18 +35,18 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ---       | ---   |
 | effective_focal_length |28.004
 | back_focal_length | 37.078
-| optical_invariant | 2.96
+| optical_invariant | 3.001
 | object_distance | 1.0E10
 | image_distance | 37.078
 | power | 0.036
 | pp1_H | 36.59
 | ppk_H' | 9.073
 | ffl_F | 8.586
-| fno | 3.5
+| fno | 3.452
 | enp_dist_P | 25.624
-| enp_radius | 4.001
+| enp_radius | 4.056
 | exp_dist_P' | -8.825
-| exp_radius | 6.576
+| exp_radius | 6.667
 | m | -0
 | red | -3.570857430164152E8
 | n_obj | 1
@@ -54,25 +54,33 @@ Note that where glass types are shown the refractive index and abbe number is as
 | img_ht | 20.722
 | obj_ang | 36.5
 | obj_na | 0
-| img_na | -0.141|
+| img_na | -0.143|
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 6.052 | 15.267|
- | Field(x=0.0, y=0.1) | 7.73 | 32.058|
- | Field(x=0.0, y=0.2) | 7.904 | 26.978|
- | Field(x=0.0, y=0.3) | 9.994 | 30.922|
- | Field(x=0.0, y=0.4) | 12.503 | 30.729|
- | Field(x=0.0, y=0.5) | 15.25 | 32.38|
- | Field(x=0.0, y=0.6) | 17.004 | 34.557|
- | Field(x=0.0, y=0.7) | 16.875 | 41.026|
- | Field(x=0.0, y=0.8) | 14.85 | 56.809|
- | Field(x=0.0, y=0.9) | 16.848 | 92.672|
- | Field(x=0.0, y=1.0) | 40.397 | 160.615|
-## Geometric MTF
-![Geometrical MTF](./mtf.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+ | Field(x=0.0, y=0.0) | 8.182 | 23.719|
+ | Field(x=0.0, y=0.1) | 7.621 | 32.125|
+ | Field(x=0.0, y=0.2) | 8.111 | 28.841|
+ | Field(x=0.0, y=0.3) | 9.908 | 29.35|
+ | Field(x=0.0, y=0.4) | 12.493 | 30.099|
+ | Field(x=0.0, y=0.5) | 15.248 | 32.315|
+ | Field(x=0.0, y=0.6) | 17.006 | 34.546|
+ | Field(x=0.0, y=0.7) | 16.871 | 40.666|
+ | Field(x=0.0, y=0.8) | 14.87 | 57.227|
+ | Field(x=0.0, y=0.9) | 16.833 | 92.504|
+ | Field(x=0.0, y=1.0) | 40.325 | 160.282|
+## Polychromatic Geometric MTF
+![Polychromatic Geometrical MTF](./mtf.svg)
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
+* To generate above, MTFs for wavelengths 587.5618(d), 486.1327(F), 656.2725(C) were calculated across 10 fields, and then averaged
+## Polychromatic Geometric MTF (Weighted)
+![Polychromatic Geometrical MTF Weighted](./mtf-w.svg)
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
+* To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
-* [OpticalBench Compatible Data File, tab delimited](./JP1963-026133_Example01.txt)
+* [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./JP1963-026133_Example01.zmx)
+
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-07-15

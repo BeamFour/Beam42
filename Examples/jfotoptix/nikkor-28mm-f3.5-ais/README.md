@@ -2,7 +2,7 @@
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
-|US | US 4099850 | EX 5 | 1977 | Sei Matsui | Nikon Corp | [link](https://patents.google.com/patent/US4099850A/en) |
+|US | US4099850 | 5 | 1977 | Sei Matsui | Nippon Kogaku | [link](https://patents.google.com/patent/US4099850A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

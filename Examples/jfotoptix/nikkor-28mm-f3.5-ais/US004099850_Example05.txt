@@ -1,8 +1,5 @@
 [descriptive data]				
 title	US 4,099,850 Example 5 (Nikon Nikkor 28mm f/3.5)
-#patent	country	number	example	year	inventors	org	link
-patent	US	US 4099850	EX 5	1977	Sei Matsui	Nikon Corp	https://patents.google.com/patent/US4099850A/en
-lens name	AIS Nikkor 28mm f/3.5
 [constants]
 Scaled	28.6	100
 [variable distances]				
@@ -42,3 +39,14 @@ originX	102
 originY	1027			
 ppmm	37.193
 [notes]
+[patent info]
+country	US
+number	US4099850
+example	5
+year applied	1977
+inventors	Sei Matsui
+current assignee	Nikon Corp
+original assignee	Nippon Kogaku
+link	https://patents.google.com/patent/US4099850A/en
+[report data]
+lens name	AIS Nikkor 28mm f/3.5

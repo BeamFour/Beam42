@@ -11,7 +11,7 @@ Total Length	undefined
 Magnification	0
 d0	Infinity
 Bf(p)	37.82
-Bf	37.62
+Bf	37.59
 [lens data]
 1	95.52	5.87	1.6751	51.60	32.3
 2	805.67	0.30		48.46	

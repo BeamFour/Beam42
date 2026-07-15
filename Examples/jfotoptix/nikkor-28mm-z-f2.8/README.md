@@ -2,7 +2,7 @@
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
-|EU | WO 2022/071249 | EX 2 | 2021 | SHIMADA, Toshiyuki | Nikon Corp | [link](https://patentscope.wipo.int/search/en/detail.jsf?docId=WO2022071249) |
+|EU | WO2022/071249 | 2 | 2021 | SHIMADA, Toshiyuki | Nikon Corp | [link](https://patentscope.wipo.int/search/en/detail.jsf?docId=WO2022071249) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -30,11 +30,11 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 20 | 0.0 | 1.6 | 44.1 | 1.5168 | 63.88 |  |
 | 21 | 0.0 | 0.86 | 44.1 |  |  |  |
 ## Aspherical Data
-| ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 13 | 0.0 | 0.0 | 2.85655E-5 | -1.38279E-8 | 5.79289E-10 | 9.06875E-13 | -2.2576E-15 | 1.3307E-17 | 0.0 | 0.0 | 0.0 |
-| 14 | 0.0 | 0.0 | 2.41081E-5 | 9.24872E-8 | -6.64821E-10 | 1.30136E-12 | 8.8976E-16 | 0.0 | 0.0 | 0.0 | 0.0 |
-| 15 | 0.0 | 0.0 | 3.97489E-5 | 2.41498E-7 | -1.14609E-9 | 2.49848E-12 | -2.3864E-15 | 0.0 | 0.0 | 0.0 | 0.0 |
+| ID  | Type | k   | P1 | P2 | P3 | P4 | P5 | P6 | P7 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 13| EVEN | 0.0 | 0.0 | 2.85655E-5 | -1.38279E-8 | 5.79289E-10 | 9.06875E-13 | -2.2576E-15 | 1.3307E-17 |
+| 14| EVEN | 0.0 | 0.0 | 2.41081E-5 | 9.24872E-8 | -6.64821E-10 | 1.30136E-12 | 8.8976E-16 | 0  |
+| 15| EVEN | 0.0 | 0.0 | 3.97489E-5 | 2.41498E-7 | -1.14609E-9 | 2.49848E-12 | -2.3864E-15 | 0  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -56,11 +56,11 @@ Note that where glass types are shown the refractive index and abbe number is as
 | pp1_H | 15.447
 | ppk_H' | -27.911
 | ffl_F | -13.377
-| fno | 2.909
+| fno | 2.908
 | enp_dist_P | 3.621
-| enp_radius | 4.954
+| enp_radius | 4.955
 | exp_dist_P' | -47.911
-| exp_radius | 8.401
+| exp_radius | 8.402
 | m | -0
 | red | -3.469352809606849E8
 | n_obj | 1
@@ -72,27 +72,29 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 2.308 | 4.332|
- | Field(x=0.0, y=0.1) | 2.94 | 7.383|
- | Field(x=0.0, y=0.2) | 3.981 | 9.3|
- | Field(x=0.0, y=0.3) | 4.869 | 15.193|
- | Field(x=0.0, y=0.4) | 5.726 | 17.503|
- | Field(x=0.0, y=0.5) | 7.071 | 23.53|
- | Field(x=0.0, y=0.6) | 8.783 | 34.508|
- | Field(x=0.0, y=0.7) | 11.721 | 51.358|
- | Field(x=0.0, y=0.8) | 16.222 | 75.166|
- | Field(x=0.0, y=0.9) | 22.061 | 98.822|
- | Field(x=0.0, y=1.0) | 26.662 | 104.606|
+ | Field(x=0.0, y=0.0) | 2.274 | 4.329|
+ | Field(x=0.0, y=0.1) | 2.891 | 7.406|
+ | Field(x=0.0, y=0.2) | 3.95 | 9.362|
+ | Field(x=0.0, y=0.3) | 4.775 | 15.343|
+ | Field(x=0.0, y=0.4) | 5.743 | 17.422|
+ | Field(x=0.0, y=0.5) | 7.027 | 23.532|
+ | Field(x=0.0, y=0.6) | 8.968 | 34.377|
+ | Field(x=0.0, y=0.7) | 11.835 | 51.252|
+ | Field(x=0.0, y=0.8) | 16.218 | 75.133|
+ | Field(x=0.0, y=0.9) | 22.05 | 98.77|
+ | Field(x=0.0, y=1.0) | 26.672 | 104.589|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d), 486.1327(F), 656.2725(C) were calculated across 10 fields, and then averaged
 ## Polychromatic Geometric MTF (Weighted)
 ![Polychromatic Geometrical MTF Weighted](./mtf-w.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
-* [OpticalBench Compatible Data File, tab delimited](./WO2022-071249_Example02P.txt)
+* [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./WO2022-071249_Example02P.zmx)
+
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-07-16

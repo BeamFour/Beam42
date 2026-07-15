@@ -1,8 +1,5 @@
 [descriptive data]
 title	US 5,917,663 Example 2 (Nikon AI Nikkor 28mm f/2.8S)
-#patent	country	number	example	year	inventors	org	link
-patent	US	US5917663	EX 2	1998	Kenzaburo Suzuki	Nikon Corp	https://patents.google.com/patent/US5917663A/en
-lens name	AI Nikkor 28mm f/2.8S (v2) (secondary patent)
 [constants]
 [variable distances]
 Focal Length	28.610
@@ -48,3 +45,14 @@ originX	68
 originY	351
 ppmm	12.544
 [notes]
+[patent info]
+country	US
+number	US5917663
+example	2
+year applied	1998
+inventors	Kenzaburo Suzuki
+current assignee	Nikon Corp
+original assignee	Nippon Kogaku
+link	https://patents.google.com/patent/US5917663A/en
+[report data]
+lens name	AI Nikkor 28mm f/2.8S (v2) (secondary patent)

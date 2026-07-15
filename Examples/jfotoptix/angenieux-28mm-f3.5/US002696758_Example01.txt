@@ -1,8 +1,5 @@
 [descriptive data]
 title	US 2696758 Example 1 (Angenieux 28mm f3.5 R11)
-#patent	country	number	example	year	inventors	org	link
-patent	US	US 2696758	EX 1	1950	Pierre Angenieux	Angenieux	https://patents.google.com/patent/US2696758A/en
-lens name	Angenieux 28mm f3.5 R11
 [constants]
 Scaled	28	100
 [variable distances]
@@ -41,3 +38,14 @@ originY	267.45
 ppmm	9.965
 [notes]
 Bill: Angle of View and F-Number from specification.
+[patent info]
+country	US
+number	US2696758
+example	1
+year applied	1950
+inventors	Pierre Angenieux
+current assignee	Angenieux
+original assignee	Angenieux
+link	https://patents.google.com/patent/US2696758A/en
+[report data]
+lens name	Angenieux 28mm f3.5 R11

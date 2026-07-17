@@ -1,0 +1,59 @@
+package org.redukti.examples;
+
+import org.redukti.importers.obench.OpticalBenchDataImporter;
+import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
+import org.redukti.optim.*;
+import org.redukti.spec.Prescription;
+
+public class FindBestBackfocus {
+
+    private static Prescription getPrescription(String specfile) throws Exception {
+        OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
+        specs.parse_file(specfile);
+        return Prescription.build_prescription(specs, true,
+                new double[]{587.5618,656.2725,546.074,486.1327,435.8343},
+                new double[]{1.0,0.475,0.98,0.49,0.15});
+    }
+
+    public static void main(String[] args) throws Exception {
+        var prescription = getPrescription(args[0]);
+        var surface = Integer.parseInt(args[1]);
+        var analysis = new Analysis(prescription, new double[]{0}, new int[]{10, 30, 50});
+        var f = new LMDerMeritFunction(analysis,
+                new Var[]{
+                        new VarThickness(prescription, surface)
+                },
+                new Goal[]{
+                        new GeoMTF(analysis, 1, 0, 10, 1.0, 1.0),
+                        new GeoMTF(analysis, 1, 1, 10, 1.0, 1.0),
+                        new GeoMTF(analysis, 1, 0, 30, 1.0, 1.0),
+                        new GeoMTF(analysis, 1, 1, 30, 1.0, 1.0),
+                        new GeoMTF(analysis, 1, 0, 50, 1.0, 1.0),
+                        new GeoMTF(analysis, 1, 1, 50, 1.0, 1.0),
+                        new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length, prescription._focal_length, 1.0),
+                        new GoalParax(analysis, ParaxialFirstOrderInfo.Fno, prescription._fno, 1.0),
+                        new GoalRayAberration(analysis, 1, 0, 0, 587.5618, 0, 1),
+                        new GoalRayAberration(analysis, 1, 0, 1, 587.5618, 0, 1),
+                        new GoalRayAberration(analysis, 1, 0, 2, 587.5618, 0, 1),
+                        new GoalRayAberration(analysis, 1, 0, 3, 587.5618, 0, 1),
+                        new GoalRayAberration(analysis, 1, 0, 4, 587.5618, 0, 1),
+                        new GoalRayAberration(analysis, 1, 0, 5, 587.5618, 0, 1),
+                        new GoalRayAberration(analysis, 1, 0, 6, 587.5618, 0, 1),
+                        new GoalRayAberration(analysis, 1, 0, 7, 587.5618, 0, 1),
+                        new GoalRayAberration(analysis, 1, 0, 8, 587.5618, 0, 1),
+                        new GoalRayAberration(analysis, 1, 0, 9, 587.5618, 0, 1),
+                },
+                false);
+        analysis.compute();
+        var lm = f.getSolver();
+        System.out.println("Aberrations:\n");
+        System.out.println(analysis._ray_aberrations.list_ray_fans());
+        System.out.println("Before:\n");
+        System.out.println(f.toString());
+        var istatus = lm.solve();
+        System.out.println("Status = " + istatus);
+        System.out.println("After:\n");
+        System.out.println(f.toString());
+        System.out.println(prescription.toString());
+    }
+}

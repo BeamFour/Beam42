@@ -2265,7 +2265,17 @@ public class MinPack {
                 wa2[j-1] = sum;
             }
             temp = enorm(n, 0, wa2);
-            sgnorm = (gnorm / temp) / temp;
+            /* Fix from cminpack
+               Guard temp == 0: a rank-deficient R can map the (nonzero) scaled
+               gradient to ~0, and sgnorm = gnorm/temp/temp would then be +Inf.
+               Setting sgnorm = delta reproduces exactly what the Inf value would
+               yield downstream (sgnorm < delta stays false, so alpha remains 0 and
+               the step length collapses to delta), while avoiding the transient
+               Inf. */
+            if (temp == 0.)
+                sgnorm = delta;
+            else
+                sgnorm = (gnorm / temp) / temp;
 
             /*     test whether the scaled gradient direction is acceptable. */
 

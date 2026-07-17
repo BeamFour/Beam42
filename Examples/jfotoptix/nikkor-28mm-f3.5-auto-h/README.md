@@ -20,7 +20,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 10 | -112.588 | 2.548 | 12.15 | 1.65844 | 50.84 | Hikari | J-SSK5 |
 | 11 | -14.784 | 0.196 | 12.15 |  |  |  |
 | 12 | 59.64 | 1.764 | 13.03 | 1.51633 | 64.14 | Schott | BK7HT |
-| 13 | -56.14 | 36.95 | 13.03 |  |  |  |
+| 13 | -56.14 | 36.916 | 13.03 |  |  |  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -45,7 +45,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | fno | 3.452
 | enp_dist_P | 25.624
 | enp_radius | 4.056
-| exp_dist_P' | -8.825
+| exp_dist_P' | -8.791
 | exp_radius | 6.667
 | m | -0
 | red | -3.570857430164152E8
@@ -58,17 +58,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 8.182 | 23.719|
- | Field(x=0.0, y=0.1) | 7.621 | 32.125|
- | Field(x=0.0, y=0.2) | 8.111 | 28.841|
- | Field(x=0.0, y=0.3) | 9.908 | 29.35|
- | Field(x=0.0, y=0.4) | 12.493 | 30.099|
- | Field(x=0.0, y=0.5) | 15.248 | 32.315|
- | Field(x=0.0, y=0.6) | 17.006 | 34.546|
- | Field(x=0.0, y=0.7) | 16.871 | 40.666|
- | Field(x=0.0, y=0.8) | 14.87 | 57.227|
- | Field(x=0.0, y=0.9) | 16.833 | 92.504|
- | Field(x=0.0, y=1.0) | 40.325 | 160.282|
+ | Field(x=0.0, y=0.0) | 9.607 | 28.69|
+ | Field(x=0.0, y=0.1) | 8.503 | 37.09|
+ | Field(x=0.0, y=0.2) | 8.109 | 33.706|
+ | Field(x=0.0, y=0.3) | 9.023 | 34.18|
+ | Field(x=0.0, y=0.4) | 10.867 | 34.877|
+ | Field(x=0.0, y=0.5) | 13.355 | 35.78|
+ | Field(x=0.0, y=0.6) | 15.171 | 38.032|
+ | Field(x=0.0, y=0.7) | 15.501 | 45.328|
+ | Field(x=0.0, y=0.8) | 14.699 | 61.963|
+ | Field(x=0.0, y=0.9) | 18.611 | 97.222|
+ | Field(x=0.0, y=1.0) | 42.344 | 164.809|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10=red,30=blue,50=black cycles/mm
@@ -83,4 +83,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./JP1963-026133_Example01.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-07-15
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-07-17

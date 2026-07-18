@@ -13,7 +13,7 @@ Image Height	43.2
 Magnification	0
 d0	Infinity
 Bf(o)	22.40
-Bf	22.22
+Bf	22.245
 [lens data]
 1	16.884	1.904	1.5638	12.18	60.7	S-BAL41
 2	72.660	0.140		12.18	
@@ -37,3 +37,14 @@ originX	207.77
 originY	432.58
 ppmm	38.320
 [notes]
+[patent info]
+country	US
+number	US2645974
+example	EX 1
+year applied	1951
+inventors	Ito Hiroshi
+current assignee	Canon Inc
+original assignee	Canon Inc
+link	https://patents.google.com/patent/US2645974A/en
+[report data]
+lens name	Canon Serenar 28mm f3.5

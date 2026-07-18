@@ -12,7 +12,7 @@ F-Number	1.8
 Image Height	43.2
 Magnification	0
 d0	Infinity
-Bf	24.15
+Bf	24.148
 [lens data]
 1	20.2650	3.3950	1.6584	22.65	50.8	S-BSM25	Ohara
 2	62.5450	0.1750		22.65

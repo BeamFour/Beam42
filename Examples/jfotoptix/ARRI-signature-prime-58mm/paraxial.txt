@@ -6,19 +6,19 @@ pp1               114.9
 bfl               1.002
 ppk              -56.99
 pp sep            47.08
-f/#               1.700
+f/#               1.702
 m            -5.799e-09
 red          -1.724e+08
 obj_dist      1.000e+10
 obj_ang           20.16
 enp_dist          75.89
-enp_radius        17.06
-na obj        1.706e-09
+enp_radius        17.03
+na obj        1.703e-09
 n obj             1.000
 img_dist          1.002
 img_ht            21.29
 exp_dist         -176.5
-exp_radius        52.20
-na img          -0.2822
+exp_radius        52.13
+na img          -0.2818
 n img             1.000
-optical invariant        6.262
+optical invariant        6.254

@@ -56,3 +56,14 @@ originY	436.97
 ppmm	4.552
 [notes]
 Bill: Patent diameters. Magnification measured. Increased CG diameter.
+[patent info]
+country	US
+number	US20200341250
+example	EX 1
+year applied	2018
+inventors	Keiichi Mochizuki
+current assignee	Nittoh Inc
+original assignee	Nittoh Inc
+link	https://patents.google.com/patent/US20200341250A1/en
+[report data]
+lens name	Nittoh ARRI Signature Prime 58mm T1.8

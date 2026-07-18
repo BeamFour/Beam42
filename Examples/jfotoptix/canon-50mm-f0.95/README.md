@@ -20,7 +20,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 10 | 64.4484 | 7.482 | 30.24 | 1.7859 | 44.2 | Ohara | S-LAH51 |
 | 11 | -37.5648 | 0.1032 | 30.24 |  |  |  |
 | 12 | 62.5908 | 5.9856 | 35.6 | 1.7859 | 44.2 | Ohara | S-LAH51 |
-| 13 | -67.2348 | 20.317 | 35.6 |  |  |  |
+| 13 | -67.2348 | 20.3 | 35.6 |  |  |  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -35,18 +35,18 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ---       | ---   |
 | effective_focal_length |51.638
 | back_focal_length | 20.375
-| optical_invariant | 11.258
+| optical_invariant | 11.25
 | object_distance | 1.0E10
 | image_distance | 20.375
 | power | 0.019
 | pp1_H | 41.975
 | ppk_H' | -31.264
 | ffl_F | -9.663
-| fno | 0.95
+| fno | 0.951
 | enp_dist_P | 54.424
-| enp_radius | 27.178
-| exp_dist_P' | -21.176
-| exp_radius | 21.899
+| enp_radius | 27.16
+| exp_dist_P' | -21.159
+| exp_radius | 21.884
 | m | -0
 | red | -1.9365435743009177E8
 | n_obj | 1
@@ -54,31 +54,33 @@ Note that where glass types are shown the refractive index and abbe number is as
 | img_ht | 21.389
 | obj_ang | 22.5
 | obj_na | 0
-| img_na | -0.466|
+| img_na | -0.465|
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 59.652 | 234.97|
- | Field(x=0.0, y=0.1) | 93.926 | 520.236|
- | Field(x=0.0, y=0.2) | 138.85 | 701.69|
- | Field(x=0.0, y=0.3) | 166.874 | 774.952|
- | Field(x=0.0, y=0.4) | 178.24 | 772.833|
- | Field(x=0.0, y=0.5) | 166.715 | 675.356|
- | Field(x=0.0, y=0.6) | 141.875 | 530.553|
- | Field(x=0.0, y=0.7) | 120.704 | 435.888|
- | Field(x=0.0, y=0.8) | 127.348 | 527.442|
- | Field(x=0.0, y=0.9) | 158.908 | 603.457|
- | Field(x=0.0, y=1.0) | 168.149 | 514.335|
+ | Field(x=0.0, y=0.0) | 64.548 | 245.986|
+ | Field(x=0.0, y=0.1) | 97.512 | 530.622|
+ | Field(x=0.0, y=0.2) | 142.185 | 709.638|
+ | Field(x=0.0, y=0.3) | 170.557 | 784.21|
+ | Field(x=0.0, y=0.4) | 181.921 | 785.758|
+ | Field(x=0.0, y=0.5) | 170.327 | 684.491|
+ | Field(x=0.0, y=0.6) | 145.345 | 539.614|
+ | Field(x=0.0, y=0.7) | 124.392 | 444.019|
+ | Field(x=0.0, y=0.8) | 130.679 | 534.305|
+ | Field(x=0.0, y=0.9) | 161.77 | 609.605|
+ | Field(x=0.0, y=1.0) | 169.877 | 517.1|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d), 486.1327(F), 656.2725(C) were calculated across 10 fields, and then averaged
 ## Polychromatic Geometric MTF (Weighted)
 ![Polychromatic Geometrical MTF Weighted](./mtf-w.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
-* [OpticalBench Compatible Data File, tab delimited](./JP1964-010178_Example01.txt)
+* [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./JP1964-010178_Example01.zmx)
+
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-07-18

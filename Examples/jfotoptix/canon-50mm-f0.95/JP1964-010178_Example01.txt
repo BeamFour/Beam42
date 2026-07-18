@@ -13,7 +13,7 @@ Image Height	43.28
 Total Length	undefined
 Magnification	0
 d0	Infinity
-Bf	20.317	20.37
+Bf	20.30	20.37
 [lens data]
 1	75.3876	6.0372	1.79952	62.44	42.3	S-LAH52	J-LASF02	K-LASFN3
 2	300.1572	0.1032		62.44		
@@ -34,3 +34,14 @@ originX	232
 originY	604
 ppmm	14.683
 [notes]
+[patent info]
+country	JP
+number	JP 1964-010178
+example	EX 1
+year applied	1964
+inventors	Ito Hiroshi
+current assignee	Canon Inc
+original assignee	Canon Inc
+link	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S39-010178/12/en
+[report data]
+lens name	Canon 50mm f0.95

@@ -10,7 +10,7 @@ Image Height	43.2
 Magnification	0
 d0	Infinity
 Bf(p)	undefined
-Bf	36.2
+Bf	36.192
 [lens data]
 1	43.5259	6.501	1.8061	45.88	40.7	S-LAH53	Ohara
 2	142.4533	0.149		45.88	

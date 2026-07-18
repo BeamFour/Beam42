@@ -12,7 +12,7 @@ Image Height	43.2
 Total Length	undefined
 Magnification	0
 d0	Infinity
-Bf	37.21
+Bf	37.226
 Aperture Diameter	4.317
 [lens data]
 1	57.2	3.9	1.77279	106.62	49.5
@@ -54,3 +54,14 @@ originY	496
 ppmm	6.386
 [notes]
 Dibyendu: Missing vd for filter - best match based on refractive index is 52.3 (Schott KF6)
+[patent info]
+country	US
+number	US3728011
+example	EX 1
+year applied	1971
+inventors	Ikuo Mori
+current assignee	Nikon Corp
+original assignee	Nikon Corp
+link	https://patents.google.com/patent/US3728011A/en
+[report data]
+lens name	Nikkor 13mm f8 Prototype

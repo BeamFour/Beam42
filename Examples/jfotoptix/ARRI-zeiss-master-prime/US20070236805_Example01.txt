@@ -48,3 +48,14 @@ ppmm	7.629
 Bill: No patent F-Number, no apherical conic, no Image Height.
 Zeiss web site: horizontal Angle of View 28.26 for 24.9x18.7mm for 17.81 diagonal and 31.14mm
 Correct aspherical in DE 10 2005 025 204 A1
+[patent info]
+country	US
+number	US20070236805
+example	EX 1
+year applied	2005
+inventors	Juergen Klein,Juergen Noffke,Dietmar Gaengler
+current assignee	Carl Zeiss AG
+original assignee	Carl Zeiss AG
+link	https://patents.google.com/patent/US7446944B2/en
+[report data]
+lens name	ARRI Zeiss Master Prime T1.3 50mm

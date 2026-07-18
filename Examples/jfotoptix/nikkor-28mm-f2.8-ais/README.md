@@ -24,7 +24,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 14 | -46.001 | 3.1 | 14.0 | 1.67 | 57.31 | Hoya | LACL7 |
 | 15 | -17.9 | 0.1 | 16.1 |  |  |  |
 | 16 | 109.097 | 3.5 | 19.6 | 1.67 | 57.31 | Hoya | LACL7 |
-| 17 | -34.8 | 38.875 | 19.6 |  |  |  |
+| 17 | -34.8 | 38.864 | 19.6 |  |  |  |
 ## Layouts
 ![Layout Only](./layoutonly.svg)
 ![Layout Field 0.0](./layout.svg)
@@ -49,7 +49,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | fno | 2.893
 | enp_dist_P | 22.373
 | enp_radius | 4.948
-| exp_dist_P' | -16.753
+| exp_dist_P' | -16.742
 | exp_radius | 9.661
 | m | -0
 | red | -3.492862873229612E8
@@ -62,17 +62,17 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 4.054 | 8.208|
- | Field(x=0.0, y=0.1) | 4.465 | 15.108|
- | Field(x=0.0, y=0.2) | 5.431 | 15.909|
- | Field(x=0.0, y=0.3) | 6.266 | 18.107|
- | Field(x=0.0, y=0.4) | 6.944 | 22.615|
- | Field(x=0.0, y=0.5) | 7.761 | 30.439|
- | Field(x=0.0, y=0.6) | 8.876 | 43.781|
- | Field(x=0.0, y=0.7) | 11.114 | 63.772|
- | Field(x=0.0, y=0.8) | 16.648 | 98.72|
- | Field(x=0.0, y=0.9) | 29.451 | 144.496|
- | Field(x=0.0, y=1.0) | 56.924 | 220.417|
+ | Field(x=0.0, y=0.0) | 4.099 | 8.933|
+ | Field(x=0.0, y=0.1) | 4.401 | 17.079|
+ | Field(x=0.0, y=0.2) | 5.308 | 17.8|
+ | Field(x=0.0, y=0.3) | 5.96 | 20.004|
+ | Field(x=0.0, y=0.4) | 6.544 | 24.51|
+ | Field(x=0.0, y=0.5) | 7.385 | 32.341|
+ | Field(x=0.0, y=0.6) | 8.718 | 45.676|
+ | Field(x=0.0, y=0.7) | 11.341 | 65.664|
+ | Field(x=0.0, y=0.8) | 17.214 | 100.578|
+ | Field(x=0.0, y=0.9) | 30.207 | 146.289|
+ | Field(x=0.0, y=1.0) | 57.721 | 222.123|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10=red,30=blue,50=black cycles/mm
@@ -87,4 +87,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./US005917663_Example02.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-07-15
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-07-18

@@ -10,7 +10,7 @@ Total Length	undefined
 Magnification	0
 d0	Infinity
 Bf(orig)	38.9793
-Bf	38.875
+Bf	38.864
 [lens data]
 1	60.5000	3.500	1.67003	40.8	47.07	J-BAF10
 2	118.3000	0.100		39.2

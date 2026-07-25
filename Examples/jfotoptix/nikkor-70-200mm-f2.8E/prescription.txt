@@ -7,7 +7,7 @@ Angle of View	33.64	12.2
 F-Number	2.85	2.88
 Image Height	43.2	43.2
 Magnification	0	0
-Bf	53.89	53.91
+Bf	53.894	53.906
 d5	3.014	50.952
 d13	50.598	2.66
 Aperture Diameter	38.97	38.523

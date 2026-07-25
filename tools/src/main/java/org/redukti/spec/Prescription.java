@@ -45,7 +45,10 @@ public class Prescription {
 
     /** Maps our config id to scenario number in the OpticalBench specs
      * The scenario in OBench corresponds to how it is defined in
-     * source patent data
+     * source patent data.
+     * Note that these scenario numbers get lost when we write new
+     * prescription because the new prescription ends up only with the
+     * configured scenarios.
      */
     public int[] _configurations;
     /** Each config is given a name */
@@ -63,7 +66,7 @@ public class Prescription {
     // This is used only for layout diagrams - to specify rays
     public Distribution _distribution;   // FIXME rename, used for ray finding only
 
-    /** This was used to find chaief ray angle in the older optimj module but will no longer be used */
+    /** This was used to find chief ray angle in the older optimj module but will no longer be used */
     @Deprecated
     public double _var_angle_of_view = 0.0;
 

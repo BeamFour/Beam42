@@ -1,5 +1,5 @@
 [descriptive data]
-title	WO 2019/097669 Example 1 (Nikon AF-S Nikkor 70-200mm f/2.8 E FL ED VR)
+title	US11378789 Example 1 (Nikon AF-S Nikkor 70-200mm f/2.8 E FL ED VR)
 [constants]
 [variable distances]
 Focal Length	71.5	135.0	196.0	undefined	undefined	undefined
@@ -65,6 +65,15 @@ originX	41
 originY	336
 ppmm	7.101
 [notes]
+[patent info]
+country	US
+number	US11378789
+example	1
+year applied	2017
+inventors	Tomoki Ito
+current assignee	Nikon Corp
+original assignee	Nikon Corp
+link	https://patents.google.com/patent/US11378789B2/en
 [report data]
 lens name	AF-S Nikkor 70-200mm f/2.8 E FL ED VR
 scenarios	0	2

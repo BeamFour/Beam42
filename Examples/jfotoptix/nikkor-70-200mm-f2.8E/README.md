@@ -1,4 +1,8 @@
 # AF-S Nikkor 70-200mm f/2.8 E FL ED VR
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US11378789 | 1 | 2017 | Tomoki Ito | Nikon Corp | [link](https://patents.google.com/patent/US11378789B2/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

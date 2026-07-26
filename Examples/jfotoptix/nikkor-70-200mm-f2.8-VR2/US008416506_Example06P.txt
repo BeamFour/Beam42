@@ -75,7 +75,7 @@ originY	74
 [patent info]
 country	US
 number	US8416506
-example	1
+example	6
 year applied	2010
 inventors	Tomoki Ito
 current assignee	Nikon Corp

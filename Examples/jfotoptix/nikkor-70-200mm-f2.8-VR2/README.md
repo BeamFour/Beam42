@@ -2,7 +2,7 @@
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
-|US | US8416506 | 1 | 2010 | Tomoki Ito | Nikon Corp | [link](https://patents.google.com/patent/US8416506B2/en) |
+|US | US8416506 | 6 | 2010 | Tomoki Ito | Nikon Corp | [link](https://patents.google.com/patent/US8416506B2/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -180,4 +180,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./US008416506_Example06P.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-07-09
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-07-26

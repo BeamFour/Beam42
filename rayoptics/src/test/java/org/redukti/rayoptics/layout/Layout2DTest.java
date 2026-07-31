@@ -47,11 +47,14 @@ public class Layout2DTest {
                 new LayoutOptions().drawReferenceRays(false));
         String reference = layout.renderSvg(model, 1000, 500, new LayoutOptions());
         String fan = layout.renderSvg(model, 1000, 500,
-                new LayoutOptions().drawReferenceRays(false).fanRayCount(9));
+                new LayoutOptions().drawReferenceRays(false).fanRayCount(9).clipRays(true));
+        String traceFan = layout.renderSvg(model, 1000, 500,
+                new LayoutOptions().drawReferenceRays(false).fanRayCount(9).clipRays(true).useTraceFan(true));
 
         Files.writeString(output.resolve("leica-summicron-elements.svg"), elements);
         Files.writeString(output.resolve("leica-summicron-reference-rays.svg"), reference);
         Files.writeString(output.resolve("leica-summicron-ray-fan.svg"), fan);
+        Files.writeString(output.resolve("leica-summicron-trace-fan.svg"), traceFan);
         Assertions.assertTrue(elements.contains("<polyline"));
         Assertions.assertTrue(reference.length() > elements.length());
         Assertions.assertTrue(fan.length() > elements.length());
@@ -71,11 +74,14 @@ public class Layout2DTest {
                 new LayoutOptions().drawReferenceRays(false));
         String reference = layout.renderSvg(model, 1200, 600, new LayoutOptions());
         String fan = layout.renderSvg(model, 1200, 600,
-                new LayoutOptions().drawReferenceRays(false).fanRayCount(11));
+                new LayoutOptions().drawReferenceRays(false).fanRayCount(11).clipRays(true));
+        String traceFan = layout.renderSvg(model, 1200, 600,
+                new LayoutOptions().drawReferenceRays(false).fanRayCount(11).clipRays(true).useTraceFan(true));
 
         Files.writeString(output.resolve("nikkor-wide-zoom-elements.svg"), elements);
         Files.writeString(output.resolve("nikkor-wide-zoom-reference-rays.svg"), reference);
         Files.writeString(output.resolve("nikkor-wide-zoom-ray-fan.svg"), fan);
+        Files.writeString(output.resolve("nikkor-wide-zoom-trace-fan.svg"), traceFan);
 
         long aspherics = model.seq_model.ifcs.stream()
                 .filter(ifc -> ifc.profile instanceof EvenPolynomial)

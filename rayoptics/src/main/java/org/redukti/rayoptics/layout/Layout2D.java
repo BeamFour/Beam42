@@ -9,6 +9,7 @@ import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.RayPkg;
 import org.redukti.rayoptics.raytr.RayResult;
 import org.redukti.rayoptics.raytr.Trace;
+import org.redukti.rayoptics.raytr.TraceFanDef;
 import org.redukti.rayoptics.raytr.TraceOptions;
 import org.redukti.rayoptics.seq.Interface;
 import org.redukti.rayoptics.seq.SequentialModel;
@@ -55,6 +56,8 @@ public final class Layout2D {
         if (options == null) options = new LayoutOptions();
         if (options.surfaceSamples < 2) throw new IllegalArgumentException("surfaceSamples must be >= 2");
         if (options.margin < 0.0) throw new IllegalArgumentException("margin must be >= 0");
+        if (options.useTraceFan && options.fanRayCount == 1)
+            throw new IllegalArgumentException("Trace.trace_fan requires fanRayCount >= 2");
 
         // Rays can extend beyond the physical elements, so build every requested
         // path before calculating the viewport.
@@ -266,18 +269,40 @@ public final class Layout2D {
                 addRay(out, model.seq_model, named.get("-Y"), color);
             }
             if (options.fanRayCount > 0) {
-                // Fan coordinates traverse normalized pupil space from -1 to +1.
-                int count = options.fanRayCount;
-                for (int i = 0; i < count; i++) {
-                    double py = count == 1 ? 0.0 : -1.0 + 2.0 * i / (count - 1.0);
-                    RayResult result = Trace.trace_ray(model, new Vector2(0, py), field,
-                            wavelength, traceOptions(options));
-                    addRay(out, model.seq_model, result.pkg, color);
-                }
+                if (options.useTraceFan)
+                    addTraceFan(out, model, field, wavelength, color, options);
+                else
+                    addDirectFan(out, model, field, wavelength, color, options);
             }
         }
     }
 
+    /** Traces each normalized pupil coordinate independently, retaining partial failed rays. */
+    private void addDirectFan(List<Polyline> out, OpticalModel model, Field field,
+                              double wavelength, Rgb color, LayoutOptions options) {
+        int count = options.fanRayCount;
+        for (int i = 0; i < count; i++) {
+            double py = count == 1 ? 0.0 : -1.0 + 2.0 * i / (count - 1.0);
+            RayResult result = Trace.trace_ray(model, new Vector2(0, py), field,
+                    wavelength, traceOptions(options));
+            addRay(out, model.seq_model, result.pkg, color);
+        }
+    }
+
+    /**
+     * Uses Trace.trace_fan unchanged. Its current error filter omits rays which
+     * terminate before reaching the image plane.
+     */
+    private void addTraceFan(List<Polyline> out, OpticalModel model, Field field,
+                             double wavelength, Rgb color, LayoutOptions options) {
+        TraceFanDef fan = new TraceFanDef(new Vector2(0.0, -1.0),
+                new Vector2(0.0, 1.0), options.fanRayCount);
+        double focus = model.optical_spec.defocus().get_focus();
+        var traced = Trace.trace_fan(model, fan, field, wavelength, focus,
+                null, traceOptions(options));
+        for (var item : traced)
+            addRay(out, model.seq_model, item.ray_pkg, color);
+    }
     /** Maps layout ray settings onto the tracing subsystem's options. */
     private TraceOptions traceOptions(LayoutOptions options) {
         TraceOptions result = new TraceOptions();

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
 import org.redukti.rayoptics.optical.OpticalModel;
-import org.redukti.rayoptics.parax.FirstOrderData;
 import org.redukti.rayoptics.raytr.VigCalc;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.seq.SurfaceData;
@@ -22,7 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.regex.Pattern;
 
-public class SystemLayout2DTest {
+public class Layout2DTest {
     @Test
     public void createsStaticElementModel() {
         OpticalModel model = leicaSummicron();
@@ -40,7 +39,7 @@ public class SystemLayout2DTest {
     @Test
     public void rendersVisualCheckSvgs() throws IOException {
         OpticalModel model = leicaSummicron();
-        SystemLayout2D layout = new SystemLayout2D();
+        Layout2D layout = new Layout2D();
         Path output = Path.of("target", "layout-examples");
         Files.createDirectories(output);
 
@@ -64,7 +63,7 @@ public class SystemLayout2DTest {
     @Test
     public void rendersWideAngleAsphericVisualCheckSvgs() throws IOException {
         OpticalModel model = nikkorWideZoom();
-        SystemLayout2D layout = new SystemLayout2D();
+        Layout2D layout = new Layout2D();
         Path output = Path.of("target", "layout-examples");
         Files.createDirectories(output);
 

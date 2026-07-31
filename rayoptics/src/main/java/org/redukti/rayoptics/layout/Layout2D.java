@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 /** Draws a static y-z (meridional) view of a rayoptics model. */
-public final class SystemLayout2D {
+public final class Layout2D {
     private static final Rgb ELEMENT_COLOR = Rgb.rgb_black;
     private static final Rgb STOP_COLOR = Rgb.rgb_black;
     private static final Rgb AXIS_COLOR = Rgb.rgb_gray;

@@ -18,6 +18,8 @@ import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
 import org.redukti.plotter.*;
 import org.redukti.rayoptics.analysis.*;
+import org.redukti.rayoptics.layout.Layout2D;
+import org.redukti.rayoptics.layout.LayoutOptions;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrderData;
 import org.redukti.rayoptics.raytr.Trace;
@@ -31,6 +33,7 @@ import org.redukti.spec.VigType;
 import org.redukti.util.Args;
 import org.redukti.util.Helper;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -376,6 +379,26 @@ public class LensTool2 {
             OpticalSystem skewedSystem = createSystem(specs,scenario,arguments.use_glass_types,true,1.0,arguments.only_d_line);
             outputLayoutWithUserRays(skewedSystem,Helper.getOutputPath(arguments.specfile,suffixed_name("layout-skew",filename_suffix,".svg"),arguments.outdir),points,arguments.dumpSystem,arguments.include_lost_rays);
         }
+
+        public void doNewLayoutDiagrams(OpticalBenchDataImporter.LensSpecifications specs,Args arguments, int config, int scenario, String filename_suffix, VigType vigType) throws Exception {
+            // First we use rayoptics to get ray starts
+            // For very wide angle lenses, blindly spraying rays doesn't work very well
+            final double[] fields = {0.0, 1.0};
+            var prescription = createPrescription(specs,arguments.use_glass_types,arguments.only_d_line);
+            var opm = new RayOpticsModelBuilder(prescription).build_optical_model(true,fields,false,vigType,true, config);
+            Layout2D layout = new Layout2D();
+            Path output = Helper.getOutputPath(arguments.specfile,suffixed_name("layout-rayfan",filename_suffix,".svg"),arguments.outdir);
+            String fan = layout.renderSvg(opm, 1000, 500,
+                    new LayoutOptions().drawReferenceRays(false).fanRayCount(9));
+            Files.writeString(output, fan);
+            output = Helper.getOutputPath(arguments.specfile,suffixed_name("layout-elements",filename_suffix,".svg"),arguments.outdir);
+            String elements = layout.renderSvg(opm, 1000, 500,
+                    new LayoutOptions().drawReferenceRays(false));
+            Files.writeString(output, elements);
+            String reference = layout.renderSvg(opm, 1000, 500, new LayoutOptions());
+            output = Helper.getOutputPath(arguments.specfile,suffixed_name("layout-reference-rays",filename_suffix,".svg"),arguments.outdir);
+            Files.writeString(output, reference);
+        }
     }
 
     private static String suffixed_name(String baseName, String suffix, String ext) {
@@ -416,10 +439,13 @@ public class LensTool2 {
                 Helper.createOutputFile(Helper.getOutputPath(arguments.specfile, suffixed_name("vig", scenario_filesuffix, ".txt"), arguments.outdir), osp.list_str(new StringBuilder()).toString());
                 Helper.createOutputFile(Helper.getOutputPath(arguments.specfile, suffixed_name("paraxial", scenario_filesuffix, ".txt"), arguments.outdir), fod.toString());
 
-                if (arguments.do_wideangle_layout /* || osp.fov.is_wide_angle */)
+                if (arguments.do_wideangle_layout || osp.fov.is_wide_angle) {
                     new Layout().doLayoutDiagramsForWides(specs, arguments, config, scenario, scenario_filesuffix, vigType);
-                else
+                }
+                else {
                     new Layout().doLayoutDiagrams(specs, arguments, scenario, scenario_filesuffix);
+                }
+                new Layout().doNewLayoutDiagrams(specs, arguments, config, scenario, scenario_filesuffix, vigType);
 
 //            StringBuilder buf = new StringBuilder();
 //            for (int i = 0; i < fields.length; i++) {

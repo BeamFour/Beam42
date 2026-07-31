@@ -31,7 +31,13 @@ public final class Layout2D {
             Rgb.rgb_cyan, Rgb.rgb_yellow
     };
 
-    private record Polyline(List<Vector2> points, Rgb color) {}
+    private static final double STOP_STROKE_WIDTH = 2.5;
+
+    private record Polyline(List<Vector2> points, Rgb color, double strokeWidth) {
+        private Polyline(List<Vector2> points, Rgb color) {
+            this(points, color, 1.0);
+        }
+    }
 
     public String renderSvg(OpticalModel model, double width, double height, LayoutOptions options) {
         RendererSvg renderer = new RendererSvg(width, height);
@@ -58,11 +64,13 @@ public final class Layout2D {
         if (options.drawOpticalAxis)
             renderer.draw_segment(new Vector2(bounds.minX, 0.0), new Vector2(bounds.maxX, 0.0), AXIS_COLOR);
         for (Polyline line : geometry) {
+            renderer.set_stroke_width(line.strokeWidth);
             if (line.points.size() == 2)
                 renderer.draw_segment(line.points.get(0), line.points.get(1), line.color);
             else if (line.points.size() > 2)
                 renderer.draw_polygon(line.points.toArray(new Vector2[0]), line.color, false, false);
         }
+        renderer.set_stroke_width(1.0);
     }
 
     private void addElements(List<Polyline> out, OpticalModel model, ElementModel elementModel, int samples) {
@@ -183,20 +191,20 @@ public final class Layout2D {
     }
     private void addStop(List<Polyline> out, SequentialModel sm, Stop stop) {
         addApertureMarker(out, sm.gbl_tfrms.get(stop.surfaceIndex()),
-                maxAperture(stop.referenceSurface()));
+                maxAperture(stop.referenceSurface()), STOP_STROKE_WIDTH);
     }
 
     private void addAperture(List<Polyline> out, SequentialModel sm, Aperture aperture) {
         addApertureMarker(out, sm.gbl_tfrms.get(aperture.surfaceIndex()),
-                maxAperture(aperture.referenceSurface()));
+                maxAperture(aperture.referenceSurface()), 1.0);
     }
 
-    private void addApertureMarker(List<Polyline> out, Tfm3d tfm, double radius) {
+    private void addApertureMarker(List<Polyline> out, Tfm3d tfm, double radius, double strokeWidth) {
         double outer = radius * 1.2;
         out.add(new Polyline(List.of(toLayout(tfm, new Vector3(0, radius, 0)),
-                toLayout(tfm, new Vector3(0, outer, 0))), STOP_COLOR));
+                toLayout(tfm, new Vector3(0, outer, 0))), STOP_COLOR, strokeWidth));
         out.add(new Polyline(List.of(toLayout(tfm, new Vector3(0, -radius, 0)),
-                toLayout(tfm, new Vector3(0, -outer, 0))), STOP_COLOR));
+                toLayout(tfm, new Vector3(0, -outer, 0))), STOP_COLOR, strokeWidth));
     }
 
     private void addImagePlane(List<Polyline> out, OpticalModel model, DummyInterface image) {

@@ -101,10 +101,15 @@ public class Layout2DTest {
                 new LayoutOptions().drawReferenceRays(false));
         Assertions.assertFalse(svg.contains("NaN"));
         Assertions.assertFalse(svg.contains("Infinity"));
+        Assertions.assertEquals(2, countOccurrences(svg, "stroke-width=\"2.5\""),
+                "only the two halves of the explicit stop should be bold");
         assertImagePlane(svg, 250.0);
         assertOrthogonalBlackSegments(svg);
     }
 
+    private static int countOccurrences(String text, String value) {
+        return (text.length() - text.replace(value, "").length()) / value.length();
+    }
     private static void assertImagePlane(String svg, double axisY) {
         var line = Pattern.compile("<line x1=\"([^\"]+)\" y1=\"([^\"]+)\" x2=\"([^\"]+)\" y2=\"([^\"]+)\"[^>]*stroke=\"#000000\"").matcher(svg);
         boolean found = false;

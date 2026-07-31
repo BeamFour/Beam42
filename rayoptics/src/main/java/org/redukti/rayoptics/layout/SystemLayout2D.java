@@ -18,10 +18,8 @@ import org.redukti.render.rendering.RendererViewport;
 import org.redukti.render.rendering.Rgb;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /** Draws a static y-z (meridional) view of a rayoptics model. */
 public final class SystemLayout2D {
@@ -69,24 +67,62 @@ public final class SystemLayout2D {
 
     private void addElements(List<Polyline> out, OpticalModel model, ElementModel elementModel, int samples) {
         SequentialModel sm = model.seq_model;
-        Set<Integer> drawnSurfaces = new HashSet<>();
         for (Element element : elementModel.elements()) {
             if (element instanceof Lens lens) {
-                addSurface(out, sm, lens.firstSurfaceIndex(), lens.surface1(), samples, drawnSurfaces);
-                addSurface(out, sm, lens.secondSurfaceIndex(), lens.surface2(), samples, drawnSurfaces);
-                addLensEdges(out, sm, lens);
+                addLens(out, sm, lens, samples);
             } else if (element instanceof Stop stop) {
                 addStop(out, sm, stop);
             } else if (element instanceof Mirror mirror && mirror.surface() instanceof Surface surface) {
-                addSurface(out, sm, mirror.surfaceIndex(), surface, samples, drawnSurfaces);
+                addSurface(out, sm, mirror.surfaceIndex(), surface, surfaceRadius(surface), samples);
             }
         }
     }
 
+    /** Implements Geopter's curvature-dependent DrawLens/DrawFlat construction. */
+    private void addLens(List<Polyline> out, SequentialModel sm, Lens lens, int samples) {
+        double od1 = semiDiameter(lens.surface1());
+        double od2 = semiDiameter(lens.surface2());
+        double mechanicalRadius = Math.max(maxAperture(lens.surface1()), maxAperture(lens.surface2()));
+        double cv1 = lens.surface1().profile.cv;
+        double cv2 = lens.surface2().profile.cv;
+
+        double drawRadius1;
+        double drawRadius2;
+        boolean flat1 = false;
+        boolean flat2 = false;
+
+        if (cv1 > 0.0 && cv2 < 0.0) {
+            drawRadius1 = mechanicalRadius;
+            drawRadius2 = mechanicalRadius;
+        } else if ((cv1 > 0.0 && cv2 > 0.0) || (cv1 < 0.0 && cv2 < 0.0)) {
+            if (cv1 - cv2 > 0.0) {
+                drawRadius1 = mechanicalRadius;
+                drawRadius2 = mechanicalRadius;
+            } else if (od1 > od2) {
+                drawRadius1 = mechanicalRadius;
+                drawRadius2 = od2;
+                flat2 = true;
+            } else {
+                drawRadius1 = od1;
+                drawRadius2 = mechanicalRadius;
+                flat1 = true;
+            }
+        } else {
+            drawRadius1 = od1;
+            drawRadius2 = od2;
+            flat1 = true;
+            flat2 = true;
+        }
+
+        addSurface(out, sm, lens.firstSurfaceIndex(), lens.surface1(), drawRadius1, samples);
+        addSurface(out, sm, lens.secondSurfaceIndex(), lens.surface2(), drawRadius2, samples);
+        if (flat1) addFlats(out, sm, lens.firstSurfaceIndex(), lens.surface1(), od1, mechanicalRadius);
+        if (flat2) addFlats(out, sm, lens.secondSurfaceIndex(), lens.surface2(), od2, mechanicalRadius);
+        addCommonEdges(out, sm, lens, drawRadius1, drawRadius2, mechanicalRadius);
+    }
+
     private void addSurface(List<Polyline> out, SequentialModel sm, int index, Surface surface,
-                            int samples, Set<Integer> drawn) {
-        if (!drawn.add(index)) return;
-        double radius = surfaceRadius(surface);
+                            double radius, int samples) {
         List<Vector2> points = new ArrayList<>();
         for (int i = 0; i < samples; i++) {
             double y = -radius + 2.0 * radius * i / (samples - 1.0);
@@ -101,27 +137,48 @@ public final class SystemLayout2D {
         flush(out, points, ELEMENT_COLOR);
     }
 
-    private void addLensEdges(List<Polyline> out, SequentialModel sm, Lens lens) {
-        double r1 = surfaceRadius(lens.surface1());
-        double r2 = surfaceRadius(lens.surface2());
-        addEdge(out, sm, lens, r1, r2);
-        addEdge(out, sm, lens, -r1, -r2);
+    private void addFlats(List<Polyline> out, SequentialModel sm, int surfaceIndex,
+                          Surface surface, double profileRadius, double mechanicalRadius) {
+        if (mechanicalRadius <= profileRadius) return;
+        addFlat(out, sm, surfaceIndex, surface, profileRadius, mechanicalRadius);
+        addFlat(out, sm, surfaceIndex, surface, -profileRadius, -mechanicalRadius);
     }
 
-    private void addEdge(List<Polyline> out, SequentialModel sm, Lens lens, double y1, double y2) {
+    private void addFlat(List<Polyline> out, SequentialModel sm, int surfaceIndex,
+                         Surface surface, double fromY, double toY) {
         try {
+            double sag = surface.profile.sag(0.0, fromY);
+            Tfm3d tfm = sm.gbl_tfrms.get(surfaceIndex);
+            out.add(new Polyline(List.of(
+                    toLayout(tfm, new Vector3(0.0, fromY, sag)),
+                    toLayout(tfm, new Vector3(0.0, toY, sag))), ELEMENT_COLOR));
+        } catch (RuntimeException ignored) {
+            // No flat can be anchored when the profile is invalid at its edge.
+        }
+    }
+
+    private void addCommonEdges(List<Polyline> out, SequentialModel sm, Lens lens,
+                                double profileRadius1, double profileRadius2, double mechanicalRadius) {
+        addCommonEdge(out, sm, lens, profileRadius1, profileRadius2, mechanicalRadius);
+        addCommonEdge(out, sm, lens, -profileRadius1, -profileRadius2, -mechanicalRadius);
+    }
+
+    private void addCommonEdge(List<Polyline> out, SequentialModel sm, Lens lens,
+                               double profileY1, double profileY2, double edgeY) {
+        try {
+            double sag1 = lens.surface1().profile.sag(0.0, profileY1);
+            double sag2 = lens.surface2().profile.sag(0.0, profileY2);
             Vector2 p1 = toLayout(sm.gbl_tfrms.get(lens.firstSurfaceIndex()),
-                    new Vector3(0.0, y1, lens.surface1().profile.sag(0.0, y1)));
+                    new Vector3(0.0, edgeY, sag1));
             Vector2 p2 = toLayout(sm.gbl_tfrms.get(lens.secondSurfaceIndex()),
-                    new Vector3(0.0, y2, lens.surface2().profile.sag(0.0, y2)));
+                    new Vector3(0.0, edgeY, sag2));
             out.add(new Polyline(List.of(p1, p2), ELEMENT_COLOR));
         } catch (RuntimeException ignored) {
             // A mechanical aperture outside the valid profile has no drawable rim point.
         }
     }
-
     private void addStop(List<Polyline> out, SequentialModel sm, Stop stop) {
-        double radius = Math.abs(stop.referenceSurface().max_aperture);
+        double radius = maxAperture(stop.referenceSurface());
         double outer = radius * 1.2;
         Tfm3d tfm = sm.gbl_tfrms.get(stop.surfaceIndex());
         out.add(new Polyline(List.of(toLayout(tfm, new Vector3(0, radius, 0)),
@@ -174,12 +231,23 @@ public final class SystemLayout2D {
         flush(out, points, color);
     }
 
-    private static double surfaceRadius(Interface surface) {
-        try {
-            double radius = surface.surface_od();
-            if (Double.isFinite(radius) && radius > 0.0) return radius;
-        } catch (RuntimeException ignored) {}
+    /** Beam43 max_aperture corresponds to Geopter's traced SemiDiameter. */
+    private static double semiDiameter(Interface surface) {
         return Math.max(Math.abs(surface.max_aperture), 1.0e-9);
+    }
+
+    /** Geopter MaxAperture is the larger of semi-diameter and explicit aperture extent. */
+    private static double maxAperture(Interface surface) {
+        double radius = semiDiameter(surface);
+        try {
+            double surfaceOd = surface.surface_od();
+            if (Double.isFinite(surfaceOd)) radius = Math.max(radius, Math.abs(surfaceOd));
+        } catch (RuntimeException ignored) {}
+        return radius;
+    }
+
+    private static double surfaceRadius(Interface surface) {
+        return maxAperture(surface);
     }
 
     private static Vector2 toLayout(Tfm3d tfm, Vector3 local) {

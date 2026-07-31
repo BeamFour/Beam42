@@ -18,6 +18,7 @@ import org.redukti.rayoptics.util.Pair;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.regex.Pattern;
 
 public class SystemLayout2DTest {
     @Test
@@ -55,8 +56,23 @@ public class SystemLayout2DTest {
         Assertions.assertTrue(fan.length() > elements.length());
         Assertions.assertFalse(reference.contains("NaN"));
         Assertions.assertFalse(reference.contains("Infinity"));
+        assertOrthogonalBlackSegments(elements);
     }
 
+    private static void assertOrthogonalBlackSegments(String svg) {
+        var line = Pattern.compile("<line x1=\"([^\"]+)\" y1=\"([^\"]+)\" x2=\"([^\"]+)\" y2=\"([^\"]+)\"[^>]*stroke=\"#000000\"").matcher(svg);
+        int count = 0;
+        while (line.find()) {
+            double x1 = Double.parseDouble(line.group(1));
+            double y1 = Double.parseDouble(line.group(2));
+            double x2 = Double.parseDouble(line.group(3));
+            double y2 = Double.parseDouble(line.group(4));
+            Assertions.assertTrue(Math.abs(x1 - x2) < 1.0e-9 || Math.abs(y1 - y2) < 1.0e-9,
+                    "mechanical edge must be horizontal or vertical");
+            count++;
+        }
+        Assertions.assertTrue(count > 0);
+    }
     private static OpticalModel leicaSummicron() {
         OpticalModel model = new OpticalModel();
         SequentialModel sm = model.seq_model;

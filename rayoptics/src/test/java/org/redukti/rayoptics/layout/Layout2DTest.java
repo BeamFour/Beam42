@@ -88,6 +88,38 @@ public class Layout2DTest {
         Assertions.assertFalse(reference.contains("Infinity"));
         assertOrthogonalBlackSegments(elements);
     }
+    @Test
+    public void rendersImagePlaneAndNonStopAperture() {
+        OpticalModel model = withNonStopAperture();
+        ElementModel elementModel = new ElementModel(model);
+        long apertures = elementModel.elements().stream()
+                .filter(element -> element.type() == ElementType.APERTURE)
+                .count();
+        Assertions.assertEquals(1, apertures);
+
+        String svg = new Layout2D().renderSvg(model, 1000, 500,
+                new LayoutOptions().drawReferenceRays(false));
+        Assertions.assertFalse(svg.contains("NaN"));
+        Assertions.assertFalse(svg.contains("Infinity"));
+        assertImagePlane(svg, 250.0);
+        assertOrthogonalBlackSegments(svg);
+    }
+
+    private static void assertImagePlane(String svg, double axisY) {
+        var line = Pattern.compile("<line x1=\"([^\"]+)\" y1=\"([^\"]+)\" x2=\"([^\"]+)\" y2=\"([^\"]+)\"[^>]*stroke=\"#000000\"").matcher(svg);
+        boolean found = false;
+        while (line.find()) {
+            double x1 = Double.parseDouble(line.group(1));
+            double y1 = Double.parseDouble(line.group(2));
+            double x2 = Double.parseDouble(line.group(3));
+            double y2 = Double.parseDouble(line.group(4));
+            if (Math.abs(x1 - x2) < 1.0e-9 && Math.min(y1, y2) < axisY && Math.max(y1, y2) > axisY) {
+                found = true;
+                break;
+            }
+        }
+        Assertions.assertTrue(found, "image plane should cross the optical axis");
+    }
     private static void assertOrthogonalBlackSegments(String svg) {
         var line = Pattern.compile("<line x1=\"([^\"]+)\" y1=\"([^\"]+)\" x2=\"([^\"]+)\" y2=\"([^\"]+)\"[^>]*stroke=\"#000000\"").matcher(svg);
         int count = 0;
@@ -125,6 +157,16 @@ public class Layout2DTest {
         sm.add_surface(new SurfaceData(0.0, 3.69).rindex(1.79227, 47.15).max_aperture(11.48));
         sm.add_surface(new SurfaceData(-42.71, 37.32).max_aperture(11.985));
         sm.do_apertures = false;
+        model.update_model();
+        VigCalc.set_pupil(model);
+        model.update_model();
+        return model;
+    }
+    private static OpticalModel withNonStopAperture() {
+        OpticalModel model = leicaSummicron();
+        SequentialModel sm = model.seq_model;
+        sm.set_cur_surface(sm.get_num_surfaces() - 2);
+        sm.add_surface(new SurfaceData(0.0, 0.0).max_aperture(7.0));
         model.update_model();
         VigCalc.set_pupil(model);
         model.update_model();

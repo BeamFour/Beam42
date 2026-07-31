@@ -72,6 +72,10 @@ public final class Layout2D {
                 addLens(out, sm, lens, samples);
             } else if (element instanceof Stop stop) {
                 addStop(out, sm, stop);
+            } else if (element instanceof Aperture aperture) {
+                addAperture(out, sm, aperture);
+            } else if (element instanceof DummyInterface dummy && "Image".equals(dummy.label())) {
+                addImagePlane(out, model, dummy);
             } else if (element instanceof Mirror mirror && mirror.surface() instanceof Surface surface) {
                 addSurface(out, sm, mirror.surfaceIndex(), surface, surfaceRadius(surface), samples);
             }
@@ -178,13 +182,32 @@ public final class Layout2D {
         }
     }
     private void addStop(List<Polyline> out, SequentialModel sm, Stop stop) {
-        double radius = maxAperture(stop.referenceSurface());
+        addApertureMarker(out, sm.gbl_tfrms.get(stop.surfaceIndex()),
+                maxAperture(stop.referenceSurface()));
+    }
+
+    private void addAperture(List<Polyline> out, SequentialModel sm, Aperture aperture) {
+        addApertureMarker(out, sm.gbl_tfrms.get(aperture.surfaceIndex()),
+                maxAperture(aperture.referenceSurface()));
+    }
+
+    private void addApertureMarker(List<Polyline> out, Tfm3d tfm, double radius) {
         double outer = radius * 1.2;
-        Tfm3d tfm = sm.gbl_tfrms.get(stop.surfaceIndex());
         out.add(new Polyline(List.of(toLayout(tfm, new Vector3(0, radius, 0)),
                 toLayout(tfm, new Vector3(0, outer, 0))), STOP_COLOR));
         out.add(new Polyline(List.of(toLayout(tfm, new Vector3(0, -radius, 0)),
                 toLayout(tfm, new Vector3(0, -outer, 0))), STOP_COLOR));
+    }
+
+    private void addImagePlane(List<Polyline> out, OpticalModel model, DummyInterface image) {
+        double radius = maxAperture(image.surface());
+        try {
+            if (model.optical_spec.parax_data != null && model.optical_spec.parax_data.fod != null)
+                radius = Math.max(radius, Math.abs(model.optical_spec.parax_data.fod.img_ht));
+        } catch (RuntimeException ignored) {}
+        Tfm3d tfm = model.seq_model.gbl_tfrms.get(image.surfaceIndex());
+        out.add(new Polyline(List.of(toLayout(tfm, new Vector3(0, -radius, 0)),
+                toLayout(tfm, new Vector3(0, radius, 0))), ELEMENT_COLOR));
     }
 
     private void addRays(List<Polyline> out, OpticalModel model, LayoutOptions options) {

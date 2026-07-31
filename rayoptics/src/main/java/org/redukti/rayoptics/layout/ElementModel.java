@@ -25,6 +25,7 @@ public final class ElementModel {
         List<Element> next = new ArrayList<>();
         int lastSurface = sm.ifcs.size() - 1;
         next.add(new DummyInterface(0, sm.ifcs.get(0), "Object"));
+        double wvl = sm.central_wavelength();
 
         for (int i = 1; i < lastSurface; i++) {
             var ifc = sm.ifcs.get(i);
@@ -33,11 +34,12 @@ public final class ElementModel {
             }
             if (sm.stop_surface != null && sm.stop_surface == i) {
                 next.add(new Stop(i, ifc));
+            } else if (isAperture(sm, i, wvl)) {
+                next.add(new Aperture(i, ifc));
             }
         }
 
-        double wvl = sm.central_wavelength();
-        for (int i = 0; i < sm.gaps.size(); i++) {
+       for (int i = 0; i < sm.gaps.size(); i++) {
             Gap gap = sm.gaps.get(i);
             if (!isAir(gap, wvl) && i + 1 < sm.ifcs.size()
                     && sm.ifcs.get(i) instanceof Surface s1
@@ -49,6 +51,18 @@ public final class ElementModel {
         elements = List.copyOf(next);
     }
 
+    static boolean isAperture(SequentialModel sm, int surfaceIndex, double wavelength) {
+        if (surfaceIndex < 1 || surfaceIndex >= sm.ifcs.size() - 1 || surfaceIndex >= sm.gaps.size())
+            return false;
+        var ifc = sm.ifcs.get(surfaceIndex);
+        Gap precedingGap = sm.gaps.get(surfaceIndex - 1);
+        Gap followingGap = sm.gaps.get(surfaceIndex);
+        return ifc.interact_mode != InteractMode.REFLECT
+                && ifc.profile != null
+                && Math.abs(ifc.profile.cv) < 1.0e-12
+                && Math.abs(followingGap.thi) < 1.0e-12
+                && isAir(followingGap, wavelength);
+    }
     public List<Element> elements() { return elements; }
 
     public static boolean isAir(Gap gap, double wavelength) {

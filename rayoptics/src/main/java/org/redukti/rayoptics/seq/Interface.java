@@ -146,7 +146,7 @@ public class Interface {
     // TODO phase() method
 
     public void apply_scale_factor(double scale_factor) {
-        this.max_aperture *= scale_factor;
+        this.max_aperture *= Math.abs(scale_factor);
         if (decenter != null)
             decenter.apply_scale_factor(scale_factor);
     }

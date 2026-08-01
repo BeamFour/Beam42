@@ -28,7 +28,7 @@ public final class Layout2D {
     private static final Rgb STOP_COLOR = Rgb.rgb_black;
     private static final Rgb AXIS_COLOR = Rgb.rgb_gray;
     private static final Rgb[] FIELD_COLORS = {
-            Rgb.rgb_red, Rgb.rgb_green, Rgb.rgb_blue, Rgb.rgb_magenta,
+            Rgb.rgb_red, Rgb.rgb_blue, Rgb.rgb_green, Rgb.rgb_magenta,
             Rgb.rgb_cyan, Rgb.rgb_yellow
     };
 
@@ -88,8 +88,8 @@ public final class Layout2D {
     private void addElements(List<Polyline> out, OpticalModel model, ElementModel elementModel, int samples) {
         SequentialModel sm = model.seq_model;
         for (Element element : elementModel.elements()) {
-            if (element instanceof Lens lens) {
-                addLens(out, sm, lens, samples);
+            if (element instanceof LensElement lensElement) {
+                addLens(out, sm, lensElement, samples);
             } else if (element instanceof Stop stop) {
                 addStop(out, sm, stop);
             } else if (element instanceof Aperture aperture) {
@@ -103,12 +103,12 @@ public final class Layout2D {
     }
 
     /** Implements Geopter's curvature-dependent DrawLens/DrawFlat construction. */
-    private void addLens(List<Polyline> out, SequentialModel sm, Lens lens, int samples) {
-        double od1 = semiDiameter(lens.surface1());
-        double od2 = semiDiameter(lens.surface2());
-        double mechanicalRadius = Math.max(maxAperture(lens.surface1()), maxAperture(lens.surface2()));
-        double cv1 = lens.surface1().profile.cv;
-        double cv2 = lens.surface2().profile.cv;
+    private void addLens(List<Polyline> out, SequentialModel sm, LensElement lensElement, int samples) {
+        double od1 = semiDiameter(lensElement.surface1());
+        double od2 = semiDiameter(lensElement.surface2());
+        double mechanicalRadius = Math.max(maxAperture(lensElement.surface1()), maxAperture(lensElement.surface2()));
+        double cv1 = lensElement.surface1().profile.cv;
+        double cv2 = lensElement.surface2().profile.cv;
 
         double drawRadius1;
         double drawRadius2;
@@ -140,11 +140,11 @@ public final class Layout2D {
             flat2 = true;
         }
 
-        addSurface(out, sm, lens.firstSurfaceIndex(), lens.surface1(), drawRadius1, samples);
-        addSurface(out, sm, lens.secondSurfaceIndex(), lens.surface2(), drawRadius2, samples);
-        if (flat1) addFlats(out, sm, lens.firstSurfaceIndex(), lens.surface1(), od1, mechanicalRadius);
-        if (flat2) addFlats(out, sm, lens.secondSurfaceIndex(), lens.surface2(), od2, mechanicalRadius);
-        addCommonEdges(out, sm, lens, drawRadius1, drawRadius2, mechanicalRadius);
+        addSurface(out, sm, lensElement.firstSurfaceIndex(), lensElement.surface1(), drawRadius1, samples);
+        addSurface(out, sm, lensElement.secondSurfaceIndex(), lensElement.surface2(), drawRadius2, samples);
+        if (flat1) addFlats(out, sm, lensElement.firstSurfaceIndex(), lensElement.surface1(), od1, mechanicalRadius);
+        if (flat2) addFlats(out, sm, lensElement.secondSurfaceIndex(), lensElement.surface2(), od2, mechanicalRadius);
+        addCommonEdges(out, sm, lensElement, drawRadius1, drawRadius2, mechanicalRadius);
     }
 
     /**
@@ -190,24 +190,24 @@ public final class Layout2D {
     }
 
     /** Adds the upper and lower mechanical rims joining the lens surfaces. */
-    private void addCommonEdges(List<Polyline> out, SequentialModel sm, Lens lens,
+    private void addCommonEdges(List<Polyline> out, SequentialModel sm, LensElement lensElement,
                                 double profileRadius1, double profileRadius2, double mechanicalRadius) {
-        addCommonEdge(out, sm, lens, profileRadius1, profileRadius2, mechanicalRadius);
-        addCommonEdge(out, sm, lens, -profileRadius1, -profileRadius2, -mechanicalRadius);
+        addCommonEdge(out, sm, lensElement, profileRadius1, profileRadius2, mechanicalRadius);
+        addCommonEdge(out, sm, lensElement, -profileRadius1, -profileRadius2, -mechanicalRadius);
     }
 
     /**
      * Joins one side of a lens at a common mechanical height, retaining each
      * surface's sag where its curved profile or flat terminates.
      */
-    private void addCommonEdge(List<Polyline> out, SequentialModel sm, Lens lens,
+    private void addCommonEdge(List<Polyline> out, SequentialModel sm, LensElement lensElement,
                                double profileY1, double profileY2, double edgeY) {
         try {
-            double sag1 = lens.surface1().profile.sag(0.0, profileY1);
-            double sag2 = lens.surface2().profile.sag(0.0, profileY2);
-            Vector2 p1 = toLayout(sm.gbl_tfrms.get(lens.firstSurfaceIndex()),
+            double sag1 = lensElement.surface1().profile.sag(0.0, profileY1);
+            double sag2 = lensElement.surface2().profile.sag(0.0, profileY2);
+            Vector2 p1 = toLayout(sm.gbl_tfrms.get(lensElement.firstSurfaceIndex()),
                     new Vector3(0.0, edgeY, sag1));
-            Vector2 p2 = toLayout(sm.gbl_tfrms.get(lens.secondSurfaceIndex()),
+            Vector2 p2 = toLayout(sm.gbl_tfrms.get(lensElement.secondSurfaceIndex()),
                     new Vector3(0.0, edgeY, sag2));
             out.add(new Polyline(List.of(p1, p2), ELEMENT_COLOR));
         } catch (RuntimeException ignored) {

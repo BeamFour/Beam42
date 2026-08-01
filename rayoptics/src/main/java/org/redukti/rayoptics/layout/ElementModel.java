@@ -44,7 +44,7 @@ public final class ElementModel {
             if (!isAir(gap, wvl) && i + 1 < sm.ifcs.size()
                     && sm.ifcs.get(i) instanceof Surface s1
                     && sm.ifcs.get(i + 1) instanceof Surface s2) {
-                next.add(new Lens(i, i + 1, s1, s2, gap));
+                next.add(new LensElement(i, i + 1, s1, s2, gap));
             }
         }
         next.add(new DummyInterface(lastSurface, sm.ifcs.get(lastSurface), "Image"));

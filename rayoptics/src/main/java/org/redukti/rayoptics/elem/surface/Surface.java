@@ -97,6 +97,17 @@ public class Surface extends Interface {
         set_optical_power(pwr);
     }
 
+    @Override
+    public void apply_scale_factor(double scale_factor) {
+        super.apply_scale_factor(scale_factor);
+        profile.apply_scale_factor(scale_factor);
+        var abs_scale_factor = Math.abs(scale_factor);
+        for (var e : edge_apertures)
+            e.apply_scale_factor(abs_scale_factor);
+        for (var ca : clear_apertures)
+            ca.apply_scale_factor(abs_scale_factor);
+    }
+
     /**
      * Filter obscurations out of the clear_aperture list.
      */

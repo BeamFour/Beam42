@@ -415,7 +415,7 @@ public class SequentialModel {
                 ifc.delta_n = n_after - n_before;
                 n_before = n_after;
 
-                z_dir_after = z_dir_after;
+                z_dir_before = z_dir_after;
                 this.z_dir.set(i,z_dir_after);
             }
 
@@ -463,6 +463,7 @@ public class SequentialModel {
             var idx2 = surfs[1];
             for (int i = idx1; i < idx2+1; i++) {
                 try {
+                    ifcs.get(i).apply_scale_factor(scale_factor);
                     if (i < idx2)
                         gaps.get(i).apply_scale_factor(scale_factor);
                 }

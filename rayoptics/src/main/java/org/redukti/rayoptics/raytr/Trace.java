@@ -733,8 +733,6 @@ public class Trace {
     }
 
     public static List<GridItem> trace_fan(OpticalModel opt_model, TraceFanDef fan_rng, Field fld, double wvl, double foc, ImageFilter img_filter, TraceOptions trace_options) {
-        trace_options.output_filter = null;
-        trace_options.rayerr_filter = null;
         var start = fan_rng.start;
         var stop =  fan_rng.stop;
         var num = fan_rng.num_rays;
@@ -745,11 +743,11 @@ public class Trace {
             var ray_result = trace_safe(opt_model, pupil, fld, wvl, trace_options);
             if (ray_result.pkg != null) {
                 if (img_filter != null) {
-                    var result = img_filter.apply(ray_result.pkg.vig_pupil,ray_result.pkg);
+                    var result = img_filter.apply(pupil,ray_result.pkg);
                     fan.add(result);
                 }
                 else {
-                    fan.add(new GridItem(ray_result.pkg.vig_pupil,ray_result.pkg));
+                    fan.add(new GridItem(pupil,ray_result.pkg));
                 }
             }
             start = new Vector2(start.x+step.x, start.y+step.y);
@@ -758,8 +756,7 @@ public class Trace {
     }
 
     public static List<GridItem> trace_grid(OpticalModel opt_model, TraceGridDef grid_rng, Field fld, double wvl, double foc, ImageFilter img_filter, boolean append_if_none, TraceOptions trace_options) {
-        trace_options.rayerr_filter = null;
-        trace_options.output_filter = null;
+        trace_options = trace_options.copy();
         trace_options.check_apertures = true;
         var start = grid_rng.grid_start;
         var stop = grid_rng.grid_stop;
@@ -786,7 +783,8 @@ public class Trace {
                             grid.add(item);
                     }
                     else {
-                        grid.add(new GridItem(pupil,null));
+                        if (append_if_none)
+                            grid.add(new GridItem(pupil,null));
                     }
                 }
                 start = new Vector2(start.x,start.y+step.y);
@@ -797,8 +795,7 @@ public class Trace {
     }
 
     public static List<GridItem> trace_rings(OpticalModel opt_model, TraceRingsDef grid_rng, Field fld, double wvl, double foc, ImageFilter img_filter, boolean append_if_none, TraceOptions trace_options) {
-        trace_options.rayerr_filter = null;
-        trace_options.output_filter = null;
+        trace_options = trace_options.copy();
         trace_options.check_apertures = true;
         trace_options.pupil_type = PupilType.REL_PUPIL;
         trace_options.apply_vignetting = true;
@@ -836,7 +833,8 @@ public class Trace {
                         grid.add(item);
                 }
                 else {
-                    grid.add(new GridItem(pupil,null));
+                    if (append_if_none)
+                        grid.add(new GridItem(pupil,null));
                 }
             }
         }

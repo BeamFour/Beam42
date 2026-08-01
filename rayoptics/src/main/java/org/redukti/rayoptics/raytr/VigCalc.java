@@ -230,7 +230,7 @@ public class VigCalc {
                 } else {
                     var slpk = scale_ratio * Lists.get(ax_ray,-1).slp;
                     if (pupil_spec == ValueKey.NA) {
-                        var nk = sm.central_rndx(0);
+                        var nk = sm.central_rndx(-1);
                         osp.pupil.value = -nk * rsm2.d.y;
                     } else if (pupil_spec == ValueKey.Fnum) {
                         osp.pupil.value = -1.0 / (2.0 * slpk);

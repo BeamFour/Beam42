@@ -37,4 +37,17 @@ public class TraceOptions {
 
     public Vector2 image_pt_2d;
     public Vector2 image_delta;
+
+    public TraceOptions copy() {
+        var traceOptions = new TraceOptions();
+        traceOptions.pt_inside_fuzz = this.pt_inside_fuzz;
+        traceOptions.check_apertures = this.check_apertures;
+        traceOptions.apply_vignetting = this.apply_vignetting;
+        traceOptions.pupil_type = this.pupil_type;
+        traceOptions.output_filter = this.output_filter;
+        traceOptions.rayerr_filter = this.rayerr_filter;
+        traceOptions.image_pt_2d = this.image_pt_2d;
+        traceOptions.image_delta = this.image_delta;
+        return traceOptions;
+    }
 }

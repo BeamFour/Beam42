@@ -19,6 +19,7 @@ import org.redukti.rayoptics.util.Pair;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class Layout2DTest {
@@ -27,14 +28,32 @@ public class Layout2DTest {
         OpticalModel model = leicaSummicron();
         ElementModel elements = new ElementModel(model);
         long lenses = elements.elements().stream().filter(e -> e.type() == ElementType.LENS).count();
+        long cemented = elements.elements().stream()
+                .filter(e -> e.type() == ElementType.CEMENTED_LENS).count();
         long stops = elements.elements().stream().filter(e -> e.type() == ElementType.STOP).count();
         long dummies = elements.elements().stream().filter(e -> e.type() == ElementType.DUMMY_INTERFACE).count();
-        Assertions.assertEquals(6, lenses);
+        Assertions.assertEquals(2, lenses);
+        Assertions.assertEquals(2, cemented);
         Assertions.assertEquals(1, stops);
         Assertions.assertEquals(2, dummies);
         Assertions.assertThrows(UnsupportedOperationException.class,
                 () -> elements.elements().add(new AirGap(0, model.seq_model.gaps.get(0))));
     }
+    @Test
+    public void groupsConsecutiveGlassGapsIntoCementedElements() {
+        ElementModel elements = new ElementModel(leicaSummicron());
+        List<CementedElement> cemented = elements.elements().stream()
+                .filter(CementedElement.class::isInstance)
+                .map(CementedElement.class::cast)
+                .toList();
+
+        Assertions.assertEquals(2, cemented.size());
+        Assertions.assertEquals(List.of(3, 4, 5), cemented.get(0).surfaceIndices());
+        Assertions.assertEquals(2, cemented.get(0).gaps().size());
+        Assertions.assertThrows(UnsupportedOperationException.class,
+                () -> cemented.get(0).surfaces().add(cemented.get(0).surfaces().get(0)));
+    }
+
 
     @Test
     public void rendersVisualCheckSvgs() throws IOException {
@@ -56,6 +75,8 @@ public class Layout2DTest {
         Files.writeString(output.resolve("leica-summicron-ray-fan.svg"), fan);
         Files.writeString(output.resolve("leica-summicron-trace-fan.svg"), traceFan);
         Assertions.assertTrue(elements.contains("<polyline"));
+        Assertions.assertEquals(10, countOccurrences(elements, "<polyline"),
+                "each of the ten distinct glass surfaces should be emitted once");
         Assertions.assertTrue(reference.length() > elements.length());
         Assertions.assertTrue(fan.length() > elements.length());
         Assertions.assertFalse(reference.contains("NaN"));

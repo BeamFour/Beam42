@@ -39,12 +39,34 @@ public final class ElementModel {
             }
         }
 
-       for (int i = 0; i < sm.gaps.size(); i++) {
-            Gap gap = sm.gaps.get(i);
-            if (!isAir(gap, wvl) && i + 1 < sm.ifcs.size()
-                    && sm.ifcs.get(i) instanceof Surface s1
-                    && sm.ifcs.get(i + 1) instanceof Surface s2) {
-                next.add(new LensElement(i, i + 1, s1, s2, gap));
+        // A run of adjacent glass gaps is one cemented assembly. Keeping it
+        // together records that each internal interface is physically shared.
+        for (int i = 0; i < sm.gaps.size();) {
+            if (isAir(sm.gaps.get(i), wvl)) {
+                i++;
+                continue;
+            }
+            int firstGap = i;
+            while (i < sm.gaps.size() && !isAir(sm.gaps.get(i), wvl)) i++;
+            int gapCount = i - firstGap;
+            if (i >= sm.ifcs.size()) continue;
+
+            if (gapCount == 1
+                    && sm.ifcs.get(firstGap) instanceof Surface s1
+                    && sm.ifcs.get(firstGap + 1) instanceof Surface s2) {
+                next.add(new LensElement(firstGap, firstGap + 1, s1, s2, sm.gaps.get(firstGap)));
+            } else if (gapCount > 1) {
+                List<Integer> indices = new ArrayList<>(gapCount + 1);
+                List<Surface> surfaces = new ArrayList<>(gapCount + 1);
+                List<Gap> gaps = new ArrayList<>(gapCount);
+                boolean allSurfaces = true;
+                for (int j = firstGap; j <= i; j++) {
+                    indices.add(j);
+                    if (sm.ifcs.get(j) instanceof Surface surface) surfaces.add(surface);
+                    else allSurfaces = false;
+                    if (j < i) gaps.add(sm.gaps.get(j));
+                }
+                if (allSurfaces) next.add(new CementedElement(indices, surfaces, gaps));
             }
         }
         next.add(new DummyInterface(lastSurface, sm.ifcs.get(lastSurface), "Image"));

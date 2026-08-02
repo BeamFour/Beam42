@@ -19,6 +19,7 @@ import org.redukti.render.rendering.RendererViewport;
 import org.redukti.render.rendering.Rgb;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -90,6 +91,8 @@ public final class Layout2D {
         for (Element element : elementModel.elements()) {
             if (element instanceof LensElement lensElement) {
                 addLens(out, sm, lensElement, samples);
+            } else if (element instanceof CementedElement cementedElement) {
+                addCementedElement(out, sm, cementedElement, samples);
             } else if (element instanceof Stop stop) {
                 addStop(out, sm, stop);
             } else if (element instanceof Aperture aperture) {
@@ -146,6 +149,100 @@ public final class Layout2D {
         if (flat2) addFlats(out, sm, lensElement.secondSurfaceIndex(), lensElement.surface2(), od2, mechanicalRadius);
         addCommonEdges(out, sm, lensElement, drawRadius1, drawRadius2, mechanicalRadius);
     }
+
+    /**
+     * Draws a cemented assembly while emitting every shared optical profile
+     * once. Each material gap still receives its own upper and lower rim.
+     */
+    private void addCementedElement(List<Polyline> out, SequentialModel sm,
+                                    CementedElement element, int samples) {
+        List<LensElement> lenses = new ArrayList<>();
+        List<LensDrawing> drawings = new ArrayList<>();
+        Map<Integer, SurfaceDrawing> surfaces = new LinkedHashMap<>();
+
+        for (int i = 0; i < element.gaps().size(); i++) {
+            LensElement lens = new LensElement(element.surfaceIndices().get(i),
+                    element.surfaceIndices().get(i + 1), element.surfaces().get(i),
+                    element.surfaces().get(i + 1), element.gaps().get(i));
+            LensDrawing drawing = lensDrawing(lens);
+            lenses.add(lens);
+            drawings.add(drawing);
+            mergeSurfaceDrawing(surfaces, lens.firstSurfaceIndex(), lens.surface1(),
+                    drawing.drawRadius1, drawing.flat1, drawing.mechanicalRadius);
+            mergeSurfaceDrawing(surfaces, lens.secondSurfaceIndex(), lens.surface2(),
+                    drawing.drawRadius2, drawing.flat2, drawing.mechanicalRadius);
+        }
+
+        for (var entry : surfaces.entrySet()) {
+            SurfaceDrawing drawing = entry.getValue();
+            addSurface(out, sm, entry.getKey(), drawing.surface, drawing.profileRadius, samples);
+            if (drawing.flat)
+                addFlats(out, sm, entry.getKey(), drawing.surface,
+                        drawing.profileRadius, drawing.mechanicalRadius);
+        }
+        for (int i = 0; i < lenses.size(); i++) {
+            LensDrawing drawing = drawings.get(i);
+            addCommonEdges(out, sm, lenses.get(i), drawing.drawRadius1,
+                    drawing.drawRadius2, drawing.mechanicalRadius);
+        }
+    }
+
+    /** Combines the drawing requests made for a surface shared by two glass gaps. */
+    private static void mergeSurfaceDrawing(Map<Integer, SurfaceDrawing> drawings, int index,
+                                            Surface surface, double profileRadius, boolean flat,
+                                            double mechanicalRadius) {
+        SurfaceDrawing previous = drawings.get(index);
+        if (previous == null) {
+            drawings.put(index, new SurfaceDrawing(surface, profileRadius, flat, mechanicalRadius));
+        } else {
+            drawings.put(index, new SurfaceDrawing(surface,
+                    Math.max(previous.profileRadius, profileRadius), previous.flat || flat,
+                    Math.max(previous.mechanicalRadius, mechanicalRadius)));
+        }
+    }
+
+    /** Calculates the same per-gap curvature choices used by addLens. */
+    private static LensDrawing lensDrawing(LensElement lens) {
+        double od1 = semiDiameter(lens.surface1());
+        double od2 = semiDiameter(lens.surface2());
+        double mechanicalRadius = Math.max(maxAperture(lens.surface1()), maxAperture(lens.surface2()));
+        double cv1 = lens.surface1().profile.cv;
+        double cv2 = lens.surface2().profile.cv;
+        double drawRadius1;
+        double drawRadius2;
+        boolean flat1 = false;
+        boolean flat2 = false;
+
+        if (cv1 > 0.0 && cv2 < 0.0) {
+            drawRadius1 = mechanicalRadius;
+            drawRadius2 = mechanicalRadius;
+        } else if ((cv1 > 0.0 && cv2 > 0.0) || (cv1 < 0.0 && cv2 < 0.0)) {
+            if (cv1 - cv2 > 0.0) {
+                drawRadius1 = mechanicalRadius;
+                drawRadius2 = mechanicalRadius;
+            } else if (od1 > od2) {
+                drawRadius1 = mechanicalRadius;
+                drawRadius2 = od2;
+                flat2 = true;
+            } else {
+                drawRadius1 = od1;
+                drawRadius2 = mechanicalRadius;
+                flat1 = true;
+            }
+        } else {
+            drawRadius1 = od1;
+            drawRadius2 = od2;
+            flat1 = true;
+            flat2 = true;
+        }
+        return new LensDrawing(drawRadius1, drawRadius2, flat1, flat2, mechanicalRadius);
+    }
+
+    private record LensDrawing(double drawRadius1, double drawRadius2, boolean flat1, boolean flat2,
+                               double mechanicalRadius) {}
+
+    private record SurfaceDrawing(Surface surface, double profileRadius, boolean flat,
+                                  double mechanicalRadius) {}
 
     /**
      * Samples a surface sag in its local meridional plane and transforms the

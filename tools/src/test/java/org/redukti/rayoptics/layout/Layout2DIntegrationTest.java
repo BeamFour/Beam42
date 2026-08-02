@@ -29,6 +29,7 @@ public class Layout2DIntegrationTest {
         return new RayOpticsModelBuilder(prescription).build_optical_model(true,fields,false, VigType.SetPupil,true,0);
     }
     static void doLayout(OpticalModel model, String testname) throws Exception {
+        var osp = model.optical_spec;
         Layout2D layout = new Layout2D();
         Path output = Path.of("target", "layout-tests");
         Files.createDirectories(output);
@@ -45,6 +46,7 @@ public class Layout2DIntegrationTest {
         Files.writeString(output.resolve(testname + "-reference-rays.svg"), reference);
         Files.writeString(output.resolve(testname + "-summicron-ray-fan.svg"), fan);
         Files.writeString(output.resolve(testname + "-summicron-trace-fan.svg"), traceFan);
+        Files.writeString(output.resolve(testname + "-vig.txt"), osp.list_str(new StringBuilder()).toString());
     }
 
     @Test

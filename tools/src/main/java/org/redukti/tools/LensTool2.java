@@ -389,13 +389,14 @@ public class LensTool2 {
             Layout2D layout = new Layout2D();
             Path output = Helper.getOutputPath(arguments.specfile,suffixed_name("layout-rayfan",filename_suffix,".svg"),arguments.outdir);
             String fan = layout.renderSvg(opm, 1000, 500,
-                    new LayoutOptions().drawReferenceRays(false).fanRayCount(9));
+                    new LayoutOptions().drawReferenceRays(false).fanRayCount(9).clipRays(true).useTraceFan(true));
             Files.writeString(output, fan);
             output = Helper.getOutputPath(arguments.specfile,suffixed_name("layout-elements",filename_suffix,".svg"),arguments.outdir);
             String elements = layout.renderSvg(opm, 1000, 500,
                     new LayoutOptions().drawReferenceRays(false));
             Files.writeString(output, elements);
-            String reference = layout.renderSvg(opm, 1000, 500, new LayoutOptions());
+            String reference = layout.renderSvg(opm, 1000, 500,
+                    new LayoutOptions());
             output = Helper.getOutputPath(arguments.specfile,suffixed_name("layout-reference-rays",filename_suffix,".svg"),arguments.outdir);
             Files.writeString(output, reference);
         }

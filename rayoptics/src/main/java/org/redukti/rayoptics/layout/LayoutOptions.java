@@ -7,7 +7,7 @@ public final class LayoutOptions {
     public boolean drawReferenceRays = true;
     public int fanRayCount = 0;
     /** Use Trace.trace_fan rather than tracing each fan pupil coordinate directly. */
-    public boolean useTraceFan = true;
+    public boolean useTraceFan = false;
     public boolean clipRays = false;
     public int surfaceSamples = 101;
     public double margin = 0.05;

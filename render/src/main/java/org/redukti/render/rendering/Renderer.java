@@ -142,6 +142,19 @@ public abstract class Renderer {
     public String get_stroke_dasharray() {
         return _stroke_dasharray;
     }
+
+    protected double _stroke_width = 1.0;
+
+    public void set_stroke_width(double width) {
+        if (!(width > 0.0) || !Double.isFinite(width))
+            throw new IllegalArgumentException("stroke width must be finite and positive");
+        this._stroke_width = width;
+    }
+
+    public double get_stroke_width() {
+        return _stroke_width;
+    }
+
     //double _max_intensity; // max ray intensity updated on
 
     public Renderer()

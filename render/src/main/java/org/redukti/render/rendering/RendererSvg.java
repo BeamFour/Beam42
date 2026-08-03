@@ -226,6 +226,11 @@ public class RendererSvg extends Renderer2d {
         }
     }
 
+    void svg_add_stroke_width() {
+        if (_stroke_width != 1.0)
+            _out.append(" stroke-width=\"").append(format(_stroke_width)).append("\"");
+    }
+
     void svg_add_id(String id) {
         _out.append(" fill=\"").append(id).append("\"");
     }
@@ -251,6 +256,7 @@ public class RendererSvg extends Renderer2d {
 
         svg_begin_line(v2da.x(), v2da.y(), v2db.x(), v2db.y(), false);
         svg_add_stroke(rgb);
+        svg_add_stroke_width();
         svg_add_dasharray();
         svg_end();
     }
@@ -330,8 +336,10 @@ public class RendererSvg extends Renderer2d {
             svg_add_stroke(rgb);
         }
 
-        if (!filled)
+        if (!filled) {
+            svg_add_stroke_width();
             svg_add_dasharray();
+        }
 
         _out.append(" points=\"");
 

@@ -4,6 +4,9 @@ import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.jfotoptix.medium.GlassMap;
 import org.redukti.util.Args;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 public class RayOpticsExporter {
@@ -56,7 +59,7 @@ public class RayOpticsExporter {
      * numbering of surfaces and therefore we need to adjust the surface id
      * when we see a field stop. Currently we cannot handle more than 1 field stop.
      */
-    void generate_lens_data(OpticalBenchDataImporter.LensSpecifications system, int scenario, StringBuilder fp) {
+    void generate_lens_data(OpticalBenchDataImporter.LensSpecifications system, int scenario, StringBuilder fp, boolean use_glass_types) {
         List<OpticalBenchDataImporter.LensSurface> surfaces = system.get_surfaces();
         OpticalBenchDataImporter.Variable view_angles = system.find_variable("Angle of View");
         OpticalBenchDataImporter.Variable image_heights = system.find_variable("Image Height");
@@ -84,7 +87,7 @@ public class RayOpticsExporter {
                 if (s.get_refractive_index() != 0.0) {
                     String glassName = s.get_glass_name();
                     GlassMap glassMap = glassName != null ? GlassMap.glassByName(glassName) : null;
-                    if (glassMap != null && glassMap.get_manufacturer() != null) {
+                    if (glassMap != null && glassMap.get_manufacturer() != null && use_glass_types) {
                         fp.append("sm.add_surface([")
                                 .append(s.get_radius()).append(",")
                                 .append(thickness).append(",'")
@@ -147,10 +150,10 @@ public class RayOpticsExporter {
                 .append("spot_plt = plt.figure(FigureClass=SpotDiagramFigure, opt_model=opm, \n")
                 .append("                      scale_type=Fit.User_Scale, user_scale_value=0.1, is_dark=isdark).plot()\n");
     }
-    String generate(OpticalBenchDataImporter.LensSpecifications system, int scenario) {
+    String generate(OpticalBenchDataImporter.LensSpecifications system, int scenario, boolean use_glass_types) {
         StringBuilder sb = new StringBuilder();
         generate_preamble(system, scenario, sb);
-        generate_lens_data(system, scenario, sb);
+        generate_lens_data(system, scenario, sb, use_glass_types);
         generate_rest(sb);
         return sb.toString();
     }
@@ -164,7 +167,9 @@ public class RayOpticsExporter {
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(arguments.specfile);
         RayOpticsExporter exporter = new RayOpticsExporter();
-        System.out.println(exporter.generate(specs, arguments.scenario));
+        if (arguments.outputFile != null)
+            Files.writeString(new File(arguments.outputFile).toPath(),exporter.generate(specs, arguments.scenario, arguments.use_glass_types), StandardOpenOption.CREATE);
+        System.out.println(exporter.generate(specs, arguments.scenario, arguments.use_glass_types));
     }
 
 }

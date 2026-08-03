@@ -85,11 +85,11 @@ public class LeicaSummilux50ASPH {
                         new GeoMTF(analysis,4,0,40,0.1,1.0),
                         new GeoMTF(analysis,4,1,40,0.1,1.0),
 
-//                      new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,52.0, 2.0),
-//                      new GoalParax(analysis, ParaxialFirstOrderInfo.Fno, 1.4, 1.0),
-                      //new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 26.256, 1.0),
-                      //new GoalParax(analysis, ParaxialFirstOrderInfo.Pp1, 51.8, 1.0),
-                      //new GoalParax(analysis, ParaxialFirstOrderInfo.Ppk, 20.2, 1.0)
+//                      new GoalParax(analysis, ParaxHelper.Effective_focal_length,52.0, 2.0),
+//                      new GoalParax(analysis, ParaxHelper.Fno, 1.4, 1.0),
+                      //new GoalParax(analysis, ParaxHelper.Back_focal_length, 26.256, 1.0),
+                      //new GoalParax(analysis, ParaxHelper.Pp1, 51.8, 1.0),
+                      //new GoalParax(analysis, ParaxHelper.Ppk, 20.2, 1.0)
                 });
         analysis.compute();
         var lm = f.getSolver();

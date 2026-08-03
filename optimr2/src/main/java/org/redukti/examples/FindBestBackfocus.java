@@ -1,7 +1,6 @@
 package org.redukti.examples;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
-import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.optim.*;
 import org.redukti.spec.Prescription;
 
@@ -17,7 +16,7 @@ public class FindBestBackfocus {
     }
 
     public static void main(String[] args) throws Exception {
-        int scenario = 1;
+        int scenario = 0;
         var prescription = getPrescription(args[0]);
         var surface = Integer.parseInt(args[1]);
         var analysis = new Analysis(prescription, new double[]{0}, new int[]{10, 30, 50}, scenario);
@@ -33,11 +32,11 @@ public class FindBestBackfocus {
                         new GeoMTF(analysis, 1, 0, 50, 1.0, 1.0),
                         new GeoMTF(analysis, 1, 1, 50, 1.0, 1.0),
                         prescription._focal_length_by_scenario != null
-                            ? new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length, prescription._focal_length_by_scenario[scenario], 1.0)
-                            : new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length, prescription._focal_length, 1.0),
+                            ? new GoalParax(analysis, ParaxHelper.Effective_focal_length, prescription._focal_length_by_scenario[scenario], 1.0)
+                            : new GoalParax(analysis, ParaxHelper.Effective_focal_length, prescription._focal_length, 1.0),
                         prescription._f_number_by_scenario != null
-                            ? new GoalParax(analysis, ParaxialFirstOrderInfo.Fno, prescription._f_number_by_scenario[scenario], 1.0)
-                            : new GoalParax(analysis, ParaxialFirstOrderInfo.Fno, prescription._fno, 1.0),
+                            ? new GoalParax(analysis, ParaxHelper.Fno, prescription._f_number_by_scenario[scenario], 1.0)
+                            : new GoalParax(analysis, ParaxHelper.Fno, prescription._fno, 1.0),
                         new GoalRayAberration(analysis, 1, 0, 0, 587.5618, 0, 1),
                         new GoalRayAberration(analysis, 1, 0, 1, 587.5618, 0, 1),
                         new GoalRayAberration(analysis, 1, 0, 2, 587.5618, 0, 1),

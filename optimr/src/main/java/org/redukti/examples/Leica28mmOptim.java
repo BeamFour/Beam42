@@ -1,8 +1,6 @@
 package org.redukti.examples;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
-import org.redukti.mathlib.LMLSolver;
-import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.spec.Prescription;
 import org.redukti.optim.*;
 
@@ -51,9 +49,9 @@ public class Leica28mmOptim {
                       new GoalSpotMaxRadius(analysis, 2, 30.0, 2.0),
                       new GoalSpotMaxRadius(analysis, 3, 90.0, 2.0),
                       new GoalSpotMaxRadius(analysis, 4, 120.0, 2.0),
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,28.32, 2.0),
-                      //new GoalParax(analysis, ParaxialFirstOrderInfo.Enp_dist, 28.745, 1.0),
-                      //new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 38.1031, 1.0)
+                      new GoalParax(analysis, ParaxHelper.Effective_focal_length,28.32, 2.0),
+                      //new GoalParax(analysis, ParaxHelper.Enp_dist, 28.745, 1.0),
+                      //new GoalParax(analysis, ParaxHelper.Back_focal_length, 38.1031, 1.0)
                 });
         analysis.compute();
         var lm = f.getSolver();

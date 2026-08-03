@@ -1,6 +1,6 @@
 package org.redukti.importers.agf;
 
-import org.redukti.jfotoptix.light.SpectralLine;
+import org.redukti.rayoptics.util.SpectralLine;
 
 public abstract class AGFBase {
 

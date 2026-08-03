@@ -1,7 +1,6 @@
 package org.redukti.examples;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
-import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.optim.*;
 import org.redukti.spec.Prescription;
 
@@ -78,9 +77,9 @@ public class AFSNikkor58Optim01 {
                         new GeoMTF(analysis,3,1,30,0.55,1.0),
                         new GeoMTF(analysis,4,0,30,0.28,1.0),
                         new GeoMTF(analysis,4,1,30,0.23,1.0),
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,58.29, 2.0),
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Enp_dist, 28.745, 1.0),
-                      //new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 38.7, 1.0)
+                      new GoalParax(analysis, ParaxHelper.Effective_focal_length,58.29, 2.0),
+                      new GoalParax(analysis, ParaxHelper.Enp_dist, 28.745, 1.0),
+                      //new GoalParax(analysis, ParaxHelper.Back_focal_length, 38.7, 1.0)
                 });
         analysis.compute();
         var lm = f.getSolver();

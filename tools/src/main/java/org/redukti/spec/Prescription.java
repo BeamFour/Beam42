@@ -1,9 +1,7 @@
 package org.redukti.spec;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
-import org.redukti.jfotoptix.medium.GlassMap;
-import org.redukti.jfotoptix.patterns.Distribution;
-import org.redukti.jfotoptix.patterns.Pattern;
+import org.redukti.rayoptics.seq.Glass;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -63,9 +61,6 @@ public class Prescription {
     // that vary for configurations but these are specified for
     // each surface
 
-    // This is used only for layout diagrams - to specify rays
-    public Distribution _distribution;   // FIXME rename, used for ray finding only
-
     /** This was used to find chief ray angle in the older optimj module but will no longer be used */
     @Deprecated
     public double _var_angle_of_view = 0.0;
@@ -96,7 +91,6 @@ public class Prescription {
         this._diameter_image_circle = diameter_image_circle;
         this._wvls = wvls;
         this._wts = wts;
-        this._distribution = new Distribution(Pattern.UserDefined,10, 0.999);
     }
     public Prescription surf(double radius, double thickness, double diameter, double nd, double vd, String glass_name) {
         _surface_list.add(new SurfaceType(Integer.toString(_surface_list.size()+1), false, radius, thickness, diameter, nd, vd, glass_name));
@@ -186,7 +180,7 @@ public class Prescription {
             field_stop(thickness,diameter);
             return this;
         }
-        if (use_glass_types && glass_name != null && GlassMap.glassByName(glass_name) != null) {
+        if (use_glass_types && glass_name != null && Glass.glass_by_name(glass_name) != null) {
             surf(radius,thickness,diameter,refractive_index,abbe_vd,glass_name);
         }
         else if (refractive_index != 0.0) {

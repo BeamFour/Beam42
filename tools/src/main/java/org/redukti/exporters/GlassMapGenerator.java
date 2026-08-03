@@ -2,8 +2,8 @@ package org.redukti.exporters;
 
 import org.redukti.importers.agf.AGFBase;
 import org.redukti.importers.agf.AGFImporter;
-import org.redukti.jfotoptix.light.SpectralLine;
 import org.redukti.mathlib.M;
+import org.redukti.rayoptics.util.SpectralLine;
 
 import java.text.DecimalFormat;
 

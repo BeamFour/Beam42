@@ -1,9 +1,7 @@
 package org.redukti.examples;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
-import org.redukti.mathlib.LMLSolver;
 import org.redukti.optim.*;
-import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.spec.Prescription;
 
 public class NoctNikkor58Optim3 {
@@ -50,9 +48,9 @@ public class NoctNikkor58Optim3 {
                       new GoalSpotMaxRadius(analysis, 4, 80.0, 2.0),
                       new GoalSpotMaxRadius(analysis, 5, 120.0, 2.0),
                       new GoalSpotMaxRadius(analysis, 6, 200.0, 2.0),
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,58.0, 2.0),
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Enp_dist, 35.7894, 1.0),
-                      //new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 38.7, 1.0)
+                      new GoalParax(analysis, ParaxHelper.Effective_focal_length,58.0, 2.0),
+                      new GoalParax(analysis, ParaxHelper.Enp_dist, 35.7894, 1.0),
+                      //new GoalParax(analysis, ParaxHelper.Back_focal_length, 38.7, 1.0)
                 });
         analysis.compute();
         var lm = f.getSolver();

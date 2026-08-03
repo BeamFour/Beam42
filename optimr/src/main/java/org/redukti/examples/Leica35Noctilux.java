@@ -1,7 +1,6 @@
 package org.redukti.examples;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
-import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.optim.*;
 import org.redukti.spec.Prescription;
 
@@ -110,11 +109,11 @@ public class Leica35Noctilux {
                 new GeoMTF(analysis,4,0,40,0.5,1.0),
                 new GeoMTF(analysis,4,1,40,0.3,1.0),
 
-                new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,34.56, 1.0),
-                new GoalParax(analysis, ParaxialFirstOrderInfo.Fno, 1.223, 1.0),
-                //new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 14.42, 1.0),
-                //new GoalParax(analysis, ParaxialFirstOrderInfo.Pp1, 51.8, 1.0),
-                //new GoalParax(analysis, ParaxialFirstOrderInfo.Ppk, 20.2, 1.0)
+                new GoalParax(analysis, ParaxHelper.Effective_focal_length,34.56, 1.0),
+                new GoalParax(analysis, ParaxHelper.Fno, 1.223, 1.0),
+                //new GoalParax(analysis, ParaxHelper.Back_focal_length, 14.42, 1.0),
+                //new GoalParax(analysis, ParaxHelper.Pp1, 51.8, 1.0),
+                //new GoalParax(analysis, ParaxHelper.Ppk, 20.2, 1.0)
 
 //                        new GoalRayAberration(analysis,1,0,0,546.074, 0,1),
 //                        new GoalRayAberration(analysis,1,0,1,546.074, 0,1),

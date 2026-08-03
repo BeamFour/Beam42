@@ -2,7 +2,6 @@ package org.redukti.optim;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.SurfaceType;
 
@@ -79,9 +78,9 @@ public class TestOptim {
                         new GoalRayAberration(analysis,6,0,-1,587.5618, 0,1),
                         new GoalRayAberration(analysis,6,0,0,486.1327, 0,1),
                         new GoalRayAberration(analysis,6,0,-1,486.1327, 0,1),
-                        new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,58.0, 1.0),
-                        new GoalParax(analysis, ParaxialFirstOrderInfo.Fno, 1.2, 1.0),
-                        new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 37.78, 1.0),
+                        new GoalParax(analysis, ParaxHelper.Effective_focal_length,58.0, 1.0),
+                        new GoalParax(analysis, ParaxHelper.Fno, 1.2, 1.0),
+                        new GoalParax(analysis, ParaxHelper.Back_focal_length, 37.78, 1.0),
                 });
         analysis.compute();
         var lm = f.getSolver();

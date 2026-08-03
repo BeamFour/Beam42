@@ -1,8 +1,6 @@
 package org.redukti.examples;
 
-import org.redukti.mathlib.LMLSolver;
 import org.redukti.optim.*;
-import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.spec.Prescription;
 
 // Takes too long to run for more than about 22 glasses (that takes 2 hrs as well)
@@ -59,11 +57,11 @@ public class NoctNikkor58Optim2 {
                       new GoalSpotRMS(analysis, 2, 20.0, 2.0),
                       new GoalSpotMaxRadius(analysis, 1, 25.0, 5.0),
                       new GoalSpotMaxRadius(analysis, 2, 50.0, 2.0),
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,58.0, 1.0),
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Fno, 1.2, 1.0),
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 37.78, 1.0),
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Pp1, 51.8, 1.0),
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Ppk, 20.2, 1.0)
+                      new GoalParax(analysis, ParaxHelper.Effective_focal_length,58.0, 1.0),
+                      new GoalParax(analysis, ParaxHelper.Fno, 1.2, 1.0),
+                      new GoalParax(analysis, ParaxHelper.Back_focal_length, 37.78, 1.0),
+                      new GoalParax(analysis, ParaxHelper.Pp1, 51.8, 1.0),
+                      new GoalParax(analysis, ParaxHelper.Ppk, 20.2, 1.0)
                 });
         analysis.compute();
         var lm = f.getSolver();

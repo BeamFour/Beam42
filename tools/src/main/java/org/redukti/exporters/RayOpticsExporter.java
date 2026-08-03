@@ -1,7 +1,7 @@
 package org.redukti.exporters;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
-import org.redukti.jfotoptix.medium.GlassMap;
+import org.redukti.rayoptics.seq.Glass;
 import org.redukti.util.Args;
 
 import java.io.File;
@@ -86,13 +86,13 @@ public class RayOpticsExporter {
             if (s.get_surface_type() == OpticalBenchDataImporter.SurfaceType.surface) {
                 if (s.get_refractive_index() != 0.0) {
                     String glassName = s.get_glass_name();
-                    GlassMap glassMap = glassName != null ? GlassMap.glassByName(glassName) : null;
-                    if (glassMap != null && glassMap.get_manufacturer() != null && use_glass_types) {
+                    Glass glass = glassName != null ? Glass.glass_by_name(glassName) : null;
+                    if (glass != null && glass.catalog_name != null && use_glass_types) {
                         fp.append("sm.add_surface([")
                                 .append(s.get_radius()).append(",")
                                 .append(thickness).append(",'")
-                                .append(glassMap.get_name()).append("','")
-                                .append(glassMap.get_manufacturer()).append("']");
+                                .append(glass.label).append("','")
+                                .append(glass.catalog_name).append("']");
                     }
                     else {
                         fp.append("sm.add_surface([")

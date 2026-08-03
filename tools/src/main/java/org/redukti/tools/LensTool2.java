@@ -2,31 +2,17 @@ package org.redukti.tools;
 
 import org.redukti.exporters.ZemaxExporter;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
-import org.redukti.jfotoptix.layout.SystemLayout2D;
-import org.redukti.jfotoptix.light.SpectralLine;
-import org.redukti.jfotoptix.model.OpticalSystem;
-import org.redukti.jfotoptix.model.PointSource;
-import org.redukti.jfotoptix.patterns.Distribution;
-import org.redukti.jfotoptix.patterns.Pattern;
-import org.redukti.jfotoptix.tracing.RayTraceParameters;
-import org.redukti.jfotoptix.tracing.RayTraceRenderer;
-import org.redukti.jfotoptix.tracing.RayTraceResults;
-import org.redukti.jfotoptix.tracing.RayTracer;
 import org.redukti.mathlib.M;
-import org.redukti.mathlib.Matrix3;
-import org.redukti.mathlib.Vector2;
-import org.redukti.mathlib.Vector3;
-import org.redukti.plotter.*;
+import org.redukti.plotter.GeoMTFByFieldPlot;
+import org.redukti.plotter.GeoMTFPlot;
+import org.redukti.plotter.RayAberrationPlot;
+import org.redukti.plotter.SpotDiagram;
 import org.redukti.rayoptics.analysis.*;
 import org.redukti.rayoptics.layout.Layout2D;
 import org.redukti.rayoptics.layout.LayoutOptions;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrderData;
-import org.redukti.rayoptics.raytr.Trace;
 import org.redukti.rayoptics.raytr.TraceOptions;
-import org.redukti.rayoptics.util.Lists;
-import org.redukti.render.rendering.RendererSvg;
-import org.redukti.spec.FotoptixSystemBuilder;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.RayOpticsModelBuilder;
 import org.redukti.spec.VigType;
@@ -38,7 +24,6 @@ import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class LensTool2 {
@@ -244,142 +229,6 @@ public class LensTool2 {
 
     static class Layout {
 
-        private OpticalSystem createSystem(OpticalBenchDataImporter.LensSpecifications specs, int scenario, boolean use_glass_types, boolean skew_rays, double percent_skew, boolean d_line) {
-            OpticalSystem.Builder systemBuilder = FotoptixSystemBuilder.build_system(specs, scenario, use_glass_types);
-            double half_angle_of_view_in_radians = specs.get_half_angle_of_view_in_radians(scenario);
-            Vector3 direction = Vector3.vector3_001;
-            if (skew_rays) {
-                // Construct unit vector at an angle
-                //      double z1 = cos (angleOfView);
-                //      double y1 = sin (angleOfView);
-                //      unit_vector = math::Vector3 (0, y1, z1);
-                half_angle_of_view_in_radians *= percent_skew;
-                Matrix3 r = Matrix3.get_rotation_matrix(0, half_angle_of_view_in_radians);
-                direction = r.multiply(direction);
-            }
-            PointSource.Builder ps = new PointSource.Builder(PointSource.SourceInfinityMode.SourceAtInfinity, direction)
-                    .add_spectral_line(SpectralLine.d);
-            if (!d_line) {
-                ps.add_spectral_line(SpectralLine.C)
-                        .add_spectral_line(SpectralLine.F);
-            }
-            systemBuilder.add(ps);
-            return systemBuilder.build();
-        }
-
-        private void outputLayout(OpticalSystem system, Path output_file) throws Exception {
-            // draw 2d system layout
-            RendererSvg renderer = new RendererSvg(2400, 1400);
-            SystemLayout2D systemLayout2D = new SystemLayout2D();
-            systemLayout2D.layout2d(renderer, system);
-            if (output_file != null) {
-                Helper.createOutputFile(output_file, renderer.write(new StringBuilder()).toString());
-            } else {
-                System.out.println(renderer.write(new StringBuilder()).toString());
-            }
-        }
-
-        private void outputLayoutWithRays(OpticalSystem system, Path output_file, int trace_density, boolean dump_system, boolean include_lost_rays) throws Exception {
-            // draw 2d system layout
-            RendererSvg renderer = new RendererSvg(800, 400);
-            SystemLayout2D systemLayout2D = new SystemLayout2D();
-            systemLayout2D.layout2d(renderer, system);
-            RayTraceParameters parameters = new RayTraceParameters(system);
-            RayTracer rayTracer = new RayTracer();
-            parameters.set_default_distribution(
-                    new Distribution(Pattern.MeridionalDist, trace_density, 0.999));
-            if (dump_system) {
-                System.out.println(parameters.sequenceToString(new StringBuilder()).toString());
-            }
-            RayTraceResults result = rayTracer.trace(system, parameters);
-            RayTraceRenderer.draw_2d(renderer, result, !include_lost_rays, null);
-            if (output_file != null) {
-                Helper.createOutputFile(output_file, renderer.write(new StringBuilder()).toString());
-            } else {
-                System.out.println(renderer.write(new StringBuilder()).toString());
-            }
-            //result.report();
-        }
-
-        /**
-         * The supplied points must be x/y coordinates on the first surface
-         */
-        private void outputLayoutWithUserRays(OpticalSystem system, Path output_file, List<Vector2> points, boolean dump_system, boolean include_lost_rays) throws Exception {
-            // draw 2d system layout
-            RendererSvg renderer = new RendererSvg(800, 400);
-            SystemLayout2D systemLayout2D = new SystemLayout2D();
-            systemLayout2D.layout2d(renderer, system);
-            RayTraceParameters parameters = new RayTraceParameters(system);
-            RayTracer rayTracer = new RayTracer();
-            parameters.set_default_distribution(
-                    new Distribution(Pattern.UserDefined, 10, 0.999)
-                            .set_user_defined_points(points));
-            if (dump_system) {
-                System.out.println(parameters.sequenceToString(new StringBuilder()).toString());
-            }
-            RayTraceResults result = rayTracer.trace(system, parameters);
-            RayTraceRenderer.draw_2d(renderer, result, !include_lost_rays, null);
-            if (output_file != null) {
-                Helper.createOutputFile(output_file, renderer.write(new StringBuilder()).toString());
-            } else {
-                System.out.println(renderer.write(new StringBuilder()).toString());
-            }
-            //result.report();
-        }
-
-        public void doLayoutDiagrams(OpticalBenchDataImporter.LensSpecifications specs,Args arguments, int scenario, String filename_suffix) throws Exception {
-            OpticalSystem system = createSystem(specs,scenario,arguments.use_glass_types,false,0,arguments.only_d_line);
-            if (arguments.dumpSystem) {
-                System.out.println(system);
-            }
-            OpticalSystem skewedSystem = createSystem(specs,scenario,arguments.use_glass_types,true,1.0,arguments.only_d_line);
-            if (arguments.dumpSystem) {
-                System.out.println(skewedSystem);
-            }
-            OpticalSystem semiSkewedSystem = createSystem(specs,scenario,arguments.use_glass_types,true,0.7,arguments.only_d_line);
-            outputLayout(system,Helper.getOutputPath(arguments.specfile,suffixed_name("layoutonly",filename_suffix,".svg"),arguments.outdir));
-            outputLayoutWithRays(system,Helper.getOutputPath(arguments.specfile,suffixed_name("layout",filename_suffix,".svg"),arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
-            outputLayoutWithRays(semiSkewedSystem,Helper.getOutputPath(arguments.specfile,suffixed_name("layout-semi-skew",filename_suffix,".svg"),arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
-            outputLayoutWithRays(skewedSystem,Helper.getOutputPath(arguments.specfile,suffixed_name("layout-skew",filename_suffix,".svg"),arguments.outdir),arguments.trace_density,arguments.dumpSystem,arguments.include_lost_rays);
-        }
-
-        // For a given field, compute ray targets
-        // that are on the first surface
-        List<Vector2> generate_ray_targets(OpticalModel opm, int field, double wvl, int surf) {
-            var osp = opm.optical_spec;
-            var fov = osp.fov;
-            var fld = fov.fields[field];
-            var list = new ArrayList<Vector2>();
-            var brays = Trace.trace_boundary_rays_at_field(opm,fld,wvl,new TraceOptions());
-            for (var raypkg: brays) {
-                var pt = Lists.get(raypkg.ray,surf);
-                list.add(pt.p.project_xy());
-            }
-            return list;
-        }
-
-        public void doLayoutDiagramsForWides(OpticalBenchDataImporter.LensSpecifications specs,Args arguments, int config, int scenario, String filename_suffix, VigType vigType) throws Exception {
-            // First we use rayoptics to get ray starts
-            // For very wide angle lenses, blindly spraying rays doesn't work very well
-            final double[] fields = {0.0, 0.7, 1.0};
-            var prescription = createPrescription(specs,arguments.use_glass_types,arguments.only_d_line);
-            var opm = new RayOpticsModelBuilder(prescription).build_optical_model(true,fields,false,vigType,true, config);
-
-            // On axis rays field 0
-            OpticalSystem system = createSystem(specs,scenario,arguments.use_glass_types,false,0,arguments.only_d_line);
-            outputLayout(system,Helper.getOutputPath(arguments.specfile,suffixed_name("layoutonly",filename_suffix,".svg"),arguments.outdir));
-            var points = generate_ray_targets(opm,0,587.5618,1);
-            outputLayoutWithUserRays(system,Helper.getOutputPath(arguments.specfile,suffixed_name("layout",filename_suffix,".svg"),arguments.outdir),points,arguments.dumpSystem,arguments.include_lost_rays);
-            // Skew rays field 0.7
-            OpticalSystem semiSkewedSystem = createSystem(specs,scenario,arguments.use_glass_types,true,0.7,arguments.only_d_line);
-            points = generate_ray_targets(opm,1,587.5618,1);
-            outputLayoutWithUserRays(semiSkewedSystem,Helper.getOutputPath(arguments.specfile,suffixed_name("layout-semi-skew",filename_suffix,".svg"),arguments.outdir),points,arguments.dumpSystem,arguments.include_lost_rays);
-            // Skew rays field 1.0
-            points = generate_ray_targets(opm,2,587.5618,1);
-            OpticalSystem skewedSystem = createSystem(specs,scenario,arguments.use_glass_types,true,1.0,arguments.only_d_line);
-            outputLayoutWithUserRays(skewedSystem,Helper.getOutputPath(arguments.specfile,suffixed_name("layout-skew",filename_suffix,".svg"),arguments.outdir),points,arguments.dumpSystem,arguments.include_lost_rays);
-        }
-
         public void doNewLayoutDiagrams(OpticalBenchDataImporter.LensSpecifications specs,Args arguments, int config, int scenario, String filename_suffix, VigType vigType) throws Exception {
             // First we use rayoptics to get ray starts
             // For very wide angle lenses, blindly spraying rays doesn't work very well
@@ -387,11 +236,11 @@ public class LensTool2 {
             var prescription = createPrescription(specs,arguments.use_glass_types,arguments.only_d_line);
             var opm = new RayOpticsModelBuilder(prescription).build_optical_model(true,fields,false,vigType,true, config);
             Layout2D layout = new Layout2D();
-            Path output = Helper.getOutputPath(arguments.specfile,suffixed_name("layout-rayfan",filename_suffix,".svg"),arguments.outdir);
+            Path output = Helper.getOutputPath(arguments.specfile,suffixed_name("layout",filename_suffix,".svg"),arguments.outdir);
             String fan = layout.renderSvg(opm, 1000, 500,
                     new LayoutOptions().drawReferenceRays(false).fanRayCount(9).clipRays(true).useTraceFan(true));
             Files.writeString(output, fan);
-            output = Helper.getOutputPath(arguments.specfile,suffixed_name("layout-elements",filename_suffix,".svg"),arguments.outdir);
+            output = Helper.getOutputPath(arguments.specfile,suffixed_name("layoutonly",filename_suffix,".svg"),arguments.outdir);
             String elements = layout.renderSvg(opm, 1000, 500,
                     new LayoutOptions().drawReferenceRays(false));
             Files.writeString(output, elements);
@@ -440,10 +289,6 @@ public class LensTool2 {
                 Helper.createOutputFile(Helper.getOutputPath(arguments.specfile, suffixed_name("vig", scenario_filesuffix, ".txt"), arguments.outdir), osp.list_str(new StringBuilder()).toString());
                 Helper.createOutputFile(Helper.getOutputPath(arguments.specfile, suffixed_name("paraxial", scenario_filesuffix, ".txt"), arguments.outdir), fod.toString());
 
-                if (arguments.do_wideangle_layout /* || osp.fov.is_wide_angle */)
-                    new Layout().doLayoutDiagramsForWides(specs, arguments, config, scenario, scenario_filesuffix, vigType);
-                else
-                    new Layout().doLayoutDiagrams(specs, arguments, scenario, scenario_filesuffix);
                 new Layout().doNewLayoutDiagrams(specs, arguments, config, scenario, scenario_filesuffix, vigType);
 
 //            StringBuilder buf = new StringBuilder();

@@ -1,7 +1,5 @@
 package org.redukti.examples;
 
-import org.redukti.mathlib.LMLSolver;
-import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.spec.Prescription;
 import org.redukti.optim.*;
 
@@ -76,8 +74,8 @@ public class Noctilux50Optim2 {
                       new GoalSpotMaxRadius(analysis, 1, 37.0, 5.0),
                       new GoalSpotMaxRadius(analysis, 2, 100.0, 2.0),
                       new GoalSpotMaxRadius(analysis, 3, 250.0, 2.0),
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,52.4, 1.0),
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Enp_dist, 42.9, 1.0)
+                      new GoalParax(analysis, ParaxHelper.Effective_focal_length,52.4, 1.0),
+                      new GoalParax(analysis, ParaxHelper.Enp_dist, 42.9, 1.0)
                 });
         analysis.compute();
         var lm = f.getSolver();

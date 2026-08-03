@@ -1,7 +1,5 @@
 package org.redukti.examples;
 
-import org.redukti.mathlib.LMLSolver;
-import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.spec.Prescription;
 import org.redukti.optim.*;
 import org.redukti.spec.SurfaceType;
@@ -71,9 +69,9 @@ public class AFSNikkor58Optim02 {
                       new GoalSpotMaxRadius(analysis, 2, 80.0, 2.0),
                       new GoalSpotMaxRadius(analysis, 3, 100.0, 2.0),
                       new GoalSpotMaxRadius(analysis, 4, 120.0, 2.0),
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,58.035, 3.0),
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Enp_dist, 29.4, 1.0),
-                      //new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 38.7, 1.0)
+                      new GoalParax(analysis, ParaxHelper.Effective_focal_length,58.035, 3.0),
+                      new GoalParax(analysis, ParaxHelper.Enp_dist, 29.4, 1.0),
+                      //new GoalParax(analysis, ParaxHelper.Back_focal_length, 38.7, 1.0)
                 });
         analysis.compute();
         var lm = f.getSolver();

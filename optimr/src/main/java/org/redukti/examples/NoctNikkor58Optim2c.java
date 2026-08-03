@@ -1,6 +1,5 @@
 package org.redukti.examples;
 
-import org.redukti.jfotoptix.parax.ParaxialFirstOrderInfo;
 import org.redukti.optim.*;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.SurfaceType;
@@ -168,11 +167,11 @@ public class NoctNikkor58Optim2c {
 //                        new GoalMTF(analysis,2,0,8,656.2725, 30, 0,1),
 //                        new GoalMTF(analysis,2,0,9,656.2725, 30, 0,1),
 
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Effective_focal_length,58.0, 1.0),
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Fno, 1.2, 1.0),
-                      new GoalParax(analysis, ParaxialFirstOrderInfo.Back_focal_length, 37.78, 1.0),
-                      //new GoalParax(analysis, ParaxialFirstOrderInfo.Pp1, 51.8, 1.0),
-                      //new GoalParax(analysis, ParaxialFirstOrderInfo.Ppk, 20.2, 1.0)
+                      new GoalParax(analysis, ParaxHelper.Effective_focal_length,58.0, 1.0),
+                      new GoalParax(analysis, ParaxHelper.Fno, 1.2, 1.0),
+                      new GoalParax(analysis, ParaxHelper.Back_focal_length, 37.78, 1.0),
+                      //new GoalParax(analysis, ParaxHelper.Pp1, 51.8, 1.0),
+                      //new GoalParax(analysis, ParaxHelper.Ppk, 20.2, 1.0)
                 });
         analysis.compute();
         var lm = f.getSolver();

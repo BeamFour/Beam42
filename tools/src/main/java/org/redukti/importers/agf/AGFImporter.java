@@ -30,6 +30,8 @@ public class AGFImporter {
         String code = null;
         String nd = null;
         String vd = null;
+        String dpgf = null;
+        String relative_cost = null;
         var lines = Files.readAllLines(new File(file_name).toPath());
         for (var line : lines) {
             if (line.isEmpty() || line.startsWith("!")) continue;
@@ -59,14 +61,28 @@ public class AGFImporter {
                 Melt Freq is an integer between 1 and 5 to indicate the relative frequency of melting by the manufacturer.
                  */
                 if (currentGlass != null && currentName != null) {
+                    if (dpgf != null) {
+                        double v = parseDouble(dpgf);
+                        if (v != 0.0) currentGlass.set_dgpF(v);
+                    }
+                    if (relative_cost != null) {
+                        double v = parseDouble(relative_cost);
+                        if (v != 0.0) currentGlass.set_relative_cost(v);
+                    }
                     glasses.add(currentGlass);
                 }
                 currentGlass = null;
                 currentName = words[1];
-                dispersionFormula = (int)parseDouble(words[2]);
+                dispersionFormula = (int) parseDouble(words[2]);
                 code = words[3];
                 nd = words[4];
                 vd = words[5];
+                dpgf = null;
+                relative_cost = null;
+            } else if (words[0].equals("ED")) {
+                dpgf = words[4];
+            } else if (words[0].equals("OD")) {
+                relative_cost = words[1];
             } else if (words[0].equals("CD")) {
                 // coefficient data - up to 10
                 double[] coefs = new double[words.length-1];
@@ -90,6 +106,14 @@ public class AGFImporter {
             }
         }
         if (currentGlass != null && currentName != null) {
+            if (dpgf != null) {
+                double v = parseDouble(dpgf);
+                if (v != 0.0) currentGlass.set_dgpF(v);
+            }
+            if (relative_cost != null) {
+                double v = parseDouble(relative_cost);
+                if (v != 0.0) currentGlass.set_relative_cost(v);
+            }
             glasses.add(currentGlass);
         }
         return glasses;

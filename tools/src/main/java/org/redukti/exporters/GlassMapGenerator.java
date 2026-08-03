@@ -3,7 +3,6 @@ package org.redukti.exporters;
 import org.redukti.importers.agf.AGFBase;
 import org.redukti.importers.agf.AGFImporter;
 import org.redukti.jfotoptix.light.SpectralLine;
-import org.redukti.jfotoptix.medium.GlassMap;
 import org.redukti.mathlib.M;
 
 import java.text.DecimalFormat;
@@ -26,10 +25,10 @@ public class GlassMapGenerator {
     public static Cat[] catalogs = new Cat[] {
             new Cat("Hikari", "glassdata/NIKON-HIKARI20220701_MD_BD_added_HG.agf"),
             new Cat("Hoya", "glassdata/HOYA20260126_include_obsolete.agf"),
-            new Cat("Schott", "glassdata/SCHOTT.AGF"),
+            new Cat("Schott", "glassdata/SCHOTT-June-2025-B.AGF"),
             new Cat("Ohara", "glassdata/OHARA_240131.AGF"),
             new Cat("SUMITA", "glassdata/sumita-032026-include-discont-zemax.agf"),
-            new Cat("CDGM", "glassdata/CDGM.AGF"),
+            new Cat("CDGM", "glassdata/CDGM-ZEMAX202603.AGF"),
             new Cat("CORNING", "glassdata/CORNING.AGF")
     };
 
@@ -50,7 +49,7 @@ public class GlassMapGenerator {
 
     public static String toCodeString(AGFBase g) {
         StringBuilder sb = new StringBuilder();
-        sb.append("glasses.put(\"").append(g._name).append("\", new GlassMap(\"");
+        sb.append("glasses.put(\"").append(g._name).append("\", new Glass(\"");
         sb.append(g._manufacturer).append("\", \"").append(g._name).append("\", ");
         sb.append(decimalFormat.format(g.get_refractive_index(SpectralLine.d))).append(", ");
         sb.append(decimalFormat.format(g.get_refractive_index(SpectralLine.C))).append(", ");
@@ -61,7 +60,9 @@ public class GlassMapGenerator {
         sb.append(decimalFormat.format(g.get_refractive_index(SpectralLine.g))).append(", ");
         sb.append(decimalFormat2.format(g.get_abbe_vd())).append(", ");
         sb.append(decimalFormat2.format(g.get_abbe_ve())).append(", ");
-        sb.append("0.0));");
+        sb.append(decimalFormat.format(g.get_dpgF())).append("));");
+        if (g.get_relative_cost() != 0)
+            sb.append(" // relative cost ").append(g.get_relative_cost());
         return sb.toString();
     }
 

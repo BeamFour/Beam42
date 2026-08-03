@@ -5,7 +5,6 @@ This project is an attempt to create a basic geometric optical analysis software
 The project combines solutions from following open source projects:
 
 * **BEAM FOUR** - incorporates [BeamFour](https://github.com/StellarSoftwareBerkeley/BeamFour), originally written by Late  [Michael Lampton](https://www.ssl.berkeley.edu/~mlampton/).
-* **JFotoptix** - a Java port of [GNU Optical](https://github.com/dibyendumajumdar/goptical).
 * **RayOptics** - a Java port of Michael Hayford's [Ray-Optics](https://github.com/mjhoptics/ray-optics).
 
 ## Features and Goals
@@ -24,11 +23,12 @@ The project combines solutions from following open source projects:
     * Paraxial report
     * Zemax file
     * A markdown README that brings together all of above
-* Features a Levenberg Marquardt Lampton solver based optimizer with following features
+* Features an optimizer with following features
     * Set variables on surface properties
     * Fit to spot size or ray aberration goals or MTF targets
     * Constrain by paraxial parameters
-    * The optimization functions above are available only via Java API calls. There is no UI for this. 
+    * The optimization functions above are available only via Java API calls. There is no UI for this.
+    * Provides Levenberg Marquardt Lampton / Netlib LMDER solvers
     * Note: There are some optimization functions in BeamFour that do have a UI; but BeamFour is a more general ray tracing and
       analysis software that doesn't do many things that are typical of photographic lenses.
 
@@ -68,10 +68,10 @@ The project combines solutions from following open source projects:
 
 Here are some other projects that I have not personally tried out
 
-* OpticSim (Julia) by Microsoft: https://github.com/microsoft/OpticSim.jl
+* Optiland: (python): https://github.com/HarrisonKramer/optiland
 * Astree (C++): https://github.com/edeforas/Astree
 * OpticsSpy (python): https://github.com/Sterncat/opticspy 
 * Pyrate (python) https://github.com/mess42/pyrate
 * A Matlab/Octave project: https://github.com/heterophyllus/OpticalDesign-Toolbox
-* Optiland: (python): https://github.com/HarrisonKramer/optiland
 * Kraken - Optical Simulator (python): https://github.com/Garchupiter/Kraken-Optical-Simulator
+* OpticSim (Julia) by Microsoft: https://github.com/microsoft/OpticSim.jl

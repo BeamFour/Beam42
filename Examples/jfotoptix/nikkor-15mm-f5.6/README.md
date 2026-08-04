@@ -38,7 +38,8 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 28 | 315.5 | 5.7 | 15.9 | 1.5168 | 64.13 | Hikari | J-BK7A |
 | 29 | -23.86 | 37.3 | 15.9 |  |  |  |
 ## Layouts
-![Layout Only](./layout.svg)
+![Layout Elements](./layoutonly.svg)
+![Layout](./layout.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew.svg)
@@ -96,4 +97,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./JP1973-071634_Example02.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-07-18
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-08-04

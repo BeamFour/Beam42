@@ -289,6 +289,55 @@ public class VigCalc {
         fld.vly = vig_factors[3];
     }
 
+    // FIXME this is same as R_pupil_coordnate except it returns null on error rather than throwing
+    public static class Fn_r_pupil_coordinate implements ScalarObjectiveFunction {
+        OpticalModel opt_model;
+        int indx;
+        int xy;
+        Field fld;
+        double wvl;
+        double r_target;
+
+        public Fn_r_pupil_coordinate(OpticalModel opt_model, int indx, int xy, Field fld, double wvl, double r_target) {
+            this.opt_model = opt_model;
+            this.indx = indx;
+            this.xy = xy;
+            this.fld = fld;
+            this.wvl = wvl;
+            this.r_target = r_target;
+        }
+        public Double eval(double xy_coord) {
+            var rel_p1 = Vector2.vector2_0.set(xy, xy_coord);
+            RayPkg ray_pkg = null;
+            try {
+                var options = new TraceOptions();
+                options.apply_vignetting = false;
+                options.check_apertures = false;
+                ray_pkg = Trace.trace_base(opt_model, rel_p1.as_array(), fld, wvl, options);
+            }
+            catch (TraceException ray_error) {
+                ray_pkg = ray_error.ray_pkg;
+                // Check if the ray error occurred at or before the indx surface.
+                // if the error is at or following indx, drop thru
+                if (ray_error instanceof TraceMissedSurfaceException) {
+                    // no surface intersection, so no ray data at indx
+                    if (ray_error.surf <= indx)
+                        return null;
+                }
+                else {
+                    // other ray trace error exceptions
+                    if (ray_error.surf < indx)
+                        return null;
+                }
+            }
+            // compute the radial distance to the intersection point
+            var p = Lists.get(ray_pkg.ray,indx).p;
+            var r_ray = Math.copySign(Math.sqrt(p.x*p.x + p.y*p.y), r_target);
+            var delta = r_ray - r_target;
+            return delta;
+        }
+    }
+
     /**
      * Find the limiting aperture and return the vignetting factor.
      *
@@ -385,6 +434,14 @@ public class VigCalc {
                 }
                 else {
                     var r_target = Lists.get(sm.ifcs,indx).edge_pt_target(start_dir);
+                    // If we missed the first surface, use bisection to bracket
+                    // the edge. Use the result to start the newton iteration to
+                    // quickly find the edge.
+                    if (ray_error instanceof TraceMissedSurfaceException missedSurfaceException &&
+                        missedSurfaceException.surf == 1) {
+                        var edge = Wideangle.find_edge(new Fn_r_pupil_coordinate(opm,indx,xy,fld,wvl,r_target.v(xy)),0.0,rel_p1.v(xy),null);
+                        rel_p1 = rel_p1.set(xy,edge.z_enp);
+                    }
                     rel_p1 = iterate_pupil_ray(opm,indx,xy,rel_p1.v(xy),r_target.v(xy),fld,wvl);
                     still_iterating = true;
                     clip_indx = indx;

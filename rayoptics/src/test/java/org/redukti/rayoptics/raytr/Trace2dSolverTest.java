@@ -17,7 +17,7 @@ class Trace2dSolverTest {
         SequentialModel seqModel = planeSurfaceModel();
         double[] target = {2.5, -3.75};
 
-        RayResultWithStartCoord result = Trace.get_2d_minpack_lavenberg_marquardt_solution(
+        RayResultWithStartCoord result = Trace.get_2d_solution(
                 seqModel, 1, Vector3.ZERO, 100.0, 587.5618, target, true);
 
         assertArrayEquals(target, result.start_coords, 1.0e-9);
@@ -31,7 +31,7 @@ class Trace2dSolverTest {
         SequentialModel seqModel = planeSurfaceModel();
         double[] target = {-1.25, 4.5};
 
-        RayResultWithStartCoord result = Trace.get_2d_minpack_lavenberg_marquardt_solution_raw(
+        RayResultWithStartCoord result = Trace.get_2d_solution_raw(
                 seqModel.path(), 1, Vector3.ZERO, 100.0, 587.5618, target, true);
 
         assertArrayEquals(target, result.start_coords, 1.0e-9);
@@ -47,7 +47,7 @@ class Trace2dSolverTest {
 
         RayResultWithStartCoord oneDimensional = Trace.get_1d_solution(
                 seqModel, 1, Vector3.ZERO, 100.0, 587.5618, yTarget, true);
-        RayResultWithStartCoord twoDimensional = Trace.get_2d_minpack_lavenberg_marquardt_solution(
+        RayResultWithStartCoord twoDimensional = Trace.get_2d_solution(
                 seqModel, 1, Vector3.ZERO, 100.0, 587.5618,
                 new double[]{0.0, yTarget}, true);
 
@@ -61,7 +61,7 @@ class Trace2dSolverTest {
     void acceptsAnExactInitialSolution() {
         SequentialModel seqModel = planeSurfaceModel();
 
-        RayResultWithStartCoord result = Trace.get_2d_minpack_lavenberg_marquardt_solution(
+        RayResultWithStartCoord result = Trace.get_2d_solution(
                 seqModel, 1, Vector3.ZERO, 100.0, 587.5618, new double[]{0.0, 0.0}, true);
 
         assertArrayEquals(new double[]{0.0, 0.0}, result.start_coords, 0.0);

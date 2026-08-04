@@ -308,10 +308,10 @@ public class Trace {
     }
 
     /* Solver for use in Minpack algos */
-    static class LmObjectiveFunction extends BaseObjectiveFunction implements MinPack.Hybrd_Function, MinPack.Lmder_Function {
+    static class HybrdObjectiveFunction extends BaseObjectiveFunction implements MinPack.Hybrd_Function {
         final double[] xy_target; // target x,y values
 
-        public LmObjectiveFunction(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target, boolean not_wa, RayResult rr) {
+        public HybrdObjectiveFunction(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target, boolean not_wa, RayResult rr) {
             super(seq_model, ifcx, pt0, dist, wvl, not_wa, rr);
             this.xy_target = xy_target;
         }
@@ -323,34 +323,21 @@ public class Trace {
             fvec[1] = seg.p.y - xy_target[1];
         }
 
-        @Override
-        public int apply(int m, int n, double[] x, double[] fvec, int iflag) {
-            int[] iflags = new int[1];
-            apply(n, x, fvec, iflags);
-            return iflags[0];
-        }
-
-        @Override
-        public boolean hasJacobian() {
-            return false;
-        }
     }
 
-    public static RayResultWithStartCoord get_2d_minpack_lavenberg_marquardt_solution(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target, boolean not_wa) {
+    public static RayResultWithStartCoord get_2d_solution(SequentialModel seq_model, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target, boolean not_wa) {
         RayResultWithStartCoord res = new RayResultWithStartCoord();
-        LmObjectiveFunction f = new LmObjectiveFunction(seq_model, ifcx, pt0, dist, wvl, Arrays.copyOf(xy_target, xy_target.length), not_wa, res.rr);
+        HybrdObjectiveFunction f = new HybrdObjectiveFunction(seq_model, ifcx, pt0, dist, wvl, Arrays.copyOf(xy_target, xy_target.length), not_wa, res.rr);
         double[] x = new double[2];
         double[] fvec = new double[2];
-        double[] fjac = new double[4];
         int lwa = (2 * (3 * 2 + 13)) / 2;
         double[] wa = new double[lwa];
         int info[] = new int[1];
-        int[] ipvt = new int[2];
-        // epsfcn is relative error; fdjac2 uses its square root as the step.
+        // epsfcn is relative error; fdjac1 uses its square root as the step.
         double epsfcn = 1.0e-8;
-        info[0] = MinPack.lmder1(f, 2, 2, x, fvec, fjac, 2, 1e-15, ipvt, wa, lwa, epsfcn);
-        // fdjac2 restores x but leaves rr referring to its last perturbed ray.
-        f.apply(2, 2, x, fvec, 1);
+        info[0] = MinPack.hybrd1(f, 2, x, fvec, 1.0e-10, wa, lwa, epsfcn);
+        // Numerical Jacobian evaluation leaves rr referring to a perturbed ray.
+        f.apply(2, x, fvec, new int[1]);
 
         double residual = Math.hypot(fvec[0], fvec[1]);
         double coordinateScale = Math.max(Math.max(Math.abs(x[0]), Math.abs(x[1])),
@@ -398,16 +385,13 @@ public class Trace {
         var pt0 = coord.pt;
         var d0 = coord.dir;
 
-        // 0.3171082641317441 (secant)
-        // 0.3171081317490797 (lm)
-        // 0.3171081737822994 (expected)
         if (ifcx != null) {
             if (pt0.x == 0.0 && xy_target[0] == 0.0) {
                 // do 1D iteration if field and target points are zero in x
                 var y_target = xy_target[1];
                 return get_1d_solution(seq_model, ifcx, pt0, obj2enp_dist, wvl, y_target, not_wa);
             } else {
-                return get_2d_minpack_lavenberg_marquardt_solution(seq_model, ifcx, pt0, obj2enp_dist, wvl, xy_target, not_wa);
+                return get_2d_solution(seq_model, ifcx, pt0, obj2enp_dist, wvl, xy_target, not_wa);
             }
         } else {
             // floating stop surface - use entrance pupil for aiming
@@ -875,10 +859,10 @@ public class Trace {
     }
 
     /* Solver for use in Minpack algos */
-    static class LmObjectiveFunctionRaw extends BaseObjectiveFunctionRaw implements MinPack.Hybrd_Function, MinPack.Lmder_Function {
+    static class HybrdObjectiveFunctionRaw extends BaseObjectiveFunctionRaw implements MinPack.Hybrd_Function {
         final double[] xy_target; // target x,y values
 
-        public LmObjectiveFunctionRaw(List<PathSeg> pthlist, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target, boolean not_wa, RayResult rr) {
+        public HybrdObjectiveFunctionRaw(List<PathSeg> pthlist, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target, boolean not_wa, RayResult rr) {
             super(pthlist, ifcx, pt0, dist, wvl, not_wa, rr);
             this.xy_target = xy_target;
         }
@@ -890,34 +874,21 @@ public class Trace {
             fvec[1] = seg.p.y - xy_target[1];
         }
 
-        @Override
-        public int apply(int m, int n, double[] x, double[] fvec, int iflag) {
-            int[] iflags = new int[1];
-            apply(n, x, fvec, iflags);
-            return iflags[0];
-        }
-
-        @Override
-        public boolean hasJacobian() {
-            return false;
-        }
     }
 
-    public static RayResultWithStartCoord get_2d_minpack_lavenberg_marquardt_solution_raw(List<PathSeg> pthlist, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target, boolean not_wa) {
+    public static RayResultWithStartCoord get_2d_solution_raw(List<PathSeg> pthlist, Integer ifcx, Vector3 pt0, double dist, double wvl, double[] xy_target, boolean not_wa) {
         RayResultWithStartCoord res = new RayResultWithStartCoord();
-        LmObjectiveFunctionRaw f = new LmObjectiveFunctionRaw(pthlist, ifcx, pt0, dist, wvl, Arrays.copyOf(xy_target, xy_target.length), not_wa, res.rr);
+        HybrdObjectiveFunctionRaw f = new HybrdObjectiveFunctionRaw(pthlist, ifcx, pt0, dist, wvl, Arrays.copyOf(xy_target, xy_target.length), not_wa, res.rr);
         double[] x = new double[2];
         double[] fvec = new double[2];
-        double[] fjac = new double[4];
         int lwa = (2 * (3 * 2 + 13)) / 2;
         double[] wa = new double[lwa];
         int info[] = new int[1];
-        int[] ipvt = new int[2];
-        // epsfcn is relative error; fdjac2 uses its square root as the step.
+        // epsfcn is relative error; fdjac1 uses its square root as the step.
         double epsfcn = 1.0e-8;
-        info[0] = MinPack.lmder1(f, 2, 2, x, fvec, fjac, 2, 1e-15, ipvt, wa, lwa, epsfcn);
-        // fdjac2 restores x but leaves rr referring to its last perturbed ray.
-        f.apply(2, 2, x, fvec, 1);
+        info[0] = MinPack.hybrd1(f, 2, x, fvec, 1.0e-10, wa, lwa, epsfcn);
+        // Numerical Jacobian evaluation leaves rr referring to a perturbed ray.
+        f.apply(2, x, fvec, new int[1]);
 
         double residual = Math.hypot(fvec[0], fvec[1]);
         double coordinateScale = Math.max(Math.max(Math.abs(x[0]), Math.abs(x[1])),
@@ -965,7 +936,7 @@ public class Trace {
                 }
             } else {
                 try {
-                    return get_2d_minpack_lavenberg_marquardt_solution_raw(pthlist, ifcx, pt0, obj2pup_dist, wvl, xy_target, not_wa);
+                    return get_2d_solution_raw(pthlist, ifcx, pt0, obj2pup_dist, wvl, xy_target, not_wa);
                 }
                 catch (TraceException ray_err) {
                     var result = new RayResultWithStartCoord();

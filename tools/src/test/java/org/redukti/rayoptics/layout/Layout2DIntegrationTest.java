@@ -44,8 +44,8 @@ public class Layout2DIntegrationTest {
 
         Files.writeString(output.resolve(testname + "-elements.svg"), elements);
         Files.writeString(output.resolve(testname + "-reference-rays.svg"), reference);
-        Files.writeString(output.resolve(testname + "-summicron-ray-fan.svg"), fan);
-        Files.writeString(output.resolve(testname + "-summicron-trace-fan.svg"), traceFan);
+        Files.writeString(output.resolve(testname + "-ray-fan.svg"), fan);
+        Files.writeString(output.resolve(testname + "-trace-fan.svg"), traceFan);
         Files.writeString(output.resolve(testname + "-vig.txt"), osp.list_str(new StringBuilder()).toString());
     }
 

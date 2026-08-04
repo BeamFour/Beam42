@@ -59,9 +59,8 @@ Note that where glass types are shown the refractive index and abbe number is as
 | d29 | 12.01 | 12.01 |
 # 10mm f4.0
 ## Layouts
-![Layout Only](./layoutonly-0.svg)
-![Layout Field 0.0](./layout-0.svg)
-![Layout Field 0.7](./layout-semi-skew-0.svg)
+![Layout Elements](./layoutonly-0.svg)
+![Layout](./layout-0.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot-0.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew-0.svg)
@@ -107,20 +106,18 @@ Note that where glass types are shown the refractive index and abbe number is as
  | Field(x=0.0, y=1.0) | 16.167 | 46.224|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf-0.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d), 486.1327(F), 656.2725(C) were calculated across 10 fields, and then averaged
 ## Polychromatic Geometric MTF (Weighted)
 ![Polychromatic Geometrical MTF Weighted](./mtf-w-0.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 # 20mm f4.0
 ## Layouts
-![Layout Only](./layoutonly-1.svg)
-![Layout Field 0.0](./layout-1.svg)
-![Layout Field 0.7](./layout-semi-skew-1.svg)
-![Layout Field 1.0](./layout-skew-1.svg)
+![Layout Elements](./layoutonly-1.svg)
+![Layout](./layout-1.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot-1.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew-1.svg)
@@ -166,16 +163,16 @@ Note that where glass types are shown the refractive index and abbe number is as
  | Field(x=0.0, y=1.0) | 42.484 | 136.757|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf-1.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d), 486.1327(F), 656.2725(C) were calculated across 10 fields, and then averaged
 ## Polychromatic Geometric MTF (Weighted)
 ![Polychromatic Geometrical MTF Weighted](./mtf-w-1.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./US20240045184_Example01P.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-02-06
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-08-04

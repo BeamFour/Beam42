@@ -13,7 +13,6 @@ import org.redukti.rayoptics.specs.Coord;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.specs.FieldSpec;
 import org.redukti.rayoptics.util.Lists;
-import org.redukti.rayoptics.util.Pair;
 
 import java.util.*;
 
@@ -348,19 +347,22 @@ public class Trace {
         int info[] = new int[1];
         int[] ipvt = new int[2];
         // epsfcn is relative error; fdjac2 uses its square root as the step.
-        double epsfcn = 1.0e-12;
+        double epsfcn = 1.0e-8;
         info[0] = MinPack.lmder1(f, 2, 2, x, fvec, fjac, 2, 1e-15, ipvt, wa, lwa, epsfcn);
         // fdjac2 restores x but leaves rr referring to its last perturbed ray.
         f.apply(2, 2, x, fvec, 1);
 
         double residual = Math.hypot(fvec[0], fvec[1]);
-        double residualTolerance = 1.0e-10 * Math.max(1.0,
+        double coordinateScale = Math.max(Math.max(Math.abs(x[0]), Math.abs(x[1])),
                 Math.max(Math.abs(xy_target[0]), Math.abs(xy_target[1])));
+        double residualTolerance = Math.max(1.0e-7,
+                1.0e-8 * coordinateScale);
         boolean converged = info[0] >= 1 && info[0] <= 4
                 && residual <= residualTolerance;
         if (!converged) {
             TraceException failure = new TraceException("2D ray aiming failed: MINPACK info=" + info[0]
-                    + ", residual=" + residual);
+                    + ", residual=" + residual + ", tolerance=" + residualTolerance
+                    + ", start=" + Arrays.toString(x));
             failure.surf = ifcx;
             failure.ifc = seq_model.ifcs.get(ifcx);
             failure.ray_pkg = res.rr.pkg;
@@ -912,19 +914,22 @@ public class Trace {
         int info[] = new int[1];
         int[] ipvt = new int[2];
         // epsfcn is relative error; fdjac2 uses its square root as the step.
-        double epsfcn = 1.0e-12;
+        double epsfcn = 1.0e-8;
         info[0] = MinPack.lmder1(f, 2, 2, x, fvec, fjac, 2, 1e-15, ipvt, wa, lwa, epsfcn);
         // fdjac2 restores x but leaves rr referring to its last perturbed ray.
         f.apply(2, 2, x, fvec, 1);
 
         double residual = Math.hypot(fvec[0], fvec[1]);
-        double residualTolerance = 1.0e-10 * Math.max(1.0,
+        double coordinateScale = Math.max(Math.max(Math.abs(x[0]), Math.abs(x[1])),
                 Math.max(Math.abs(xy_target[0]), Math.abs(xy_target[1])));
+        double residualTolerance = Math.max(1.0e-7,
+                1.0e-8 * coordinateScale);
         boolean converged = info[0] >= 1 && info[0] <= 4
                 && residual <= residualTolerance;
         if (!converged) {
             TraceException failure = new TraceException("2D ray aiming failed: MINPACK info=" + info[0]
-                    + ", residual=" + residual);
+                    + ", residual=" + residual + ", tolerance=" + residualTolerance
+                    + ", start=" + Arrays.toString(x));
             failure.surf = ifcx;
             failure.ifc = pthlist.get(ifcx).ifc;
             failure.ray_pkg = res.rr.pkg;

@@ -100,6 +100,9 @@ public class SurfaceType {
     public boolean is_even_a2_asphere() {
         return is_aspheric() && _asph_type == ASPH_EVEN_A2;
     }
+    public boolean is_even_asphere() {
+        return is_aspheric() && _asph_type == ASPH_EVEN;
+    }
     public StringBuilder to_opt_bench_str(StringBuilder sb, boolean is_last) {
         sb.append(_id).append("\t");
         if (_is_aperture_stop)

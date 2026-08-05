@@ -159,12 +159,6 @@ public class Trace {
      * - **op_delta** - optical path wrt equally inclined chords to the
      * optical axis
      * - **wvl** - wavelength (in nm) that the ray was traced in
-     *
-     * @param seq_model
-     * @param pt0
-     * @param dir0
-     * @param wvl
-     * @return
      */
     public static RayPkg trace(SequentialModel seq_model, Vector3 pt0, Vector3 dir0, double wvl, TraceOptions trace_options) {
         var options = new RayTraceOptions(trace_options);
@@ -265,7 +259,7 @@ public class Trace {
             if (not_wa && dir0.z * seq_model.z_dir.get(0).value < 0)
                 dir0 = dir0.negate();
 
-            RayPkg pkg = null;
+            RayPkg pkg;
             try {
                 pkg = RayTrace.trace(seq_model, pt0, dir0, wvl);
                 rr.pkg = pkg;
@@ -367,12 +361,6 @@ public class Trace {
      * <p>
      * If the iteration fails, a TraceError will be raised
      *
-     * @param opt_model
-     * @param ifcx
-     * @param xy_target
-     * @param fld
-     * @param wvl
-     * @return
      */
     public static RayResultWithStartCoord iterate_ray(final OpticalModel opt_model, Integer ifcx, double[] xy_target, Field fld, double wvl) {
         var seq_model = opt_model.seq_model;

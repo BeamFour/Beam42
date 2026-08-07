@@ -206,7 +206,9 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
           //iCaret = iFieldStartCol[field];
             iCaret = myEJIF.model().getiFieldStartCol(field);
         if ((row>=0) && (row<JMAX-2))
-          jCaret = row; 
+          jCaret = row;
+
+        showCaretPosition();
     }
 
     int getCaretY()  // added A106 for AutoRayGen
@@ -418,8 +420,10 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     void setCaretToMark()
     {
         int jMark = Math.min(jDown, jDrag); 
-        if (jMark >= 0)
-          jCaret = jMark; 
+        if (jMark >= 0) {
+            jCaret = jMark;
+            showCaretPosition();
+        }
     }
 
     void doDelete()
@@ -445,7 +449,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
         stashForUndo();
         jCaret = myEJIF.model().vLoadString(s, false, jCaret);
         myEJIF.model().setDirty(true);
-        repaint();
+        showCaretPosition();
     }
 
 
@@ -574,6 +578,39 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
 
     private int getOneLineLength(int j) {
         return myEJIF.model().getOneLineLength(j);
+    }
+
+    /**
+     * Keeps the viewport and scrollbars synchronized with the logical caret.
+     * This must be called after either caret coordinate changes.
+     */
+    private void showCaretPosition()
+    {
+        iCaret = Math.max(0, Math.min(IMAX-2, iCaret));
+        jCaret = Math.max(0, Math.min(JMAX-1, jCaret));
+
+        // guard for iWidth and jHeight being 0 before first paint
+        if (iCaret < iOff)
+            iOff = iCaret;
+        if (iWidth > 1 && iCaret >= iOff + iWidth-1)
+            iOff = Math.max(0, iCaret-iWidth+1);
+        else if (iWidth <= 1)
+            iOff = iCaret;
+
+        if (jCaret < jOff)
+            jOff = jCaret;
+        if (jHeight > 1 && jCaret >= jOff + jHeight-1)
+            jOff = Math.max(0, jCaret-jHeight+1);
+        else if (jHeight <= 1)
+            jOff = jCaret;
+
+        // sync scroll bars
+        if (vsbReference != null)
+            vsbReference.setValue(jOff);
+        if (hsbReference != null)
+            hsbReference.setValue(iOff);
+
+        repaint();
     }
 
     StringBuffer fieldToStringBuffer() {
@@ -715,21 +752,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
                    break; 
             }
 
-            if (iCaret < iOff)
-              iOff = iCaret; 
-            if (iCaret >= iOff + iWidth-1)
-              iOff = Math.max(0, iCaret-iWidth+1); 
-
-            if (jCaret < jOff)
-              jOff = jCaret; 
-            if (jCaret >= jOff + jHeight-1)
-              jOff = Math.max(0, jCaret-jHeight+1); 
-
-            if (vsbReference != null)
-              vsbReference.setValue(jOff); 
-            if (hsbReference != null)
-              hsbReference.setValue(iOff); 
-            repaint();
+            showCaretPosition();
         }
 
         public void keyReleased(KeyEvent event) 
@@ -759,7 +782,8 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
                   myEJIF.dataModel.setDirty(true);
               }
             if (jCaret == RULER)
-              getFieldInfo(); 
+              getFieldInfo();
+            showCaretPosition();
         }
 
     } //---end private class MyKeyHandler------------

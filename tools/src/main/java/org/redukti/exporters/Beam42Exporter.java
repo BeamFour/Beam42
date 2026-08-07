@@ -10,9 +10,6 @@ import org.redukti.rayoptics.raytr.*;
 import org.redukti.rayoptics.seq.Glass;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.specs.Field;
-import org.redukti.rayoptics.specs.FieldSpec;
-import org.redukti.rayoptics.specs.ImageKey;
-import org.redukti.rayoptics.specs.ValueKey;
 import org.redukti.rayoptics.util.SpectralLine;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.RayOpticsModelBuilder;
@@ -223,7 +220,6 @@ public class Beam42Exporter {
             new ColumnDef("W0", 20, M.decimal_format(21)),
             new ColumnDef("xfinal", 16, null),
             new ColumnDef("notes", 30, null),
-//            new ColumnDef("@", 20, MathUtils.decimal_format(10)),
     };
 
     static final int RAY_wave_col = 0;
@@ -271,112 +267,19 @@ public class Beam42Exporter {
 
     public static final double REFERENCE_RAY_PLANE_CLEARANCE = 10.0;
 
-    /** Returns the configured chief and pupil-boundary rays on a common plane before surface 1. */
-//    public static List<ReferenceRay> reference_rays(OpticalModel model, Field field) {
-//        return reference_rays(model, field, model.seq_model.central_wavelength(), REFERENCE_RAY_PLANE_CLEARANCE);
-//    }
-
-    /** Positions reference rays on global z = min(surface 1 z) - clearance. */
-//    public static List<ReferenceRay> reference_rays(OpticalModel model, Field field,
-//                                                                                double wavelength, double clearance) {
-//        Objects.requireNonNull(model, "model");
-//        Objects.requireNonNull(field, "field");
-//        if (!Double.isFinite(clearance) || clearance < 0.0)
-//            throw new IllegalArgumentException("clearance must be finite and >= 0");
-//        SequentialModel sm = model.seq_model;
-//        if (sm.ifcs.size() < 2) throw new IllegalArgumentException("optical model has no first surface");
-//        double planeZ = object_side_surface_z(sm) - clearance;
-//        TraceOptions options = new TraceOptions();
-//        options.rayerr_filter = "full";
-//        List<RayPkg> packages = Trace.trace_boundary_rays_at_field(model, field, wavelength, options);
-//        List<ReferenceRay> result = new ArrayList<>();
-//        for (int i = 0; i < packages.size(); i++) {
-//            RayPkg pkg = packages.get(i);
-//            if (pkg == null || pkg.ray == null || pkg.ray.size() < 2) continue;
-//            String[] labels = model.optical_spec.pupil.ray_labels;
-//            String label = i < labels.length ? labels[i] : Integer.toString(i);
-//            Vector3 hit = sm.gbl_tfrms.get(1).rt.multiply(pkg.ray.get(1).p).add(sm.gbl_tfrms.get(1).t);
-//            Vector3 direction = sm.gbl_tfrms.get(0).rt.multiply(pkg.ray.get(0).d).normalize();
-//            if (Math.abs(direction.z) < 1.0e-14)
-//                throw new IllegalArgumentException("reference ray is parallel to the start plane: " + label);
-//            Vector3 position = hit.add(direction.times((planeZ - hit.z) / direction.z));
-//            result.add(new ReferenceRay(label, position, direction));
-//        }
-//        return List.copyOf(result);
-//    }
-
-    private static Vector3 compute_ray_start(Field fld, Vector3 origin, double z_clearance) {
-        FieldSpec fov = fld.fov;
-        double ray_half_angle_in_radians = 0;
-        if (fov.key.imageKey == ImageKey.Object &&
-            fov.key.valueKey == ValueKey.Angle) {
-            ray_half_angle_in_radians = Math.toRadians(fov.value);
-        }
-        else
-            throw new UnsupportedOperationException("Field Spec is not specified in angle");
-        double z = origin.z;
-        double distance = z_clearance + z;
-        // tan(distance) tells us height of the triangle where tan(angle) = ht/distance.
-        double height_adjustment = ray_half_angle_in_radians != 0 ? Math.tan(ray_half_angle_in_radians) * distance : 1.0;
-        // Adjust y
-        double y_ht = origin.y - height_adjustment;
-        // Adjust z
-        return new Vector3(origin.x, y_ht, z-distance);
-    }
-
-    public static RayStart chief_ray(OpticalModel model, Field field,
-                                     double wavelength, double clearance) {
-        Objects.requireNonNull(model, "model");
-        Objects.requireNonNull(field, "field");
-        if (!Double.isFinite(clearance) || clearance < 0.0)
-            throw new IllegalArgumentException("clearance must be finite and >= 0");
-        SequentialModel sm = model.seq_model;
-        if (sm.ifcs.size() < 2) throw new IllegalArgumentException("optical model has no first surface");
-        double planeZ = object_side_surface_z(sm) - clearance;
-        TraceOptions options = new TraceOptions();
-        options.rayerr_filter = "full";
-        ChiefRayPkg crpkg = Trace.trace_chief_ray(model, field, wavelength, 0);
-        RayPkg pkg = crpkg.chief_ray;
-        // Codex version
-//        Vector3 hit = sm.gbl_tfrms.get(1).rt.multiply(pkg.ray.get(1).p).add(sm.gbl_tfrms.get(1).t);
-//        Vector3 direction = sm.gbl_tfrms.get(0).rt.multiply(pkg.ray.get(0).d).normalize();
-//        if (Math.abs(direction.z) < 1.0e-14)
-//            throw new IllegalArgumentException("chief ray is parallel to the start plane");
-//        Vector3 position = hit.add(direction.times((planeZ - hit.z) / direction.z));
-        // Second version
-        Vector3 position = pkg.ray.get(1).p;
-        Vector3 direction = pkg.ray.get(0).d;
-        position = position.add(direction.times(planeZ));
-        return new RayStart(wavelength, position, direction);
-        // Third version
-//        Vector3 position = pkg.ray.get(1).p;    // Intersection at position
-//        Vector3 direction = pkg.ray.get(0).d;
-//        return new RayStart(wavelength,compute_ray_start(field,position,10),direction);
-    }
-
-    static void create_rings(OpticalModel opt_model, Field fld, double wvl,Vector3 direction,double clearance, List<RayStart> rayStarts) {
+    static void create_rings(OpticalModel opt_model, Field fld, double wvl,double clearance, List<RayStart> rayStarts) {
         SequentialModel sm = opt_model.seq_model;
         var grid_def = new TraceRingsDef();
         grid_def.num_rings = 5;
-        grid_def.max_radius = 1;
         double planeZ = object_side_surface_z(sm) - clearance;
         var gridList = Trace.trace_rings(opt_model,grid_def,fld,wvl,0.0,
                     null,false,new TraceOptions());
         for (var gridItem: gridList) {
             RayPkg pkg = gridItem.ray_pkg;
-            // Codex version
-//            Vector3 hit = sm.gbl_tfrms.get(1).rt.multiply(pkg.ray.get(1).p).add(sm.gbl_tfrms.get(1).t);
-//            Vector3 direction = sm.gbl_tfrms.get(0).rt.multiply(pkg.ray.get(0).d).normalize();
-//            if (Math.abs(direction.z) < 1.0e-14)
-//                throw new IllegalArgumentException("chief ray is parallel to the start plane");
-//            Vector3 position = hit.add(direction.times((planeZ - hit.z) / direction.z));
-            // Second versiom
             Vector3 position = pkg.ray.get(1).p;
+            Vector3 direction = pkg.ray.get(0).d;
             position = position.add(direction.times(planeZ));
             rayStarts.add(new RayStart(wvl, position, direction));
-            // Third version
-//            Vector3 position = pkg.ray.get(1).p;    // Intersection at position
-//            rayStarts.add(new RayStart(wvl,compute_ray_start(fld,position,10),direction));
         }
     }
 
@@ -405,15 +308,14 @@ public class Beam42Exporter {
     static void generate_rays_table(Prescription prescription, int scenario, double[] fields, String[] labels, Args arguments) throws IOException {
         var model = new RayOpticsModelBuilder(prescription).build_optical_model(true,fields,false,VigType.SetPupil,true,scenario);
         var fov = model.optical_spec.fov;
-        double[] wavelengths = {SpectralLine.d, SpectralLine.F, SpectralLine.C};
+        double[] wavelengths = arguments.only_d_line
+                ? new double[]{SpectralLine.d}
+                : new double[]{SpectralLine.d, SpectralLine.F, SpectralLine.C};
         for (int i = 0; i < fov.fields.length; i++) {
             var fld = fov.fields[i];
             List<RayStart> rayStarts = new ArrayList<>();
             for (var wvl: wavelengths) {
-                var rayStart = chief_ray(model, fld, wvl, REFERENCE_RAY_PLANE_CLEARANCE);
-                rayStarts.add(rayStart);
-                var direction = rayStart.direction;
-                create_rings(model,fld,wvl,direction,REFERENCE_RAY_PLANE_CLEARANCE,rayStarts);
+                create_rings(model,fld,wvl,REFERENCE_RAY_PLANE_CLEARANCE,rayStarts);
             }
             Helper.createOutputFile(Helper.getOutputPath(arguments, labels[i] + ".RAY"), generate_rays_table(rayStarts));
         }

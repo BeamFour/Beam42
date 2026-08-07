@@ -225,12 +225,27 @@ public class LensTool2 {
         }
     }
 
-    public static void doLayoutDiagrams(OpticalBenchDataImporter.LensSpecifications specs,Args arguments, int config, int scenario, String filename_suffix, VigType vigType) throws Exception {
+    private static OpticalModel createLayoutSystem(
+            Prescription prescription,
+            int config,
+            VigType vigType,
+            boolean useWideAngleAiming) {
+
+        double[] layoutFields = {0.0, 1.0};
+
+        return createSystem(
+                prescription,
+                true,
+                vigType,
+                useWideAngleAiming,
+                layoutFields,
+                config);
+    }
+
+    public static void doLayoutDiagrams(Prescription prescription,Args arguments, int config, String filename_suffix) throws Exception {
         // First we use rayoptics to get ray starts
         // For very wide angle lenses, blindly spraying rays doesn't work very well
-        final double[] fields = {0.0, 1.0};
-        var prescription = createPrescription(specs,arguments.use_glass_types,arguments.only_d_line);
-        var opm = new RayOpticsModelBuilder(prescription).build_optical_model(true,fields,false,vigType,true, config);
+        var opm = createLayoutSystem(prescription,config,VigType.SetPupil,true);
         Layout2D layout = new Layout2D();
         Path output = Helper.getOutputPath(arguments.specfile,suffixed_name("layout-fan",filename_suffix,".svg"),arguments.outdir);
         String fan = layout.renderSvg(opm, 1000, 500,
@@ -270,7 +285,6 @@ public class LensTool2 {
             Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), zemaxExporter.generate(prescription, arguments.only_d_line));
             StringBuilder SB = startREADME(specs);
             for (int config = 0; config < Math.max(prescription.get_num_configurations(),1); config++) {
-                var scenario = prescription.get_num_configurations() > 0 ? prescription._configurations[config] : 0;
                 if (prescription.get_num_configurations() > 0)
                     addConfigLabelToREADME(SB,prescription._configuration_names[config]);
                 var scenario_filesuffix = prescription.get_num_configurations() > 0 ? ("-"+config) : "";
@@ -283,7 +297,7 @@ public class LensTool2 {
                 System.out.println(osp.list_str(new StringBuilder()).toString());
                 Helper.createOutputFile(Helper.getOutputPath(arguments.specfile, suffixed_name("vig", scenario_filesuffix, ".txt"), arguments.outdir), osp.list_str(new StringBuilder()).toString());
                 Helper.createOutputFile(Helper.getOutputPath(arguments.specfile, suffixed_name("paraxial", scenario_filesuffix, ".txt"), arguments.outdir), fod.toString());
-                doLayoutDiagrams(specs, arguments, config, scenario, scenario_filesuffix, vigType);
+                doLayoutDiagrams(prescription, arguments, config, scenario_filesuffix);
 
 //            StringBuilder buf = new StringBuilder();
 //            for (int i = 0; i < fields.length; i++) {

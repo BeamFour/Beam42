@@ -962,8 +962,8 @@ class Options extends JMenu implements B4constants
     {
         int NCHARS = 4; 
         JPanel aPanel = new JPanel(); 
-        int count = 5;   // five strings in aPanel
-        aPanel.setPreferredSize(new Dimension(300, 24+20*count)); 
+        int count = 13;   // thirteen strings in aPanel
+        aPanel.setPreferredSize(new Dimension(390, 24+20*count));
         // aPanel.setMaximumSize(getPreferredSize()); 
         aPanel.setLayout(new BoxLayout(aPanel, BoxLayout.Y_AXIS));
         aPanel.add(new JLabel("  F7 or Ctl/Cmd Left:  narrow field")); 
@@ -972,6 +972,13 @@ class Options extends JMenu implements B4constants
         aPanel.add(new JLabel("  F10 or Alt Down:      copy down")); 
         aPanel.add(new JLabel("  Ctl-Alt-Down:        copy to bottom"));
         aPanel.add(new JLabel("  Ctl/Cmd Z:           undo & redo")); 
+        aPanel.add(new JLabel("  Tab / Shift+Tab:     next / previous field"));
+        aPanel.add(new JLabel("  Home:                start of document"));
+        aPanel.add(new JLabel("  Enter:               next row (table); split line (text)"));
+        aPanel.add(new JLabel("  Backspace/Delete:    erase (table); delete/join (text)"));
+        aPanel.add(new JLabel("  Left Button Click:   set caret"));
+        aPanel.add(new JLabel("  Left Button Drag:    mark rows"));
+        aPanel.add(new JLabel("  Mouse Wheel:         scroll vertically"));
         aPanel.setBorder(BorderFactory.createTitledBorder("Special Editor Keys"));
 
         JPanel bPanel = new JPanel(); 

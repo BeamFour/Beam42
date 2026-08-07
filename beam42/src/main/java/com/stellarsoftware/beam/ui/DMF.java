@@ -553,11 +553,11 @@ public class DMF extends JFrame implements B4constants
         specialKeysMenuItem = new JMenuItem("Special Keys"); 
         specialKeysMenuItem.addActionListener(new ActionListener()
         {
-            int panelWidth = 230; 
+            int panelWidth = 330;
             public void actionPerformed(ActionEvent ae)
             {
                 JPanel aPanel = new JPanel(); 
-                int count = 6;   // six strings in aPanel
+                int count = 13;  // thirteen strings in aPanel
                 aPanel.setPreferredSize(new Dimension(panelWidth, (1+count)*18)); 
                 aPanel.setMaximumSize(getPreferredSize()); 
                 aPanel.setLayout(new BoxLayout(aPanel, BoxLayout.Y_AXIS));
@@ -567,6 +567,13 @@ public class DMF extends JFrame implements B4constants
                 aPanel.add(new JLabel("Alt Down:           copy down")); 
                 aPanel.add(new JLabel("Ctrl Alt Down:  copy to bottom"));
                 aPanel.add(new JLabel("Ctrl Z:              undo & redo")); 
+                aPanel.add(new JLabel("Tab / Shift+Tab: next / previous field"));
+                aPanel.add(new JLabel("Home: start of document"));
+                aPanel.add(new JLabel("Enter: start of next row"));
+                aPanel.add(new JLabel("Backspace/Delete: erase previous character"));
+                aPanel.add(new JLabel("Left Button Click: set caret"));
+                aPanel.add(new JLabel("Left Button Drag: mark rows"));
+                aPanel.add(new JLabel("Mouse Wheel: scroll vertically"));
                 aPanel.setBorder(BorderFactory.createTitledBorder("Table Mode Keys"));
 
                 JPanel bPanel = new JPanel(); 

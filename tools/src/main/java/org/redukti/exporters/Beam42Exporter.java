@@ -10,6 +10,9 @@ import org.redukti.rayoptics.raytr.*;
 import org.redukti.rayoptics.seq.Glass;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.specs.Field;
+import org.redukti.rayoptics.specs.FieldSpec;
+import org.redukti.rayoptics.specs.ImageKey;
+import org.redukti.rayoptics.specs.ValueKey;
 import org.redukti.rayoptics.util.SpectralLine;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.RayOpticsModelBuilder;
@@ -80,19 +83,19 @@ public class Beam42Exporter {
             new ColumnDef("A14", 16, M.decimal_format_scientific(10)),
     };
 
-    final int Type_col = 0;
-    final int Index_col = 1;
-    final int Z_col = 2;
-    final int C_col = 3;
-    final int Dia_col = 4;
-    final int S_col = 5;
-    final int A2_col = 6;
-    final int A4_col = 7;
-    final int A6_col = 8;
-    final int A8_col = 9;
-    final int A10_col = 10;
-    final int A12_col = 11;
-    final int A14_col = 12;
+    final int OPT_Type_col = 0;
+    final int OPT_Index_col = 1;
+    final int OPT_Z_col = 2;
+    final int OPT_C_col = 3;
+    final int OPT_Dia_col = 4;
+    final int OPT_S_col = 5;
+    final int OPT_A2_col = 6;
+    final int OPT_A4_col = 7;
+    final int OPT_A6_col = 8;
+    final int OPT_A8_col = 9;
+    final int OPT_A10_col = 10;
+    final int OPT_A12_col = 11;
+    final int OPT_A14_col = 12;
 
     static void generate_heading(StringBuilder sb, ColumnDef[] columns) {
         for (int i = 0; i < columns.length; i++) {
@@ -131,13 +134,13 @@ public class Beam42Exporter {
         if (surface_type._glass_name != null)
             return surface_type._glass_name;
         if (surface_type._nd == 0)
-            return "1.0";
+            return "1";
         return Double.toString(surface_type._nd);
     }
     String generate(Prescription prescription, int scenario) {
         StringBuilder sb = new StringBuilder();
         double wvln = SpectralLine.d;
-        sb.append(prescription._surfaces.length).append(" surfaces").append(System.lineSeparator());
+        sb.append(prescription._surfaces.length + 1).append(" surfaces").append(System.lineSeparator());
         //sb.append("Type   Index   Z    C    Dia   S    A2   A4   A6    A8    A10   A12   A14  ").append(System.lineSeparator());
         //sb.append("-----:-------:----:----:-----:----:----:-----:-----:-----:-----:-----:-----").append(System.lineSeparator());
         generate_heading(sb, opt_columns);
@@ -145,66 +148,68 @@ public class Beam42Exporter {
         double z = 0;
         // Refractive index is shown on next surface
         // value of 1.0 is for air
-        String index = "";
+        String index = "1";
         for (var e: prescription._surfaces) {
             if (e._is_aperture_stop || e._is_field_stop) {
-                sb.append(opt_columns[Type_col].pad("iris")).append(":")
-                        .append(opt_columns[Index_col].pad(index)).append(":")
-                        .append(opt_columns[Z_col].pad(z)).append(":")
-                        .append(opt_columns[C_col].pad(get_curvature(e))).append(":")
-                        .append(opt_columns[Dia_col].pad(get_diameter(e, scenario))).append(":")
-                        .append(opt_columns[S_col].pad("")).append(":")
-                        .append(opt_columns[A2_col].pad("")).append(":")
-                        .append(opt_columns[A4_col].pad("")).append(":")
-                        .append(opt_columns[A6_col].pad("")).append(":")
-                        .append(opt_columns[A8_col].pad("")).append(":")
-                        .append(opt_columns[A10_col].pad("")).append(":")
-                        .append(opt_columns[A12_col].pad("")).append(":")
-                        .append(opt_columns[A14_col].pad("")).append(": ");
+                sb.append(opt_columns[OPT_Type_col].pad("iris")).append(":")
+                        .append(opt_columns[OPT_Index_col].pad(index)).append(":")
+                        .append(opt_columns[OPT_Z_col].pad(z)).append(":")
+                        .append(opt_columns[OPT_C_col].pad(get_curvature(e))).append(":")
+                        .append(opt_columns[OPT_Dia_col].pad(get_diameter(e, scenario))).append(":")
+                        .append(opt_columns[OPT_S_col].pad("")).append(":")
+                        .append(opt_columns[OPT_A2_col].pad("")).append(":")
+                        .append(opt_columns[OPT_A4_col].pad("")).append(":")
+                        .append(opt_columns[OPT_A6_col].pad("")).append(":")
+                        .append(opt_columns[OPT_A8_col].pad("")).append(":")
+                        .append(opt_columns[OPT_A10_col].pad("")).append(":")
+                        .append(opt_columns[OPT_A12_col].pad("")).append(":")
+                        .append(opt_columns[OPT_A14_col].pad("")).append(": ");
             }
             else {
-                sb.append(opt_columns[Type_col].pad("lens")).append(":")
-                        .append(opt_columns[Index_col].pad(index)).append(":")
-                        .append(opt_columns[Z_col].pad(z)).append(":")
-                        .append(opt_columns[C_col].pad(get_curvature(e))).append(":")
-                        .append(opt_columns[Dia_col].pad(get_diameter(e, scenario))).append(":");
+                sb.append(opt_columns[OPT_Type_col].pad("lens")).append(":")
+                        .append(opt_columns[OPT_Index_col].pad(index)).append(":")
+                        .append(opt_columns[OPT_Z_col].pad(z)).append(":")
+                        .append(opt_columns[OPT_C_col].pad(get_curvature(e))).append(":")
+                        .append(opt_columns[OPT_Dia_col].pad(get_diameter(e, scenario))).append(":");
                 if (e.is_even_asphere()) {
-                    sb.append(opt_columns[S_col].pad(e.get_cc()+1.0)).append(":")
-                            .append(opt_columns[A2_col].pad(get_coeff(e,0))).append(":")
-                            .append(opt_columns[A4_col].pad(get_coeff(e,1))).append(":")
-                            .append(opt_columns[A6_col].pad(get_coeff(e,2))).append(":")
-                            .append(opt_columns[A8_col].pad(get_coeff(e,3))).append(":")
-                            .append(opt_columns[A10_col].pad(get_coeff(e,4))).append(":")
-                            .append(opt_columns[A12_col].pad(get_coeff(e,5))).append(":")
-                            .append(opt_columns[A14_col].pad(get_coeff(e,6))).append(": ");
+                    sb.append(opt_columns[OPT_S_col].pad(e.get_cc() + 1.0)).append(":")
+                            .append(opt_columns[OPT_A2_col].pad(get_coeff(e, 0))).append(":")
+                            .append(opt_columns[OPT_A4_col].pad(get_coeff(e, 1))).append(":")
+                            .append(opt_columns[OPT_A6_col].pad(get_coeff(e, 2))).append(":")
+                            .append(opt_columns[OPT_A8_col].pad(get_coeff(e, 3))).append(":")
+                            .append(opt_columns[OPT_A10_col].pad(get_coeff(e, 4))).append(":")
+                            .append(opt_columns[OPT_A12_col].pad(get_coeff(e, 5))).append(":")
+                            .append(opt_columns[OPT_A14_col].pad(get_coeff(e, 6))).append(": ");
+                } else if (e.is_aspheric()) {
+                    throw new UnsupportedOperationException("Only EVEN asphere supported at present");
                 } else {
-                    sb.append(opt_columns[S_col].pad("")).append(":")
-                            .append(opt_columns[A2_col].pad("")).append(":")
-                            .append(opt_columns[A4_col].pad("")).append(":")
-                            .append(opt_columns[A6_col].pad("")).append(":")
-                            .append(opt_columns[A8_col].pad("")).append(":")
-                            .append(opt_columns[A10_col].pad("")).append(":")
-                            .append(opt_columns[A12_col].pad("")).append(":")
-                            .append(opt_columns[A14_col].pad("")).append(": ");
+                    sb.append(opt_columns[OPT_S_col].pad("")).append(":")
+                            .append(opt_columns[OPT_A2_col].pad("")).append(":")
+                            .append(opt_columns[OPT_A4_col].pad("")).append(":")
+                            .append(opt_columns[OPT_A6_col].pad("")).append(":")
+                            .append(opt_columns[OPT_A8_col].pad("")).append(":")
+                            .append(opt_columns[OPT_A10_col].pad("")).append(":")
+                            .append(opt_columns[OPT_A12_col].pad("")).append(":")
+                            .append(opt_columns[OPT_A14_col].pad("")).append(": ");
                 }
             }
             z += e.get_thickness_by_scenario(scenario);
             index = get_refractive_index_or_glass(e);
             sb.append(System.lineSeparator());
         }
-        sb.append(opt_columns[Type_col].pad("film")).append(":")
-                        .append(opt_columns[Index_col].pad("")).append(":")
-                        .append(opt_columns[Z_col].pad(z)).append(":")
-                        .append(opt_columns[C_col].pad(0)).append(":")
-                        .append(opt_columns[Dia_col].pad(prescription._diameter_image_circle)).append(":")
-                        .append(opt_columns[S_col].pad("")).append(":")
-                        .append(opt_columns[A2_col].pad("")).append(":")
-                        .append(opt_columns[A4_col].pad("")).append(":")
-                        .append(opt_columns[A6_col].pad("")).append(":")
-                        .append(opt_columns[A8_col].pad("")).append(":")
-                        .append(opt_columns[A10_col].pad("")).append(":")
-                        .append(opt_columns[A12_col].pad("")).append(":")
-                        .append(opt_columns[A14_col].pad("")).append(": ");
+        sb.append(opt_columns[OPT_Type_col].pad("film")).append(":")
+                        .append(opt_columns[OPT_Index_col].pad("1")).append(":")
+                        .append(opt_columns[OPT_Z_col].pad(z)).append(":")
+                        .append(opt_columns[OPT_C_col].pad(0)).append(":")
+                        .append(opt_columns[OPT_Dia_col].pad(prescription._diameter_image_circle + 8.0)).append(":")
+                        .append(opt_columns[OPT_S_col].pad("")).append(":")
+                        .append(opt_columns[OPT_A2_col].pad("")).append(":")
+                        .append(opt_columns[OPT_A4_col].pad("")).append(":")
+                        .append(opt_columns[OPT_A6_col].pad("")).append(":")
+                        .append(opt_columns[OPT_A8_col].pad("")).append(":")
+                        .append(opt_columns[OPT_A10_col].pad("")).append(":")
+                        .append(opt_columns[OPT_A12_col].pad("")).append(":")
+                        .append(opt_columns[OPT_A14_col].pad("")).append(": ");
         return sb.toString();
     }
 
@@ -221,15 +226,15 @@ public class Beam42Exporter {
 //            new ColumnDef("@", 20, MathUtils.decimal_format(10)),
     };
 
-    static final int Ray_wave = 0;
-    static final int X0_col = 1;
-    static final int Y0_col = 2;
-    static final int Z0_col = 3;
-    static final int U0_col = 4;
-    static final int V0_col = 5;
-    static final int W0_col = 6;
-    static final int xfinal_col = 7;
-    static final int notes_col = 8;
+    static final int RAY_wave_col = 0;
+    static final int RAY_X0_col = 1;
+    static final int RAY_Y0_col = 2;
+    static final int RAY_Z0_col = 3;
+    static final int RAY_U0_col = 4;
+    static final int RAY_V0_col = 5;
+    static final int RAY_W0_col = 6;
+    static final int RAY_xfinal_col = 7;
+    static final int RAY_notes_col = 8;
 
     record RayStart(double wvl, Vector3 position, Vector3 direction) {}
 
@@ -240,7 +245,7 @@ public class Beam42Exporter {
         generate_heading_line(sb, ray_columns);
         for (var rayStart : rayStarts) {
             String indexName = "nd ";
-            String color = "y";
+            String color = "g";
             if (rayStart.wvl == SpectralLine.F) {
                 indexName = "nF ";
                 color = "b";
@@ -249,15 +254,15 @@ public class Beam42Exporter {
                 indexName = "nC ";
                 color = "r";
             }
-            sb.append(ray_columns[Ray_wave].pad(indexName)).append(color)
-                    .append(ray_columns[X0_col].pad(rayStart.position.x())).append(":")
-                    .append(ray_columns[Y0_col].pad(rayStart.position.y())).append(":")
-                    .append(ray_columns[Z0_col].pad(rayStart.position.z())).append(":")
-                    .append(ray_columns[U0_col].pad(rayStart.direction.x())).append(":")
-                    .append(ray_columns[V0_col].pad(rayStart.direction.y())).append(":")
-                    .append(ray_columns[W0_col].pad(rayStart.direction.z())).append(":")
-                    .append(ray_columns[xfinal_col].pad("")).append(":")
-                    .append(ray_columns[notes_col].pad("")).append(":")
+            sb.append(ray_columns[RAY_wave_col].pad(indexName)).append(color)
+                    .append(ray_columns[RAY_X0_col].pad(rayStart.position.x())).append(":")
+                    .append(ray_columns[RAY_Y0_col].pad(rayStart.position.y())).append(":")
+                    .append(ray_columns[RAY_Z0_col].pad(rayStart.position.z())).append(":")
+                    .append(ray_columns[RAY_U0_col].pad(rayStart.direction.x())).append(":")
+                    .append(ray_columns[RAY_V0_col].pad(rayStart.direction.y())).append(":")
+                    .append(ray_columns[RAY_W0_col].pad(rayStart.direction.z())).append(":")
+                    .append(ray_columns[RAY_xfinal_col].pad("")).append(":")
+                    .append(ray_columns[RAY_notes_col].pad("")).append(":")
                     .append(" ").append(System.lineSeparator());
 
         }
@@ -300,6 +305,25 @@ public class Beam42Exporter {
 //        return List.copyOf(result);
 //    }
 
+    private static Vector3 compute_ray_start(Field fld, Vector3 origin, double z_clearance) {
+        FieldSpec fov = fld.fov;
+        double ray_half_angle_in_radians = 0;
+        if (fov.key.imageKey == ImageKey.Object &&
+            fov.key.valueKey == ValueKey.Angle) {
+            ray_half_angle_in_radians = Math.toRadians(fov.value);
+        }
+        else
+            throw new UnsupportedOperationException("Field Spec is not specified in angle");
+        double z = origin.z;
+        double distance = z_clearance + z;
+        // tan(distance) tells us height of the triangle where tan(angle) = ht/distance.
+        double height_adjustment = ray_half_angle_in_radians != 0 ? Math.tan(ray_half_angle_in_radians) * distance : 1.0;
+        // Adjust y
+        double y_ht = origin.y - height_adjustment;
+        // Adjust z
+        return new Vector3(origin.x, y_ht, z-distance);
+    }
+
     public static RayStart chief_ray(OpticalModel model, Field field,
                                      double wavelength, double clearance) {
         Objects.requireNonNull(model, "model");
@@ -313,18 +337,24 @@ public class Beam42Exporter {
         options.rayerr_filter = "full";
         ChiefRayPkg crpkg = Trace.trace_chief_ray(model, field, wavelength, 0);
         RayPkg pkg = crpkg.chief_ray;
+        // Codex version
 //        Vector3 hit = sm.gbl_tfrms.get(1).rt.multiply(pkg.ray.get(1).p).add(sm.gbl_tfrms.get(1).t);
 //        Vector3 direction = sm.gbl_tfrms.get(0).rt.multiply(pkg.ray.get(0).d).normalize();
 //        if (Math.abs(direction.z) < 1.0e-14)
 //            throw new IllegalArgumentException("chief ray is parallel to the start plane");
 //        Vector3 position = hit.add(direction.times((planeZ - hit.z) / direction.z));
+        // Second version
         Vector3 position = pkg.ray.get(1).p;
         Vector3 direction = pkg.ray.get(0).d;
-        position = position.minus(direction.times(10));
+        position = position.add(direction.times(planeZ));
         return new RayStart(wavelength, position, direction);
+        // Third version
+//        Vector3 position = pkg.ray.get(1).p;    // Intersection at position
+//        Vector3 direction = pkg.ray.get(0).d;
+//        return new RayStart(wavelength,compute_ray_start(field,position,10),direction);
     }
 
-    static void create_rings(OpticalModel opt_model, Field fld, double wvl, double clearance, List<RayStart> rayStarts) {
+    static void create_rings(OpticalModel opt_model, Field fld, double wvl,Vector3 direction,double clearance, List<RayStart> rayStarts) {
         SequentialModel sm = opt_model.seq_model;
         var grid_def = new TraceRingsDef();
         grid_def.num_rings = 5;
@@ -334,15 +364,19 @@ public class Beam42Exporter {
                     null,false,new TraceOptions());
         for (var gridItem: gridList) {
             RayPkg pkg = gridItem.ray_pkg;
+            // Codex version
 //            Vector3 hit = sm.gbl_tfrms.get(1).rt.multiply(pkg.ray.get(1).p).add(sm.gbl_tfrms.get(1).t);
 //            Vector3 direction = sm.gbl_tfrms.get(0).rt.multiply(pkg.ray.get(0).d).normalize();
 //            if (Math.abs(direction.z) < 1.0e-14)
 //                throw new IllegalArgumentException("chief ray is parallel to the start plane");
 //            Vector3 position = hit.add(direction.times((planeZ - hit.z) / direction.z));
+            // Second versiom
             Vector3 position = pkg.ray.get(1).p;
-            Vector3 direction = pkg.ray.get(0).d;
-            position = position.minus(direction.times(10));
+            position = position.add(direction.times(planeZ));
             rayStarts.add(new RayStart(wvl, position, direction));
+            // Third version
+//            Vector3 position = pkg.ray.get(1).p;    // Intersection at position
+//            rayStarts.add(new RayStart(wvl,compute_ray_start(fld,position,10),direction));
         }
     }
 
@@ -371,16 +405,16 @@ public class Beam42Exporter {
     static void generate_rays_table(Prescription prescription, int scenario, double[] fields, String[] labels, Args arguments) throws IOException {
         var model = new RayOpticsModelBuilder(prescription).build_optical_model(true,fields,false,VigType.SetPupil,true,scenario);
         var fov = model.optical_spec.fov;
-        double[] wavelengths = {SpectralLine.d /*, SpectralLine.F, SpectralLine.C*/};
+        double[] wavelengths = {SpectralLine.d, SpectralLine.F, SpectralLine.C};
         for (int i = 0; i < fov.fields.length; i++) {
             var fld = fov.fields[i];
             List<RayStart> rayStarts = new ArrayList<>();
             for (var wvl: wavelengths) {
                 var rayStart = chief_ray(model, fld, wvl, REFERENCE_RAY_PLANE_CLEARANCE);
                 rayStarts.add(rayStart);
-                create_rings(model,fld,wvl,REFERENCE_RAY_PLANE_CLEARANCE,rayStarts);
+                var direction = rayStart.direction;
+                create_rings(model,fld,wvl,direction,REFERENCE_RAY_PLANE_CLEARANCE,rayStarts);
             }
-            //System.out.println(generate_rays_table(rayStarts));
             Helper.createOutputFile(Helper.getOutputPath(arguments, labels[i] + ".RAY"), generate_rays_table(rayStarts));
         }
     }
@@ -392,10 +426,10 @@ public class Beam42Exporter {
             new ColumnDef("nF", 10, M.decimal_format(6)),
     };
 
-    static final int Glass_col = 0;
-    static final int nd_col = 1;
-    static final int nC_col = 2;
-    static final int nF_col = 3;
+    static final int MED_Glass_col = 0;
+    static final int MED_nd_col = 1;
+    static final int MED_nC_col = 2;
+    static final int MED_nF_col = 3;
 
     static Set<Glass> get_glasses(Prescription prescription) {
         Set<Glass> glasses = new HashSet<>();
@@ -416,10 +450,10 @@ public class Beam42Exporter {
         generate_heading(sb, med_columns);
         generate_heading_line(sb, med_columns);
         for (var g: glasses) {
-            sb.append(med_columns[Glass_col].pad(g.name())).append(":")
-                    .append(med_columns[nd_col].pad(g.nd)).append(":")
-                    .append(med_columns[nC_col].pad(g.nC)).append(":")
-                    .append(med_columns[nF_col].pad(g.nF)).append(": ")
+            sb.append(med_columns[MED_Glass_col].pad(g.name())).append(":")
+                    .append(med_columns[MED_nd_col].pad(g.nd)).append(":")
+                    .append(med_columns[MED_nC_col].pad(g.nC)).append(":")
+                    .append(med_columns[MED_nF_col].pad(g.nF)).append(": ")
                     .append(System.lineSeparator());
         }
         Helper.createOutputFile(Helper.getOutputPath(arguments, ".MED"), sb.toString());
@@ -436,12 +470,8 @@ public class Beam42Exporter {
         Prescription prescription = Prescription.build_prescription(specs,true);
         Beam42Exporter exporter = new Beam42Exporter();
 
-        //System.out.println(exporter.generate(prescription, arguments.scenario));
         Helper.createOutputFile(Helper.getOutputPath(arguments, ".OPT"), exporter.generate(prescription, arguments.scenario));
-
         generate_rays_table(prescription,arguments.scenario,new double[] {0.0,1.0},new String[] {"","-SKEW"},arguments);
-
-        //System.out.println(exporter.generate(specs, system, arguments.scenario));
         generate_med_table(prescription,arguments);
     }
 }

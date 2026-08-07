@@ -1,8 +1,11 @@
 package com.stellarsoftware.beam.core.render;
 
 import com.stellarsoftware.beam.core.B4constants;
+import com.stellarsoftware.beam.core.Globals;
 import com.stellarsoftware.beam.core.U;
 import com.stellarsoftware.beam.core.analysis.LineSpreadMTF;
+
+import java.util.Arrays;
 
 @SuppressWarnings("serial")
 
@@ -27,6 +30,12 @@ import com.stellarsoftware.beam.core.analysis.LineSpreadMTF;
  * ray to the line-spread histogram only when the copied name matches (or the
  * filter is blank). DrawMTF therefore requires no separate wavelength handling:
  * it transforms the already-filtered H1D histogram.
+ *
+ * The H1D options also provide an MTF maximum plotting frequency. A blank or
+ * non-positive value plots the complete result through Nyquist. A positive
+ * value below Nyquist truncates the displayed and exported result at that
+ * frequency; the endpoint magnitude is linearly interpolated between the two
+ * surrounding FFT samples. The complete FFT is still calculated first.
  *
  * @author M.Lampton (c) STELLAR SOFTWARE 2004 all rights reserved.
  */
@@ -67,8 +76,25 @@ public class DrawMTF extends DrawBase
             lineSpread[i] = myH1DPanel.getHisto(i);
         LineSpreadMTF mtf = new LineSpreadMTF(lineSpread, histospan / nbins);
         double[] frequency = mtf.frequency();
-        dFrequency = frequency;
         double[] magnitude = mtf.magnitude();
+        // If user set a max frequency then limit the plot to user specified
+        // max frequency
+        double maxFrequency = U.suckDouble(Globals.reg.getuo(UO_1D, 9));
+        if (Double.isFinite(maxFrequency) && maxFrequency > 0.0
+                && maxFrequency < frequency[frequency.length - 1]) {
+            int upper = 1;
+            while (frequency[upper] < maxFrequency)
+                upper++;
+            double fraction = (maxFrequency - frequency[upper - 1])
+                    / (frequency[upper] - frequency[upper - 1]);
+            double endpoint = magnitude[upper - 1]
+                    + fraction * (magnitude[upper] - magnitude[upper - 1]);
+            frequency = Arrays.copyOf(frequency, upper + 1);
+            magnitude = Arrays.copyOf(magnitude, upper + 1);
+            frequency[upper] = maxFrequency;
+            magnitude[upper] = endpoint;
+        }
+        dFrequency = frequency;
         nplotfreqs = magnitude.length;
         nbins = nplotfreqs;
         dPower = new double[nplotfreqs];

@@ -738,9 +738,11 @@ class Options extends JMenu implements B4constants
         LabelDataBox hmax      = new LabelDataBox(UO_1D, 6, NCHARS); 
         LabelBitBox average    = new LabelBitBox(UO_1D, 7); 
         LabelDataBox wavelength = new LabelDataBox(UO_1D, 8, NCHARS);
+        LabelDataBox mtfMaxFrequency = new LabelDataBox(UO_1D, 9, NCHARS);
         
         int result = JOptionPane.showOptionDialog(frame,
-           new Object[] {var, nbins, bounds, hmin, hmax, average, wavelength},
+           new Object[] {var, nbins, bounds, hmin, hmax, average, wavelength,
+                   mtfMaxFrequency},
            "Histogram 1Dim Options", 
            JOptionPane.OK_CANCEL_OPTION, 
            JOptionPane.PLAIN_MESSAGE,
@@ -758,6 +760,7 @@ class Options extends JMenu implements B4constants
             Globals.reg.putuo(UO_1D, 6, hmax.getText());
             Globals.reg.putuo(UO_1D, 7, average.isSelected() ? "T" : "F");
             Globals.reg.putuo(UO_1D, 8, wavelength.getText().trim());
+            Globals.reg.putuo(UO_1D, 9, mtfMaxFrequency.getText().trim());
             updateAllInstances("Histo1Dim"); 
         }
     }

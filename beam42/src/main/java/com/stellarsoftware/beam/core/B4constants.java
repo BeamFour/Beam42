@@ -1014,7 +1014,8 @@ public interface B4constants
           {"Manual Min",        ""},  // 5
           {"Manual Max",        ""},  // 6
           {"Show average",     "T"},  // 7
-          {"Wavelength",        ""}   // 8; blank includes all wavelengths
+          {"Wavelength",        ""},  // 8; blank includes all wavelengths
+          {"MTF Max Frequency", "0"}  // 9; non-positive plots to Nyquist
        },
 
        {  // group 8 = UO_2D

@@ -175,7 +175,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
                 int linelen = getOneLineLength(j);
                 int count = Math.max(0, linelen - iOff);
                 String s = myEJIF.model().getLine(j, iOff, count);
-                g2.drawString(s, 0, (jwin+1)*charheight);
+                drawFixedWidthString(g2, s, (jwin+1)*charheight);
                 // alternative: g2.drawChars(....)
             }
             else                      // beyond the table
@@ -233,6 +233,26 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
             g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                                 RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
         }
+    }
+
+    /**
+     * Draws a row on the editor's fixed-width integer grid.
+     *
+     * A normal drawString() call may use fractional glyph advances, causing the
+     * displayed text to drift away from the integer coordinates used by the caret
+     * and mouse hit-testing. The glyph positions are therefore set explicitly from
+     * charwidth. Drawing the resulting GlyphVector in one operation also avoids the
+     * performance cost of making a separate draw call for every character.
+     */
+    private void drawFixedWidthString(Graphics2D g2, String s, int baseline)
+    {
+        GlyphVector glyphs =
+                g2.getFont().createGlyphVector(g2.getFontRenderContext(), s);
+
+        for (int i=0; i<glyphs.getNumGlyphs(); i++)
+            glyphs.setGlyphPosition(i, new Point(i*charwidth, 0));
+
+        g2.drawGlyphVector(glyphs, 0, baseline);
     }
 
     void setVerticalPosition(int rowNumber)
@@ -875,8 +895,7 @@ class EPanel extends JPanel implements B4constants, MouseWheelListener
     // Set the font:   g2.setFont(font);
     // Then, call this:
     {
-        FontRenderContext frc = g2.getFontRenderContext();
-        return (int) f.getStringBounds("a", frc).getWidth(); 
+        return Math.max(1, g2.getFontMetrics(f).charWidth('M'));
     }
 
 

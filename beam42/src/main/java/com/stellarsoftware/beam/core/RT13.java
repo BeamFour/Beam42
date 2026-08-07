@@ -186,6 +186,7 @@ public class RT13 implements B4constants
 
     public double  surfs[][]      = new double[MAXSURFS+1][ONPARMS];
     public double  raystarts[][]  = new double[MAXRAYS+1][RNSTARTS];
+    private final String[] rayWavelengthNames = new String[MAXRAYS+1];
     public double  spans[]        = new double[RNSTARTS];  // set by REJIF
     public double  smins[]        = new double[RNSTARTS];  // set by REJIF
     public double  smaxs[]        = new double[RNSTARTS];  // set by REJIF
@@ -452,6 +453,16 @@ public class RT13 implements B4constants
         }
     }
 
+    public void setRayWavelengthName(int ray, String wavelength) {
+        if (ray >= 0 && ray < rayWavelengthNames.length)
+            rayWavelengthNames[ray] = wavelength == null ? "" : wavelength.trim();
+    }
+
+    public String getRayWavelengthName(int ray) {
+        if (ray < 0 || ray >= rayWavelengthNames.length || rayWavelengthNames[ray] == null)
+            return "";
+        return rayWavelengthNames[ray];
+    }
 
   
     public int iBuildRays(boolean bAll)
@@ -995,6 +1006,7 @@ public class RT13 implements B4constants
         
         // Choose a random table kray for color, wavel, order.
         int krand = (int) (nrays * Math.random() + 1.0); 
+        setRayWavelengthName(0, getRayWavelengthName(krand));
 
         //----Construct the random ray values XYZUVWP here-------------
      

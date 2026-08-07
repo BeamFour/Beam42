@@ -91,7 +91,8 @@ class MTFPanel extends GPanel
             fw = new FileWriter(file);
             pw = new PrintWriter(fw);
             for (int i=0; i<drawMTF.nbins; i++)
-              pw.println(U.fwd(drawMTF.dPower[i],12,6));
+              pw.println(U.fwd(drawMTF.dFrequency[i],12,6) + " "
+                      + U.fwd(drawMTF.dPower[i],12,6));
             fw.close();
         }
         catch (Exception e)
@@ -99,4 +100,3 @@ class MTFPanel extends GPanel
     }
 
 }
-

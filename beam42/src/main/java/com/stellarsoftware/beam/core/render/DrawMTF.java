@@ -2,6 +2,7 @@ package com.stellarsoftware.beam.core.render;
 
 import com.stellarsoftware.beam.core.B4constants;
 import com.stellarsoftware.beam.core.U;
+import com.stellarsoftware.beam.core.analysis.LineSpreadMTF;
 
 @SuppressWarnings("serial")
 
@@ -12,6 +13,20 @@ import com.stellarsoftware.beam.core.U;
  * Font details are generated here when needed; uses LowerLeftOrigin.
  *
  * Needs to get properly centered and sized. Rect not square.
+ *
+ * The MTF is calculated from the line-spread histogram produced by DrawH1D.
+ * DrawH1D may be configured with an exact (trimmed) wavelength-name filter
+ * matching the text in the RAY table's @wave column. A blank filter includes
+ * all wavelengths. Filtering is applied before the automatic bounds and the
+ * histogram are calculated, so DrawMTF only receives the selected rays.
+ *
+ * Random rays use reserved ray slot zero; table rays are numbered from one.
+ * Before a random ray is traced, RT13 randomly chooses a table ray for its
+ * discrete properties and copies that ray's @wave text to slot zero. After the
+ * trace, DrawH1D applies its wavelength filter to slot zero and adds the random
+ * ray to the line-spread histogram only when the copied name matches (or the
+ * filter is blank). DrawMTF therefore requires no separate wavelength handling:
+ * it transforms the already-filtered H1D histogram.
  *
  * @author M.Lampton (c) STELLAR SOFTWARE 2004 all rights reserved.
  */
@@ -28,8 +43,8 @@ public class DrawMTF extends DrawBase
     public int nbins = 1;
     private int ncomplexpairs = 1;
     private int nplotfreqs = 1;
-    private double cData[] = new double[2*MAXBINS];  // real, imag, real...
-    public double[] dPower = new double[MAXBINS];
+    public double[] dPower = new double[0];
+    public double[] dFrequency = new double[0];
     private int  CADstyle=0;
     private int hnticks, hndigits, vnticks, vndigits;
     private double hticks[] = new double[12];
@@ -46,20 +61,21 @@ public class DrawMTF extends DrawBase
 
         myH1DPanel = h1d; // FIXME review this
         nbins = myH1DPanel.getNbins();
-        while ((ncomplexpairs < nbins) && (ncomplexpairs < 1024))
-            ncomplexpairs *= 2;
-
-        nplotfreqs = ncomplexpairs / 8; // 16;  // 8;  // 4;
-        nplotfreqs = 16;  // 32;
         histospan = myH1DPanel.getHistoSpan();
-        deltaf = 1.0 / histospan;
-        freqspan = deltaf * nplotfreqs;
-
-        for (int i=0; i<MAXBINS; i++)  // ok beyond nbins
-        {
-            cData[2*i] = (double) myH1DPanel.getHisto(i);
-            cData[2*i+1] = 0.0;
-        }
+        int[] lineSpread = new int[nbins];
+        for (int i=0; i<nbins; i++)
+            lineSpread[i] = myH1DPanel.getHisto(i);
+        LineSpreadMTF mtf = new LineSpreadMTF(lineSpread, histospan / nbins);
+        double[] frequency = mtf.frequency();
+        dFrequency = frequency;
+        double[] magnitude = mtf.magnitude();
+        nplotfreqs = magnitude.length;
+        nbins = nplotfreqs;
+        dPower = new double[nplotfreqs];
+        deltaf = frequency.length > 1 ? frequency[1] : 1.0;
+        freqspan = frequency[frequency.length - 1];
+        for (int i=0; i<nplotfreqs; i++)
+            dPower[i] = 100.0 * magnitude[i];
 
         // now set the local scale factors in host GPanel...
         uxspan = EXTRAROOM * freqspan;
@@ -79,18 +95,6 @@ public class DrawMTF extends DrawBase
             vticks[i] = i*20;
 
 
-        // now do the Fourier transform....
-        int nn[] = new int[1];
-        nn[0] = ncomplexpairs;
-        U.fourn(cData, nn, 1, 1);
-        for (int i=0; i<nplotfreqs; i++)
-            dPower[i] = cData[2*i]*cData[2*i] + cData[2*i+1]*cData[2*i+1];
-        if (dPower[0] > 0.0)
-        {
-            double coef = 100.0 / dPower[0];
-            for (int i=0; i<nplotfreqs; i++)
-                dPower[i] *= coef;
-        }
     }
 
 //-----------protected methods concretizing GPanel-------
@@ -229,16 +233,9 @@ public class DrawMTF extends DrawBase
 
         ////// Now plot the histogram....
 
-        double dx = freqspan / nplotfreqs;
-        add2D(0, 0, B4constants.MOVETO);
-        add2D(0, dPower[0], B4constants.PATHTO);     // up
-        add2D(dx, dPower[0], B4constants.PATHTO);    // and over
+        add2D(dFrequency[0], dPower[0], B4constants.MOVETO);
         for (int i=1; i<nplotfreqs; i++)
-        {
-            add2D(i*dx, dPower[i], B4constants.PATHTO);
-            int op = (i < nplotfreqs-1) ? B4constants.PATHTO : B4constants.STROKE;
-            add2D((i+1)*dx, dPower[i], op);
-        }
+            add2D(dFrequency[i], dPower[i],
+                    i < nplotfreqs-1 ? B4constants.PATHTO : B4constants.STROKE);
     }  // end of doArt()
 }
-

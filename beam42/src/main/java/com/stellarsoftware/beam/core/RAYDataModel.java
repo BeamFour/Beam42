@@ -105,6 +105,7 @@ public class RAYDataModel extends B4DataModel {
         for (int kray=0; kray<=MAXRAYS; kray++)
         {
             wavenames[kray] = "";
+            rt13.setRayWavelengthName(kray, "");
             for (int ia=0; ia<RNSTARTS; ia++)
                 rt13.raystarts[kray][ia] = -0.0; // -0.0 means absentee data
         }
@@ -206,6 +207,7 @@ public class RAYDataModel extends B4DataModel {
                     if (op == RSWAVEL)  // special case, no syntax check
                     {
                         wavenames[kray] = getFieldTrim(field, 2+kray);
+                        rt13.setRayWavelengthName(kray, wavenames[kray]);
                         if (wavenames[kray].length() < 1)
                             Globals.giFlags[RALLWAVESPRESENT] = 0;  // false
                         rt13.raystarts[kray][RSCOLOR] = U.getColorCode(getTag(field, 2+kray));

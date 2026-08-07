@@ -3,6 +3,7 @@ package com.stellarsoftware.beam.core.render;
 import com.stellarsoftware.beam.core.Globals;
 import com.stellarsoftware.beam.core.RAYDataModel;
 import com.stellarsoftware.beam.core.U;
+import com.stellarsoftware.beam.core.analysis.Histogram1D;
 
 import static com.stellarsoftware.beam.core.Globals.RT13;
 
@@ -69,6 +70,8 @@ public class DrawH1D extends DrawBase
 
     private int CADstyle=0;
     public int[] histo = new int[MAXBINS];
+    private Histogram1D histogram;
+    private String wavelength = "";
     private int vnticks, vndigits;
     private double vticks[] = new double[10];
     private String hst;
@@ -164,6 +167,7 @@ public class DrawH1D extends DrawBase
     // Parses UO fields, performs sizing; trace was already run.
     {
         bPleaseParseUO = false; // flag in GPanel
+        wavelength = Globals.reg.getuo(UO_1D, 8).trim();
 
         shmin = new String(""); // value label
         shmax = new String(""); // value label
@@ -183,10 +187,11 @@ public class DrawH1D extends DrawBase
         //  Goal here is to determine hmin, hmax.
 
         int ngood=0;
+        hmin = hmax = 0.0;
         RT13.iBuildRays(true);
         for (int kray=1; kray<=nrays; kray++)
         {
-            if (RT13.isRayOK[kray])
+            if (RT13.isRayOK[kray] && acceptsWavelength(kray))
             {
                 double h = RT13.dGetRay(kray, hsurf, hattr);
                 if (ngood==0)
@@ -274,8 +279,10 @@ public class DrawH1D extends DrawBase
 
         //---finally compute the table-ray histogram------
 
-        for (int i=0; i<MAXBINS; i++)
-            histo[i] = 0;
+        histogram = new Histogram1D(nbins, hmin, hmax);
+        histo = histogram.bins();
+        sum = 0.0;
+        count = 0;
 
         for (int kray=1; kray<=nrays; kray++)
             if (RT13.isRayOK[kray])
@@ -453,12 +460,16 @@ public class DrawH1D extends DrawBase
 
     private void addRayToHisto(int kray)
     {
+        if (!acceptsWavelength(kray))
+            return;
         double h = RT13.dGetRay(kray, hsurf, hattr);
-        int ih = (int) Math.floor(nbins*(h-hmin)/(hmax-hmin));
-        if ((ih>=0) && (ih<nbins))
-            histo[ih]++;
-        sum += h;
-        count++;
+        histogram.add(h);
+        sum = histogram.sum();
+        count = histogram.count();
+    }
+
+    private boolean acceptsWavelength(int kray) {
+        return wavelength.isEmpty() || wavelength.equals(RT13.getRayWavelengthName(kray).trim());
     }
 
 

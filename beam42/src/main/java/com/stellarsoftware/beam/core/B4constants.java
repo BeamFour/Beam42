@@ -1013,7 +1013,8 @@ public interface B4constants
           {"Manual Bounds",    "F"},  // 4
           {"Manual Min",        ""},  // 5
           {"Manual Max",        ""},  // 6
-          {"Show average",     "T"}   // 7
+          {"Show average",     "T"},  // 7
+          {"Wavelength",        ""}   // 8; blank includes all wavelengths
        },
 
        {  // group 8 = UO_2D
@@ -1230,4 +1231,3 @@ public interface B4constants
        }   
     };    
 } //--------end of B4onstants.java---------------------
-

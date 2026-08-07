@@ -763,6 +763,8 @@ public interface B4constants
     static final Color DGRAY = new Color(155, 155, 155); 
     static final Color LBLUE = new Color(192, 192, 255); 
     static final Color DRED  = new Color(155, 0, 0);
+    static final Color DGREEN = new Color(0, 138, 0);
+    static final Color DYELLOW = new Color(198, 146, 0);
 
     //------run menu item macros and strings for GJIF & DMF----------------
 

@@ -239,7 +239,7 @@ public class Beam42Exporter {
         generate_heading_line(sb, ray_columns);
         for (var rayStart : rayStarts) {
             String indexName = "nd ";
-            String color = "g";
+            String color = "y";
             if (rayStart.wvl == SpectralLine.F) {
                 indexName = "nF ";
                 color = "b";

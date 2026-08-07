@@ -940,8 +940,8 @@ abstract class GPanel extends JPanel implements B4constants, Printable
                       { 
                           case BLACK:   gX.setPaint(Color.BLACK); break; 
                           case RED:     gX.setPaint(Color.RED); break; 
-                          case GREEN:   gX.setPaint(Color.GREEN); break; 
-                          case YELLOW:  gX.setPaint(Color.YELLOW); break; 
+                          case GREEN:   gX.setPaint(DGREEN); break; 
+                          case YELLOW:  gX.setPaint(DYELLOW); break; 
                           case BLUE:    gX.setPaint(Color.BLUE); break; 
                           case MAGENTA: gX.setPaint(Color.MAGENTA); break;                       
                           case CYAN:    gX.setPaint(Color.CYAN); break; 

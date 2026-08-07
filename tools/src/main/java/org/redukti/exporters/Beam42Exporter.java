@@ -4,11 +4,9 @@ package org.redukti.exporters;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.mathlib.M;
 import org.redukti.mathlib.Vector3;
-import org.redukti.rayoptics.math.Tfm3d;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.*;
 import org.redukti.rayoptics.seq.Glass;
-import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.util.SpectralLine;
 import org.redukti.spec.Prescription;
@@ -268,41 +266,19 @@ public class Beam42Exporter {
     public static final double REFERENCE_RAY_PLANE_CLEARANCE = 10.0;
 
     static void create_rings(OpticalModel opt_model, Field fld, double wvl,double clearance, List<RayStart> rayStarts) {
-        SequentialModel sm = opt_model.seq_model;
         var grid_def = new TraceRingsDef();
         grid_def.num_rings = 5;
-        double planeZ = object_side_surface_z(sm) - clearance;
         var gridList = Trace.trace_rings(opt_model,grid_def,fld,wvl,0.0,
                     null,false,new TraceOptions());
         for (var gridItem: gridList) {
             RayPkg pkg = gridItem.ray_pkg;
-            Vector3 position = pkg.ray.get(1).p;
-            Vector3 direction = pkg.ray.get(0).d;
-            position = position.add(direction.times(planeZ));
+            Vector3 hit = pkg.ray.get(1).p;
+            Vector3 direction = pkg.ray.get(0).d.normalize();
+            if (direction.z <= 1.0e-14)
+                throw new IllegalArgumentException("Ray does not propagate towards positive z");
+            Vector3 position = hit.minus(direction.times(clearance / direction.z));
             rayStarts.add(new RayStart(wvl, position, direction));
         }
-    }
-
-    private static double object_side_surface_z(SequentialModel sm) {
-        var surface = sm.ifcs.get(1);
-        Tfm3d tfm = sm.gbl_tfrms.get(1);
-        double radius = Math.max(0.0, surface.max_aperture);
-        double minZ = Double.POSITIVE_INFINITY;
-        for (int ri = 0; ri <= 128; ri++) {
-            double r = radius * ri / 128.0;
-            int count = ri == 0 ? 1 : 256;
-            for (int ai = 0; ai < count; ai++) {
-                double angle = 2.0 * Math.PI * ai / count;
-                double x = r * Math.cos(angle), y = r * Math.sin(angle);
-                try {
-                    double z = tfm.rt.multiply(new Vector3(x, y, surface.profile.sag(x, y))).add(tfm.t).z;
-                    if (Double.isFinite(z)) minZ = Math.min(minZ, z);
-                } catch (RuntimeException ignored) { }
-            }
-        }
-        if (!Double.isFinite(minZ))
-            throw new IllegalArgumentException("unable to determine the object-side extent of surface 1");
-        return minZ;
     }
 
     static void generate_rays_table(Prescription prescription, int scenario, double[] fields, String[] labels, Args arguments) throws IOException {

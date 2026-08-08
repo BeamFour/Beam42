@@ -65,7 +65,7 @@ public interface B4constants
     static final int MAXRINGS       = (int) (-0.5+Math.sqrt(12*MAXRAYS-3.)/6.);
     static final int MAXMEDIA       = 200;       // < JMAX
     static final int MAXGOALS       = 7;         // AutoAdjust
-    // static final int MAXWFEGROUPS   = 100; 
+    static final int MAXWFEGROUPS   = 100;
     static final int MAXADJ         = 100; 
     static final int MAXMAP         = 100;  
     static final int MAXMP          = 9;      // multiplots per axis

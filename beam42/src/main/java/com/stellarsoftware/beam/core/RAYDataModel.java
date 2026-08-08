@@ -251,6 +251,7 @@ public class RAYDataModel extends B4DataModel {
         Globals.giFlags[RSYNTAXERR] = rsyntaxerr;
         Globals.giFlags[RALLWAVESNUMERIC] = allWavesNumeric ? 1 : 0;
         Globals.giFlags[RNADJ] = iParseAdjustables(nrays);
+        Globals.giFlags[RNWFEGROUPS] = iParseWFEgroups(nrays);
 
         setSminsSpans();
 
@@ -467,14 +468,13 @@ public class RAYDataModel extends B4DataModel {
         return (c=='?') || Character.isLetter(c);
     }
 
-/*
     private int iParseWFEgroups(int nrays)
     // Fills in RT13.iWFEgroup[kray].
     // Groups are numbered 0, 1, ...ngroups-1.
     // Returns how many groups were found based on WFE tags.
     {
         for (int k=1; k<=nrays; k++)    // First, assign everything to
-          RT13.iWFEgroup[k] = 0;        // group number zero.
+          rt13.iWFEgroup[k] = 0;        // group number zero.
 
         if (fwfe < 0)                   // No WFE field present?
           return 1;                     // Then just one huge group.
@@ -489,6 +489,9 @@ public class RAYDataModel extends B4DataModel {
         {
             if (bLookedAt[ktop])              // skip; already catalogued.
               continue;
+            // Preserve the historical fixed-size storage without allowing a
+            // malformed table containing more cohort tags to index past it.
+            int group = Math.min(ngroups, MAXWFEGROUPS-1);
             char tag = getTag(fwfe, ktop+2);
 
             // Search for all cohorts here and below
@@ -497,19 +500,17 @@ public class RAYDataModel extends B4DataModel {
             {
                 if (!bLookedAt[k] && (tag==getTag(fwfe, k+2)))
                 {
-                    RT13.iWFEgroup[k] = ngroups;
+                    rt13.iWFEgroup[k] = group;
                     bLookedAt[k] = true;
                     nrayspergroup++;     // diagnostic
                     nraysfound++;        // diagnostic
                 }
             }
-            ngroups++;
+            if (ngroups < MAXWFEGROUPS)
+                ngroups++;
         }
         return ngroups;
     }
-*/
-
-
     private void setSminsSpans()
     // Examines tabulated raystarts[] for extreme values;
     // Sets smins[][], spans[][] for use by randomizer in RT13.
@@ -519,6 +520,7 @@ public class RAYDataModel extends B4DataModel {
     // A207: WFEgroups eliminated
     {
         int nrays = Globals.giFlags[RNRAYS];
+        int ngroups = Math.min(Globals.giFlags[RNWFEGROUPS], MAXWFEGROUPS);
         for (int iatt=RX; iatt<=RW; iatt++)
         {
             // System.out.println("REJIF.setSminsSpans() is starting iatt = "+iatt);
@@ -559,6 +561,35 @@ public class RAYDataModel extends B4DataModel {
             // System.out.printf("REJIF.setSminsSpans() returning iatt, xmin, span = %3d %8.4f %8.4f \n", iatt, xmin, xmax-xmin);
 
         } //---------------done with all attributes---------------------
+
+        for (int group=0; group<ngroups; group++)
+        {
+            for (int iatt=RX; iatt<=RW; iatt++)
+            {
+                boolean present = false;
+                double min = 0.0, max = 0.0;
+                for (int k=1; k<=nrays; k++)
+                {
+                    if (rt13.iWFEgroup[k] != group)
+                        continue;
+                    double value = rt13.raystarts[k][iatt];
+                    if (U.isNegZero(value))
+                        continue;
+                    if (!present)
+                    {
+                        min = max = value;
+                        present = true;
+                    }
+                    else
+                    {
+                        min = Math.min(min, value);
+                        max = Math.max(max, value);
+                    }
+                }
+                rt13.groupMins[group][iatt] = present ? min : -0.0;
+                rt13.groupSpans[group][iatt] = present ? max-min : -0.0;
+            }
+        }
     } //-----------------done setting spans-----------------------
 
 }

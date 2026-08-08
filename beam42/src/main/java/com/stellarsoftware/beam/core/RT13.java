@@ -180,6 +180,7 @@ import com.stellarsoftware.beam.ui.DMF;
 public class RT13 implements B4constants
 {
     private int iFailSurf, iFailCode; // for AutoAdjust line 298
+    private boolean groupedRandomizationEnabled;
     
     /*--------public input working arrays for OEJIF and REJIF------*/
     /*-------RNSTARTS = 10, the number of ray start attributes-----*/
@@ -190,6 +191,8 @@ public class RT13 implements B4constants
     public double  spans[]        = new double[RNSTARTS];  // set by REJIF
     public double  smins[]        = new double[RNSTARTS];  // set by REJIF
     public double  smaxs[]        = new double[RNSTARTS];  // set by REJIF
+    public double  groupSpans[][] = new double[MAXWFEGROUPS][RNSTARTS];
+    public double  groupMins[][]  = new double[MAXWFEGROUPS][RNSTARTS];
     public double  media[][]      = new double[MAXMEDIA+1][MAXFIELDS];
 
     public int     gO2M[] = new int[MAXSURFS+1]; // from DMF; for jsurf gives glass ID
@@ -205,7 +208,7 @@ public class RT13 implements B4constants
 
     public double  refractLayoutShading[] = new double[MAXSURFS+1];
     public boolean isRayOK[] = new boolean[MAXRAYS+1];
-    // public static int     iWFEgroup[] = new int[MAXRAYS+1];  // eliminated A207
+    public int iWFEgroup[] = new int[MAXRAYS+1];
     // public static double     dot[] = new double[MAXRAYS+1];  // moved into attribs
     
 
@@ -223,6 +226,16 @@ public class RT13 implements B4constants
         return iFailCode;
     }
 
+    public boolean isGroupedRandomizationEnabled()
+    {
+        return groupedRandomizationEnabled;
+    }
+
+    public void setGroupedRandomizationEnabled(boolean enabled)
+    {
+        groupedRandomizationEnabled = enabled;
+    }
+
     public double dGetRay(int kray, int j, int iattrib)
     // Accesses any one ray trace result, after iBuildRays() has been run.
     // "j" is the desired surface number.
@@ -234,8 +247,8 @@ public class RT13 implements B4constants
             double x = dRays[kray][j][iattrib];
             return x; 
         }
-        // if (iattrib == RTWFE)
-        //   return dWFE[kray]; //--why use a special array for WFE?
+        if (iattrib == RTWFE)
+          return dWFE[kray];
         return -0.0; 
     }
 
@@ -505,7 +518,7 @@ public class RT13 implements B4constants
                   isRayOK[k] = bOK;
             }
         }
-        // doWFEtask(ngood, gnrays, gnsurfs); // temporary elimination
+        doWFEtask(ngood, gnrays, gnsurfs);
         return ngood; 
     } //---end of iBuildRays()------
 
@@ -730,9 +743,38 @@ public class RT13 implements B4constants
 
 
     public boolean bRunRandomRay()
-    // This edition has no WFE group support. A207
+    // This runs bRunray() whose iInitRaySeq() does the randomization.
+    // Of course assumes that raystarts[] is current and correct!
+    // Then this does all the WFE correction stuff.
+    // Assumes that doWFEtask() has been run, thereby building
+    // group arrays sWFE[], eWFE[], ijWFE[][], and tiltWFE[][].
+    // But yikes! a random ray won't have any "group" identity since
+    // it could have been randomed to any intermediate field point.
+    // Ergo, no way to apply WFE correction to a random ray
+    // except via start & end tilts.  May as well use kGuideRay???
     {
-        return bRunOneRay(0);   // includes iCreateOneRandomRayStart()
+        int nsurfs = Globals.giFlags[ONSURFS];
+        boolean ok = bRunOneRay(0);
+        dWFE[0] = -0.0;
+        if (!ok || !isGroupedRandomizationEnabled())
+            return ok;
+
+        int group = iWFEgroup[kGuideRay];
+        double startCorrection =
+              (dRays[0][0][RX] - sWFE[group][RX]) * dRays[0][0][RU]
+            + (dRays[0][0][RY] - sWFE[group][RY]) * dRays[0][0][RV]
+            + (dRays[0][0][RZ] - sWFE[group][RZ]) * dRays[0][0][RW];
+        double endCorrection =
+              (dRays[0][nsurfs][RX] - eWFE[group][RX]) * dRays[0][nsurfs][RU]
+            + (dRays[0][nsurfs][RY] - eWFE[group][RY]) * dRays[0][nsurfs][RV]
+            + (dRays[0][nsurfs][RZ] - eWFE[group][RZ]) * dRays[0][nsurfs][RW];
+        dWFE[0] = dRays[0][nsurfs][RPATH] + startCorrection - endCorrection - avgWFE[group];
+        int jx = ijWFE[group][0];
+        int jy = ijWFE[group][1];
+        dWFE[0] -= tiltWFE[group][0]
+                + tiltWFE[group][1] * dRays[0][nsurfs][jx]
+                + tiltWFE[group][2] * dRays[0][nsurfs][jy];
+        return true;
     }
 
 
@@ -757,19 +799,17 @@ public class RT13 implements B4constants
     
     /*--------------for WFE table and random-----------------*/
 
-    // private static double dWFE[]      = new double[MAXRAYS+1];      
-    // private static double sWFE[][]    = new double[MAXWFEGROUPS][3]; 
-    // private static double eWFE[][]    = new double[MAXWFEGROUPS][3]; 
-    // private static double avgWFE[]    = new double[MAXWFEGROUPS]; 
-    // private static double tiltWFE[][] = new double[MAXWFEGROUPS][3]; 
-    // private static int    ijWFE[][]   = new int[MAXWFEGROUPS][2];     // pupil
+    private double dWFE[]      = new double[MAXRAYS+1];
+    private double sWFE[][]    = new double[MAXWFEGROUPS][3];
+    private double eWFE[][]    = new double[MAXWFEGROUPS][3];
+    private double avgWFE[]    = new double[MAXWFEGROUPS];
+    private double tiltWFE[][] = new double[MAXWFEGROUPS][3];
+    private int    ijWFE[][]   = new int[MAXWFEGROUPS][2];
     
     private int ngood = 0;
     
     
-/* A207 eliminated this task temporarily
-
-    static private void doWFEtask(int gngood, int gnrays, int gnsurfs)
+    private void doWFEtask(int gngood, int gnrays, int gnsurfs)
     // Run this after each ray trace regardless of presence of WFEcolumn.
     // It computes dWFE[] using dRays[][][] data. 
     // It saves ray start sWFE[][] and ray end eWFE[][] information,
@@ -789,7 +829,7 @@ public class RT13 implements B4constants
         if (gngood < 1)
           return; 
 
-        int ngroups = DMF.giFlags[RNWFEGROUPS];
+        int ngroups = Math.min(Globals.giFlags[RNWFEGROUPS], MAXWFEGROUPS);
 
         for (int ig=0; ig<ngroups; ig++)           //---zero start & end----
         {
@@ -858,7 +898,7 @@ public class RT13 implements B4constants
             }
             if (ngg < 1)
             {
-               return; 
+               continue;
             }
             avgWFE[ig] /= ngg; 
         }
@@ -883,7 +923,7 @@ public class RT13 implements B4constants
                     ngg++; 
                 }
             }
-            if (bGetPupil(rr, ig, ngg, ijWFE[ig]))
+            if (bGetBestPupil(rr, ig, ngg, ijWFE[ig]))
             {
                 int jx = ijWFE[ig][0]; 
                 int jy = ijWFE[ig][1]; 
@@ -899,7 +939,6 @@ public class RT13 implements B4constants
             } 
         }
     } //----------finished with doWFEtable()-----------------------
-*/
 
 
     static private boolean bGetBestPupil(double rr[][], int g, int n, int ij[])
@@ -1003,14 +1042,17 @@ public class RT13 implements B4constants
         double  dConcen   = U.suckDouble(Globals.reg.getuo(UO_RAND, 12));
         dConcen = Math.max(1, dConcen); 
         int which = bCosine ? 1 : bBell ? 2 : bGauss ? 3: bLorentz ? 4 : 0;  
+        boolean grouped = isGroupedRandomizationEnabled();
         
         // Choose a random table kray for color, wavel, order.
         int krand = (int) (nrays * Math.random() + 1.0); 
+        int group = iWFEgroup[krand];
         setRayWavelengthName(0, getRayWavelengthName(krand));
 
         //----Construct the random ray values XYZUVWP here-------------
      
-        int krandxyz = (int) (nrays * Math.random() + 1.0);  
+        int krandxyz = grouped ? randomRayInGroup(group, nrays)
+                               : (int) (nrays * Math.random() + 1.0);
         for (int i=RX; i<=RZ; i++)
         {   
             boolean bAbsent = U.isNegZero(raystarts[krand][i]); 
@@ -1021,13 +1063,16 @@ public class RT13 implements B4constants
             else
             {
                 if (bXYZcontinuous)        // continuous distribution
-                   raystarts[0][i] = smins[i] + getRand(which, dConcen)*spans[i]; 
+                   raystarts[0][i] = grouped
+                           ? groupMins[group][i] + getRand(which, dConcen)*groupSpans[group][i]
+                           : smins[i] + getRand(which, dConcen)*spans[i];
                 else                       // discrete distribution
                    raystarts[0][i] = raystarts[krandxyz][i]; 
             }
         }  
 
-        int kranduvw = (int) (nrays * Math.random() + 1.0);           
+        int kranduvw = grouped ? randomRayInGroup(group, nrays)
+                               : (int) (nrays * Math.random() + 1.0);
         for (int i=RU; i<=RW; i++)
         {   
             boolean bAbsent = U.isNegZero(raystarts[krand][i]); 
@@ -1038,7 +1083,9 @@ public class RT13 implements B4constants
             else
             {
                 if (bUVWcontinuous)
-                    raystarts[0][i] = smins[i] + getRand(which, dConcen)*spans[i]; 
+                    raystarts[0][i] = grouped
+                            ? groupMins[group][i] + getRand(which, dConcen)*groupSpans[group][i]
+                            : smins[i] + getRand(which, dConcen)*spans[i];
                 else
                     raystarts[0][i] = raystarts[kranduvw][i]; 
             }
@@ -1097,6 +1144,21 @@ public class RT13 implements B4constants
         // System.out.printf("RT13.iCreateRandomRay() has generated V0 = %8.4f \n", raystarts[0][RV]);
         // System.out.printf("RT13.iCreateRandomRay() has generated W0 = %8.4f \n", raystarts[0][RW]);
         return krand;
+    }
+
+    private int randomRayInGroup(int group, int nrays)
+    {
+        int count = 0;
+        for (int k=1; k<=nrays; k++)
+            if (iWFEgroup[k] == group)
+                count++;
+        if (count == 0)
+            return 1;
+        int selected = (int) (count * Math.random());
+        for (int k=1; k<=nrays; k++)
+            if (iWFEgroup[k] == group && selected-- == 0)
+                return k;
+        return 1;
     }
 
 

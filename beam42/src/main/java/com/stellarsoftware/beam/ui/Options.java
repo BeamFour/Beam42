@@ -838,9 +838,11 @@ class Options extends JMenu implements B4constants
         BorVertRadioBox xyz = new BorVertRadioBox("X0 Y0 Z0", UO_RAND, 3, 2);         // two buttons
         BorVertRadioBox uvw = new BorVertRadioBox("U0 V0 W0", UO_RAND, 5, 2);         // two buttons
         BorVertRadioField brf = new BorVertRadioField("Distribution", UO_RAND,7,5);
+        JCheckBox groupedWfe = new JCheckBox("Enable grouped WFE randomization?",
+                Globals.RT13.isGroupedRandomizationEnabled());
 
         int result = JOptionPane.showOptionDialog(frame,
-           new Object[] {refresh, tries, succ, xyz, uvw, brf}, 
+           new Object[] {refresh, tries, succ, xyz, uvw, brf, groupedWfe},
            "Random Ray Options", 
            JOptionPane.OK_CANCEL_OPTION, 
            JOptionPane.PLAIN_MESSAGE,
@@ -861,6 +863,7 @@ class Options extends JMenu implements B4constants
             for (int i=0; i<5; i++)   // five buttons
               Globals.reg.putuo(UO_RAND, 7+i, brf.isSelected(i) ? "T" : "F");
             Globals.reg.putuo(UO_RAND, 12, brf.getText());
+            Globals.RT13.setGroupedRandomizationEnabled(groupedWfe.isSelected());
         }
     }
     

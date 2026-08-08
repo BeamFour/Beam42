@@ -3,9 +3,13 @@
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.seq;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 public class Glass extends Medium {
 
@@ -113,6 +117,14 @@ public class Glass extends Medium {
 
     record GlassName(String catalog_name, String glass_name) {}
 
+    public record GlassMatch(Glass glass, double nd_difference, double vd_difference,
+                             double score, boolean exact) {}
+
+    public static final double DEFAULT_ND_TOLERANCE = 0.005;
+    public static final double DEFAULT_VD_TOLERANCE = 1.0;
+    public static final double EXACT_ND_TOLERANCE = 0.00001;
+    public static final double EXACT_VD_TOLERANCE = 0.1;
+
     static String[] catalog_priority = {
             "Hoya",
             "Ohara",
@@ -144,9 +156,59 @@ public class Glass extends Medium {
         return glasses.get(new GlassName(get_catalog_name(catalog_name), glass_name));
     }
     public static Map<GlassName, Glass> glasses = new HashMap<>();
+    private static final NavigableMap<Double, List<Glass>> glasses_by_nd = new TreeMap<>();
 
     public static void addGlass(Glass glass) {
         glasses.put(new GlassName(glass.catalog_name,glass.label),glass);
+        glasses_by_nd.computeIfAbsent(glass.nd, ignored -> new ArrayList<>()).add(glass);
+    }
+
+    public static List<GlassMatch> find_glasses(double nd, double vd) {
+        return find_glasses(nd, vd, DEFAULT_ND_TOLERANCE, DEFAULT_VD_TOLERANCE, 3);
+    }
+
+    public static List<GlassMatch> find_glasses(double nd, double vd,
+                                                 double nd_tolerance,
+                                                 double vd_tolerance,
+                                                 int limit) {
+        if (!Double.isFinite(nd) || !Double.isFinite(vd) ||
+                nd_tolerance <= 0.0 || vd_tolerance <= 0.0 || limit <= 0)
+            return List.of();
+
+        var matches = new ArrayList<GlassMatch>();
+        var candidates = glasses_by_nd.subMap(nd - nd_tolerance, true,
+                nd + nd_tolerance, true);
+        for (var glasses_at_index: candidates.values()) {
+            for (Glass glass: glasses_at_index) {
+                double nd_difference = Math.abs(glass.nd - nd);
+                double vd_difference = Math.abs(glass.vd - vd);
+                if (vd_difference > vd_tolerance)
+                    continue;
+                double score = Math.pow(nd_difference / nd_tolerance, 2.0)
+                        + Math.pow(vd_difference / vd_tolerance, 2.0);
+                boolean exact = nd_difference <= EXACT_ND_TOLERANCE
+                        && vd_difference <= EXACT_VD_TOLERANCE;
+                matches.add(new GlassMatch(glass, nd_difference, vd_difference, score, exact));
+            }
+        }
+        matches.sort(Comparator
+                .comparing(GlassMatch::exact).reversed()
+                .thenComparingInt(match -> match.exact
+                        ? catalog_rank(match.glass.catalog_name) : 0)
+                .thenComparingDouble(GlassMatch::score)
+                .thenComparingDouble(GlassMatch::nd_difference)
+                .thenComparingDouble(GlassMatch::vd_difference)
+                .thenComparingInt(match -> catalog_rank(match.glass.catalog_name))
+                .thenComparing(match -> match.glass.label));
+        return List.copyOf(matches.subList(0, Math.min(limit, matches.size())));
+    }
+
+    private static int catalog_rank(String catalog_name) {
+        for (int i = 0; i < catalog_priority.length; i++) {
+            if (catalog_priority[i].equals(catalog_name))
+                return i;
+        }
+        return catalog_priority.length;
     }
     static void add_hikari_glasses() {
 // Hikari

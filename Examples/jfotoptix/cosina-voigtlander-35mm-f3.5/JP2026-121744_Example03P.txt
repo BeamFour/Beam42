@@ -1,0 +1,41 @@
+[descriptive data]
+title	JP 2026-121744 Example 3 (Cosina Color Skopar 35mm F3.5 Aspherical)
+[variable distances]
+Focal Length	35.74	undefined
+Angle of View	61.50	undefined
+F-Number	3.58	undefined
+Total Length	40.03	43.12
+Image Height	43.26	43.26
+Magnification	0	-0.08661
+d0	Infinity	450.00
+Bf	15.11	18.20
+[lens data]
+1	13.403	3.11	1.91082	12.66	35.25
+2	-179.549	0.90	1.80809	11.15	22.76
+3	15.453	3.10		8.61
+4	AS	2.64		7.919
+5	-14.459	0.90	1.61340	8.09	44.27
+6	42.264	2.45	1.88300	10.62	40.81
+7	-42.264	0.25		11.81
+8	31.099	3.67	1.49700	15.99	81.61
+9	-31.099	5.80		15.99
+10	-25.356	2.10	1.51633	16.69	64.06
+11	-100.000	Bf		22.11
+[aspherical data]
+10	-25.356	0	-5.5781E-04	2.2937E-06	-6.1771E-08	1.0322E-09	-4.0737E-12
+11	-100.000	0	-4.1509E-04	2.7671E-06	-2.4381E-08	2.5192E-10	-8.7175E-13
+[group data]
+G2a	5	7	-73.89
+L3	8	9	31.91
+[figure]
+source	Data/JP2026-121744_Figure05.png
+originX	52.32
+originY	458.28
+ppmm	22.800
+[figure]
+source	Data/JP2026-121744_Figure05P.png
+originX	75.07
+originY	225.93
+ppmm	19.394
+[notes]
+Bill: Measured Magnification.

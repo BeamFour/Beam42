@@ -81,7 +81,7 @@ class MPlotPanel extends GPanel
 
     MPlotPanel(GJIF gj)
     {
-        super(new DrawMPlot());
+        super(new DrawMPlot(DMF.mejif == null ? null : DMF.mejif.model()));
         myGJIF = gj;           // protected; used here & GPanel
         drawMPlot = (DrawMPlot) drawBase;
     }

@@ -141,11 +141,17 @@ public class DrawMPlot extends DrawBase
 
     private int ngood[][];          // i, j
 
-    MEDDataModel medDataModel;
+    private final MEDDataModel medDataModel;
 
 
     public DrawMPlot()
     {
+        this(null);
+    }
+
+    public DrawMPlot(MEDDataModel medDataModel)
+    {
+        this.medDataModel = medDataModel;
         uxspan = 1.0;          // parent GPanel setup
         uxcenter = 0.0;        // parent GPanel setup
         uyspan = 1.0;          // parent GPanel setup
@@ -449,7 +455,6 @@ public class DrawMPlot extends DrawBase
     {
         if (frag.length()<1)
             return "Zero wave length";           // SNH
-        // FIXME medDataModel must be set
         if ((0== Globals.giFlags[MPRESENT]) || (null==medDataModel))
             return "Media table is required";    // SNH
         for (int f=1; f<MAXFIELDS; f++)

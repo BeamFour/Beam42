@@ -9,7 +9,7 @@ public class B4DataParser {
     private MEDDataModel medDataModel;
     private RT13 rt13;
 
-    public B4DataParser(OPTDataModel optDataModel, RAYDataModel rayDataModel, MEDDataModel medDataModeln, RT13 rt13) {
+    public B4DataParser(OPTDataModel optDataModel, RAYDataModel rayDataModel, MEDDataModel medDataModel, RT13 rt13) {
         this.optDataModel = optDataModel;
         this.rayDataModel = rayDataModel;
         this.medDataModel = medDataModel;

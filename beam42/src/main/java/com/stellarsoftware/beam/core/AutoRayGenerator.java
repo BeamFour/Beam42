@@ -163,7 +163,7 @@ public class AutoRayGenerator implements B4constants
     }
 
     public Comparo getResults() {
-        Comparo comparo = new Comparo(optEditor, rayEditor, Globals.RT13);
+        Comparo comparo = new Comparo(optEditor, rayEditor, rt13);
         comparo.doResiduals();
         int nptest = comparo.iGetNPTS();
         double sos = comparo.dGetSOS();

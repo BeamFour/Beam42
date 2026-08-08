@@ -86,7 +86,8 @@ public class RayOpticsExporter {
             if (s.get_surface_type() == OpticalBenchDataImporter.SurfaceType.surface) {
                 if (s.get_refractive_index() != 0.0) {
                     String glassName = s.get_glass_name();
-                    Glass glass = glassName != null ? Glass.glass_by_name(glassName) : null;
+                    String catalogName = Glass.get_catalog_name(s.get_catalog_name());
+                    Glass glass = glassName != null ? Glass.glass_by_catalog_name(catalogName, glassName) : null;
                     if (glass != null && glass.catalog_name != null && use_glass_types) {
                         fp.append("sm.add_surface([")
                                 .append(s.get_radius()).append(",")

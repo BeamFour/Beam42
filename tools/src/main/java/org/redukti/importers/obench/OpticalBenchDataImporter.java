@@ -4,6 +4,8 @@ Copyright (c) 2021 Dibyendu Majumdar
 */
 package org.redukti.importers.obench;
 
+import org.redukti.rayoptics.seq.Glass;
+
 import java.io.File;
 import java.nio.file.Files;
 import java.util.*;
@@ -187,6 +189,7 @@ public class OpticalBenchDataImporter {
             _abbe_vd = 0;
             _is_cover_glass = false;
             _glass_name = null;
+            _catalog_name = null;
         }
 
         public SurfaceType get_surface_type() {
@@ -275,6 +278,10 @@ public class OpticalBenchDataImporter {
 
         public String get_glass_name() { return _glass_name; }
 
+        void set_catalog_name(String name) { _catalog_name = name; }
+
+        public String get_catalog_name() { return _catalog_name; }
+
         public List<Double> get_thickness_by_scenario() {
             return _thickness_by_scenario;
         }
@@ -293,6 +300,7 @@ public class OpticalBenchDataImporter {
         private boolean _is_cover_glass;
         private AsphericalData _aspherical_data;
         private String _glass_name;
+        private String _catalog_name;
     }
 
     public static final class LensSpecifications {
@@ -429,6 +437,10 @@ public class OpticalBenchDataImporter {
                         }
                         if (words.length >= 7 && !words[6].isEmpty()) {
                             surface_data.set_glass_name(words[6]);
+                        }
+                        if (words.length >= 8 && !words[7].isEmpty()) {
+                            String catalog_name = Glass.get_catalog_name(words[7]);
+                            surface_data.set_catalog_name(catalog_name);
                         }
                         surfaces_.add(surface_data);
                     }

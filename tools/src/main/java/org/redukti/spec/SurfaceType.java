@@ -16,6 +16,7 @@ public class SurfaceType {
     public boolean _is_field_stop;
     public double _nd;
     public double _vd;
+    public String _catalog_name;
     public String _glass_name;
     // Aspheric
     public int _asph_type;
@@ -32,7 +33,7 @@ public class SurfaceType {
     public double[] _thickness_by_scenario;
     public double[] _diameter_by_scenario;
 
-    public SurfaceType(String id, boolean is_aperture_stop, double radius, double thickness, double diameter, double nd, double vd, String glass_name) {
+    public SurfaceType(String id, boolean is_aperture_stop, double radius, double thickness, double diameter, double nd, double vd, String glass_name, String catalog_name) {
         this._id = id;
         this._radius = radius;
         this._thickness = thickness;
@@ -41,6 +42,7 @@ public class SurfaceType {
         this._nd = nd;
         this._vd = vd;
         this._glass_name = glass_name;
+        this._catalog_name = catalog_name;
         this._asph_type = 0;
     }
     public SurfaceType set_thickness_by_scenario(double[] thickness_by_scenario) {
@@ -91,6 +93,7 @@ public class SurfaceType {
     public String get_glass_name() {
         return _glass_name;
     }
+    public String get_catalog_name() { return _catalog_name; }
     public boolean is_aspheric() {
         return _asph_type != 0;
     }
@@ -122,7 +125,7 @@ public class SurfaceType {
         double nd = _nd;
         double vd = _vd;
         if (nd != 0.0 && _glass_name != null) {
-            glass = Glass.glass_by_name(_glass_name);
+            glass = Glass.glass_by_catalog_name(_catalog_name, _glass_name);
             if (glass != null) {
                 nd = glass.nd;
                 vd = glass.vd;
@@ -135,8 +138,11 @@ public class SurfaceType {
         if (nd != 0.0)
             sb.append(vd);
         sb.append("\t");
-        if (glass != null)
-            sb.append(_glass_name);
+        if (glass != null) {
+            sb.append(_glass_name)
+                    .append("\t")
+                    .append(glass.catalog_name);
+        }
         sb.append("\n");
         return sb;
     }
@@ -242,21 +248,23 @@ public class SurfaceType {
             sb.append(_diameter);
         sb.append(" | ");
         String glassMaker = "";
-        if (_nd != 0.0 && _glass_name != null) {
-            Glass glass = Glass.glass_by_name(_glass_name);
+        double nd = _nd;
+        double vd = _vd;
+        if (nd != 0.0 && _glass_name != null) {
+            Glass glass = Glass.glass_by_catalog_name(_catalog_name, _glass_name);
             if (glass != null) {
-                _nd = glass.nd;
-                _vd = glass.vd;
+                nd = glass.nd;
+                vd = glass.vd;
                 glassMaker = glass.catalog_name;
             }
         }
-        if (_nd != 0.0)
-            sb.append(_nd);
+        if (nd != 0.0)
+            sb.append(nd);
         sb.append(" | ");
-        if (_nd != 0.0)
-            sb.append(_vd);
+        if (nd != 0.0)
+            sb.append(vd);
         sb.append(" | ");
-        if (_nd != 0.0 && _glass_name != null) {
+        if (nd != 0.0 && _glass_name != null) {
             sb.append(glassMaker)
                     .append(" | ")
                     .append(_glass_name);

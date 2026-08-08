@@ -92,24 +92,24 @@ public class Prescription {
         this._wvls = wvls;
         this._wts = wts;
     }
-    public Prescription surf(double radius, double thickness, double diameter, double nd, double vd, String glass_name) {
-        _surface_list.add(new SurfaceType(Integer.toString(_surface_list.size()+1), false, radius, thickness, diameter, nd, vd, glass_name));
+    public Prescription surf(double radius, double thickness, double diameter, double nd, double vd, String glass_name, String catalog_name) {
+        _surface_list.add(new SurfaceType(Integer.toString(_surface_list.size()+1), false, radius, thickness, diameter, nd, vd, glass_name, catalog_name));
         return this;
     }
     public Prescription surf(double radius, double thickness, double diameter, double nd, double vd) {
-        _surface_list.add(new SurfaceType(Integer.toString(_surface_list.size()+1),false, radius, thickness, diameter, nd, vd, null));
+        _surface_list.add(new SurfaceType(Integer.toString(_surface_list.size()+1),false, radius, thickness, diameter, nd, vd, null, null));
         return this;
     }
     public Prescription surf(double radius, double thickness, double diameter) {
-        _surface_list.add(new SurfaceType(Integer.toString(_surface_list.size()+1),false, radius, thickness, diameter, 0, 0, null));
+        _surface_list.add(new SurfaceType(Integer.toString(_surface_list.size()+1),false, radius, thickness, diameter, 0, 0, null, null));
         return this;
     }
     public Prescription stop(double thickness, double diameter) {
-        _surface_list.add(new SurfaceType(Integer.toString(_surface_list.size()+1),true,0,thickness,diameter,0,0,null));
+        _surface_list.add(new SurfaceType(Integer.toString(_surface_list.size()+1),true,0,thickness,diameter,0,0,null, null));
         return this;
     }
     public Prescription field_stop(double thickness, double diameter) {
-        var surface = new SurfaceType(Integer.toString(_surface_list.size()+1),false,0,thickness,diameter,0,0,null);
+        var surface = new SurfaceType(Integer.toString(_surface_list.size()+1),false,0,thickness,diameter,0,0,null, null);
         surface._is_field_stop = true;
         _surface_list.add(surface);
         return this;
@@ -172,6 +172,7 @@ public class Prescription {
         double abbe_vd = surface.get_abbe_vd();
         double diameter = surface.get_diameter(scenario);
         String glass_name = surface.get_glass_name();
+        String catalog_name = surface.get_catalog_name();
         if (surface.get_surface_type() == OpticalBenchDataImporter.SurfaceType.aperture_stop) {
             stop(thickness,diameter);
             return this;
@@ -180,8 +181,8 @@ public class Prescription {
             field_stop(thickness,diameter);
             return this;
         }
-        if (use_glass_types && glass_name != null && Glass.glass_by_name(glass_name) != null) {
-            surf(radius,thickness,diameter,refractive_index,abbe_vd,glass_name);
+        if (use_glass_types && glass_name != null && Glass.glass_by_catalog_name(catalog_name, glass_name) != null) {
+            surf(radius,thickness,diameter,refractive_index,abbe_vd,glass_name,catalog_name);
         }
         else if (refractive_index != 0.0) {
             surf(radius,thickness,diameter,refractive_index, abbe_vd);

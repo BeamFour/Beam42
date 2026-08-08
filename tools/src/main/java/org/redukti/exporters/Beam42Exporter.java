@@ -311,9 +311,9 @@ public class Beam42Exporter {
 
     static Set<Glass> get_glasses(Prescription prescription) {
         Set<Glass> glasses = new HashSet<>();
-        for (var e: prescription._surfaces) {
-            if (e._glass_name != null) {
-                Glass g = Glass.glass_by_name(e._glass_name);
+        for (SurfaceType s: prescription._surfaces) {
+            if (s._glass_name != null) {
+                Glass g = Glass.glass_by_catalog_name(s._catalog_name, s._glass_name);
                 if (g != null)
                     glasses.add(g);
             }

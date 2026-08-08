@@ -87,7 +87,7 @@ public class RayOpticsModelBuilder {
         double thickness = s.get_thickness_by_scenario(config);
 
         if (s.get_refractive_index() != 0.0) {
-            var glass = Glass.glass_by_name(s.get_glass_name());
+            var glass = Glass.glass_by_catalog_name(s.get_catalog_name(), s.get_glass_name());
             if (glass == null) {
                 sm.add_surface(new SurfaceData(s.get_radius_of_curvature(), thickness)
                         .max_aperture(ap_radius)

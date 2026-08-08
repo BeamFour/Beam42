@@ -50,17 +50,4 @@ public class Medium {
     public String name() {
         return label;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Medium medium = (Medium) o;
-        return Double.compare(medium.nd, nd) == 0 && Objects.equals(label, medium.label) && Objects.equals(catalog_name, medium.catalog_name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(label, nd, catalog_name);
-    }
 }

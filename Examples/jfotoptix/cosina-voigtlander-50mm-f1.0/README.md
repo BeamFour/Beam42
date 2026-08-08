@@ -16,15 +16,15 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 6 | 19.835 | 12.05 | 32.78 |  |  |  |
 | 7 | AS | 3.24 | 31.881 |  |  |  |
 | 8 | -40.995 | 1.55 | 31.89 | 1.76182 | 26.61 | Hoya | FD140 |
-| 9 | 26.578 | 10.8 | 35.18 | 1.883 | 40.81 | Hoya | TAFD30 |
+| 9 | 26.578 | 10.8 | 35.18 | 1.883 | 40.69 | Hikari | J-LASF08A |
 | 10 | -90.702 | 0.31 | 35.18 |  |  |  |
-| 11 | 78.611 | 5.05 | 36.44 | 1.883 | 40.81 | Hoya | TAFD30 |
+| 11 | 78.611 | 5.05 | 36.44 | 1.883 | 40.69 | Hikari | J-LASF08A |
 | 12 | -125.199 | 0.31 | 36.44 |  |  |  |
-| 13 | 53.736 | 9.47 | 31.18 | 1.883 | 40.81 | Hoya | TAFD30 |
+| 13 | 53.736 | 9.47 | 31.18 | 1.883 | 40.69 | Hikari | J-LASF08A |
 | 14 | -78.407 | 1.55 | 31.18 | 1.55298 | 55.07 | Hikari | J-KZFH4 |
 | 15 | 45.846 | 1.42 | 25.18 |  |  |  |
 | 16 | 3376.612 | 2.78 | 28.08 | 1.80835 | 40.55 | Ohara | L-LAH84 |
-| 17 | 120.496 | 18.722 | 25.76 |  |  |  |
+| 17 | 120.496 | 18.721 | 25.76 |  |  |  |
 ## Aspherical Data
 | ID  | Type | k   | P1 | P2 | P3 | P4 | P5 | P6 | P7 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -32,10 +32,8 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 16| EVEN | -20.0 | 0.0 | 2.4371E-5 | -9.23649E-8 | 1.14851E-9 | -1.18851E-11 | 5.37423E-14 | -9.17045E-17 |
 | 17| EVEN | 20.0 | 0.0 | 3.37528E-5 | -2.40831E-8 | -1.16539E-10 | 1.9524E-13 | -7.7965E-16 | 2.20734E-18 |
 ## Layouts
-![Layout Only](./layoutonly.svg)
-![Layout Field 0.0](./layout.svg)
-![Layout Field 0.7](./layout-semi-skew.svg)
-![Layout Field 1.0](./layout-skew.svg)
+![Layout Elements](./layoutonly.svg)
+![Layout](./layout.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew.svg)
@@ -55,7 +53,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | fno | 1.043
 | enp_dist_P | 38.303
 | enp_radius | 23.966
-| exp_dist_P' | -23.298
+| exp_dist_P' | -23.297
 | exp_radius | 20.152
 | m | -0
 | red | -2.0000928296044186E8
@@ -68,29 +66,29 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 15.946 | 33.891|
- | Field(x=0.0, y=0.1) | 17.213 | 51.13|
- | Field(x=0.0, y=0.2) | 17.057 | 51.527|
- | Field(x=0.0, y=0.3) | 16.165 | 53.179|
- | Field(x=0.0, y=0.4) | 16.104 | 56.571|
- | Field(x=0.0, y=0.5) | 15.935 | 58.228|
- | Field(x=0.0, y=0.6) | 16.726 | 55.275|
- | Field(x=0.0, y=0.7) | 20.174 | 66.731|
- | Field(x=0.0, y=0.8) | 26.614 | 92.611|
- | Field(x=0.0, y=0.9) | 35.752 | 132.056|
- | Field(x=0.0, y=1.0) | 40.727 | 135.262|
+ | Field(x=0.0, y=0.0) | 16.545 | 34.938|
+ | Field(x=0.0, y=0.1) | 17.816 | 52.338|
+ | Field(x=0.0, y=0.2) | 17.684 | 52.722|
+ | Field(x=0.0, y=0.3) | 16.826 | 55.902|
+ | Field(x=0.0, y=0.4) | 16.735 | 58.958|
+ | Field(x=0.0, y=0.5) | 16.471 | 60.297|
+ | Field(x=0.0, y=0.6) | 17.121 | 57.02|
+ | Field(x=0.0, y=0.7) | 20.386 | 67.806|
+ | Field(x=0.0, y=0.8) | 26.696 | 93.718|
+ | Field(x=0.0, y=0.9) | 35.749 | 131.148|
+ | Field(x=0.0, y=1.0) | 39.368 | 131.156|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d), 486.1327(F), 656.2725(C) were calculated across 10 fields, and then averaged
 ## Polychromatic Geometric MTF (Weighted)
 ![Polychromatic Geometrical MTF Weighted](./mtf-w.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./JP2023-063766_Example01P.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-05-01
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-08-08

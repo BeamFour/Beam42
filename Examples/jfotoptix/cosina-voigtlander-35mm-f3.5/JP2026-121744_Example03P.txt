@@ -39,3 +39,14 @@ originY	225.93
 ppmm	19.394
 [notes]
 Bill: Measured Magnification.
+[patent info]
+country	JP
+number	JP 2026-098935
+example	2
+year applied	2025
+inventors	Nozomu Mishima
+current assignee	Cosina Inc
+original assignee	Cosina Inc
+link	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2026-121744/11/en
+[report data]
+lens name	Cosina Voigtlander COLOR-SKOPAR 35mm F3.5 Aspherical

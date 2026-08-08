@@ -1,3 +1,8 @@
+# Cosina Voigtlander COLOR-SKOPAR 35mm F3.5 Aspherical
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|JP | JP 2026-098935 | 2 | 2025 | Nozomu Mishima | Cosina Inc | [link](https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2026-121744/11/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

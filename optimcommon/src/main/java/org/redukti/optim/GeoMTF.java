@@ -11,7 +11,7 @@ public class GeoMTF extends Goal {
     /**
      * @param analysis Results from current iteration
      * @param field Fields start at 1
-     * @param xy    xy==0 mean sagitall, xy==1 means tangential, fields are on y axis
+     * @param xy    xy==0 mean sagittal, xy==1 means tangential, fields are on y axis
      * @param freq  MTF frequency
      * @param target    The goal
      * @param weight    Weighting

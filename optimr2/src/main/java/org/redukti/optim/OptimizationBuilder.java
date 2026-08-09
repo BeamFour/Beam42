@@ -23,7 +23,7 @@ public final class OptimizationBuilder {
     private double[] fields;
     private int[] mtfFrequencies;
     private int[] curvatureSurfaces = new int[0];
-ad    private boolean allCurvatureSurfaces;
+    private boolean allCurvatureSurfaces;
     private int[] thicknessSurfaces = new int[0];
     private boolean includeExistingAspherics;
     private boolean weighted = true;

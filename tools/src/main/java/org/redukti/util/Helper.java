@@ -2,7 +2,6 @@ package org.redukti.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,7 +31,7 @@ public class Helper {
         return Paths.get(path.getParent().toString(), arguments.outputFile + extension);
     }
 
-    public static Path getOutputPath(String specfile, String outputFile, String outdir) {
+    public static Path getOutputFileWithPath(String specfile, String outputFile, String outdir) {
         if (outputFile == null) {
             throw new IllegalArgumentException("Output file name not specified");
         }
@@ -68,11 +67,11 @@ public class Helper {
 
     public static void createOutputFile(Path outpath, String string) throws IOException {
         try {
-            Files.write(outpath, string.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            Files.writeString(outpath, string, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         }
-        catch (Exception e) {
-            System.err.println("Failed to create file " + outpath);
-            e.printStackTrace();
+        catch (IOException e) {
+            System.err.println("Failed to create file " + outpath + ": " + e.getMessage());
+            throw e;
         }
     }
 }

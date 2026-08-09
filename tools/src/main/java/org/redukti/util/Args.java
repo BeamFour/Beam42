@@ -18,6 +18,7 @@ public final class Args {
     public boolean use_grid_pattern = false;
     public boolean auto_size_spots = false;
     public boolean do_wideangle_layout = false;
+    public boolean force = false;
 
     public static Args parseArguments(String[] args) {
         Args arguments = new Args();
@@ -55,6 +56,9 @@ public final class Args {
             }
             else if (arg1.equals("--exclude-lost-rays")) {
                 arguments.include_lost_rays = false;
+            }
+            else if (arg1.equals("--force")) {
+                arguments.force = true;
             }
             else if (arg1.equals("--trace-density")) {
                 arguments.trace_density = Integer.parseInt(arg2);

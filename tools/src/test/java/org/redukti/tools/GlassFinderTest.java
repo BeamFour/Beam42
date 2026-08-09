@@ -16,7 +16,7 @@ class GlassFinderTest {
                 + "[notes]\n"
                 + "unchanged\n";
 
-        GlassFinder.EnrichmentResult result = GlassFinder.enrich(input);
+        GlassFinder.EnrichmentResult result = GlassFinder.enrich(input,false);
         Glass expected = Glass.find_glasses(1.58267, 46.48).get(0).glass();
 
         assertEquals(1, result.selected());
@@ -32,7 +32,7 @@ class GlassFinderTest {
         String input = "[lens data]\n"
                 + "1\t50\t4\t1.58270\t20\t46.50\n";
 
-        GlassFinder.EnrichmentResult result = GlassFinder.enrich(input);
+        GlassFinder.EnrichmentResult result = GlassFinder.enrich(input,false);
 
         assertEquals(0, result.selected());
         assertEquals(1, result.ambiguous());
@@ -45,7 +45,7 @@ class GlassFinderTest {
         String input = "[lens data]\n"
                 + "1\t50\t4\t1.58267\t20\t46.19\tBAF3\tSchott\n";
 
-        GlassFinder.EnrichmentResult result = GlassFinder.enrich(input);
+        GlassFinder.EnrichmentResult result = GlassFinder.enrich(input,false);
 
         assertEquals(input, result.text());
         assertEquals(0, result.selected());
@@ -57,8 +57,8 @@ class GlassFinderTest {
         String input = "[lens data]\n"
                 + "1\t50\t4\t1.58270\t20\t46.50\n";
 
-        String first = GlassFinder.enrich(input).text();
-        String second = GlassFinder.enrich(first).text();
+        String first = GlassFinder.enrich(input,false).text();
+        String second = GlassFinder.enrich(first,false).text();
 
         assertEquals(first, second);
     }
@@ -71,7 +71,7 @@ class GlassFinderTest {
                 + "\tcandidate=Ohara/FPL51,nd=1.49700,vd=81.61,dnd=0.00000,dvd=0.01"
                 + "\tcandidate=Schott/N-PK52A,nd=1.49700,vd=81.61,dnd=0.00000,dvd=0.01\n";
 
-        GlassFinder.EnrichmentResult result = GlassFinder.enrich(input);
+        GlassFinder.EnrichmentResult result = GlassFinder.enrich(input, false);
 
         assertEquals(1, result.selected());
         assertEquals(0, result.ambiguous());
@@ -85,7 +85,7 @@ class GlassFinderTest {
         String input = "[lens data]\n"
                 + "1\t50\t4\t1.10\t20\t10.0\n";
 
-        GlassFinder.EnrichmentResult result = GlassFinder.enrich(input);
+        GlassFinder.EnrichmentResult result = GlassFinder.enrich(input, false);
 
         assertEquals(1, result.unmatched());
         assertEquals(input, result.text());

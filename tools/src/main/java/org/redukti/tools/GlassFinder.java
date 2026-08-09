@@ -1,6 +1,8 @@
 package org.redukti.tools;
 
 import org.redukti.rayoptics.seq.Glass;
+import org.redukti.util.Args;
+import org.redukti.util.Helper;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,7 +21,7 @@ public final class GlassFinder {
 
     public record EnrichmentResult(String text, int selected, int ambiguous, int unmatched) {}
 
-    public static EnrichmentResult enrich(String input) {
+    public static EnrichmentResult enrich(String input, boolean force) {
         String newline = input.contains("\r\n") ? "\r\n" : "\n";
         boolean endsWithNewline = input.endsWith("\n");
         String[] lines = input.split("\\r?\\n", -1);
@@ -43,7 +45,7 @@ public final class GlassFinder {
 
             String[] fields = line.split("\\t", -1);
             if (fields.length < 6 || fields[1].equals("AS") || fields[1].equals("FS") ||
-                    fields[1].equals("CG") || !isEmpty(fields, 6) || !isEmpty(fields, 7)) {
+                    fields[1].equals("CG")) {
                 output.add(line);
                 continue;
             }
@@ -51,6 +53,12 @@ public final class GlassFinder {
             Double nd = parseDouble(fields[3]);
             Double vd = parseDouble(fields[5]);
             if (nd == null || vd == null || nd == 0.0 || vd == 0.0) {
+                output.add(line);
+                continue;
+            }
+
+            if (!isEmpty(fields, 6) && !isEmpty(fields, 7)
+                    && !force && Glass.get_catalog_name(fields[7]) != null) {
                 output.add(line);
                 continue;
             }
@@ -130,24 +138,19 @@ public final class GlassFinder {
     }
 
     public static void main(String[] args) throws IOException {
-        Path input = null;
-        Path output = null;
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("--specfile") && i + 1 < args.length)
-                input = Path.of(args[++i]);
-            else if (args[i].equals("-o") && i + 1 < args.length)
-                output = Path.of(args[++i]);
-            else {
-                usage();
-                System.exit(2);
-            }
-        }
-        if (input == null || output == null) {
+        Args arguments = Args.parseArguments(args);
+        if (arguments.specfile == null) {
             usage();
             System.exit(2);
         }
+        Path input = Path.of(arguments.specfile);
+        Path output;
+        if (arguments.outputFile != null)
+            output = Path.of(arguments.outputFile);
+        else
+            output = Helper.getOutputFileWithPath(arguments.specfile,"specs.txt",null);
 
-        EnrichmentResult result = enrich(Files.readString(input));
+        EnrichmentResult result = enrich(Files.readString(input), arguments.force);
         Files.writeString(output, result.text());
         System.out.printf("Selected %d glass types; %d ambiguous; %d unmatched%n",
                 result.selected(), result.ambiguous(), result.unmatched());

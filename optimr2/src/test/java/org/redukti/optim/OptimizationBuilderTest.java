@@ -129,6 +129,27 @@ class OptimizationBuilderTest {
     }
 
     @Test
+    void appendsUserSuppliedVariablesAndAnalysisBoundGoals() {
+        Prescription prescription = prescription();
+        Var customVariable = new VarThickness(prescription, 0);
+        var setup = OptimizationBuilder.builder(prescription)
+                .fields(0.0)
+                .mtfFrequencies(10)
+                .dLineOnly(true)
+                .additionalVariables(customVariable)
+                .additionalGoals(analysis -> new GoalSpotRMS(analysis, 1, 7.5, 4.0))
+                .build();
+
+        assertEquals(1, setup.variables().length);
+        assertEquals(customVariable, setup.variables()[0]);
+        Goal customGoal = setup.goals()[setup.goals().length - 1];
+        GoalSpotRMS spotGoal = assertInstanceOf(GoalSpotRMS.class, customGoal);
+        assertEquals(setup.analysis(), spotGoal._analysis);
+        assertEquals(7.5, spotGoal._target);
+        assertEquals(4.0, spotGoal._weight);
+    }
+
+    @Test
     void validatesMtfArrayLengthsAndMeasuredFrequencies() {
         assertThrows(IllegalArgumentException.class, () ->
                 OptimizationBuilder.builder(prescription())
@@ -152,6 +173,11 @@ class OptimizationBuilderTest {
                         .mtfFrequencies(10)
                         .spotRmsGoals(new double[]{10.0})
                         .build());
+
+        Prescription prescription = prescription();
+        assertThrows(IllegalArgumentException.class, () ->
+                OptimizationBuilder.builder(prescription)
+                        .additionalVariables(new VarThickness(prescription(), 0)));
     }
 
     private static void assertMtf(Goal goal, int frequency, int field, int orientation,

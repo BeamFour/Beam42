@@ -29,6 +29,8 @@ public final class OptimizationBuilder {
     private boolean weighted = true;
     private boolean dLineOnly;
     private final List<MtfGoals> mtfGoals = new ArrayList<>();
+    private final List<Var> additionalVariables = new ArrayList<>();
+    private final List<GoalFactory> additionalGoalFactories = new ArrayList<>();
     private SpotGoals spotRmsGoals;
     private SpotGoals spotMaxRadiusGoals;
 
@@ -131,6 +133,35 @@ public final class OptimizationBuilder {
         return this;
     }
 
+    /** Adds caller-defined variables after the automatically generated variables. */
+    public OptimizationBuilder additionalVariables(Var... variables) {
+        if (variables == null)
+            throw new IllegalArgumentException("additional variables must not be null");
+        for (Var variable : variables) {
+            if (variable == null)
+                throw new IllegalArgumentException("additional variables must not contain null");
+            if (variable._prescription != prescription)
+                throw new IllegalArgumentException("additional variables must use this builder's prescription");
+            additionalVariables.add(variable);
+        }
+        return this;
+    }
+
+    /**
+     * Adds caller-defined goals after the automatically generated goals.
+     * Factories receive the exact Analysis owned by the resulting setup.
+     */
+    public OptimizationBuilder additionalGoals(GoalFactory... factories) {
+        if (factories == null)
+            throw new IllegalArgumentException("additional goal factories must not be null");
+        for (GoalFactory factory : factories) {
+            if (factory == null)
+                throw new IllegalArgumentException("additional goal factories must not contain null");
+            additionalGoalFactories.add(factory);
+        }
+        return this;
+    }
+
     public OptimizationSetup build() {
         validate();
         Analysis analysis = new Analysis(prescription, copy(fields), copy(mtfFrequencies));
@@ -169,6 +200,7 @@ public final class OptimizationBuilder {
                 }
             }
         }
+        result.addAll(additionalVariables);
         return result;
     }
 
@@ -210,6 +242,14 @@ public final class OptimizationBuilder {
                                 prescription._wvls[wavelength], 0.0, weight));
                 }
             }
+        }
+        for (GoalFactory factory : additionalGoalFactories) {
+            Goal goal = factory.create(analysis);
+            if (goal == null)
+                throw new IllegalArgumentException("an additional goal factory returned null");
+            if (goal._analysis != analysis)
+                throw new IllegalArgumentException("additional goals must use the Analysis supplied to their factory");
+            result.add(goal);
         }
         return result;
     }
@@ -353,6 +393,11 @@ public final class OptimizationBuilder {
             Arrays.fill(weights, 1.0);
             return weights;
         }
+    }
+
+    @FunctionalInterface
+    public interface GoalFactory {
+        Goal create(Analysis analysis);
     }
 
     public static final class OptimizationSetup {

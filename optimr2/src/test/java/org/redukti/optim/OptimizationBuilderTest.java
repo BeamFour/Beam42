@@ -22,6 +22,8 @@ class OptimizationBuilderTest {
                 .asph(SurfaceType.ASPH_EVEN, -0.5,
                         new double[]{0.0, 2.5e-6, 0.0, -4.0e-10})
                 .surf(-50.0, 20.0, 30.0)
+                .stop(1.0, 20.0)
+                .surf(0.0, 5.0, 30.0)
                 .build();
     }
 
@@ -89,6 +91,44 @@ class OptimizationBuilderTest {
     }
 
     @Test
+    void buildsSpotGoalsWithOptionalFieldWeights() {
+        var setup = OptimizationBuilder.builder(prescription())
+                .fields(0.0, 1.0)
+                .mtfFrequencies(10)
+                .spotRmsGoals(new double[]{8.0, 20.0}, new double[]{3.0, 1.0})
+                .spotMaxRadiusGoals(new double[]{15.0, 50.0})
+                .build();
+
+        Goal[] goals = setup.goals();
+        GoalSpotRMS rms0 = assertInstanceOf(GoalSpotRMS.class, goals[0]);
+        GoalSpotRMS rms1 = assertInstanceOf(GoalSpotRMS.class, goals[1]);
+        GoalSpotMaxRadius max0 = assertInstanceOf(GoalSpotMaxRadius.class, goals[2]);
+        GoalSpotMaxRadius max1 = assertInstanceOf(GoalSpotMaxRadius.class, goals[3]);
+        assertEquals(8.0, rms0._target);
+        assertEquals(3.0, rms0._weight);
+        assertEquals(20.0, rms1._target);
+        assertEquals(1.0, rms1._weight);
+        assertEquals(15.0, max0._target);
+        assertEquals(1.0, max0._weight);
+        assertEquals(50.0, max1._target);
+        assertEquals(1.0, max1._weight);
+    }
+
+    @Test
+    void selectsAllCurvedNonStopSurfaces() {
+        Var[] variables = OptimizationBuilder.builder(prescription())
+                .fields(0.0)
+                .mtfFrequencies(10)
+                .allCurvatureSurfaces()
+                .build()
+                .variables();
+
+        assertEquals(2, variables.length);
+        assertEquals(0, ((VarRadius) variables[0])._surface_id);
+        assertEquals(1, ((VarRadius) variables[1])._surface_id);
+    }
+
+    @Test
     void validatesMtfArrayLengthsAndMeasuredFrequencies() {
         assertThrows(IllegalArgumentException.class, () ->
                 OptimizationBuilder.builder(prescription())
@@ -104,6 +144,13 @@ class OptimizationBuilderTest {
                         .mtfFrequencies(10)
                         .mtfGoals(OptimizationBuilder.mtf(10,
                                 new double[]{90}, new double[]{90, 80}))
+                        .build());
+
+        assertThrows(IllegalArgumentException.class, () ->
+                OptimizationBuilder.builder(prescription())
+                        .fields(0.0, 1.0)
+                        .mtfFrequencies(10)
+                        .spotRmsGoals(new double[]{10.0})
                         .build());
     }
 

@@ -23,11 +23,14 @@ public final class OptimizationBuilder {
     private double[] fields;
     private int[] mtfFrequencies;
     private int[] curvatureSurfaces = new int[0];
+ad    private boolean allCurvatureSurfaces;
     private int[] thicknessSurfaces = new int[0];
     private boolean includeExistingAspherics;
     private boolean weighted = true;
     private boolean dLineOnly;
     private final List<MtfGoals> mtfGoals = new ArrayList<>();
+    private SpotGoals spotRmsGoals;
+    private SpotGoals spotMaxRadiusGoals;
 
     private OptimizationBuilder(Prescription prescription) {
         if (prescription == null)
@@ -67,6 +70,16 @@ public final class OptimizationBuilder {
 
     public OptimizationBuilder curvatureSurfaces(int... surfaces) {
         this.curvatureSurfaces = copy(surfaces);
+        this.allCurvatureSurfaces = false;
+        return this;
+    }
+
+    /**
+     * Vary every curved optical surface. Aperture/field stops and surfaces
+     * whose radius is zero (and therefore intentionally flat) are excluded.
+     */
+    public OptimizationBuilder allCurvatureSurfaces() {
+        this.allCurvatureSurfaces = true;
         return this;
     }
 
@@ -100,6 +113,24 @@ public final class OptimizationBuilder {
         return this;
     }
 
+    public OptimizationBuilder spotRmsGoals(double[] targets) {
+        return spotRmsGoals(targets, null);
+    }
+
+    public OptimizationBuilder spotRmsGoals(double[] targets, double[] weights) {
+        this.spotRmsGoals = new SpotGoals(targets, weights);
+        return this;
+    }
+
+    public OptimizationBuilder spotMaxRadiusGoals(double[] targets) {
+        return spotMaxRadiusGoals(targets, null);
+    }
+
+    public OptimizationBuilder spotMaxRadiusGoals(double[] targets, double[] weights) {
+        this.spotMaxRadiusGoals = new SpotGoals(targets, weights);
+        return this;
+    }
+
     public OptimizationSetup build() {
         validate();
         Analysis analysis = new Analysis(prescription, copy(fields), copy(mtfFrequencies));
@@ -110,8 +141,17 @@ public final class OptimizationBuilder {
 
     private List<Var> buildVariables() {
         List<Var> result = new ArrayList<>();
-        for (int surface : curvatureSurfaces)
-            result.add(new VarRadius(prescription, surface));
+        if (allCurvatureSurfaces) {
+            for (int surface = 0; surface < prescription._surfaces.length; surface++) {
+                var definition = prescription._surfaces[surface];
+                if (!definition.is_aperture_stop() && !definition.is_field_stop()
+                        && definition._radius != 0.0)
+                    result.add(new VarRadius(prescription, surface));
+            }
+        } else {
+            for (int surface : curvatureSurfaces)
+                result.add(new VarRadius(prescription, surface));
+        }
         for (int surface : thicknessSurfaces)
             result.add(new VarThickness(prescription, surface));
         if (includeExistingAspherics) {
@@ -141,6 +181,17 @@ public final class OptimizationBuilder {
                 result.add(new GeoMTF(analysis, field + 1, TANGENTIAL, curve.frequency,
                         curve.tangential[field] / 100.0, curve.tangentialWeights[field]));
             }
+        }
+
+        if (spotRmsGoals != null) {
+            for (int field = 0; field < fields.length; field++)
+                result.add(new GoalSpotRMS(analysis, field + 1,
+                        spotRmsGoals.targets[field], spotRmsGoals.weights[field]));
+        }
+        if (spotMaxRadiusGoals != null) {
+            for (int field = 0; field < fields.length; field++)
+                result.add(new GoalSpotMaxRadius(analysis, field + 1,
+                        spotMaxRadiusGoals.targets[field], spotMaxRadiusGoals.weights[field]));
         }
 
         // Anchor first-order properties to the requested prescription values.
@@ -187,6 +238,10 @@ public final class OptimizationBuilder {
                 throw new IllegalArgumentException("duplicate MTF goal frequency: " + curve.frequency);
             curve.validate(fields.length);
         }
+        if (spotRmsGoals != null)
+            spotRmsGoals.validate(fields.length, "spot RMS");
+        if (spotMaxRadiusGoals != null)
+            spotMaxRadiusGoals.validate(fields.length, "spot maximum radius");
         validateSurfaces(curvatureSurfaces, "curvature");
         validateSurfaces(thicknessSurfaces, "thickness");
         if (dLineOnly && Arrays.stream(prescription._wvls).noneMatch(w -> sameWavelength(w, Glass.d)))
@@ -266,6 +321,37 @@ public final class OptimizationBuilder {
             for (double value : values)
                 if (!Double.isFinite(value) || value < 0.0)
                     throw new IllegalArgumentException(name + " must be finite and non-negative");
+        }
+    }
+
+    private static final class SpotGoals {
+        private final double[] targets;
+        private final double[] weights;
+
+        private SpotGoals(double[] targets, double[] weights) {
+            this.targets = copy(targets);
+            this.weights = weights == null ? unitWeights(targets) : copy(weights);
+        }
+
+        private void validate(int fieldCount, String name) {
+            if (targets == null || targets.length != fieldCount)
+                throw new IllegalArgumentException(name + " targets must contain one value per field");
+            if (weights == null || weights.length != fieldCount)
+                throw new IllegalArgumentException(name + " weights must contain one value per field");
+            for (double target : targets)
+                if (!Double.isFinite(target) || target < 0.0)
+                    throw new IllegalArgumentException(name + " targets must be finite and non-negative");
+            for (double weight : weights)
+                if (!Double.isFinite(weight) || weight < 0.0)
+                    throw new IllegalArgumentException(name + " weights must be finite and non-negative");
+        }
+
+        private static double[] unitWeights(double[] targets) {
+            if (targets == null)
+                return null;
+            double[] weights = new double[targets.length];
+            Arrays.fill(weights, 1.0);
+            return weights;
         }
     }
 

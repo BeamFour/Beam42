@@ -33,11 +33,11 @@ public class LensTool2 {
         specs.parse_file(specfile);
         return specs;
     }
-
     public static Prescription createPrescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types, boolean d_line) {
-        var wvls = d_line ? new double[] {587.5618} : new double[] {587.5618, 486.1327, 656.2725};
-        var wts = d_line ? new double[] {1.0} : new double[] {1.0, 1.0, 1.0};
-        return Prescription.build_prescription(specs,use_glass_types,wvls,wts,0);
+        return Prescription.build_prescription(specs, use_glass_types, false, d_line);
+    }
+    public static Prescription createPrescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types, boolean weighted, boolean d_line) {
+        return Prescription.build_prescription(specs, use_glass_types, weighted, d_line);
     }
     public static Prescription createPrescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types, double[] wvls, double[] wts) {
         return Prescription.build_prescription(specs,use_glass_types,wvls,wts);
@@ -157,7 +157,7 @@ public class LensTool2 {
 
     private static SpotAnalysisResult generateSpotDiagrams(OpticalModel opm,Args arguments,boolean standardSize, String filename_suffix) throws Exception {
         var spotAnalysis = SpotAnalysis.eval(opm,new SpotOptions());
-        Helper.createOutputFile(Helper.getOutputPath(arguments.specfile,suffixed_name("spot-report",filename_suffix,".txt"),arguments.outdir), spotAnalysis.toString());
+        Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile,suffixed_name("spot-report",filename_suffix,".txt"),arguments.outdir), spotAnalysis.toString());
         for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
             var spotFld = spotAnalysis.spot_results.get(i);
             String filename = null;
@@ -169,7 +169,7 @@ public class LensTool2 {
                 filename = suffixed_name("spot-skew", filename_suffix, ".svg");
             if (filename == null)
                 continue;
-            var outfile = Helper.getOutputPath(arguments.specfile, filename, arguments.outdir);
+            var outfile = Helper.getOutputFileWithPath(arguments.specfile, filename, arguments.outdir);
             outputSpotAnalysis(spotFld, outfile,standardSize ? 600. : null);
         }
         return spotAnalysis;
@@ -184,7 +184,7 @@ public class LensTool2 {
             PolyMTF polyMtfForField = null;
             for (var intercepts: spotFld.intercepts) {
                 String filename = suffixed_name("mtf-fld" + i + "-" + (int)intercepts.wvl, filename_suffix,  ".svg");
-                var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
+                var output_file = Helper.getOutputFileWithPath(arguments.specfile,filename,arguments.outdir);
                 var mtf = new MonochromaticGeometricMTF(intercepts, cfg);
                 if (polyMtfForField == null)
                     polyMtfForField = new PolyMTF(mtf.mtf.fft_size,mtf.h2d.pixel_size);
@@ -203,10 +203,10 @@ public class LensTool2 {
         var mtfResults = new ArrayList<MTFResultByFreq>();
         for (var freq: freqs)
             mtfResults.add(new MTFResultByFreq(mtfs,freq));
-        var mtffile = Helper.getOutputPath(arguments.specfile,suffixed_name(outname, filename_suffix, ".svg"),arguments.outdir);
+        var mtffile = Helper.getOutputFileWithPath(arguments.specfile,suffixed_name(outname, filename_suffix, ".svg"),arguments.outdir);
         var plot = new GeoMTFByFieldPlot(mtfResults,fields);
         Helper.createOutputFile(mtffile,plot.plot());
-        var mtfdata = Helper.getOutputPath(arguments.specfile,suffixed_name(outname, filename_suffix, ".csv"),arguments.outdir);
+        var mtfdata = Helper.getOutputFileWithPath(arguments.specfile,suffixed_name(outname, filename_suffix, ".csv"),arguments.outdir);
         Helper.createOutputFile(mtfdata,plot.toString());
     }
 
@@ -214,13 +214,13 @@ public class LensTool2 {
         var rayAber = TransverseRayAberrationAnalysis.eval(opm, 21, new TraceOptions());
         for (var fan_results: rayAber.results) {
             String filename = suffixed_name("rayabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag"), filname_suffix, ".svg");
-            var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
+            var output_file = Helper.getOutputFileWithPath(arguments.specfile,filename,arguments.outdir);
             Helper.createOutputFile(output_file, new RayAberrationPlot(rayAber).plot(fan_results, 0));
         }
         var opdAber = WavefrontAberrationAnalysis.eval(opm, 21, new TraceOptions());
         for (var fan_results: opdAber.results) {
             String filename = suffixed_name("opdabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag"), filname_suffix, ".svg");
-            var output_file = Helper.getOutputPath(arguments.specfile,filename,arguments.outdir);
+            var output_file = Helper.getOutputFileWithPath(arguments.specfile,filename,arguments.outdir);
             Helper.createOutputFile(output_file, new RayAberrationPlot(opdAber).plot(fan_results, 0));
         }
     }
@@ -247,17 +247,17 @@ public class LensTool2 {
         // For very wide angle lenses, blindly spraying rays doesn't work very well
         var opm = createLayoutSystem(prescription,config,VigType.SetPupil,true);
         Layout2D layout = new Layout2D();
-        Path output = Helper.getOutputPath(arguments.specfile,suffixed_name("layout-fan",filename_suffix,".svg"),arguments.outdir);
+        Path output = Helper.getOutputFileWithPath(arguments.specfile,suffixed_name("layout-fan",filename_suffix,".svg"),arguments.outdir);
         String fan = layout.renderSvg(opm, 1000, 500,
                 new LayoutOptions().drawReferenceRays(false).fanRayCount(9).clipRays(true).useTraceFan(true));
         Files.writeString(output, fan);
-        output = Helper.getOutputPath(arguments.specfile,suffixed_name("layoutonly",filename_suffix,".svg"),arguments.outdir);
+        output = Helper.getOutputFileWithPath(arguments.specfile,suffixed_name("layoutonly",filename_suffix,".svg"),arguments.outdir);
         String elements = layout.renderSvg(opm, 1000, 500,
                 new LayoutOptions().drawReferenceRays(false));
         Files.writeString(output, elements);
         String reference = layout.renderSvg(opm, 1000, 500,
                 new LayoutOptions());
-        output = Helper.getOutputPath(arguments.specfile,suffixed_name("layout",filename_suffix,".svg"),arguments.outdir);
+        output = Helper.getOutputFileWithPath(arguments.specfile,suffixed_name("layout",filename_suffix,".svg"),arguments.outdir);
         Files.writeString(output, reference);
     }
 
@@ -280,7 +280,7 @@ public class LensTool2 {
             OpticalBenchDataImporter.LensSpecifications specs = getSpecsFromFile(arguments.specfile);
             var prescription = createPrescription(specs,arguments.use_glass_types,arguments.only_d_line);
             String prescription_output = prescription.to_opt_bench_str(new StringBuilder()).toString();
-            Helper.createOutputFile(Helper.getOutputPath(arguments.specfile, "prescription.txt", arguments.outdir), prescription_output);
+            Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile, "prescription.txt", arguments.outdir), prescription_output);
             ZemaxExporter zemaxExporter = new ZemaxExporter();
             Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), zemaxExporter.generate(prescription, arguments.only_d_line));
             StringBuilder SB = startREADME(specs);
@@ -295,8 +295,8 @@ public class LensTool2 {
                 System.out.println(sm.list_surfaces(new StringBuilder()).toString());
                 System.out.println(sm.list_gaps(new StringBuilder()).toString());
                 System.out.println(osp.list_str(new StringBuilder()).toString());
-                Helper.createOutputFile(Helper.getOutputPath(arguments.specfile, suffixed_name("vig", scenario_filesuffix, ".txt"), arguments.outdir), osp.list_str(new StringBuilder()).toString());
-                Helper.createOutputFile(Helper.getOutputPath(arguments.specfile, suffixed_name("paraxial", scenario_filesuffix, ".txt"), arguments.outdir), fod.toString());
+                Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile, suffixed_name("vig", scenario_filesuffix, ".txt"), arguments.outdir), osp.list_str(new StringBuilder()).toString());
+                Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile, suffixed_name("paraxial", scenario_filesuffix, ".txt"), arguments.outdir), fod.toString());
                 doLayoutDiagrams(prescription, arguments, config, scenario_filesuffix);
 
 //            StringBuilder buf = new StringBuilder();
@@ -317,15 +317,13 @@ public class LensTool2 {
                 if (arguments.do_ray_aberrations)
                     generateRayAberrationPlots(opm, arguments, scenario_filesuffix);
                 // Generate MTF with weighted average across wavelengths
-                var wvls = arguments.only_d_line ? new double[] {587.5618} : new double[]{587.5618, 656.2725, 546.074, 486.1327, 435.8343};
-                var wts = arguments.only_d_line ? new double[] {1.0} : new double[]{1.0, 0.475, 0.98, 0.49, 0.15};
-                var prescriptionForWeightedMTF = createPrescription(specs, arguments.use_glass_types, wvls, wts);
+                var prescriptionForWeightedMTF = createPrescription(specs, arguments.use_glass_types, true, arguments.only_d_line);
                 opm = createSystem(prescriptionForWeightedMTF, true, vigType, true, fields, config);
                 generateMTFs(opm, arguments, fields, prescriptionForWeightedMTF.get_wvl_wts(), "mtf-w", scenario_filesuffix);
             }
             createREADME(SB,
                     arguments.specfile,
-                    Helper.getOutputPath(arguments.specfile, "README.md", arguments.outdir));
+                    Helper.getOutputFileWithPath(arguments.specfile, "README.md", arguments.outdir));
         }
         catch (Exception e) {
             System.err.println("Failed due to: " + e.getMessage());

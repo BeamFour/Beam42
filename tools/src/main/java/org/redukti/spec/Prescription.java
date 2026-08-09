@@ -203,20 +203,42 @@ public class Prescription {
         }
         return this;
     }
-
     public static Prescription build_prescription_d_line(OpticalBenchDataImporter.LensSpecifications specs) {
-        return build_prescription(specs,true,new double[] {587.5618},new double[] {1.0},0);
+        return build_prescription(specs,true, false, true);
     }
     public static Prescription build_prescription_e_line(OpticalBenchDataImporter.LensSpecifications specs) {
-        return build_prescription(specs,true,new double[] {546.074},new double[] {1.0},0);
+        return build_prescription(specs,true, new double[] {546.074}, new double[] {1.0},0);
     }
     public static Prescription build_prescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types) {
-        return build_prescription(specs,use_glass_types,new double[] {587.5618, 486.1327, 656.2725},new double[] {1.0, 1.0, 1.0},0);
+        return build_prescription(specs, use_glass_types,false,false);
     }
     public static Prescription build_prescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types, double[] wvls, double[] wts) {
-        return build_prescription(specs,use_glass_types,wvls,wts,0);
+        return build_prescription(specs, use_glass_types, wvls, wts,0);
     }
 
+    public final static double WT_d = 1.0;
+    public final static double WT_C = 0.475;
+    public final static double WT_e = 0.98;
+    public final static double WT_F = 0.49;
+    public final static double WT_g = 0.15;
+
+    public static Prescription build_prescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types, boolean weighted, boolean d_line) {
+        double[] wvls;
+        double[] wts;
+        if (d_line) {
+            wvls = new double[] { Glass.d };
+            wts = new double[] {1.0};
+        }
+        else if (weighted) {
+            wvls = new double[]{Glass.d, Glass.C, Glass.e, Glass.F, Glass.g};
+            wts = new double[]{WT_d, WT_C, WT_e, WT_F, WT_g};
+        }
+        else {
+            wvls = new double[]{Glass.d, Glass.F, Glass.C};
+            wts = new double[]{1.0, 1.0, 1.0};
+        }
+        return build_prescription(specs,use_glass_types,wvls,wts,0);
+    }
     /**
      * Helper to build a Prescription from OpticalBench file.
      *

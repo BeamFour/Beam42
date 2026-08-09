@@ -6,7 +6,7 @@ import org.redukti.spec.Prescription;
 
 import static org.redukti.optim.OptimizationBuilder.mtf;
 
-public class ZeissOtusML50mm {
+public class ZeissOtusML50mmv2 {
 
     private static Prescription getPrescription(String specfile, boolean weighted,
                                                 boolean dLineOnly) throws Exception {
@@ -16,7 +16,7 @@ public class ZeissOtusML50mm {
     }
 
     public static void main(String[] args) throws Exception {
-        boolean weighted = true;
+        boolean weighted = false;
         boolean dLineOnly = false;
         var prescription = getPrescription(args[0], weighted, dLineOnly);
 
@@ -24,8 +24,7 @@ public class ZeissOtusML50mm {
                 .fields(0.0, 0.3, 0.7, 1.0)
                 .mtfFrequencies(10, 20, 40)
                 .curvatureSurfaces(
-                        0, 1, 2, 3, 4, 5, 6, 8, 9,
-                        11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23)
+                        3, 5, 6, 13, 16)
                 .thicknessSurfaces(25)
                 .includeExistingAspherics(true)
                 .weighted(weighted)
@@ -39,7 +38,7 @@ public class ZeissOtusML50mm {
                                 new double[]{85, 85, 78, 62}),
                         mtf(40,
                                 new double[]{65, 65, 64, 58},
-                                new double[]{65, 62, 45, 38}))
+                                new double[]{65, 62, 47, 40}))
                 .build();
 
         var analysis = setup.analysis();

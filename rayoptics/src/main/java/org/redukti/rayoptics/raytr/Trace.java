@@ -776,6 +776,84 @@ public class Trace {
         return points;
     }
 
+    /**
+     * Generates a Gaussian quadrature pattern over a circular pupil.
+     *
+     * <p>The radial coordinates are Gauss-Legendre nodes transformed from
+     * {@code [-1, 1]} to squared pupil radius {@code [0, 1]}. Each radial node
+     * is repeated at uniformly spaced angles. The returned weights are
+     * normalized to sum to one, so they integrate a pupil average rather than
+     * the area (pi) of the unit disk.</p>
+     *
+     * <p>Based on William H. Peirce, "Numerical Integration Over the Planar
+     * Annulus", Journal of the Society for Industrial and Applied Mathematics,
+     * Vol. 5, No. 2 (1957), pp. 66-73.</p>
+     */
+    static List<GaussianQuadraturePoint> generate_gaussian_quadrature(
+            TraceRingsDef grid_rng, int num_rings, Integer num_spokes) {
+        if (num_rings < 1 || (num_spokes != null && num_spokes < 1)) {
+            throw new IllegalArgumentException("The number of rings and spokes must be at least 1");
+        }
+
+        int spokes = num_spokes == null ? 4 * (num_rings + 1) : num_spokes;
+        double[][] nodesAndWeights = gauss_legendre_nodes_and_weights(num_rings);
+        List<GaussianQuadraturePoint> points = new ArrayList<>(num_rings * spokes);
+
+        for (int angle = 1; angle <= spokes; angle++) {
+            double theta = 2.0 * Math.PI * angle / spokes;
+            double cosTheta = Math.cos(theta);
+            double sinTheta = Math.sin(theta);
+            for (int ring = 0; ring < num_rings; ring++) {
+                double radius = grid_rng.max_radius
+                        * Math.sqrt(0.5 + 0.5 * nodesAndWeights[0][ring]);
+                Vector2 pupil = new Vector2(
+                        grid_rng.cx + radius * cosTheta,
+                        grid_rng.cy + radius * sinTheta);
+                double weight = 0.5 * nodesAndWeights[1][ring] / spokes;
+                points.add(new GaussianQuadraturePoint(pupil, weight));
+            }
+        }
+        return points;
+    }
+
+    /** Computes Gauss-Legendre nodes and weights on [-1, 1]. */
+    private static double[][] gauss_legendre_nodes_and_weights(int order) {
+        double[] nodes = new double[order];
+        double[] weights = new double[order];
+        int rootsToFind = (order + 1) / 2;
+
+        for (int i = 0; i < rootsToFind; i++) {
+            double x = Math.cos(Math.PI * (i + 0.75) / (order + 0.5));
+            double derivative;
+            double delta;
+            do {
+                double p0 = 1.0;
+                double p1 = x;
+                for (int degree = 2; degree <= order; degree++) {
+                    double p2 = ((2.0 * degree - 1.0) * x * p1
+                            - (degree - 1.0) * p0) / degree;
+                    p0 = p1;
+                    p1 = p2;
+                }
+                double polynomial = p1;
+                double previousPolynomial = p0;
+                derivative = order * (x * polynomial - previousPolynomial)
+                        / (x * x - 1.0);
+                delta = polynomial / derivative;
+                x -= delta;
+            } while (Math.abs(delta) > 1.0e-15);
+
+            double weight = 2.0 / ((1.0 - x * x) * derivative * derivative);
+            nodes[i] = -x;
+            nodes[order - 1 - i] = x;
+            weights[i] = weight;
+            weights[order - 1 - i] = weight;
+        }
+        return new double[][]{nodes, weights};
+    }
+
+    record GaussianQuadraturePoint(Vector2 pupil, double weight) {}
+
 
     static class BaseObjectiveFunctionRaw {
         final List<PathSeg> pthlist;

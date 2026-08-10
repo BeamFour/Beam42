@@ -16,7 +16,7 @@ public class ZeissOtusML50mmv2 {
     }
 
     public static void main(String[] args) throws Exception {
-        boolean weighted = false;
+        boolean weighted = true;
         boolean dLineOnly = false;
         var prescription = getPrescription(args[0], weighted, dLineOnly);
 

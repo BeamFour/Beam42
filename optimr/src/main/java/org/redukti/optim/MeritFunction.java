@@ -14,6 +14,7 @@ public class MeritFunction implements LMLFunction {
         private Analysis analysis;
         private Var[] vars;
         private Goal[] outs;
+        private final double[] sqrtWeights;
         private double tol = 1E-6;
         private int nfev = 0;
         private int njev = 0;
@@ -25,6 +26,13 @@ public class MeritFunction implements LMLFunction {
             this.resid = new double[outs.length];
             this.point = new double[vars.length];
             this.jac = new double[outs.length][vars.length];
+            this.sqrtWeights = new double[outs.length];
+            for (int i = 0; i < outs.length; i++) {
+                double weight = outs[i]._weight;
+                if (!Double.isFinite(weight) || weight < 0.0)
+                    throw new IllegalArgumentException("Goal weight must be finite and non-negative");
+                sqrtWeights[i] = Math.sqrt(weight);
+            }
         }
 
         @Override
@@ -41,7 +49,7 @@ public class MeritFunction implements LMLFunction {
             }
             double sos = 0.0;
             for (int i = 0; i < outs.length; i++) {
-                resid[i] = (outs[i]._target - outs[i]. value())*outs[i]._weight;
+                resid[i] = (outs[i]._target - outs[i]. value())*sqrtWeights[i];
                 sos += M.square(resid[i]);
             }
             if (M.isZero(sos))
@@ -167,7 +175,7 @@ public class MeritFunction implements LMLFunction {
             double sos = 0.0;
             double[] resid = new double[outs.length];
             for (int i = 0; i < outs.length; i++) {
-                resid[i] = (outs[i]._target - outs[i]. value())*outs[i]._weight;
+                resid[i] = (outs[i]._target - outs[i]. value())*sqrtWeights[i];
                 sos += M.square(resid[i]);
             }
             if (M.isZero(sos))

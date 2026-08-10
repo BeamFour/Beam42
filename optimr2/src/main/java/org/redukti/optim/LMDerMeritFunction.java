@@ -20,8 +20,11 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
         this.functions = functions;
         this.weights = new double[functions.length];
         this.use_native = use_native;
-        for (int i = 0; i < functions.length; i++)
-            weights[i] = functions[i]._weight;
+        for (int i = 0; i < functions.length; i++) {
+            if (!Double.isFinite(functions[i]._weight) || functions[i]._weight < 0.0)
+                throw new IllegalArgumentException("Goal weight must be finite and non-negative");
+            weights[i] = Math.sqrt(functions[i]._weight);
+        }
         for (int i = 0; i < vars.length; i++)
             vars[i].read_from_prescription();
     }
@@ -196,7 +199,7 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
         double sos = 0.0;
         double[] resid = new double[functions.length];
         for (int i = 0; i < functions.length; i++) {
-            resid[i] = (functions[i]._target - functions[i]. value())*functions[i]._weight;
+            resid[i] = (functions[i]._target - functions[i]. value())*weights[i];
             sos += M.square(resid[i]);
         }
         if (M.isZero(sos))

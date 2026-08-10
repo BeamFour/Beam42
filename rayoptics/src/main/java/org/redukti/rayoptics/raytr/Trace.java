@@ -711,6 +711,40 @@ public class Trace {
         return grid;
     }
 
+    public static List<GridItem> trace_gaussian_quadrature(
+            OpticalModel opt_model, TraceRingsDef grid_rng, Integer num_spokes,
+            Field fld, double wvl, double foc, ImageFilter img_filter,
+            boolean append_if_none, TraceOptions trace_options) {
+        trace_options = trace_options.copy();
+        trace_options.check_apertures = true;
+        trace_options.pupil_type = PupilType.REL_PUPIL;
+        trace_options.apply_vignetting = true;
+
+        var grid = new ArrayList<GridItem>();
+        var points = generate_gaussian_quadrature(grid_rng, grid_rng.num_rings, num_spokes);
+        for (var point : points) {
+            var pupil = point.pupil();
+            var ray_result = trace_safe(opt_model, pupil, fld, wvl, trace_options);
+            if (ray_result.pkg != null) {
+                GridItem item = img_filter != null
+                        ? img_filter.apply(pupil, ray_result.pkg)
+                        : new GridItem(pupil, ray_result.pkg);
+                grid.add(item.withWeight(point.weight()));
+            }
+            else if (img_filter != null) {
+                var item = img_filter.apply(pupil, null);
+                if (item != null)
+                    grid.add(item.withWeight(point.weight()));
+                else if (append_if_none)
+                    grid.add(new GridItem(pupil, null).withWeight(point.weight()));
+            }
+            else if (append_if_none) {
+                grid.add(new GridItem(pupil, null).withWeight(point.weight()));
+            }
+        }
+        return grid;
+    }
+
     private static List<Vector2> generate_hexapolar_points(TraceRingsDef grid_rng, double max_radius, int num_rings) {
         List<Vector2> points;
         points = new ArrayList<>();

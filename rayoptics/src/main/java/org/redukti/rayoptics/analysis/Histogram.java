@@ -117,9 +117,7 @@ public class Histogram {
             int iy = (int) Math.floor(num_bins * (y - hmin) / (hmax - hmin));
             if (ix < 0 || ix >= num_bins || iy < 0 || iy >= num_bins)
                 continue;
-            // ideally we should assign a weight here
-            // For now we assign 1 for each hit
-            h2d[ix][iy] += wt;
+            h2d[ix][iy] += wt * intercepts.weights[i];
         }
     }
     private void normalize_histogram() {

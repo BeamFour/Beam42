@@ -884,4 +884,37 @@ public class SequentialModel {
         return grids;
     }
 
+    public List<TraceGridByWvl> trace_gaussian_quadrature(
+        TraceGridCallback fct,
+        int fi,
+        Integer wl,
+        int num_rings,
+        Integer num_spokes,
+        boolean append_if_none,
+        TraceOptions trace_options) {
+        var osp = opt_model.optical_spec;
+        var wvls = osp.wvls;
+        var wvl = central_wavelength();
+        double[] wv_list = wl == null ? wvls.wavelengths : new double[]{wvl};
+        var fld = osp.fov.fields[fi];
+        var foc = osp.defocus().get_focus();
+        var pc = Trace.setup_pupil_coords(opt_model, fld, wvl, foc, null, null);
+
+        fld.chief_ray = pc.chief_ray_pkg;
+        fld.ref_sphere = pc.ref_sphere;
+
+        List<TraceGridByWvl> grids = new ArrayList<>();
+        var grid_def = new TraceRingsDef();
+        grid_def.num_rings = num_rings;
+        for (int wi = 0; wi < wv_list.length; wi++) {
+            wvl = wv_list[wi];
+            var grid = Trace.trace_gaussian_quadrature(
+                    opt_model, grid_def, num_spokes, fld, wvl, foc,
+                    new ImgFilterImp(wi, fld, wvl, foc, fct),
+                    append_if_none, trace_options);
+            grids.add(new TraceGridByWvl(wvl, grid));
+        }
+        return grids;
+    }
+
 }

@@ -39,6 +39,13 @@ public class SpotAnalysis {
         return seq_model.trace_rings(SpotAnalysis::spot,fi,wl,num_rays,false,trace_options);
     }
 
+    public static List<TraceGridByWvl> eval_gaussian_quadrature(
+            OpticalModel opt_model, int fi, Integer wl, int num_rings,
+            Integer num_spokes, TraceOptions trace_options) {
+        return opt_model.seq_model.trace_gaussian_quadrature(
+                SpotAnalysis::spot, fi, wl, num_rings, num_spokes, false, trace_options);
+    }
+
     public static SpotAnalysisResult eval(OpticalModel opt_model, SpotOptions options) {
         var num_rays = options.num_rays;
         var trace_options = options.traceOptions;
@@ -49,6 +56,9 @@ public class SpotAnalysis {
             Field f = fov.fields[fi];
             if (options.use_grid)
                 result.add(f, eval_grid(opt_model,fi,null,num_rays,trace_options), ref_wvl);
+            else if (options.use_gaussian_quadrature)
+                result.add(f, eval_gaussian_quadrature(
+                        opt_model, fi, null, num_rays, options.num_spokes, trace_options), ref_wvl);
             else
                 result.add(f, eval_rings(opt_model,fi,null,num_rays,trace_options), ref_wvl);
         }

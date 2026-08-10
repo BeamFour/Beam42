@@ -48,7 +48,7 @@ public class SpotAnalysisResult {
         private void computeMeanMax() {
             max_radius = 0;
             mean_radius = 0;
-            int count = 0;
+            double totalWeight = 0.0;
             for (var results: intercepts) {
                 for (int i = 0; i < results.x.length; i++) {
                     double r = results.x[i] * results.x[i] + results.y[i] * results.y[i];
@@ -56,11 +56,11 @@ public class SpotAnalysisResult {
                     if (l > max_radius) {
                         max_radius = l;
                     }
-                    mean_radius += (l * l);
+                    mean_radius += results.weights[i] * l * l;
+                    totalWeight += results.weights[i];
                 }
-                count += results.x.length;
             }
-            mean_radius = Math.sqrt(mean_radius/count);
+            mean_radius = Math.sqrt(mean_radius/totalWeight);
         }
 
         @Override

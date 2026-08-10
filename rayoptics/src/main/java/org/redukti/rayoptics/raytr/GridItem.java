@@ -9,16 +9,22 @@ public class GridItem {
     public final Vector2 pupil;
     public final Double result;
     public final RayPkg ray_pkg;
+    public final double weight;
 
     public GridItem(Vector2 pupil, RayPkg ray_pkg) {
-        this.pupil = pupil;
-        this.result = null;
-        this.ray_pkg = ray_pkg;
+        this(pupil, ray_pkg, null, 1.0);
     }
     public GridItem(Vector2 pupil, RayPkg ray_pkg, double result) {
+        this(pupil, ray_pkg, result, 1.0);
+    }
+    private GridItem(Vector2 pupil, RayPkg ray_pkg, Double result, double weight) {
         this.pupil = pupil;
         this.result = result;
         this.ray_pkg = ray_pkg;
+        this.weight = weight;
+    }
+    public GridItem withWeight(double weight) {
+        return new GridItem(pupil, ray_pkg, result, weight);
     }
     @Override
     public String toString() {

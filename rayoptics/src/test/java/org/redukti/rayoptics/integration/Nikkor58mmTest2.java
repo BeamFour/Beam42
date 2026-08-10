@@ -138,7 +138,7 @@ public class Nikkor58mmTest2 {
         Trace.apply_paraxial_vignetting(opm);
         //VigCalc.set_vig(opm,true);
         //opm.update_model();
-        var transAber = TransverseRayAberrationAnalysis.eval_abr_fan(opm,0,1,21,new TraceOptions());
+        var transAber = TransverseRayAberrationAnalysis.eval_abr_fan(opm,0,1,21,false,new TraceOptions());
 
         double[] xvals = {-2.46527285e-01, -2.21874556e-01, -1.97221828e-01, -1.72569099e-01,
   -1.47916371e-01, -1.23263642e-01, -9.86109139e-02, -7.39581854e-02,

@@ -79,7 +79,13 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
             okay = false;
         }
         for (int i = 0; i < functions.length; i++) {
-            double r = okay ? (functions[i].value() - functions[i]._target) * weights[i] : BIGVAL;
+            double value = okay ? functions[i].value() : BIGVAL;
+            double r;
+            if (!Double.isFinite(value) || value >= BIGVAL) {
+                r = BIGVAL;
+            } else {
+                r = (value - functions[i]._target) * weights[i];
+            }
             fvec[i] = Double.isFinite(r) ? r : BIGVAL;
         }
     }
@@ -167,7 +173,11 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
             // (buildJacobian returns false, lmder terminates with info < 0).
             return false;
         for (int i = 0; i < functions.length; i++) {
-            resid[i] = functions[i].value();
+            double value = functions[i].value();
+            if (!Double.isFinite(value) || value >= BIGVAL)
+                return false;
+
+            resid[i] = value;
         }
         return okay;
     }

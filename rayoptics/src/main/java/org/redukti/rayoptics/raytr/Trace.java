@@ -599,7 +599,7 @@ public class Trace {
         return rvalue;
     }
 
-    public static List<GridItem> trace_fan(OpticalModel opt_model, TraceFanDef fan_rng, Field fld, double wvl, double foc, ImageFilter img_filter, TraceOptions trace_options) {
+    public static List<GridItem> trace_fan(OpticalModel opt_model, TraceFanDef fan_rng, Field fld, double wvl, double foc, boolean append_if_none, ImageFilter img_filter, TraceOptions trace_options) {
         var start = fan_rng.start;
         var stop =  fan_rng.stop;
         var num = fan_rng.num_rays;
@@ -610,12 +610,15 @@ public class Trace {
             var ray_result = trace_safe(opt_model, pupil, fld, wvl, trace_options);
             if (ray_result.pkg != null) {
                 if (img_filter != null) {
-                    var result = img_filter.apply(pupil,ray_result.pkg);
-                    fan.add(result);
+                    fan.add(img_filter.apply(pupil,ray_result.pkg));
                 }
                 else {
                     fan.add(new GridItem(pupil,ray_result.pkg));
                 }
+            }
+            else if (append_if_none) {
+                //ray outside pupil or failed
+                fan.add(new GridItem(pupil,null));
             }
             start = new Vector2(start.x+step.x, start.y+step.y);
         }

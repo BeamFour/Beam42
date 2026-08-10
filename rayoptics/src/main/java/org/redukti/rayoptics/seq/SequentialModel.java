@@ -748,6 +748,7 @@ public class SequentialModel {
             int fi,
             int xy,
             int num_rays,
+            boolean append_if_none,
             TraceOptions trace_options)
     {
         var osp = opt_model.optical_spec;
@@ -782,7 +783,7 @@ public class SequentialModel {
             var cr_pkg = coords.chief_ray_pkg;
             fld.chief_ray = cr_pkg;
             fld.ref_sphere = rs_pkg;
-            var fan = Trace.trace_fan(opt_model,fan_def,fld,wvl,foc,new FanFilter(opt_model,xy,fld,wvl,foc,fct),trace_options);
+            var fan = Trace.trace_fan(opt_model,fan_def,fld,wvl,foc,append_if_none,new FanFilter(opt_model,xy,fld,wvl,foc,fct),trace_options);
             var f_x = new ArrayList<Double>();
             var f_y = new ArrayList<Double>();
             for (int i = 0; i < fan.size(); i++) {
@@ -792,7 +793,7 @@ public class SequentialModel {
                 f_y.add(y_val);
                 if (Math.abs(p.v(xy)) > max_rho_val)
                     max_rho_val = Math.abs(p.v(xy));
-                if (Math.abs(y_val) > max_y_val)
+                if (y_val != null && Math.abs(y_val) > max_y_val)
                     max_y_val = Math.abs(y_val);
             }
             fans.add(new TraceFanPoints(wvl,f_x,f_y));

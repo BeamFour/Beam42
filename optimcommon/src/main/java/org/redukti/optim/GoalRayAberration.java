@@ -17,13 +17,21 @@ public class GoalRayAberration extends Goal {
         this._xy = xy;
         this._pos = pos;
         this._wvl = wvl;
+        if (pos < 0)
+            pos += Analysis.NUM_TRANSVERSE_RAYS;
+        if (pos < 0 || pos >= Analysis.NUM_TRANSVERSE_RAYS)
+            throw new IllegalArgumentException("position out of range, max number of rays is " + Analysis.NUM_TRANSVERSE_RAYS);
     }
 
     @Override
     public double value() {
         var fans = _analysis._ray_aberrations.get_fans(_field, _xy, _wvl);
-        if (fans != null && _pos < fans.fan_x.size())
-            return Lists.get(fans.fan_y, _pos);
+        if (fans != null && _pos < fans.fan_x.size()) {
+            var result = Lists.get(fans.fan_y, _pos);
+            return result != null && Double.isFinite(result)
+                    ? result
+                    : LMLSolver.BIGVAL;
+        }
         return LMLSolver.BIGVAL;
     }
 

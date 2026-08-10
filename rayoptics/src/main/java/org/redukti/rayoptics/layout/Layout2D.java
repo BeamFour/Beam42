@@ -395,7 +395,7 @@ public final class Layout2D {
         TraceFanDef fan = new TraceFanDef(new Vector2(0.0, -1.0),
                 new Vector2(0.0, 1.0), options.fanRayCount);
         double focus = model.optical_spec.defocus().get_focus();
-        var traced = Trace.trace_fan(model, fan, field, wavelength, focus,
+        var traced = Trace.trace_fan(model, fan, field, wavelength, focus, false,
                 null, traceOptions(options));
         for (var item : traced)
             addRay(out, model.seq_model, item.ray_pkg, color);

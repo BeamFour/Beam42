@@ -96,7 +96,7 @@ public class TestOptimLMder {
         System.out.println(f.toString());
         System.out.println(prescription.toString());
         Assertions.assertTrue(finalRMS < initialRMS);
-        Assertions.assertEquals(34.591,finalRMS,1e-3);
+        Assertions.assertEquals(22.392,finalRMS,1e-3);
     }
 
 }

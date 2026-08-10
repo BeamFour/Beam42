@@ -18,6 +18,9 @@ public class Analysis {
     public int[] _freqs;
     public final int _scenario;
 
+    public final static int NUM_TRANSVERSE_RAYS = 10;
+    public final static int NUM_SPOT_RAYS = 64;
+
     /**
      * Systems and spot analysis setup for each field
      * Always has at least 1 field, and first field is always 0.0
@@ -53,10 +56,12 @@ public class Analysis {
         // TODO support scenarios
         _opt_model = new RayOpticsModelBuilder(_prescription)
                 .build_optical_model(true, _fields,false, VigType.SetPupil, true, _scenario);
-        var spotAnalysis = SpotAnalysis.eval(_opt_model,new SpotOptions().num_rays(64).use_grid(false));
+        var spotAnalysis = SpotAnalysis.eval(_opt_model,new SpotOptions().num_rays(NUM_SPOT_RAYS).use_grid(false));
         _spots = spotAnalysis.spot_results.toArray(new SpotAnalysisResult.SpotResultsForField[0]);
         _pfo = ParaxHelper.asArray(_opt_model.optical_spec.parax_data.fod);
-        _ray_aberrations = TransverseRayAberrationAnalysis.eval(_opt_model,10,new TraceOptions());
+        // we set append_if_none to get all rays even if they
+        // failed to trace, the failed rays are handled in GoalRayAberration
+        _ray_aberrations = TransverseRayAberrationAnalysis.eval(_opt_model, NUM_TRANSVERSE_RAYS,true, new TraceOptions());
         _mtfs = spotAnalysis.computeMTFs(_freqs);
     }
 }

@@ -211,13 +211,13 @@ public class LensTool2 {
     }
 
     private static void generateRayAberrationPlots(OpticalModel opm, Args arguments, String filname_suffix) throws Exception {
-        var rayAber = TransverseRayAberrationAnalysis.eval(opm, 21, new TraceOptions());
+        var rayAber = TransverseRayAberrationAnalysis.eval(opm, 21, false, new TraceOptions());
         for (var fan_results: rayAber.results) {
             String filename = suffixed_name("rayabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag"), filname_suffix, ".svg");
             var output_file = Helper.getOutputFileWithPath(arguments.specfile,filename,arguments.outdir);
             Helper.createOutputFile(output_file, new RayAberrationPlot(rayAber).plot(fan_results, 0));
         }
-        var opdAber = WavefrontAberrationAnalysis.eval(opm, 21, new TraceOptions());
+        var opdAber = WavefrontAberrationAnalysis.eval(opm, 21, false, new TraceOptions());
         for (var fan_results: opdAber.results) {
             String filename = suffixed_name("opdabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag"), filname_suffix, ".svg");
             var output_file = Helper.getOutputFileWithPath(arguments.specfile,filename,arguments.outdir);

@@ -142,7 +142,7 @@ public class Nikkor58mmTest3 {
         Trace.apply_paraxial_vignetting(opm);
         //VigCalc.set_vig(opm,true);
         //opm.update_model();
-        var transAber = TransverseRayAberrationAnalysis.eval_abr_fan(opm,0,1,21,new TraceOptions());
+        var transAber = TransverseRayAberrationAnalysis.eval_abr_fan(opm,0,1,21,false,new TraceOptions());
 //
 //        Plot plot = new Plot();
 //        plot.set_title("Transverse ray aberration");

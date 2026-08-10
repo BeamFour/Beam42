@@ -8,7 +8,6 @@ import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.*;
 import org.redukti.rayoptics.seq.Glass;
 import org.redukti.rayoptics.specs.Field;
-import org.redukti.rayoptics.util.SpectralLine;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.RayOpticsModelBuilder;
 import org.redukti.spec.SurfaceType;
@@ -134,7 +133,7 @@ public class Beam42Exporter {
     }
     String generate(Prescription prescription, int scenario) {
         StringBuilder sb = new StringBuilder();
-        double wvln = SpectralLine.d;
+        double wvln = Glass.d;
         sb.append(prescription._surfaces.length + 1).append(" surfaces").append(System.lineSeparator());
         //sb.append("Type   Index   Z    C    Dia   S    A2   A4   A6    A8    A10   A12   A14  ").append(System.lineSeparator());
         //sb.append("-----:-------:----:----:-----:----:----:-----:-----:-----:-----:-----:-----").append(System.lineSeparator());
@@ -240,11 +239,11 @@ public class Beam42Exporter {
         for (var rayStart : rayStarts) {
             String indexName = "nd ";
             String color = "y";
-            if (rayStart.wvl == SpectralLine.F) {
+            if (rayStart.wvl == Glass.F) {
                 indexName = "nF ";
                 color = "b";
             }
-            else if (rayStart.wvl == SpectralLine.C) {
+            else if (rayStart.wvl == Glass.C) {
                 indexName = "nC ";
                 color = "r";
             }
@@ -285,8 +284,8 @@ public class Beam42Exporter {
         var model = new RayOpticsModelBuilder(prescription).build_optical_model(true,fields,false,VigType.SetPupil,true,scenario);
         var fov = model.optical_spec.fov;
         double[] wavelengths = arguments.only_d_line
-                ? new double[]{SpectralLine.d}
-                : new double[]{SpectralLine.d, SpectralLine.F, SpectralLine.C};
+                ? new double[]{Glass.d}
+                : new double[]{Glass.d, Glass.F, Glass.C};
         for (int i = 0; i < fov.fields.length; i++) {
             var fld = fov.fields[i];
             List<RayStart> rayStarts = new ArrayList<>();

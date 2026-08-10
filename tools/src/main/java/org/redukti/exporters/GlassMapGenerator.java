@@ -3,7 +3,7 @@ package org.redukti.exporters;
 import org.redukti.importers.agf.AGFBase;
 import org.redukti.importers.agf.AGFImporter;
 import org.redukti.mathlib.M;
-import org.redukti.rayoptics.util.SpectralLine;
+import org.redukti.rayoptics.seq.Glass;
 
 import java.text.DecimalFormat;
 
@@ -32,32 +32,17 @@ public class GlassMapGenerator {
             new Cat("CORNING", "glassdata/CORNING.AGF")
     };
 
-//    public static GlassMap toGlassMap(AGFBase agf) {
-//        return new GlassMap(
-//                agf._manufacturer,
-//                agf._name,
-//                agf.get_refractive_index(SpectralLine.d),
-//                agf.get_refractive_index(SpectralLine.C),
-//                agf.get_refractive_index(SpectralLine.F),
-//                agf.get_refractive_index(SpectralLine.e),
-//                agf.get_refractive_index(SpectralLine.C_),
-//                agf.get_refractive_index(SpectralLine.F_),
-//                agf.get_abbe_vd(),
-//                agf.get_abbe_ve(),
-//                0.0);
-//    }
-
     public static String toCodeString(AGFBase g) {
         StringBuilder sb = new StringBuilder();
         sb.append("glasses.put(\"").append(g._name).append("\", new Glass(\"");
         sb.append(g._manufacturer).append("\", \"").append(g._name).append("\", ");
-        sb.append(decimalFormat.format(g.get_refractive_index(SpectralLine.d))).append(", ");
-        sb.append(decimalFormat.format(g.get_refractive_index(SpectralLine.C))).append(", ");
-        sb.append(decimalFormat.format(g.get_refractive_index(SpectralLine.F))).append(", ");
-        sb.append(decimalFormat.format(g.get_refractive_index(SpectralLine.e))).append(", ");
-        sb.append(decimalFormat.format(g.get_refractive_index(SpectralLine.C_))).append(", ");
-        sb.append(decimalFormat.format(g.get_refractive_index(SpectralLine.F_))).append(", ");
-        sb.append(decimalFormat.format(g.get_refractive_index(SpectralLine.g))).append(", ");
+        sb.append(decimalFormat.format(g.get_refractive_index(Glass.d))).append(", ");
+        sb.append(decimalFormat.format(g.get_refractive_index(Glass.C))).append(", ");
+        sb.append(decimalFormat.format(g.get_refractive_index(Glass.F))).append(", ");
+        sb.append(decimalFormat.format(g.get_refractive_index(Glass.e))).append(", ");
+        sb.append(decimalFormat.format(g.get_refractive_index(Glass.C_))).append(", ");
+        sb.append(decimalFormat.format(g.get_refractive_index(Glass.F_))).append(", ");
+        sb.append(decimalFormat.format(g.get_refractive_index(Glass.g))).append(", ");
         sb.append(decimalFormat2.format(g.get_abbe_vd())).append(", ");
         sb.append(decimalFormat2.format(g.get_abbe_ve())).append(", ");
         sb.append(decimalFormat.format(g.get_dpgF())).append("));");

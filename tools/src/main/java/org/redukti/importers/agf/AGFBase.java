@@ -1,6 +1,6 @@
 package org.redukti.importers.agf;
 
-import org.redukti.rayoptics.util.SpectralLine;
+import org.redukti.rayoptics.seq.Glass;
 
 public abstract class AGFBase {
 
@@ -28,15 +28,15 @@ public abstract class AGFBase {
         return get_measurement_index(wavelen);
     }
     public double get_abbe_vd() {
-        return (get_measurement_index(SpectralLine.d) - 1.0)
-                / (get_measurement_index(SpectralLine.F)
-                - get_measurement_index(SpectralLine.C));
+        return (get_measurement_index(Glass.d) - 1.0)
+                / (get_measurement_index(Glass.F)
+                - get_measurement_index(Glass.C));
     }
 
     public double get_abbe_ve() {
-        return (get_measurement_index(SpectralLine.e) - 1.0)
-                / (get_measurement_index(SpectralLine.F_)
-                - get_measurement_index(SpectralLine.C_));
+        return (get_measurement_index(Glass.e) - 1.0)
+                / (get_measurement_index(Glass.F_)
+                - get_measurement_index(Glass.C_));
     }
 
     public void set_dgpF(double value) {

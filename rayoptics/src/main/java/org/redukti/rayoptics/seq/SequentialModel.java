@@ -917,4 +917,46 @@ public class SequentialModel {
         return grids;
     }
 
+    /**
+     * Trace contrast-optimization ray triplets and apply the analysis callback
+     * while the wavelength-specific chief ray and reference sphere are active.
+     */
+    public <T> List<ContrastTraceByWvl<T>> trace_contrast(
+            ContrastTraceCallback<T> callback, int fi, Integer wl,
+            int num_rings, Integer num_spokes,
+            Vector2 sagittal_shift, Vector2 tangential_shift,
+            TraceOptions trace_options) {
+        var osp = opt_model.optical_spec;
+        var wavelengths = osp.wvls.wavelengths;
+        double[] wavelengthList = wl == null
+                ? wavelengths
+                : new double[]{wavelengths[wl]};
+        var field = osp.fov.fields[fi];
+        var focus = osp.defocus().get_focus();
+        var referenceWavelength = central_wavelength();
+        var referenceCoordinates = Trace.setup_pupil_coords(
+                opt_model, field, referenceWavelength, focus, null, null);
+        var referenceImagePoint = referenceCoordinates.ref_sphere.image_pt.project_xy();
+
+        var result = new ArrayList<ContrastTraceByWvl<T>>();
+        var definition = new TraceRingsDef();
+        definition.num_rings = num_rings;
+        for (double wavelength : wavelengthList) {
+            var coordinates = Trace.setup_pupil_coords(
+                    opt_model, field, wavelength, focus, referenceImagePoint, null);
+            field.chief_ray = coordinates.chief_ray_pkg;
+            field.ref_sphere = coordinates.ref_sphere;
+            var rays = Trace.trace_contrast(
+                    opt_model, definition, num_spokes,
+                    sagittal_shift, tangential_shift,
+                    field, wavelength, trace_options);
+            var samples = new ArrayList<T>(rays.size());
+            for (var ray : rays) {
+                samples.add(callback.apply(ray, field, wavelength, focus));
+            }
+            result.add(new ContrastTraceByWvl<>(wavelength, samples));
+        }
+        return result;
+    }
+
 }

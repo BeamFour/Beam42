@@ -745,6 +745,47 @@ public class Trace {
         return grid;
     }
 
+    /**
+     * Trace the reference and the two displaced rays required by contrast
+     * optimization. Pupil displacements are expressed in relative pupil
+     * coordinates. Samples for which either displaced point is outside the
+     * unit pupil, or for which any ray cannot be traced, are omitted.
+     */
+    public static List<ContrastRayTriplet> trace_contrast(
+            OpticalModel opt_model, TraceRingsDef grid_rng, Integer num_spokes,
+            Vector2 sagittal_shift, Vector2 tangential_shift,
+            Field fld, double wvl, TraceOptions trace_options) {
+        trace_options = trace_options.copy();
+        trace_options.check_apertures = true;
+        trace_options.pupil_type = PupilType.REL_PUPIL;
+        trace_options.apply_vignetting = true;
+
+        var samples = new ArrayList<ContrastRayTriplet>();
+        var points = generate_gaussian_quadrature(grid_rng, grid_rng.num_rings, num_spokes);
+        for (var point : points) {
+            var pupil = point.pupil();
+            var sagittalPupil = pupil.plus(sagittal_shift);
+            var tangentialPupil = pupil.plus(tangential_shift);
+            if (!inside_relative_pupil(pupil)
+                    || !inside_relative_pupil(sagittalPupil)
+                    || !inside_relative_pupil(tangentialPupil)) {
+                continue;
+            }
+            var reference = trace_safe(opt_model, pupil, fld, wvl, trace_options).pkg;
+            var sagittal = trace_safe(opt_model, sagittalPupil, fld, wvl, trace_options).pkg;
+            var tangential = trace_safe(opt_model, tangentialPupil, fld, wvl, trace_options).pkg;
+            if (reference != null && sagittal != null && tangential != null) {
+                samples.add(new ContrastRayTriplet(
+                        pupil, reference, sagittal, tangential, point.weight()));
+            }
+        }
+        return samples;
+    }
+
+    private static boolean inside_relative_pupil(Vector2 pupil) {
+        return pupil.x * pupil.x + pupil.y * pupil.y <= 1.0 + 1.0e-14;
+    }
+
     private static List<Vector2> generate_hexapolar_points(TraceRingsDef grid_rng, double max_radius, int num_rings) {
         List<Vector2> points;
         points = new ArrayList<>();

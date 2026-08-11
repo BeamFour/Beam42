@@ -55,7 +55,7 @@ public class Analysis {
         this(prescription,fields,freqs,0);
     }
     public Analysis using_gauss_quadrature_pattern(int num_rings, int num_spokes) {
-        _spot_pattern = SpotOptions.PATTEN_GAUSS_QUADRATURE;
+        _spot_pattern = SpotOptions.PATTERN_GAUSS_QUADRATURE;
         _num_rings = num_rings;
         _num_spokes = num_spokes;
         return this;
@@ -69,7 +69,7 @@ public class Analysis {
         _opt_model = new RayOpticsModelBuilder(_prescription)
                 .build_optical_model(true, _fields,false, VigType.SetPupil, true, _scenario);
         SpotOptions options;
-        if (_spot_pattern == SpotOptions.PATTEN_GAUSS_QUADRATURE) {
+        if (_spot_pattern == SpotOptions.PATTERN_GAUSS_QUADRATURE) {
             options = new SpotOptions().use_gaussian_quadrature().num_rings(_num_rings).num_spokes(_num_spokes);
         }
         else {

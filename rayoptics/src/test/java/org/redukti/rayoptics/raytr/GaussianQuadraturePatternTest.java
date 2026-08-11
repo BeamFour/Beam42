@@ -1,6 +1,8 @@
 package org.redukti.rayoptics.raytr;
 
 import org.junit.jupiter.api.Test;
+import org.redukti.mathlib.Vector2;
+import org.redukti.rayoptics.specs.Field;
 
 import java.util.List;
 
@@ -79,6 +81,62 @@ class GaussianQuadraturePatternTest {
                 () -> Trace.generate_gaussian_quadrature(definition, 0, null));
         assertThrows(IllegalArgumentException.class,
                 () -> Trace.generate_gaussian_quadrature(definition, 1, 0));
+    }
+
+    @Test
+    void contrastPatternUsesPhysicalVignettedPupilAndPreservesShear() {
+        TraceRingsDef definition = new TraceRingsDef();
+        definition.num_rings = 3;
+        Field field = asymmetricVignettedField();
+        Vector2 sagittalShift = new Vector2(0.06743, 0.0);
+        Vector2 tangentialShift = new Vector2(0.0, 0.06743);
+
+        List<Trace.GaussianQuadraturePoint> points =
+                Trace.generate_contrast_quadrature(
+                        definition, 6, sagittalShift, tangentialShift, field);
+
+        assertEquals(18, points.size());
+        assertEquals(1.0,
+                points.stream().mapToDouble(Trace.GaussianQuadraturePoint::weight).sum(),
+                1.0e-14);
+        for (Trace.GaussianQuadraturePoint point : points) {
+            Vector2 pupil = point.pupil();
+            assertTrue(Trace.inside_vignetted_pupil(pupil, field));
+            assertTrue(Trace.inside_vignetted_pupil(pupil.plus(sagittalShift), field));
+            assertTrue(Trace.inside_vignetted_pupil(pupil.plus(tangentialShift), field));
+            assertEquals(sagittalShift.x, pupil.plus(sagittalShift).x - pupil.x, 1.0e-15);
+            assertEquals(tangentialShift.y, pupil.plus(tangentialShift).y - pupil.y, 1.0e-15);
+        }
+    }
+
+    @Test
+    void physicalContrastShearDoesNotChangeWhenItCrossesVignettingAxis() {
+        TraceRingsDef definition = new TraceRingsDef();
+        definition.num_rings = 3;
+        Field field = asymmetricVignettedField();
+        Vector2 tangentialShift = new Vector2(0.0, 0.06743);
+
+        List<Trace.GaussianQuadraturePoint> points =
+                Trace.generate_contrast_quadrature(
+                        definition, 6, Vector2.vector2_0, tangentialShift, field);
+
+        Trace.GaussianQuadraturePoint crossing = points.stream()
+                .filter(point -> point.pupil().y < 0.0
+                        && point.pupil().y + tangentialShift.y > 0.0)
+                .findFirst()
+                .orElseThrow();
+        assertEquals(tangentialShift.y,
+                crossing.pupil().plus(tangentialShift).y - crossing.pupil().y,
+                1.0e-15);
+    }
+
+    private static Field asymmetricVignettedField() {
+        Field field = new Field(null);
+        field.vux = 0.216;
+        field.vlx = 0.216;
+        field.vuy = 0.636;
+        field.vly = 0.687;
+        return field;
     }
 
     private static double weightedMoment(List<Trace.GaussianQuadraturePoint> points, int xPower, int yPower) {

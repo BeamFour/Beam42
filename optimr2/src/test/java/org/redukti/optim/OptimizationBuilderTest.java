@@ -11,6 +11,8 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class OptimizationBuilderTest {
@@ -205,6 +207,80 @@ class OptimizationBuilderTest {
     void rejectsInvalidHexapolarSampleCount() {
         assertThrows(IllegalArgumentException.class, () ->
                 OptimizationBuilder.builder(prescription()).useHexapolarSpotPattern(0));
+    }
+
+    @Test
+    void buildsStablePerSampleContrastGoalsAndSkipsUnusedMtfAnalysis() {
+        var setup = OptimizationBuilder.builder(prescription())
+                .fields(0.0, 1.0)
+                .mtfFrequencies(10, 20)
+                .contrastSampling(2, 4)
+                .contrastGoals(OptimizationBuilder.contrast(20,
+                        new double[]{2.0, 0.5}, new double[]{3.0, 0.25}))
+                .build();
+
+        GoalContrast[] contrastGoals = Arrays.stream(setup.goals())
+                .filter(GoalContrast.class::isInstance)
+                .map(GoalContrast.class::cast)
+                .toArray(GoalContrast[]::new);
+        assertEquals(2 * 3 * 2 * 4 * 2, contrastGoals.length);
+        assertEquals(20, contrastGoals[0]._frequency);
+        assertEquals(0, contrastGoals[0]._field);
+        assertEquals(0, contrastGoals[0]._wavelength);
+        assertEquals(0, contrastGoals[0]._sample);
+        assertEquals(GoalContrast.SAGITTAL, contrastGoals[0]._orientation);
+        assertEquals(2.0, contrastGoals[0]._weight);
+        assertEquals(GoalContrast.TANGENTIAL, contrastGoals[1]._orientation);
+        assertEquals(3.0, contrastGoals[1]._weight);
+
+        Analysis analysis = setup.analysis();
+        assertArrayEquals(new int[]{20}, analysis._contrast_freqs);
+        assertEquals(2, analysis._contrast_num_rings);
+        assertEquals(4, analysis._contrast_num_spokes);
+        assertFalse(analysis._compute_spots);
+        assertFalse(analysis._compute_mtf);
+        assertTrue(analysis._compute_ray_aberrations);
+    }
+
+    @Test
+    void validatesContrastConfiguration() {
+        assertThrows(IllegalArgumentException.class, () ->
+                OptimizationBuilder.builder(prescription()).contrastSampling(0, 6));
+        assertThrows(IllegalArgumentException.class, () ->
+                OptimizationBuilder.builder(prescription())
+                        .fields(0.0, 1.0)
+                        .mtfFrequencies(20)
+                        .contrastGoals(OptimizationBuilder.contrast(20, new double[]{1.0}))
+                        .build());
+        assertThrows(IllegalArgumentException.class, () ->
+                OptimizationBuilder.builder(prescription())
+                        .fields(0.0)
+                        .mtfFrequencies(20)
+                        .contrastGoals(
+                                OptimizationBuilder.contrast(20, new double[]{1.0}),
+                                OptimizationBuilder.contrast(20, new double[]{1.0}))
+                        .build());
+    }
+
+    @Test
+    void computesContrastGoalsWithoutComputingSpotMtf() {
+        var setup = OptimizationBuilder.builder(prescription())
+                .fields(0.0)
+                .mtfFrequencies(20)
+                .dLineOnly(true)
+                .contrastSampling(2, 4)
+                .contrastGoals(OptimizationBuilder.contrast(20, new double[]{1.0}))
+                .build();
+
+        setup.analysis().compute();
+
+        assertEquals(null, setup.analysis()._spots);
+        assertEquals(null, setup.analysis()._mtfs);
+        assertEquals(1, setup.analysis()._contrasts.length);
+        Arrays.stream(setup.goals())
+                .filter(GoalContrast.class::isInstance)
+                .map(GoalContrast.class::cast)
+                .forEach(goal -> assertTrue(Double.isFinite(goal.value())));
     }
 
     @Test

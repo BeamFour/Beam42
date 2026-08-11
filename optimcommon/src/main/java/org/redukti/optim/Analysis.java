@@ -15,12 +15,19 @@ public class Analysis {
     public SpotAnalysisResult.SpotResultsForField[] _spots;
     public RayAberrationResult _ray_aberrations;
     public MTFResultByFreq[] _mtfs;
+    public ContrastAnalysisResult[] _contrasts;
     public int[] _freqs;
+    public int[] _contrast_freqs = new int[0];
     public final int _scenario;
     public int _spot_pattern = SpotOptions.PATTERN_HEXAPOLAR;
     public int _num_rays = 64;
     public int _num_rings = 14;
     public int _num_spokes = 20;
+    public int _contrast_num_rings = 3;
+    public int _contrast_num_spokes = 6;
+    public boolean _compute_spots = true;
+    public boolean _compute_ray_aberrations = true;
+    public boolean _compute_mtf = true;
     public final static int NUM_TRANSVERSE_RAYS = 10;
 
     /**
@@ -65,22 +72,49 @@ public class Analysis {
         _num_rays = num_rays;
         return this;
     }
+    public Analysis using_contrast_analysis(int[] frequencies, int num_rings, int num_spokes) {
+        _contrast_freqs = frequencies == null ? new int[0] : frequencies.clone();
+        _contrast_num_rings = num_rings;
+        _contrast_num_spokes = num_spokes;
+        return this;
+    }
+    public Analysis required_analyses(boolean spots, boolean rayAberrations, boolean mtf) {
+        _compute_spots = spots || mtf;
+        _compute_ray_aberrations = rayAberrations;
+        _compute_mtf = mtf;
+        return this;
+    }
     public void compute() {
         _opt_model = new RayOpticsModelBuilder(_prescription)
                 .build_optical_model(true, _fields,false, VigType.SetPupil, true, _scenario);
-        SpotOptions options;
-        if (_spot_pattern == SpotOptions.PATTERN_GAUSS_QUADRATURE) {
-            options = new SpotOptions().use_gaussian_quadrature().num_rings(_num_rings).num_spokes(_num_spokes);
+        _pfo = ParaxHelper.asArray(_opt_model.optical_spec.parax_data.fod);
+        if (_compute_spots) {
+            SpotOptions options;
+            if (_spot_pattern == SpotOptions.PATTERN_GAUSS_QUADRATURE) {
+                options = new SpotOptions().use_gaussian_quadrature().num_rings(_num_rings).num_spokes(_num_spokes);
+            }
+            else {
+                options = new SpotOptions().use_hexapolar().num_rays(_num_rays);
+            }
+            var spotAnalysis = SpotAnalysis.eval(_opt_model,options);
+            _spots = spotAnalysis.spot_results.toArray(new SpotAnalysisResult.SpotResultsForField[0]);
+            _mtfs = _compute_mtf ? spotAnalysis.computeMTFs(_freqs) : null;
         }
         else {
-            options = new SpotOptions().use_hexapolar().num_rays(_num_rays);
+            _spots = null;
+            _mtfs = null;
         }
-        var spotAnalysis = SpotAnalysis.eval(_opt_model,options);
-        _spots = spotAnalysis.spot_results.toArray(new SpotAnalysisResult.SpotResultsForField[0]);
-        _pfo = ParaxHelper.asArray(_opt_model.optical_spec.parax_data.fod);
-        // we set append_if_none to get all rays even if they
-        // failed to trace, the failed rays are handled in GoalRayAberration
-        _ray_aberrations = TransverseRayAberrationAnalysis.eval(_opt_model, NUM_TRANSVERSE_RAYS,true, new TraceOptions());
-        _mtfs = spotAnalysis.computeMTFs(_freqs);
+        // We set append_if_none to retain failed fan rays; their goals apply a penalty.
+        _ray_aberrations = _compute_ray_aberrations
+                ? TransverseRayAberrationAnalysis.eval(
+                        _opt_model, NUM_TRANSVERSE_RAYS, true, new TraceOptions())
+                : null;
+        _contrasts = new ContrastAnalysisResult[_contrast_freqs.length];
+        for (int i = 0; i < _contrast_freqs.length; i++) {
+            var options = new ContrastOptions(_contrast_freqs[i])
+                    .num_rings(_contrast_num_rings)
+                    .num_spokes(_contrast_num_spokes);
+            _contrasts[i] = ContrastAnalysis.eval(_opt_model, options);
+        }
     }
 }

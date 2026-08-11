@@ -15,7 +15,7 @@ public class ContrastAnalysisResult {
     }
 
     public record Sample(Vector2 pupil, double sagittalDifference,
-                         double tangentialDifference, double weight) {
+                         double tangentialDifference, double weight, boolean valid) {
         public double sagittalResidual() { return Math.sqrt(weight) * sagittalDifference; }
         public double tangentialResidual() { return Math.sqrt(weight) * tangentialDifference; }
     }

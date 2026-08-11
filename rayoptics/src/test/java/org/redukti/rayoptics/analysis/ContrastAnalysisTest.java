@@ -30,7 +30,7 @@ class ContrastAnalysisTest {
         for (var field : result.fields) {
             assertEquals(3, field.wavelengths().size());
             for (var wavelength : field.wavelengths()) {
-                assertFalse(wavelength.samples().isEmpty());
+                assertEquals(12, wavelength.samples().size());
                 assertEquals(1.0, wavelength.samples().stream()
                         .mapToDouble(ContrastAnalysisResult.Sample::weight).sum(), 1.0e-14);
                 for (var sample : wavelength.samples()) {

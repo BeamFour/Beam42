@@ -18,11 +18,6 @@ public class ContrastAnalysis {
             for (int wavelengthIndex = 0; wavelengthIndex < wavelengths.length; wavelengthIndex++) {
                 double wavelength = wavelengths[wavelengthIndex];
                 double shift = normalized_pupil_shift(opticalModel, wavelength, options.spatialFrequency);
-                if (shift >= 2.0) {
-                    wavelengthResults.add(new ContrastAnalysisResult.WavelengthResult(
-                            wavelength, shift, java.util.List.of()));
-                    continue;
-                }
                 var traced = opticalModel.seq_model.trace_contrast(
                         (rays, field, tracedWavelength, focus) -> sample(
                                 opticalModel, rays, field, tracedWavelength, focus),
@@ -31,7 +26,7 @@ public class ContrastAnalysis {
                         new Vector2(shift, 0.0), new Vector2(0.0, shift),
                         options.traceOptions);
                 wavelengthResults.add(new ContrastAnalysisResult.WavelengthResult(
-                        wavelength, shift, normalize_weights(traced.get(0).samples())));
+                        wavelength, shift, traced.get(0).samples()));
             }
             result.fields.add(new ContrastAnalysisResult.FieldResult(fields[fieldIndex], wavelengthResults));
         }
@@ -53,13 +48,20 @@ public class ContrastAnalysis {
             OpticalModel opticalModel, ContrastRayTriplet rays,
             org.redukti.rayoptics.specs.Field field,
             double wavelength, double focus) {
+        if (rays.reference() == null || rays.sagittal() == null || rays.tangential() == null) {
+            return new ContrastAnalysisResult.Sample(
+                    rays.pupil(), 0.0, 0.0, rays.weight(), false);
+        }
         double reference = WavefrontAberrationAnalysis.opd(
                 opticalModel, rays.pupil(), 0, rays.reference(), field, wavelength, focus);
         double sagittal = opd(opticalModel, rays.sagittal(), field, wavelength, focus,
                 rays.sagittal().input_pupil) - reference;
         double tangential = opd(opticalModel, rays.tangential(), field, wavelength, focus,
                 rays.tangential().input_pupil) - reference;
-        return new ContrastAnalysisResult.Sample(rays.pupil(), sagittal, tangential, rays.weight());
+        boolean valid = Double.isFinite(reference)
+                && Double.isFinite(sagittal) && Double.isFinite(tangential);
+        return new ContrastAnalysisResult.Sample(
+                rays.pupil(), sagittal, tangential, rays.weight(), valid);
     }
 
     private static double opd(OpticalModel opticalModel,
@@ -70,16 +72,4 @@ public class ContrastAnalysis {
                 opticalModel, pupil, 0, ray, field, wavelength, focus);
     }
 
-    private static java.util.List<ContrastAnalysisResult.Sample> normalize_weights(
-            java.util.List<ContrastAnalysisResult.Sample> samples) {
-        double total = samples.stream().mapToDouble(ContrastAnalysisResult.Sample::weight).sum();
-        if (total == 0.0) return samples;
-        var normalized = new ArrayList<ContrastAnalysisResult.Sample>(samples.size());
-        for (var sample : samples) {
-            normalized.add(new ContrastAnalysisResult.Sample(
-                    sample.pupil(), sample.sagittalDifference(), sample.tangentialDifference(),
-                    sample.weight() / total));
-        }
-        return normalized;
-    }
 }

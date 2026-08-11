@@ -748,8 +748,9 @@ public class Trace {
     /**
      * Trace the reference and the two displaced rays required by contrast
      * optimization. Pupil displacements are expressed in relative pupil
-     * coordinates. Samples for which either displaced point is outside the
-     * unit pupil, or for which any ray cannot be traced, are omitted.
+     * coordinates. Every quadrature sample is returned so clients can keep a
+     * stable residual layout; a ray is null when its pupil point is outside
+     * the unit pupil or the trace fails.
      */
     public static List<ContrastRayTriplet> trace_contrast(
             OpticalModel opt_model, TraceRingsDef grid_rng, Integer num_spokes,
@@ -761,25 +762,43 @@ public class Trace {
         trace_options.apply_vignetting = true;
 
         var samples = new ArrayList<ContrastRayTriplet>();
-        var points = generate_gaussian_quadrature(grid_rng, grid_rng.num_rings, num_spokes);
+        // The base pupil must be valid at p, p+s and p+t. Sample an inscribed
+        // circle of that three-disk overlap, centred between the three pupils.
+        var overlapDefinition = new TraceRingsDef();
+        overlapDefinition.num_rings = grid_rng.num_rings;
+        overlapDefinition.cx = grid_rng.cx - 0.5 * (sagittal_shift.x + tangential_shift.x);
+        overlapDefinition.cy = grid_rng.cy - 0.5 * (sagittal_shift.y + tangential_shift.y);
+        var overlapCenter = new Vector2(overlapDefinition.cx, overlapDefinition.cy);
+        double enclosingRadius = Math.max(
+                overlapCenter.minus(new Vector2(grid_rng.cx, grid_rng.cy)).len(),
+                Math.max(
+                        overlapCenter.minus(new Vector2(
+                                grid_rng.cx - sagittal_shift.x,
+                                grid_rng.cy - sagittal_shift.y)).len(),
+                        overlapCenter.minus(new Vector2(
+                                grid_rng.cx - tangential_shift.x,
+                                grid_rng.cy - tangential_shift.y)).len()));
+        overlapDefinition.max_radius = Math.max(0.0, grid_rng.max_radius - enclosingRadius);
+        var points = generate_gaussian_quadrature(
+                overlapDefinition, overlapDefinition.num_rings, num_spokes);
         for (var point : points) {
             var pupil = point.pupil();
             var sagittalPupil = pupil.plus(sagittal_shift);
             var tangentialPupil = pupil.plus(tangential_shift);
-            if (!inside_relative_pupil(pupil)
-                    || !inside_relative_pupil(sagittalPupil)
-                    || !inside_relative_pupil(tangentialPupil)) {
-                continue;
-            }
-            var reference = trace_safe(opt_model, pupil, fld, wvl, trace_options).pkg;
-            var sagittal = trace_safe(opt_model, sagittalPupil, fld, wvl, trace_options).pkg;
-            var tangential = trace_safe(opt_model, tangentialPupil, fld, wvl, trace_options).pkg;
-            if (reference != null && sagittal != null && tangential != null) {
-                samples.add(new ContrastRayTriplet(
-                        pupil, reference, sagittal, tangential, point.weight()));
-            }
+            var reference = trace_if_inside(opt_model, pupil, fld, wvl, trace_options);
+            var sagittal = trace_if_inside(opt_model, sagittalPupil, fld, wvl, trace_options);
+            var tangential = trace_if_inside(opt_model, tangentialPupil, fld, wvl, trace_options);
+            samples.add(new ContrastRayTriplet(
+                    pupil, reference, sagittal, tangential, point.weight()));
         }
         return samples;
+    }
+
+    private static RayPkg trace_if_inside(OpticalModel opt_model, Vector2 pupil,
+                                          Field fld, double wvl, TraceOptions trace_options) {
+        return inside_relative_pupil(pupil)
+                ? trace_safe(opt_model, pupil, fld, wvl, trace_options).pkg
+                : null;
     }
 
     private static boolean inside_relative_pupil(Vector2 pupil) {

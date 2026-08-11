@@ -30,7 +30,10 @@ public final class OptimizationBuilder {
     private boolean dLineOnly;
     private boolean useHexapolarSpotPattern;
     private int hexapolarSpotRays = 64;
+    private int contrastRings = 3;
+    private int contrastSpokes = 6;
     private final List<MtfGoals> mtfGoals = new ArrayList<>();
+    private final List<ContrastGoals> contrastGoals = new ArrayList<>();
     private final List<Var> additionalVariables = new ArrayList<>();
     private final List<GoalFactory> additionalGoalFactories = new ArrayList<>();
     private SpotGoals spotRmsGoals;
@@ -60,6 +63,17 @@ public final class OptimizationBuilder {
     public static MtfGoals mtf(int frequency, double[] sagittal, double[] tangential,
                                double[] sagittalWeights, double[] tangentialWeights) {
         return new MtfGoals(frequency, sagittal, tangential, sagittalWeights, tangentialWeights);
+    }
+
+    /** Contrast optimization at one frequency, with one directional weight per field. */
+    public static ContrastGoals contrast(int frequency, double[] sagittalWeights,
+                                         double[] tangentialWeights) {
+        return new ContrastGoals(frequency, sagittalWeights, tangentialWeights);
+    }
+
+    /** Applies one weight per field to both contrast directions. */
+    public static ContrastGoals contrast(int frequency, double[] weights) {
+        return new ContrastGoals(frequency, weights, weights);
     }
 
     public OptimizationBuilder fields(double... fields) {
@@ -137,6 +151,21 @@ public final class OptimizationBuilder {
         return this;
     }
 
+    public OptimizationBuilder contrastGoals(ContrastGoals... goals) {
+        if (goals == null)
+            throw new IllegalArgumentException("contrast goals must not be null");
+        this.contrastGoals.addAll(Arrays.asList(goals));
+        return this;
+    }
+
+    public OptimizationBuilder contrastSampling(int rings, int spokes) {
+        if (rings < 1 || spokes < 1)
+            throw new IllegalArgumentException("contrast rings and spokes must be at least 1");
+        contrastRings = rings;
+        contrastSpokes = spokes;
+        return this;
+    }
+
     public OptimizationBuilder spotRmsGoals(double[] targets) {
         return spotRmsGoals(targets, null);
     }
@@ -190,7 +219,24 @@ public final class OptimizationBuilder {
         List<Var> variables = buildVariables();
         List<Goal> goals = buildGoals(analysis);
         configureSpotPattern(analysis, goals);
+        configureContrastAnalysis(analysis, goals);
         return new OptimizationSetup(analysis, variables.toArray(new Var[0]), goals.toArray(new Goal[0]));
+    }
+
+    private void configureContrastAnalysis(Analysis analysis, List<Goal> goals) {
+        if (contrastGoals.isEmpty()) return;
+        int[] frequencies = contrastGoals.stream().mapToInt(goal -> goal.frequency).toArray();
+        analysis.using_contrast_analysis(frequencies, contrastRings, contrastSpokes);
+        // Contrast-only MTF optimization must not retain the cost of spot/MTF analysis.
+        // Additional goal factories are conservatively assumed to require all analyses.
+        if (additionalGoalFactories.isEmpty()) {
+            boolean spots = goals.stream().anyMatch(goal ->
+                    goal instanceof GoalSpotRMS || goal instanceof GoalSpotMaxRadius || goal instanceof GeoMTF);
+            boolean mtf = goals.stream().anyMatch(GeoMTF.class::isInstance);
+            boolean rayAberrations = goals.stream().anyMatch(goal ->
+                    goal instanceof GoalRayAberration || goal instanceof GoalMTFProxy);
+            analysis.required_analyses(spots, rayAberrations, mtf);
+        }
     }
 
     private void configureSpotPattern(Analysis analysis, List<Goal> goals) {
@@ -243,6 +289,23 @@ public final class OptimizationBuilder {
                         curve.sagittal[field] / 100.0, curve.sagittalWeights[field]));
                 result.add(new GeoMTF(analysis, field + 1, TANGENTIAL, curve.frequency,
                         curve.tangential[field] / 100.0, curve.tangentialWeights[field]));
+            }
+        }
+
+        int contrastSamples = contrastRings * contrastSpokes;
+        for (ContrastGoals curve : contrastGoals) {
+            for (int field = 0; field < fields.length; field++) {
+                for (int wavelength = 0; wavelength < prescription._wvls.length; wavelength++) {
+                    double wavelengthWeight = weighted ? prescription._wts[wavelength] : 1.0;
+                    for (int sample = 0; sample < contrastSamples; sample++) {
+                        result.add(new GoalContrast(analysis, curve.frequency, field + 1,
+                                wavelength, sample, SAGITTAL,
+                                wavelengthWeight * curve.sagittalWeights[field]));
+                        result.add(new GoalContrast(analysis, curve.frequency, field + 1,
+                                wavelength, sample, TANGENTIAL,
+                                wavelengthWeight * curve.tangentialWeights[field]));
+                    }
+                }
             }
         }
 
@@ -307,6 +370,14 @@ public final class OptimizationBuilder {
                 throw new IllegalArgumentException("MTF goal frequency was not requested for measurement: " + curve.frequency);
             if (!goalFrequencies.add(curve.frequency))
                 throw new IllegalArgumentException("duplicate MTF goal frequency: " + curve.frequency);
+            curve.validate(fields.length);
+        }
+        Set<Integer> contrastFrequencies = new HashSet<>();
+        for (ContrastGoals curve : contrastGoals) {
+            if (curve == null)
+                throw new IllegalArgumentException("contrast goals must not contain null");
+            if (curve.frequency <= 0 || !contrastFrequencies.add(curve.frequency))
+                throw new IllegalArgumentException("contrast frequencies must be positive and unique");
             curve.validate(fields.length);
         }
         if (spotRmsGoals != null)
@@ -392,6 +463,23 @@ public final class OptimizationBuilder {
             for (double value : values)
                 if (!Double.isFinite(value) || value < 0.0)
                     throw new IllegalArgumentException(name + " must be finite and non-negative");
+        }
+    }
+
+    public static final class ContrastGoals {
+        private final int frequency;
+        private final double[] sagittalWeights;
+        private final double[] tangentialWeights;
+
+        private ContrastGoals(int frequency, double[] sagittalWeights, double[] tangentialWeights) {
+            this.frequency = frequency;
+            this.sagittalWeights = copy(sagittalWeights);
+            this.tangentialWeights = copy(tangentialWeights);
+        }
+
+        private void validate(int fieldCount) {
+            MtfGoals.validateWeights(sagittalWeights, fieldCount, "sagittal contrast weights");
+            MtfGoals.validateWeights(tangentialWeights, fieldCount, "tangential contrast weights");
         }
     }
 

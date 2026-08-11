@@ -2,8 +2,6 @@ package org.redukti.rayoptics.analysis;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.redukti.data.DiscreteSet;
-import org.redukti.data.Interpolation;
 import org.redukti.mathlib.M;
 import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
 import org.redukti.rayoptics.optical.OpticalModel;
@@ -14,14 +12,22 @@ import org.redukti.rayoptics.specs.*;
 import org.redukti.rayoptics.util.Pair;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 
 public class MtfTest {
 
-    static final DecimalFormat df = M.decimal_format();
+    static final DecimalFormat df = decimalFormat();
+
+    private static DecimalFormat decimalFormat() {
+        DecimalFormat format = M.decimal_format();
+        format.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(Locale.ROOT));
+        return format;
+    }
 
     static OpticalModel buildTestModel() {
         OpticalModel opm = new OpticalModel();
@@ -142,8 +148,10 @@ public class MtfTest {
         return opm;
     }
 
-    static List<MTFResultByFreq> generateMTFs(OpticalModel opm, int[] freqs, double[] fields, Map<Double,Double> wv_wts, boolean use_guass_quadrature) {
-        var spotAnalysis = SpotAnalysis.eval(opm,new SpotOptions(use_guass_quadrature));
+    static List<MTFResultByFreq> generateMTFs(OpticalModel opm, int[] freqs,
+                                              Map<Double,Double> wv_wts,
+                                              SpotOptions spotOptions) {
+        var spotAnalysis = SpotAnalysis.eval(opm, spotOptions);
         var mtfs = new ArrayList<PolyMTF>();
         for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
             var spotFld = spotAnalysis.spot_results.get(i);
@@ -188,8 +196,6 @@ public class MtfTest {
         for (var i = 0; i < mtfs_by_freq.size(); i++) {
             var mtf = mtfs_by_freq.get(i);
             for (int xy = 0; xy < 2; xy++) {
-                var set = new DiscreteSet();
-                set.set_interpolation(Interpolation.Cubic);
                 double[] mtf_data = (xy == 0) ? mtf.sag_mtf_by_field : mtf.tan_mtf_by_field;
                 sb.append(mtf.freq).append(" ").append(xy==0?"sag":"tan").append(",");
                 for (int j = 0; j < mtf_data.length; j++) {
@@ -203,16 +209,21 @@ public class MtfTest {
         return sb.toString();
     }
     @Test
-    public void testMtf() {
+    public void testMtfSamplingPatterns() {
         var opm = buildTestModel();
-        var mtfByFreq = generateMTFs(opm,
+        var wavelengthWeights = get_wvl_wts(
+                new double[] {587.5618, 486.1327, 656.2725},
+                new double[] {1.0, 1.0, 1.0});
+        var hexapolarMtf = generateMTFs(opm,
                 new int[] {10,30,50},
-                new double[] { 0.0, 0.7, 1.0 },
-                get_wvl_wts(new double[] {587.5618, 486.1327, 656.2725},
-                        new double[] {1.0, 1.0, 1.0}),
-                false);
-        var results = toString(mtfByFreq, new double[] { 0.0, 0.7, 1.0 });
-        String expected = """
+                wavelengthWeights,
+                new SpotOptions().use_hexapolar().num_rays(64));
+        var quadratureMtf = generateMTFs(opm,
+                new int[] {10,30,50},
+                wavelengthWeights,
+                new SpotOptions().use_gaussian_quadrature().num_rings(14).num_spokes(20));
+
+        String expectedHexapolar = """
 ,0,0.7,1
 10 sag,0.967,0.955,0.763
 10 tan,0.967,0.949,0.939
@@ -221,19 +232,7 @@ public class MtfTest {
 50 sag,0.519,0.47,0.414
 50 tan,0.519,0.385,0.319
 """;
-        Assertions.assertEquals(expected,results);
-    }
-    @Test
-    public void testMtfUsingGaussQuadrature() {
-        var opm = buildTestModel();
-        var mtfByFreq = generateMTFs(opm,
-                new int[] {10,30,50},
-                new double[] { 0.0, 0.7, 1.0 },
-                get_wvl_wts(new double[] {587.5618, 486.1327, 656.2725},
-                        new double[] {1.0, 1.0, 1.0}),
-                true);
-        var results = toString(mtfByFreq, new double[] { 0.0, 0.7, 1.0 });
-        String expected = """
+        String expectedQuadrature = """
 ,0,0.7,1
 10 sag,0.967,0.954,0.766
 10 tan,0.967,0.95,0.94
@@ -242,7 +241,27 @@ public class MtfTest {
 50 sag,0.519,0.478,0.417
 50 tan,0.519,0.388,0.316
 """;
-        Assertions.assertEquals(expected,results);
+        double[] fields = {0.0, 0.7, 1.0};
+        Assertions.assertEquals(expectedHexapolar, toString(hexapolarMtf, fields));
+        Assertions.assertEquals(expectedQuadrature, toString(quadratureMtf, fields));
+        assertMtfClose(hexapolarMtf, quadratureMtf, 0.01);
+    }
+
+    private static void assertMtfClose(List<MTFResultByFreq> expected,
+                                       List<MTFResultByFreq> actual,
+                                       double tolerance) {
+        Assertions.assertEquals(expected.size(), actual.size());
+        for (int frequency = 0; frequency < expected.size(); frequency++) {
+            MTFResultByFreq expectedResult = expected.get(frequency);
+            MTFResultByFreq actualResult = actual.get(frequency);
+            Assertions.assertEquals(expectedResult.freq, actualResult.freq);
+            Assertions.assertArrayEquals(expectedResult.sag_mtf_by_field,
+                    actualResult.sag_mtf_by_field, tolerance,
+                    "Sagittal MTF differs at " + expectedResult.freq + " cycles/mm");
+            Assertions.assertArrayEquals(expectedResult.tan_mtf_by_field,
+                    actualResult.tan_mtf_by_field, tolerance,
+                    "Tangential MTF differs at " + expectedResult.freq + " cycles/mm");
+        }
     }
 
 }

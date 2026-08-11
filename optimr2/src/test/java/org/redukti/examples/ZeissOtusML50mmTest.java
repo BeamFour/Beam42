@@ -1,11 +1,13 @@
 package org.redukti.examples;
 
 import org.junit.jupiter.api.Test;
+import org.redukti.optim.ParaxHelper;
 import org.redukti.rayoptics.analysis.SpotOptions;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -35,6 +37,21 @@ class ZeissOtusML50mmTest {
         assertTrue(finalRms < initialRms,
                 () -> "Expected RMS merit to improve from " + initialRms + " but got " + finalRms);
         assertEquals(0.0160522, finalRms, 1.0e-6);
+
+        var analysis = setup.analysis();
+        assertEquals(50.1770744, analysis._pfo[ParaxHelper.Effective_focal_length], 1.0e-6);
+        assertEquals(1.43832395, analysis._pfo[ParaxHelper.Fno], 1.0e-6);
+        assertArrayEquals(new double[]{
+                        5.83978998, 7.20583613, 7.53832391, 8.69058359},
+                java.util.Arrays.stream(analysis._spots)
+                        .mapToDouble(spot -> spot.get_mean_radius()).toArray(),
+                1.0e-6);
+        assertArrayEquals(new double[]{
+                        0.59088210, 0.59802511, 0.52815747, 0.62313845},
+                analysis._mtfs[2].sag_mtf_by_field, 1.0e-6);
+        assertArrayEquals(new double[]{
+                        0.59088210, 0.54005008, 0.47372891, 0.32960330},
+                analysis._mtfs[2].tan_mtf_by_field, 1.0e-6);
     }
 
     private static Path repositoryRoot() {

@@ -17,9 +17,11 @@ public class Analysis {
     public MTFResultByFreq[] _mtfs;
     public int[] _freqs;
     public final int _scenario;
-
+    public int _spot_pattern = SpotOptions.PATTERN_HEXAPOLAR;
+    public int _num_rays = 64;
+    public int _num_rings = 14;
+    public int _num_spokes = 20;
     public final static int NUM_TRANSVERSE_RAYS = 10;
-    public final static int NUM_SPOT_RAYS = 64;
 
     /**
      * Systems and spot analysis setup for each field
@@ -52,11 +54,28 @@ public class Analysis {
     public Analysis(Prescription prescription, double[] fields, int[] freqs) {
         this(prescription,fields,freqs,0);
     }
+    public Analysis using_gauss_quadrature_pattern(int num_rings, int num_spokes) {
+        _spot_pattern = SpotOptions.PATTEN_GAUSS_QUADRATURE;
+        _num_rings = num_rings;
+        _num_spokes = num_spokes;
+        return this;
+    }
+    public Analysis using_hexapolar_pattern(int num_rays) {
+        _spot_pattern = SpotOptions.PATTERN_HEXAPOLAR;
+        _num_rays = num_rays;
+        return this;
+    }
     public void compute() {
-        // TODO support scenarios
         _opt_model = new RayOpticsModelBuilder(_prescription)
                 .build_optical_model(true, _fields,false, VigType.SetPupil, true, _scenario);
-        var spotAnalysis = SpotAnalysis.eval(_opt_model,new SpotOptions().num_rays(NUM_SPOT_RAYS).use_grid(false));
+        SpotOptions options;
+        if (_spot_pattern == SpotOptions.PATTEN_GAUSS_QUADRATURE) {
+            options = new SpotOptions().use_gaussian_quadrature().num_rings(_num_rings).num_spokes(_num_spokes);
+        }
+        else {
+            options = new SpotOptions().use_hexapolar().num_rays(_num_rays);
+        }
+        var spotAnalysis = SpotAnalysis.eval(_opt_model,options);
         _spots = spotAnalysis.spot_results.toArray(new SpotAnalysisResult.SpotResultsForField[0]);
         _pfo = ParaxHelper.asArray(_opt_model.optical_spec.parax_data.fod);
         // we set append_if_none to get all rays even if they

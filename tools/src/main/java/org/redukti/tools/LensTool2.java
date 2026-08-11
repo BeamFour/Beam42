@@ -176,7 +176,7 @@ public class LensTool2 {
     }
 
     private static void generateMTFs(OpticalModel opm, Args arguments, double[] fields, Map<Double,Double> wv_wts, String outname, String filename_suffix) throws Exception {
-        var spotAnalysis = SpotAnalysis.eval(opm,new SpotOptions().num_rays(64).use_grid(false));
+        var spotAnalysis = SpotAnalysis.eval(opm,new SpotOptions());
         var mtfs = new ArrayList<PolyMTF>();
         for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
             var spotFld = spotAnalysis.spot_results.get(i);

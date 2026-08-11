@@ -54,12 +54,13 @@ public class SpotAnalysis {
         var ref_wvl = fov.optical_spec.wvls.central_wvl();
         for (int fi = 0; fi < fov.fields.length; fi++) {
             Field f = fov.fields[fi];
-            if (options.use_grid)
+            if (options.is_grid())
                 result.add(f, eval_grid(opt_model,fi,null,num_rays,trace_options), ref_wvl);
-            else if (options.use_gaussian_quadrature)
+            else if (options.is_gauss_quadrature())
                 result.add(f, eval_gaussian_quadrature(
                         opt_model, fi, null, num_rays, options.num_spokes, trace_options), ref_wvl);
             else
+                // hexapolar
                 result.add(f, eval_rings(opt_model,fi,null,num_rays,trace_options), ref_wvl);
         }
         return result;

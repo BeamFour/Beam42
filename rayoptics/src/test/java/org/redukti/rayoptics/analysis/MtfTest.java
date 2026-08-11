@@ -142,8 +142,8 @@ public class MtfTest {
         return opm;
     }
 
-    static List<MTFResultByFreq> generateMTFs(OpticalModel opm, int[] freqs, double[] fields, Map<Double,Double> wv_wts) {
-        var spotAnalysis = SpotAnalysis.eval(opm,new SpotOptions().num_rays(64).use_grid(false));
+    static List<MTFResultByFreq> generateMTFs(OpticalModel opm, int[] freqs, double[] fields, Map<Double,Double> wv_wts, boolean use_guass_quadrature) {
+        var spotAnalysis = SpotAnalysis.eval(opm,new SpotOptions(use_guass_quadrature));
         var mtfs = new ArrayList<PolyMTF>();
         for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
             var spotFld = spotAnalysis.spot_results.get(i);
@@ -209,7 +209,8 @@ public class MtfTest {
                 new int[] {10,30,50},
                 new double[] { 0.0, 0.7, 1.0 },
                 get_wvl_wts(new double[] {587.5618, 486.1327, 656.2725},
-                        new double[] {1.0, 1.0, 1.0}));
+                        new double[] {1.0, 1.0, 1.0}),
+                false);
         var results = toString(mtfByFreq, new double[] { 0.0, 0.7, 1.0 });
         String expected = """
 ,0,0.7,1
@@ -222,4 +223,26 @@ public class MtfTest {
 """;
         Assertions.assertEquals(expected,results);
     }
+    @Test
+    public void testMtfUsingGaussQuadrature() {
+        var opm = buildTestModel();
+        var mtfByFreq = generateMTFs(opm,
+                new int[] {10,30,50},
+                new double[] { 0.0, 0.7, 1.0 },
+                get_wvl_wts(new double[] {587.5618, 486.1327, 656.2725},
+                        new double[] {1.0, 1.0, 1.0}),
+                true);
+        var results = toString(mtfByFreq, new double[] { 0.0, 0.7, 1.0 });
+        String expected = """
+,0,0.7,1
+10 sag,0.967,0.954,0.766
+10 tan,0.967,0.95,0.94
+30 sag,0.753,0.713,0.507
+30 tan,0.753,0.654,0.593
+50 sag,0.519,0.478,0.417
+50 tan,0.519,0.388,0.316
+""";
+        Assertions.assertEquals(expected,results);
+    }
+
 }

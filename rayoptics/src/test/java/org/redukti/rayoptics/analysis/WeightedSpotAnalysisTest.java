@@ -36,12 +36,14 @@ class WeightedSpotAnalysisTest {
 
     @Test
     void selectingGridAndQuadraturePatternsIsUnambiguous() {
-        var options = new SpotOptions().use_gaussian_quadrature(true);
-        assertTrue(options.use_gaussian_quadrature);
-        assertFalse(options.use_grid);
+        var options = new SpotOptions(true);
+        assertTrue(options.is_gauss_quadrature());
+        assertFalse(options.is_grid());
+        assertFalse(options.is_hexapolar());
 
-        options.use_grid(true);
-        assertTrue(options.use_grid);
-        assertFalse(options.use_gaussian_quadrature);
+        options.use_grid();
+        assertTrue(options.is_grid());
+        assertFalse(options.is_gauss_quadrature());
+        assertFalse(options.is_hexapolar());
     }
 }

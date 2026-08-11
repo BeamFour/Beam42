@@ -1,0 +1,381 @@
+# Review: Contrast Optimization implementation
+
+Review of the contrast-optimization implementation on branch `contrast_opt`, against:
+
+> *Contrast Optimization: A faster and better technique for optimizing on MTF*
+> Ken Moore, Erin Elliott, Mark Nicholson, Chris Normanshire, Shawn Gay, Jade Aiona — Zemax, LLC
+
+Test case: `ZeissOtusML50mmTest.optimizesPatentPrescriptionUsingContrast()`
+
+## Code under review
+
+| File | Role |
+| --- | --- |
+| [ContrastAnalysis.java](rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysis.java) | frequency → pupil shear, wavefront-difference sampling |
+| [ContrastAnalysisResult.java](rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysisResult.java) | sample/residual container |
+| [ContrastOptions.java](rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastOptions.java) | sampling configuration |
+| [Trace.java:755](rayoptics/src/main/java/org/redukti/rayoptics/raytr/Trace.java:755) | `trace_contrast` — overlap region and ray triplets |
+| [SequentialModel.java:924](rayoptics/src/main/java/org/redukti/rayoptics/seq/SequentialModel.java:924) | per-wavelength chief ray / reference sphere setup |
+| [GoalContrast.java](optimcommon/src/main/java/org/redukti/optim/GoalContrast.java) | one residual per (freq, field, wavelength, sample, orientation) |
+| [Analysis.java:112](optimcommon/src/main/java/org/redukti/optim/Analysis.java:112) | analysis driver |
+| [OptimizationBuilder.java:295](optimr2/src/main/java/org/redukti/optim/OptimizationBuilder.java:295) | goal construction |
+
+## Verdict
+
+The structure is faithful to the paper. One real bug materially corrupts the off-axis
+merit; a second tuning problem is costing measurable lens quality. Both are fixable
+without redesigning anything.
+
+**What is correct:**
+
+- Shear `= 2·λ·F#·ν` in normalized pupil radii
+  ([ContrastAnalysis.java:40](rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysis.java:40))
+  — displacement 2 at the incoherent cutoff `1/(λF#)`. `fod.fno` is the working F/#,
+  so finite conjugates are handled.
+- OPD is returned in waves, so residuals are commensurate across wavelengths.
+- Gauss-Legendre quadrature weights sum to 1 and enter the residual as `√w`, with the
+  goal weight contributing a second `√w` in `LMDerMeritFunction`, giving a correct
+  weighted least squares `Σr² = Σ w·ΔW²`.
+- Sharing the reference ray between the sagittal and tangential members of a triplet
+  is a genuine 3-rays-per-sample economy over the naive 4.
+- The pupil-shift direction convention (sagittal = x shear, tangential = y shear) is
+  the standard one.
+- `check_apertures = false` during the triplet trace is a deliberate and correct
+  smoothness choice, consistent with how the wavefront fans are traced.
+- Unlike the neighbouring `trace_grid` / `trace_rings`, `trace_contrast` correctly uses
+  `wavelengths[wl]` rather than the central wavelength when a single wavelength index
+  is requested.
+
+**Measured speed claim (warm JIT, 20 repetitions):**
+
+```
+contrast analysis only            15.7 ms
+contrast + ray-aberration fans    15.8 ms
+contrast + fans + spot/MTF        64.4 ms
+```
+
+The paper's central claim holds — a contrast evaluation is **4.1× cheaper** than the
+full spot/MTF analysis it replaces.
+
+---
+
+## 1. Vignetting silently rescales the shear — the off-axis merit runs at the wrong frequency
+
+**Severity: high. This is a live bug in the test case, not a latent one.**
+
+[Trace.java:765](rayoptics/src/main/java/org/redukti/rayoptics/raytr/Trace.java:765) sets
+`apply_vignetting = true` while working in `REL_PUPIL` coordinates, so `Field.apply_vignetting`
+rescales every pupil coordinate before the trace. But the shear is computed from the axial
+F/# in *unvignetted* pupil fractions and then applied in *vignetted-relative* coordinates.
+
+This lens is heavily vignetted (`vuy = 0.636`, `vly = 0.687`, `vux = vlx = 0.216` at full
+field), so the shear that actually reaches the ray trace is:
+
+| field | sagittal shear | → effective ν | tangential shear (upper/lower) | → effective ν |
+| --- | --- | --- | --- | --- |
+| 0.0 | 0.06743 | 40.0 | 0.06743 / 0.06743 | 40.0 / 40.0 |
+| 0.3 | 0.06651 | 39.5 | 0.06222 / 0.05580 | 36.9 / 33.1 |
+| 0.7 | 0.06167 | 36.6 | 0.04614 / 0.03707 | 27.4 / 22.0 |
+| 1.0 | 0.05284 | **31.3** | 0.02456 / 0.02110 | **14.6 / 12.5** |
+
+(requested shear for 40 cyc/mm = 0.06743 pupil radii)
+
+At full field the tangential contrast goal is effectively optimizing ~13 cyc/mm while
+asking for 40. Two further consequences:
+
+- Because `apply_vignetting` applies a *different* scale to the upper and lower pupil,
+  the shear is not a rigid translation — it kinks at `pupil.y = 0`, so a base point and
+  its sheared partner straddling the axis get inconsistent displacements.
+- The three-disk overlap geometry in `trace_contrast` is reasoned in the pre-vignetting
+  coordinate system while the physics happens post-vignetting, so the sampled region no
+  longer matches the real aperture.
+
+**Symptom:** `tan@40` at field 3 is the worst number in every configuration tried
+(0.539–0.567) and is the *only* metric that does not respond to better sampling. The
+merit barely sees it.
+
+**Suggested fix:** trace the triplet with `apply_vignetting = false` and construct the
+sample region inside the vignetted aperture explicitly, so the shear remains a true
+translation in physical pupil space. Rescaling the shift per axis is a partial patch —
+it does not remove the upper/lower kink.
+
+---
+
+## 2. The default 3×6 sampling is too coarse, and the optimizer exploits it
+
+**Severity: high (quality, not correctness).**
+
+`ContrastOptions` defaults to 3 rings × 6 spokes = 18 points, and
+`createContrastSetup` uses `contrastSampling(3, 6)`.
+
+On the **starting** design 18 points are adequate — 0.2084 against a converged 0.2074,
+0.5% error. On the **optimized** design they are not:
+
+| field | σ(ΔW) at 3×6 (what the optimizer sees) | converged (20×40) | error |
+| --- | --- | --- | --- |
+| 0 | 0.0569 | 0.0629 | −10% |
+| 1 | 0.0687 | 0.0962 | −29% |
+| 2 | 0.0352 | 0.0644 | **−45%** |
+| 3 | 0.0402 | 0.0416 | −3% |
+
+Accurate before optimization, badly wrong after — that asymmetry is the signature of
+fitting the quadrature grid rather than the wavefront.
+
+Re-optimizing at 6×12 produces a genuinely better lens, measured on the *independent*
+spot/MTF analysis:
+
+| configuration | solve time | spot RMS | sag@40 | tan@40 |
+| --- | --- | --- | --- | --- |
+| 3×6, freqs 10/20/40 (current) | 33.5 s | 2.52, 5.73, 5.19, 5.11 | .908 .809 .792 .830 | .908 .751 .727 .567 |
+| 6×12, freqs 10/20/40 | 140.0 s | 2.34, **3.76**, **4.26**, 5.19 | .915 .860 .819 .847 | .915 .822 .766 .539 |
+| 6×12, freq 40 only | 55.6 s | 2.32, 3.94, 4.38, 5.14 | .918 .855 .815 .844 | .918 .821 .758 .552 |
+| 8×16, freq 40 only | 93.8 s | 2.32, 3.95, 4.40, 5.19 | .918 .856 .813 .846 | .918 .822 .759 .539 |
+
+Field-1 spot RMS improves 34%; sagittal MTF improves at every field. The single
+regression is `tan@40` at field 3 (0.567 → 0.539) — the field crippled by issue 1.
+
+8×16 reproduces 6×12, so **6×12 is converged**; there is no reason to go finer.
+
+---
+
+## 3. The residual is the un-centred second moment, not the variance
+
+**Severity: medium.**
+
+The modulus of the OTF is
+
+```
+|OTF| = |⟨exp(iΦ)⟩|  ≈  1 − Var(Φ)/2        where Φ = 2π·ΔW
+```
+
+i.e. it depends on the **variance** of the phase difference, not on `⟨Φ²⟩`. A constant
+`ΔW` across the pupil is a pure image displacement (it moves the phase transfer
+function, not the modulus) and costs no MTF at all. But
+[ContrastAnalysisResult.java:19](rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysisResult.java:19)
+forms `√w · ΔW` with no mean removal, so `Σr² = ⟨Φ²⟩ = Var + mean²`.
+
+This is not negligible, and it concentrates:
+
+- Overall the mean term is **5.2%** of the total contrast sum-of-squares.
+- At field 1, tangential, 40 cyc/mm: mean = −0.220 waves against rms 0.337 — the mean
+  accounts for **42%** of that block's residual.
+- The mean scales exactly linearly with the shear (−0.0578 / −0.1145 / −0.2198 at
+  10 / 20 / 40 cyc/mm), confirming it is pure wavefront tilt, i.e. image displacement.
+- By symmetry the sagittal mean is zero on all fields, so the whole effect lands on the
+  tangential residuals.
+
+**Suggested fix:** subtract the weighted mean per (frequency, field, wavelength,
+orientation) group. The residual `√w_i·(ΔW_i − ΔW̄)` is still smooth and LM handles the
+rank-1 deficiency per group without trouble.
+
+If you want to retain a polychromatic lateral-color penalty, subtract the *reference
+wavelength's* mean from every wavelength rather than each wavelength's own mean — that
+keeps colour-dependent tilt (which does reduce polychromatic MTF) while discarding the
+common tilt (which does not).
+
+---
+
+## 4. The three frequencies are near-collinear — two thirds of the ray budget is wasted
+
+**Severity: medium (performance).**
+
+At 40 cyc/mm the shear is 0.067 pupil radii, i.e. **3.4% of the 1186 cyc/mm cutoff**. In
+that limit `ΔW ≈ s·∂W/∂y`, so the residual is just a scaled OPD gradient and every
+frequency produces the same direction:
+
+```
+cos(r10, r20) = 0.99974
+cos(r20, r40) = 0.99932
+cos(r10, r40) = 0.99823
+```
+
+The merit is therefore, to within 0.2%, `1.3125 × ‖r40‖²`. The 10 and 20 cyc/mm goals
+add 2/3 of the ray-trace cost and essentially no new information.
+
+Confirmed end to end (table in §2): dropping to a single 40 cyc/mm goal at 6×12 gives a
+statistically indistinguishable lens in **55.6 s instead of 140.0 s**.
+
+Worth noting as a property of the technique rather than a defect: at a few percent of
+cutoff, contrast optimization degenerates into transverse-ray-aberration least squares.
+The benefit realized here is dense, smooth, well-conditioned residuals — not
+MTF-specific information. That is still the paper's main claim, but if you want the
+genuinely MTF-specific behaviour you need a frequency where the shear is a large
+fraction of the pupil (0.3–0.5 × cutoff).
+
+**Recommended configuration:** 6×12 sampling, single frequency. Better than the current
+baseline on 4/4 spot RMS and 7/8 MTF numbers, at 55.6 s vs 33.5 s.
+
+---
+
+## 5. High frequencies fail without a diagnostic
+
+**Severity: low for this lens, high for LWIR / slow systems.**
+
+[Trace.java:784](rayoptics/src/main/java/org/redukti/rayoptics/raytr/Trace.java:784)
+clamps the sampling radius:
+
+```java
+overlapDefinition.max_radius = Math.max(0.0, grid_rng.max_radius - enclosingRadius);
+```
+
+Once `enclosingRadius = 0.707·d` reaches 1, all quadrature points collapse onto the grid
+centre `(−d/2, −d/2)` — which is itself **outside** the unit pupil. `trace_if_inside`
+then returns null, every goal in that block returns `BIGVAL`, `buildJacobian` returns
+false, and the solve aborts with no explanation.
+
+The threshold is per-wavelength, so the longest wavelength fails first, at
+`ν ≈ 0.707/(λ_max·F#)`:
+
+- this lens: 751 cyc/mm — unreachable, so not an issue here;
+- an f/8 LWIR lens at 10 µm: **8.8 cyc/mm** — entirely reachable.
+
+Observed behaviour sweeping frequency on this lens (3×6 sampling):
+
+```
+freq=  40  shift=0.0674  maxSampleRadius=0.94334
+freq= 400  shift=0.6743  maxSampleRadius=0.96462
+freq= 800  shift=1.3486  maxSampleRadius=1.06512   <- outside the pupil
+freq=1000  shift=1.6857  maxSampleRadius=1.33140   <- fully collapsed
+```
+
+`ContrastOptions` validates only `frequency >= 0`. It should reject frequencies above
+the representable limit, or at minimum `trace_contrast` should raise rather than emit
+degenerate samples.
+
+**Related, lower priority:** the inscribed circle is a *valid* (conservative) subset of
+the three-disk intersection — for `|q − c| ≤ R`, `|q − c_i| ≤ R + 0.707d = 1` — but it
+shrinks the radius by `0.707·d` where each direction alone needs only `d/2`, and it
+couples the sagittal and tangential domains into a single region. Harmless at 3% of
+cutoff (max sample radius 0.943 vs 0.942), and the smoothness it buys as F/# varies is a
+reasonable trade. Worth a comment recording that it is a deliberate trade-off.
+
+---
+
+## Smaller items
+
+- **`dLineOnly` is ignored for contrast goals.**
+  [OptimizationBuilder.java:298](optimr2/src/main/java/org/redukti/optim/OptimizationBuilder.java:298)
+  loops all `prescription._wvls` unconditionally, while the ray-aberration loop at
+  line 331 honours the flag. Consistent in the `ZeissOtusML50mm` path only because the
+  prescription itself is restricted upstream.
+
+- **There is no way to build a contrast-only merit.** The comment at
+  [OptimizationBuilder.java:230](optimr2/src/main/java/org/redukti/optim/OptimizationBuilder.java:230)
+  is half true: spots and MTF are correctly disabled (verified: `_compute_spots=false`,
+  `_compute_mtf=false`), but `buildGoals` unconditionally adds 240 `GoalRayAberration`
+  residuals, so `_compute_ray_aberrations` is always true. Measured cost is negligible
+  (15.7 → 15.8 ms) and the residuals are only 4.5% of the SOS, but the test is not
+  measuring contrast optimization in isolation.
+
+  Residual breakdown for the test: 1296 `GoalContrast` + 240 `GoalRayAberration`
+  + 2 `GoalParax` = 1538, with SOS 8.801 / 0.411 / 0.0002.
+
+- **`contrastSamples = rings × spokes` is an unchecked contract** between
+  `OptimizationBuilder` and `generate_gaussian_quadrature`. It holds today, but
+  `ContrastOptions.num_spokes(null)` is a legal call that yields `4·(rings+1)` spokes,
+  and any mismatch surfaces as `BIGVAL` and a dead solve rather than an error. Consider
+  deriving goal count from the first analysis result, or asserting the sizes match.
+
+- **6 spokes samples the x axis but not the y axis** (θ = 60°, 120°, … 360°). On axis,
+  where sagittal and tangential must be identical by symmetry, they differ in the 4th
+  digit (0.09463 vs 0.09467 at 40 cyc/mm). A spoke count divisible by 4 makes the two
+  directions sample-equivalent.
+
+- **`ContrastAnalysis.opd(...)` is a no-op wrapper.** `WavefrontAberrationAnalysis.opd`
+  ignores its `p` and `xy` arguments entirely, so the careful
+  `rays.sagittal().input_pupil` vs `rays.pupil()` distinction has no effect. Either use
+  it or delete the wrapper.
+
+- **`WavefrontAberrationAnalysis.opd` returns `Double` and is auto-unboxed** into
+  `double reference` in `ContrastAnalysis.sample`. Guarded today only because the
+  default `rayerr_filter = null` makes `trace_safe` return a null pkg first — one
+  `TraceOptions` change away from an NPE.
+
+- **`GoalContrast.value()` compares a `double` frequency to an `int`.**
+  `ContrastOptions` accepts arbitrary frequencies but only integers are addressable from
+  the optimizer path.
+
+- **`traced.get(0)`** in `ContrastAnalysis.eval` assumes exactly one wavelength came
+  back. True because `wavelengthIndex` is non-null, but brittle.
+
+- **`SequentialModel.trace_contrast` leaves `field.chief_ray` / `field.ref_sphere`**
+  pointing at the last wavelength's values. Contrast runs last in `Analysis.compute()`,
+  so anything reading that shared state afterwards sees a contrast leftover.
+
+- **Reference-sphere convention differs between analyses.** `trace_contrast` re-aims the
+  chief ray per wavelength while pinning the image point to the central wavelength;
+  `trace_grid` / `trace_rings` set the reference sphere once at the central wavelength
+  and never re-set it. The surrogate and the metric used to validate it are therefore
+  not referenced identically.
+
+- **`LMDerSolver.solve()` does not recompute the analysis at the final `x`.** lmder can
+  set `info=1` on a *rejected* trial step, leaving the goals holding the rejected
+  point's values while the prescription holds the accepted one. The test reads
+  `meritFunction.getRMS()` before its own `compute()`, so `finalRms` could in principle
+  describe a different design than the one asserted on. It reproduces in practice, but
+  ending `solve()` with a `compute()` at the returned `x` would make it safe.
+
+- **Redundant setup work.** `ContrastAnalysis.eval` is called once per frequency and each
+  call re-runs `setup_pupil_coords` per (field, wavelength), including the
+  reference-wavelength setup that depends only on the field — 9× redundant per field
+  across three frequencies. Minor next to the ray tracing, but free to fix by looping
+  frequencies inside.
+
+---
+
+## On the test
+
+- `assertTrue(finalRms < initialRms)` is close to vacuous for a converged LM run; the
+  absolute assertions are doing the real work.
+- Validating the surrogate against an **independent** spot/MTF analysis is exactly the
+  right approach, and keeping the second hexapolar spot regression for LensTool2
+  comparison is a good idea.
+- The 1e-6 locks on a 44-variable nonlinear solve are brittle across JDK, FPU and
+  library changes. Worth a comment saying they are regression locks rather than physics.
+- The `finalRms` values in the two tests (0.0091 vs 0.0161) are **not comparable** —
+  `getRMS()` divides by `functions.length` and the residual counts differ (1538 vs 266).
+  Worth a comment so nobody reads it as a quality comparison.
+
+---
+
+## Suggested order of work
+
+1. **Fix the vignetting/shear coupling** (§1) — it is why field 3 tangential is stuck.
+2. **Raise the sampling default to ~6×12 and drop to a single frequency** (§2, §4) —
+   a better lens in less time.
+3. **Subtract the weighted mean** (§3).
+4. **Validate frequency against the cutoff** (§5).
+
+## How the numbers were obtained
+
+The probe programs that produced every figure in this document live in
+`optimr2/src/test/java/org/redukti/examples/`. They are not JUnit tests — each has a
+`main` method — but they sit in the test source root so they compile against the
+module's classpath and can reach the package-private helpers on `ZeissOtusML50mm`.
+
+| Probe | Evidence it produced |
+| --- | --- |
+| [ContrastProbe.java](optimr2/src/test/java/org/redukti/examples/ContrastProbe.java) | goal counts and SOS by type; per-block mean/rms/variance of ΔW (§3) |
+| [ContrastProbe2.java](optimr2/src/test/java/org/redukti/examples/ContrastProbe2.java) | frequency-block cosines (§4); mean fraction 5.2% (§3); surrogate vs geometric MTF |
+| [ContrastProbe3.java](optimr2/src/test/java/org/redukti/examples/ContrastProbe3.java) | sampling convergence 3×6 → 20×40 (§2); warm cost split (Verdict) |
+| [ContrastProbe4.java](optimr2/src/test/java/org/redukti/examples/ContrastProbe4.java) | the four-way re-optimization table (§2, §4). Slowest — ~5 minutes |
+| [ContrastProbe5.java](optimr2/src/test/java/org/redukti/examples/ContrastProbe5.java) | frequency sweep showing sample collapse outside the pupil (§5) |
+| [ContrastProbe6.java](optimr2/src/test/java/org/redukti/examples/ContrastProbe6.java) | clear-aperture survival per field; the vignetting factors that exposed §1 |
+| [ContrastProbe7.java](optimr2/src/test/java/org/redukti/examples/ContrastProbe7.java) | **inconclusive**, superseded by Probe8 — kept as a record of a dead end |
+| [ContrastProbe8.java](optimr2/src/test/java/org/redukti/examples/ContrastProbe8.java) | the §1 shear table — direct proof via `Field.apply_vignetting` |
+
+`ContrastProbes.java` in the same package holds the shared prescription-path lookup.
+
+Run one with (from the repository root, after a build):
+
+```
+javac -cp "beam42/target/classes;mathlib/target/classes;optimcommon/target/classes;optimr2/target/classes;rayoptics/target/classes;render/target/classes;tools/target/classes" -d /tmp/probes optimr2/src/test/java/org/redukti/examples/ContrastProbe*.java
+java -cp "/tmp/probes;beam42/target/classes;mathlib/target/classes;optimcommon/target/classes;optimr2/target/classes;rayoptics/target/classes;render/target/classes;tools/target/classes" org.redukti.examples.ContrastProbe8
+```
+
+All figures measured against
+`Examples/jfotoptix/cosina-otus-ml-50mm-f1.4/JP2026-105585_Example01.txt` using the
+`createContrastSetup` configuration, on JDK 25, running the compiled classes in
+`*/target/classes` directly. Timings are wall-clock on a single machine and are
+indicative rather than benchmark-grade; the sampling, collinearity, mean-fraction and
+shear measurements are deterministic and reproducible.

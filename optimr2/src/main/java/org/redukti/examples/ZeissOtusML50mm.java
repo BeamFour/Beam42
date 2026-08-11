@@ -2,25 +2,23 @@ package org.redukti.examples;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.optim.OptimizationBuilder;
+import org.redukti.optim.OptimizationBuilder.OptimizationSetup;
 import org.redukti.spec.Prescription;
 
 import static org.redukti.optim.OptimizationBuilder.mtf;
 
 public class ZeissOtusML50mm {
 
-    private static Prescription getPrescription(String specfile, boolean weighted,
-                                                boolean dLineOnly) throws Exception {
+    static Prescription getPrescription(String specfile, boolean weighted,
+                                        boolean dLineOnly) throws Exception {
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(specfile);
         return Prescription.build_prescription(specs, true, weighted, dLineOnly);
     }
 
-    public static void main(String[] args) throws Exception {
-        boolean weighted = false;
-        boolean dLineOnly = false;
-        var prescription = getPrescription(args[0], weighted, dLineOnly);
-
-        var setup = OptimizationBuilder.builder(prescription)
+    static OptimizationSetup createSetup(Prescription prescription, boolean weighted,
+                                         boolean dLineOnly) {
+        return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
                 .mtfFrequencies(10, 20, 40)
                 .curvatureSurfaces(
@@ -41,6 +39,13 @@ public class ZeissOtusML50mm {
                                 new double[]{65, 65, 64, 58},
                                 new double[]{65, 62, 45, 38}))
                 .build();
+    }
+
+    public static void main(String[] args) throws Exception {
+        boolean weighted = false;
+        boolean dLineOnly = false;
+        var prescription = getPrescription(args[0], weighted, dLineOnly);
+        var setup = createSetup(prescription, weighted, dLineOnly);
 
         var analysis = setup.analysis();
         var meritFunction = setup.meritFunction(false);

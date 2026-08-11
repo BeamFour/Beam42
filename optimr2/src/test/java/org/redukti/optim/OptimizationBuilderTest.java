@@ -1,6 +1,7 @@
 package org.redukti.optim;
 
 import org.junit.jupiter.api.Test;
+import org.redukti.rayoptics.analysis.SpotOptions;
 import org.redukti.rayoptics.seq.Glass;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.SurfaceType;
@@ -147,6 +148,63 @@ class OptimizationBuilderTest {
         assertEquals(setup.analysis(), spotGoal._analysis);
         assertEquals(7.5, spotGoal._target);
         assertEquals(4.0, spotGoal._weight);
+    }
+
+    @Test
+    void usesGaussianQuadratureByDefault() {
+        Analysis analysis = OptimizationBuilder.builder(prescription())
+                .fields(0.0)
+                .mtfFrequencies(10)
+                .build()
+                .analysis();
+
+        assertEquals(SpotOptions.PATTERN_GAUSS_QUADRATURE, analysis._spot_pattern);
+        assertEquals(14, analysis._num_rings);
+        assertEquals(20, analysis._num_spokes);
+    }
+
+    @Test
+    void permitsExplicitHexapolarSpotSampling() {
+        Analysis analysis = OptimizationBuilder.builder(prescription())
+                .fields(0.0)
+                .mtfFrequencies(10)
+                .useHexapolarSpotPattern(32)
+                .build()
+                .analysis();
+
+        assertEquals(SpotOptions.PATTERN_HEXAPOLAR, analysis._spot_pattern);
+        assertEquals(32, analysis._num_rays);
+    }
+
+    @Test
+    void maximumSpotRadiusGoalForcesHexapolarSampling() {
+        Analysis analysis = OptimizationBuilder.builder(prescription())
+                .fields(0.0)
+                .mtfFrequencies(10)
+                .spotMaxRadiusGoals(new double[]{20.0})
+                .build()
+                .analysis();
+
+        assertEquals(SpotOptions.PATTERN_HEXAPOLAR, analysis._spot_pattern);
+        assertEquals(64, analysis._num_rays);
+    }
+
+    @Test
+    void additionalMaximumSpotRadiusGoalForcesHexapolarSampling() {
+        Analysis analysis = OptimizationBuilder.builder(prescription())
+                .fields(0.0)
+                .mtfFrequencies(10)
+                .additionalGoals(a -> new GoalSpotMaxRadius(a, 1, 20.0, 1.0))
+                .build()
+                .analysis();
+
+        assertEquals(SpotOptions.PATTERN_HEXAPOLAR, analysis._spot_pattern);
+    }
+
+    @Test
+    void rejectsInvalidHexapolarSampleCount() {
+        assertThrows(IllegalArgumentException.class, () ->
+                OptimizationBuilder.builder(prescription()).useHexapolarSpotPattern(0));
     }
 
     @Test

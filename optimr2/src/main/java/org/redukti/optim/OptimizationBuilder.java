@@ -28,6 +28,8 @@ public final class OptimizationBuilder {
     private boolean includeExistingAspherics;
     private boolean weighted = true;
     private boolean dLineOnly;
+    private boolean useHexapolarSpotPattern;
+    private int hexapolarSpotRays = 64;
     private final List<MtfGoals> mtfGoals = new ArrayList<>();
     private final List<Var> additionalVariables = new ArrayList<>();
     private final List<GoalFactory> additionalGoalFactories = new ArrayList<>();
@@ -108,6 +110,26 @@ public final class OptimizationBuilder {
         return this;
     }
 
+    /**
+     * Use hexapolar sampling for spot analysis even when no maximum-radius
+     * goal requires it. The default is Gaussian quadrature.
+     */
+    public OptimizationBuilder useHexapolarSpotPattern() {
+        return useHexapolarSpotPattern(64);
+    }
+
+    /**
+     * Use hexapolar sampling with the requested number of pupil rings for
+     * spot analysis even when no maximum-radius goal requires it.
+     */
+    public OptimizationBuilder useHexapolarSpotPattern(int numRays) {
+        if (numRays < 1)
+            throw new IllegalArgumentException("hexapolar spot rays must be at least 1");
+        this.useHexapolarSpotPattern = true;
+        this.hexapolarSpotRays = numRays;
+        return this;
+    }
+
     public OptimizationBuilder mtfGoals(MtfGoals... goals) {
         if (goals == null)
             throw new IllegalArgumentException("MTF goals must not be null");
@@ -167,7 +189,16 @@ public final class OptimizationBuilder {
         Analysis analysis = new Analysis(prescription, copy(fields), copy(mtfFrequencies));
         List<Var> variables = buildVariables();
         List<Goal> goals = buildGoals(analysis);
+        configureSpotPattern(analysis, goals);
         return new OptimizationSetup(analysis, variables.toArray(new Var[0]), goals.toArray(new Goal[0]));
+    }
+
+    private void configureSpotPattern(Analysis analysis, List<Goal> goals) {
+        boolean hasSpotMaxRadiusGoal = goals.stream().anyMatch(GoalSpotMaxRadius.class::isInstance);
+        if (useHexapolarSpotPattern || hasSpotMaxRadiusGoal)
+            analysis.using_hexapolar_pattern(hexapolarSpotRays);
+        else
+            analysis.using_gauss_quadrature_pattern(14, 20);
     }
 
     private List<Var> buildVariables() {

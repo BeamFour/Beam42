@@ -757,7 +757,10 @@ public class Trace {
             Vector2 sagittal_shift, Vector2 tangential_shift,
             Field fld, double wvl, TraceOptions trace_options) {
         trace_options = trace_options.copy();
-        trace_options.check_apertures = true;
+        // Pupil vignetting is already applied below. As with wavefront fans,
+        // do not turn temporary clear-aperture clipping into a discontinuous
+        // optimizer failure while a surface is being varied.
+        trace_options.check_apertures = false;
         trace_options.pupil_type = PupilType.REL_PUPIL;
         trace_options.apply_vignetting = true;
 

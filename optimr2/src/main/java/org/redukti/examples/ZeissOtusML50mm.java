@@ -6,6 +6,7 @@ import org.redukti.optim.OptimizationBuilder.OptimizationSetup;
 import org.redukti.spec.Prescription;
 
 import static org.redukti.optim.OptimizationBuilder.mtf;
+import static org.redukti.optim.OptimizationBuilder.contrast;
 
 public class ZeissOtusML50mm {
 
@@ -41,12 +42,33 @@ public class ZeissOtusML50mm {
                 .build();
     }
 
+    static OptimizationSetup createContrastSetup(Prescription prescription, boolean weighted,
+                                                  boolean dLineOnly) {
+        double[] fieldWeights = {1.0, 1.0, 1.0, 1.0};
+        return OptimizationBuilder.builder(prescription)
+                .fields(0.0, 0.3, 0.7, 1.0)
+                .mtfFrequencies(10, 20, 40)
+                .curvatureSurfaces(
+                        0, 1, 2, 3, 4, 5, 6, 8, 9,
+                        11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23)
+                .thicknessSurfaces(25)
+                .includeExistingAspherics(true)
+                .weighted(weighted)
+                .dLineOnly(dLineOnly)
+                .contrastSampling(3, 6)
+                .contrastGoals(
+                        contrast(10, fieldWeights),
+                        contrast(20, fieldWeights),
+                        contrast(40, fieldWeights))
+                .build();
+    }
+
     public static void main(String[] args) throws Exception {
         boolean weighted = false;
         boolean dLineOnly = false;
         var prescription = getPrescription(args[0], weighted, dLineOnly);
-        var setup = createSetup(prescription, weighted, dLineOnly);
-
+        //var setup = createSetup(prescription, weighted, dLineOnly);
+        var setup = createContrastSetup(prescription, weighted, dLineOnly);
         var analysis = setup.analysis();
         var meritFunction = setup.meritFunction(false);
         analysis.compute();

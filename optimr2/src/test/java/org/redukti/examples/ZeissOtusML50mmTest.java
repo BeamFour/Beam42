@@ -3,6 +3,7 @@ package org.redukti.examples;
 import org.junit.jupiter.api.Test;
 import org.redukti.optim.ParaxHelper;
 import org.redukti.rayoptics.analysis.SpotOptions;
+import org.redukti.rayoptics.analysis.SpotAnalysis;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,6 +13,77 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ZeissOtusML50mmTest {
+
+    @Test
+    void optimizesPatentPrescriptionUsingContrast() throws Exception {
+        Path input = repositoryRoot().resolve(
+                "Examples/jfotoptix/cosina-otus-ml-50mm-f1.4/JP2026-105585_Example01.txt");
+        boolean weighted = false;
+        boolean dLineOnly = false;
+        var prescription = ZeissOtusML50mm.getPrescription(
+                input.toAbsolutePath().toString(), weighted, dLineOnly);
+        var setup = ZeissOtusML50mm.createContrastSetup(prescription, weighted, dLineOnly);
+
+        setup.analysis().compute();
+        var meritFunction = setup.meritFunction(false);
+        double initialRms = meritFunction.getRMS();
+        long invalidContrastGoals = java.util.Arrays.stream(setup.goals())
+                .filter(org.redukti.optim.GoalContrast.class::isInstance)
+                .filter(goal -> goal.value() >= org.redukti.mathlib.LMLSolver.BIGVAL)
+                .count();
+        assertEquals(0, invalidContrastGoals, "Initial contrast sampling contains failed rays");
+        long started = System.nanoTime();
+        int status = meritFunction.getSolver().solve();
+        long elapsedMillis = (System.nanoTime() - started) / 1_000_000;
+        double finalRms = meritFunction.getRMS();
+
+        assertTrue(status > 0, "Optimizer failed with status " + status);
+        assertTrue(finalRms < initialRms,
+                () -> "Expected contrast RMS to improve from " + initialRms + " but got " + finalRms);
+
+        System.out.println(prescription);
+
+        // Contrast residuals are a merit surrogate; final performance is
+        // deliberately measured with the normal direct spot/MTF analysis.
+        var analysis = setup.analysis();
+        analysis.required_analyses(true, true, true);
+        analysis.compute();
+        double[] spotRms = java.util.Arrays.stream(analysis._spots)
+                .mapToDouble(spot -> spot.get_mean_radius()).toArray();
+        double[] sagittal40 = analysis._mtfs[2].sag_mtf_by_field;
+        double[] tangential40 = analysis._mtfs[2].tan_mtf_by_field;
+        double[] hexapolarSpotRms = SpotAnalysis.eval(
+                        analysis._opt_model, new SpotOptions().use_hexapolar().num_rays(64))
+                .spot_results.stream().mapToDouble(spot -> spot.get_mean_radius()).toArray();
+        assertEquals(0.0091038174, finalRms, 1.0e-6);
+        assertArrayEquals(new double[]{
+                        2.52248012, 5.72977623, 5.18877970, 5.11112766},
+                spotRms, 1.0e-6);
+        // LensTool2 uses SpotOptions' 64-ray Hexapolar default. Keep this
+        // second absolute regression so its report can be compared directly.
+        assertArrayEquals(new double[]{
+                        2.53282810, 5.74332429, 5.45374930, 5.17585013},
+                hexapolarSpotRms, 1.0e-6);
+        assertArrayEquals(new double[]{
+                        0.90768182, 0.80901036, 0.79210317, 0.83023380},
+                sagittal40, 1.0e-6);
+        assertArrayEquals(new double[]{
+                        0.90768182, 0.75059798, 0.72682492, 0.56745601},
+                tangential40, 1.0e-6);
+
+        // Retain a direct A/B assertion as well as the absolute values above.
+        assertAllLessThan(spotRms,
+                new double[]{5.83978998, 7.20583613, 7.53832391, 8.69058359},
+                "spot RMS");
+        assertAllGreaterThan(sagittal40,
+                new double[]{0.59088210, 0.59802511, 0.52815747, 0.62313845},
+                "40 cycle/mm sagittal MTF");
+        assertAllGreaterThan(tangential40,
+                new double[]{0.59088210, 0.54005008, 0.47372891, 0.32960330},
+                "40 cycle/mm tangential MTF");
+        System.out.println("Contrast Otus: elapsedMs=" + elapsedMillis
+                + " initialRms=" + initialRms + " finalRms=" + finalRms);
+    }
 
     @Test
     void optimizesPatentPrescriptionUsingGaussianQuadrature() throws Exception {
@@ -30,8 +102,12 @@ class ZeissOtusML50mmTest {
         setup.analysis().compute();
         var meritFunction = setup.meritFunction(false);
         double initialRms = meritFunction.getRMS();
+        long started = System.nanoTime();
         int status = meritFunction.getSolver().solve();
+        long elapsedMillis = (System.nanoTime() - started) / 1_000_000;
         double finalRms = meritFunction.getRMS();
+        System.out.println("Direct Otus: elapsedMs=" + elapsedMillis
+                + " initialRms=" + initialRms + " finalRms=" + finalRms);
 
         assertTrue(status > 0, "Optimizer failed with status " + status);
         assertTrue(finalRms < initialRms,
@@ -52,6 +128,26 @@ class ZeissOtusML50mmTest {
         assertArrayEquals(new double[]{
                         0.59088210, 0.54005008, 0.47372891, 0.32960330},
                 analysis._mtfs[2].tan_mtf_by_field, 1.0e-6);
+    }
+
+    private static void assertAllGreaterThan(double[] actual, double[] comparison, String label) {
+        assertEquals(comparison.length, actual.length);
+        for (int i = 0; i < actual.length; i++) {
+            int index = i;
+            assertTrue(actual[i] > comparison[i],
+                    () -> label + " field " + index + ": expected " + actual[index]
+                            + " to exceed direct result " + comparison[index]);
+        }
+    }
+
+    private static void assertAllLessThan(double[] actual, double[] comparison, String label) {
+        assertEquals(comparison.length, actual.length);
+        for (int i = 0; i < actual.length; i++) {
+            int index = i;
+            assertTrue(actual[i] < comparison[i],
+                    () -> label + " field " + index + ": expected " + actual[index]
+                            + " to be below direct result " + comparison[index]);
+        }
     }
 
     private static Path repositoryRoot() {

@@ -367,6 +367,44 @@ Two things amplify this:
 This is also why the Otus looks healthy: it converges to σ ≈ 0.06–0.10, comfortably in
 regime. The Leica never gets field 0.7 sagittal below 0.31.
 
+### Why not just add the existing `GeoMTF` goals?
+
+The obvious cheap answer — no new code, reuse `GeoMTF` — was tested and does not work.
+Sweeping the weight on `mtf(10/30/50, target 100%)` added to the contrast merit:
+
+| GeoMTF weight | njev | field 0.7 sag @50 | field 1.0 sag @50 | spot RMS |
+| --- | --- | --- | --- | --- |
+| none (contrast only) | 48 | 0.0410 | 0.5498 | 6.93 7.02 8.62 11.66 |
+| 0.003 | 48 | 0.0219 | 0.4785 | 6.56 6.79 8.70 13.02 |
+| 0.03 | 15 | 0.0734 | 0.5358 | 6.28 8.06 11.44 17.73 |
+| 0.3 | 12 | 0.1095 | 0.5142 | 5.95 9.60 13.77 19.75 |
+| 1.0 | 7 | 0.3482 | 0.2755 | 4.70 12.45 16.77 26.50 |
+
+There is no sweet spot. Every weight that meaningfully repairs field 0.7 costs more
+elsewhere than it gains — spot RMS degrades monotonically at fields 1–3 — and `njev`
+collapses from 48 to 7 as the MTF goals gain influence. The solver is stalling, not
+converging.
+
+The cause is conditioning, and it is directly measurable. Sweeping one curvature across
+the Jacobian step and watching successive increments of each candidate goal:
+
+```
+  delta |   GeoMTF    d(GeoMTF) |   phasor    d(phasor)
+ -1.667 |  0.04537   +0.00512 |  0.03090   +0.00057
+ -1.333 |  0.03706   -0.00832 |  0.03146   +0.00056
+ -1.000 |  0.03988   +0.00282 |  0.03200   +0.00054
+ -0.667 |  0.04585   +0.00597 |  0.03252   +0.00052
+  0.000 |  0.05014   +0.00192 |  0.03352   +0.00049
+  1.000 |  0.05418   +0.00191 |  0.03491   +0.00045
+  2.000 |  0.06028   +0.00400 |  0.03619   +0.00041
+```
+
+`GeoMTF` jitters by ±0.008 — including a sign reversal — while the true change over a
+third of a Jacobian step is ~0.0015. Signal-to-noise below 1: a central-difference
+derivative of it is close to random. The phasor over the same sweep is monotone and
+smooth to five decimals. This is the paper's own thesis reproduced numerically, and it
+is the reason the phasor goal is worth writing rather than reusing `GeoMTF`.
+
 ### Suggested fix: a phasor-based MTF goal
 
 Add a `GoalContrastMTF` **alongside** `GoalContrast`, not replacing it — the dense
@@ -378,6 +416,17 @@ method fast; they just need a companion that sees what they cannot.
 - Value `|Σ w·e^{i2πΔW}| / Σw` with all wavelengths pooled into one complex sum, which
   is the physically correct polychromatic OTF. Target and weight semantics identical to
   `GeoMTF`, so it can reuse the `MtfGoals` spec type.
+- **Target 1.0.** `LMDerMeritFunction` forms `r = (value − target)·weight`, which is
+  two-sided: any target below 1.0 penalises *exceeding* it as much as falling short. The
+  Otus legacy targets (65/62/45/38 at 40 cyc/mm) are now beaten by 0.75–0.91, so wiring
+  them in would drag the design back down. A target of 1.0 cannot be exceeded, so the
+  two-sidedness becomes harmless and the residual is a clean "maximize" form whose
+  gradient vanishes naturally as MTF → 1. Use a spec curve only with real requirements,
+  and consider making the goal one-sided first — a fix that would benefit `GeoMTF` too.
+- **Set the weight deliberately.** A handful of aggregate goals with residuals ~0.5 will
+  swamp thousands of least-squares residuals at ~0.02: at the Leica optimum the contrast
+  block carries SOS ≈ 1.74 against ≈ 6 for 24 unit-weight MTF goals. This bit the
+  `GeoMTF` experiment above and applies equally here.
 - **No extra ray tracing** — it reuses the triplets already traced. That makes it a cheap
   diffraction MTF operator: the spot/MTF path costs 64.4 ms per evaluation, this is
   effectively free.

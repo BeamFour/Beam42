@@ -59,8 +59,8 @@ public class ContrastProbe10 {
     }
 
     public static void main(String[] args) throws Exception {
-        var prescription = GenericOpt.getPrescription(ContrastProbes.leicaInputPath(), false, false);
-        var setup = GenericOpt.createContrastSetup(prescription, false, false);
+        var prescription = GenericContrastOpt.getPrescription(ContrastProbes.leicaInputPath(), false, false);
+        var setup = GenericContrastOpt.createContrastSetup(prescription, false, false);
         var a = setup.analysis();
         a.required_analyses(true, true, true);
         a.compute();

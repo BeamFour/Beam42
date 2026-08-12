@@ -38,6 +38,7 @@ class OptimizationBuilderTest {
                 .curvatureSurfaces(0, 1)
                 .thicknessSurfaces(1)
                 .includeExistingAspherics(true)
+                .rayAberrationGoals()
                 .mtfGoals(OptimizationBuilder.mtf(10,
                         new double[]{90, 80}, new double[]{85, 65},
                         new double[]{2.0, 0.5}))
@@ -81,6 +82,7 @@ class OptimizationBuilderTest {
                 .mtfFrequencies(10)
                 .weighted(false)
                 .dLineOnly(true)
+                .rayAberrationGoals()
                 .build();
 
         assertEquals(42, setup.goals().length); // two paraxial + 2 fields * 2 fans * 10 samples
@@ -91,6 +93,31 @@ class OptimizationBuilderTest {
                     assertEquals(Glass.d, goal._wvl);
                     assertEquals(1.0, goal._weight);
                 });
+    }
+
+    @Test
+    void rayAberrationGoalsAreOptionalAndDisabledByDefault() {
+        var setup = OptimizationBuilder.builder(prescription())
+                .fields(0.0, 1.0)
+                .mtfFrequencies(10)
+                .build();
+
+        assertEquals(2, setup.goals().length, "only the paraxial anchors are automatic");
+        assertFalse(Arrays.stream(setup.goals()).anyMatch(GoalRayAberration.class::isInstance));
+        assertFalse(setup.analysis()._compute_ray_aberrations);
+    }
+
+    @Test
+    void rejectsUnderdeterminedMeritInsteadOfAddingHiddenRayGoals() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                OptimizationBuilder.builder(prescription())
+                        .fields(0.0)
+                        .mtfFrequencies(10)
+                        .curvatureSurfaces(0, 1)
+                        .thicknessSurfaces(0, 1)
+                        .build());
+
+        assertTrue(exception.getMessage().contains("rayAberrationGoals()"));
     }
 
     @Test
@@ -239,7 +266,7 @@ class OptimizationBuilderTest {
         assertEquals(4, analysis._contrast_num_spokes);
         assertFalse(analysis._compute_spots);
         assertFalse(analysis._compute_mtf);
-        assertTrue(analysis._compute_ray_aberrations);
+        assertFalse(analysis._compute_ray_aberrations);
     }
 
     @Test

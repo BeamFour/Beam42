@@ -28,6 +28,7 @@ public final class OptimizationBuilder {
     private boolean includeExistingAspherics;
     private boolean weighted = true;
     private boolean dLineOnly;
+    private boolean addRayAberrationGoals;
     private boolean useHexapolarSpotPattern;
     private int hexapolarSpotRays = 64;
     // 3x6 is enough to measure a fixed design but not to optimize against: the
@@ -123,9 +124,24 @@ public final class OptimizationBuilder {
         return this;
     }
 
-    /** Restrict ray-aberration goals to the Fraunhofer d-line. */
+    /** Restrict enabled ray-aberration goals to the Fraunhofer d-line. */
     public OptimizationBuilder dLineOnly(boolean dLineOnly) {
         this.dLineOnly = dLineOnly;
+        return this;
+    }
+
+    /**
+     * Add the legacy ten-sample sagittal and tangential ray-aberration fans to
+     * the merit function. They are disabled by default: dense contrast or spot
+     * goals already provide enough residuals, and a failed fan edge ray should
+     * not invalidate an otherwise usable merit function.
+     */
+    public OptimizationBuilder rayAberrationGoals() {
+        return rayAberrationGoals(true);
+    }
+
+    public OptimizationBuilder rayAberrationGoals(boolean enabled) {
+        this.addRayAberrationGoals = enabled;
         return this;
     }
 
@@ -223,8 +239,14 @@ public final class OptimizationBuilder {
         Analysis analysis = new Analysis(prescription, copy(fields), copy(mtfFrequencies));
         List<Var> variables = buildVariables();
         List<Goal> goals = buildGoals(analysis);
+        if (goals.size() < variables.size())
+            throw new IllegalArgumentException(
+                    "optimization requires at least as many goals as variables: "
+                            + goals.size() + " goals for " + variables.size() + " variables"
+                            + "; add optical goals or enable rayAberrationGoals()");
         configureSpotPattern(analysis, goals);
         configureContrastAnalysis(analysis, goals);
+        configureRequiredAnalyses(analysis, goals);
         return new OptimizationSetup(analysis, variables.toArray(new Var[0]), goals.toArray(new Goal[0]));
     }
 
@@ -232,7 +254,9 @@ public final class OptimizationBuilder {
         if (contrastGoals.isEmpty()) return;
         int[] frequencies = contrastGoals.stream().mapToInt(goal -> goal.frequency).toArray();
         analysis.using_contrast_analysis(frequencies, contrastRings, contrastSpokes);
-        // Contrast-only MTF optimization must not retain the cost of spot/MTF analysis.
+    }
+
+    private void configureRequiredAnalyses(Analysis analysis, List<Goal> goals) {
         // Additional goal factories are conservatively assumed to require all analyses.
         if (additionalGoalFactories.isEmpty()) {
             boolean spots = goals.stream().anyMatch(goal ->
@@ -330,15 +354,17 @@ public final class OptimizationBuilder {
                 prescription._focal_length, 1.0));
         result.add(new GoalParax(analysis, ParaxHelper.Fno, prescription._fno, 1.0));
 
-        for (int field = 1; field <= fields.length; field++) {
-            for (int orientation = SAGITTAL; orientation <= TANGENTIAL; orientation++) {
-                for (int wavelength = 0; wavelength < prescription._wvls.length; wavelength++) {
-                    if (dLineOnly && !sameWavelength(prescription._wvls[wavelength], Glass.d))
-                        continue;
-                    double weight = weighted ? prescription._wts[wavelength] : 1.0;
-                    for (int sample = 0; sample < RAY_FAN_SAMPLES; sample++)
-                        result.add(new GoalRayAberration(analysis, field, orientation, sample,
-                                prescription._wvls[wavelength], 0.0, weight));
+        if (addRayAberrationGoals) {
+            for (int field = 1; field <= fields.length; field++) {
+                for (int orientation = SAGITTAL; orientation <= TANGENTIAL; orientation++) {
+                    for (int wavelength = 0; wavelength < prescription._wvls.length; wavelength++) {
+                        if (dLineOnly && !sameWavelength(prescription._wvls[wavelength], Glass.d))
+                            continue;
+                        double weight = weighted ? prescription._wts[wavelength] : 1.0;
+                        for (int sample = 0; sample < RAY_FAN_SAMPLES; sample++)
+                            result.add(new GoalRayAberration(analysis, field, orientation, sample,
+                                    prescription._wvls[wavelength], 0.0, weight));
+                    }
                 }
             }
         }
@@ -391,7 +417,8 @@ public final class OptimizationBuilder {
             spotMaxRadiusGoals.validate(fields.length, "spot maximum radius");
         validateSurfaces(curvatureSurfaces, "curvature");
         validateSurfaces(thicknessSurfaces, "thickness");
-        if (dLineOnly && Arrays.stream(prescription._wvls).noneMatch(w -> sameWavelength(w, Glass.d)))
+        if (addRayAberrationGoals && dLineOnly
+                && Arrays.stream(prescription._wvls).noneMatch(w -> sameWavelength(w, Glass.d)))
             throw new IllegalArgumentException("d-line optimization requires the prescription to contain the d-line wavelength");
     }
 

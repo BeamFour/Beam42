@@ -55,6 +55,10 @@ public class ZeissOtusML50mm {
                 .includeExistingAspherics(true)
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)
+                // Retain the historical Otus merit explicitly. Ray fans are
+                // optional in OptimizationBuilder because dense contrast goals
+                // do not generally need them.
+                .rayAberrationGoals()
                 .contrastSampling(6, 12)
                 .contrastGoals(
                         contrast(10, fieldWeights),

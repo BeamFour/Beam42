@@ -43,8 +43,10 @@ public class GenericOpt {
         analysis.compute();
         var solver = meritFunction.getSolver();
 
-        System.out.println("Aberrations:\n");
-        System.out.println(analysis._ray_aberrations.list_ray_fans());
+        if (analysis._ray_aberrations != null) {
+            System.out.println("Aberrations:\n");
+            System.out.println(analysis._ray_aberrations.list_ray_fans());
+        }
         System.out.println("Before:\n");
         System.out.println(meritFunction);
         var status = solver.solve();

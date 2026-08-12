@@ -88,27 +88,28 @@ public class Field {
 
     public double[] apply_vignetting(double[] pupil) {
         double[] vig_pupil = Arrays.copyOf(pupil, pupil.length);
-        if (pupil[0] < 0.0) {
-            if (vlx != 0.0) {
-                vig_pupil[0] *= (1.0 - vlx);
-            }
-        }
-        else {
-            if (vux != 0.0) {
-                vig_pupil[0] *= (1.0 - vux);
-            }
-        }
-        if (pupil[1] < 0.0) {
-            if (vly != 0.0) {
-                vig_pupil[1] *= (1.0 - vly);
-            }
-        }
-        else {
-            if (vuy != 0.0) {
-                vig_pupil[1] *= (1.0 - vuy);
-            }
-        }
+        vig_pupil[0] *= vignetting_scale_x(pupil[0]);
+        vig_pupil[1] *= vignetting_scale_y(pupil[1]);
         return vig_pupil;
+    }
+
+    /**
+     * Factor by which {@link #apply_vignetting} scales an x pupil coordinate.
+     * The upper and lower factors differ, so the scale depends on the sign of
+     * the coordinate and the map has a kink at the axis.
+     */
+    public double vignetting_scale_x(double x) {
+        return vignetting_scale(x, vlx, vux);
+    }
+
+    /** Factor by which {@link #apply_vignetting} scales a y pupil coordinate. */
+    public double vignetting_scale_y(double y) {
+        return vignetting_scale(y, vly, vuy);
+    }
+
+    private static double vignetting_scale(double coordinate, double lower, double upper) {
+        double factor = coordinate < 0.0 ? lower : upper;
+        return factor == 0.0 ? 1.0 : 1.0 - factor;
     }
 
     /**

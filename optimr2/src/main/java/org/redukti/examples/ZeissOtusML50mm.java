@@ -55,7 +55,7 @@ public class ZeissOtusML50mm {
                 .includeExistingAspherics(true)
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)
-                .contrastSampling(3, 6)
+                .contrastSampling(6, 12)
                 .contrastGoals(
                         contrast(10, fieldWeights),
                         contrast(20, fieldWeights),

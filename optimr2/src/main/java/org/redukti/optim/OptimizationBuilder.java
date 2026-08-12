@@ -30,8 +30,13 @@ public final class OptimizationBuilder {
     private boolean dLineOnly;
     private boolean useHexapolarSpotPattern;
     private int hexapolarSpotRays = 64;
-    private int contrastRings = 3;
-    private int contrastSpokes = 6;
+    // 3x6 is enough to measure a fixed design but not to optimize against: the
+    // solver drives the 18 sampled points further than the wavefront between
+    // them, so the merit reads better than the lens is. 6x12 is converged - 8x16
+    // reproduces it - and 12 spokes samples the x and y axes alike, so sagittal
+    // and tangential residuals stay comparable.
+    private int contrastRings = 6;
+    private int contrastSpokes = 12;
     private final List<MtfGoals> mtfGoals = new ArrayList<>();
     private final List<ContrastGoals> contrastGoals = new ArrayList<>();
     private final List<Var> additionalVariables = new ArrayList<>();

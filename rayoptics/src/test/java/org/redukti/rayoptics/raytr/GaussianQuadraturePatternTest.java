@@ -84,7 +84,7 @@ class GaussianQuadraturePatternTest {
     }
 
     @Test
-    void contrastPatternUsesPhysicalVignettedPupilAndPreservesShear() {
+    void contrastPatternAndBothPartnersStayInsideTheVignettedPupil() {
         TraceRingsDef definition = new TraceRingsDef();
         definition.num_rings = 3;
         Field field = asymmetricVignettedField();
@@ -104,13 +104,44 @@ class GaussianQuadraturePatternTest {
             assertTrue(Trace.inside_vignetted_pupil(pupil, field));
             assertTrue(Trace.inside_vignetted_pupil(pupil.plus(sagittalShift), field));
             assertTrue(Trace.inside_vignetted_pupil(pupil.plus(tangentialShift), field));
-            assertEquals(sagittalShift.x, pupil.plus(sagittalShift).x - pupil.x, 1.0e-15);
-            assertEquals(tangentialShift.y, pupil.plus(tangentialShift).y - pupil.y, 1.0e-15);
         }
     }
 
+    /**
+     * The samples are absolute pupil coordinates, so the tracer must be told not
+     * to apply Field vignetting a second time. Re-applying it would rescale the
+     * displaced rays and turn the requested shear into a smaller, field- and
+     * direction-dependent one - the defect this pattern exists to avoid.
+     */
     @Test
-    void physicalContrastShearDoesNotChangeWhenItCrossesVignettingAxis() {
+    void reapplyingFieldVignettingWouldCorruptTheRequestedShear() {
+        TraceRingsDef definition = new TraceRingsDef();
+        definition.num_rings = 3;
+        Field field = asymmetricVignettedField();
+        Vector2 tangentialShift = new Vector2(0.0, 0.06743);
+
+        List<Trace.GaussianQuadraturePoint> points =
+                Trace.generate_contrast_quadrature(
+                        definition, 6, Vector2.vector2_0, tangentialShift, field);
+
+        for (Trace.GaussianQuadraturePoint point : points) {
+            Vector2 pupil = point.pupil();
+            double reapplied = vignettedY(field, pupil.plus(tangentialShift))
+                    - vignettedY(field, pupil);
+            // 1-vuy=0.364 and 1-vly=0.313, so a second application shrinks the
+            // 40 cycle/mm shear to somewhere near a third of its intended size.
+            assertTrue(reapplied < 0.5 * tangentialShift.y,
+                    () -> "expected re-applied vignetting to shrink the shear, got " + reapplied);
+        }
+    }
+
+    /**
+     * A base sample and its displaced partner can sit on opposite sides of the
+     * y axis, where the vignetting factors differ. Re-applying vignetting there
+     * would not even be a rigid translation.
+     */
+    @Test
+    void shearStraddlingTheVignettingAxisIsNotARigidTranslationWhenReapplied() {
         TraceRingsDef definition = new TraceRingsDef();
         definition.num_rings = 3;
         Field field = asymmetricVignettedField();
@@ -125,9 +156,65 @@ class GaussianQuadraturePatternTest {
                         && point.pupil().y + tangentialShift.y > 0.0)
                 .findFirst()
                 .orElseThrow();
-        assertEquals(tangentialShift.y,
-                crossing.pupil().plus(tangentialShift).y - crossing.pupil().y,
-                1.0e-15);
+        Trace.GaussianQuadraturePoint below = points.stream()
+                .filter(point -> point.pupil().y + tangentialShift.y < 0.0)
+                .findFirst()
+                .orElseThrow();
+
+        double crossingShear = vignettedY(field, crossing.pupil().plus(tangentialShift))
+                - vignettedY(field, crossing.pupil());
+        double belowShear = vignettedY(field, below.pupil().plus(tangentialShift))
+                - vignettedY(field, below.pupil());
+        assertTrue(Math.abs(crossingShear - belowShear) > 1.0e-6,
+                "a straddling pair and a wholly-below pair should disagree once"
+                        + " vignetting is re-applied");
+    }
+
+    @Test
+    void rejectsShearThatLeavesTooLittlePupilToSample() {
+        TraceRingsDef definition = new TraceRingsDef();
+        definition.num_rings = 3;
+        Field field = new Field(null);
+
+        // Well inside the pupil: sampled normally.
+        Trace.generate_contrast_quadrature(definition, 6,
+                new Vector2(0.5, 0.0), new Vector2(0.0, 0.5), field);
+
+        // The overlap centre is still inside the pupil here, but the pattern
+        // would have to collapse onto it, reporting zero wavefront difference.
+        assertThrows(IllegalArgumentException.class, () ->
+                Trace.generate_contrast_quadrature(definition, 6,
+                        new Vector2(1.41, 0.0), new Vector2(0.0, 1.41), field));
+
+        // Beyond the point where even the overlap centre is valid.
+        assertThrows(IllegalArgumentException.class, () ->
+                Trace.generate_contrast_quadrature(definition, 6,
+                        new Vector2(1.9, 0.0), new Vector2(0.0, 1.9), field));
+    }
+
+    @Test
+    void contrastPatternSamplesAreDistinct() {
+        TraceRingsDef definition = new TraceRingsDef();
+        definition.num_rings = 3;
+        Field field = asymmetricVignettedField();
+        Vector2 shift = new Vector2(0.06743, 0.0);
+
+        List<Trace.GaussianQuadraturePoint> points =
+                Trace.generate_contrast_quadrature(
+                        definition, 6, shift, new Vector2(0.0, 0.06743), field);
+
+        double closest = Double.MAX_VALUE;
+        for (int i = 0; i < points.size(); i++)
+            for (int j = i + 1; j < points.size(); j++)
+                closest = Math.min(closest,
+                        points.get(i).pupil().minus(points.get(j).pupil()).len());
+        final double smallest = closest;
+        assertTrue(smallest > 0.01,
+                () -> "samples collapsed towards the overlap centre, closest pair " + smallest);
+    }
+
+    private static double vignettedY(Field field, Vector2 pupil) {
+        return field.apply_vignetting(pupil.as_array())[1];
     }
 
     private static Field asymmetricVignettedField() {

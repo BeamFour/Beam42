@@ -11,27 +11,25 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 1 | 200.0 | 14.0 | 102.05 | 1.49782 | 82.57 | Hikari | J-FKH1 |
 | 2 | -540.0 | 0.3 | 102.05 |  |  |  |
 | 3 | 112.869 | 15.5 | 97.66 | 1.49782 | 82.57 | Hikari | J-FKH1 |
-| 4 | -600.0 | 0.65 | 97.66 |  |  |  |
+| 4 | -600.0 | 0.4763414595637902 | 97.66 |  |  |  |
 | 5 | -480.0 | 5.0 | 95.69 | 1.7552 | 27.51 | Hikari | E-SF4 |
-| 6 | 431.735 | 41.201 | 95.69 |  |  |  |
+| 6 | 431.735 | 46.24140839615228 | 95.69 |  |  |  |
 | 7 | -386.0 | 7.5 | 70.05 | 1.79504 | 28.54 | Hikari | E-LAF9 |
 | 8 | -125.0 | 2.6 | 69.05 | 1.4645 | 65.77 | Hoya | FC3 |
-| 9 | 286.185 | 21.5 | 69.05 |  |  |  |
+| 9 | 286.185 | 18.98283778475241 | 69.05 |  |  |  |
 | 10 | -161.2 | 3.4 | 55.9 | 1.4645 | 65.77 | Hoya | FC3 |
-| 11 | 67.815 | 22.912 | 53.21 |  |  |  |
+| 11 | 67.815 | 18.883185601635763 | 53.21 |  |  |  |
 | 12 | 171.0 | 6.5 | 53.71 | 1.6935 | 53.2 | Hikari | E-LAK13 |
-| 13 | -131.975 | 2.0 | 53.71 |  |  |  |
+| 13 | -131.975 | 1.533476773185139 | 53.71 |  |  |  |
 | 14 | -213.0 | 2.0 | 52.37 | 1.5995 | 35.2 | Schott | F16 |
 | 15 | 61.0 | 11.0 | 50.69 | 1.6968 | 55.52 | Hikari | J-LAK14 |
-| 16 | -193.237 | 11.2 | 50.69 |  |  |  |
-| 17 | AS | 10.8 | 39.998 |  |  |  |
+| 16 | -193.237 | 6.922214892339323 | 50.69 |  |  |  |
+| 17 | AS | 22.345546925975615 | 39.998 |  |  |  |
 | 18 | -130.0 | 3.0 | 38.64 | 1.4645 | 65.77 | Hoya | FC3 |
-| 19 | -311.705 | 66.115 | 35.74 |  |  |  |
+| 19 | -311.705 | 53.828803705363526 | 35.74 |  |  |  |
 ## Layouts
-![Layout Only](./layoutonly.svg)
-![Layout Field 0.0](./layout.svg)
-![Layout Field 0.7](./layout-semi-skew.svg)
-![Layout Field 1.0](./layout-skew.svg)
+![Layout Elements](./layoutonly.svg)
+![Layout](./layout.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew.svg)
@@ -39,54 +37,54 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
-| effective_focal_length |202.941
-| back_focal_length | 66.111
-| optical_invariant | 5.307
+| effective_focal_length |200.061
+| back_focal_length | 53.898
+| optical_invariant | 5.184
 | object_distance | 1.0E10
-| image_distance | 66.111
+| image_distance | 53.898
 | power | 0.005
-| pp1_H | 81.831
-| ppk_H' | -136.83
-| ffl_F | -121.11
-| fno | 2.064
-| enp_dist_P | 401.587
-| enp_radius | 49.172
-| exp_dist_P' | -12.687
-| exp_radius | 19.092
+| pp1_H | 63.807
+| ppk_H' | -146.163
+| ffl_F | -136.255
+| fno | 2.083
+| enp_dist_P | 380.606
+| enp_radius | 48.028
+| exp_dist_P' | -23.47
+| exp_radius | 18.59
 | m | -0
-| red | -4.9275453923074216E7
+| red | -4.998464363112712E7
 | n_obj | 1
 | n_img | 1
-| img_ht | 21.903
+| img_ht | 21.592
 | obj_ang | 6.16
 | obj_na | 0
-| img_na | -0.235|
+| img_na | -0.233|
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 14.909 | 42.84|
- | Field(x=0.0, y=0.1) | 15.807 | 56.57|
- | Field(x=0.0, y=0.2) | 15.045 | 55.501|
- | Field(x=0.0, y=0.3) | 14.429 | 51.792|
- | Field(x=0.0, y=0.4) | 13.404 | 43.971|
- | Field(x=0.0, y=0.5) | 12.829 | 38.834|
- | Field(x=0.0, y=0.6) | 13.304 | 36.509|
- | Field(x=0.0, y=0.7) | 13.927 | 35.852|
- | Field(x=0.0, y=0.8) | 14.112 | 33.466|
- | Field(x=0.0, y=0.9) | 13.521 | 35.679|
- | Field(x=0.0, y=1.0) | 12.085 | 36.06|
+ | Field(x=0.0, y=0.0) | 8.899 | 20.325|
+ | Field(x=0.0, y=0.1) | 9.268 | 28.606|
+ | Field(x=0.0, y=0.2) | 9.819 | 31.663|
+ | Field(x=0.0, y=0.3) | 10.225 | 33.824|
+ | Field(x=0.0, y=0.4) | 10.225 | 34.863|
+ | Field(x=0.0, y=0.5) | 9.914 | 33.985|
+ | Field(x=0.0, y=0.6) | 9.564 | 32.39|
+ | Field(x=0.0, y=0.7) | 9.538 | 30.52|
+ | Field(x=0.0, y=0.8) | 9.998 | 27.698|
+ | Field(x=0.0, y=0.9) | 11.246 | 29.024|
+ | Field(x=0.0, y=1.0) | 13.956 | 41.175|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d), 486.1327(F), 656.2725(C) were calculated across 10 fields, and then averaged
 ## Polychromatic Geometric MTF (Weighted)
 ![Polychromatic Geometrical MTF Weighted](./mtf-w.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
-* [Zemax file](./US004176913_Example02.zmx)
+* [Zemax file](./US004176913_Example02-optimized.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-05-14
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-08-12

@@ -322,15 +322,16 @@ public final class OptimizationBuilder {
         }
 
         int contrastSamples = contrastRings * contrastSpokes;
-        for (ContrastGoals curve : contrastGoals) {
+        for (int contrast_index = 0; contrast_index < contrastGoals.size(); contrast_index++) {
+            ContrastGoals curve = contrastGoals.get(contrast_index);
             for (int field = 0; field < fields.length; field++) {
                 for (int wavelength = 0; wavelength < prescription._wvls.length; wavelength++) {
                     double wavelengthWeight = weighted ? prescription._wts[wavelength] : 1.0;
                     for (int sample = 0; sample < contrastSamples; sample++) {
-                        result.add(new GoalContrast(analysis, curve.frequency, field + 1,
+                        result.add(new GoalContrast(analysis, contrast_index, curve.frequency, field + 1,
                                 wavelength, sample, SAGITTAL,
                                 wavelengthWeight * curve.sagittalWeights[field]));
-                        result.add(new GoalContrast(analysis, curve.frequency, field + 1,
+                        result.add(new GoalContrast(analysis, contrast_index, curve.frequency, field + 1,
                                 wavelength, sample, TANGENTIAL,
                                 wavelengthWeight * curve.tangentialWeights[field]));
                     }

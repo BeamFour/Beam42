@@ -251,10 +251,11 @@ class OptimizationBuilderTest {
                 .map(GoalContrast.class::cast)
                 .toArray(GoalContrast[]::new);
         assertEquals(2 * 3 * 2 * 4 * 2, contrastGoals.length);
+        assertEquals(0, contrastGoals[0]._contrast_index);
         assertEquals(20, contrastGoals[0]._frequency);
         assertEquals(0, contrastGoals[0]._field);
-        assertEquals(0, contrastGoals[0]._wavelength);
-        assertEquals(0, contrastGoals[0]._sample);
+        assertEquals(0, contrastGoals[0]._wavelength_index);
+        assertEquals(0, contrastGoals[0]._sample_index);
         assertEquals(GoalContrast.SAGITTAL, contrastGoals[0]._orientation);
         assertEquals(2.0, contrastGoals[0]._weight);
         assertEquals(GoalContrast.TANGENTIAL, contrastGoals[1]._orientation);
@@ -296,18 +297,23 @@ class OptimizationBuilderTest {
                 .mtfFrequencies(20)
                 .dLineOnly(true)
                 .contrastSampling(2, 4)
-                .contrastGoals(OptimizationBuilder.contrast(20, new double[]{1.0}))
+                .contrastGoals(
+                        OptimizationBuilder.contrast(10, new double[]{1.0}),
+                        OptimizationBuilder.contrast(20, new double[]{1.0}))
                 .build();
 
         setup.analysis().compute();
 
         assertEquals(null, setup.analysis()._spots);
         assertEquals(null, setup.analysis()._mtfs);
-        assertEquals(1, setup.analysis()._contrasts.length);
-        Arrays.stream(setup.goals())
+        assertEquals(2, setup.analysis()._contrasts.length);
+        GoalContrast[] goals = Arrays.stream(setup.goals())
                 .filter(GoalContrast.class::isInstance)
                 .map(GoalContrast.class::cast)
-                .forEach(goal -> assertTrue(Double.isFinite(goal.value())));
+                .toArray(GoalContrast[]::new);
+        assertTrue(Arrays.stream(goals).anyMatch(goal -> goal._contrast_index == 0 && goal._frequency == 10));
+        assertTrue(Arrays.stream(goals).anyMatch(goal -> goal._contrast_index == 1 && goal._frequency == 20));
+        Arrays.stream(goals).forEach(goal -> assertTrue(Double.isFinite(goal.value())));
     }
 
     @Test

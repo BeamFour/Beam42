@@ -252,8 +252,15 @@ public class VigCalc {
         }
         if (!Objects.equals(osp.pupil.value,pupil_value_orig)) {
             opm.update_model();
-            set_vig(opm,null);
         }
+        // Always establish vignetting, even when the pupil value was already
+        // correct. Skipping is only safe when earlier factors can stand in, and
+        // set_pupil is called on freshly built models where there are none -
+        // the factors would silently stay at zero. Callers cannot tell that
+        // apart from a genuinely unvignetted system: contrast sampling in
+        // particular would then take the full pupil as available and, since it
+        // traces without aperture checking, optimize light the lens blocks.
+        set_vig(opm,null);
     }
     public static void set_pupil(OpticalModel opm) {
         set_pupil(opm,false);

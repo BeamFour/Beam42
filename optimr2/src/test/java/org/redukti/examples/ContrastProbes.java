@@ -16,11 +16,22 @@ public final class ContrastProbes {
     private ContrastProbes() {
     }
 
-    /** The Zeiss Otus ML 50mm patent prescription used by every probe. */
+    /** The Zeiss Otus ML 50mm patent prescription used by most of the probes. */
     public static String inputPath() {
-        return repositoryRoot()
-                .resolve("Examples/jfotoptix/cosina-otus-ml-50mm-f1.4/JP2026-105585_Example01.txt")
-                .toAbsolutePath().toString();
+        return resolve("Examples/jfotoptix/cosina-otus-ml-50mm-f1.4/JP2026-105585_Example01.txt");
+    }
+
+    /**
+     * The Leica R APO 75mm f/2. Used by the finding-6 probes: it is a much harder
+     * starting point than the Otus and stays outside the small-phase regime where the
+     * least-squares contrast merit tracks MTF.
+     */
+    public static String leicaInputPath() {
+        return resolve("Examples/jfotoptix/leica-r-apo-75mm-f2-mandler/specs.txt");
+    }
+
+    private static String resolve(String relative) {
+        return repositoryRoot().resolve(relative).toAbsolutePath().toString();
     }
 
     private static Path repositoryRoot() {

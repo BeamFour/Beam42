@@ -71,7 +71,8 @@ public class ZeissOtusML50mm {
     public static void main(String[] args) throws Exception {
         boolean weighted = false;
         boolean dLineOnly = false;
-        var prescription = getPrescription(args[0], weighted, dLineOnly);
+        String specfile = ExampleFinder.geoPathToExample("Examples/jfotoptix/cosina-otus-ml-50mm-f1.4/JP2026-105585_Example01.txt");
+        var prescription = getPrescription(specfile, weighted, dLineOnly);
         //var setup = createSetup(prescription, weighted, dLineOnly);
         var setup = createContrastSetup(prescription, weighted, dLineOnly);
         var analysis = setup.analysis();

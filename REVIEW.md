@@ -467,8 +467,10 @@ necessary but not sufficient, and two things escaped it:
 
 - `|OTF|` is **non-differentiable where the OTF passes through zero** — `hypot(re, im)`
   has a V-shaped kink at the origin. Field 0.7 sagittal sits at ~0.03–0.04, right beside
-  a zero; the sweep never crossed it, so it looked smooth. Optimizing `|OTF|²` instead
-  would be a polynomial in the OPDs and differentiable through zero. Untested.
+  a zero; the sweep never crossed it, so it looked smooth. The kink is genuinely
+  reachable on this design: the real part is negative at three groups on the start
+  design (30 cyc/mm fld 1.0 tan, 50 fld 0.7 tan, 50 fld 1.0 tan), i.e. those have already
+  passed through a contrast reversal.
 - Local derivative quality says nothing about the landscape. A residual of 0.96 against
   a target of 1.0, with a small local gradient, invites exactly the large destructive
   steps observed.
@@ -484,8 +486,38 @@ What survives unchanged is the diagnosis, which rests on the σ/phasor/geometric
 and the non-monotonicity demonstration, not on the remedy: **the least-squares residual
 stops tracking MTF above ~0.1 waves, and under-weights a catastrophic field by ~4×.**
 What has *not* been found is a merit formulation that fixes it without collateral
-damage. Worth trying next: `|OTF|²` to remove the kink, reachable targets rather than
-1.0, and more variables.
+damage.
+
+### If this is retried: optimize the real part, not the modulus or its square
+
+`|OTF|²` was suggested here earlier as a way to remove the kink. That was a mistake, and
+the measured OTF components show why. Since the residual gradient scales as
+`d(|OTF|²)/d|OTF| = 2·|OTF|`, squaring *suppresses* sensitivity exactly where the MTF is
+near zero — the case that matters. On the Leica start design that factor is 0.067 at
+50 cyc/mm field 0.7 sagittal against 1.38 at 10 cyc/mm on axis, so squaring would
+de-emphasise the broken group by roughly twentyfold relative to the healthy ones. It
+removes the kink by flattening the thing you are trying to fix.
+
+The better route is the **real part of the OTF**, target 1.0. For the sagittal direction
+this is exact rather than an approximation: `dW` is odd about the shear centre (the same
+symmetry as in finding 3), so the sine terms cancel and the OTF is purely real —
+measured `|im| < 0.0013` at every sagittal group and every frequency, against a real
+part of 0.03–0.69. So `|OTF|_sag = |re|`, and `re` is:
+
+- analytic in the OPDs, hence smooth through zero — no kink;
+- undiminished in sensitivity near zero, unlike the square;
+- correctly ordered through a contrast reversal, since negative `re` reads as worse than
+  zero contrast rather than folding back up as the modulus does.
+
+The caveat is the tangential direction, where `im` is substantial (0.16–0.48, being the
+coma-induced image displacement). There `re` alone under-reports the modulus, and
+driving `re` to 1 also drives `im` to 0 — reintroducing a penalty on image displacement
+that finding 3 establishes is MTF-irrelevant. So the clean form is `re` sagittal and
+something else tangential, which is untidy but at least well founded.
+
+This is reasoning plus one measurement, not a validated result. The last confident
+mechanism claim in this section was wrong; treat it accordingly and measure before
+believing.
 
 The reverted implementation was itself sound — a correct, cheap polychromatic
 diffraction-MTF evaluator costing no extra ray tracing, which would be useful for
@@ -593,9 +625,10 @@ Done:
 Remaining, in priority order:
 
 4. **Resolve §6.** A phasor MTF goal was implemented and reverted; see the outcome
-   subsection before retrying that route. Untried: `|OTF|²` to remove the kink at OTF
-   zeros, reachable targets rather than 1.0, and more variables than `GenericOpt`'s 14
-   curvatures.
+   subsection before retrying that route. Most promising untried variant: the **real
+   part** of the OTF rather than its modulus (exact for sagittal, smooth through zero).
+   Also untried: reachable targets rather than 1.0, and more variables than
+   `GenericOpt`'s 14 curvatures.
 5. **Subtract the weighted mean** (§3) — tangential only; worth doing, but it cannot
    explain a sagittal symptom.
 6. **Drop to a single contrast frequency** (§4) — recovers most of the cost that the

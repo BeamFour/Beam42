@@ -17,10 +17,14 @@ public class GenericContrastOpt {
 
     static OptimizationBuilder.OptimizationSetup createContrastSetup(Prescription prescription, boolean weighted,
                                                                      boolean dLineOnly) {
+        //double[] fieldWeights = {8.0, 4.0, 2.0, 1.0};
         double[] fieldWeights = {1.0, 1.0, 1.0, 1.0};
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
                 .mtfFrequencies(10, 30, 50)
+                //.thicknessSurfaces(3,5,8,10,12,15,16,18)  Nikkor 200mm f2
+                //.curvatureSurfaces(0)
+                .includeExistingAspherics(true)
                 .allCurvatureSurfaces()
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)

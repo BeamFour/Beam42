@@ -210,69 +210,6 @@ class OptimizationBuilderTest {
     }
 
     @Test
-    void buildsContrastMtfGoalsWithoutRequiringSpotAnalysis() {
-        var setup = OptimizationBuilder.builder(prescription())
-                .fields(0.0, 1.0)
-                .mtfFrequencies(10, 20)
-                .contrastSampling(2, 4)
-                .contrastGoals(OptimizationBuilder.contrast(20, new double[]{1.0, 1.0}))
-                .contrastMtfGoals(OptimizationBuilder.mtf(20,
-                        new double[]{100, 100}, new double[]{100, 90},
-                        new double[]{0.5, 0.25}))
-                .build();
-
-        GoalContrastMTF[] goals = Arrays.stream(setup.goals())
-                .filter(GoalContrastMTF.class::isInstance)
-                .map(GoalContrastMTF.class::cast)
-                .toArray(GoalContrastMTF[]::new);
-        assertEquals(2 * 2, goals.length, "one per field per orientation, not per sample");
-        assertEquals(20, goals[0]._frequency);
-        assertEquals(0, goals[0]._field);
-        assertEquals(GoalContrastMTF.SAGITTAL, goals[0]._orientation);
-        assertEquals(1.0, goals[0]._target);
-        assertEquals(0.5, goals[0]._weight);
-        assertEquals(GoalContrastMTF.TANGENTIAL, goals[1]._orientation);
-        assertEquals(1.0, goals[1]._target, 1.0e-12);
-        // field 1 tangential is the only one given a target below 100%
-        assertEquals(1, goals[3]._field);
-        assertEquals(GoalContrastMTF.TANGENTIAL, goals[3]._orientation);
-        assertEquals(0.9, goals[3]._target, 1.0e-12);
-        assertEquals(0.25, goals[3]._weight);
-
-        // Unlike GeoMTF, these read the contrast rays, so no spot/MTF analysis is needed.
-        assertFalse(setup.analysis()._compute_spots);
-        assertFalse(setup.analysis()._compute_mtf);
-
-        setup.analysis().compute();
-        for (GoalContrastMTF goal : goals) {
-            double value = goal.value();
-            assertTrue(value >= 0.0 && value <= 1.0, () -> "modulus out of range: " + value);
-        }
-    }
-
-    @Test
-    void contrastMtfGoalsRequireAMatchingContrastFrequency() {
-        // The pupil shear is per frequency, so 10 was never sampled.
-        assertThrows(IllegalArgumentException.class, () ->
-                OptimizationBuilder.builder(prescription())
-                        .fields(0.0, 1.0)
-                        .mtfFrequencies(10, 20)
-                        .contrastGoals(OptimizationBuilder.contrast(20, new double[]{1.0, 1.0}))
-                        .contrastMtfGoals(OptimizationBuilder.mtf(10,
-                                new double[]{100, 100}, new double[]{100, 100}))
-                        .build());
-        assertThrows(IllegalArgumentException.class, () ->
-                OptimizationBuilder.builder(prescription())
-                        .fields(0.0, 1.0)
-                        .mtfFrequencies(20)
-                        .contrastGoals(OptimizationBuilder.contrast(20, new double[]{1.0, 1.0}))
-                        .contrastMtfGoals(
-                                OptimizationBuilder.mtf(20, new double[]{100, 100}, new double[]{100, 100}),
-                                OptimizationBuilder.mtf(20, new double[]{100, 100}, new double[]{100, 100}))
-                        .build());
-    }
-
-    @Test
     void buildsStablePerSampleContrastGoalsAndSkipsUnusedMtfAnalysis() {
         var setup = OptimizationBuilder.builder(prescription())
                 .fields(0.0, 1.0)

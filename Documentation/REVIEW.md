@@ -26,12 +26,12 @@ and 4 it produces a design that is measurably worse, not merely a merit that is 
 
 | File | Role |
 | --- | --- |
-| [ContrastAnalysis.java](rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysis.java) | frequency → pupil shear, wavefront-difference sampling |
-| [ContrastAnalysisResult.java](rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysisResult.java) | sample/residual container |
-| [ContrastOptions.java](rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastOptions.java) | sampling configuration |
+| [ContrastAnalysis.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysis.java) | frequency → pupil shear, wavefront-difference sampling |
+| [ContrastAnalysisResult.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysisResult.java) | sample/residual container |
+| [ContrastOptions.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastOptions.java) | sampling configuration |
 | [Trace.java:755](rayoptics/src/main/java/org/redukti/rayoptics/raytr/Trace.java:755) | `trace_contrast` — overlap region and ray triplets |
 | [SequentialModel.java:924](rayoptics/src/main/java/org/redukti/rayoptics/seq/SequentialModel.java:924) | per-wavelength chief ray / reference sphere setup |
-| [GoalContrast.java](optimcommon/src/main/java/org/redukti/optim/GoalContrast.java) | one residual per (freq, field, wavelength, sample, orientation) |
+| [GoalContrast.java](../optimcommon/src/main/java/org/redukti/optim/GoalContrast.java) | one residual per (freq, field, wavelength, sample, orientation) |
 | [Analysis.java:112](optimcommon/src/main/java/org/redukti/optim/Analysis.java:112) | analysis driver |
 | [OptimizationBuilder.java:295](optimr2/src/main/java/org/redukti/optim/OptimizationBuilder.java:295) | goal construction |
 
@@ -646,17 +646,17 @@ module's classpath and can reach the package-private helpers on `ZeissOtusML50mm
 
 | Probe | Evidence it produced |
 | --- | --- |
-| [ContrastProbe.java](optimr2/src/test/java/org/redukti/examples/ContrastProbe.java) | goal counts and SOS by type; per-block mean/rms/variance of ΔW (§3) |
-| [ContrastProbe2.java](optimr2/src/test/java/org/redukti/examples/ContrastProbe2.java) | frequency-block cosines (§4); mean fraction 5.2% (§3); surrogate vs geometric MTF |
-| [ContrastProbe3.java](optimr2/src/test/java/org/redukti/examples/ContrastProbe3.java) | sampling convergence 3×6 → 20×40 (§2); warm cost split (Verdict) |
-| [ContrastProbe4.java](optimr2/src/test/java/org/redukti/examples/ContrastProbe4.java) | the four-way re-optimization table (§2, §4). Slowest — ~5 minutes |
-| [ContrastProbe5.java](optimr2/src/test/java/org/redukti/examples/ContrastProbe5.java) | frequency sweep showing sample collapse outside the pupil (§5) |
-| [ContrastProbe6.java](optimr2/src/test/java/org/redukti/examples/ContrastProbe6.java) | clear-aperture survival per field; the vignetting factors that exposed §1 |
-| [ContrastProbe7.java](optimr2/src/test/java/org/redukti/examples/ContrastProbe7.java) | **inconclusive**, superseded by Probe8 — kept as a record of a dead end |
-| [ContrastProbe8.java](optimr2/src/test/java/org/redukti/examples/ContrastProbe8.java) | the §1 shear table — direct proof via `Field.apply_vignetting` |
-| [ContrastProbe9.java](optimr2/src/test/java/org/redukti/examples/ContrastProbe9.java) | §6 — reproduces the Leica mid-field drop; mean decomposition that rules out §3 |
-| [ContrastProbe10.java](optimr2/src/test/java/org/redukti/examples/ContrastProbe10.java) | §6 core evidence — σ vs LSQ prediction vs phasor vs geometric MTF |
-| [ContrastProbe11.java](optimr2/src/test/java/org/redukti/examples/ContrastProbe11.java) | §6 — phasor sampling convergence, 6×12 → 40×80 |
+| [ContrastProbe.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe.java) | goal counts and SOS by type; per-block mean/rms/variance of ΔW (§3) |
+| [ContrastProbe2.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe2.java) | frequency-block cosines (§4); mean fraction 5.2% (§3); surrogate vs geometric MTF |
+| [ContrastProbe3.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe3.java) | sampling convergence 3×6 → 20×40 (§2); warm cost split (Verdict) |
+| [ContrastProbe4.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe4.java) | the four-way re-optimization table (§2, §4). Slowest — ~5 minutes |
+| [ContrastProbe5.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe5.java) | frequency sweep showing sample collapse outside the pupil (§5) |
+| [ContrastProbe6.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe6.java) | clear-aperture survival per field; the vignetting factors that exposed §1 |
+| [ContrastProbe7.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe7.java) | **inconclusive**, superseded by Probe8 — kept as a record of a dead end |
+| [ContrastProbe8.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe8.java) | the §1 shear table — direct proof via `Field.apply_vignetting` |
+| [ContrastProbe9.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe9.java) | §6 — reproduces the Leica mid-field drop; mean decomposition that rules out §3 |
+| [ContrastProbe10.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe10.java) | §6 core evidence — σ vs LSQ prediction vs phasor vs geometric MTF |
+| [ContrastProbe11.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe11.java) | §6 — phasor sampling convergence, 6×12 → 40×80 |
 
 `ContrastProbes.java` in the same package holds the shared prescription-path lookups.
 Probes 1–8 use the Otus; 9–11 use the Leica 75/2.

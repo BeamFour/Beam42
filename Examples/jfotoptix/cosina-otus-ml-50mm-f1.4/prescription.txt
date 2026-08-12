@@ -51,4 +51,4 @@ current assignee	Cosina Inc
 original assignee	Cosina Inc
 link	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2026-105585/11/en
 [report data]
-lens name	Zeiss Otus ML 50mm f1.4
+lens name	Zeiss Otus ML 50mm f1.4 (Reoptimized)

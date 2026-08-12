@@ -1,4 +1,4 @@
-# Zeiss Otus ML 50mm f1.4
+# Zeiss Otus ML 50mm f1.4 (Reoptimized)
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |

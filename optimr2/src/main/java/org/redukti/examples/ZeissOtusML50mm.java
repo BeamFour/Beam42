@@ -29,6 +29,7 @@ public class ZeissOtusML50mm {
                 .includeExistingAspherics(true)
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)
+                .rayAberrationGoals()
                 .mtfGoals(
                         mtf(10,
                                 new double[]{93, 93, 94, 93},

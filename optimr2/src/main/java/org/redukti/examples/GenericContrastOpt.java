@@ -6,7 +6,7 @@ import org.redukti.spec.Prescription;
 
 import static org.redukti.optim.OptimizationBuilder.contrast;
 
-public class GenericOpt {
+public class GenericContrastOpt {
 
     static Prescription getPrescription(String specfile, boolean weighted,
                                         boolean dLineOnly) throws Exception {

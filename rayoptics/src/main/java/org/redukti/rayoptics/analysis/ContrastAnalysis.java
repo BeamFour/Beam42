@@ -50,7 +50,7 @@ public class ContrastAnalysis {
             double wavelength, double focus) {
         if (rays.reference() == null || rays.sagittal() == null || rays.tangential() == null) {
             return new ContrastAnalysisResult.Sample(
-                    rays.pupil(), 0.0, 0.0, rays.weight(), false);
+                    rays.pupil(), 0.0, 0.0, rays.weight(), false, failure(rays));
         }
         double reference = WavefrontAberrationAnalysis.opd(
                 opticalModel, rays.pupil(), 0, rays.reference(), field, wavelength, focus);
@@ -61,7 +61,22 @@ public class ContrastAnalysis {
         boolean valid = Double.isFinite(reference)
                 && Double.isFinite(sagittal) && Double.isFinite(tangential);
         return new ContrastAnalysisResult.Sample(
-                rays.pupil(), sagittal, tangential, rays.weight(), valid);
+                rays.pupil(), sagittal, tangential, rays.weight(), valid,
+                valid ? null : new ContrastAnalysisResult.Failure(
+                        "OPD", "NonFiniteWavefrontDifference", -1));
+    }
+
+    private static ContrastAnalysisResult.Failure failure(ContrastRayTriplet rays) {
+        if (rays.referenceError() != null) return failure("reference", rays.referenceError());
+        if (rays.sagittalError() != null) return failure("sagittal", rays.sagittalError());
+        if (rays.tangentialError() != null) return failure("tangential", rays.tangentialError());
+        return new ContrastAnalysisResult.Failure("unknown", "MissingRay", -1);
+    }
+
+    private static ContrastAnalysisResult.Failure failure(
+            String ray, org.redukti.rayoptics.exceptions.TraceException error) {
+        return new ContrastAnalysisResult.Failure(
+                ray, error.getClass().getSimpleName(), error.surf);
     }
 
     private static double opd(OpticalModel opticalModel,

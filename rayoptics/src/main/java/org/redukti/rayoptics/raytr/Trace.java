@@ -766,6 +766,7 @@ public class Trace {
         trace_options.check_apertures = false;
         trace_options.pupil_type = PupilType.REL_PUPIL;
         trace_options.apply_vignetting = false;
+        trace_options.rayerr_filter = "summary";
 
         var samples = new ArrayList<ContrastRayTriplet>();
         var points = generate_contrast_quadrature(
@@ -774,11 +775,12 @@ public class Trace {
             var pupil = point.pupil();
             var sagittalPupil = pupil.plus(sagittal_shift);
             var tangentialPupil = pupil.plus(tangential_shift);
-            var reference = trace_safe(opt_model, pupil, fld, wvl, trace_options).pkg;
-            var sagittal = trace_safe(opt_model, sagittalPupil, fld, wvl, trace_options).pkg;
-            var tangential = trace_safe(opt_model, tangentialPupil, fld, wvl, trace_options).pkg;
+            var reference = trace_safe(opt_model, pupil, fld, wvl, trace_options);
+            var sagittal = trace_safe(opt_model, sagittalPupil, fld, wvl, trace_options);
+            var tangential = trace_safe(opt_model, tangentialPupil, fld, wvl, trace_options);
             samples.add(new ContrastRayTriplet(
-                    pupil, reference, sagittal, tangential, point.weight()));
+                    pupil, reference.pkg, sagittal.pkg, tangential.pkg,
+                    reference.err, sagittal.err, tangential.err, point.weight()));
         }
         return samples;
     }

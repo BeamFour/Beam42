@@ -182,7 +182,41 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
         return okay;
     }
 
+    private void validateInitialContrastSamples() {
+        if (analysis._contrasts == null) return;
+        int invalidCount = 0;
+        String first = null;
+        for (var contrast : analysis._contrasts) {
+            for (var field : contrast.fields) {
+                for (var wavelength : field.wavelengths()) {
+                    for (var sample : wavelength.samples()) {
+                        if (sample.valid()) continue;
+                        invalidCount++;
+                        if (first == null) {
+                            var failure = sample.failure();
+                            first = "first failure: " + failure.ray() + " ray encountered "
+                                    + failure.exceptionType() + " at surface " + failure.surface()
+                                    + ", field=" + field.field().y
+                                    + ", wavelength=" + wavelength.wavelength() + " nm"
+                                    + ", frequency=" + contrast.spatialFrequency + " cycles/mm"
+                                    + ", pupil=" + sample.pupil();
+                        }
+                    }
+                }
+            }
+        }
+        if (invalidCount > 0)
+            throw new IllegalStateException("Cannot start optimization: " + invalidCount
+                    + " contrast samples contain failed rays; " + first);
+    }
+
+    private void validateInputs() {
+        analysis.compute();
+        validateInitialContrastSamples();
+    }
+
     public Solver getSolver() {
+        validateInputs();
         return new LMDerSolver(analysis, vars, functions, use_native);
     }
 

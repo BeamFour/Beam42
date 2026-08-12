@@ -39,6 +39,7 @@ public final class OptimizationBuilder {
     private int contrastSpokes = 12;
     private final List<MtfGoals> mtfGoals = new ArrayList<>();
     private final List<ContrastGoals> contrastGoals = new ArrayList<>();
+    private final List<MtfGoals> contrastMtfGoals = new ArrayList<>();
     private final List<Var> additionalVariables = new ArrayList<>();
     private final List<GoalFactory> additionalGoalFactories = new ArrayList<>();
     private SpotGoals spotRmsGoals;
@@ -168,6 +169,26 @@ public final class OptimizationBuilder {
             throw new IllegalArgumentException("contrast rings and spokes must be at least 1");
         contrastRings = rings;
         contrastSpokes = spokes;
+        return this;
+    }
+
+    /**
+     * Adds MTF goals evaluated from the contrast rays rather than from the spot diagram.
+     *
+     * <p>The per-sample contrast residuals track MTF only while the pupil phase
+     * difference stays well under a wave; past that they can improve while the MTF gets
+     * worse. These goals measure the MTF directly and cost no extra ray tracing, so they
+     * cover that blind spot. Each frequency must already have a {@link #contrastGoals}
+     * entry, because the pupil shear is computed per frequency.
+     *
+     * <p>Prefer 100% targets: the solver penalises exceeding a target as much as missing
+     * it, so a lower one pulls a field back down once it is met. Weights need care too -
+     * a handful of these will otherwise swamp thousands of per-sample residuals.
+     */
+    public OptimizationBuilder contrastMtfGoals(MtfGoals... goals) {
+        if (goals == null)
+            throw new IllegalArgumentException("contrast MTF goals must not be null");
+        this.contrastMtfGoals.addAll(Arrays.asList(goals));
         return this;
     }
 
@@ -314,6 +335,22 @@ public final class OptimizationBuilder {
             }
         }
 
+        if (!contrastMtfGoals.isEmpty()) {
+            double[] wavelengthWeights = new double[prescription._wvls.length];
+            for (int wavelength = 0; wavelength < wavelengthWeights.length; wavelength++)
+                wavelengthWeights[wavelength] = weighted ? prescription._wts[wavelength] : 1.0;
+            for (MtfGoals curve : contrastMtfGoals) {
+                for (int field = 0; field < fields.length; field++) {
+                    result.add(new GoalContrastMTF(analysis, curve.frequency, field + 1,
+                            SAGITTAL, curve.sagittal[field] / 100.0,
+                            curve.sagittalWeights[field], wavelengthWeights));
+                    result.add(new GoalContrastMTF(analysis, curve.frequency, field + 1,
+                            TANGENTIAL, curve.tangential[field] / 100.0,
+                            curve.tangentialWeights[field], wavelengthWeights));
+                }
+            }
+        }
+
         if (spotRmsGoals != null) {
             for (int field = 0; field < fields.length; field++)
                 result.add(new GoalSpotRMS(analysis, field + 1,
@@ -383,6 +420,20 @@ public final class OptimizationBuilder {
                 throw new IllegalArgumentException("contrast goals must not contain null");
             if (curve.frequency <= 0 || !contrastFrequencies.add(curve.frequency))
                 throw new IllegalArgumentException("contrast frequencies must be positive and unique");
+            curve.validate(fields.length);
+        }
+        Set<Integer> contrastMtfFrequencies = new HashSet<>();
+        for (MtfGoals curve : contrastMtfGoals) {
+            if (curve == null)
+                throw new IllegalArgumentException("contrast MTF goals must not contain null");
+            // The pupil shear is computed per frequency, so a contrast MTF goal can only
+            // read a frequency the contrast analysis was asked to sample.
+            if (!contrastFrequencies.contains(curve.frequency))
+                throw new IllegalArgumentException(
+                        "contrast MTF goal frequency has no contrast goal: " + curve.frequency);
+            if (!contrastMtfFrequencies.add(curve.frequency))
+                throw new IllegalArgumentException(
+                        "duplicate contrast MTF goal frequency: " + curve.frequency);
             curve.validate(fields.length);
         }
         if (spotRmsGoals != null)

@@ -16,7 +16,7 @@ Test case: `ZeissOtusML50mmTest.optimizesPatentPrescriptionUsingContrast()`
 | [3](#3-the-residual-is-the-un-centred-second-moment-not-the-variance) | Un-centred second moment | **Open** — tangential only, see the refinement below |
 | [4](#4-the-three-frequencies-are-near-collinear--two-thirds-of-the-ray-budget-is-wasted) | Frequencies near-collinear | **Open** |
 | [5](#5-high-frequencies-fail-without-a-diagnostic) | High-frequency degeneracy | **Partly fixed** — the silent collapse now throws; the 0.707×cutoff ceiling remains |
-| [6](#6-the-least-squares-reduction-only-tracks-mtf-in-the-small-phase-regime) | Least-squares only valid at small phase | **Open — highest priority.** Causes a real MTF regression |
+| [6](#6-the-least-squares-reduction-only-tracks-mtf-in-the-small-phase-regime) | Least-squares only valid at small phase | **Open.** Diagnosed and reproduced; `GoalContrastMTF` added but does *not* resolve it |
 
 Finding 6 was added after the first four fixes landed, prompted by a mid-field MTF drop
 running `GenericOpt` on the Leica 75/2. It is the most consequential open item: unlike 3
@@ -441,6 +441,55 @@ aberration. On the start design at 50 cyc/mm field 0.7 sagittal it reads 0.1379 
 goal; 12×24 is close and 24×48 converged. Either raise the sampling or only trust the
 goal once the design is in regime.
 
+### Outcome: implemented, and it does **not** resolve the drop
+
+`GoalContrastMTF` was written as described above and unit tested. On the Leica it
+behaves essentially like `GeoMTF`:
+
+| variant | njev | fld 0.7 sag@50 | fld 1.0 sag@50 | spot RMS |
+| --- | --- | --- | --- | --- |
+| contrast only | 48 | 0.0410 | 0.5498 | 6.93 7.02 8.62 11.66 |
+| contrastMTF 0.03 | 25 | 0.0240 | 0.4507 | 6.66 6.81 9.37 14.96 |
+| contrastMTF 0.3 | 24 | 0.0762 | 0.4579 | 5.79 11.10 13.66 19.74 |
+| contrastMTF 1.0 | 4 | 0.3379 | 0.3047 | 3.77 17.26 16.59 26.65 |
+| targeted at fld 0.7 sag only, 0.5 | 25 | 0.1561 | 0.5214 | 6.36 7.82 11.30 18.26 |
+
+No weight repairs field 0.7 without paying for it elsewhere, and even a *single* active
+MTF goal roughly halves `njev`. Aiming the goal only at the known blind spot helps
+(0.041 → 0.156 at weight 0.5) but still costs field 0.7 tangential (0.517 → 0.313) and
+outer-field spot RMS.
+
+**The conditioning argument above was wrong, and is retained only as a record.** The
+smoothness sweep measured `d(phasor)/d(one variable)` at a single point. That is
+necessary but not sufficient, and two things escaped it:
+
+- `|OTF|` is **non-differentiable where the OTF passes through zero** — `hypot(re, im)`
+  has a V-shaped kink at the origin. Field 0.7 sagittal sits at ~0.03–0.04, right beside
+  a zero; the sweep never crossed it, so it looked smooth. Optimizing `|OTF|²` instead
+  would be a polynomial in the OPDs and differentiable through zero. Untested.
+- Local derivative quality says nothing about the landscape. A residual of 0.96 against
+  a target of 1.0, with a small local gradient, invites exactly the large destructive
+  steps observed.
+
+**Reframing.** Both `GeoMTF` and the phasor *can* reach ~0.34 at field 0.7 — at the cost
+of fields 1 and 3. Summed sagittal MTF at 50 cyc/mm is actually higher for those runs
+(1.78 vs 1.40). So this is substantially a genuine Pareto trade in the design space,
+with the equal-weight contrast merit choosing one balance, rather than purely an
+optimizer failure. `GenericOpt` offers only 14 curvature variables, which narrows the
+frontier further.
+
+What survives unchanged is the diagnosis, which rests on the σ/phasor/geometric table
+and the non-monotonicity demonstration, not on the remedy: **the least-squares residual
+stops tracking MTF above ~0.1 waves, and under-weights a catastrophic field by ~4×.**
+What has *not* been found is a merit formulation that fixes it without collateral
+damage. Worth trying next: `|OTF|²` to remove the kink, reachable targets rather than
+1.0, and more variables.
+
+`GoalContrastMTF` is worth keeping regardless — it is a correct, cheap polychromatic
+diffraction-MTF evaluator that costs no extra ray tracing, which makes it useful for
+reporting and for goals on designs already in regime. It should not be presented as the
+answer to this finding.
+
 ---
 
 ## Smaller items
@@ -540,8 +589,9 @@ Done:
 
 Remaining, in priority order:
 
-4. **Add a phasor-based MTF goal** (§6) — the only open item that is producing a worse
-   lens rather than a wasteful merit.
+4. **Resolve §6.** `GoalContrastMTF` is implemented but does not fix it; see the outcome
+   subsection. Untried: `|OTF|²` to remove the kink at OTF zeros, reachable targets
+   rather than 1.0, and more variables than `GenericOpt`'s 14 curvatures.
 5. **Subtract the weighted mean** (§3) — tangential only; worth doing, but it cannot
    explain a sagittal symptom.
 6. **Drop to a single contrast frequency** (§4) — recovers most of the cost that the

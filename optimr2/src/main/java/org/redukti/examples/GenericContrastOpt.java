@@ -29,6 +29,7 @@ public class GenericContrastOpt {
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)
                 .contrastSampling(6, 12)
+                .calibrateContrastFrequency(true)
                 .contrastGoals(
                         contrast(10, fieldWeights),
                         contrast(30, fieldWeights),

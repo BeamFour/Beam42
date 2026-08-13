@@ -38,6 +38,7 @@ public final class OptimizationBuilder {
     // and tangential residuals stay comparable.
     private int contrastRings = 6;
     private int contrastSpokes = 12;
+    private boolean calibrateContrastFrequency = false;
     private final List<MtfGoals> mtfGoals = new ArrayList<>();
     private final List<ContrastGoals> contrastGoals = new ArrayList<>();
     private final List<Var> additionalVariables = new ArrayList<>();
@@ -187,6 +188,23 @@ public final class OptimizationBuilder {
         return this;
     }
 
+    /**
+     * Correct the contrast pupil shift so each sample realises the requested spatial
+     * frequency in image space.
+     *
+     * <p>The shift is applied in entrance-pupil coordinates but derives from an
+     * exit-pupil relation, so pupil aberration makes the realised frequency fall short,
+     * increasingly with field - measured 8.5% low at full field tangential on an f/2
+     * lens. Enabling this measures the shortfall per field, wavelength and direction and
+     * scales the shift to compensate, which brought that case to within 0.1%.
+     *
+     * <p>Off by default because it changes every contrast residual.
+     */
+    public OptimizationBuilder calibrateContrastFrequency(boolean value) {
+        calibrateContrastFrequency = value;
+        return this;
+    }
+
     public OptimizationBuilder spotRmsGoals(double[] targets) {
         return spotRmsGoals(targets, null);
     }
@@ -254,6 +272,7 @@ public final class OptimizationBuilder {
         if (contrastGoals.isEmpty()) return;
         int[] frequencies = contrastGoals.stream().mapToInt(goal -> goal.frequency).toArray();
         analysis.using_contrast_analysis(frequencies, contrastRings, contrastSpokes);
+        analysis.calibrating_contrast_frequency(calibrateContrastFrequency);
     }
 
     private void configureRequiredAnalyses(Analysis analysis, List<Goal> goals) {

@@ -17,6 +17,7 @@ Test case: `ZeissOtusML50mmTest.optimizesPatentPrescriptionUsingContrast()`
 | [4](#4-the-three-frequencies-are-near-collinear--two-thirds-of-the-ray-budget-is-wasted) | Frequencies near-collinear | **Open** |
 | [5](#5-high-frequencies-fail-without-a-diagnostic) | High-frequency degeneracy | **Partly fixed** — the silent collapse now throws; the 0.707×cutoff ceiling remains |
 | [6](#6-the-least-squares-reduction-only-tracks-mtf-in-the-small-phase-regime) | Least-squares only valid at small phase | **Open.** Diagnosed and reproduced; a phasor MTF goal was tried and reverted (`1438105c`) |
+| [7](#7-the-shear-is-applied-at-the-entrance-pupil-not-the-exit-pupil) | Shear applied at entrance, not exit, pupil | **Mitigated, opt-in.** `calibrate_frequency` removes the field bias (8.5% → 0.08%); exact fix pending upstream |
 
 Finding 6 was added after the first four fixes landed, prompted by a mid-field MTF drop
 running `GenericOpt` on the Leica 75/2. It is the most consequential open item: unlike 3
@@ -527,6 +528,99 @@ because it was wrong. Restore it from `1438105c` if a use appears.
 
 ---
 
+## 7. The shear is applied at the entrance pupil, not the exit pupil
+
+**Severity: moderate. Same class as finding 1, an order of magnitude smaller.**
+
+> **MITIGATED, opt-in.** `calibrate_frequency` corrects the field-dependent part; see
+> "The 90% correction" below. The exact treatment is with the upstream ray-optics
+> project.
+
+The OTF is the autocorrelation of the **exit** pupil function, and the paper computes the
+shear there. `trace_contrast` works in `PupilType.REL_PUPIL`, and
+`OpticalSpecs.ray_start_from_osp` builds those rays from `fod.enp_radius` and
+`fod.enp_dist` — **entrance** pupil coordinates. So the displacement is derived from an
+exit-pupil relation (`2·λ·F#·ν`, working F/#) but applied as a rigid translation in the
+entrance pupil. Those agree only where the pupil imaging is aberration free; real pupil
+aberration makes the entrance→exit mapping nonlinear.
+
+### Measuring it without locating the exit pupil
+
+Two rays produce image-plane fringes of frequency ν exactly when their image-space
+direction cosines differ by `λ·ν`. That holds wherever the exit pupil lies, so it tests
+the shear directly. Ratio of realised to requested frequency, Leica 75/2 at 50 cyc/mm
+(min / mean / max across the pupil):
+
+```
+fld |   sag: min/mean/max      |   tan: min/mean/max
+  0 | 0.9740  0.9956  1.0014   | 0.9740  0.9956  1.0014
+  1 | 0.9699  0.9924  0.9975   | 0.9593  0.9886  0.9946
+  2 | 0.9470  0.9746  0.9811   | 0.9414  0.9547  0.9589
+  3 | 0.9315  0.9528  0.9589   | 0.9109  0.9157  0.9166
+```
+
+Two distinct errors:
+
+- a **field-dependent bias** — the mean falls from 0.996 on axis to **0.916** at full
+  field tangential, so that group is optimized at ~45.8 cyc/mm rather than 50;
+- a **within-pupil variation** — even on axis the ratio spans 0.974 to 1.001, so the
+  shear is not a rigid translation in the exit pupil and each sample is smeared slightly
+  across frequency rather than sitting at one.
+
+The ratio is nearly independent of ν (0.9936 / 0.9946 / 0.9956 on axis at 10 / 30 / 50),
+as expected for a property of the pupil mapping rather than of the frequency.
+
+### The 90% correction
+
+Getting this exactly right needs each partner ray aimed iteratively until its direction
+cosine differs from the base ray's by `λ·ν` — several extra traces per sample. The
+field-dependent bias is the dominant term and is much cheaper to remove: probe it.
+
+`ContrastOptions.calibrate_frequency(true)` traces one probe pair per field, wavelength
+and direction at ±shift/2, measures the realised direction-cosine difference, and scales
+the entrance-pupil shift by `λν / realised`. Four extra rays per field and wavelength
+against roughly two hundred for the samples.
+
+```
+fld dir |  scale | ratio before | ratio after
+  3 tan | 1.0914 |       0.9155 |      0.9992
+  3 sag | 1.0441 |       0.9501 |      0.9920
+  2 tan | 1.0462 |       0.9542 |      0.9983
+  1 tan | 1.0085 |       0.9874 |      0.9958
+  0 sag | 1.0000 |       0.9942 |      0.9942
+```
+
+Worst case 8.5% low becomes 0.08% low; the residual ≤0.8% is the within-pupil spread,
+which is what the remaining 10% would buy.
+
+The on-axis row shows the method's limit: the probe straddles the pupil centre where the
+mapping is locally linear, so it returns a scale of 1.0000 and leaves the 0.6%
+pupil-averaged offset in place. The correction targets the *field* bias, which it
+captures well because that bias is nearly uniform across the pupil — the full-field
+tangential spread is only 0.911–0.917.
+
+Verified smooth: sweeping a curvature across the Jacobian step with calibration on gives
+monotone, noise-free increments (+0.003045 rising to +0.003186), the same character as
+with it off. It does not degrade the finite-difference Jacobian.
+
+**Off by default**, because it changes every contrast residual and therefore every
+committed golden value. Enable with `OptimizationBuilder.calibrateContrastFrequency(true)`,
+`Analysis.calibrating_contrast_frequency(true)`, or `ContrastOptions.calibrate_frequency(true)`.
+
+### Kept clear of the upstream port
+
+The ray tracing is a port of the upstream ray-optics project and needs to stay close to
+it so bug fixes remain portable. The whole correction therefore lives in Beam43-only
+files — `ContrastAnalysis`, `ContrastOptions`, `Analysis`, `OptimizationBuilder` — and
+calls `Trace.setup_pupil_coords` and `Trace.trace_safe` purely as a consumer. Nothing
+under `raytr/`, `specs/` or `seq/` was touched.
+
+(Note for the same reason: the `Field.apply_vignetting` refactor introduced under
+"Smaller items" *is* a deviation from upstream, albeit a behaviour-preserving one. It
+could be reverted to reduce porting friction.)
+
+---
+
 ## Smaller items
 
 - **`dLineOnly` is ignored for contrast goals.**
@@ -621,6 +715,8 @@ Done:
 1. ~~**Fix the vignetting/shear coupling** (§1)~~ — it was why field 3 tangential was stuck.
 2. ~~**Raise the sampling default to ~6×12**~~ (§2).
 3. ~~**Stop the degenerate high-frequency case failing silently**~~ (§5).
+3a. ~~**Correct the entrance-pupil shear bias** (§7)~~ — available, opt-in, pending the
+    exact exit-pupil treatment from upstream.
 
 Remaining, in priority order:
 
@@ -657,6 +753,8 @@ module's classpath and can reach the package-private helpers on `ZeissOtusML50mm
 | [ContrastProbe9.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe9.java) | §6 — reproduces the Leica mid-field drop; mean decomposition that rules out §3 |
 | [ContrastProbe10.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe10.java) | §6 core evidence — σ vs LSQ prediction vs phasor vs geometric MTF |
 | [ContrastProbe11.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe11.java) | §6 — phasor sampling convergence, 6×12 → 40×80 |
+| [ContrastProbe12.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe12.java) | §7 — realised vs requested frequency, exposing the entrance/exit pupil error |
+| [ContrastProbe13.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe13.java) | §7 — verifies `calibrate_frequency` removes the field-dependent bias |
 
 `ContrastProbes.java` in the same package holds the shared prescription-path lookups.
 Probes 1–8 use the Otus; 9–11 use the Leica 75/2.

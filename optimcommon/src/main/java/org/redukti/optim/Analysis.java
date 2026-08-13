@@ -25,6 +25,8 @@ public class Analysis {
     public int _num_spokes = 20;
     public int _contrast_num_rings = 3;
     public int _contrast_num_spokes = 6;
+    /** See {@link ContrastOptions#calibrate_frequency(boolean)}; off by default. */
+    public boolean _contrast_calibrate_frequency = false;
     public boolean _compute_spots = true;
     public boolean _compute_ray_aberrations = true;
     public boolean _compute_mtf = true;
@@ -78,6 +80,11 @@ public class Analysis {
         _contrast_num_spokes = num_spokes;
         return this;
     }
+    /** See {@link ContrastOptions#calibrate_frequency(boolean)}. */
+    public Analysis calibrating_contrast_frequency(boolean value) {
+        _contrast_calibrate_frequency = value;
+        return this;
+    }
     public Analysis required_analyses(boolean spots, boolean rayAberrations, boolean mtf) {
         _compute_spots = spots || mtf;
         _compute_ray_aberrations = rayAberrations;
@@ -113,7 +120,8 @@ public class Analysis {
         for (int i = 0; i < _contrast_freqs.length; i++) {
             var options = new ContrastOptions(_contrast_freqs[i])
                     .num_rings(_contrast_num_rings)
-                    .num_spokes(_contrast_num_spokes);
+                    .num_spokes(_contrast_num_spokes)
+                    .calibrate_frequency(_contrast_calibrate_frequency);
             _contrasts[i] = ContrastAnalysis.eval(_opt_model, options);
         }
     }

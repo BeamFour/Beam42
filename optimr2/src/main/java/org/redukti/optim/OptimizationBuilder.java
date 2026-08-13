@@ -25,6 +25,7 @@ public final class OptimizationBuilder {
     private int[] curvatureSurfaces = new int[0];
     private boolean allCurvatureSurfaces;
     private int[] thicknessSurfaces = new int[0];
+    private boolean allThicknessSurfaces;
     private boolean includeExistingAspherics;
     private boolean weighted = true;
     private boolean dLineOnly;
@@ -39,6 +40,8 @@ public final class OptimizationBuilder {
     private int contrastRings = 6;
     private int contrastSpokes = 12;
     private boolean calibrateContrastFrequency = false;
+    private Double thicknessGoalWeight;
+    private Double curvatureGoalWeight;
     private final List<MtfGoals> mtfGoals = new ArrayList<>();
     private final List<ContrastGoals> contrastGoals = new ArrayList<>();
     private final List<Var> additionalVariables = new ArrayList<>();
@@ -110,7 +113,29 @@ public final class OptimizationBuilder {
 
     public OptimizationBuilder thicknessSurfaces(int... surfaces) {
         this.thicknessSurfaces = copy(surfaces);
+        this.allThicknessSurfaces = false;
         return this;
+    }
+
+    /**
+     * Vary every thickness, air spaces and element thicknesses alike. Surfaces with zero
+     * thickness are excluded, being coincident rather than a space to open up.
+     *
+     * <p>The counterpart to {@link #allCurvatureSurfaces()}, and best paired with
+     * {@link #thicknessGoals(double)} - with every space free and nothing holding the
+     * layout, the solver will collapse gaps and drive elements through one another.
+     */
+    public OptimizationBuilder allThicknessSurfaces() {
+        this.allThicknessSurfaces = true;
+        return this;
+    }
+
+    /** Thickness of a surface for the scenario this builder targets. */
+    private double thicknessOf(int surface) {
+        var definition = prescription._surfaces[surface];
+        return definition._thickness_by_scenario != null
+                ? definition._thickness_by_scenario[0]
+                : definition._thickness;
     }
 
     /** Include nonzero conic constants and nonzero coefficients already present in the prescription. */
@@ -177,6 +202,40 @@ public final class OptimizationBuilder {
         if (goals == null)
             throw new IllegalArgumentException("contrast goals must not be null");
         this.contrastGoals.addAll(Arrays.asList(goals));
+        return this;
+    }
+
+    /**
+     * Hold the varied thicknesses near their starting values.
+     *
+     * <p>An optical merit function has no opinion about mechanical layout, so left alone
+     * the solver will collapse air spaces and push elements through each other and
+     * through the stop. This anchors each varied thickness to where it began: it is still
+     * free to move, it just costs merit to do so, with {@code weight} deciding how much.
+     *
+     * @param weight goal weight; the residual is a fraction of the starting thickness,
+     *               so one weight is meaningful across gaps of very different sizes
+     */
+    public OptimizationBuilder thicknessGoals(double weight) {
+        if (!Double.isFinite(weight) || weight < 0.0)
+            throw new IllegalArgumentException("thickness goal weight must be finite and non-negative");
+        this.thicknessGoalWeight = weight;
+        return this;
+    }
+
+    /**
+     * Hold the varied surfaces near their starting <em>curvatures</em>.
+     *
+     * <p>Curvature, not radius: radius runs away towards infinity on a near-flat surface
+     * for a negligible optical change, so a fractional radius goal would barely restrain
+     * it there while over-restraining a strongly curved one. See {@link GoalCurvature}.
+     *
+     * @param weight goal weight
+     */
+    public OptimizationBuilder curvatureGoals(double weight) {
+        if (!Double.isFinite(weight) || weight < 0.0)
+            throw new IllegalArgumentException("curvature goal weight must be finite and non-negative");
+        this.curvatureGoalWeight = weight;
         return this;
     }
 
@@ -256,7 +315,7 @@ public final class OptimizationBuilder {
         validate();
         Analysis analysis = new Analysis(prescription, copy(fields), copy(mtfFrequencies));
         List<Var> variables = buildVariables();
-        List<Goal> goals = buildGoals(analysis);
+        List<Goal> goals = buildGoals(analysis, variables);
         if (goals.size() < variables.size())
             throw new IllegalArgumentException(
                     "optimization requires at least as many goals as variables: "
@@ -308,8 +367,17 @@ public final class OptimizationBuilder {
             for (int surface : curvatureSurfaces)
                 result.add(new VarRadius(prescription, surface));
         }
-        for (int surface : thicknessSurfaces)
-            result.add(new VarThickness(prescription, surface));
+        if (allThicknessSurfaces) {
+            for (int surface = 0; surface < prescription._surfaces.length; surface++) {
+                // A zero thickness is a coincident surface, not a space to open up, and
+                // it gives the fractional GoalThickness no base to work from.
+                if (thicknessOf(surface) != 0.0)
+                    result.add(new VarThickness(prescription, surface));
+            }
+        } else {
+            for (int surface : thicknessSurfaces)
+                result.add(new VarThickness(prescription, surface));
+        }
         if (includeExistingAspherics) {
             for (int surfaceId = 0; surfaceId < prescription._surfaces.length; surfaceId++) {
                 var surface = prescription._surfaces[surfaceId];
@@ -329,8 +397,23 @@ public final class OptimizationBuilder {
         return result;
     }
 
-    private List<Goal> buildGoals(Analysis analysis) {
+    private List<Goal> buildGoals(Analysis analysis, List<Var> variables) {
         List<Goal> result = new ArrayList<>();
+        // Anchor the varied parameters to where they started. Built from the variable
+        // list so the goals attach to exactly what is free to move, and built here while
+        // the prescription still holds its original values.
+        if (thicknessGoalWeight != null) {
+            for (Var variable : variables)
+                if (variable instanceof VarThickness thickness)
+                    result.add(new GoalThickness(analysis, thickness._surface_id,
+                            thicknessGoalWeight));
+        }
+        if (curvatureGoalWeight != null) {
+            for (Var variable : variables)
+                if (variable instanceof VarRadius radius)
+                    result.add(new GoalCurvature(analysis, radius._surface_id,
+                            curvatureGoalWeight));
+        }
         for (MtfGoals curve : mtfGoals) {
             for (int field = 0; field < fields.length; field++) {
                 result.add(new GeoMTF(analysis, field + 1, SAGITTAL, curve.frequency,

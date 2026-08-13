@@ -6,7 +6,7 @@ import org.redukti.spec.Prescription;
 
 import static org.redukti.optim.OptimizationBuilder.contrast;
 
-public class GenericContrastOpt {
+public class CosinaVoigtlanderApo28mmf2 {
 
     static Prescription getPrescription(String specfile, boolean weighted,
                                         boolean dLineOnly) throws Exception {
@@ -46,7 +46,8 @@ public class GenericContrastOpt {
     public static void main(String[] args) throws Exception {
         boolean weighted = false;
         boolean dLineOnly = false;
-        var prescription = getPrescription(args[0], weighted, dLineOnly);
+        String specfile = ExampleFinder.geoPathToExample("Examples/jfotoptix/cosina-voigtlander-28mm-f2-apo/JP2026-098935_Example01.txt");
+        var prescription = getPrescription(specfile, weighted, dLineOnly);
         //var setup = createSetup(prescription, weighted, dLineOnly);
         var setup = createContrastSetup(prescription, weighted, dLineOnly);
         var analysis = setup.analysis();

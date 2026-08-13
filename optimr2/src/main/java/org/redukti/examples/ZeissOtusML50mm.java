@@ -48,7 +48,7 @@ public class ZeissOtusML50mm {
         double[] fieldWeights = {1.0, 1.0, 1.0, 1.0};
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
-                .mtfFrequencies(10, 20, 40)
+                .mtfFrequencies(10, 30, 50)
                 .curvatureSurfaces(
                         0, 1, 2, 3, 4, 5, 6, 8, 9,
                         11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23)
@@ -61,10 +61,11 @@ public class ZeissOtusML50mm {
                 // do not generally need them.
                 .rayAberrationGoals()
                 .contrastSampling(6, 12)
+                .calibrateContrastFrequency(true)
                 .contrastGoals(
                         contrast(10, fieldWeights),
-                        contrast(20, fieldWeights),
-                        contrast(40, fieldWeights))
+                        contrast(30, fieldWeights),
+                        contrast(50, fieldWeights))
                 .build();
     }
 
@@ -84,10 +85,13 @@ public class ZeissOtusML50mm {
         System.out.println(analysis._ray_aberrations.list_ray_fans());
         System.out.println("Before:\n");
         System.out.println(meritFunction);
+        long started = System.nanoTime();
         var status = solver.solve();
+        long elapsedMillis = (System.nanoTime() - started) / 1_000_000;
         System.out.println("Status = " + status);
         System.out.println("After:\n");
         System.out.println(meritFunction);
         System.out.println(prescription);
+        System.out.println("Time taken " + elapsedMillis + " ms");
     }
 }

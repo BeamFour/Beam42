@@ -607,6 +607,45 @@ with it off. It does not degrade the finite-difference Jacobian.
 committed golden value. Enable with `OptimizationBuilder.calibrateContrastFrequency(true)`,
 `Analysis.calibrating_contrast_frequency(true)`, or `ContrastOptions.calibrate_frequency(true)`.
 
+### Effect on the Otus
+
+The Otus is worse affected than the Leica, as expected at f/1.4 — corrections needed at
+40 cyc/mm:
+
+| field | sagittal | tangential |
+| --- | --- | --- |
+| 0.0 | 1.0000 | 1.0000 |
+| 0.3 | 1.0080 | 1.0184 |
+| 0.7 | 1.0464 | 1.0998 |
+| 1.0 | 1.0973 | **1.2040** |
+
+So full-field tangential was being optimized at ~33 cyc/mm rather than 40 — a 17%
+shortfall against the Leica's 8.5%. Re-optimizing with the correction on:
+
+| | calibrate off (committed) | calibrate on |
+| --- | --- | --- |
+| spot RMS | 2.398 3.487 3.917 4.181 | 2.499 3.477 3.914 **4.042** |
+| sag@40 | .9106 .8692 .7990 .8086 | .9040 .8667 .7904 .7960 |
+| tan@40 | .9106 .8221 .8011 .7542 | .9040 .8242 .8128 **.8013** |
+
+The correction gives the off-axis tangential groups the frequency they were asked for,
+and the optimizer responds where it had been under-corrected: tangential MTF at 40 cyc/mm
+rises at three of four fields, by 0.047 at full field, and full-field spot RMS improves.
+It pays for that with a little axial performance and a uniform ~0.01 of sagittal MTF.
+
+The better summary is the weakest link and the spread across the field:
+
+| | worst of the eight MTF@40 numbers | max − min |
+| --- | --- | --- |
+| calibrate off | 0.7542 | 0.156 |
+| calibrate on | **0.7904** | **0.114** |
+
+So correcting the frequency produces a more uniform lens with a better worst case, which
+is what one would expect from removing a field-dependent bias that had been quietly
+under-weighting the outer field. Note the two `finalRms` values (0.0064364267 against
+0.0069304768) are **not comparable** — they are different merit functions, since the
+sampled frequencies differ.
+
 ### Kept clear of the upstream port
 
 The ray tracing is a port of the upstream ray-optics project and needs to stay close to

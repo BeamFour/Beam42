@@ -24,7 +24,7 @@ public class ContrastProbe8 {
         a.compute();
         var m = a._opt_model;
         double wvl = 587.5618;
-        double requested = ContrastAnalysis.normalized_pupil_shift(m, wvl, 40.0);
+        double requested = ContrastAnalysis.normalized_entry_pupil_shift(m, wvl, 40.0);
         System.out.printf("requested shear for 40 cyc/mm = %.5f pupil radii%n%n", requested);
         System.out.println("what Trace actually applies, after Field.apply_vignetting:");
         System.out.println("field   base p        sag shear   -> eff freq   tan shear   -> eff freq");

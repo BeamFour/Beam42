@@ -14,7 +14,7 @@ class ContrastAnalysisTest {
         double wavelength = 550.0;
         double frequency = 50.0;
 
-        double shift = ContrastAnalysis.normalized_pupil_shift(model, wavelength, frequency);
+        double shift = ContrastAnalysis.normalized_entry_pupil_shift(model, wavelength, frequency);
 
         assertEquals(0.05413662972175293, shift, 1.0e-12);
     }

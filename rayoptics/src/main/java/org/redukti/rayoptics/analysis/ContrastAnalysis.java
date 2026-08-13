@@ -25,10 +25,10 @@ public class ContrastAnalysis {
             var wavelengthResults = new ArrayList<ContrastAnalysisResult.WavelengthResult>();
             for (int wavelengthIndex = 0; wavelengthIndex < wavelengths.length; wavelengthIndex++) {
                 double wavelength = wavelengths[wavelengthIndex];
-                double shift = normalized_pupil_shift(opticalModel, wavelength, options.spatialFrequency);
-                double sagittalShift = shift * frequency_calibration(
+                double shift = normalized_entry_pupil_shift(opticalModel, wavelength, options.spatialFrequency);
+                double sagittalShift = shift * exit_pupil_frequency_calibration(
                         opticalModel, fields[fieldIndex], wavelength, shift, X, options);
-                double tangentialShift = shift * frequency_calibration(
+                double tangentialShift = shift * exit_pupil_frequency_calibration(
                         opticalModel, fields[fieldIndex], wavelength, shift, Y, options);
                 var traced = opticalModel.seq_model.trace_contrast(
                         (rays, field, tracedWavelength, focus) -> sample(
@@ -46,10 +46,17 @@ public class ContrastAnalysis {
     }
 
     /**
-     * Convert frequency to a displacement in normalized pupil-radius units.
-     * The displacement is 2 at the incoherent diffraction cutoff 1/(lambda F#).
+     * Convert frequency to a displacement in normalized <em>entrance</em> pupil-radius
+     * units. The displacement is 2 at the incoherent diffraction cutoff 1/(lambda F#).
+     *
+     * <p>Note the mismatch the name records: the magnitude comes from an exit-pupil
+     * relation, since that is where the OTF autocorrelation is defined, but it is applied
+     * in entrance-pupil coordinates because that is what {@code REL_PUPIL} means. Those
+     * coincide only where the pupil imaging is aberration free. See
+     * {@link #exit_pupil_frequency_calibration}, which measures and corrects the
+     * difference when {@link ContrastOptions#calibrate_frequency(boolean)} is enabled.
      */
-    public static double normalized_pupil_shift(
+    public static double normalized_entry_pupil_shift(
             OpticalModel opticalModel, double wavelength, double spatialFrequency) {
         double wavelengthInSystemUnits = opticalModel.nm_to_sys_units(wavelength);
         double fNumber = Math.abs(opticalModel.optical_spec.parax_data.fod.fno);
@@ -62,7 +69,7 @@ public class ContrastAnalysis {
      *
      * <p>{@code REL_PUPIL} coordinates are normalised on the <em>entrance</em> pupil, but
      * the OTF is the autocorrelation of the <em>exit</em> pupil, and
-     * {@link #normalized_pupil_shift} derives its displacement from an exit-pupil relation
+     * {@link #normalized_entry_pupil_shift} derives its displacement from an exit-pupil relation
      * ({@code 2*lambda*F#*nu}). The two agree only where the pupil imaging is aberration
      * free; real pupil aberration lands a rigid entrance-pupil shift as a smaller,
      * field-dependent exit-pupil shift - around 8% low at full field on a fast lens.
@@ -78,7 +85,7 @@ public class ContrastAnalysis {
      * need per-ray aiming and is left uncorrected. Cost is four rays per field and
      * wavelength against the couple of hundred used for the samples.
      */
-    private static double frequency_calibration(
+    private static double exit_pupil_frequency_calibration(
             OpticalModel opticalModel, Field field, double wavelength,
             double shift, int axis, ContrastOptions options) {
         if (!options.calibrateFrequency || !(shift > 0.0)) return 1.0;

@@ -26,7 +26,7 @@ public class ContrastProbe5 {
                 1.0 / (lambda * fno), 0.707 / (lambda * fno));
         for (double f : new double[]{40, 400, 800, 830, 850, 1000}) {
             var c = ContrastAnalysis.eval(a._opt_model, new ContrastOptions(f).num_rings(3).num_spokes(6));
-            double shift = ContrastAnalysis.normalized_pupil_shift(a._opt_model, 587.5618, f);
+            double shift = ContrastAnalysis.normalized_entry_pupil_shift(a._opt_model, 587.5618, f);
             double maxAbs = 0, maxR = 0;
             for (var fr : c.fields)
                 for (var w : fr.wavelengths())

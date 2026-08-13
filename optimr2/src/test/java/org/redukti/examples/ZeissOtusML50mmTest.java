@@ -1,9 +1,12 @@
 package org.redukti.examples;
 
 import org.junit.jupiter.api.Test;
+import org.redukti.optim.OptimizationBuilder;
+import org.redukti.optim.OptimizationBuilder.OptimizationSetup;
 import org.redukti.optim.ParaxHelper;
 import org.redukti.rayoptics.analysis.SpotOptions;
 import org.redukti.rayoptics.analysis.SpotAnalysis;
+import org.redukti.spec.Prescription;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,8 +14,70 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.redukti.optim.OptimizationBuilder.contrast;
 
 class ZeissOtusML50mmTest {
+
+    /** The direct spot/MTF configuration the gaussian-quadrature expectations assume. */
+    private static OptimizationSetup frozenDirectSetup(Prescription prescription) {
+        return OptimizationBuilder.builder(prescription)
+                .fields(0.0, 0.3, 0.7, 1.0)
+                .mtfFrequencies(10, 20, 40)
+                .curvatureSurfaces(
+                        0, 1, 2, 3, 4, 5, 6, 8, 9,
+                        11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23)
+                .thicknessSurfaces(25)
+                .includeExistingAspherics(true)
+                .weighted(false)
+                .dLineOnly(false)
+                .rayAberrationGoals()
+                .mtfGoals(
+                        OptimizationBuilder.mtf(10,
+                                new double[]{93, 93, 94, 93},
+                                new double[]{93, 93, 90, 82}),
+                        OptimizationBuilder.mtf(20,
+                                new double[]{85, 85, 85, 80},
+                                new double[]{85, 85, 78, 62}),
+                        OptimizationBuilder.mtf(40,
+                                new double[]{65, 65, 64, 58},
+                                new double[]{65, 62, 45, 38}))
+                .build();
+    }
+
+    /**
+     * The contrast configuration this test's expected values were generated under,
+     * declared here rather than taken from {@link ZeissOtusML50mm}.
+     *
+     * <p>The example class is a place to try things - frequencies, sampling, the
+     * exit-pupil frequency calibration - and every one of those changes the merit
+     * function and therefore every number asserted below. Sharing its setup meant an
+     * experiment silently became a test failure. This test locks the implementation's
+     * behaviour on a fixed configuration, so it has to own that configuration.
+     *
+     * <p>Change it only deliberately, and regenerate the expected values when you do.
+     */
+    private static OptimizationSetup frozenContrastSetup(Prescription prescription) {
+        double[] fieldWeights = {1.0, 1.0, 1.0, 1.0};
+        return OptimizationBuilder.builder(prescription)
+                .fields(0.0, 0.3, 0.7, 1.0)
+                .mtfFrequencies(10, 20, 40)
+                .curvatureSurfaces(
+                        0, 1, 2, 3, 4, 5, 6, 8, 9,
+                        11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23)
+                .thicknessSurfaces(25)
+                .includeExistingAspherics(true)
+                .weighted(false)
+                .dLineOnly(false)
+                // Ray fans are opt-in now; they were unconditional when these values
+                // were generated, so keep them to preserve the merit.
+                .rayAberrationGoals()
+                .contrastSampling(6, 12)
+                .contrastGoals(
+                        contrast(10, fieldWeights),
+                        contrast(20, fieldWeights),
+                        contrast(40, fieldWeights))
+                .build();
+    }
 
     @Test
     void optimizesPatentPrescriptionUsingContrast() throws Exception {
@@ -22,7 +87,7 @@ class ZeissOtusML50mmTest {
         boolean dLineOnly = false;
         var prescription = ZeissOtusML50mm.getPrescription(
                 input.toAbsolutePath().toString(), weighted, dLineOnly);
-        var setup = ZeissOtusML50mm.createContrastSetup(prescription, weighted, dLineOnly);
+        var setup = frozenContrastSetup(prescription);
 
         setup.analysis().compute();
         var meritFunction = setup.meritFunction(false);
@@ -95,7 +160,7 @@ class ZeissOtusML50mmTest {
         boolean dLineOnly = false;
         var prescription = ZeissOtusML50mm.getPrescription(
                 input.toAbsolutePath().toString(), weighted, dLineOnly);
-        var setup = ZeissOtusML50mm.createSetup(prescription, weighted, dLineOnly);
+        var setup = frozenDirectSetup(prescription);
 
         assertEquals(SpotOptions.PATTERN_GAUSS_QUADRATURE, setup.analysis()._spot_pattern);
 

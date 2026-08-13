@@ -4,6 +4,8 @@ import org.redukti.mathlib.LMLSolver;
 import org.redukti.mathlib.M;
 import org.redukti.mathlib.MinPack;
 
+import java.util.Arrays;
+
 public class LMDerMeritFunction implements MinPack.Lmder_Function {
 
     private static final double BIGVAL = LMLSolver.BIGVAL;
@@ -110,11 +112,39 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
         return 0;
     }
 
+    /**
+     * Central differences where possible, degrading per residual rather than abandoning
+     * the solve.
+     *
+     * <p>A trial step can kill a ray - most easily when thicknesses are varied, since
+     * nothing stops an air space closing - and that used to fail the whole Jacobian and
+     * terminate lmder with info &lt; 0. But a failure is usually confined to a handful of
+     * residuals at one perturbed point, and the rest of the column is perfectly good. So
+     * each entry falls back as far as it needs to:
+     *
+     * <ul>
+     *   <li>both perturbed points usable - central difference, as before;</li>
+     *   <li>one side usable - one-sided difference against the base point, losing an
+     *       order of accuracy but keeping the derivative;</li>
+     *   <li>neither usable - zero, which tells the solver only that it does not know,
+     *       so that variable stays put this iteration instead of the run ending.</li>
+     * </ul>
+     *
+     * <p>When nothing fails, every entry takes the first branch and the Jacobian is
+     * numerically identical to the previous implementation.
+     */
     public boolean buildJacobian(double[] x, double[] fjac, int ldfjac) {
         final int n = vars.length;
         final int m = functions.length;
-        double[] resid = new double[m];
-        double delta[] = new double[n];
+        double[] base = new double[m];
+        double[] forward = new double[m];
+        double[] backward = new double[m];
+        double[] delta = new double[n];
+
+        // lmder computes fvec at x before asking for the Jacobian, but the last
+        // evaluation may have been a rejected trial step, so re-establish x here.
+        evaluate(x, delta, base);
+
         for (int j = 0; j < n; j++) {
             // Fixed absolute step per variable (scaled units). A step relative
             // to the current value is zero for zero-valued parameters (fresh
@@ -122,42 +152,39 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
             double dDelta = vars[j]._d_delta;
             if (!Double.isFinite(dDelta) || dDelta <= 0.0)
                 return false;
-            for (int k = 0; k < n; k++)
-                delta[k] = (k == j) ? dDelta : 0.0;
-            if (!nudge(x, delta, resid)) {
-                return false;
-            }
-            for (int i = 0; i < m; i++)
-                fjac[i + j * ldfjac] = resid[i];
 
-            for (int k = 0; k < n; k++)
-                delta[k] = (k == j) ? -1.0 * dDelta : 0.0;
-            if (!nudge(x, delta, resid)) {
-                return false;
-            }
-            for (int i = 0; i < m; i++)
-                fjac[i + j * ldfjac] -= resid[i];
+            delta[j] = dDelta;
+            evaluate(x, delta, forward);
+            delta[j] = -dDelta;
+            evaluate(x, delta, backward);
+            delta[j] = 0.0;
 
             for (int i = 0; i < m; i++) {
-                fjac[i + j * ldfjac] /= (2.0 * dDelta);
-                if (!Double.isFinite(fjac[i + j * ldfjac]))
-                    return false;
-            }
-        }
-        // Scale by weights
-        for (int j = 0; j < n; j++) {
-            for (int i = 0; i < m; i++) {
-                fjac[i + j * ldfjac] = fjac[i + j * ldfjac] * weights[i];
+                double derivative;
+                if (!Double.isNaN(forward[i]) && !Double.isNaN(backward[i]))
+                    derivative = (forward[i] - backward[i]) / (2.0 * dDelta);
+                else if (!Double.isNaN(forward[i]) && !Double.isNaN(base[i]))
+                    derivative = (forward[i] - base[i]) / dDelta;
+                else if (!Double.isNaN(backward[i]) && !Double.isNaN(base[i]))
+                    derivative = (base[i] - backward[i]) / dDelta;
+                else
+                    derivative = 0.0;
+                fjac[i + j * ldfjac] = Double.isFinite(derivative)
+                        ? derivative * weights[i] : 0.0;
             }
         }
         // Restore the prescription and analysis to the unperturbed point x
-        for (int k = 0; k < n; k++)
-            delta[k] = 0.0;
-        return nudge(x, delta, resid);
+        evaluate(x, delta, base);
+        return true;
     }
 
-    public boolean nudge(double[] x, double[] delta, double[] resid) {
-        boolean okay = true;
+    /**
+     * Applies {@code x + delta} and evaluates every goal, writing raw values into
+     * {@code resid} and NaN for any that could not be evaluated.
+     *
+     * @return true if at least one goal produced a usable value
+     */
+    private boolean evaluate(double[] x, double[] delta, double[] resid) {
         try {
             for (int i = 0; i < delta.length; i++) {
                 vars[i].set_scaled_value(x[i] + delta[i]);
@@ -165,21 +192,17 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
             }
             analysis.compute();
         } catch (Exception e) {
-            okay = false;
-        }
-        if (!okay)
-            // A killed ray during Jacobian evaluation: differencing BIGVAL
-            // residuals would poison the Jacobian, so report failure instead
-            // (buildJacobian returns false, lmder terminates with info < 0).
+            Arrays.fill(resid, Double.NaN);
             return false;
+        }
+        boolean any = false;
         for (int i = 0; i < functions.length; i++) {
             double value = functions[i].value();
-            if (!Double.isFinite(value) || value >= BIGVAL)
-                return false;
-
-            resid[i] = value;
+            boolean usable = Double.isFinite(value) && value < BIGVAL;
+            resid[i] = usable ? value : Double.NaN;
+            any |= usable;
         }
-        return okay;
+        return any;
     }
 
     private void validateInitialContrastSamples() {

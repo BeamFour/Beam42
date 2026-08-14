@@ -23,6 +23,7 @@ public class Analysis {
     public int _num_rays = 64;
     public int _num_rings = 14;
     public int _num_spokes = 20;
+    public boolean _append_failed_spot_rays = false;
     public int _contrast_num_rings = 3;
     public int _contrast_num_spokes = 6;
     /** See {@link ContrastOptions#calibrate_frequency(boolean)}; off by default. */
@@ -69,6 +70,10 @@ public class Analysis {
         _num_spokes = num_spokes;
         return this;
     }
+    public Analysis retaining_failed_spot_rays(boolean value) {
+        _append_failed_spot_rays = value;
+        return this;
+    }
     public Analysis using_hexapolar_pattern(int num_rays) {
         _spot_pattern = SpotOptions.PATTERN_HEXAPOLAR;
         _num_rays = num_rays;
@@ -98,7 +103,9 @@ public class Analysis {
         if (_compute_spots) {
             SpotOptions options;
             if (_spot_pattern == SpotOptions.PATTERN_GAUSS_QUADRATURE) {
-                options = new SpotOptions().use_gaussian_quadrature().num_rings(_num_rings).num_spokes(_num_spokes);
+                options = new SpotOptions().use_gaussian_quadrature()
+                        .num_rings(_num_rings).num_spokes(_num_spokes)
+                        .append_failed_rays(_append_failed_spot_rays);
             }
             else {
                 options = new SpotOptions().use_hexapolar().num_rays(_num_rays);

@@ -736,10 +736,10 @@ public class Trace {
                 if (item != null)
                     grid.add(item.withWeight(point.weight()));
                 else if (append_if_none)
-                    grid.add(new GridItem(pupil, null).withWeight(point.weight()));
+                    grid.add(GridItem.failed(pupil).withWeight(point.weight()));
             }
             else if (append_if_none) {
-                grid.add(new GridItem(pupil, null).withWeight(point.weight()));
+                grid.add(GridItem.failed(pupil).withWeight(point.weight()));
             }
         }
         return grid;

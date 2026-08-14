@@ -32,6 +32,11 @@ public final class OptimizationBuilder {
     private boolean addRayAberrationGoals;
     private boolean useHexapolarSpotPattern;
     private int hexapolarSpotRays = 64;
+    private int gaussianQuadratureRings = 14;
+    private int gaussianQuadratureSpokes = 20;
+    private double[] spotRmsRayXWeights;
+    private double[] spotRmsRayYWeights;
+    private boolean addSpotRmsRayGoals;
     // 3x6 is enough to measure a fixed design but not to optimize against: the
     // solver drives the 18 sampled points further than the wavefront between
     // them, so the merit reads better than the lens is. 6x12 is converged - 8x16
@@ -273,6 +278,38 @@ public final class OptimizationBuilder {
         return this;
     }
 
+    /**
+     * Minimize RMS spot radius through individual signed X/Y ray deviations.
+     * One field weight is applied to every wavelength, sample and orientation.
+     */
+    public OptimizationBuilder spotRmsRayGoals(double... fieldWeights) {
+        this.addSpotRmsRayGoals = true;
+        this.spotRmsRayXWeights = copy(fieldWeights);
+        this.spotRmsRayYWeights = copy(fieldWeights);
+        return this;
+    }
+
+    /** Assign separate per-field weights to the signed X and Y spot deviations. */
+    public OptimizationBuilder spotRmsRayGoals(double[] xWeights, double[] yWeights) {
+        this.addSpotRmsRayGoals = true;
+        this.spotRmsRayXWeights = copy(xWeights);
+        this.spotRmsRayYWeights = copy(yWeights);
+        return this;
+    }
+
+    /**
+     * Configure the ordinary Gaussian-quadrature spot pattern shared by spot and
+     * geometric-MTF analyses. Contrast uses its separate sheared-pupil pattern.
+     */
+    public OptimizationBuilder gaussianQuadratureSampling(int rings, int spokes) {
+        if (rings < 1 || spokes < 1)
+            throw new IllegalArgumentException(
+                    "Gaussian-quadrature rings and spokes must be at least 1");
+        this.gaussianQuadratureRings = rings;
+        this.gaussianQuadratureSpokes = spokes;
+        return this;
+    }
+
     public OptimizationBuilder spotMaxRadiusGoals(double[] targets) {
         return spotMaxRadiusGoals(targets, null);
     }
@@ -338,7 +375,8 @@ public final class OptimizationBuilder {
         // Additional goal factories are conservatively assumed to require all analyses.
         if (additionalGoalFactories.isEmpty()) {
             boolean spots = goals.stream().anyMatch(goal ->
-                    goal instanceof GoalSpotRMS || goal instanceof GoalSpotMaxRadius || goal instanceof GeoMTF);
+                    goal instanceof GoalSpotRMS || goal instanceof GoalSpotDeviation
+                            || goal instanceof GoalSpotMaxRadius || goal instanceof GeoMTF);
             boolean mtf = goals.stream().anyMatch(GeoMTF.class::isInstance);
             boolean rayAberrations = goals.stream().anyMatch(goal ->
                     goal instanceof GoalRayAberration || goal instanceof GoalMTFProxy);
@@ -348,10 +386,16 @@ public final class OptimizationBuilder {
 
     private void configureSpotPattern(Analysis analysis, List<Goal> goals) {
         boolean hasSpotMaxRadiusGoal = goals.stream().anyMatch(GoalSpotMaxRadius.class::isInstance);
-        if (useHexapolarSpotPattern || hasSpotMaxRadiusGoal)
+        if (addSpotRmsRayGoals) {
+            analysis.using_gauss_quadrature_pattern(
+                            gaussianQuadratureRings, gaussianQuadratureSpokes)
+                    .retaining_failed_spot_rays(true);
+        }
+        else if (useHexapolarSpotPattern || hasSpotMaxRadiusGoal)
             analysis.using_hexapolar_pattern(hexapolarSpotRays);
         else
-            analysis.using_gauss_quadrature_pattern(14, 20);
+            analysis.using_gauss_quadrature_pattern(
+                    gaussianQuadratureRings, gaussianQuadratureSpokes);
     }
 
     private List<Var> buildVariables() {
@@ -446,6 +490,22 @@ public final class OptimizationBuilder {
                 result.add(new GoalSpotRMS(analysis, field + 1,
                         spotRmsGoals.targets[field], spotRmsGoals.weights[field]));
         }
+        if (addSpotRmsRayGoals) {
+            int samples = gaussianQuadratureRings * gaussianQuadratureSpokes;
+            for (int field = 0; field < fields.length; field++) {
+                for (int wavelength = 0; wavelength < prescription._wvls.length; wavelength++) {
+                    double wavelengthWeight = weighted ? prescription._wts[wavelength] : 1.0;
+                    for (int sample = 0; sample < samples; sample++) {
+                        result.add(new GoalSpotDeviation(analysis, field, wavelength,
+                                sample, GoalSpotDeviation.X,
+                                wavelengthWeight * spotRmsRayXWeights[field]));
+                        result.add(new GoalSpotDeviation(analysis, field, wavelength,
+                                sample, GoalSpotDeviation.Y,
+                                wavelengthWeight * spotRmsRayYWeights[field]));
+                    }
+                }
+            }
+        }
         if (spotMaxRadiusGoals != null) {
             for (int field = 0; field < fields.length; field++)
                 result.add(new GoalSpotMaxRadius(analysis, field + 1,
@@ -516,6 +576,18 @@ public final class OptimizationBuilder {
         }
         if (spotRmsGoals != null)
             spotRmsGoals.validate(fields.length, "spot RMS");
+        if (addSpotRmsRayGoals) {
+            MtfGoals.validateWeights(spotRmsRayXWeights, fields.length,
+                    "spot RMS ray X weights");
+            MtfGoals.validateWeights(spotRmsRayYWeights, fields.length,
+                    "spot RMS ray Y weights");
+            if (spotRmsGoals != null)
+                throw new IllegalArgumentException(
+                        "aggregate and per-ray spot RMS goals cannot both be enabled");
+            if (spotMaxRadiusGoals != null || useHexapolarSpotPattern)
+                throw new IllegalArgumentException(
+                        "per-ray spot RMS goals require Gaussian-quadrature spot sampling");
+        }
         if (spotMaxRadiusGoals != null)
             spotMaxRadiusGoals.validate(fields.length, "spot maximum radius");
         validateSurfaces(curvatureSurfaces, "curvature");

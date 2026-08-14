@@ -51,6 +51,7 @@ public class SpotAnalysisResult {
             double totalWeight = 0.0;
             for (var results: intercepts) {
                 for (int i = 0; i < results.x.length; i++) {
+                    if (!results.valid[i]) continue;
                     double r = results.x[i] * results.x[i] + results.y[i] * results.y[i];
                     double l = Math.sqrt(r);
                     if (l > max_radius) {
@@ -60,7 +61,8 @@ public class SpotAnalysisResult {
                     totalWeight += results.weights[i];
                 }
             }
-            mean_radius = Math.sqrt(mean_radius/totalWeight);
+            mean_radius = totalWeight > 0.0
+                    ? Math.sqrt(mean_radius/totalWeight) : Double.NaN;
         }
 
         @Override

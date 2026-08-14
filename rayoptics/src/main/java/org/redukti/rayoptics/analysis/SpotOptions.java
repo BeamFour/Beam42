@@ -11,6 +11,7 @@ public class SpotOptions {
     TraceOptions traceOptions = new TraceOptions();
     int pattern;
     boolean use_centroid = true;
+    boolean append_failed_rays = false;
     int num_rays;
     Integer num_spokes = null;
 
@@ -53,6 +54,10 @@ public class SpotOptions {
     }
     public SpotOptions use_centroid(boolean value) {
         this.use_centroid = value;
+        return this;
+    }
+    public SpotOptions append_failed_rays(boolean value) {
+        this.append_failed_rays = value;
         return this;
     }
     public boolean is_gauss_quadrature() {

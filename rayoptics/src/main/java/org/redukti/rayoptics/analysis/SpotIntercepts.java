@@ -8,6 +8,7 @@ public class SpotIntercepts {
     public final double[] x;
     public final double[] y;
     public final double[] weights;
+    public final boolean[] valid;
     public final TraceGridByWvl trace_data;
 
     public SpotIntercepts(TraceGridByWvl trace_data) {
@@ -16,10 +17,13 @@ public class SpotIntercepts {
         this.x = new double[trace_data.grid.size()];
         this.y = new double[trace_data.grid.size()];
         this.weights = new double[trace_data.grid.size()];
+        this.valid = new boolean[trace_data.grid.size()];
         for (int i = 0; i < trace_data.grid.size(); i++) {
-            this.x[i] = trace_data.grid.get(i).pupil.x();
-            this.y[i] = trace_data.grid.get(i).pupil.y();
-            this.weights[i] = trace_data.grid.get(i).weight;
+            var item = trace_data.grid.get(i);
+            this.valid[i] = item.valid;
+            this.x[i] = valid[i] ? item.pupil.x() : Double.NaN;
+            this.y[i] = valid[i] ? item.pupil.y() : Double.NaN;
+            this.weights[i] = item.weight;
         }
     }
 
@@ -27,10 +31,12 @@ public class SpotIntercepts {
         double cx = 0, cy = 0;
         double totalWeight = 0.0;
         for (int i = 0; i < trace_data.grid.size(); i++) {
+            if (!valid[i]) continue;
             cx += this.weights[i] * this.x[i];
             cy += this.weights[i] * this.y[i];
             totalWeight += this.weights[i];
         }
+        if (!(totalWeight > 0.0)) return new Vector2(Double.NaN, Double.NaN);
         cx = cx / totalWeight;
         cy = cy / totalWeight;
         return new Vector2(cx,cy);
@@ -38,6 +44,7 @@ public class SpotIntercepts {
 
     public void adjust_to_centroid(Vector2 centroid) {
         for (int i = 0; i < trace_data.grid.size(); i++) {
+            if (!valid[i]) continue;
             this.x[i] -= centroid.x;
             this.y[i] -= centroid.y;
         }

@@ -27,11 +27,11 @@ public class GenericContrastOpt {
                 //.curvatureSurfaces(0)
                 .includeExistingAspherics(true)
                 .allCurvatureSurfaces()
-                .allThicknessSurfaces()
+                //.allThicknessSurfaces()
                 // Everything is free, so hold the layout: without these the solver
                 // collapses air spaces and pushes elements through the stop.
                 .curvatureGoals(1.0)
-                .thicknessGoals(1.0)
+                //.thicknessGoals(1.0)
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)
                 .contrastSampling(6, 12)

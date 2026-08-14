@@ -190,6 +190,15 @@ class OptimizationBuilderTest {
         assertEquals(SpotOptions.PATTERN_GAUSS_QUADRATURE, analysis._spot_pattern);
         assertEquals(14, analysis._num_rings);
         assertEquals(20, analysis._num_spokes);
+
+        Analysis configured = OptimizationBuilder.builder(prescription())
+                .fields(0.0)
+                .mtfFrequencies(10)
+                .gaussianQuadratureSampling(3, 8)
+                .build()
+                .analysis();
+        assertEquals(3, configured._num_rings);
+        assertEquals(8, configured._num_spokes);
     }
 
     @Test
@@ -317,6 +326,59 @@ class OptimizationBuilderTest {
     }
 
     @Test
+    void buildsPerRaySpotGoalsWhoseSumMatchesRmsSpotRadius() {
+        var setup = OptimizationBuilder.builder(prescription())
+                .fields(0.0)
+                .mtfFrequencies(20)
+                .weighted(false)
+                .gaussianQuadratureSampling(2, 4)
+                .spotRmsRayGoals(new double[]{1.0}, new double[]{1.0})
+                .build();
+
+        assertEquals(SpotOptions.PATTERN_GAUSS_QUADRATURE, setup.analysis()._spot_pattern);
+        assertEquals(2, setup.analysis()._num_rings);
+        assertEquals(4, setup.analysis()._num_spokes);
+        assertTrue(setup.analysis()._append_failed_spot_rays);
+        setup.analysis().compute();
+
+        GoalSpotDeviation[] goals = Arrays.stream(setup.goals())
+                .filter(GoalSpotDeviation.class::isInstance)
+                .map(GoalSpotDeviation.class::cast)
+                .toArray(GoalSpotDeviation[]::new);
+        assertEquals(3 * 2 * 4 * 2, goals.length);
+        assertEquals(GoalSpotDeviation.X, goals[0]._orientation);
+        assertEquals(GoalSpotDeviation.Y, goals[1]._orientation);
+        assertEquals(1.0, goals[0]._weight);
+        assertEquals(1.0, goals[1]._weight);
+
+        double sumOfSquares = Arrays.stream(goals)
+                .mapToDouble(goal -> goal.value() * goal.value())
+                .sum();
+        double rmsFromGoals = Math.sqrt(sumOfSquares / 3.0);
+        assertEquals(setup.analysis()._spots[0].get_mean_radius(), rmsFromGoals, 1.0e-9);
+    }
+
+    @Test
+    void perRaySpotGoalsImproveSpotMeritDuringOptimization() {
+        var setup = OptimizationBuilder.builder(prescription())
+                .fields(0.0)
+                .mtfFrequencies(20)
+                .curvatureSurfaces(0)
+                .weighted(false)
+                .gaussianQuadratureSampling(2, 4)
+                .spotRmsRayGoals(1.0)
+                .build();
+        setup.analysis().compute();
+        var merit = setup.meritFunction(false);
+        double initial = merit.getRMS();
+
+        int status = merit.getSolver().solve();
+
+        assertTrue(status > 0, "lmder status=" + status);
+        assertTrue(merit.getRMS() < initial);
+    }
+
+    @Test
     void validatesMtfArrayLengthsAndMeasuredFrequencies() {
         assertThrows(IllegalArgumentException.class, () ->
                 OptimizationBuilder.builder(prescription())
@@ -339,6 +401,21 @@ class OptimizationBuilderTest {
                         .fields(0.0, 1.0)
                         .mtfFrequencies(10)
                         .spotRmsGoals(new double[]{10.0})
+                        .build());
+
+        assertThrows(IllegalArgumentException.class, () ->
+                OptimizationBuilder.builder(prescription())
+                        .fields(0.0, 1.0)
+                        .mtfFrequencies(10)
+                        .spotRmsRayGoals(1.0)
+                        .build());
+
+        assertThrows(IllegalArgumentException.class, () ->
+                OptimizationBuilder.builder(prescription())
+                        .fields(0.0)
+                        .mtfFrequencies(10)
+                        .spotRmsRayGoals(1.0)
+                        .useHexapolarSpotPattern()
                         .build());
 
         Prescription prescription = prescription();

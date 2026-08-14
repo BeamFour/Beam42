@@ -220,6 +220,55 @@ parameter-preservation residuals, compare their aggregate sum-of-squares contrib
 when choosing weights. A nominal weight of `1.0` is a useful starting point, but is not
 automatically equal in influence to the complete optical merit.
 
+## Per-ray RMS spot optimization
+
+`GoalSpotRMS` exposes one aggregate spot-radius value per field. Although suitable for
+measurement, differentiating a single square-rooted aggregate gives the solver much less
+information than exposing the signed ray deviations that make up the same RMS value.
+
+Enable the granular form with one field weight per configured field:
+
+```java
+.gaussianQuadratureSampling(6, 12)
+.spotRmsRayGoals(new double[] {1.0, 1.0, 1.0, 1.0})
+```
+
+Separate X and Y field weights are also supported:
+
+```java
+.spotRmsRayGoals(xWeights, yWeights)
+```
+
+The sampling pattern is Gaussian quadrature. For every field, wavelength and pupil
+sample, the builder creates two `GoalSpotDeviation` residuals. If `(dx, dy)` is the ray
+intercept relative to the reference-wavelength centroid and `w_p` is its quadrature
+weight, their values in microns are
+
+```text
+r_x = 1000 sqrt(w_p) dx
+r_y = 1000 sqrt(w_p) dy
+```
+
+The merit function additionally applies the square roots of the field/orientation and
+wavelength weights. Consequently, minimizing the sum of the individual squared
+residuals is mathematically equivalent to minimizing the corresponding weighted RMS
+spot radius, while retaining the sign and direction of every ray error for the Jacobian.
+
+`gaussianQuadratureSampling` configures the common ordinary spot pattern used by
+per-ray spot goals, aggregate Gaussian spot analysis and geometric MTF. The historical
+default remains 14 rings by 20 spokes; 6 by 12 gives 72 pupil rays and 144 residuals per
+field and wavelength when a smaller optimization merit is wanted. Contrast retains a
+separate `contrastSampling` setting because it integrates over the overlap of sheared
+pupils rather than the ordinary spot pupil.
+Sampling must remain fixed throughout an optimization; failed rays therefore retain
+their sample positions and report an invalid goal instead of being removed and shifting
+the remaining goal indices.
+
+Per-ray RMS goals cannot be combined with aggregate `spotRmsGoals`, maximum-radius spot
+goals, or explicitly requested hexapolar sampling in the same builder configuration.
+Maximum radius is inherently controlled by the worst sampled ray rather than a
+Gaussian-weighted RMS distribution and remains a separate hexapolar use case.
+
 ### Suggested comparison measurements
 
 When comparing contrast optimization across prescriptions, record:

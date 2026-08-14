@@ -4,9 +4,6 @@ import org.redukti.mathlib.LMLSolver;
 
 /** One signed, Gaussian-weighted image-plane ray deviation for RMS spot optimization. */
 public class GoalSpotDeviation extends Goal {
-    public static final int X = 0;
-    public static final int Y = 1;
-
     /** Zero based, as stored; the constructor takes a one based field. */
     public final int _field;
     public final int _wavelength_index;
@@ -19,8 +16,7 @@ public class GoalSpotDeviation extends Goal {
         if (field < 1) throw new IllegalArgumentException("field is one based and must be positive");
         if (wavelength_index < 0 || sample_index < 0)
             throw new IllegalArgumentException("indices must be non-negative");
-        if (orientation != X && orientation != Y)
-            throw new IllegalArgumentException("invalid spot orientation");
+        Orientation.checked(orientation);
         _field = field - 1;
         _wavelength_index = wavelength_index;
         _sample_index = sample_index;
@@ -37,7 +33,7 @@ public class GoalSpotDeviation extends Goal {
         var intercepts = field.intercepts.get(_wavelength_index);
         if (_sample_index >= intercepts.x.length || !intercepts.valid[_sample_index])
             return LMLSolver.BIGVAL;
-        double deviation = _orientation == X
+        double deviation = _orientation == Orientation.X
                 ? intercepts.x[_sample_index] : intercepts.y[_sample_index];
         // SpotAnalysis stores system units (normally mm); public spot radii and
         // optimization targets use microns.
@@ -49,7 +45,7 @@ public class GoalSpotDeviation extends Goal {
         return "SpotDeviation field=" + _field
                 + ", wavelength=" + _wavelength_index
                 + ", sample=" + _sample_index
-                + ", orientation=" + (_orientation == X ? "x" : "y")
+                + ", orientation=" + (_orientation == Orientation.X ? "x" : "y")
                 + ", target=" + _target + ", weight=" + _weight + " = " + value();
     }
 }

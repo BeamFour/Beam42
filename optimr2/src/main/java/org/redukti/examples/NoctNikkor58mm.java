@@ -34,7 +34,7 @@ public class NoctNikkor58mm {
                 .dLineOnly(dLineOnly)
                 .applyCurvatureConstraints()
                 .gaussianQuadratureSampling(3, 6)
-                .spotRmsRayGoals(fieldWeights)
+                .spotDeviationGoals(fieldWeights)
                 .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 37.78, 1.0))
                 .build();
     }

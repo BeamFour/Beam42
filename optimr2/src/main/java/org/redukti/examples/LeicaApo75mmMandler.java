@@ -55,7 +55,7 @@ public class LeicaApo75mmMandler {
                 .applyCurvatureConstraints()
                 .applyThicknessConstraints()
                 .gaussianQuadratureSampling(3, 6)
-                .spotRmsRayGoals(fieldWeights)
+                .spotDeviationGoals(fieldWeights)
                 .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 39.38, 1.0))
                 .build();
     }

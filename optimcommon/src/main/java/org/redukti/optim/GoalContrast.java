@@ -4,9 +4,6 @@ import org.redukti.mathlib.LMLSolver;
 
 /** A single weighted pupil phase-difference residual for contrast optimization. */
 public class GoalContrast extends Goal {
-    public static final int SAGITTAL = 0;
-    public static final int TANGENTIAL = 1;
-
     public final int _contrast_index;
     public final int _frequency;
     public final int _field;
@@ -26,8 +23,7 @@ public class GoalContrast extends Goal {
         if (contrast_index < 0) throw new IllegalArgumentException("contrast index must be non-negative");
         if (field < 1) throw new IllegalArgumentException("field is one based and must be positive");
         if (wavelength_index < 0 || sample_index < 0) throw new IllegalArgumentException("indices must be non-negative");
-        if (orientation != SAGITTAL && orientation != TANGENTIAL)
-            throw new IllegalArgumentException("invalid contrast orientation");
+        Orientation.checked(orientation);
         _contrast_index = contrast_index;
         _frequency = frequency;
         _field = field - 1;
@@ -49,7 +45,7 @@ public class GoalContrast extends Goal {
         if (_sample_index >= samples.size()) return LMLSolver.BIGVAL;
         var sample = samples.get(_sample_index);
         if (!sample.valid()) return LMLSolver.BIGVAL;
-        return _orientation == SAGITTAL
+        return _orientation == Orientation.SAGITTAL
                 ? sample.sagittalResidual()
                 : sample.tangentialResidual();
     }
@@ -58,7 +54,7 @@ public class GoalContrast extends Goal {
     public String toString() {
         return "Contrast index=" + _contrast_index + ", frequency=" + _frequency + ", field=" + _field
                 + ", wavelength=" + _wavelength_index + ", sample=" + _sample_index
-                + ", orientation=" + _orientation + ", weight=" + _weight
+                + ", orientation=" + Orientation.name(_orientation) + ", weight=" + _weight
                 + " = " + value();
     }
 }

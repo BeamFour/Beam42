@@ -4,17 +4,17 @@ import org.redukti.mathlib.LMLSolver;
 import org.redukti.rayoptics.util.Lists;
 
 /**
- * Ray aberration for a field / xy / pos / wvl.
+ * Ray aberration for a field / orientation / pos / wvl.
  */
 public class GoalRayAberration extends Goal {
     public final int _field;
-    public final int _xy;
+    public final int _orientation;
     public final int _pos;
     public final double _wvl;
-    public GoalRayAberration(Analysis analysis, int field, int xy, int pos, double wvl, double target, double weight) {
+    public GoalRayAberration(Analysis analysis, int field, int orientation, int pos, double wvl, double target, double weight) {
         super(analysis,target,weight);
         this._field = field-1;
-        this._xy = xy;
+        this._orientation = Orientation.checked(orientation);
         this._pos = pos;
         this._wvl = wvl;
         if (pos < 0)
@@ -25,7 +25,7 @@ public class GoalRayAberration extends Goal {
 
     @Override
     public double value() {
-        var fans = _analysis._ray_aberrations.get_fans(_field, _xy, _wvl);
+        var fans = _analysis._ray_aberrations.get_fans(_field, _orientation, _wvl);
         if (fans != null && _pos < fans.fan_x.size()) {
             var result = Lists.get(fans.fan_y, _pos);
             return result != null && Double.isFinite(result)
@@ -37,6 +37,6 @@ public class GoalRayAberration extends Goal {
 
     @Override
     public String toString() {
-        return "RayAberration field=" + _field + ", xy=" + _xy + ", pos=" + _pos + ", target=" + _target + ", weight=" + _weight + " = " + value();
+        return "RayAberration field=" + _field + ", orientation=" + Orientation.name(_orientation) + ", pos=" + _pos + ", target=" + _target + ", weight=" + _weight + " = " + value();
     }
 }

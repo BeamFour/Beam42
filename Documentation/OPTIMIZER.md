@@ -264,14 +264,19 @@ Enable the granular form with one field weight per configured field:
 
 ```java
 .gaussianQuadratureSampling(6, 12)
-.spotRmsRayGoals(new double[] {1.0, 1.0, 1.0, 1.0})
+.spotDeviationGoals(new double[] {1.0, 1.0, 1.0, 1.0})
 ```
 
 Separate X and Y field weights are also supported:
 
 ```java
-.spotRmsRayGoals(xWeights, yWeights)
+.spotDeviationGoals(xWeights, yWeights)
 ```
+
+Note that the array is *weights*, not targets: every residual aims at zero, so these
+goals minimize spot size rather than steer it to a value. This is the one difference in
+argument meaning from the neighbouring `spotRmsGoals(targets)` and
+`spotMaxRadiusGoals(targets)`.
 
 The sampling pattern is Gaussian quadrature. For every field, wavelength and pupil
 sample, the builder creates two `GoalSpotDeviation` residuals. If `(dx, dy)` is the ray
@@ -298,7 +303,7 @@ Sampling must remain fixed throughout an optimization; failed rays therefore ret
 their sample positions and report an invalid goal instead of being removed and shifting
 the remaining goal indices.
 
-Per-ray RMS goals cannot be combined with aggregate `spotRmsGoals`, maximum-radius spot
+Spot deviation goals cannot be combined with aggregate `spotRmsGoals`, maximum-radius spot
 goals, or explicitly requested hexapolar sampling in the same builder configuration.
 Maximum radius is inherently controlled by the worst sampled ray rather than a
 Gaussian-weighted RMS distribution and remains a separate hexapolar use case.

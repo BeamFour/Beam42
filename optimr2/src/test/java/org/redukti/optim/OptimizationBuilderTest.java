@@ -54,10 +54,10 @@ class OptimizationBuilderTest {
 
         Goal[] goals = setup.goals();
         assertEquals(126, goals.length);
-        assertMtf(goals[0], 10, 1, OptimizationBuilder.SAGITTAL, 0.90, 2.0);
-        assertMtf(goals[1], 10, 1, OptimizationBuilder.TANGENTIAL, 0.85, 2.0);
-        assertMtf(goals[2], 10, 2, OptimizationBuilder.SAGITTAL, 0.80, 0.5);
-        assertMtf(goals[3], 10, 2, OptimizationBuilder.TANGENTIAL, 0.65, 0.5);
+        assertMtf(goals[0], 10, 1, Orientation.SAGITTAL, 0.90, 2.0);
+        assertMtf(goals[1], 10, 1, Orientation.TANGENTIAL, 0.85, 2.0);
+        assertMtf(goals[2], 10, 2, Orientation.SAGITTAL, 0.80, 0.5);
+        assertMtf(goals[3], 10, 2, Orientation.TANGENTIAL, 0.65, 0.5);
 
         GoalParax focalLength = (GoalParax) goals[4];
         GoalParax fNumber = (GoalParax) goals[5];
@@ -265,9 +265,9 @@ class OptimizationBuilderTest {
         assertEquals(0, contrastGoals[0]._field);
         assertEquals(0, contrastGoals[0]._wavelength_index);
         assertEquals(0, contrastGoals[0]._sample_index);
-        assertEquals(GoalContrast.SAGITTAL, contrastGoals[0]._orientation);
+        assertEquals(Orientation.SAGITTAL, contrastGoals[0]._orientation);
         assertEquals(2.0, contrastGoals[0]._weight);
-        assertEquals(GoalContrast.TANGENTIAL, contrastGoals[1]._orientation);
+        assertEquals(Orientation.TANGENTIAL, contrastGoals[1]._orientation);
         assertEquals(3.0, contrastGoals[1]._weight);
 
         Analysis analysis = setup.analysis();
@@ -332,7 +332,7 @@ class OptimizationBuilderTest {
                 .mtfFrequencies(20)
                 .weighted(false)
                 .gaussianQuadratureSampling(2, 4)
-                .spotRmsRayGoals(new double[]{1.0}, new double[]{1.0})
+                .spotDeviationGoals(new double[]{1.0}, new double[]{1.0})
                 .build();
 
         assertEquals(SpotOptions.PATTERN_GAUSS_QUADRATURE, setup.analysis()._spot_pattern);
@@ -346,8 +346,8 @@ class OptimizationBuilderTest {
                 .map(GoalSpotDeviation.class::cast)
                 .toArray(GoalSpotDeviation[]::new);
         assertEquals(3 * 2 * 4 * 2, goals.length);
-        assertEquals(GoalSpotDeviation.X, goals[0]._orientation);
-        assertEquals(GoalSpotDeviation.Y, goals[1]._orientation);
+        assertEquals(Orientation.X, goals[0]._orientation);
+        assertEquals(Orientation.Y, goals[1]._orientation);
         assertEquals(1.0, goals[0]._weight);
         assertEquals(1.0, goals[1]._weight);
         // Fields are one based on the way in, as for every other field-addressed goal,
@@ -355,7 +355,7 @@ class OptimizationBuilderTest {
         // the wrong field rather than fail, so pin it.
         assertEquals(0, goals[0]._field);
         assertThrows(IllegalArgumentException.class,
-                () -> new GoalSpotDeviation(setup.analysis(), 0, 0, 0, GoalSpotDeviation.X, 1.0));
+                () -> new GoalSpotDeviation(setup.analysis(), 0, 0, 0, Orientation.X, 1.0));
 
         double sumOfSquares = Arrays.stream(goals)
                 .mapToDouble(goal -> goal.value() * goal.value())
@@ -372,7 +372,7 @@ class OptimizationBuilderTest {
                 .varyCurvatures(0)
                 .weighted(false)
                 .gaussianQuadratureSampling(2, 4)
-                .spotRmsRayGoals(1.0)
+                .spotDeviationGoals(1.0)
                 .build();
         setup.analysis().compute();
         var merit = setup.meritFunction(false);
@@ -413,14 +413,14 @@ class OptimizationBuilderTest {
                 OptimizationBuilder.builder(prescription())
                         .fields(0.0, 1.0)
                         .mtfFrequencies(10)
-                        .spotRmsRayGoals(1.0)
+                        .spotDeviationGoals(1.0)
                         .build());
 
         assertThrows(IllegalArgumentException.class, () ->
                 OptimizationBuilder.builder(prescription())
                         .fields(0.0)
                         .mtfFrequencies(10)
-                        .spotRmsRayGoals(1.0)
+                        .spotDeviationGoals(1.0)
                         .hexapolarSampling()
                         .build());
 
@@ -435,7 +435,7 @@ class OptimizationBuilderTest {
         GoalGeoMTF mtf = assertInstanceOf(GoalGeoMTF.class, goal);
         assertEquals(frequency, mtf._freq);
         assertEquals(field, mtf._field);
-        assertEquals(orientation, mtf._xy);
+        assertEquals(orientation, mtf._orientation);
         assertEquals(target, mtf._target);
         assertEquals(weight, mtf._weight);
     }

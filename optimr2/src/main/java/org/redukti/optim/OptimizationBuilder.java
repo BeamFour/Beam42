@@ -15,9 +15,6 @@ import java.util.Set;
  * other optimization variable classes.
  */
 public final class OptimizationBuilder {
-    public static final int SAGITTAL = 0;
-    public static final int TANGENTIAL = 1;
-
     /**
      * Default strength for {@link #applyThicknessConstraints()} and {@link #applyCurvatureConstraints()}.
      *
@@ -57,9 +54,9 @@ public final class OptimizationBuilder {
     private int hexapolarSpotRays = 64;
     private int gaussianQuadratureRings = 14;
     private int gaussianQuadratureSpokes = 20;
-    private double[] spotRmsRayXWeights;
-    private double[] spotRmsRayYWeights;
-    private boolean addSpotRmsRayGoals;
+    private double[] spotDeviationXWeights;
+    private double[] spotDeviationYWeights;
+    private boolean addSpotDeviationGoals;
     // 3x6 is enough to measure a fixed design but not to optimize against: the
     // solver drives the 18 sampled points further than the wavefront between
     // them, so the merit reads better than the lens is. 6x12 is converged - 8x16
@@ -290,6 +287,11 @@ public final class OptimizationBuilder {
         return this;
     }
 
+    /**
+     * One aggregate {@link GoalSpotRMS} per field, each aiming at a target RMS spot
+     * radius in microns. To minimize spot size rather than hit a number, prefer
+     * {@link #spotDeviationGoals(double...)}, which takes weights instead.
+     */
     public OptimizationBuilder spotRmsGoals(double[] targets) {
         return spotRmsGoals(targets, null);
     }
@@ -300,21 +302,26 @@ public final class OptimizationBuilder {
     }
 
     /**
-     * Minimize RMS spot radius through individual signed X/Y ray deviations.
-     * One field weight is applied to every wavelength, sample and orientation.
+     * Minimize RMS spot radius through the individual signed X/Y ray deviations that
+     * make it up, one {@link GoalSpotDeviation} per orientation per sampled ray.
+     * Differentiating those exposes far more to the solver than one square-rooted
+     * aggregate does.
+     *
+     * <p>These take <em>weights</em>, not targets - every residual aims at zero. One
+     * weight per field is applied to every wavelength, sample and orientation.
      */
-    public OptimizationBuilder spotRmsRayGoals(double... fieldWeights) {
-        this.addSpotRmsRayGoals = true;
-        this.spotRmsRayXWeights = copy(fieldWeights);
-        this.spotRmsRayYWeights = copy(fieldWeights);
+    public OptimizationBuilder spotDeviationGoals(double... fieldWeights) {
+        this.addSpotDeviationGoals = true;
+        this.spotDeviationXWeights = copy(fieldWeights);
+        this.spotDeviationYWeights = copy(fieldWeights);
         return this;
     }
 
     /** Assign separate per-field weights to the signed X and Y spot deviations. */
-    public OptimizationBuilder spotRmsRayGoals(double[] xWeights, double[] yWeights) {
-        this.addSpotRmsRayGoals = true;
-        this.spotRmsRayXWeights = copy(xWeights);
-        this.spotRmsRayYWeights = copy(yWeights);
+    public OptimizationBuilder spotDeviationGoals(double[] xWeights, double[] yWeights) {
+        this.addSpotDeviationGoals = true;
+        this.spotDeviationXWeights = copy(xWeights);
+        this.spotDeviationYWeights = copy(yWeights);
         return this;
     }
 
@@ -453,7 +460,7 @@ public final class OptimizationBuilder {
 
     private void configureSpotPattern(Analysis analysis, List<Goal> goals) {
         boolean hasSpotMaxRadiusGoal = goals.stream().anyMatch(GoalSpotMaxRadius.class::isInstance);
-        if (addSpotRmsRayGoals) {
+        if (addSpotDeviationGoals) {
             analysis.using_gauss_quadrature_pattern(
                             gaussianQuadratureRings, gaussianQuadratureSpokes)
                     .retaining_failed_spot_rays(true);
@@ -527,9 +534,9 @@ public final class OptimizationBuilder {
         }
         for (MtfGoals curve : mtfGoals) {
             for (int field = 0; field < fields.length; field++) {
-                result.add(new GoalGeoMTF(analysis, field + 1, SAGITTAL, curve.frequency,
+                result.add(new GoalGeoMTF(analysis, field + 1, Orientation.SAGITTAL, curve.frequency,
                         curve.sagittal[field] / 100.0, curve.sagittalWeights[field]));
-                result.add(new GoalGeoMTF(analysis, field + 1, TANGENTIAL, curve.frequency,
+                result.add(new GoalGeoMTF(analysis, field + 1, Orientation.TANGENTIAL, curve.frequency,
                         curve.tangential[field] / 100.0, curve.tangentialWeights[field]));
             }
         }
@@ -542,10 +549,10 @@ public final class OptimizationBuilder {
                     double wavelengthWeight = weighted ? prescription._wts[wavelength] : 1.0;
                     for (int sample = 0; sample < contrastSamples; sample++) {
                         result.add(new GoalContrast(analysis, contrast_index, curve.frequency, field + 1,
-                                wavelength, sample, SAGITTAL,
+                                wavelength, sample, Orientation.SAGITTAL,
                                 wavelengthWeight * curve.sagittalWeights[field]));
                         result.add(new GoalContrast(analysis, contrast_index, curve.frequency, field + 1,
-                                wavelength, sample, TANGENTIAL,
+                                wavelength, sample, Orientation.TANGENTIAL,
                                 wavelengthWeight * curve.tangentialWeights[field]));
                     }
                 }
@@ -557,18 +564,18 @@ public final class OptimizationBuilder {
                 result.add(new GoalSpotRMS(analysis, field + 1,
                         spotRmsGoals.targets[field], spotRmsGoals.weights[field]));
         }
-        if (addSpotRmsRayGoals) {
+        if (addSpotDeviationGoals) {
             int samples = gaussianQuadratureRings * gaussianQuadratureSpokes;
             for (int field = 0; field < fields.length; field++) {
                 for (int wavelength = 0; wavelength < prescription._wvls.length; wavelength++) {
                     double wavelengthWeight = weighted ? prescription._wts[wavelength] : 1.0;
                     for (int sample = 0; sample < samples; sample++) {
                         result.add(new GoalSpotDeviation(analysis, field + 1, wavelength,
-                                sample, GoalSpotDeviation.X,
-                                wavelengthWeight * spotRmsRayXWeights[field]));
+                                sample, Orientation.X,
+                                wavelengthWeight * spotDeviationXWeights[field]));
                         result.add(new GoalSpotDeviation(analysis, field + 1, wavelength,
-                                sample, GoalSpotDeviation.Y,
-                                wavelengthWeight * spotRmsRayYWeights[field]));
+                                sample, Orientation.Y,
+                                wavelengthWeight * spotDeviationYWeights[field]));
                     }
                 }
             }
@@ -586,7 +593,7 @@ public final class OptimizationBuilder {
 
         if (addRayAberrationGoals) {
             for (int field = 1; field <= fields.length; field++) {
-                for (int orientation = SAGITTAL; orientation <= TANGENTIAL; orientation++) {
+                for (int orientation = Orientation.SAGITTAL; orientation <= Orientation.TANGENTIAL; orientation++) {
                     for (int wavelength = 0; wavelength < prescription._wvls.length; wavelength++) {
                         if (dLineOnly && !sameWavelength(prescription._wvls[wavelength], Glass.d))
                             continue;
@@ -643,17 +650,17 @@ public final class OptimizationBuilder {
         }
         if (spotRmsGoals != null)
             spotRmsGoals.validate(fields.length, "spot RMS");
-        if (addSpotRmsRayGoals) {
-            MtfGoals.validateWeights(spotRmsRayXWeights, fields.length,
-                    "spot RMS ray X weights");
-            MtfGoals.validateWeights(spotRmsRayYWeights, fields.length,
-                    "spot RMS ray Y weights");
+        if (addSpotDeviationGoals) {
+            MtfGoals.validateWeights(spotDeviationXWeights, fields.length,
+                    "spot deviation X weights");
+            MtfGoals.validateWeights(spotDeviationYWeights, fields.length,
+                    "spot deviation Y weights");
             if (spotRmsGoals != null)
                 throw new IllegalArgumentException(
-                        "aggregate and per-ray spot RMS goals cannot both be enabled");
+                        "aggregate spot RMS goals and per-ray spot deviation goals cannot both be enabled");
             if (spotMaxRadiusGoals != null || useHexapolarSpotPattern)
                 throw new IllegalArgumentException(
-                        "per-ray spot RMS goals require Gaussian-quadrature spot sampling");
+                        "spot deviation goals require Gaussian-quadrature spot sampling");
         }
         if (spotMaxRadiusGoals != null)
             spotMaxRadiusGoals.validate(fields.length, "spot maximum radius");

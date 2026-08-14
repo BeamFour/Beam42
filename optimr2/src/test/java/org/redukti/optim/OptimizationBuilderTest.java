@@ -35,9 +35,9 @@ class OptimizationBuilderTest {
         var setup = OptimizationBuilder.builder(prescription())
                 .fields(0.0, 1.0)
                 .mtfFrequencies(10, 20)
-                .curvatureSurfaces(0, 1)
-                .thicknessSurfaces(1)
-                .includeExistingAspherics(true)
+                .varyCurvatures(0, 1)
+                .varyThicknesses(1)
+                .varyExistingAspherics()
                 .rayAberrationGoals()
                 .mtfGoals(OptimizationBuilder.mtf(10,
                         new double[]{90, 80}, new double[]{85, 65},
@@ -113,8 +113,8 @@ class OptimizationBuilderTest {
                 OptimizationBuilder.builder(prescription())
                         .fields(0.0)
                         .mtfFrequencies(10)
-                        .curvatureSurfaces(0, 1)
-                        .thicknessSurfaces(0, 1)
+                        .varyCurvatures(0, 1)
+                        .varyThicknesses(0, 1)
                         .build());
 
         assertTrue(exception.getMessage().contains("rayAberrationGoals()"));
@@ -149,7 +149,7 @@ class OptimizationBuilderTest {
         Var[] variables = OptimizationBuilder.builder(prescription())
                 .fields(0.0)
                 .mtfFrequencies(10)
-                .allCurvatureSurfaces()
+                .varyAllCurvatures()
                 .build()
                 .variables();
 
@@ -206,7 +206,7 @@ class OptimizationBuilderTest {
         Analysis analysis = OptimizationBuilder.builder(prescription())
                 .fields(0.0)
                 .mtfFrequencies(10)
-                .useHexapolarSpotPattern(32)
+                .hexapolarSampling(32)
                 .build()
                 .analysis();
 
@@ -242,7 +242,7 @@ class OptimizationBuilderTest {
     @Test
     void rejectsInvalidHexapolarSampleCount() {
         assertThrows(IllegalArgumentException.class, () ->
-                OptimizationBuilder.builder(prescription()).useHexapolarSpotPattern(0));
+                OptimizationBuilder.builder(prescription()).hexapolarSampling(0));
     }
 
     @Test
@@ -369,7 +369,7 @@ class OptimizationBuilderTest {
         var setup = OptimizationBuilder.builder(prescription())
                 .fields(0.0)
                 .mtfFrequencies(20)
-                .curvatureSurfaces(0)
+                .varyCurvatures(0)
                 .weighted(false)
                 .gaussianQuadratureSampling(2, 4)
                 .spotRmsRayGoals(1.0)
@@ -421,7 +421,7 @@ class OptimizationBuilderTest {
                         .fields(0.0)
                         .mtfFrequencies(10)
                         .spotRmsRayGoals(1.0)
-                        .useHexapolarSpotPattern()
+                        .hexapolarSampling()
                         .build());
 
         Prescription prescription = prescription();

@@ -89,6 +89,168 @@ public final class OptimizationBuilder {
         return new OptimizationBuilder(prescription);
     }
 
+    // ------------------------------------------------------------------
+    // Configuration - what gets evaluated, and how finely
+    // ------------------------------------------------------------------
+
+    public OptimizationBuilder fields(double... fields) {
+        this.fields = copy(fields);
+        return this;
+    }
+
+    public OptimizationBuilder mtfFrequencies(int... frequencies) {
+        this.mtfFrequencies = copy(frequencies);
+        return this;
+    }
+
+    /** Use the prescription's wavelength weights; false assigns every wavelength weight 1.0. */
+    public OptimizationBuilder weighted(boolean weighted) {
+        this.weighted = weighted;
+        return this;
+    }
+
+    /** Restrict enabled ray-aberration goals to the Fraunhofer d-line. */
+    public OptimizationBuilder dLineOnly(boolean dLineOnly) {
+        this.dLineOnly = dLineOnly;
+        return this;
+    }
+
+    /**
+     * Configure the ordinary Gaussian-quadrature spot pattern shared by spot and
+     * geometric-MTF analyses. Contrast uses its separate sheared-pupil pattern.
+     */
+    public OptimizationBuilder gaussianQuadratureSampling(int rings, int spokes) {
+        if (rings < 1 || spokes < 1)
+            throw new IllegalArgumentException(
+                    "Gaussian-quadrature rings and spokes must be at least 1");
+        this.gaussianQuadratureRings = rings;
+        this.gaussianQuadratureSpokes = spokes;
+        return this;
+    }
+
+    /**
+     * Use hexapolar sampling for spot analysis even when no maximum-radius
+     * goal requires it. The default is Gaussian quadrature.
+     */
+    public OptimizationBuilder hexapolarSampling() {
+        return hexapolarSampling(64);
+    }
+
+    /**
+     * Use hexapolar sampling with the requested number of pupil rings for
+     * spot analysis even when no maximum-radius goal requires it.
+     */
+    public OptimizationBuilder hexapolarSampling(int numRays) {
+        if (numRays < 1)
+            throw new IllegalArgumentException("hexapolar spot rays must be at least 1");
+        this.useHexapolarSpotPattern = true;
+        this.hexapolarSpotRays = numRays;
+        return this;
+    }
+
+    public OptimizationBuilder contrastSampling(int rings, int spokes) {
+        if (rings < 1 || spokes < 1)
+            throw new IllegalArgumentException("contrast rings and spokes must be at least 1");
+        contrastRings = rings;
+        contrastSpokes = spokes;
+        return this;
+    }
+
+    /**
+     * Correct the contrast pupil shift so each sample realises the requested spatial
+     * frequency in image space.
+     *
+     * <p>The shift is applied in entrance-pupil coordinates but derives from an
+     * exit-pupil relation, so pupil aberration makes the realised frequency fall short,
+     * increasingly with field - measured 8.5% low at full field tangential on an f/2
+     * lens. Enabling this measures the shortfall per field, wavelength and direction and
+     * scales the shift to compensate, which brought that case to within 0.1%.
+     *
+     * <p>Off by default because it changes every contrast residual.
+     */
+    public OptimizationBuilder calibrateContrastFrequency(boolean value) {
+        calibrateContrastFrequency = value;
+        return this;
+    }
+
+    // ------------------------------------------------------------------
+    // Variables - what the solver is allowed to change
+    // ------------------------------------------------------------------
+
+    public OptimizationBuilder varyCurvatures(int... surfaces) {
+        this.curvatureSurfaces = copy(surfaces);
+        this.allCurvatureSurfaces = false;
+        return this;
+    }
+
+    /**
+     * Vary every curved optical surface. Aperture/field stops and surfaces
+     * whose radius is zero (and therefore intentionally flat) are excluded.
+     */
+    public OptimizationBuilder varyAllCurvatures() {
+        this.allCurvatureSurfaces = true;
+        return this;
+    }
+
+    public OptimizationBuilder varyThicknesses(int... surfaces) {
+        this.thicknessSurfaces = copy(surfaces);
+        this.allThicknessSurfaces = false;
+        return this;
+    }
+
+    /**
+     * Vary every thickness, air spaces and element thicknesses alike. Surfaces with zero
+     * thickness are excluded, being coincident rather than a space to open up.
+     *
+     * <p>The counterpart to {@link #varyAllCurvatures()}, and best paired with
+     * {@link #applyThicknessConstraints(double)} - with every space free and nothing holding the
+     * layout, the solver will collapse gaps and drive elements through one another.
+     */
+    public OptimizationBuilder varyAllThicknesses() {
+        this.allThicknessSurfaces = true;
+        return this;
+    }
+
+    /** Thickness of a surface for the scenario this builder targets. */
+    private double thicknessOf(int surface) {
+        var definition = prescription._surfaces[surface];
+        return definition._thickness_by_scenario != null
+                ? definition._thickness_by_scenario[0]
+                : definition._thickness;
+    }
+
+    /**
+     * Vary the conic constants and polynomial coefficients already present in the
+     * prescription. Only nonzero terms become variables, so a spherical surface stays
+     * spherical and an asphere does not gain orders it did not have.
+     */
+    public OptimizationBuilder varyExistingAspherics() {
+        return varyExistingAspherics(true);
+    }
+
+    public OptimizationBuilder varyExistingAspherics(boolean include) {
+        this.includeExistingAspherics = include;
+        return this;
+    }
+
+    /** Adds caller-defined variables after the automatically generated variables. */
+    public OptimizationBuilder additionalVariables(Var... variables) {
+        if (variables == null)
+            throw new IllegalArgumentException("additional variables must not be null");
+        for (Var variable : variables) {
+            if (variable == null)
+                throw new IllegalArgumentException("additional variables must not contain null");
+            if (variable._prescription != prescription)
+                throw new IllegalArgumentException("additional variables must use this builder's prescription");
+            additionalVariables.add(variable);
+        }
+        return this;
+    }
+
+    // ------------------------------------------------------------------
+    // Goals - what the solver optimizes towards
+    // ------------------------------------------------------------------
+
     public static MtfGoals mtf(int frequency, double[] sagittal, double[] tangential) {
         return new MtfGoals(frequency, sagittal, tangential, null, null);
     }
@@ -114,73 +276,54 @@ public final class OptimizationBuilder {
         return new ContrastGoals(frequency, weights, weights);
     }
 
-    public OptimizationBuilder fields(double... fields) {
-        this.fields = copy(fields);
+    public OptimizationBuilder mtfGoals(MtfGoals... goals) {
+        if (goals == null)
+            throw new IllegalArgumentException("MTF goals must not be null");
+        this.mtfGoals.addAll(Arrays.asList(goals));
         return this;
     }
 
-    public OptimizationBuilder mtfFrequencies(int... frequencies) {
-        this.mtfFrequencies = copy(frequencies);
+    public OptimizationBuilder contrastGoals(ContrastGoals... goals) {
+        if (goals == null)
+            throw new IllegalArgumentException("contrast goals must not be null");
+        this.contrastGoals.addAll(Arrays.asList(goals));
         return this;
     }
 
-    public OptimizationBuilder curvatureSurfaces(int... surfaces) {
-        this.curvatureSurfaces = copy(surfaces);
-        this.allCurvatureSurfaces = false;
-        return this;
+    public OptimizationBuilder spotRmsGoals(double[] targets) {
+        return spotRmsGoals(targets, null);
     }
 
-    /**
-     * Vary every curved optical surface. Aperture/field stops and surfaces
-     * whose radius is zero (and therefore intentionally flat) are excluded.
-     */
-    public OptimizationBuilder allCurvatureSurfaces() {
-        this.allCurvatureSurfaces = true;
-        return this;
-    }
-
-    public OptimizationBuilder thicknessSurfaces(int... surfaces) {
-        this.thicknessSurfaces = copy(surfaces);
-        this.allThicknessSurfaces = false;
+    public OptimizationBuilder spotRmsGoals(double[] targets, double[] weights) {
+        this.spotRmsGoals = new SpotGoals(targets, weights);
         return this;
     }
 
     /**
-     * Vary every thickness, air spaces and element thicknesses alike. Surfaces with zero
-     * thickness are excluded, being coincident rather than a space to open up.
-     *
-     * <p>The counterpart to {@link #allCurvatureSurfaces()}, and best paired with
-     * {@link #applyThicknessConstraints(double)} - with every space free and nothing holding the
-     * layout, the solver will collapse gaps and drive elements through one another.
+     * Minimize RMS spot radius through individual signed X/Y ray deviations.
+     * One field weight is applied to every wavelength, sample and orientation.
      */
-    public OptimizationBuilder allThicknessSurfaces() {
-        this.allThicknessSurfaces = true;
+    public OptimizationBuilder spotRmsRayGoals(double... fieldWeights) {
+        this.addSpotRmsRayGoals = true;
+        this.spotRmsRayXWeights = copy(fieldWeights);
+        this.spotRmsRayYWeights = copy(fieldWeights);
         return this;
     }
 
-    /** Thickness of a surface for the scenario this builder targets. */
-    private double thicknessOf(int surface) {
-        var definition = prescription._surfaces[surface];
-        return definition._thickness_by_scenario != null
-                ? definition._thickness_by_scenario[0]
-                : definition._thickness;
-    }
-
-    /** Include nonzero conic constants and nonzero coefficients already present in the prescription. */
-    public OptimizationBuilder includeExistingAspherics(boolean include) {
-        this.includeExistingAspherics = include;
+    /** Assign separate per-field weights to the signed X and Y spot deviations. */
+    public OptimizationBuilder spotRmsRayGoals(double[] xWeights, double[] yWeights) {
+        this.addSpotRmsRayGoals = true;
+        this.spotRmsRayXWeights = copy(xWeights);
+        this.spotRmsRayYWeights = copy(yWeights);
         return this;
     }
 
-    /** Use the prescription's wavelength weights; false assigns every wavelength weight 1.0. */
-    public OptimizationBuilder weighted(boolean weighted) {
-        this.weighted = weighted;
-        return this;
+    public OptimizationBuilder spotMaxRadiusGoals(double[] targets) {
+        return spotMaxRadiusGoals(targets, null);
     }
 
-    /** Restrict enabled ray-aberration goals to the Fraunhofer d-line. */
-    public OptimizationBuilder dLineOnly(boolean dLineOnly) {
-        this.dLineOnly = dLineOnly;
+    public OptimizationBuilder spotMaxRadiusGoals(double[] targets, double[] weights) {
+        this.spotMaxRadiusGoals = new SpotGoals(targets, weights);
         return this;
     }
 
@@ -200,38 +343,23 @@ public final class OptimizationBuilder {
     }
 
     /**
-     * Use hexapolar sampling for spot analysis even when no maximum-radius
-     * goal requires it. The default is Gaussian quadrature.
+     * Adds caller-defined goals after the automatically generated goals.
+     * Factories receive the exact Analysis owned by the resulting setup.
      */
-    public OptimizationBuilder useHexapolarSpotPattern() {
-        return useHexapolarSpotPattern(64);
-    }
-
-    /**
-     * Use hexapolar sampling with the requested number of pupil rings for
-     * spot analysis even when no maximum-radius goal requires it.
-     */
-    public OptimizationBuilder useHexapolarSpotPattern(int numRays) {
-        if (numRays < 1)
-            throw new IllegalArgumentException("hexapolar spot rays must be at least 1");
-        this.useHexapolarSpotPattern = true;
-        this.hexapolarSpotRays = numRays;
+    public OptimizationBuilder additionalGoals(GoalFactory... factories) {
+        if (factories == null)
+            throw new IllegalArgumentException("additional goal factories must not be null");
+        for (GoalFactory factory : factories) {
+            if (factory == null)
+                throw new IllegalArgumentException("additional goal factories must not contain null");
+            additionalGoalFactories.add(factory);
+        }
         return this;
     }
 
-    public OptimizationBuilder mtfGoals(MtfGoals... goals) {
-        if (goals == null)
-            throw new IllegalArgumentException("MTF goals must not be null");
-        this.mtfGoals.addAll(Arrays.asList(goals));
-        return this;
-    }
-
-    public OptimizationBuilder contrastGoals(ContrastGoals... goals) {
-        if (goals == null)
-            throw new IllegalArgumentException("contrast goals must not be null");
-        this.contrastGoals.addAll(Arrays.asList(goals));
-        return this;
-    }
+    // ------------------------------------------------------------------
+    // Constraints - what holds the starting design together
+    // ------------------------------------------------------------------
 
     /**
      * Hold the varied thicknesses near their starting values, at the nominal weight.
@@ -283,109 +411,9 @@ public final class OptimizationBuilder {
         return this;
     }
 
-    public OptimizationBuilder contrastSampling(int rings, int spokes) {
-        if (rings < 1 || spokes < 1)
-            throw new IllegalArgumentException("contrast rings and spokes must be at least 1");
-        contrastRings = rings;
-        contrastSpokes = spokes;
-        return this;
-    }
-
-    /**
-     * Correct the contrast pupil shift so each sample realises the requested spatial
-     * frequency in image space.
-     *
-     * <p>The shift is applied in entrance-pupil coordinates but derives from an
-     * exit-pupil relation, so pupil aberration makes the realised frequency fall short,
-     * increasingly with field - measured 8.5% low at full field tangential on an f/2
-     * lens. Enabling this measures the shortfall per field, wavelength and direction and
-     * scales the shift to compensate, which brought that case to within 0.1%.
-     *
-     * <p>Off by default because it changes every contrast residual.
-     */
-    public OptimizationBuilder calibrateContrastFrequency(boolean value) {
-        calibrateContrastFrequency = value;
-        return this;
-    }
-
-    public OptimizationBuilder spotRmsGoals(double[] targets) {
-        return spotRmsGoals(targets, null);
-    }
-
-    public OptimizationBuilder spotRmsGoals(double[] targets, double[] weights) {
-        this.spotRmsGoals = new SpotGoals(targets, weights);
-        return this;
-    }
-
-    /**
-     * Minimize RMS spot radius through individual signed X/Y ray deviations.
-     * One field weight is applied to every wavelength, sample and orientation.
-     */
-    public OptimizationBuilder spotRmsRayGoals(double... fieldWeights) {
-        this.addSpotRmsRayGoals = true;
-        this.spotRmsRayXWeights = copy(fieldWeights);
-        this.spotRmsRayYWeights = copy(fieldWeights);
-        return this;
-    }
-
-    /** Assign separate per-field weights to the signed X and Y spot deviations. */
-    public OptimizationBuilder spotRmsRayGoals(double[] xWeights, double[] yWeights) {
-        this.addSpotRmsRayGoals = true;
-        this.spotRmsRayXWeights = copy(xWeights);
-        this.spotRmsRayYWeights = copy(yWeights);
-        return this;
-    }
-
-    /**
-     * Configure the ordinary Gaussian-quadrature spot pattern shared by spot and
-     * geometric-MTF analyses. Contrast uses its separate sheared-pupil pattern.
-     */
-    public OptimizationBuilder gaussianQuadratureSampling(int rings, int spokes) {
-        if (rings < 1 || spokes < 1)
-            throw new IllegalArgumentException(
-                    "Gaussian-quadrature rings and spokes must be at least 1");
-        this.gaussianQuadratureRings = rings;
-        this.gaussianQuadratureSpokes = spokes;
-        return this;
-    }
-
-    public OptimizationBuilder spotMaxRadiusGoals(double[] targets) {
-        return spotMaxRadiusGoals(targets, null);
-    }
-
-    public OptimizationBuilder spotMaxRadiusGoals(double[] targets, double[] weights) {
-        this.spotMaxRadiusGoals = new SpotGoals(targets, weights);
-        return this;
-    }
-
-    /** Adds caller-defined variables after the automatically generated variables. */
-    public OptimizationBuilder additionalVariables(Var... variables) {
-        if (variables == null)
-            throw new IllegalArgumentException("additional variables must not be null");
-        for (Var variable : variables) {
-            if (variable == null)
-                throw new IllegalArgumentException("additional variables must not contain null");
-            if (variable._prescription != prescription)
-                throw new IllegalArgumentException("additional variables must use this builder's prescription");
-            additionalVariables.add(variable);
-        }
-        return this;
-    }
-
-    /**
-     * Adds caller-defined goals after the automatically generated goals.
-     * Factories receive the exact Analysis owned by the resulting setup.
-     */
-    public OptimizationBuilder additionalGoals(GoalFactory... factories) {
-        if (factories == null)
-            throw new IllegalArgumentException("additional goal factories must not be null");
-        for (GoalFactory factory : factories) {
-            if (factory == null)
-                throw new IllegalArgumentException("additional goal factories must not contain null");
-            additionalGoalFactories.add(factory);
-        }
-        return this;
-    }
+    // ------------------------------------------------------------------
+    // Build
+    // ------------------------------------------------------------------
 
     public OptimizationSetup build() {
         validate();

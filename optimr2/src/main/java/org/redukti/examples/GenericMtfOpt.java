@@ -20,7 +20,7 @@ public class GenericMtfOpt {
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
                 .mtfFrequencies(10, 30, 50)
-                .allCurvatureSurfaces()
+                .varyAllCurvatures()
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)
                 .rayAberrationGoals()

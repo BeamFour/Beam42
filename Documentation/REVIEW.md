@@ -306,7 +306,7 @@ reasonable trade. Worth a comment recording that it is a deliberate trade-off.
 
 Found by running `GenericOpt` on
 `Examples/jfotoptix/leica-r-apo-75mm-f2-mandler/specs.txt` (fields 0/0.3/0.7/1.0,
-frequencies 10/30/50, `allCurvatureSurfaces`, 6×12). Mid-field sagittal MTF *drops*
+frequencies 10/30/50, `varyAllCurvatures`, 6×12). Mid-field sagittal MTF *drops*
 across the optimization:
 
 | field 0.7, 50 cyc/mm | before | after |

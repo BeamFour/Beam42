@@ -22,12 +22,12 @@ public class GenericContrastOpt {
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
                 .mtfFrequencies(10, 30, 50)
-                //.thicknessSurfaces(1,4,6,7,9,12,14)
-                //.thicknessSurfaces(3,5,8,10,12,15,16,18)  Nikkor 200mm f2
-                //.curvatureSurfaces(0)
-                .includeExistingAspherics(true)
-                .allCurvatureSurfaces()
-                //.allThicknessSurfaces()
+                //.varyThicknesses(1,4,6,7,9,12,14)
+                //.varyThicknesses(3,5,8,10,12,15,16,18)  Nikkor 200mm f2
+                //.varyCurvatures(0)
+                .varyExistingAspherics()
+                .varyAllCurvatures()
+                //.varyAllThicknesses()
                 // Everything is free, so hold the layout: without these the solver
                 // collapses air spaces and pushes elements through the stop.
                 .applyCurvatureConstraints()

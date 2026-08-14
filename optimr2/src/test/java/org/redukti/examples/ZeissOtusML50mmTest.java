@@ -23,11 +23,11 @@ class ZeissOtusML50mmTest {
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
                 .mtfFrequencies(10, 20, 40)
-                .curvatureSurfaces(
+                .varyCurvatures(
                         0, 1, 2, 3, 4, 5, 6, 8, 9,
                         11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23)
-                .thicknessSurfaces(25)
-                .includeExistingAspherics(true)
+                .varyThicknesses(25)
+                .varyExistingAspherics()
                 .weighted(false)
                 .dLineOnly(false)
                 .rayAberrationGoals()
@@ -61,11 +61,11 @@ class ZeissOtusML50mmTest {
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
                 .mtfFrequencies(10, 20, 40)
-                .curvatureSurfaces(
+                .varyCurvatures(
                         0, 1, 2, 3, 4, 5, 6, 8, 9,
                         11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23)
-                .thicknessSurfaces(25)
-                .includeExistingAspherics(true)
+                .varyThicknesses(25)
+                .varyExistingAspherics()
                 .weighted(false)
                 .dLineOnly(false)
                 // Ray fans are opt-in now; they were unconditional when these values

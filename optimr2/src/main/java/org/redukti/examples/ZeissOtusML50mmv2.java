@@ -23,10 +23,10 @@ public class ZeissOtusML50mmv2 {
         var setup = OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
                 .mtfFrequencies(10, 20, 40)
-                .curvatureSurfaces(
+                .varyCurvatures(
                         3, 5, 6, 13, 16)
-                .thicknessSurfaces(25)
-                .includeExistingAspherics(true)
+                .varyThicknesses(25)
+                .varyExistingAspherics()
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)
                 .mtfGoals(

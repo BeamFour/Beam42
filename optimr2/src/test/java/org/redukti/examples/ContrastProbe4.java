@@ -26,10 +26,10 @@ public class ContrastProbe4 {
         var b = OptimizationBuilder.builder(p)
                 .fields(0.0, 0.3, 0.7, 1.0)
                 .mtfFrequencies(10, 20, 40)
-                .curvatureSurfaces(0, 1, 2, 3, 4, 5, 6, 8, 9,
+                .varyCurvatures(0, 1, 2, 3, 4, 5, 6, 8, 9,
                         11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23)
-                .thicknessSurfaces(25)
-                .includeExistingAspherics(true)
+                .varyThicknesses(25)
+                .varyExistingAspherics()
                 .contrastSampling(rings, spokes);
         var goals = Arrays.stream(freqs).mapToObj(f -> contrast(f, w))
                 .toArray(OptimizationBuilder.ContrastGoals[]::new);

@@ -182,7 +182,7 @@ starting values.
 ```
 
 These methods add constraints only for the corresponding parameters that are actually
-varied. They pair naturally with `allCurvatureSurfaces()` and `allThicknessSurfaces()`,
+varied. They pair naturally with `varyAllCurvatures()` and `varyAllThicknesses()`,
 but work equally with explicit surface lists.
 
 Both take an optional weight. The no-argument form uses

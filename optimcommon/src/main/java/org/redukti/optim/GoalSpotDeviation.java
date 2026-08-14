@@ -7,29 +7,31 @@ public class GoalSpotDeviation extends Goal {
     public static final int X = 0;
     public static final int Y = 1;
 
-    public final int _field_index;
+    /** Zero based, as stored; the constructor takes a one based field. */
+    public final int _field;
     public final int _wavelength_index;
     public final int _sample_index;
     public final int _orientation;
 
-    public GoalSpotDeviation(Analysis analysis, int fieldIndex, int wavelengthIndex,
-                             int sampleIndex, int orientation, double weight) {
+    public GoalSpotDeviation(Analysis analysis, int field, int wavelength_index,
+                             int sample_index, int orientation, double weight) {
         super(analysis, 0.0, weight);
-        if (fieldIndex < 0 || wavelengthIndex < 0 || sampleIndex < 0)
-            throw new IllegalArgumentException("spot indices must be non-negative");
+        if (field < 1) throw new IllegalArgumentException("field is one based and must be positive");
+        if (wavelength_index < 0 || sample_index < 0)
+            throw new IllegalArgumentException("indices must be non-negative");
         if (orientation != X && orientation != Y)
             throw new IllegalArgumentException("invalid spot orientation");
-        _field_index = fieldIndex;
-        _wavelength_index = wavelengthIndex;
-        _sample_index = sampleIndex;
+        _field = field - 1;
+        _wavelength_index = wavelength_index;
+        _sample_index = sample_index;
         _orientation = orientation;
     }
 
     @Override
     public double value() {
-        if (_analysis._spots == null || _field_index >= _analysis._spots.length)
+        if (_analysis._spots == null || _field >= _analysis._spots.length)
             return LMLSolver.BIGVAL;
-        var field = _analysis._spots[_field_index];
+        var field = _analysis._spots[_field];
         if (field == null || _wavelength_index >= field.intercepts.size())
             return LMLSolver.BIGVAL;
         var intercepts = field.intercepts.get(_wavelength_index);
@@ -44,7 +46,7 @@ public class GoalSpotDeviation extends Goal {
 
     @Override
     public String toString() {
-        return "SpotDeviation field=" + _field_index
+        return "SpotDeviation field=" + _field
                 + ", wavelength=" + _wavelength_index
                 + ", sample=" + _sample_index
                 + ", orientation=" + (_orientation == X ? "x" : "y")

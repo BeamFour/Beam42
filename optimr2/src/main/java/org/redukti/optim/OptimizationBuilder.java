@@ -496,10 +496,10 @@ public final class OptimizationBuilder {
                 for (int wavelength = 0; wavelength < prescription._wvls.length; wavelength++) {
                     double wavelengthWeight = weighted ? prescription._wts[wavelength] : 1.0;
                     for (int sample = 0; sample < samples; sample++) {
-                        result.add(new GoalSpotDeviation(analysis, field, wavelength,
+                        result.add(new GoalSpotDeviation(analysis, field + 1, wavelength,
                                 sample, GoalSpotDeviation.X,
                                 wavelengthWeight * spotRmsRayXWeights[field]));
-                        result.add(new GoalSpotDeviation(analysis, field, wavelength,
+                        result.add(new GoalSpotDeviation(analysis, field + 1, wavelength,
                                 sample, GoalSpotDeviation.Y,
                                 wavelengthWeight * spotRmsRayYWeights[field]));
                     }

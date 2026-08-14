@@ -350,6 +350,12 @@ class OptimizationBuilderTest {
         assertEquals(GoalSpotDeviation.Y, goals[1]._orientation);
         assertEquals(1.0, goals[0]._weight);
         assertEquals(1.0, goals[1]._weight);
+        // Fields are one based on the way in, as for every other field-addressed goal,
+        // and stored zero based. An off-by-one here would silently attach the goal to
+        // the wrong field rather than fail, so pin it.
+        assertEquals(0, goals[0]._field);
+        assertThrows(IllegalArgumentException.class,
+                () -> new GoalSpotDeviation(setup.analysis(), 0, 0, 0, GoalSpotDeviation.X, 1.0));
 
         double sumOfSquares = Arrays.stream(goals)
                 .mapToDouble(goal -> goal.value() * goal.value())

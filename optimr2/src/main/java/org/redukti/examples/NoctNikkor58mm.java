@@ -16,9 +16,10 @@ public class NoctNikkor58mm {
         return Prescription.build_prescription(specs, true, weighted, dLineOnly);
     }
 
-    static OptimizationBuilder.OptimizationSetup createSetup(Prescription prescription, boolean weighted,
-                                                                     boolean dLineOnly) {
-        double[] fieldWeights = {1.3, 1.2, 1.1, 1.0};
+    static OptimizationBuilder.OptimizationSetup createSpotDeviationSetup(Prescription prescription,
+                                                             boolean weighted,
+                                                             boolean dLineOnly,
+                                                             double[] fieldWeights) {
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
                 .mtfFrequencies(10, 30, 50)
@@ -31,19 +32,90 @@ public class NoctNikkor58mm {
                         new VarAsphCoeff(prescription,0,4,1E14))
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)
-                //.rayAberrationGoals()
                 .curvatureGoals(1.0)
-                //.spotRmsGoals(new double[]{15, 30, 50, 70})
-//                .mtfGoals(
-//                        mtf(10,
-//                                new double[]{60, 50, 40, 30},
-//                                new double[]{60, 50, 35, 25}),
-//                        mtf(30,
-//                                new double[]{40, 35, 30, 20},
-//                                new double[]{40, 35, 20, 10}),
-//                        mtf(50,
-//                                new double[]{30, 25, 20, 20},
-//                                new double[]{30, 25, 10, 10}))
+                .gaussianQuadratureSampling(3, 6)
+                .spotRmsRayGoals(fieldWeights)
+                .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 37.78, 1.0))
+                .build();
+    }
+
+    static OptimizationBuilder.OptimizationSetup createSpotSizeSetup(Prescription prescription,
+                                                                     boolean weighted,
+                                                                     boolean dLineOnly,
+                                                                     double[] fieldWeights) {
+        return OptimizationBuilder.builder(prescription)
+                .fields(0.0, 0.3, 0.7, 1.0)
+                .mtfFrequencies(10, 30, 50)
+                .allCurvatureSurfaces()
+                .additionalVariables(
+                        new VarAsphK(prescription, 0),
+                        new VarAsphCoeff(prescription,0,1,1E6),
+                        new VarAsphCoeff(prescription,0,2,1E9),
+                        new VarAsphCoeff(prescription,0,3,1E11),
+                        new VarAsphCoeff(prescription,0,4,1E14))
+                .weighted(weighted)
+                .dLineOnly(dLineOnly)
+                .curvatureGoals(1.0)
+                .spotRmsGoals(new double[]{15, 30, 50, 70},
+                              fieldWeights)
+                .gaussianQuadratureSampling(6, 12)
+                .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 37.78, 1.0))
+                .build();
+    }
+
+    static OptimizationBuilder.OptimizationSetup createMtfSetup(Prescription prescription,
+                                                                     boolean weighted,
+                                                                     boolean dLineOnly,
+                                                                     double[] fieldWeights) {
+        return OptimizationBuilder.builder(prescription)
+                .fields(0.0, 0.3, 0.7, 1.0)
+                .mtfFrequencies(10, 30, 50)
+                .allCurvatureSurfaces()
+                .additionalVariables(
+                        new VarAsphK(prescription, 0),
+                        new VarAsphCoeff(prescription,0,1,1E6),
+                        new VarAsphCoeff(prescription,0,2,1E9),
+                        new VarAsphCoeff(prescription,0,3,1E11),
+                        new VarAsphCoeff(prescription,0,4,1E14))
+                .weighted(weighted)
+                .dLineOnly(dLineOnly)
+                .curvatureGoals(1.0)
+                .mtfGoals(
+                        mtf(10,
+                                new double[]{60, 50, 40, 30},
+                                new double[]{60, 50, 35, 25},
+                                fieldWeights),
+                        mtf(30,
+                                new double[]{40, 35, 30, 20},
+                                new double[]{40, 35, 20, 10},
+                                fieldWeights),
+                        mtf(50,
+                                new double[]{30, 25, 20, 20},
+                                new double[]{30, 25, 10, 10},
+                                fieldWeights))
+                .gaussianQuadratureSampling(6, 12)
+                .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 37.78, 1.0))
+                .build();
+    }
+
+
+    static OptimizationBuilder.OptimizationSetup createContrastSetup(Prescription prescription,
+                                                                     boolean weighted,
+                                                                     boolean dLineOnly,
+                                                                     double[] fieldWeights) {
+        return OptimizationBuilder.builder(prescription)
+                .fields(0.0, 0.3, 0.7, 1.0)
+                .mtfFrequencies(10, 30, 50)
+                .allCurvatureSurfaces()
+                .additionalVariables(
+                        new VarAsphK(prescription, 0),
+                        new VarAsphCoeff(prescription,0,1,1E6),
+                        new VarAsphCoeff(prescription,0,2,1E9),
+                        new VarAsphCoeff(prescription,0,3,1E11),
+                        new VarAsphCoeff(prescription,0,4,1E14))
+                .weighted(weighted)
+                .dLineOnly(dLineOnly)
+                .curvatureGoals(1.0)
                 .contrastSampling(6, 12)
                 .contrastGoals(
                         contrast(10, fieldWeights),
@@ -54,12 +126,37 @@ public class NoctNikkor58mm {
                 .build();
     }
 
+    static OptimizationBuilder.OptimizationSetup createRayAberrationSetup(Prescription prescription,
+                                                                     boolean weighted,
+                                                                     boolean dLineOnly,
+                                                                     double[] fieldWeights) {
+        return OptimizationBuilder.builder(prescription)
+                .fields(0.0, 0.3, 0.7, 1.0)
+                .mtfFrequencies(10, 30, 50)
+                .allCurvatureSurfaces()
+                .additionalVariables(
+                        new VarAsphK(prescription, 0),
+                        new VarAsphCoeff(prescription,0,1,1E6),
+                        new VarAsphCoeff(prescription,0,2,1E9),
+                        new VarAsphCoeff(prescription,0,3,1E11),
+                        new VarAsphCoeff(prescription,0,4,1E14))
+                .weighted(weighted)
+                .dLineOnly(dLineOnly)
+                .rayAberrationGoals()
+                .curvatureGoals(1.0)
+                .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 37.78, 1.0))
+                .build();
+    }
+
+
     public static void main(String[] args) throws Exception {
         boolean weighted = false;
         boolean dLineOnly = false;
+        double[] fieldWeights = {1.0, 1.0, 1.0, 1.0};
         String specfile = ExampleFinder.geoPathToExample("Examples/jfotoptix/nikkor-58mm-f1.2/version5/Noct-Nikkor-58mmf1.2.txt");
+        //String specfile = ExampleFinder.geoPathToExample("Examples/jfotoptix/nikkor-58mm-f1.2/version19/specs.txt");
         var prescription = getPrescription(specfile, weighted, dLineOnly);
-        var setup = createSetup(prescription, weighted, dLineOnly);
+        var setup = createSpotDeviationSetup(prescription, weighted, dLineOnly, fieldWeights);
         var analysis = setup.analysis();
         var meritFunction = setup.meritFunction(false);
         analysis.compute();

@@ -52,8 +52,8 @@ public class LeicaApo75mmMandler {
                 .allThicknessSurfaces()
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)
-                .curvatureGoals(1.0)
-                .thicknessGoals(1.0)
+                .constrainCurvature(1.0)
+                .constrainThickness(1.0)
                 .gaussianQuadratureSampling(3, 6)
                 .spotRmsRayGoals(fieldWeights)
                 .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 39.38, 1.0))
@@ -71,8 +71,8 @@ public class LeicaApo75mmMandler {
                 .allThicknessSurfaces()
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)
-                .curvatureGoals(1.0)
-                .thicknessGoals(1.0)
+                .constrainCurvature(1.0)
+                .constrainThickness(1.0)
                 .spotRmsGoals(new double[]{0, 0, 0, 0},
                               fieldWeights)
                 .gaussianQuadratureSampling(6, 12)
@@ -94,8 +94,8 @@ public class LeicaApo75mmMandler {
                 .allThicknessSurfaces()
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)
-                .curvatureGoals(1.0)
-                .thicknessGoals(1.0)
+                .constrainCurvature(1.0)
+                .constrainThickness(1.0)
                 .mtfGoals(
                         mtf(10,
                                 new double[]{95, 95, 91, 85, 82},
@@ -126,8 +126,8 @@ public class LeicaApo75mmMandler {
                 .allThicknessSurfaces()
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)
-                .curvatureGoals(1.0)
-                .thicknessGoals(1.0)
+                .constrainCurvature(1.0)
+                .constrainThickness(1.0)
                 .contrastSampling(6, 12)
                 .contrastGoals(
                         contrast(10, fieldWeights),
@@ -150,8 +150,8 @@ public class LeicaApo75mmMandler {
                 .dLineOnly(dLineOnly)
                 .mtfFrequencies(10, 20, 40)
                 .rayAberrationGoals()
-                .curvatureGoals(1.0)
-                .thicknessGoals(1.0)
+                .constrainCurvature(1.0)
+                .constrainThickness(1.0)
                 .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 39.38, 1.0))
                 .build();
     }

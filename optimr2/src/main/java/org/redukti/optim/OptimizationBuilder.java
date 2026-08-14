@@ -45,8 +45,8 @@ public final class OptimizationBuilder {
     private int contrastRings = 6;
     private int contrastSpokes = 12;
     private boolean calibrateContrastFrequency = false;
-    private Double thicknessGoalWeight;
-    private Double curvatureGoalWeight;
+    private Double thicknessConstraintWeight;
+    private Double curvatureConstraintWeight;
     private final List<MtfGoals> mtfGoals = new ArrayList<>();
     private final List<ContrastGoals> contrastGoals = new ArrayList<>();
     private final List<Var> additionalVariables = new ArrayList<>();
@@ -127,7 +127,7 @@ public final class OptimizationBuilder {
      * thickness are excluded, being coincident rather than a space to open up.
      *
      * <p>The counterpart to {@link #allCurvatureSurfaces()}, and best paired with
-     * {@link #thicknessGoals(double)} - with every space free and nothing holding the
+     * {@link #constrainThickness(double)} - with every space free and nothing holding the
      * layout, the solver will collapse gaps and drive elements through one another.
      */
     public OptimizationBuilder allThicknessSurfaces() {
@@ -218,13 +218,13 @@ public final class OptimizationBuilder {
      * through the stop. This anchors each varied thickness to where it began: it is still
      * free to move, it just costs merit to do so, with {@code weight} deciding how much.
      *
-     * @param weight goal weight; the residual is a fraction of the starting thickness,
+     * @param weight constraint weight; the residual is a fraction of the starting thickness,
      *               so one weight is meaningful across gaps of very different sizes
      */
-    public OptimizationBuilder thicknessGoals(double weight) {
+    public OptimizationBuilder constrainThickness(double weight) {
         if (!Double.isFinite(weight) || weight < 0.0)
-            throw new IllegalArgumentException("thickness goal weight must be finite and non-negative");
-        this.thicknessGoalWeight = weight;
+            throw new IllegalArgumentException("thickness constraint weight must be finite and non-negative");
+        this.thicknessConstraintWeight = weight;
         return this;
     }
 
@@ -232,15 +232,15 @@ public final class OptimizationBuilder {
      * Hold the varied surfaces near their starting <em>curvatures</em>.
      *
      * <p>Curvature, not radius: radius runs away towards infinity on a near-flat surface
-     * for a negligible optical change, so a fractional radius goal would barely restrain
-     * it there while over-restraining a strongly curved one. See {@link GoalCurvature}.
+     * for a negligible optical change, so a fractional radius constraint would barely restrain
+     * it there while over-restraining a strongly curved one. See {@link ConstraintCurvature}.
      *
-     * @param weight goal weight
+     * @param weight constraint weight
      */
-    public OptimizationBuilder curvatureGoals(double weight) {
+    public OptimizationBuilder constrainCurvature(double weight) {
         if (!Double.isFinite(weight) || weight < 0.0)
-            throw new IllegalArgumentException("curvature goal weight must be finite and non-negative");
-        this.curvatureGoalWeight = weight;
+            throw new IllegalArgumentException("curvature constraint weight must be finite and non-negative");
+        this.curvatureConstraintWeight = weight;
         return this;
     }
 
@@ -414,7 +414,7 @@ public final class OptimizationBuilder {
         if (allThicknessSurfaces) {
             for (int surface = 0; surface < prescription._surfaces.length; surface++) {
                 // A zero thickness is a coincident surface, not a space to open up, and
-                // it gives the fractional GoalThickness no base to work from.
+                // it gives the fractional ConstraintThickness no base to work from.
                 if (thicknessOf(surface) != 0.0)
                     result.add(new VarThickness(prescription, surface));
             }
@@ -446,17 +446,17 @@ public final class OptimizationBuilder {
         // Anchor the varied parameters to where they started. Built from the variable
         // list so the goals attach to exactly what is free to move, and built here while
         // the prescription still holds its original values.
-        if (thicknessGoalWeight != null) {
+        if (thicknessConstraintWeight != null) {
             for (Var variable : variables)
                 if (variable instanceof VarThickness thickness)
-                    result.add(new GoalThickness(analysis, thickness._surface_id,
-                            thicknessGoalWeight));
+                    result.add(new ConstraintThickness(analysis, thickness._surface_id,
+                            thicknessConstraintWeight));
         }
-        if (curvatureGoalWeight != null) {
+        if (curvatureConstraintWeight != null) {
             for (Var variable : variables)
                 if (variable instanceof VarRadius radius)
-                    result.add(new GoalCurvature(analysis, radius._surface_id,
-                            curvatureGoalWeight));
+                    result.add(new ConstraintCurvature(analysis, radius._surface_id,
+                            curvatureConstraintWeight));
         }
         for (MtfGoals curve : mtfGoals) {
             for (int field = 0; field < fields.length; field++) {

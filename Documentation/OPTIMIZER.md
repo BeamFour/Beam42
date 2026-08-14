@@ -173,19 +173,19 @@ historical values.
 Contrast optimization has a broad, smooth capture range and can substantially rearrange
 a lens when many prescription parameters are free. Optical performance goals alone do
 not preserve element shape, air gaps or mechanical layout. `OptimizationBuilder`
-therefore provides optional soft goals that anchor varied parameters to their starting
-values.
+therefore provides optional soft constraints that anchor varied parameters to their
+starting values.
 
 ```java
-.curvatureGoals(curvatureWeight)
-.thicknessGoals(thicknessWeight)
+.constrainCurvature(curvatureWeight)
+.constrainThickness(thicknessWeight)
 ```
 
-These methods add goals only for the corresponding parameters that are actually varied.
-They pair naturally with `allCurvatureSurfaces()` and `allThicknessSurfaces()`, but work
-equally with explicit surface lists.
+These methods add constraints only for the corresponding parameters that are actually
+varied. They pair naturally with `allCurvatureSurfaces()` and `allThicknessSurfaces()`,
+but work equally with explicit surface lists.
 
-For a surface whose starting radius is `r0`, the curvature goal returns
+For a surface whose starting radius is `r0`, the curvature constraint returns
 
 ```text
 r0 / r - 1
@@ -195,24 +195,31 @@ which is the fractional change in curvature `c/c0 - 1`. Curvature is used rather
 radius because a large radius change near a flat surface can represent a very small
 optical change.
 
-For a thickness whose starting value is `t0`, the thickness goal returns
+For a thickness whose starting value is `t0`, the thickness constraint returns
 
 ```text
 t / t0 - 1
 ```
 
 Both are zero at the starting prescription. The merit function applies the square root
-of the configured goal weight, so a parameter's squared-merit contribution is
+of the configured weight, so a parameter's squared-merit contribution is
 
 ```text
 weight * fractional_change^2
 ```
 
-These are regularization goals, not hard constraints. Increasing the weight keeps the
-design closer to its original form; decreasing it gives the optimizer more freedom.
-Thickness goals constrain axial centre thickness only and do not guarantee positive
-edge separation. Neither goal imposes an absolute bound, so final prescriptions still
-need mechanical checks for negative gaps, element intersections, extreme curvatures and
+`ConstraintThickness` and `ConstraintCurvature` are named for what they express, but they
+are implemented as penalty residuals in the least-squares merit rather than as hard
+bounds: they are soft constraints, not feasibility limits. A parameter is always free to
+move, it simply costs merit to do so. Increasing the weight keeps the design closer to
+its original form; decreasing it gives the optimizer more freedom. Nothing prevents a
+sufficiently strong optical gradient from pushing a parameter a long way regardless of
+weight.
+
+Two consequences follow. Thickness constraints hold axial centre thickness only and do
+not guarantee positive edge separation, which also depends on the sag of the two bounding
+surfaces. And since neither imposes an absolute bound, final prescriptions still need
+mechanical checks for negative gaps, element intersections, extreme curvatures and
 clearance.
 
 Because a contrast merit can contain thousands of sample residuals but only a few dozen

@@ -9,9 +9,9 @@ package org.redukti.optim;
  * bounding surfaces. Keeping the layout recognisable is what makes it effective in
  * practice rather than any guarantee.
  */
-public class GoalThickness extends GoalParameter {
+public class ConstraintThickness extends Constraint {
 
-    public GoalThickness(Analysis analysis, int surfaceId, double weight) {
+    public ConstraintThickness(Analysis analysis, int surfaceId, double weight) {
         super(analysis, surfaceId, thickness(analysis, surfaceId), weight);
     }
 
@@ -23,7 +23,7 @@ public class GoalThickness extends GoalParameter {
     }
 
     @Override
-    protected double fractional_deviation() {
-        return thickness(_analysis, _surface_id) / _base - 1.0;
+    protected double current_value() {
+        return thickness(_analysis, _surface_id);
     }
 }

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.redukti.rayoptics.analysis.SpotOptions;
 import org.redukti.rayoptics.seq.Glass;
 import org.redukti.spec.Prescription;
+import org.redukti.spec.VigType;
 import org.redukti.spec.SurfaceType;
 
 import java.util.Arrays;
@@ -15,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class OptimizationBuilderTest {
 
@@ -178,6 +180,67 @@ class OptimizationBuilderTest {
         assertEquals(setup.analysis(), spotGoal._analysis);
         assertEquals(7.5, spotGoal._target);
         assertEquals(4.0, spotGoal._weight);
+    }
+
+    /**
+     * SetPupil live is what every committed regression value was generated under. Both
+     * halves of this matter: a changed default silently moves every golden number, and a
+     * default that froze would quietly stop tracking the design.
+     */
+    @Test
+    void vignettingDefaultsToLiveSetPupilAndIsConfigurable() {
+        assertEquals(VigType.SetPupil, OptimizationBuilder.builder(prescription())
+                .fields(0.0).mtfFrequencies(10).build().analysis()._vig_type);
+        assertFalse(OptimizationBuilder.builder(prescription())
+                .fields(0.0).mtfFrequencies(10).build().analysis()._freeze_vignetting);
+
+        Analysis configured = OptimizationBuilder.builder(prescription())
+                .fields(0.0)
+                .mtfFrequencies(10)
+                .vignetting(VigType.Paraxial)
+                .freezeVignetting()
+                .build()
+                .analysis();
+        assertEquals(VigType.Paraxial, configured._vig_type);
+        assertTrue(configured._freeze_vignetting);
+    }
+
+    /**
+     * The point of freezing: the factors must not follow the design. Nothing else in the
+     * merit would notice if they did - the residuals would simply be evaluated on a pupil
+     * that quietly moved, which is the drift this option exists to remove.
+     */
+    @Test
+    void frozenVignettingSurvivesAPrescriptionChange() {
+        Prescription prescription = prescription();
+        Analysis analysis = OptimizationBuilder.builder(prescription)
+                .fields(0.0, 1.0)
+                .mtfFrequencies(10)
+                .freezeVignetting()
+                .build()
+                .analysis();
+
+        analysis.compute();
+        double[][] captured = analysis.frozen_vignetting();
+        assertEquals(2, captured.length);
+        double[] modelFactors = vignettingOf(analysis, 1);
+        assertArrayEquals(captured[1], modelFactors, 0.0);
+
+        // Move a surface far enough that live factors would certainly follow.
+        prescription._surfaces[0]._radius *= 0.5;
+        analysis.compute();
+        assertArrayEquals(captured[1], vignettingOf(analysis, 1), 0.0,
+                "frozen vignetting changed when the prescription did");
+        assertArrayEquals(captured[1], analysis.frozen_vignetting()[1], 0.0);
+
+        // Unfreezing drops the capture, so the next compute measures the design again.
+        analysis.freezing_vignetting(false);
+        assertNull(analysis.frozen_vignetting());
+    }
+
+    private static double[] vignettingOf(Analysis analysis, int fieldIndex) {
+        var field = analysis._opt_model.optical_spec.fov.fields[fieldIndex];
+        return new double[]{field.vux, field.vlx, field.vuy, field.vly};
     }
 
     @Test

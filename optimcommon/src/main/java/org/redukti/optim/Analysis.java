@@ -31,6 +31,13 @@ public class Analysis {
     public boolean _compute_spots = true;
     public boolean _compute_ray_aberrations = true;
     public boolean _compute_mtf = true;
+    /** How each rebuilt model establishes its vignetting; see {@link #vignetting(VigType)}. */
+    public VigType _vig_type = VigType.SetPupil;
+    /** See {@link #freezing_vignetting(boolean)}; off by default. */
+    public boolean _freeze_vignetting = false;
+    /** Captured on the first compute when frozen: [field][vux, vlx, vuy, vly]. */
+    private double[][] _frozen_vignetting;
+    private Double _frozen_pupil_value;
     public final static int NUM_TRANSVERSE_RAYS = 10;
 
     /**
@@ -96,9 +103,113 @@ public class Analysis {
         _compute_mtf = mtf;
         return this;
     }
+
+    /**
+     * How every rebuilt optical model establishes its vignetting factors.
+     *
+     * <p>{@link VigType#SetPupil} is the default and what all existing regression values
+     * were generated under: it resizes the pupil so the axial marginal ray meets the stop
+     * edge, then measures all four factors with real rays. {@link VigType#SetVig} measures
+     * the factors the same way without the resize, and agrees closely - within 0.005 of
+     * pupil half-width and 3-4 MTF decimals on both test lenses.
+     *
+     * <p>{@link VigType#Paraxial} is cheaper but sets only the <em>y</em> factors: a
+     * paraxial ray is meridional and says nothing about the sagittal pupil, so x comes out
+     * unvignetted at every field. That makes the pupil an ellipse even on axis, where
+     * sagittal and tangential MTF must be equal - measured 0.148 apart at 40 cyc/mm on the
+     * Leica 75/2 and 0.010 on the Otus. It also means sagittal is optimized over a
+     * superset of the real aperture and tangential over a subset.
+     */
+    public Analysis vignetting(VigType vigType) {
+        _vig_type = vigType == null ? VigType.None : vigType;
+        discard_frozen_vignetting();
+        return this;
+    }
+
+    /**
+     * Measure the vignetting factors once, then hold them fixed for the rest of the run.
+     *
+     * <p>Apertures are never optimization variables, but vignetting is not therefore
+     * constant: it is where rays land on those fixed apertures, and 28 of 29 variables on
+     * the Leica 75/2 move a factor within a single Jacobian step. The drift is smooth, so
+     * it does not corrupt the finite difference, but it does mean the solver
+     * differentiates the design and the pupil together - and a more heavily vignetted lens
+     * has less aberration, so shrinking the pupil is a way to improve an MTF-like merit
+     * that costs nothing in the merit and real light in the lens. Freezing removes that
+     * route and gives every iteration the same pupil to be compared on.
+     *
+     * <p>The cost is staleness: the factors describe the design as it was at capture, so
+     * the further the solve travels the more the assumed pupil diverges from the real one.
+     * Call {@link #discard_frozen_vignetting()} between solver restarts to re-measure.
+     *
+     * <p>With {@link VigType#SetPupil} the captured pupil value is held too, since factors
+     * measured at one working f/# do not describe another. That pins {@code fod.fno}, so a
+     * {@link GoalParax} on {@link ParaxHelper#Fno} becomes inert in that combination.
+     */
+    public Analysis freezing_vignetting(boolean value) {
+        _freeze_vignetting = value;
+        if (!value) discard_frozen_vignetting();
+        return this;
+    }
+
+    /** Drop captured factors so the next {@link #compute()} measures them afresh. */
+    public Analysis discard_frozen_vignetting() {
+        _frozen_vignetting = null;
+        _frozen_pupil_value = null;
+        return this;
+    }
+
+    /** The frozen factors as [field][vux, vlx, vuy, vly], or null if not frozen yet. */
+    public double[][] frozen_vignetting() {
+        if (_frozen_vignetting == null) return null;
+        double[][] copy = new double[_frozen_vignetting.length][];
+        for (int i = 0; i < copy.length; i++) copy[i] = _frozen_vignetting[i].clone();
+        return copy;
+    }
+
+    private OpticalModel build_model(VigType vigType) {
+        return new RayOpticsModelBuilder(_prescription)
+                .build_optical_model(true, _fields, false, vigType, true, _scenario);
+    }
+
+    private OpticalModel build_vignetted_model() {
+        if (!_freeze_vignetting) return build_model(_vig_type);
+        if (_frozen_vignetting == null) capture_vignetting();
+        // Build without establishing vignetting, then stamp the captured state on.
+        OpticalModel model = build_model(VigType.None);
+        var fields = model.optical_spec.fov.fields;
+        if (fields.length != _frozen_vignetting.length)
+            throw new IllegalStateException("frozen vignetting was captured for "
+                    + _frozen_vignetting.length + " fields but the model has " + fields.length);
+        if (_frozen_pupil_value != null
+                && !_frozen_pupil_value.equals(model.optical_spec.pupil.value)) {
+            model.optical_spec.pupil.value = _frozen_pupil_value;
+            model.update_model();
+        }
+        for (int i = 0; i < fields.length; i++) {
+            fields[i].vux = _frozen_vignetting[i][0];
+            fields[i].vlx = _frozen_vignetting[i][1];
+            fields[i].vuy = _frozen_vignetting[i][2];
+            fields[i].vly = _frozen_vignetting[i][3];
+        }
+        return model;
+    }
+
+    private void capture_vignetting() {
+        OpticalModel reference = build_model(_vig_type);
+        var fields = reference.optical_spec.fov.fields;
+        _frozen_vignetting = new double[fields.length][4];
+        for (int i = 0; i < fields.length; i++) {
+            _frozen_vignetting[i][0] = fields[i].vux;
+            _frozen_vignetting[i][1] = fields[i].vlx;
+            _frozen_vignetting[i][2] = fields[i].vuy;
+            _frozen_vignetting[i][3] = fields[i].vly;
+        }
+        _frozen_pupil_value = reference.optical_spec.pupil.value;
+    }
+
     public void compute() {
-        _opt_model = new RayOpticsModelBuilder(_prescription)
-                .build_optical_model(true, _fields,false, VigType.SetPupil, true, _scenario);
+        _opt_model = build_vignetted_model();
         _pfo = ParaxHelper.asArray(_opt_model.optical_spec.parax_data.fod);
         if (_compute_spots) {
             SpotOptions options;

@@ -1,8 +1,9 @@
 package org.redukti.optim;
 
-import org.redukti.rayoptics.util.Orientation;
 import org.redukti.rayoptics.seq.Glass;
+import org.redukti.rayoptics.util.Orientation;
 import org.redukti.spec.Prescription;
+import org.redukti.spec.VigType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,6 +67,8 @@ public final class OptimizationBuilder {
     private int contrastRings = 6;
     private int contrastSpokes = 12;
     private boolean calibrateContrastFrequency = false;
+    private VigType vigType = VigType.SetPupil;
+    private boolean freezeVignetting = false;
     private Double thicknessConstraintWeight;
     private Double curvatureConstraintWeight;
     private final List<MtfGoals> mtfGoals = new ArrayList<>();
@@ -110,6 +113,30 @@ public final class OptimizationBuilder {
     /** Restrict enabled ray-aberration goals to the Fraunhofer d-line. */
     public OptimizationBuilder dLineOnly(boolean dLineOnly) {
         this.dLineOnly = dLineOnly;
+        return this;
+    }
+
+    /**
+     * How each rebuilt model establishes vignetting. See {@link Analysis#vignetting(VigType)}
+     * for the trade-offs; {@link VigType#Paraxial} in particular leaves the sagittal pupil
+     * unvignetted and breaks on-axis rotational symmetry.
+     */
+    public OptimizationBuilder vignetting(VigType vigType) {
+        this.vigType = vigType == null ? VigType.None : vigType;
+        return this;
+    }
+
+    /**
+     * Measure vignetting once at the start and hold it fixed for the run, so every
+     * iteration is compared on the same pupil. See
+     * {@link Analysis#freezing_vignetting(boolean)} for the trade-off.
+     */
+    public OptimizationBuilder freezeVignetting() {
+        return freezeVignetting(true);
+    }
+
+    public OptimizationBuilder freezeVignetting(boolean freeze) {
+        this.freezeVignetting = freeze;
         return this;
     }
 
@@ -433,6 +460,7 @@ public final class OptimizationBuilder {
                     "optimization requires at least as many goals as variables: "
                             + goals.size() + " goals for " + variables.size() + " variables"
                             + "; add optical goals or enable rayAberrationGoals()");
+        analysis.vignetting(vigType).freezing_vignetting(freezeVignetting);
         configureSpotPattern(analysis, goals);
         configureContrastAnalysis(analysis, goals);
         configureRequiredAnalyses(analysis, goals);

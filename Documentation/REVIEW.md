@@ -7,34 +7,45 @@ Review of the contrast-optimization implementation on branch `contrast_opt`, aga
 
 Test case: `ZeissOtusML50mmTest.optimizesPatentPrescriptionUsingContrast()`
 
+Findings 1–7 were written against the state of the branch at the time of the review.
+Everything below has been revisited as of 2026-08-14; see
+[Changes since this review was written](#changes-since-this-review-was-written) for the
+work that landed afterwards and does not belong to any single finding.
+
 ## Status
 
 | # | Finding | Status |
 | --- | --- | --- |
 | [1](#1-vignetting-silently-rescales-the-shear--the-off-axis-merit-runs-at-the-wrong-frequency) | Vignetting rescales the shear | **Fixed** — shear now 40.0 cyc/mm at every field |
-| [2](#2-the-default-3x6-sampling-is-too-coarse-and-the-optimizer-exploits-it) | 3×6 sampling too coarse | **Applied** — default now 6×12 |
+| [2](#2-the-default-3x6-sampling-is-too-coarse-and-the-optimizer-exploits-it) | 3×6 sampling too coarse | **Applied** — builder default now 6×12 |
 | [3](#3-the-residual-is-the-un-centred-second-moment-not-the-variance) | Un-centred second moment | **Open** — tangential only, see the refinement below |
 | [4](#4-the-three-frequencies-are-near-collinear--two-thirds-of-the-ray-budget-is-wasted) | Frequencies near-collinear | **Open** |
-| [5](#5-high-frequencies-fail-without-a-diagnostic) | High-frequency degeneracy | **Partly fixed** — the silent collapse now throws; the 0.707×cutoff ceiling remains |
-| [6](#6-the-least-squares-reduction-only-tracks-mtf-in-the-small-phase-regime) | Least-squares only valid at small phase | **Open.** Diagnosed and reproduced; a phasor MTF goal was tried and reverted (`1438105c`) |
+| [5](#5-high-frequencies-fail-without-a-diagnostic) | High-frequency degeneracy | **Partly fixed** — the silent collapse now throws; the ~0.707×cutoff ceiling remains |
+| [6](#6-the-least-squares-reduction-only-tracks-mtf-in-the-small-phase-regime) | Least-squares only valid at small phase | **Open, but downgraded.** The diagnosis stands; the regression that motivated it turned out to be defocus — see the [postscript](#postscript-the-motivating-regression-was-defocus) |
 | [7](#7-the-shear-is-applied-at-the-entrance-pupil-not-the-exit-pupil) | Shear applied at entrance, not exit, pupil | **Mitigated, opt-in.** `calibrate_frequency` removes the field bias (8.5% → 0.08%); exact fix pending upstream |
 
 Finding 6 was added after the first four fixes landed, prompted by a mid-field MTF drop
-running `GenericOpt` on the Leica 75/2. It is the most consequential open item: unlike 3
-and 4 it produces a design that is measurably worse, not merely a merit that is wasteful.
+running the generic contrast setup on the Leica 75/2. It was described here as the most
+consequential open item, on the grounds that it produced a measurably worse design rather
+than merely a wasteful merit. That framing has since been withdrawn: the drop was a
+focus error the configuration had no variable to correct. The blind spot in the merit is
+real and still unfixed, but no case is currently known where it walks a design backwards.
 
 ## Code under review
 
+Line references are as of 2026-08-14.
+
 | File | Role |
 | --- | --- |
-| [ContrastAnalysis.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysis.java) | frequency → pupil shear, wavefront-difference sampling |
+| [ContrastAnalysis.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysis.java) | frequency → pupil shear, wavefront-difference sampling, frequency calibration |
 | [ContrastAnalysisResult.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysisResult.java) | sample/residual container |
 | [ContrastOptions.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastOptions.java) | sampling configuration |
-| [Trace.java:755](rayoptics/src/main/java/org/redukti/rayoptics/raytr/Trace.java:755) | `trace_contrast` — overlap region and ray triplets |
-| [SequentialModel.java:924](rayoptics/src/main/java/org/redukti/rayoptics/seq/SequentialModel.java:924) | per-wavelength chief ray / reference sphere setup |
+| [Trace.java:755](../rayoptics/src/main/java/org/redukti/rayoptics/raytr/Trace.java:755) | `trace_contrast` — overlap region and ray triplets |
+| [SequentialModel.java:924](../rayoptics/src/main/java/org/redukti/rayoptics/seq/SequentialModel.java:924) | per-wavelength chief ray / reference sphere setup |
 | [GoalContrast.java](../optimcommon/src/main/java/org/redukti/optim/GoalContrast.java) | one residual per (freq, field, wavelength, sample, orientation) |
-| [Analysis.java:112](optimcommon/src/main/java/org/redukti/optim/Analysis.java:112) | analysis driver |
-| [OptimizationBuilder.java:295](optimr2/src/main/java/org/redukti/optim/OptimizationBuilder.java:295) | goal construction |
+| [Analysis.java:126](../optimcommon/src/main/java/org/redukti/optim/Analysis.java:126) | analysis driver — one `ContrastAnalysis.eval` per frequency |
+| [OptimizationBuilder.java:544](../optimr2/src/main/java/org/redukti/optim/OptimizationBuilder.java:544) | contrast goal construction |
+| [LMDerMeritFunction.java:116](../optimr2/src/main/java/org/redukti/optim/LMDerMeritFunction.java:116) | `buildJacobian` — added after the review, see §5 and the changes section |
 
 ## Verdict
 
@@ -45,15 +56,22 @@ without redesigning anything — and both now are.
 The one structural limitation that remains (finding 6) is inherent to the technique as
 implemented, not a coding error: the least-squares reduction is a faithful MTF proxy
 only while the pupil phase difference stays well under a radian. Inside that regime it
-is excellent and fast; outside it, it is not merely imprecise but non-monotone, and it
-can walk a design backwards. Contrast optimization is therefore best read as a
-*refiner* — superb once a design is roughly corrected, and in need of a companion goal
-when it is not.
+is excellent and fast; outside it, it is not merely imprecise but non-monotone.
+Contrast optimization is therefore best read as a *refiner* — superb once a design is
+roughly corrected, and to be validated against an independent MTF measurement when it is
+not.
+
+(This paragraph originally ended "and it can walk a design backwards", citing the Leica
+mid-field drop. That case turned out to be defocus rather than a merit failure; the
+[postscript to §6](#postscript-the-motivating-regression-was-defocus) has the detail. The
+non-monotonicity is measured and real, but the claim that it costs a design anything in
+practice is currently unsupported.)
 
 **What is correct:**
 
 - Shear `= 2·λ·F#·ν` in normalized pupil radii
-  ([ContrastAnalysis.java:40](rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysis.java:40))
+  (`normalized_entry_pupil_shift`,
+  [ContrastAnalysis.java:63](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysis.java:63))
   — displacement 2 at the incoherent cutoff `1/(λF#)`. `fod.fno` is the working F/#,
   so finite conjugates are handled.
 - OPD is returned in waves, so residuals are commensurate across wavelengths.
@@ -95,8 +113,8 @@ full spot/MTF analysis it replaces.
 > `VigCalc.set_pupil` now also calls `set_vig` unconditionally, so the factors this
 > depends on can never be left at zero on a freshly built model.
 
-[Trace.java:765](rayoptics/src/main/java/org/redukti/rayoptics/raytr/Trace.java:765) sets
-`apply_vignetting = true` while working in `REL_PUPIL` coordinates, so `Field.apply_vignetting`
+As reviewed, [Trace.java:768](../rayoptics/src/main/java/org/redukti/rayoptics/raytr/Trace.java:768)
+set `apply_vignetting = true` while working in `REL_PUPIL` coordinates, so `Field.apply_vignetting`
 rescales every pupil coordinate before the trace. But the shear is computed from the axial
 F/# in *unvignetted* pupil fractions and then applied in *vignetted-relative* coordinates.
 
@@ -143,7 +161,8 @@ it does not remove the upper/lower kink.
 > asymmetry noted under "Smaller items". Cost is ~3-4× the solve time.
 
 `ContrastOptions` defaults to 3 rings × 6 spokes = 18 points, and
-`createContrastSetup` uses `contrastSampling(3, 6)`.
+`createContrastSetup` used `contrastSampling(3, 6)`. (`ContrastOptions` still defaults to
+3×6; what changed is the builder default, which is what every optimization goes through.)
 
 On the **starting** design 18 points are adequate — 0.2084 against a converged 0.2074,
 0.5% error. On the **optimized** design they are not:
@@ -188,8 +207,8 @@ The modulus of the OTF is
 i.e. it depends on the **variance** of the phase difference, not on `⟨Φ²⟩`. A constant
 `ΔW` across the pupil is a pure image displacement (it moves the phase transfer
 function, not the modulus) and costs no MTF at all. But
-[ContrastAnalysisResult.java:19](rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysisResult.java:19)
-forms `√w · ΔW` with no mean removal, so `Σr² = ⟨Φ²⟩ = Var + mean²`.
+[ContrastAnalysisResult.java:20](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysisResult.java:20)
+forms `√w · ΔW` with no mean removal, so `Σr² = ⟨Φ²⟩ = Var + mean²`. Still the case.
 
 This is not negligible, and it concentrates:
 
@@ -260,8 +279,7 @@ baseline on 4/4 spot RMS and 7/8 MTF numbers, at 55.6 s vs 33.5 s.
 > ceiling is unchanged: the technique still cannot represent frequencies above it, it
 > just says so now instead of failing silently or opaquely.
 
-[Trace.java:784](rayoptics/src/main/java/org/redukti/rayoptics/raytr/Trace.java:784)
-clamps the sampling radius:
+As reviewed, `trace_contrast` clamped the sampling radius:
 
 ```java
 overlapDefinition.max_radius = Math.max(0.0, grid_rng.max_radius - enclosingRadius);
@@ -272,13 +290,23 @@ centre `(−d/2, −d/2)` — which is itself **outside** the unit pupil. `trace
 then returns null, every goal in that block returns `BIGVAL`, `buildJacobian` returns
 false, and the solve aborts with no explanation.
 
+That code is gone. `generate_contrast_quadrature`
+([Trace.java:821](../rayoptics/src/main/java/org/redukti/rayoptics/raytr/Trace.java:821))
+now maps the nominal pattern into the physical pupil and bisects for the largest
+contraction at which every sample and both of its partners are valid, guarded by
+`MIN_CONTRAST_CONTRACTION = 0.1`. Below that it throws, naming the frequency. The
+failure mode described above is therefore reported rather than silent — but the ceiling
+itself is unchanged, so the paragraphs below still describe what the technique can and
+cannot represent.
+
 The threshold is per-wavelength, so the longest wavelength fails first, at
 `ν ≈ 0.707/(λ_max·F#)`:
 
 - this lens: 751 cyc/mm — unreachable, so not an issue here;
 - an f/8 LWIR lens at 10 µm: **8.8 cyc/mm** — entirely reachable.
 
-Observed behaviour sweeping frequency on this lens (3×6 sampling):
+Observed behaviour sweeping frequency on this lens, against the reviewed code (3×6
+sampling; `maxSampleRadius` no longer exists):
 
 ```
 freq=  40  shift=0.0674  maxSampleRadius=0.94334
@@ -287,24 +315,29 @@ freq= 800  shift=1.3486  maxSampleRadius=1.06512   <- outside the pupil
 freq=1000  shift=1.6857  maxSampleRadius=1.33140   <- fully collapsed
 ```
 
-`ContrastOptions` validates only `frequency >= 0`. It should reject frequencies above
-the representable limit, or at minimum `trace_contrast` should raise rather than emit
-degenerate samples.
+`ContrastOptions` still validates only `frequency >= 0`. The check now happens late, in
+`generate_contrast_quadrature`, and reports rather than degrades — but rejecting an
+unrepresentable frequency where it is configured would still be better than discovering
+it on the first trace.
 
-**Related, lower priority:** the inscribed circle is a *valid* (conservative) subset of
-the three-disk intersection — for `|q − c| ≤ R`, `|q − c_i| ≤ R + 0.707d = 1` — but it
-shrinks the radius by `0.707·d` where each direction alone needs only `d/2`, and it
-couples the sagittal and tangential domains into a single region. Harmless at 3% of
-cutoff (max sample radius 0.943 vs 0.942), and the smoothness it buys as F/# varies is a
-reasonable trade. Worth a comment recording that it is a deliberate trade-off.
+~~**Related, lower priority:** the inscribed circle is a *valid* (conservative) subset of
+the three-disk intersection~~ — **superseded.** The inscribed-circle construction was
+replaced by the contraction search described above, which scales the whole pattern about
+the overlap centre instead of inscribing a disk inside it. The observation that motivated
+the note (the conservative radius costs little at 3% of cutoff) no longer applies to code
+that exists.
 
 ---
 
 ## 6. The least-squares reduction only tracks MTF in the small-phase regime
 
-**Severity: high. This is the only finding that produces a measurably worse lens.**
+~~**Severity: high. This is the only finding that produces a measurably worse lens.**~~
+**Severity: medium.** The severity claim was withdrawn — see the
+[postscript](#postscript-the-motivating-regression-was-defocus) at the end of this
+section. The analysis below is unaffected and still correct; only its consequence
+changed.
 
-Found by running `GenericOpt` on
+Found by running the generic contrast setup on
 `Examples/jfotoptix/leica-r-apo-75mm-f2-mandler/specs.txt` (fields 0/0.3/0.7/1.0,
 frequencies 10/30/50, `varyAllCurvatures`, 6×12). Mid-field sagittal MTF *drops*
 across the optimization:
@@ -352,6 +385,11 @@ is not even one-signed, being optimistic at one field and pessimistic at another
 
 ### Why it produces a regression rather than just noise
 
+> Read with the [postscript](#postscript-the-motivating-regression-was-defocus): the
+> under-weighting described here is real and measured, but it is not what produced the
+> regression. The second bullet below — no thicknesses among the variables — turned out
+> to be the whole story, and not merely an amplifier.
+
 At field 0.7 sagittal the merit sees σ = 0.306 against ~0.20 elsewhere — about **2.3×**
 worse in sum-of-squares. In MTF terms it is 0.041 against 0.39–0.55, i.e. **10×** worse.
 The squaring compresses a catastrophic failure into a mildly elevated residual, so the
@@ -362,7 +400,7 @@ Two things amplify this:
 - Residuals scale as ΔW ∝ ν, so the 50 cyc/mm block carries ~25× the sum-of-squares
   weight of the 10 cyc/mm block. The merit is dominated by exactly the frequency where
   the approximation is worst. At 10 cyc/mm every group is in regime and behaves.
-- `GenericOpt` offers only 14 variables (no thicknesses, no aspherics) against a
+- `GenericContrastOpt` offers only 14 variables (no thicknesses, no aspherics) against a
   badly-aberrated start, so the design never reaches the small-phase regime.
 
 This is also why the Otus looks healthy: it converges to σ ≈ 0.06–0.10, comfortably in
@@ -371,6 +409,8 @@ regime. The Leica never gets field 0.7 sagittal below 0.31.
 ### Why not just add the existing `GeoMTF` goals?
 
 The obvious cheap answer — no new code, reuse `GeoMTF` — was tested and does not work.
+(`GeoMTF` throughout this section is the class `GoalGeoMTF`, reached through the builder
+as `mtfGoals(mtf(...))`.)
 Sweeping the weight on `mtf(10/30/50, target 100%)` added to the contrast merit:
 
 | GeoMTF weight | njev | field 0.7 sag @50 | field 1.0 sag @50 | spot RMS |
@@ -412,7 +452,7 @@ Add a `GoalContrastMTF` **alongside** `GoalContrast`, not replacing it — the d
 least-squares residuals are what give the well-conditioned Jacobian that makes the
 method fast; they just need a companion that sees what they cannot.
 
-- One residual per (frequency, field, orientation) — 24 for `GenericOpt`, against 5184
+- One residual per (frequency, field, orientation) — 24 for `GenericContrastOpt`, against 5184
   contrast residuals. Negligible addition.
 - Value `|Σ w·e^{i2πΔW}| / Σw` with all wavelengths pooled into one complex sum, which
   is the physically correct polychromatic OTF. Target and weight semantics identical to
@@ -480,7 +520,7 @@ necessary but not sufficient, and two things escaped it:
 of fields 1 and 3. Summed sagittal MTF at 50 cyc/mm is actually higher for those runs
 (1.78 vs 1.40). So this is substantially a genuine Pareto trade in the design space,
 with the equal-weight contrast merit choosing one balance, rather than purely an
-optimizer failure. `GenericOpt` offers only 14 curvature variables, which narrows the
+optimizer failure. `GenericContrastOpt` offers only 14 curvature variables, which narrows the
 frontier further.
 
 What survives unchanged is the diagnosis, which rests on the σ/phasor/geometric table
@@ -525,6 +565,46 @@ diffraction-MTF evaluator costing no extra ray tracing, which would be useful fo
 reporting or for goals on designs already in regime. It was removed because carrying an
 API that does not solve the problem it was added for is worse than not having it, not
 because it was wrong. Restore it from `1438105c` if a use appears.
+
+### Postscript: the motivating regression was defocus
+
+The Leica field-0.7 sagittal drop that prompted this whole section has a much more
+ordinary explanation, found later while investigating the same case: the optimized design
+sits about **50 µm out of focus** at that field. Shifting focus recovers sagittal MTF at
+50 cyc/mm from 0.041 to **0.629** — better than the starting design, not worse.
+
+The cause is the configuration, not the merit. The generic contrast setup varied
+curvatures only; with no thickness among the variables, the solver had no way to move the
+image plane, so it traded field 0.7 away to satisfy the rest. The contrast merit was
+reporting a genuine improvement in what it was asked to improve. Once thicknesses are
+varied — which now requires the design-preservation constraints of the
+[changes section](#changes-since-this-review-was-written), or the layout collapses — the
+case does not reproduce.
+
+Three consequences for the rest of this section:
+
+- **The severity claim is withdrawn.** No case is currently known where the contrast
+  merit walks a design backwards. That was the basis for calling this the most
+  consequential finding, and it does not hold.
+- **The diagnosis is untouched.** The σ/phasor/geometric table, the two groups with equal
+  σ and MTF 0.31 apart, and the ~0.1-wave validity limit were all measured directly and
+  do not depend on the Leica regression. The merit genuinely stops tracking MTF above
+  that limit; what is missing is a demonstration that it costs anything in practice.
+- **The `GeoMTF` and `GoalContrastMTF` weight sweeps above were solving the wrong
+  problem.** Both were being asked to repair a focus error with curvature variables.
+  That explains why every weight that helped field 0.7 cost more elsewhere: the frontier
+  they were exploring was the wrong one. Neither experiment says much about whether a
+  phasor goal is useful, and a retry — if there is ever a reason for one — should start
+  from a configuration that can focus.
+
+Lesson recorded because it cost real effort: a merit that improves while an independent
+metric degrades is evidence of *something*, but "the merit is a bad proxy" is only one
+candidate, and it was the one this document reached for first. "The variable set cannot
+express the fix" is more common and much cheaper to check.
+
+The measurements in this postscript were made during the investigation and the probe was
+not retained, so unlike the rest of this document they are not reproducible from a
+committed program.
 
 ---
 
@@ -662,22 +742,21 @@ could be reverted to reduce porting friction.)
 
 ## Smaller items
 
-- **`dLineOnly` is ignored for contrast goals.**
-  [OptimizationBuilder.java:298](optimr2/src/main/java/org/redukti/optim/OptimizationBuilder.java:298)
-  loops all `prescription._wvls` unconditionally, while the ray-aberration loop at
-  line 331 honours the flag. Consistent in the `ZeissOtusML50mm` path only because the
-  prescription itself is restricted upstream.
+- **`dLineOnly` is ignored for contrast goals.** *Still open.*
+  [OptimizationBuilder.java:544](../optimr2/src/main/java/org/redukti/optim/OptimizationBuilder.java:544)
+  loops all `prescription._wvls` unconditionally, while the ray-aberration loop honours
+  the flag. Consistent in the `ZeissOtusML50mm` path only because the prescription itself
+  is restricted upstream.
 
-- **There is no way to build a contrast-only merit.** The comment at
-  [OptimizationBuilder.java:230](optimr2/src/main/java/org/redukti/optim/OptimizationBuilder.java:230)
-  is half true: spots and MTF are correctly disabled (verified: `_compute_spots=false`,
-  `_compute_mtf=false`), but `buildGoals` unconditionally adds 240 `GoalRayAberration`
-  residuals, so `_compute_ray_aberrations` is always true. Measured cost is negligible
-  (15.7 → 15.8 ms) and the residuals are only 4.5% of the SOS, but the test is not
-  measuring contrast optimization in isolation.
+- ~~**There is no way to build a contrast-only merit.**~~ **Fixed.** Ray-aberration fans
+  are opt-in now: `buildGoals` adds them only for `rayAberrationGoals()`, and a merit
+  with fewer goals than variables is rejected with a message naming that method rather
+  than being silently padded. `_compute_ray_aberrations` follows the goals.
 
-  Residual breakdown for the test: 1296 `GoalContrast` + 240 `GoalRayAberration`
-  + 2 `GoalParax` = 1538, with SOS 8.801 / 0.411 / 0.0002.
+  The frozen test fixture enables them deliberately, to preserve the golden values they
+  were generated under. Its residual breakdown at the current 6×12 default is 5184
+  `GoalContrast` + 240 `GoalRayAberration` + 2 `GoalParax` = 5426. (The 1296/1538 counts
+  recorded here originally were for 3×6.)
 
 - **`contrastSamples = rings × spokes` is an unchecked contract** between
   `OptimizationBuilder` and `generate_gaussian_quadrature`. It holds today, but
@@ -700,9 +779,11 @@ could be reverted to reduce porting friction.)
   default `rayerr_filter = null` makes `trace_safe` return a null pkg first — one
   `TraceOptions` change away from an NPE.
 
-- **`GoalContrast.value()` compares a `double` frequency to an `int`.**
-  `ContrastOptions` accepts arbitrary frequencies but only integers are addressable from
-  the optimizer path.
+- ~~**`GoalContrast.value()` compares a `double` frequency to an `int`.**~~ **Fixed.**
+  The goal now addresses its block by `_contrast_index` and does no frequency comparison;
+  `_frequency` is carried for reporting only. `ContrastOptions` still accepts arbitrary
+  frequencies while only integers are addressable from the optimizer path, but nothing
+  depends on the comparison any more.
 
 - **`traced.get(0)`** in `ContrastAnalysis.eval` assumes exactly one wavelength came
   back. True because `wavelengthIndex` is non-null, but brittle.
@@ -717,12 +798,10 @@ could be reverted to reduce porting friction.)
   and never re-set it. The surrogate and the metric used to validate it are therefore
   not referenced identically.
 
-- **`LMDerSolver.solve()` does not recompute the analysis at the final `x`.** lmder can
-  set `info=1` on a *rejected* trial step, leaving the goals holding the rejected
-  point's values while the prescription holds the accepted one. The test reads
-  `meritFunction.getRMS()` before its own `compute()`, so `finalRms` could in principle
-  describe a different design than the one asserted on. It reproduces in practice, but
-  ending `solve()` with a `compute()` at the returned `x` would make it safe.
+- ~~**`LMDerSolver.solve()` does not recompute the analysis at the final `x`.**~~
+  **Fixed.** `solve()` now writes the accepted `x` back to the prescription and calls
+  `analysis.compute()` before returning, so the goals and the prescription always
+  describe the same design — including for `info < 0`.
 
 - **Redundant setup work.** `ContrastAnalysis.eval` is called once per frequency and each
   call re-runs `setup_pupil_coords` per (field, wavelength), including the
@@ -741,9 +820,15 @@ could be reverted to reduce porting friction.)
   comparison is a good idea.
 - The 1e-6 locks on a 44-variable nonlinear solve are brittle across JDK, FPU and
   library changes. Worth a comment saying they are regression locks rather than physics.
-- The `finalRms` values in the two tests (0.0091 vs 0.0161) are **not comparable** —
-  `getRMS()` divides by `functions.length` and the residual counts differ (1538 vs 266).
-  Worth a comment so nobody reads it as a quality comparison.
+- The `finalRms` values in the two tests are **not comparable** — `getRMS()` divides by
+  `functions.length` and the residual counts differ (5426 against 266). Worth a comment
+  so nobody reads it as a quality comparison.
+- **Since fixed: the test owns its configuration.** It used to build its setup from
+  `ZeissOtusML50mm`, which is an example class and therefore a place to try things —
+  frequencies, sampling, calibration. Every one of those changes the merit function and
+  so every asserted number, and an experiment did in fact surface as a test failure.
+  `frozenContrastSetup` and `frozenDirectSetup` now declare the configuration inside the
+  test, with a comment saying to regenerate the values deliberately when changing it.
 
 ---
 
@@ -757,20 +842,97 @@ Done:
 3a. ~~**Correct the entrance-pupil shear bias** (§7)~~ — available, opt-in, pending the
     exact exit-pupil treatment from upstream.
 
-Remaining, in priority order:
+Remaining, in priority order. §6 has dropped down the list since the postscript: with no
+known case where the merit costs a design anything, it is a latent limitation rather than
+an active problem.
 
-4. **Resolve §6.** A phasor MTF goal was implemented and reverted; see the outcome
-   subsection before retrying that route. Most promising untried variant: the **real
-   part** of the OTF rather than its modulus (exact for sagittal, smooth through zero).
-   Also untried: reachable targets rather than 1.0, and more variables than
-   `GenericOpt`'s 14 curvatures.
-5. **Subtract the weighted mean** (§3) — tangential only; worth doing, but it cannot
-   explain a sagittal symptom.
-6. **Drop to a single contrast frequency** (§4) — recovers most of the cost that the
+4. **Subtract the weighted mean** (§3) — tangential only; worth doing, but it cannot
+   explain a sagittal symptom. Now the highest-value open item, being a real and
+   quantified 5% of the merit spent on image displacement that costs no MTF.
+5. **Drop to a single contrast frequency** (§4) — recovers most of the cost that the
    6×12 sampling change added. Note the collinearity was measured on the Otus, where
    phases are small; on a badly-aberrated design like the Leica the frequencies may be
    less redundant, so re-measure before removing any.
-7. **Validate frequency against the cutoff** (§5, remaining half).
+6. **Validate frequency against the cutoff** (§5, remaining half) — at configuration
+   time rather than on the first trace.
+7. **Honour `dLineOnly` for contrast goals**, or document that it deliberately does not
+   apply to them.
+8. **§6, if a case for it appears.** A phasor MTF goal was implemented and reverted; read
+   the outcome subsection *and* the postscript before retrying, since both weight sweeps
+   there were aimed at a defocus. Most promising untried variant: the **real part** of
+   the OTF rather than its modulus (exact for sagittal, smooth through zero). Also
+   untried: reachable targets rather than 1.0.
+
+## Changes since this review was written
+
+Work that landed after the findings above and does not belong to any one of them.
+[OPTIMIZER.md](OPTIMIZER.md) is the reference for how these behave; this section records
+only why they exist and what they change about the review.
+
+### Design-preservation constraints
+
+Varying every thickness is what §6's postscript needs — a solver that cannot move the
+image plane cannot fix a focus error. But an optical merit has no opinion about mechanical
+layout, and with every space free the Leica solve produced air gaps of **−0.365, −0.677
+and −1.349 mm**: elements passed through one another and through the stop.
+
+`ConstraintThickness` and `ConstraintCurvature` anchor each varied parameter to its
+starting value as a soft penalty in the same least-squares merit, enabled per-category
+through `applyThicknessConstraints()` / `applyCurvatureConstraints()`. With them every gap
+in that solve stayed positive and the solve converged. They resist a *fractional* change,
+which is what lets a 0.1 mm air gap and a 39 mm back focus be held equally by one weight;
+the normalization is folded into the stored weight, so the weight a constraint holds is
+not the number passed to the builder.
+
+They are penalties, not bounds. Nothing prevents a strong enough optical gradient from
+moving a parameter a long way, thickness constraints hold axial centre thickness rather
+than edge separation, and a final prescription still needs a mechanical check.
+
+### Per-ray spot goals
+
+`GoalSpotRMS` exposes one aggregate radius per field; differentiating a single
+square-rooted aggregate tells the solver much less than the signed ray deviations that
+compose it. `GoalSpotDeviation` emits two residuals per (field, wavelength, pupil sample)
+— the weighted signed x and y intercept errors in microns — so that minimizing the sum of
+squares is equivalent to minimizing the same weighted RMS spot radius while keeping the
+direction of every ray error in the Jacobian. Added through `spotDeviationGoals(weights)`.
+
+This is the same decomposition `GoalContrast` performs for MTF, applied to spot size, and
+it makes a direct spot merit competitive with the contrast merit on conditioning rather
+than only on cost.
+
+### A tolerant Jacobian
+
+`buildJacobian` ([LMDerMeritFunction.java:116](../optimr2/src/main/java/org/redukti/optim/LMDerMeritFunction.java:116))
+no longer abandons the solve the moment a probe ray fails. Per variable it retries with
+the step halved up to 8 times, and per residual it falls back to a one-sided difference
+when only one side of the central difference is usable. A failed probe restores the
+prescription and analysis in a `finally` block, so a partial state can never leak to the
+caller, and the Jacobian is reported invalid only when some residual has no usable value
+on either side.
+
+This softens §5: the degenerate high-frequency case is still unrepresentable and still
+throws, but an isolated failed ray at an ordinary frequency is now survivable rather than
+fatal to the solve.
+
+### Naming
+
+The goal and builder APIs were made consistent, which invalidates method names used
+earlier in this document and in older examples:
+
+| was | now |
+| --- | --- |
+| `curvatureSurfaces` / `allCurvatureSurfaces` | `varyCurvatures` / `varyAllCurvatures` |
+| `thicknessSurfaces` / `allThicknessSurfaces` | `varyThicknesses` / `varyAllThicknesses` |
+| `includeExistingAspherics(boolean)` | `varyExistingAspherics()` |
+| `useHexapolarSpotPattern(int)` | `hexapolarSampling(int)` |
+| `spotRmsRayGoals(weights)` | `spotDeviationGoals(weights)` |
+
+`OptimizationBuilder` is now ordered into labelled sections — configuration, variables,
+goals, constraints, build — so a reader can tell which kind of thing a method adds.
+The four duplicate sagittal/tangential constant pairs were replaced by a single
+`Orientation` class, which also validates: `GoalGeoMTF`, `GoalRayAberration` and
+`GoalMTFProxy` used to accept any integer and silently read the sagittal fan for it.
 
 ## How the numbers were obtained
 
@@ -796,7 +958,14 @@ module's classpath and can reach the package-private helpers on `ZeissOtusML50mm
 | [ContrastProbe13.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe13.java) | §7 — verifies `calibrate_frequency` removes the field-dependent bias |
 
 `ContrastProbes.java` in the same package holds the shared prescription-path lookups.
-Probes 1–8 use the Otus; 9–11 use the Leica 75/2.
+Probes 1–8 use the Otus; 9–13 use the Leica 75/2. The Otus figures in §7 came from
+re-running the test case with calibration enabled rather than from a probe.
+
+The probes were updated for the builder renames listed under
+[Changes since this review was written](#changes-since-this-review-was-written) and still
+compile, but they have not been re-run since. They reproduce the *evidence* as of the
+code at the time each finding was written; where a fix has since landed, expect the
+numbers to have moved.
 
 Run one with (from the repository root, after a build):
 
@@ -808,7 +977,7 @@ java -cp "/tmp/probes;beam42/target/classes;mathlib/target/classes;optimcommon/t
 Findings 1–5 were measured against
 `Examples/jfotoptix/cosina-otus-ml-50mm-f1.4/JP2026-105585_Example01.txt` using the
 `createContrastSetup` configuration; finding 6 against
-`Examples/jfotoptix/leica-r-apo-75mm-f2-mandler/specs.txt` using `GenericOpt`. Both on
+`Examples/jfotoptix/leica-r-apo-75mm-f2-mandler/specs.txt` using `GenericContrastOpt`. Both on
 JDK 25, running the compiled classes in `*/target/classes` directly. Timings are
 wall-clock on a single machine and are indicative rather than benchmark-grade; the
 sampling, collinearity, mean-fraction, shear and phasor measurements are deterministic

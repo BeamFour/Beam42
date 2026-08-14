@@ -80,6 +80,10 @@ public class LMDerSolver implements Solver {
             // Update prescription
             vars[i].write_to_prescription();
         }
+        // A failed Jacobian or rejected trial can leave Analysis describing the
+        // last perturbed point, including partially populated contrast results.
+        // Recompute at lmder's accepted x so reporting is coherent even for info < 0.
+        analysis.compute();
 
         return info;
     }}

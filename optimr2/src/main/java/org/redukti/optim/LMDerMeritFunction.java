@@ -4,9 +4,12 @@ import org.redukti.mathlib.LMLSolver;
 import org.redukti.mathlib.M;
 import org.redukti.mathlib.MinPack;
 
+import java.util.Arrays;
+
 public class LMDerMeritFunction implements MinPack.Lmder_Function {
 
     private static final double BIGVAL = LMLSolver.BIGVAL;
+    private static final int MAX_JACOBIAN_STEP_REDUCTIONS = 8;
 
     private double weights[];
     private Analysis analysis;
@@ -113,51 +116,81 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
     public boolean buildJacobian(double[] x, double[] fjac, int ldfjac) {
         final int n = vars.length;
         final int m = functions.length;
-        double[] resid = new double[m];
-        double delta[] = new double[n];
-        for (int j = 0; j < n; j++) {
-            // Fixed absolute step per variable (scaled units). A step relative
-            // to the current value is zero for zero-valued parameters (fresh
-            // aspheric coefficients, conic k) and yields 0/0 = NaN columns.
-            double dDelta = vars[j]._d_delta;
-            if (!Double.isFinite(dDelta) || dDelta <= 0.0)
-                return false;
-            for (int k = 0; k < n; k++)
-                delta[k] = (k == j) ? dDelta : 0.0;
-            if (!nudge(x, delta, resid)) {
-                return false;
-            }
-            for (int i = 0; i < m; i++)
-                fjac[i + j * ldfjac] = resid[i];
+        double[] base = new double[m];
+        double[] forward = new double[m];
+        double[] backward = new double[m];
+        double[] restored = new double[m];
+        double[] delta = new double[n];
+        boolean success = false;
 
-            for (int k = 0; k < n; k++)
-                delta[k] = (k == j) ? -1.0 * dDelta : 0.0;
-            if (!nudge(x, delta, resid)) {
-                return false;
-            }
-            for (int i = 0; i < m; i++)
-                fjac[i + j * ldfjac] -= resid[i];
+        try {
+            // A derivative is meaningful only around a fully valid accepted point.
+            // This also re-establishes x if the preceding LM trial was rejected.
+            success = evaluate(x, delta, base);
+            for (int j = 0; success && j < n; j++) {
+                // Fixed absolute step per variable (scaled units). A relative step
+                // degenerates at zero-valued parameters such as fresh aspherics.
+                double step = vars[j]._d_delta;
+                if (!Double.isFinite(step) || step <= 0.0) {
+                    success = false;
+                    break;
+                }
 
-            for (int i = 0; i < m; i++) {
-                fjac[i + j * ldfjac] /= (2.0 * dDelta);
-                if (!Double.isFinite(fjac[i + j * ldfjac]))
-                    return false;
+                boolean usable = false;
+                for (int attempt = 0; attempt <= MAX_JACOBIAN_STEP_REDUCTIONS; attempt++) {
+                    delta[j] = step;
+                    boolean forwardComplete = evaluate(x, delta, forward);
+                    delta[j] = -step;
+                    boolean backwardComplete = evaluate(x, delta, backward);
+                    delta[j] = 0.0;
+
+                    usable = everyResidualHasPerturbedValue(forward, backward);
+                    if (forwardComplete && backwardComplete) break;
+                    if (attempt < MAX_JACOBIAN_STEP_REDUCTIONS) step *= 0.5;
+                }
+                if (!usable) {
+                    success = false;
+                    break;
+                }
+
+                for (int i = 0; i < m; i++) {
+                    double derivative;
+                    if (isUsable(forward[i]) && isUsable(backward[i]))
+                        derivative = (forward[i] - backward[i]) / (2.0 * step);
+                    else if (isUsable(forward[i]))
+                        derivative = (forward[i] - base[i]) / step;
+                    else
+                        derivative = (base[i] - backward[i]) / step;
+                    derivative *= weights[i];
+                    if (!Double.isFinite(derivative)) {
+                        success = false;
+                        break;
+                    }
+                    fjac[i + j * ldfjac] = derivative;
+                }
             }
+        } finally {
+            // A failed probe must never leak its prescription or partial analysis
+            // state to the caller. Restoration failure invalidates the Jacobian.
+            Arrays.fill(delta, 0.0);
+            success &= evaluate(x, delta, restored);
         }
-        // Scale by weights
-        for (int j = 0; j < n; j++) {
-            for (int i = 0; i < m; i++) {
-                fjac[i + j * ldfjac] = fjac[i + j * ldfjac] * weights[i];
-            }
-        }
-        // Restore the prescription and analysis to the unperturbed point x
-        for (int k = 0; k < n; k++)
-            delta[k] = 0.0;
-        return nudge(x, delta, resid);
+        return success;
     }
 
-    public boolean nudge(double[] x, double[] delta, double[] resid) {
-        boolean okay = true;
+    private static boolean everyResidualHasPerturbedValue(
+            double[] forward, double[] backward) {
+        for (int i = 0; i < forward.length; i++)
+            if (!isUsable(forward[i]) && !isUsable(backward[i])) return false;
+        return true;
+    }
+
+    private static boolean isUsable(double value) {
+        return Double.isFinite(value) && value < BIGVAL;
+    }
+
+    /** Evaluate raw goal values at {@code x + delta}; invalid goals are stored as NaN. */
+    private boolean evaluate(double[] x, double[] delta, double[] values) {
         try {
             for (int i = 0; i < delta.length; i++) {
                 vars[i].set_scaled_value(x[i] + delta[i]);
@@ -165,21 +198,24 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
             }
             analysis.compute();
         } catch (Exception e) {
-            okay = false;
-        }
-        if (!okay)
-            // A killed ray during Jacobian evaluation: differencing BIGVAL
-            // residuals would poison the Jacobian, so report failure instead
-            // (buildJacobian returns false, lmder terminates with info < 0).
+            Arrays.fill(values, Double.NaN);
             return false;
+        }
+        boolean complete = true;
         for (int i = 0; i < functions.length; i++) {
             double value = functions[i].value();
-            if (!Double.isFinite(value) || value >= BIGVAL)
-                return false;
-
-            resid[i] = value;
+            if (isUsable(value)) values[i] = value;
+            else {
+                values[i] = Double.NaN;
+                complete = false;
+            }
         }
-        return okay;
+        return complete;
+    }
+
+    /** Retained for callers that need to evaluate a complete perturbed goal vector. */
+    public boolean nudge(double[] x, double[] delta, double[] resid) {
+        return evaluate(x, delta, resid);
     }
 
     private void validateInitialContrastSamples() {

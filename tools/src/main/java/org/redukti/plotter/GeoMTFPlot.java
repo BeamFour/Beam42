@@ -1,5 +1,6 @@
 package org.redukti.plotter;
 
+import org.redukti.rayoptics.util.Orientation;
 import org.redukti.data.DiscreteSet;
 import org.redukti.data.Interpolation;
 import org.redukti.data.Range;
@@ -36,9 +37,9 @@ public class GeoMTFPlot {
         plot.get_axes().set_position(Vector3.vector3_0);
         plot.get_axes().set_range(new Range(0, 100.0), PlotAxes.AxisMask.X);
         plot.get_axes().set_range(new Range(0, 1.0), PlotAxes.AxisMask.Y);
-        for (int xy = 0; xy < 2; xy++) {
+        for (int xy = 0; xy < Orientation.COUNT; xy++) {
             var x_data = geo_mtf.mtf.freq;
-            var y_data = xy == 0 ? geo_mtf.mtf.mag_x : geo_mtf.mtf.mag_y;
+            var y_data = xy == Orientation.SAGITTAL ? geo_mtf.mtf.mag_x : geo_mtf.mtf.mag_y;
             var set = new DiscreteSet();
             set.set_interpolation(Interpolation.Linear);
             for (int i = 0; i < count; i++) {
@@ -46,7 +47,7 @@ public class GeoMTFPlot {
                 double y = y_data[i];
                 set.add_data(x, y);
             }
-            plot.add_plot_data(set, xy==0 ? Rgb.rgb_black : Rgb.rgb_blue, xy == 0 ? "Sagittal" : "Tangential", PlotStyleMask.InterpolatePlot.value());
+            plot.add_plot_data(set, xy == Orientation.SAGITTAL ? Rgb.rgb_black : Rgb.rgb_blue, xy == Orientation.SAGITTAL ? "Sagittal" : "Tangential", PlotStyleMask.InterpolatePlot.value());
         }
         String x_label = "Spatial Frequency";
         String y_label = "Modulation";

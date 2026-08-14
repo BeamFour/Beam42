@@ -1,5 +1,6 @@
 package org.redukti.plotter;
 
+import org.redukti.rayoptics.util.Orientation;
 import org.redukti.data.DiscreteSet;
 import org.redukti.data.Interpolation;
 import org.redukti.data.Range;
@@ -51,21 +52,19 @@ public class GeoMTFByFieldPlot {
             var mtf = mtfs_by_freq.get(i);
             // color encodes the frequency
             Rgb color = FREQ_COLORS[i % FREQ_COLORS.length];
-            // xy == 0 sagittal
-            // xy == 1 tangential
-            for (int xy = 0; xy < 2; xy++) {
+            for (int xy = 0; xy < Orientation.COUNT; xy++) {
                 var set = new DiscreteSet();
                 set.set_interpolation(Interpolation.Cubic);
-                double[] mtf_data = (xy == 0) ? mtf.sag_mtf_by_field : mtf.tan_mtf_by_field;
+                double[] mtf_data = (xy == Orientation.SAGITTAL) ? mtf.sag_mtf_by_field : mtf.tan_mtf_by_field;
                 for (int j = 0; j < mtf_data.length; j++) {
                     double x = x_data[j];
                     // scale 0..1 MTF to a 0..100 percentage
                     set.add_data(x, mtf_data[j] * 100.0);
                 }
-                String label = df.format(mtf.freq) + (xy == 0 ? " Sagittal" : " Tangential");
+                String label = df.format(mtf.freq) + (xy == Orientation.SAGITTAL ? " Sagittal" : " Tangential");
                 PlotData pd = plot.add_plot_data(set, color, label, PlotStyleMask.InterpolatePlot.value());
                 // line pattern encodes sagittal vs tangential
-                pd.set_line_style(xy == 0 ? PlotData.LineStyle.Solid : PlotData.LineStyle.Dashed);
+                pd.set_line_style(xy == Orientation.SAGITTAL ? PlotData.LineStyle.Solid : PlotData.LineStyle.Dashed);
             }
         }
         String x_label = "Fields";
@@ -93,11 +92,11 @@ public class GeoMTFByFieldPlot {
         // for each freq
         for (var i = 0; i < mtfs_by_freq.size(); i++) {
             var mtf = mtfs_by_freq.get(i);
-            for (int xy = 0; xy < 2; xy++) {
+            for (int xy = 0; xy < Orientation.COUNT; xy++) {
                 var set = new DiscreteSet();
                 set.set_interpolation(Interpolation.Cubic);
-                double[] mtf_data = (xy == 0) ? mtf.sag_mtf_by_field : mtf.tan_mtf_by_field;
-                sb.append(mtf.freq).append(" ").append(xy==0?"sag":"tan").append(",");
+                double[] mtf_data = (xy == Orientation.SAGITTAL) ? mtf.sag_mtf_by_field : mtf.tan_mtf_by_field;
+                sb.append(mtf.freq).append(" ").append(Orientation.name(xy)).append(",");
                 for (int j = 0; j < mtf_data.length; j++) {
                     if (j > 0)
                         sb.append(",");

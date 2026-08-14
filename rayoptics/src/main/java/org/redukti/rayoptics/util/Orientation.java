@@ -1,16 +1,16 @@
-package org.redukti.optim;
+package org.redukti.rayoptics.util;
 
 /**
- * The two meridians a directional goal can be expressed in.
+ * The two meridians a directional result can be expressed in.
  *
- * <p>Every goal that comes in a sagittal/tangential pair encodes the choice as the
- * same {@code 0}/{@code 1} index, so they share one definition here rather than each
- * declaring its own.
+ * <p>Analyses, fans, MTF curves and optimization goals all encode the choice as the same
+ * {@code 0}/{@code 1} index - usually spelled {@code xy} in this codebase. They share one
+ * definition here rather than each declaring its own or spelling the literal.
  *
- * <p>Fields lie on the y axis, which puts the sagittal meridian on x and the
- * tangential meridian on y. {@link #X} and {@link #Y} are aliases for goals such as
- * {@link GoalSpotDeviation} that speak in ray coordinates rather than in MTF
- * orientations; they are the same two values, named for the reader.
+ * <p>Fields lie on the y axis, which puts the sagittal meridian on x and the tangential
+ * meridian on y. {@link #X} and {@link #Y} are aliases for code that speaks in ray
+ * coordinates rather than in MTF orientations; they are the same two values, named for
+ * the reader.
  */
 public final class Orientation {
 
@@ -26,6 +26,9 @@ public final class Orientation {
     /** The tangential meridian, named as a ray coordinate. */
     public static final int Y = TANGENTIAL;
 
+    /** Number of meridians, i.e. the exclusive bound for a loop over both. */
+    public static final int COUNT = 2;
+
     private Orientation() {
     }
 
@@ -37,7 +40,7 @@ public final class Orientation {
         return orientation;
     }
 
-    /** {@code "sag"} or {@code "tan"}, for goal descriptions. */
+    /** {@code "sag"} or {@code "tan"}, for labels and descriptions. */
     public static String name(int orientation) {
         return orientation == TANGENTIAL ? "tan" : "sag";
     }

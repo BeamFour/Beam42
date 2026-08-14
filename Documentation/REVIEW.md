@@ -930,8 +930,17 @@ earlier in this document and in older examples:
 
 `OptimizationBuilder` is now ordered into labelled sections — configuration, variables,
 goals, constraints, build — so a reader can tell which kind of thing a method adds.
-The four duplicate sagittal/tangential constant pairs were replaced by a single
-`Orientation` class, which also validates: `GoalGeoMTF`, `GoalRayAberration` and
+
+The duplicate sagittal/tangential constant pairs were replaced by a single
+[Orientation](../rayoptics/src/main/java/org/redukti/rayoptics/util/Orientation.java) in
+`org.redukti.rayoptics.util`, next to `ZDir`. It sits in `rayoptics` rather than
+`optimcommon` because the meridian index is a ray-optics concept, not an optimization
+one: the MTF and fan analyses, the plotting tools and the goals all encode it the same
+way, usually spelled `xy`. Beam43-only code now uses the constants where it previously
+wrote `0`, `1` or `2` directly; the upstream-ported files (`Trace`, `SequentialModel`,
+`VigCalc`, `SpotAnalysis`) were deliberately left alone to keep future ports clean.
+
+It also validates, which the goals did not: `GoalGeoMTF`, `GoalRayAberration` and
 `GoalMTFProxy` used to accept any integer and silently read the sagittal fan for it.
 
 ## How the numbers were obtained

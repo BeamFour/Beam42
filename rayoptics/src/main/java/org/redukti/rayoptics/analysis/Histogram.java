@@ -1,5 +1,7 @@
 package org.redukti.rayoptics.analysis;
 
+import org.redukti.rayoptics.util.Orientation;
+
 public class Histogram {
     /**
      * Defines the size of the grid used as histogram
@@ -132,8 +134,8 @@ public class Histogram {
     }
 
     private void build_lsf(int xy) {
-        double[] lsf = xy == 0 ? lsf_x : lsf_y;
-        if (xy == 0) {
+        double[] lsf = xy == Orientation.SAGITTAL ? lsf_x : lsf_y;
+        if (xy == Orientation.SAGITTAL) {
             // integrate over y → LSF(x)
             for (int i = 0; i < num_bins; i++) {
                 double s = 0;

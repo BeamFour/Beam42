@@ -1,5 +1,6 @@
 package org.redukti.optim;
 
+import org.redukti.rayoptics.util.Orientation;
 import org.redukti.mathlib.LMLSolver;
 
 /** One signed, Gaussian-weighted image-plane ray deviation for RMS spot optimization. */

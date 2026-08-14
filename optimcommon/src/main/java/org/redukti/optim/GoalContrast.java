@@ -1,5 +1,6 @@
 package org.redukti.optim;
 
+import org.redukti.rayoptics.util.Orientation;
 import org.redukti.mathlib.LMLSolver;
 
 /** A single weighted pupil phase-difference residual for contrast optimization. */

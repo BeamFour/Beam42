@@ -1,5 +1,6 @@
 package org.redukti.rayoptics.analysis;
 
+import org.redukti.rayoptics.util.Orientation;
 import org.redukti.mathlib.fftpack.ComplexDoubleFFT;
 
 public class BaseMTF {
@@ -40,7 +41,7 @@ public class BaseMTF {
             freq[i] = i / (fft_size * pixel_size);
     }
     protected void compute_fft(int xy) {
-        double[] fft = xy == 0 ? fft_x : fft_y;
+        double[] fft = xy == Orientation.SAGITTAL ? fft_x : fft_y;
 //        var fft2d = new DoubleFFT_1D(fft_size);
 //        fft2d.complexForward(fft);
         var fft2d = new ComplexDoubleFFT(fft_size);
@@ -57,8 +58,8 @@ public class BaseMTF {
         }
     }
     protected void compute_magnitude(int xy) {
-        double[] fft = xy == 0 ? fft_x : fft_y;
-        double[] mag = xy == 0 ? mag_x : mag_y;
+        double[] fft = xy == Orientation.SAGITTAL ? fft_x : fft_y;
+        double[] mag = xy == Orientation.SAGITTAL ? mag_x : mag_y;
         compute_magnitude(mag, fft);
     }
 }

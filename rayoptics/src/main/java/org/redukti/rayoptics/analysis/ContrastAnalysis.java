@@ -8,14 +8,11 @@ import org.redukti.rayoptics.raytr.Trace;
 import org.redukti.rayoptics.raytr.TraceOptions;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.util.Lists;
-
+import org.redukti.rayoptics.util.Orientation;
 import java.util.ArrayList;
 
 /** Wavefront-difference analysis used by contrast optimization. */
 public class ContrastAnalysis {
-
-    private static final int X = 0;
-    private static final int Y = 1;
 
     public static ContrastAnalysisResult eval(OpticalModel opticalModel, ContrastOptions options) {
         var result = new ContrastAnalysisResult(options.spatialFrequency);
@@ -27,9 +24,9 @@ public class ContrastAnalysis {
                 double wavelength = wavelengths[wavelengthIndex];
                 double shift = normalized_entry_pupil_shift(opticalModel, wavelength, options.spatialFrequency);
                 double sagittalShift = shift * exit_pupil_frequency_calibration(
-                        opticalModel, fields[fieldIndex], wavelength, shift, X, options);
+                        opticalModel, fields[fieldIndex], wavelength, shift, Orientation.X, options);
                 double tangentialShift = shift * exit_pupil_frequency_calibration(
-                        opticalModel, fields[fieldIndex], wavelength, shift, Y, options);
+                        opticalModel, fields[fieldIndex], wavelength, shift, Orientation.Y, options);
                 var traced = opticalModel.seq_model.trace_contrast(
                         (rays, field, tracedWavelength, focus) -> sample(
                                 opticalModel, rays, field, tracedWavelength, focus),
@@ -103,9 +100,9 @@ public class ContrastAnalysis {
 
         double half = 0.5 * shift;
         Double low = image_direction(opticalModel, field, wavelength, traceOptions, axis,
-                axis == X ? new Vector2(-half, 0.0) : new Vector2(0.0, -half));
+                axis == Orientation.X ? new Vector2(-half, 0.0) : new Vector2(0.0, -half));
         Double high = image_direction(opticalModel, field, wavelength, traceOptions, axis,
-                axis == X ? new Vector2(half, 0.0) : new Vector2(0.0, half));
+                axis == Orientation.X ? new Vector2(half, 0.0) : new Vector2(0.0, half));
         if (low == null || high == null) return 1.0;
 
         double realized = Math.abs(high - low);
@@ -123,7 +120,7 @@ public class ContrastAnalysis {
         var pkg = Trace.trace_safe(opticalModel, pupil, field, wavelength, traceOptions).pkg;
         if (pkg == null || pkg.ray == null || pkg.ray.size() < 2) return null;
         var segment = Lists.get(pkg.ray, -2);
-        return axis == X ? segment.d.x : segment.d.y;
+        return axis == Orientation.X ? segment.d.x : segment.d.y;
     }
 
     private static ContrastAnalysisResult.Sample sample(

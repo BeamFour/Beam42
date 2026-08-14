@@ -1,5 +1,6 @@
 package org.redukti.optim;
 
+import org.redukti.rayoptics.util.Orientation;
 import org.redukti.mathlib.LMLSolver;
 import org.redukti.rayoptics.util.Lists;
 

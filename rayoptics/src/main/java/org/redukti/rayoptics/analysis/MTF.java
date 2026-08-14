@@ -1,5 +1,7 @@
 package org.redukti.rayoptics.analysis;
 
+import org.redukti.rayoptics.util.Orientation;
+
 public class MTF extends BaseMTF {
 
     public final Histogram h2d;
@@ -24,8 +26,8 @@ public class MTF extends BaseMTF {
     }
 
     private void compute_mtf(int xy) {
-        double[] lsf = xy == 0 ? padded_lsf_x : padded_lsf_y;
-        double[] fft = xy == 0 ? fft_x : fft_y;
+        double[] lsf = xy == Orientation.SAGITTAL ? padded_lsf_x : padded_lsf_y;
+        double[] fft = xy == Orientation.SAGITTAL ? fft_x : fft_y;
         // copy the reals and set imaginary numbers to 0
         for (int i = 0; i < fft_size; i++) {
             fft[2 * i] = lsf[i];    // real

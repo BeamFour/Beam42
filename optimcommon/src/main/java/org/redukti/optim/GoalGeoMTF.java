@@ -1,5 +1,7 @@
 package org.redukti.optim;
 
+import org.redukti.rayoptics.util.Orientation;
+
 /**
  * Targets sagittal or tangential MTF at given field and freq
  */

@@ -1,5 +1,6 @@
 package org.redukti.rayoptics.analysis;
 
+import org.redukti.rayoptics.util.Orientation;
 import org.redukti.mathlib.Vector2;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.*;
@@ -25,7 +26,7 @@ public class WavefrontAberrationAnalysis {
         RayAberrationResult result = new RayAberrationResult();
         var fov = opt_model.optical_spec.fov;
         for (int fi = 0; fi < fov.fields.length; fi++) {
-            for (int xy = 0; xy < 2; xy++) {
+            for (int xy = 0; xy < Orientation.COUNT; xy++) {
                 result.add(eval_opd_fan(opt_model,fi,xy,num_rays,append_if_none,trace_options));
             }
         }

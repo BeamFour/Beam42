@@ -376,8 +376,8 @@ public final class OptimizationBuilder {
         if (additionalGoalFactories.isEmpty()) {
             boolean spots = goals.stream().anyMatch(goal ->
                     goal instanceof GoalSpotRMS || goal instanceof GoalSpotDeviation
-                            || goal instanceof GoalSpotMaxRadius || goal instanceof GeoMTF);
-            boolean mtf = goals.stream().anyMatch(GeoMTF.class::isInstance);
+                            || goal instanceof GoalSpotMaxRadius || goal instanceof GoalGeoMTF);
+            boolean mtf = goals.stream().anyMatch(GoalGeoMTF.class::isInstance);
             boolean rayAberrations = goals.stream().anyMatch(goal ->
                     goal instanceof GoalRayAberration || goal instanceof GoalMTFProxy);
             analysis.required_analyses(spots, rayAberrations, mtf);
@@ -460,9 +460,9 @@ public final class OptimizationBuilder {
         }
         for (MtfGoals curve : mtfGoals) {
             for (int field = 0; field < fields.length; field++) {
-                result.add(new GeoMTF(analysis, field + 1, SAGITTAL, curve.frequency,
+                result.add(new GoalGeoMTF(analysis, field + 1, SAGITTAL, curve.frequency,
                         curve.sagittal[field] / 100.0, curve.sagittalWeights[field]));
-                result.add(new GeoMTF(analysis, field + 1, TANGENTIAL, curve.frequency,
+                result.add(new GoalGeoMTF(analysis, field + 1, TANGENTIAL, curve.frequency,
                         curve.tangential[field] / 100.0, curve.tangentialWeights[field]));
             }
         }

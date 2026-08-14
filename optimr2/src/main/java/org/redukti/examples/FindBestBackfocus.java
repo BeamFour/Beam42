@@ -25,12 +25,12 @@ public class FindBestBackfocus {
                         new VarThickness(prescription, surface, scenario)
                 },
                 new Goal[]{
-                        new GeoMTF(analysis, 1, 0, 10, 1.0, 1.0),
-                        new GeoMTF(analysis, 1, 1, 10, 1.0, 1.0),
-                        new GeoMTF(analysis, 1, 0, 30, 1.0, 1.0),
-                        new GeoMTF(analysis, 1, 1, 30, 1.0, 1.0),
-                        new GeoMTF(analysis, 1, 0, 50, 1.0, 1.0),
-                        new GeoMTF(analysis, 1, 1, 50, 1.0, 1.0),
+                        new GoalGeoMTF(analysis, 1, 0, 10, 1.0, 1.0),
+                        new GoalGeoMTF(analysis, 1, 1, 10, 1.0, 1.0),
+                        new GoalGeoMTF(analysis, 1, 0, 30, 1.0, 1.0),
+                        new GoalGeoMTF(analysis, 1, 1, 30, 1.0, 1.0),
+                        new GoalGeoMTF(analysis, 1, 0, 50, 1.0, 1.0),
+                        new GoalGeoMTF(analysis, 1, 1, 50, 1.0, 1.0),
                         prescription._focal_length_by_scenario != null
                             ? new GoalParax(analysis, ParaxHelper.Effective_focal_length, prescription._focal_length_by_scenario[scenario], 1.0)
                             : new GoalParax(analysis, ParaxHelper.Effective_focal_length, prescription._focal_length, 1.0),

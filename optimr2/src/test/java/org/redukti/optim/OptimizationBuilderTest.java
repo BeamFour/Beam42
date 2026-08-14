@@ -426,7 +426,7 @@ class OptimizationBuilderTest {
 
     private static void assertMtf(Goal goal, int frequency, int field, int orientation,
                                   double target, double weight) {
-        GeoMTF mtf = assertInstanceOf(GeoMTF.class, goal);
+        GoalGeoMTF mtf = assertInstanceOf(GoalGeoMTF.class, goal);
         assertEquals(frequency, mtf._freq);
         assertEquals(field, mtf._field);
         assertEquals(orientation, mtf._xy);

@@ -39,6 +39,6 @@ public class GoalMTFProxy extends Goal {
 
     @Override
     public String toString() {
-        return "RayAberration field=" + _field + ", xy=" + _xy + ", pos=" + _pos + ", target=" + _target + ", weight=" + _weight + " = " + value();
+        return "MTFProxy field=" + _field + ", xy=" + _xy + ", pos=" + _pos + ", target=" + _target + ", weight=" + _weight + " = " + value();
     }
 }

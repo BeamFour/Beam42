@@ -41,15 +41,16 @@ public class SpotAnalysis {
 
     public static List<TraceGridByWvl> eval_gaussian_quadrature(
             OpticalModel opt_model, int fi, Integer wl, int num_rings,
-            Integer num_spokes, TraceOptions trace_options) {
+            Integer num_spokes, boolean append_if_none, TraceOptions trace_options) {
         return opt_model.seq_model.trace_gaussian_quadrature(
-                SpotAnalysis::spot, fi, wl, num_rings, num_spokes, false, trace_options);
+                SpotAnalysis::spot, fi, wl, num_rings, num_spokes,
+                append_if_none, trace_options);
     }
 
     public static SpotAnalysisResult eval(OpticalModel opt_model, SpotOptions options) {
-        var num_rays = options.num_rays;
-        var trace_options = options.traceOptions;
-        SpotAnalysisResult result = new SpotAnalysisResult(options.use_centroid);
+        var num_rays = options._num_rays_or_rings;
+        var trace_options = options._trace_options;
+        SpotAnalysisResult result = new SpotAnalysisResult(options._use_centroid);
         var fov = opt_model.optical_spec.fov;
         var ref_wvl = fov.optical_spec.wvls.central_wvl();
         for (int fi = 0; fi < fov.fields.length; fi++) {
@@ -58,21 +59,13 @@ public class SpotAnalysis {
                 result.add(f, eval_grid(opt_model,fi,null,num_rays,trace_options), ref_wvl);
             else if (options.is_gauss_quadrature())
                 result.add(f, eval_gaussian_quadrature(
-                        opt_model, fi, null, num_rays, options.num_spokes,
-                        options.append_failed_rays, trace_options), ref_wvl);
+                        opt_model, fi, null, num_rays, options._num_spokes,
+                        options._append_failed_rays, trace_options), ref_wvl);
             else
                 // hexapolar
                 result.add(f, eval_rings(opt_model,fi,null,num_rays,trace_options), ref_wvl);
         }
         return result;
-    }
-
-    public static List<TraceGridByWvl> eval_gaussian_quadrature(
-            OpticalModel opt_model, int fi, Integer wl, int num_rings,
-            Integer num_spokes, boolean append_if_none, TraceOptions trace_options) {
-        return opt_model.seq_model.trace_gaussian_quadrature(
-                SpotAnalysis::spot, fi, wl, num_rings, num_spokes,
-                append_if_none, trace_options);
     }
 
 }

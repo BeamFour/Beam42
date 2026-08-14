@@ -9,22 +9,28 @@ prescription is already reasonably corrected and the phase differences are small
 ### What a sample means
 
 A contrast sample is one location `p = (x, y)` in the entrance pupil at which the
-wavefront is compared with slightly displaced copies of itself. For each sample, three
-rays are traced:
+wavefront is compared with slightly displaced copies of itself. The OTF shear is
+physically defined at the exit pupil, but Beam43 launches rays in entrance-pupil
+coordinates. The optional frequency calibration described below rescales those launch
+coordinates so that the ray pairs realise the requested image-space frequency.
+
+For each sample, three rays are traced:
 
 - a reference ray at `p`;
 - a sagittal partner at `p + (s, 0)`;
 - a tangential partner at `p + (0, s)`.
 
-The displacement is
+The nominal entrance-pupil displacement is
 
 ```text
 s = 2 lambda F# frequency
 ```
 
 where `lambda` is the wavelength, `F#` is the working f-number, and `frequency` is the
-requested spatial frequency. The requested MTF frequency therefore determines the
-separation of each pair of pupil rays.
+requested spatial frequency. With calibration disabled, this same nominal displacement
+is used in both directions. With calibration enabled, sagittal and tangential scale
+factors are measured separately for every field and wavelength, so the actual entrance-
+pupil displacements may differ from each other and from `s`.
 
 The analysis calculates two wavefront differences:
 
@@ -119,6 +125,101 @@ Contrast goals are normally much smoother and cheaper to evaluate, but they are 
 surrogate. Gaussian-quadrature MTF provides the more direct result and is useful both as
 an alternative optimization goal and as an independent validation measurement.
 
+### Exit-pupil frequency calibration
+
+The relation
+
+```text
+s = 2 lambda F# frequency
+```
+
+describes the shear of the exit-pupil autocorrelation. `REL_PUPIL`, however, specifies
+where a ray passes through the entrance pupil. Pupil aberration means that a rigid shift
+at the entrance pupil does not generally produce the same normalized shift at the exit
+pupil. Without correction, the realized spatial frequency can therefore vary with field,
+wavelength and direction, with the largest error normally occurring at outer fields.
+
+Enable the correction through the builder:
+
+```java
+.calibrateContrastFrequency(true)
+```
+
+For every field and wavelength, Beam43 traces a centred probe pair separately in the
+sagittal and tangential directions. Two rays produce image-space fringes at the requested
+frequency when their image-space direction cosines differ by
+
+```text
+lambda * frequency
+```
+
+The ratio between that required difference and the measured difference becomes a scale
+factor for the entrance-pupil shift. This costs four probe rays per field and wavelength,
+which is small compared with the full contrast sampling pattern.
+
+This is a calibration rather than an exact construction in exit-pupil coordinates. It
+removes the dominant field- and direction-dependent frequency bias, but uses one scale
+factor for the complete pupil. Residual variation caused by nonlinear pupil mapping
+across individual samples remains. Correcting that last component would require aiming
+each partner ray iteratively and would be substantially more expensive.
+
+Calibration is off by default because it changes the sampled frequencies and therefore
+the numerical merit function. It should normally be enabled for new contrast-
+optimization work, while old regression cases may leave it disabled to preserve their
+historical values.
+
+## Preserving the starting lens design
+
+Contrast optimization has a broad, smooth capture range and can substantially rearrange
+a lens when many prescription parameters are free. Optical performance goals alone do
+not preserve element shape, air gaps or mechanical layout. `OptimizationBuilder`
+therefore provides optional soft goals that anchor varied parameters to their starting
+values.
+
+```java
+.curvatureGoals(curvatureWeight)
+.thicknessGoals(thicknessWeight)
+```
+
+These methods add goals only for the corresponding parameters that are actually varied.
+They pair naturally with `allCurvatureSurfaces()` and `allThicknessSurfaces()`, but work
+equally with explicit surface lists.
+
+For a surface whose starting radius is `r0`, the curvature goal returns
+
+```text
+r0 / r - 1
+```
+
+which is the fractional change in curvature `c/c0 - 1`. Curvature is used rather than
+radius because a large radius change near a flat surface can represent a very small
+optical change.
+
+For a thickness whose starting value is `t0`, the thickness goal returns
+
+```text
+t / t0 - 1
+```
+
+Both are zero at the starting prescription. The merit function applies the square root
+of the configured goal weight, so a parameter's squared-merit contribution is
+
+```text
+weight * fractional_change^2
+```
+
+These are regularization goals, not hard constraints. Increasing the weight keeps the
+design closer to its original form; decreasing it gives the optimizer more freedom.
+Thickness goals constrain axial centre thickness only and do not guarantee positive
+edge separation. Neither goal imposes an absolute bound, so final prescriptions still
+need mechanical checks for negative gaps, element intersections, extreme curvatures and
+clearance.
+
+Because a contrast merit can contain thousands of sample residuals but only a few dozen
+parameter-preservation residuals, compare their aggregate sum-of-squares contributions
+when choosing weights. A nominal weight of `1.0` is a useful starting point, but is not
+automatically equal in influence to the complete optical merit.
+
 ### Suggested comparison measurements
 
 When comparing contrast optimization across prescriptions, record:
@@ -133,4 +234,3 @@ When comparing contrast optimization across prescriptions, record:
 The per-group RMS `deltaW` is particularly useful for identifying when the contrast
 goal is acting as a faithful MTF refiner and when it has moved outside its reliable
 small-phase operating range.
-

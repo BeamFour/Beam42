@@ -177,36 +177,46 @@ therefore provides optional soft constraints that anchor varied parameters to th
 starting values.
 
 ```java
-.constrainCurvature(curvatureWeight)
-.constrainThickness(thicknessWeight)
+.applyCurvatureConstraints()
+.applyThicknessConstraints()
 ```
 
 These methods add constraints only for the corresponding parameters that are actually
 varied. They pair naturally with `allCurvatureSurfaces()` and `allThicknessSurfaces()`,
 but work equally with explicit surface lists.
 
-For a surface whose starting radius is `r0`, the curvature constraint returns
+Both take an optional weight. The no-argument form uses
+`OptimizationBuilder.NOMINAL_CONSTRAINT_WEIGHT`, which is normally what you want: because
+the residuals are fractions of each starting value, the per-parameter scaling is already
+handled, and the weight sets only the global trade between optical performance and
+preserving the layout.
+
+Each constraint reports the parameter itself against a target of its starting value, in
+the same shape as `GoalParax`. A curvature constraint returns the surface curvature `1/r`
+against a target of `1/r0`; a thickness constraint returns `t` against a target of `t0`.
+Curvature is used rather than radius because a large radius change near a flat surface
+can represent a very small optical change.
+
+The solver forms `(value - target) * sqrt(weight)`, and what these constraints resist is
+a *fractional* change rather than an absolute one. That normalization is folded into the
+weight, since
 
 ```text
-r0 / r - 1
+(v/v0 - 1) * sqrt(w) = (v - v0) * sqrt(w / v0^2)
 ```
 
-which is the fractional change in curvature `c/c0 - 1`. Curvature is used rather than
-radius because a large radius change near a flat surface can represent a very small
-optical change.
-
-For a thickness whose starting value is `t0`, the thickness constraint returns
-
-```text
-t / t0 - 1
-```
-
-Both are zero at the starting prescription. The merit function applies the square root
-of the configured weight, so a parameter's squared-merit contribution is
+so the stored weight is the configured weight divided by the square of the starting
+value, and a parameter's squared-merit contribution is
 
 ```text
 weight * fractional_change^2
 ```
+
+as it would be for an explicit fractional residual. One practical consequence: the weight
+held on a constraint is not the number passed to the builder. It is larger for small
+parameters and smaller for large ones, which is exactly what makes a 0.1mm air gap and a
+39mm back focus resist the same proportional change equally. `Constraint` exposes
+`fractional_deviation()` for reporting the proportional change directly.
 
 `ConstraintThickness` and `ConstraintCurvature` are named for what they express, but they
 are implemented as penalty residuals in the least-squares merit rather than as hard
@@ -224,8 +234,25 @@ clearance.
 
 Because a contrast merit can contain thousands of sample residuals but only a few dozen
 parameter-preservation residuals, compare their aggregate sum-of-squares contributions
-when choosing weights. A nominal weight of `1.0` is a useful starting point, but is not
+when choosing weights. The nominal weight is a useful starting point, but is not
 automatically equal in influence to the complete optical merit.
+
+Raising the weight does tighten the design. On a fifteen-element f/2 with every air space
+free, the worst thickness excursion fell from 39% to 11% to 3% at weights of 1, 10 and
+100. The useful range is narrow, though: past the nominal weight the optical cost outruns
+the benefit, and the constraints begin to dominate the Jacobian and stall the solver.
+
+A single global weight is usually enough precisely because the residuals are fractional,
+so the per-parameter scaling is already handled. When one particular surface or space
+does need holding harder than the rest, construct the constraint directly rather than
+raising the global weight:
+
+```java
+.additionalGoals(analysis -> new ConstraintThickness(analysis, 7, 10.0))
+```
+
+The factory receives the same `Analysis` the setup owns, and the constraint still reads
+its starting value before any solving, so it anchors to the original prescription.
 
 ## Per-ray RMS spot optimization
 

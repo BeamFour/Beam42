@@ -32,7 +32,7 @@ public class NoctNikkor58mm {
                         new VarAsphCoeff(prescription,0,4,1E14))
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)
-                .constrainCurvature(1.0)
+                .applyCurvatureConstraints()
                 .gaussianQuadratureSampling(3, 6)
                 .spotRmsRayGoals(fieldWeights)
                 .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 37.78, 1.0))
@@ -55,7 +55,7 @@ public class NoctNikkor58mm {
                         new VarAsphCoeff(prescription,0,4,1E14))
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)
-                .constrainCurvature(1.0)
+                .applyCurvatureConstraints()
                 .spotRmsGoals(new double[]{15, 30, 50, 70},
                               fieldWeights)
                 .gaussianQuadratureSampling(6, 12)
@@ -79,7 +79,7 @@ public class NoctNikkor58mm {
                         new VarAsphCoeff(prescription,0,4,1E14))
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)
-                .constrainCurvature(1.0)
+                .applyCurvatureConstraints()
                 .mtfGoals(
                         mtf(10,
                                 new double[]{60, 50, 40, 30},
@@ -115,7 +115,7 @@ public class NoctNikkor58mm {
                         new VarAsphCoeff(prescription,0,4,1E14))
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)
-                .constrainCurvature(1.0)
+                .applyCurvatureConstraints()
                 .contrastSampling(6, 12)
                 .contrastGoals(
                         contrast(10, fieldWeights),
@@ -143,7 +143,7 @@ public class NoctNikkor58mm {
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)
                 .rayAberrationGoals()
-                .constrainCurvature(1.0)
+                .applyCurvatureConstraints()
                 .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 37.78, 1.0))
                 .build();
     }

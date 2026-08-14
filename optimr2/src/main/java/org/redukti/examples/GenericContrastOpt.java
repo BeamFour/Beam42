@@ -30,8 +30,8 @@ public class GenericContrastOpt {
                 //.allThicknessSurfaces()
                 // Everything is free, so hold the layout: without these the solver
                 // collapses air spaces and pushes elements through the stop.
-                .constrainCurvature(1.0)
-                //.constrainThickness(1.0)
+                .applyCurvatureConstraints()
+                //.applyThicknessConstraints()
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)
                 .contrastSampling(6, 12)

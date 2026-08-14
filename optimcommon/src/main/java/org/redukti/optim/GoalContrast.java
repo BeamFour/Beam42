@@ -41,6 +41,7 @@ public class GoalContrast extends Goal {
         if (_analysis._contrasts == null || _contrast_index >= _analysis._contrasts.length)
             return LMLSolver.BIGVAL;
         var contrast = _analysis._contrasts[_contrast_index];
+        if (contrast == null) return LMLSolver.BIGVAL;
         if (_field >= contrast.fields.size()) return LMLSolver.BIGVAL;
         var wavelengths = contrast.fields.get(_field).wavelengths();
         if (_wavelength_index >= wavelengths.size()) return LMLSolver.BIGVAL;

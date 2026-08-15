@@ -3,6 +3,7 @@ package org.redukti.examples;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.optim.*;
 import org.redukti.spec.Prescription;
+import org.redukti.spec.VigType;
 
 import static org.redukti.optim.OptimizationBuilder.contrast;
 import static org.redukti.optim.OptimizationBuilder.mtf;
@@ -118,23 +119,35 @@ public class LeicaApo75mmMandler {
     static OptimizationBuilder.OptimizationSetup createContrastSetup(Prescription prescription,
                                                                      boolean weighted,
                                                                      boolean dLineOnly,
-                                                                     double[] fieldWeights) {
+                                                                     double[] wights) {
+        double[] fields = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+        double[] fieldWeights = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+        double[] sagittalWeights   = {2.0, 2.0, 2.0, 2.0, 2.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0};
+        double[] tangentialWeights = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+
         return OptimizationBuilder.builder(prescription)
-                .fields(0.0, 0.3, 0.7, 1.0)
+                .fields(fields)
                 .mtfFrequencies(10, 20, 40)
                 .varyAllCurvatures()
                 .varyAllThicknesses()
-                .weighted(weighted)
+                .weighted(true)
                 .dLineOnly(dLineOnly)
                 .applyCurvatureConstraints()
-                .applyThicknessConstraints()
+                .applyThicknessConstraints(5.0)
                 .contrastSampling(6, 12)
                 .contrastGoals(
-                        contrast(10, fieldWeights),
-                        contrast(20, fieldWeights),
-                        contrast(40, fieldWeights))
+                        contrast(10,
+                                fieldWeights),
+                        contrast(20,
+                                sagittalWeights,
+                                tangentialWeights),
+                        contrast(40,
+                                sagittalWeights,
+                                tangentialWeights))
                 .calibrateContrastFrequency(true)
                 .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 39.38, 1.0))
+                .vignetting(VigType.SetPupil)
+                .freezeVignetting()
                 .build();
     }
 

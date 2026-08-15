@@ -68,6 +68,7 @@ public final class OptimizationBuilder {
     private int contrastRings = 6;
     private int contrastSpokes = 12;
     private boolean calibrateContrastFrequency = false;
+    private boolean centerContrastResiduals = false;
     private VigType vigType = VigType.SetPupil;
     private boolean freezeVignetting = false;
     private Double thicknessConstraintWeight;
@@ -208,6 +209,24 @@ public final class OptimizationBuilder {
      */
     public OptimizationBuilder calibrateContrastFrequency(boolean value) {
         calibrateContrastFrequency = value;
+        return this;
+    }
+
+    /**
+     * Subtract the constant part of each contrast block, so the residuals carry the
+     * variance the OTF modulus depends on rather than the un-centred second moment.
+     *
+     * <p>A constant wavefront difference across the pupil is tilt, which displaces the
+     * image and costs no MTF - but it is reducible, so leaving it in offers the solver
+     * merit reduction that buys nothing. It is identically zero in the sagittal direction
+     * by symmetry and reaches 57% of an outer-field tangential block on the Leica 75/2,
+     * which biases the astigmatic focus split toward tangential.
+     *
+     * <p>Off by default because it changes every contrast residual. See
+     * {@link ContrastAnalysis#center_residuals(ContrastAnalysisResult, int)}.
+     */
+    public OptimizationBuilder centerContrastResiduals(boolean value) {
+        centerContrastResiduals = value;
         return this;
     }
 
@@ -518,6 +537,7 @@ public final class OptimizationBuilder {
         int[] frequencies = contrastGoals.stream().mapToInt(goal -> goal.frequency).toArray();
         analysis.using_contrast_analysis(frequencies, contrastRings, contrastSpokes);
         analysis.calibrating_contrast_frequency(calibrateContrastFrequency);
+        analysis.centering_contrast_residuals(centerContrastResiduals);
     }
 
     private void configureRequiredAnalyses(Analysis analysis, List<Goal> goals) {

@@ -39,7 +39,60 @@ public class ContrastAnalysis {
             }
             result.fields.add(new ContrastAnalysisResult.FieldResult(fields[fieldIndex], wavelengthResults));
         }
+        if (options.centerResiduals)
+            center_residuals(result, opticalModel.optical_spec.wvls.reference_wvl);
         return result;
+    }
+
+    /**
+     * Remove the constant part of the wavefront difference from every residual.
+     *
+     * <p>{@code |OTF| = |<exp(i.Phi)>| ~ 1 - Var(Phi)/2} depends on the <em>variance</em>
+     * of the phase difference. A constant {@code dW} across the pupil is wavefront tilt,
+     * which is an image displacement: it moves the phase transfer function and leaves the
+     * modulus alone. Left in, it contributes {@code mean^2} to the sum of squares - up to
+     * 57% of an outer-field tangential block - and, being reducible by adding tilt, offers
+     * the solver merit reduction that corresponds to no optical improvement at all.
+     *
+     * <p>The mean is subtracted per (field, orientation), <em>not</em> per wavelength. A
+     * tilt common to every wavelength is a harmless image shift, but one that differs
+     * between wavelengths is lateral colour, and that genuinely does reduce polychromatic
+     * MTF because the per-wavelength complex OTFs acquire different phases and partly
+     * cancel. Subtracting the reference wavelength's mean from all of them discards the
+     * common part and preserves the difference.
+     *
+     * <p>Defocus is untouched: it makes {@code dW} linear in the shear direction rather
+     * than constant, so its mean over a symmetric pupil is already zero. The sagittal mean
+     * is identically zero by symmetry on a rotationally symmetric system, so in practice
+     * only tangential residuals move.
+     */
+    static void center_residuals(ContrastAnalysisResult result, int referenceWavelengthIndex) {
+        for (var field : result.fields) {
+            var wavelengths = field.wavelengths();
+            int reference = referenceWavelengthIndex;
+            if (reference < 0 || reference >= wavelengths.size()) continue;
+            double sagittalOffset = weighted_mean(wavelengths.get(reference), Orientation.SAGITTAL);
+            double tangentialOffset = weighted_mean(wavelengths.get(reference), Orientation.TANGENTIAL);
+            if (!Double.isFinite(sagittalOffset) || !Double.isFinite(tangentialOffset)) continue;
+            for (int i = 0; i < wavelengths.size(); i++)
+                wavelengths.set(i, wavelengths.get(i).withOffsets(sagittalOffset, tangentialOffset));
+        }
+    }
+
+    /** Quadrature-weighted mean difference over the valid samples of one block. */
+    private static double weighted_mean(
+            ContrastAnalysisResult.WavelengthResult wavelength, int orientation) {
+        double weightedSum = 0.0;
+        double weightSum = 0.0;
+        for (var sample : wavelength.samples()) {
+            if (!sample.valid()) continue;
+            double difference = orientation == Orientation.SAGITTAL
+                    ? sample.sagittalDifference() : sample.tangentialDifference();
+            if (!Double.isFinite(difference)) continue;
+            weightedSum += sample.weight() * difference;
+            weightSum += sample.weight();
+        }
+        return weightSum > 0.0 ? weightedSum / weightSum : 0.0;
     }
 
     /**

@@ -19,7 +19,7 @@ that landed afterwards and does not belong to any single finding.
 | --- | --- | --- |
 | [1](#1-vignetting-silently-rescales-the-shear--the-off-axis-merit-runs-at-the-wrong-frequency) | Vignetting rescales the shear | **Fixed** — shear now 40.0 cyc/mm at every field |
 | [2](#2-the-default-3x6-sampling-is-too-coarse-and-the-optimizer-exploits-it) | 3×6 sampling too coarse | **Applied** — builder default now 6×12 |
-| [3](#3-the-residual-is-the-un-centred-second-moment-not-the-variance) | Un-centred second moment | **Open** — tangential only, see the refinement below |
+| [3](#3-the-residual-is-the-un-centred-second-moment-not-the-variance) | Un-centred second moment | **Fixed, opt-in.** `centerContrastResiduals(true)`; may bear on the sagittal drop through the sag/tan balance |
 | [4](#4-the-three-frequencies-are-near-collinear--two-thirds-of-the-ray-budget-is-wasted) | Frequencies near-collinear | **Open** |
 | [5](#5-high-frequencies-fail-without-a-diagnostic) | High-frequency degeneracy | **Partly fixed** — the silent collapse now throws; the ~0.707×cutoff ceiling remains |
 | [6](#6-the-least-squares-reduction-only-tracks-mtf-in-the-small-phase-regime) | Least-squares only valid at small phase | **Open, but downgraded.** The diagnosis stands; the regression that motivated it turned out to be defocus — see the [postscript](#postscript-the-motivating-regression-was-defocus) |
@@ -209,6 +209,14 @@ regression is `tan@40` at field 3 (0.567 → 0.539) — the field crippled by is
 
 **Severity: medium.**
 
+> **FIXED, opt-in.** `ContrastOptions.center_residuals(true)` /
+> `OptimizationBuilder.centerContrastResiduals(true)` subtracts the reference wavelength's
+> weighted mean per (frequency, field, orientation). Off by default because it changes
+> every contrast residual. Measured on the Leica 75/2 at 40 cyc/mm: tangential
+> sum-of-squares falls 1.046 → 0.511 at field 0.7 and 1.980 → 0.886 at full field, while
+> sagittal is unchanged to five decimals. See
+> [the sagittal/tangential balance](#why-this-may-bear-on-the-sagittal-drop) below.
+
 The modulus of the OTF is
 
 ```
@@ -219,7 +227,7 @@ i.e. it depends on the **variance** of the phase difference, not on `⟨Φ²⟩`
 `ΔW` across the pupil is a pure image displacement (it moves the phase transfer
 function, not the modulus) and costs no MTF at all. But
 [ContrastAnalysisResult.java:20](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysisResult.java:20)
-forms `√w · ΔW` with no mean removal, so `Σr² = ⟨Φ²⟩ = Var + mean²`. Still the case.
+forms `√w · ΔW` with no mean removal, so `Σr² = ⟨Φ²⟩ = Var + mean²`.
 
 This is not negligible, and it concentrates:
 
@@ -232,7 +240,8 @@ This is not negligible, and it concentrates:
   symmetric lens with the field in y the wavefront is even in x, so
   `ΔW = W(x+s,y) − W(x,y)` is odd about the shear centre and integrates to zero. Measured
   as 0.0% on every sagittal group of both test lenses. The whole effect therefore lands
-  on the tangential residuals, and this finding can never explain a sagittal symptom.
+  on the tangential residuals. (This was originally written "and this finding can never
+  explain a sagittal symptom", which does not follow — see below.)
 - On the Leica 75/2 the tangential mean share reaches **57%** (field 1.0, 50 cyc/mm),
   well above the Otus figures — so the size of the effect is strongly design-dependent.
 
@@ -243,7 +252,47 @@ rank-1 deficiency per group without trouble.
 If you want to retain a polychromatic lateral-color penalty, subtract the *reference
 wavelength's* mean from every wavelength rather than each wavelength's own mean — that
 keeps colour-dependent tilt (which does reduce polychromatic MTF) while discarding the
-common tilt (which does not).
+common tilt (which does not). This is what was implemented.
+
+### Why this may bear on the sagittal drop
+
+The bullet above concluded that a tangential-only term "can never explain a sagittal
+symptom". That was wrong, and the error is worth keeping visible: the residual *values*
+are unchanged for sagittal, but the *balance* between the two orientations is not, and
+the balance is what the optimizer acts on.
+
+Two mechanisms, the second being the one that matters:
+
+- **Weighting.** With the mean² term left in, tangential sum-of-squares is inflated by up
+  to 57% while sagittal's is exact. In a merit that sums both with equal weight that is an
+  implicit tangential up-weighting.
+- **A spurious gradient.** The mean² term is *reducible* — by adding wavefront tilt, which
+  costs no MTF at all. So there is merit reduction available on the tangential side that
+  corresponds to no optical improvement. Design freedom spent collecting it comes out of
+  somewhere, and sagittal and tangential trade against each other through the astigmatic
+  focus split: move toward the tangential focus and you move away from the sagittal one. A
+  merit summing both is nearly indifferent to which is favoured, so a spurious term on one
+  side decides it. Symptom: tangential up, sagittal down, merit improving, lens not.
+
+Measured on the Leica starting design, the factor by which centring effectively raises
+sagittal relative to tangential ([ContrastProbe18](../optimr2/src/test/java/org/redukti/examples/ContrastProbe18.java)):
+
+| field | 10 cyc/mm | 20 cyc/mm | 40 cyc/mm |
+| --- | --- | --- | --- |
+| 0.00 | 1.00× | 1.00× | 1.00× |
+| 0.50 | 1.06× | 1.10× | 1.21× |
+| 0.70 | 1.66× | 1.80× | **2.05×** |
+| 0.85 | 1.95× | 2.09× | **2.35×** |
+| 1.00 | 2.04× | 2.12× | **2.26×** |
+
+Three things line up. The bias is largest at the outer fields and at field 0.7, which is
+where the drop lives. The hand-tuned `sagittalWeights = 2.0` in
+`LeicaApo75mmMandler.createContrastSetup` is approximately what centring delivers from
+first principles. And the Otus — which does not show the pathology — has a bias of 1.00×
+at fields 0.7 through 1.0, its only significant value being 1.5× at field 0.3.
+
+This establishes that the bias exists and is large where the symptom is. It does **not**
+establish that the optimizer takes the bait; that needs an A/B solve with centring on.
 
 ---
 
@@ -1035,9 +1084,13 @@ measurement and defects that need a fix, because they want different kinds of ef
 
 ### Defects and gaps
 
-8. **Subtract the weighted mean** (§3). Real and quantified - 5% of the merit overall,
-   42-57% of individual tangential blocks - spent resisting image displacement that costs
-   no MTF. Tangential only; it cannot explain a sagittal symptom.
+8. ~~**Subtract the weighted mean** (§3)~~ - **implemented, opt-in.** What remains is the
+   A/B: solve both lenses with `centerContrastResiduals(true)` and compare against the
+   independent spot/MTF analysis. It removes 49% of the tangential block at Leica field
+   0.7 and effectively doubles sagittal's relative weight there, so it is a candidate
+   explanation for the sagittal drop - see
+   [the balance argument](#why-this-may-bear-on-the-sagittal-drop). Flip the default only
+   once that A/B is done, since it regenerates every golden value.
 9. **Validate frequency against the cutoff** (§5) at configuration time rather than on the
    first trace.
 10. **`dLineOnly` is ignored for contrast goals**, or document that it deliberately does

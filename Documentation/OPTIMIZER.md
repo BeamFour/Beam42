@@ -84,6 +84,58 @@ sum_p w_p deltaW(p)^2
 It does not calculate MTF directly. It minimizes a smooth least-squares proxy for the
 loss of contrast.
 
+### Residual centring
+
+The sum above is the un-centred second moment, and it decomposes as
+
+```text
+sum_p w_p deltaW(p)^2 = Var(deltaW) + mean(deltaW)^2
+```
+
+Only the first term belongs there. The OTF modulus depends on the *variance* of the phase
+difference, through `|OTF| = |<exp(i Phi)>| ~ 1 - Var(Phi)/2`. A constant `deltaW` across
+the pupil is wavefront tilt, which displaces the image: it moves the phase transfer
+function and leaves the modulus untouched. The geometric MTF used to validate the
+surrogate is translation invariant too, since spot analysis measures about the centroid.
+
+Enable centring through the builder:
+
+```java
+.centerContrastResiduals(true)
+```
+
+The residual becomes `sqrt(w_p) (deltaW(p) - deltaW_bar)`, where `deltaW_bar` is the
+quadrature-weighted mean over the valid samples of the block.
+
+Two properties are worth knowing before enabling it.
+
+**Defocus is not removed.** Defocus makes `deltaW` vary linearly across the pupil in the
+shear direction rather than being constant, so its mean over a symmetric pupil is already
+zero. Only the constant part goes; defocus, coma, spherical and astigmatism keep their
+full contribution.
+
+**The mean is subtracted per (frequency, field, orientation), not per wavelength.** A tilt
+common to every wavelength is a harmless image shift. A tilt that differs between
+wavelengths is lateral colour, and that genuinely does reduce polychromatic MTF, because
+the per-wavelength complex transfer functions acquire different phases and partly cancel.
+Subtracting the reference wavelength's mean from every wavelength discards the common part
+and preserves the difference.
+
+The sagittal mean is identically zero on a rotationally symmetric system, since `deltaW`
+is odd about the shear centre, so in practice only tangential residuals move. That does
+not make the change sagittal-neutral. The tangential block loses up to 57 percent of its
+sum of squares, so the balance between the two orientations shifts, and the two trade
+against each other through the astigmatic focus split. Measured on the Leica 75/2, centring
+raises sagittal's weight relative to tangential by a factor of about 2 at fields 0.7
+through 1.0.
+
+There is a second reason to prefer it. The `mean^2` term is *reducible* by adding tilt,
+which costs no MTF, so leaving it in offers the solver merit reduction that buys no optical
+improvement.
+
+Centring is off by default because it changes every contrast residual and therefore every
+committed regression value.
+
 ### Operating range and limitation
 
 The proxy is most faithful in the small-phase regime:
@@ -168,6 +220,76 @@ the numerical merit function. It should normally be enabled for new contrast-
 optimization work, while old regression cases may leave it disabled to preserve their
 historical values.
 
+## The pupil the merit sees
+
+Every residual is evaluated over a pupil, and which pupil that is depends on the
+vignetting mode, on whether the factors are held fixed, and on whether rays are also
+rejected by the physical surface apertures. All three are configurable.
+
+### Vignetting mode
+
+```java
+.vignetting(VigType.SetPupil)   // the default
+```
+
+`SetPupil` resizes the pupil so the axial marginal ray meets the stop edge, then measures
+all four vignetting factors with real rays. `SetVig` measures the same factors without the
+resize and agrees closely, within 0.005 of pupil half-width and three to four MTF decimals
+on both test lenses.
+
+`Paraxial` is cheaper and behaves differently in a way that matters. It sets only the `y`
+factors, because a paraxial ray is meridional and can say nothing about the sagittal
+pupil, so `x` comes out unvignetted at every field. The pupil is then an ellipse even on
+axis, where sagittal and tangential MTF must be equal by rotational symmetry: measured
+0.148 apart at 40 cycles/mm on the Leica 75/2, and 0.010 on the Otus. Optimizing under it
+means the sagittal pupil is a superset of the real one and the tangential pupil a subset,
+roughly 19 percent short of the real tangential aperture at full field.
+
+### Freezing the factors
+
+Apertures are never optimization variables, but vignetting is not therefore constant: it
+is where rays land on those fixed apertures. On the Leica 75/2, 28 of 29 variables move a
+vignetting factor within a single Jacobian step. The drift is smooth, so it does not
+corrupt the finite-difference Jacobian, but it does mean the solver differentiates the
+design and the pupil together — and a more heavily vignetted lens has less aberration and
+better MTF. Shrinking the pupil is therefore a way to improve the merit that costs nothing
+in the merit and real light in the lens.
+
+```java
+.freezeVignetting()
+```
+
+This measures the factors once from a reference build and holds them for the run, so every
+iteration is compared on the same pupil. The cost is staleness: the factors describe the
+design at capture, and the further a solve travels the more the assumed pupil diverges
+from the real one. Call `Analysis.discard_frozen_vignetting()` between solver restarts to
+re-measure.
+
+With `SetPupil` the captured pupil value is held as well, since factors measured at one
+working f-number do not describe another. That pins `fod.fno`, which makes a `GoalParax`
+on `Fno` inert in that combination.
+
+### Physical aperture checking
+
+```java
+.checkSpotApertures(false)
+```
+
+Whether Gaussian-quadrature spot rays are additionally rejected when they cross a physical
+surface aperture. On by default. Grid and hexapolar sampling always check, so this setting
+applies to the Gaussian-quadrature path only.
+
+Contrast sampling is the other way round: it never checks by default, because its samples
+already occupy the common vignetted-pupil overlap and turning temporary clipping into a
+discontinuous failure would hurt the optimizer. `ContrastOptions.check_apertures(true)`
+overrides that for validation.
+
+Frozen factors together with `checkSpotApertures(false)` gives a pupil that is entirely
+factor-defined and fixed for the run, which is close to the conventional arrangement in
+commercial optimizers. The trade-off is that nothing then catches factors which are wrong
+or have gone stale: rays that the real lens blocks still contribute, so the merit can
+optimize light the lens does not pass.
+
 ## Preserving the starting lens design
 
 Contrast optimization has a broad, smooth capture range and can substantially rearrange
@@ -179,6 +301,7 @@ starting values.
 ```java
 .applyCurvatureConstraints()
 .applyThicknessConstraints()
+.applyEdgeThicknessConstraints()
 ```
 
 These methods add constraints only for the corresponding parameters that are actually
@@ -218,24 +341,66 @@ parameters and smaller for large ones, which is exactly what makes a 0.1mm air g
 39mm back focus resist the same proportional change equally. `Constraint` exposes
 `fractional_deviation()` for reporting the proportional change directly.
 
-`ConstraintThickness` and `ConstraintCurvature` are named for what they express, but they
-are implemented as penalty residuals in the least-squares merit rather than as hard
-bounds: they are soft constraints, not feasibility limits. A parameter is always free to
-move, it simply costs merit to do so. Increasing the weight keeps the design closer to
-its original form; decreasing it gives the optimizer more freedom. Nothing prevents a
-sufficiently strong optical gradient from pushing a parameter a long way regardless of
-weight.
+`ConstraintThickness`, `ConstraintEdgeThickness` and `ConstraintCurvature` are named for
+what they express, but they are implemented as penalty residuals in the least-squares
+merit rather than as hard bounds: they are soft constraints, not feasibility limits. A
+parameter is always free to move, it simply costs merit to do so. Increasing the weight
+keeps the design closer to its original form; decreasing it gives the optimizer more
+freedom. Nothing prevents a sufficiently strong optical gradient from pushing a parameter
+a long way regardless of weight.
 
-Two consequences follow. Thickness constraints hold axial centre thickness only and do
-not guarantee positive edge separation, which also depends on the sag of the two bounding
-surfaces. And since neither imposes an absolute bound, final prescriptions still need
-mechanical checks for negative gaps, element intersections, extreme curvatures and
-clearance.
+Since none of these imposes an absolute bound, final prescriptions still need mechanical
+checks for extreme curvatures and clearance.
+
+### Edge separation
+
+`ConstraintThickness` holds axial centre thickness, which is not the same as keeping two
+surfaces apart. The separation at height `h` is
+
+```text
+gap(h) = t + sag_next(h) - sag_this(h)
+```
+
+so curvature can bend two surfaces through each other while the axial gap sits untouched
+at its starting value. That is how a solve with thickness constraints already in place
+produced overlapping first and second surfaces on the Leica 75/2.
+
+`applyEdgeThicknessConstraints()` anchors the quantity that actually goes negative,
+measured by default at the smaller of the two bounding semi-diameters — the outermost
+height at which both surfaces exist. It complements the axial constraint rather than
+replacing it, and both are worth having whenever curvatures and thicknesses are varied
+together.
+
+On the Leica the two quantities are only loosely related, which is why one cannot stand in
+for the other:
+
+```text
+surf |  axial t  |  edge gap  | edge/axial
+   2 |    8.0000 |     0.9694 |      0.121
+   9 |    1.5000 |     0.3052 |      0.203
+   1 |    0.1000 |     4.7926 |     47.926
+```
+
+The tightest real clearance in that lens is 0.305mm at surface 9, where the axial
+constraint is anchored to 1.5mm. A fractional move the axial constraint treats as small is
+most of the actual clearance.
+
+Gaps whose starting edge separation is not positive and finite are skipped: a fractional
+constraint cannot be formed around zero, and a design that already starts with coincident
+or crossed surfaces has nothing useful to anchor to.
+
+### Choosing the weight
 
 Because a contrast merit can contain thousands of sample residuals but only a few dozen
 parameter-preservation residuals, compare their aggregate sum-of-squares contributions
 when choosing weights. The nominal weight is a useful starting point, but is not
 automatically equal in influence to the complete optical merit.
+
+This matters more than it first appears, because the optical merit grows with field count
+while the constraint count does not. Moving a setup from 4 fields to 11 took one contrast
+block from 5184 residuals to 14256 — a factor of 2.75 — against an unchanged 29
+constraints, so the nominal weight no longer held the line it was tuned to hold and the
+layout collapsed. If you add fields, scale the constraint weight with them.
 
 Raising the weight does tighten the design. On a fifteen-element f/2 with every air space
 free, the worst thickness excursion fell from 39% to 11% to 3% at weights of 1, 10 and

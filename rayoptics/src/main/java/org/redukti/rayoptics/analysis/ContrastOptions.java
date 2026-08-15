@@ -9,6 +9,7 @@ public class ContrastOptions {
     Integer numSpokes = 6;
     TraceOptions traceOptions = new TraceOptions();
     boolean calibrateFrequency = false;
+    boolean centerResiduals = false;
 
     /**
      * @param spatialFrequency image-space spatial frequency in cycles per
@@ -39,6 +40,17 @@ public class ContrastOptions {
     public ContrastOptions trace_options(TraceOptions value) {
         if (value == null) throw new IllegalArgumentException("Trace options cannot be null");
         traceOptions = value;
+        return this;
+    }
+
+    /**
+     * Subtract the constant part of each wavefront-difference block, so the residuals
+     * carry the variance the OTF modulus depends on rather than the un-centred second
+     * moment. Off by default because it changes every contrast residual. See
+     * {@link ContrastAnalysis#center_residuals(ContrastAnalysisResult, int)}.
+     */
+    public ContrastOptions center_residuals(boolean value) {
+        centerResiduals = value;
         return this;
     }
 

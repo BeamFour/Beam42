@@ -42,13 +42,14 @@ public class GoalContrast extends Goal {
         if (_field >= contrast.fields.size()) return LMLSolver.BIGVAL;
         var wavelengths = contrast.fields.get(_field).wavelengths();
         if (_wavelength_index >= wavelengths.size()) return LMLSolver.BIGVAL;
-        var samples = wavelengths.get(_wavelength_index).samples();
-        if (_sample_index >= samples.size()) return LMLSolver.BIGVAL;
-        var sample = samples.get(_sample_index);
-        if (!sample.valid()) return LMLSolver.BIGVAL;
+        var wavelength = wavelengths.get(_wavelength_index);
+        if (_sample_index >= wavelength.samples().size()) return LMLSolver.BIGVAL;
+        if (!wavelength.samples().get(_sample_index).valid()) return LMLSolver.BIGVAL;
+        // Read through the block rather than the sample: the residual carries the block's
+        // constant offset, which is zero unless residual centering is enabled.
         return _orientation == Orientation.SAGITTAL
-                ? sample.sagittalResidual()
-                : sample.tangentialResidual();
+                ? wavelength.sagittalResidual(_sample_index)
+                : wavelength.tangentialResidual(_sample_index);
     }
 
     @Override

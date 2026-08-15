@@ -7,10 +7,11 @@ Review of the contrast-optimization implementation on branch `contrast_opt`, aga
 
 Test case: `ZeissOtusML50mmTest.optimizesPatentPrescriptionUsingContrast()`
 
-Findings 1–7 were written against the state of the branch at the time of the review.
-Everything below has been revisited as of 2026-08-14; see
-[Changes since this review was written](#changes-since-this-review-was-written) for the
-work that landed afterwards and does not belong to any single finding.
+Findings 1–7 were written against the state of the branch at the time of the review;
+finding 8 was added on 2026-08-15. Everything below has been revisited as of that date.
+See [Open questions](#open-questions) for what is unresolved and
+[Changes since this review was written](#changes-since-this-review-was-written) for work
+that landed afterwards and does not belong to any single finding.
 
 ## Status
 
@@ -23,17 +24,22 @@ work that landed afterwards and does not belong to any single finding.
 | [5](#5-high-frequencies-fail-without-a-diagnostic) | High-frequency degeneracy | **Partly fixed** — the silent collapse now throws; the ~0.707×cutoff ceiling remains |
 | [6](#6-the-least-squares-reduction-only-tracks-mtf-in-the-small-phase-regime) | Least-squares only valid at small phase | **Open, but downgraded.** The diagnosis stands; the regression that motivated it turned out to be defocus — see the [postscript](#postscript-the-motivating-regression-was-defocus) |
 | [7](#7-the-shear-is-applied-at-the-entrance-pupil-not-the-exit-pupil) | Shear applied at entrance, not exit, pupil | **Mitigated, opt-in.** `calibrate_frequency` removes the field bias (8.5% → 0.08%); exact fix pending upstream |
+| [8](#8-vignetting-is-a-moving-mode-dependent-reference-frame) | Vignetting is a moving, mode-dependent reference frame | **Partly addressed.** Mode is configurable and the factors can be frozen; the perverse incentive it exposes is unmeasured |
 
-Finding 6 was added after the first four fixes landed, prompted by a mid-field MTF drop
-running the generic contrast setup on the Leica 75/2. It was described here as the most
-consequential open item, on the grounds that it produced a measurably worse design rather
-than merely a wasteful merit. That framing has since been withdrawn: the drop was a
-focus error the configuration had no variable to correct. The blind spot in the merit is
-real and still unfixed, but no case is currently known where it walks a design backwards.
+Findings 6 and 8 are two attempts at the same symptom — a Leica 75/2 mid-field sagittal
+MTF drop — and neither currently explains it. Finding 6 blamed the least-squares
+reduction, then its postscript blamed defocus; that account held only for the
+curvature-only configuration it was measured on. Finding 8 records what vignetting does
+instead, which is real and measured, but the run that would settle whether it is the cause
+collapsed for unrelated reasons. [Open questions](#open-questions) has the current state.
+
+Read that as a caution about this document generally: findings 1, 2, 5 and 7 rest on
+direct measurement and have held up. The chain of explanations for the sagittal drop has
+been revised three times.
 
 ## Code under review
 
-Line references are as of 2026-08-14.
+Line references are as of 2026-08-15.
 
 | File | Role |
 | --- | --- |
@@ -62,10 +68,15 @@ roughly corrected, and to be validated against an independent MTF measurement wh
 not.
 
 (This paragraph originally ended "and it can walk a design backwards", citing the Leica
-mid-field drop. That case turned out to be defocus rather than a merit failure; the
-[postscript to §6](#postscript-the-motivating-regression-was-defocus) has the detail. The
-non-monotonicity is measured and real, but the claim that it costs a design anything in
-practice is currently unsupported.)
+mid-field drop. That claim was withdrawn when the drop looked like defocus, and the
+defocus account has since been narrowed to the configuration it was measured on — see
+both postscripts to §6. The non-monotonicity is measured and real; what has never been
+established is that it costs a design anything in practice.)
+
+A limitation the original review did not consider at all: the merit's *pupil* is as much
+a modelling choice as its residuals, it differs between vignetting modes, and it moves
+while the solver works. [Finding 8](#8-vignetting-is-a-moving-mode-dependent-reference-frame)
+covers it.
 
 **What is correct:**
 
@@ -606,6 +617,18 @@ The measurements in this postscript were made during the investigation and the p
 not retained, so unlike the rest of this document they are not reproducible from a
 committed program.
 
+### Second postscript: defocus does not cover the current configuration
+
+The postscript above was written against `GenericContrastOpt`, which varied curvatures
+only. `LeicaApo75mmMandler.createContrastSetup` now varies all thicknesses under
+design-preservation constraints, so the solver *can* move the image plane and a residual
+focus error can no longer be the whole story. Sagittal softness has still been seen.
+
+So the account stands for the run it was measured on and does not generalise. What
+replaces it for current runs is not settled; [finding 8](#8-vignetting-is-a-moving-mode-dependent-reference-frame)
+covers what has been measured since, and the [open questions](#open-questions) list what
+has not.
+
 ---
 
 ## 7. The shear is applied at the entrance pupil, not the exit pupil
@@ -740,6 +763,128 @@ could be reverted to reduce porting friction.)
 
 ---
 
+## 8. Vignetting is a moving, mode-dependent reference frame
+
+**Severity: moderate, and partly unresolved.** Added 2026-08-15, after §6's first
+postscript failed to explain current runs.
+
+Findings 1 and 7 both concerned getting the *shear* right inside the pupil. This one is
+about the pupil itself: which region of it the merit looks at, how that region is
+established, and the fact that it moves while the solver works.
+
+### Paraxial vignetting leaves the sagittal pupil unvignetted
+
+`Trace.apply_paraxial_vignetting` sets only `vuy` and `vly`. It cannot do otherwise - a
+paraxial ray is meridional, so it has nothing to say about x - and
+`Field.vignetting_scale` maps a factor of exactly `0.0` to a scale of `1.0`. Under
+`VigType.Paraxial` the pupil is therefore full width in x at *every* field:
+
+```
+Leica 75/2      x half-width          y half-width
+field    Paraxial   SetVig      Paraxial   SetVig
+0.0      1.0000     1.0029      0.9432     1.0029
+0.7      1.0000     0.9717      0.5980     0.6894
+1.0      1.0000     0.8747      0.3782     0.4656
+```
+
+The consequence is a hard invariant violation. On axis, sagittal and tangential MTF must
+be equal by rotational symmetry. Under the real-ray modes they are, to every printed
+digit. Under `Paraxial` they are not:
+
+| lens | mode | on-axis sag@40 | on-axis tan@40 | gap |
+| --- | --- | --- | --- | --- |
+| Leica 75/2 | Paraxial | 0.4610 | 0.6075 | **0.148** |
+| Leica 75/2 | SetVig | 0.4094 | 0.4094 | 0.000 |
+| Otus 50/1.4 | Paraxial | 0.5401 | 0.5500 | 0.010 |
+| Otus 50/1.4 | SetVig | 0.5401 | 0.5401 | 0.000 |
+
+The tangential direction gets an artificial advantage: its narrowed pupil clips aberrated
+rays, so it reads high, while sagittal carries the full width. The size of the violation
+tracks the on-axis paraxial `vuy` - 0.057 on the Leica against 0.010 on the Otus - which
+is the order of difference between the lens that shows sagittal pathology and the ones
+that do not.
+
+**This never affected committed results.** `Analysis` has always built with
+`VigType.SetPupil`; `Paraxial` appeared only in a deliberate experiment. `SetVig` and
+`SetPupil` agree closely - working F/# 2.0403 against 2.0500, x half-widths within 0.005,
+MTF identical to 3-4 decimals - so the committed default matches what LensTool2 reports.
+
+### Optimizing under Paraxial is a margin in x and a deficit in y
+
+Because x is never vignetted, the sagittal pupil under `Paraxial` is a **superset** of the
+real one and the tangential pupil is a **subset** (0.3782 against 0.4656 at full field).
+A design optimized on a superset and then measured on the real sub-aperture can only come
+out the same or better in that direction - which is a principled reason, not luck, why a
+`Paraxial`-optimized Leica evaluates well in LensTool2's sagittal MTF.
+
+The exposure is the other axis: roughly 19% of the tangential aperture at full field, the
+outermost and most aberrated zone, was never in the merit. Predicted, not yet checked.
+
+### The pupil moves during the solve
+
+Apertures are never variables, but vignetting is not therefore constant: it is where rays
+land on fixed apertures. Probing every variable at its exact Jacobian step:
+
+| mode | variables moving a factor | mean max change | worst |
+| --- | --- | --- | --- |
+| Paraxial | 28 of 29 | 3.8e-04 | 1.7e-03 |
+| SetVig | 28 of 29 | 4.5e-04 | 2.5e-03 |
+| SetPupil | 24 of 29 | 1.9e-04 | 1.4e-03 |
+
+The drift is **smooth** - sweeping surface 0's radius across ±2 Jacobian steps gives
+monotone increments with no steps or sign flips, and `SetVig` is linear to three digits -
+so it does not corrupt the finite difference. An earlier guess in the other direction was
+wrong.
+
+What it does mean is that the solver differentiates the design and the pupil together. A
+more heavily vignetted lens has less aberration and better MTF, so **shrinking the pupil
+is a way to improve the merit that costs nothing in the merit and real light in the
+lens.** Whether the solver actually takes that route is the main untested question here.
+
+Two smaller observations from the same sweep: `SetVig` and `SetPupil` move `vuy` in
+*opposite* directions for the same design change, so they are not interchangeable under
+differentiation even though they agree statically; and `set_pupil` can throw from
+`Wideangle.find_edge` on a perturbed trial geometry. The latter is caught by
+`computeResiduals`, which fills `BIGVAL` and rejects the step, so it costs an iteration
+rather than the solve.
+
+### What was added
+
+`Analysis` now takes the mode and can hold the factors fixed:
+
+```java
+.vignetting(VigType.SetPupil)   // default, unchanged behaviour
+.freezeVignetting()
+```
+
+Freezing captures the four factors once from a reference build, then builds every later
+model with `VigType.None` and stamps them on. It also holds the captured pupil value,
+since factors measured at one working f/# do not describe another - which pins `fod.fno`
+and makes a `GoalParax` on `Fno` inert in combination with `SetPupil`. The cost is
+staleness; `discard_frozen_vignetting()` re-measures between restarts.
+
+This is closer to how Zemax behaves than live re-measurement is: there, vignetting factors
+are static field data that optimization does not update, while real ray blocking at
+apertures stays dynamic and ray aiming re-solves the pupil mapping on every trace. The
+Beam43 analogue of that arrangement would be frozen factors with `check_apertures` on,
+which the contrast path deliberately does not do, for smoothness.
+
+Worth noting that Beam43 currently holds both conventions at once: `ZemaxExporter` writes
+`VDXN`/`VDYN`/`VCXN`/`VCYN`/`VANN` as all zeros, so exported models rely purely on real
+apertures, while `trace_contrast` sets `check_apertures = false` and relies purely on the
+vignetting map. Both are defensible; a design compared across the two is not being
+measured the same way.
+
+### Status: the freeze experiment is inconclusive
+
+The first attempt on the Leica produced overlapping first and second surfaces - a layout
+failure, orthogonal to vignetting, so the run says nothing either way. The likely cause is
+that the same setup moved from 4 fields to 11, which grew the contrast block from 5184
+residuals to 14256 while the constraint count stayed at ~29; see items 2 and 3 under
+[open questions](#open-questions).
+
+---
+
 ## Smaller items
 
 - **`dLineOnly` is ignored for contrast goals.** *Still open.*
@@ -832,7 +977,9 @@ could be reverted to reduce porting friction.)
 
 ---
 
-## Suggested order of work
+## Work completed
+
+Everything still open is consolidated under [Open questions](#open-questions).
 
 Done:
 
@@ -842,26 +989,76 @@ Done:
 3a. ~~**Correct the entrance-pupil shear bias** (§7)~~ — available, opt-in, pending the
     exact exit-pupil treatment from upstream.
 
-Remaining, in priority order. §6 has dropped down the list since the postscript: with no
-known case where the merit costs a design anything, it is a latent limitation rather than
-an active problem.
+## Open questions
 
-4. **Subtract the weighted mean** (§3) — tangential only; worth doing, but it cannot
-   explain a sagittal symptom. Now the highest-value open item, being a real and
-   quantified 5% of the merit spent on image displacement that costs no MTF.
-5. **Drop to a single contrast frequency** (§4) — recovers most of the cost that the
-   6×12 sampling change added. Note the collinearity was measured on the Otus, where
-   phases are small; on a badly-aberrated design like the Leica the frequencies may be
-   less redundant, so re-measure before removing any.
-6. **Validate frequency against the cutoff** (§5, remaining half) — at configuration
-   time rather than on the first trace.
-7. **Honour `dLineOnly` for contrast goals**, or document that it deliberately does not
-   apply to them.
-8. **§6, if a case for it appears.** A phasor MTF goal was implemented and reverted; read
-   the outcome subsection *and* the postscript before retrying, since both weight sweeps
-   there were aimed at a defocus. Most promising untried variant: the **real part** of
-   the OTF rather than its modulus (exact for sagittal, smooth through zero). Also
-   untried: reachable targets rather than 1.0.
+Everything unresolved, in rough priority order. Split into questions that need a
+measurement and defects that need a fix, because they want different kinds of effort.
+
+### Blocking the current investigation
+
+1. **Get a conclusive freeze run on the Leica.** The attempt collapsed the layout - first
+   and second surfaces overlapping - so it says nothing about vignetting yet. Item 2
+   probably has to be fixed first.
+2. **Constraint strength does not scale with merit size.** `NOMINAL_CONSTRAINT_WEIGHT`
+   holds one residual per varied parameter (~29 on the Leica) against an optical merit
+   that grows with field count. Moving `createContrastSetup` from 4 fields to 11 took the
+   contrast block from 5184 residuals to 14256 - 2.75x - while the constraint count did
+   not move, so weight 1.0 no longer holds the line it was tuned to hold. Either scale the
+   nominal weight by residual count, or have the builder warn when the constraint block
+   falls below some fraction of the optical merit. Immediate workaround is an explicit
+   weight, e.g. `applyThicknessConstraints(3.0)`.
+3. **No edge-thickness constraint.** `ConstraintThickness` holds *axial centre* thickness.
+   Two surfaces can keep their axial gap and still cross away from the axis when curvature
+   moves, since the edge gap is `t + sag2(h) - sag1(h)` and nothing looks at it. This is
+   the likely mechanism behind the overlap in item 1. `SurfaceProfile.sag(x, y)` already
+   exists on `Spherical`, `EvenPolynomial` and `RadialPolynomial`, and the interfaces are
+   reachable from `Analysis._opt_model.seq_model.ifcs`, so the residual is cheap to form
+   in optimcommon without touching ported code.
+
+### Measurements not yet made
+
+4. **Does the solver buy MTF by vignetting harder?** §8 establishes that it *could* -
+   the pupil is differentiated along with the design, and a smaller pupil means less
+   aberration. Untested. The check is to record `vux`/`vuy` at the start and end of a live
+   solve and see whether vignetting grew; freezing should then change the outcome.
+5. **Is the `Paraxial` tangential deficit real?** §8 predicts that optimizing under
+   `Paraxial` leaves roughly 19% of the full-field tangential aperture outside the merit.
+   Check outer-field tangential MTF in a LensTool2 report on a `Paraxial`-optimized
+   prescription.
+6. **Does the `Paraxial` sagittal advantage generalise?** The superset-pupil argument is
+   sound in principle but has been seen on one lens. If it holds elsewhere, deliberately
+   inflating the sampled aperture on both axes would be the honest version - a margin
+   rather than an accident of which factors the paraxial routine happens to set.
+7. **Re-measure §4's frequency collinearity on a badly-aberrated design.** It was
+   established on the Otus, where phases are small. On the Leica the three frequencies may
+   carry genuinely different information, so re-measure before dropping any.
+
+### Defects and gaps
+
+8. **Subtract the weighted mean** (§3). Real and quantified - 5% of the merit overall,
+   42-57% of individual tangential blocks - spent resisting image displacement that costs
+   no MTF. Tangential only; it cannot explain a sagittal symptom.
+9. **Validate frequency against the cutoff** (§5) at configuration time rather than on the
+   first trace.
+10. **`dLineOnly` is ignored for contrast goals**, or document that it deliberately does
+    not apply to them.
+11. **Two vignetting conventions coexist.** `ZemaxExporter` writes all-zero vignetting
+    factors and relies on real apertures; `trace_contrast` sets `check_apertures = false`
+    and relies entirely on the vignetting map. A design compared across the two is not
+    measured the same way.
+12. **`SetVig` and `SetPupil` differentiate differently**, moving `vuy` in opposite
+    directions for the same design change despite agreeing statically. Consequences
+    unknown; noted so it is not rediscovered.
+
+### Latent
+
+13. **§6, if a case for it appears.** The least-squares residual stops tracking MTF above
+    ~0.1 waves; that is measured and not in doubt. What is missing is any current
+    demonstration that it costs a design anything. A phasor MTF goal was implemented and
+    reverted - read the outcome subsection *and* both postscripts before retrying, since
+    the weight sweeps there were aimed at a case that is no longer understood. Most
+    promising untried variant: the **real part** of the OTF rather than its modulus (exact
+    for sagittal, smooth through zero). Also untried: reachable targets rather than 1.0.
 
 ## Changes since this review was written
 
@@ -915,6 +1112,17 @@ This softens §5: the degenerate high-frequency case is still unrepresentable an
 throws, but an isolated failed ray at an ordinary frequency is now survivable rather than
 fatal to the solve.
 
+### Configurable and freezable vignetting
+
+`Analysis` no longer hardcodes `VigType.SetPupil`; the mode is settable and the factors
+can be measured once and held. See [finding 8](#8-vignetting-is-a-moving-mode-dependent-reference-frame)
+for what the modes do and why freezing is worth having.
+
+```java
+.vignetting(VigType.SetPupil)   // default, unchanged behaviour
+.freezeVignetting()
+```
+
 ### Naming
 
 The goal and builder APIs were made consistent, which invalidates method names used
@@ -965,16 +1173,20 @@ module's classpath and can reach the package-private helpers on `ZeissOtusML50mm
 | [ContrastProbe11.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe11.java) | §6 — phasor sampling convergence, 6×12 → 40×80 |
 | [ContrastProbe12.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe12.java) | §7 — realised vs requested frequency, exposing the entrance/exit pupil error |
 | [ContrastProbe13.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe13.java) | §7 — verifies `calibrate_frequency` removes the field-dependent bias |
+| [ContrastProbe14.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe14.java) | §8 — **refutes** its own hypothesis: contrast sampling coverage is 82-95% and identical in x and y, so the contraction does not starve the sagittal direction. Kept as the record of a ruled-out cause |
+| [ContrastProbe15.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe15.java) | §8 — the three-mode comparison and the on-axis symmetry violation under `Paraxial` |
+| [ContrastProbe16.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe16.java) | §8 — vignetting drift per Jacobian step, and the smoothness sweep showing it is differentiable |
 
 `ContrastProbes.java` in the same package holds the shared prescription-path lookups.
-Probes 1–8 use the Otus; 9–13 use the Leica 75/2. The Otus figures in §7 came from
-re-running the test case with calibration enabled rather than from a probe.
+Probes 1–8 use the Otus; 9–13 use the Leica 75/2; 14–16 run both. The Otus figures in §7
+came from re-running the test case with calibration enabled rather than from a probe.
 
-The probes were updated for the builder renames listed under
+Probes 1–13 were updated for the builder renames listed under
 [Changes since this review was written](#changes-since-this-review-was-written) and still
 compile, but they have not been re-run since. They reproduce the *evidence* as of the
 code at the time each finding was written; where a fix has since landed, expect the
-numbers to have moved.
+numbers to have moved. Probes 14–16 were written and run against the code as of
+2026-08-15, so their figures are current.
 
 Run one with (from the repository root, after a build):
 

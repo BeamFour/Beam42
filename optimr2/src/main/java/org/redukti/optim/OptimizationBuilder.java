@@ -56,6 +56,7 @@ public final class OptimizationBuilder {
     private int hexapolarSpotRays = 64;
     private int gaussianQuadratureRings = 14;
     private int gaussianQuadratureSpokes = 20;
+    private boolean checkSpotApertures = true;
     private double[] spotDeviationXWeights;
     private double[] spotDeviationYWeights;
     private boolean addSpotDeviationGoals;
@@ -150,6 +151,17 @@ public final class OptimizationBuilder {
                     "Gaussian-quadrature rings and spokes must be at least 1");
         this.gaussianQuadratureRings = rings;
         this.gaussianQuadratureSpokes = spokes;
+        return this;
+    }
+
+    /**
+     * Whether Gaussian-quadrature spot rays are rejected when they cross a physical
+     * surface aperture. Disable this with frozen vignetting to optimize a fixed
+     * factor-defined pupil, matching the usual Zemax GQ merit-function behaviour.
+     * Grid and hexapolar sampling always retain physical aperture checking.
+     */
+    public OptimizationBuilder checkSpotApertures(boolean check) {
+        this.checkSpotApertures = check;
         return this;
     }
 
@@ -460,7 +472,9 @@ public final class OptimizationBuilder {
                     "optimization requires at least as many goals as variables: "
                             + goals.size() + " goals for " + variables.size() + " variables"
                             + "; add optical goals or enable rayAberrationGoals()");
-        analysis.vignetting(vigType).freezing_vignetting(freezeVignetting);
+        analysis.vignetting(vigType)
+                .freezing_vignetting(freezeVignetting)
+                .checking_spot_apertures(checkSpotApertures);
         configureSpotPattern(analysis, goals);
         configureContrastAnalysis(analysis, goals);
         configureRequiredAnalyses(analysis, goals);

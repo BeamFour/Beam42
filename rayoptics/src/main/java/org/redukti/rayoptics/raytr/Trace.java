@@ -627,6 +627,8 @@ public class Trace {
 
     public static List<GridItem> trace_grid(OpticalModel opt_model, TraceGridDef grid_rng, Field fld, double wvl, double foc, ImageFilter img_filter, boolean append_if_none, TraceOptions trace_options) {
         trace_options = trace_options.copy();
+        // A grid represents the physical sampled aperture; retain upstream
+        // ray-optics behaviour regardless of the general TraceOptions default.
         trace_options.check_apertures = true;
         var start = grid_rng.grid_start;
         var stop = grid_rng.grid_stop;
@@ -666,6 +668,9 @@ public class Trace {
 
     public static List<GridItem> trace_rings(OpticalModel opt_model, TraceRingsDef grid_rng, Field fld, double wvl, double foc, ImageFilter img_filter, boolean append_if_none, TraceOptions trace_options) {
         trace_options = trace_options.copy();
+        // Ring/hexapolar spot analysis has the same physical-aperture semantics
+        // as the upstream grid tracer. Only the optimization-oriented Gaussian
+        // quadrature path permits this check to be disabled.
         trace_options.check_apertures = true;
         trace_options.pupil_type = PupilType.REL_PUPIL;
         trace_options.apply_vignetting = true;
@@ -716,7 +721,6 @@ public class Trace {
             Field fld, double wvl, double foc, ImageFilter img_filter,
             boolean append_if_none, TraceOptions trace_options) {
         trace_options = trace_options.copy();
-        trace_options.check_apertures = true;
         trace_options.pupil_type = PupilType.REL_PUPIL;
         trace_options.apply_vignetting = true;
 
@@ -761,9 +765,9 @@ public class Trace {
         // vignetted pupil. Applying Field vignetting in trace_base as well
         // would independently scale the displaced rays and change their MTF
         // shear, especially when a pair straddles a pupil axis.
-        // As with wavefront fans, do not turn temporary clear-aperture clipping
-        // into a discontinuous optimizer failure while a surface is being varied.
-        trace_options.check_apertures = false;
+        // ContrastOptions defaults aperture checking off so temporary clipping does
+        // not become a discontinuous optimizer failure, but honour an explicit caller
+        // choice to validate against the physical surface apertures.
         trace_options.pupil_type = PupilType.REL_PUPIL;
         trace_options.apply_vignetting = false;
         trace_options.rayerr_filter = "summary";

@@ -24,6 +24,8 @@ public class Analysis {
     public int _num_rings = 14;
     public int _num_spokes = 20;
     public boolean _append_failed_spot_rays = false;
+    /** Whether ordinary spot rays are rejected by physical surface apertures. */
+    public boolean _check_spot_apertures = true;
     public int _contrast_num_rings = 3;
     public int _contrast_num_spokes = 6;
     /** See {@link ContrastOptions#calibrate_frequency(boolean)}; off by default. */
@@ -79,6 +81,10 @@ public class Analysis {
     }
     public Analysis retaining_failed_spot_rays(boolean value) {
         _append_failed_spot_rays = value;
+        return this;
+    }
+    public Analysis checking_spot_apertures(boolean value) {
+        _check_spot_apertures = value;
         return this;
     }
     public Analysis using_hexapolar_pattern(int num_rays) {
@@ -216,10 +222,12 @@ public class Analysis {
             if (_spot_pattern == SpotOptions.PATTERN_GAUSS_QUADRATURE) {
                 options = new SpotOptions().use_gaussian_quadrature()
                         .num_rings(_num_rings).num_spokes(_num_spokes)
-                        .append_failed_rays(_append_failed_spot_rays);
+                        .append_failed_rays(_append_failed_spot_rays)
+                        .check_apertures(_check_spot_apertures);
             }
             else {
-                options = new SpotOptions().use_hexapolar().num_rays(_num_rays);
+                options = new SpotOptions().use_hexapolar().num_rays(_num_rays)
+                        .check_apertures(_check_spot_apertures);
             }
             var spotAnalysis = SpotAnalysis.eval(_opt_model,options);
             _spots = spotAnalysis.spot_results.toArray(new SpotAnalysisResult.SpotResultsForField[0]);

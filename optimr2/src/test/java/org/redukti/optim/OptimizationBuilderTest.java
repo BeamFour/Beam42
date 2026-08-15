@@ -205,6 +205,25 @@ class OptimizationBuilderTest {
         assertTrue(configured._freeze_vignetting);
     }
 
+    @Test
+    void spotApertureCheckingDefaultsOnAndIsConfigurable() {
+        Analysis defaults = OptimizationBuilder.builder(prescription())
+                .fields(0.0)
+                .mtfFrequencies(10)
+                .build()
+                .analysis();
+        assertTrue(defaults._check_spot_apertures);
+
+        Analysis fixedPupil = OptimizationBuilder.builder(prescription())
+                .fields(0.0)
+                .mtfFrequencies(10)
+                .freezeVignetting()
+                .checkSpotApertures(false)
+                .build()
+                .analysis();
+        assertFalse(fixedPupil._check_spot_apertures);
+    }
+
     /**
      * The point of freezing: the factors must not follow the design. Nothing else in the
      * merit would notice if they did - the residuals would simply be evaluated on a pupil

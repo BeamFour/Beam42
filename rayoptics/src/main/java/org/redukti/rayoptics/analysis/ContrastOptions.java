@@ -19,6 +19,9 @@ public class ContrastOptions {
             throw new IllegalArgumentException("Spatial frequency must be finite and non-negative");
         }
         this.spatialFrequency = spatialFrequency;
+        // Contrast samples already occupy the common vignetted-pupil overlap.
+        // Do not additionally reject them against surface apertures by default.
+        this.traceOptions.check_apertures = false;
     }
 
     public ContrastOptions num_rings(int value) {
@@ -36,6 +39,12 @@ public class ContrastOptions {
     public ContrastOptions trace_options(TraceOptions value) {
         if (value == null) throw new IllegalArgumentException("Trace options cannot be null");
         traceOptions = value;
+        return this;
+    }
+
+    /** Whether traced contrast rays are also rejected by surface apertures. */
+    public ContrastOptions check_apertures(boolean value) {
+        traceOptions.check_apertures = value;
         return this;
     }
 

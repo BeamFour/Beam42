@@ -16,6 +16,8 @@ public class SpotOptions {
     Integer _num_spokes = null;
 
     public SpotOptions(boolean useGaussGuadrature) {
+        // Spot analysis historically checked the physical surface apertures.
+        _trace_options.check_apertures = true;
         if (useGaussGuadrature)
             use_gaussian_quadrature();
         else
@@ -58,6 +60,14 @@ public class SpotOptions {
     }
     public SpotOptions append_failed_rays(boolean value) {
         this._append_failed_rays = value;
+        return this;
+    }
+    /**
+     * Whether Gaussian-quadrature spot rays are rejected by surface apertures.
+     * Grid and ring/hexapolar spot analyses always check their physical apertures.
+     */
+    public SpotOptions check_apertures(boolean value) {
+        this._trace_options.check_apertures = value;
         return this;
     }
     public boolean is_gauss_quadrature() {

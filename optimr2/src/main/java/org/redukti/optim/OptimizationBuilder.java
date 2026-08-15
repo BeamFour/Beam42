@@ -71,6 +71,7 @@ public final class OptimizationBuilder {
     private VigType vigType = VigType.SetPupil;
     private boolean freezeVignetting = false;
     private Double thicknessConstraintWeight;
+    private Double edgeThicknessConstraintWeight;
     private Double curvatureConstraintWeight;
     private final List<MtfGoals> mtfGoals = new ArrayList<>();
     private final List<ContrastGoals> contrastGoals = new ArrayList<>();
@@ -434,6 +435,37 @@ public final class OptimizationBuilder {
     }
 
     /**
+     * Hold the <em>edge</em> separation of each varied gap near its starting value, at the
+     * nominal weight.
+     *
+     * <p>Complements {@link #applyThicknessConstraints()} rather than replacing it. That
+     * one holds axial centre thickness, which two surfaces can honour while still crossing
+     * away from the axis once curvature moves - the failure mode that produced overlapping
+     * first and second surfaces on the Leica 75/2 with thickness constraints already in
+     * place. Use both when curvatures and thicknesses are varied together.
+     */
+    public OptimizationBuilder applyEdgeThicknessConstraints() {
+        return applyEdgeThicknessConstraints(NOMINAL_CONSTRAINT_WEIGHT);
+    }
+
+    /**
+     * Hold the varied gaps near their starting edge separations, at a chosen weight.
+     *
+     * <p>Gaps whose starting edge separation is not positive and finite are skipped: a
+     * fractional constraint cannot be formed around zero, and a design that already starts
+     * with coincident or crossed surfaces has nothing useful to anchor to. See
+     * {@link ConstraintEdgeThickness#is_constrainable(Analysis, int)}.
+     *
+     * @param weight relative strength; see {@link #NOMINAL_CONSTRAINT_WEIGHT}
+     */
+    public OptimizationBuilder applyEdgeThicknessConstraints(double weight) {
+        if (!Double.isFinite(weight) || weight < 0.0)
+            throw new IllegalArgumentException("edge thickness constraint weight must be finite and non-negative");
+        this.edgeThicknessConstraintWeight = weight;
+        return this;
+    }
+
+    /**
      * Hold the varied surfaces near their starting <em>curvatures</em>, at the nominal
      * weight.
      *
@@ -568,6 +600,13 @@ public final class OptimizationBuilder {
                 if (variable instanceof VarThickness thickness)
                     result.add(new ConstraintThickness(analysis, thickness._surface_id,
                             thicknessConstraintWeight));
+        }
+        if (edgeThicknessConstraintWeight != null) {
+            for (Var variable : variables)
+                if (variable instanceof VarThickness thickness
+                        && ConstraintEdgeThickness.is_constrainable(analysis, thickness._surface_id))
+                    result.add(new ConstraintEdgeThickness(analysis, thickness._surface_id,
+                            edgeThicknessConstraintWeight));
         }
         if (curvatureConstraintWeight != null) {
             for (Var variable : variables)

@@ -262,6 +262,63 @@ class OptimizationBuilderTest {
         return new double[]{field.vux, field.vlx, field.vuy, field.vly};
     }
 
+    /**
+     * The case {@link ConstraintThickness} cannot see: axial thickness untouched, but the
+     * surfaces bent until they cross away from the axis. If this ever stops failing for
+     * the thickness constraint, the edge constraint has lost its reason to exist.
+     */
+    @Test
+    void edgeConstraintSeesCurvatureDrivenCrossingThatThicknessConstraintCannot() {
+        Prescription prescription = prescription();
+        var setup = OptimizationBuilder.builder(prescription)
+                .fields(0.0)
+                .mtfFrequencies(10)
+                .varyThicknesses(0)
+                .applyThicknessConstraints()
+                .applyEdgeThicknessConstraints()
+                .rayAberrationGoals()
+                .build();
+
+        ConstraintThickness axial = (ConstraintThickness) Arrays.stream(setup.goals())
+                .filter(ConstraintThickness.class::isInstance).findFirst().orElseThrow();
+        ConstraintEdgeThickness edge = (ConstraintEdgeThickness) Arrays.stream(setup.goals())
+                .filter(ConstraintEdgeThickness.class::isInstance).findFirst().orElseThrow();
+
+        // Surface 0 is r=50 with a 30mm diameter, so the gap is measured at h=15.
+        assertEquals(15.0, edge._height, 1.0e-12);
+        assertEquals(0.0, axial.fractional_deviation(), 1.0e-12);
+        assertEquals(0.0, edge.fractional_deviation(), 1.0e-12);
+
+        // Bend surface 0 hard toward surface 1 without touching any thickness.
+        prescription._surfaces[0]._radius = 16.0;
+
+        assertEquals(0.0, axial.fractional_deviation(), 1.0e-12,
+                "axial thickness is unchanged, which is exactly why it cannot see this");
+        assertTrue(edge.value() < 0.0,
+                () -> "expected the edge gap to have gone negative, got " + edge.value());
+        assertTrue(edge.fractional_deviation() < -1.0);
+    }
+
+    @Test
+    void edgeConstraintsSkipGapsThatCannotBeAnchored() {
+        Prescription prescription = prescription();
+        // The last surface has no following surface to form a gap with.
+        int last = prescription._surfaces.length - 1;
+        assertFalse(ConstraintEdgeThickness.is_constrainable(
+                new Analysis(prescription, new double[]{0.0}, new int[]{10}), last));
+
+        var setup = OptimizationBuilder.builder(prescription)
+                .fields(0.0)
+                .mtfFrequencies(10)
+                .varyThicknesses(last)
+                .applyEdgeThicknessConstraints()
+                .rayAberrationGoals()
+                .build();
+
+        assertFalse(Arrays.stream(setup.goals())
+                .anyMatch(ConstraintEdgeThickness.class::isInstance));
+    }
+
     @Test
     void usesGaussianQuadratureByDefault() {
         Analysis analysis = OptimizationBuilder.builder(prescription())

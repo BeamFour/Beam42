@@ -9,7 +9,7 @@ import org.redukti.spec.VigType;
 
 import static org.redukti.optim.OptimizationBuilder.contrast;
 
-public class GenericContrastOpt {
+public class Nikkor28mmf14D {
 
     static Prescription getPrescription(String specfile, boolean weighted,
                                         boolean dLineOnly) throws Exception {
@@ -20,19 +20,14 @@ public class GenericContrastOpt {
 
     static OptimizationBuilder.OptimizationSetup createContrastSetup(Prescription prescription, boolean weighted,
                                                                      boolean dLineOnly) {
-        double[] fields = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+        //double[] fieldWeights = {8.0, 4.0, 2.0, 1.0};
         double[] fieldWeights = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
-        double[] sagittalWeights   = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
-        double[] tangentialWeights = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
-
         return OptimizationBuilder.builder(prescription)
-                .fields(fields)
+                .fields(0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
                 .mtfFrequencies(10, 30, 50)
                 .varyExistingAspherics()
                 .varyAllCurvatures()
                 .varyAllThicknesses()
-                // Everything is free, so hold the layout: without these the solver
-                // collapses air spaces and pushes elements through the stop.
                 .applyCurvatureConstraints()
                 .applyThicknessConstraints()
                 .applyEdgeThicknessConstraints()
@@ -44,22 +39,18 @@ public class GenericContrastOpt {
                 .freezeVignetting()
                 .checkSpotApertures(false)
                 .contrastGoals(
-                        contrast(10,
-                                fieldWeights),
-                        contrast(20,
-                                sagittalWeights,
-                                tangentialWeights),
-                        contrast(40,
-                                sagittalWeights,
-                                tangentialWeights))
-                //.additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 38.1031, 1.0))
+                        contrast(10, fieldWeights),
+                        contrast(30, fieldWeights),
+                        contrast(50, fieldWeights))
+                .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 38.1031, 1.0))
                 .build();
     }
 
     public static void main(String[] args) throws Exception {
         boolean weighted = false;
         boolean dLineOnly = false;
-        var prescription = getPrescription(args[0], weighted, dLineOnly);
+        String specfile = ExampleFinder.geoPathToExample("Examples/jfotoptix/nikkor-28mm-f1.4d/US005315441_Example01_a.txt");
+        var prescription = getPrescription(specfile, weighted, dLineOnly);
         var setup = createContrastSetup(prescription, weighted, dLineOnly);
         var analysis = setup.analysis();
         var meritFunction = setup.meritFunction(false);

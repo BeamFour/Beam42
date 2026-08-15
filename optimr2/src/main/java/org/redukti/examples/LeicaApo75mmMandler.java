@@ -146,8 +146,10 @@ public class LeicaApo75mmMandler {
                                 tangentialWeights))
                 .calibrateContrastFrequency(true)
                 .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 39.38, 1.0))
-                .vignetting(VigType.SetPupil)
+                .vignetting(VigType.SetVig)
                 .freezeVignetting()
+                .checkSpotApertures(false)
+                .applyEdgeThicknessConstraints()
                 .build();
     }
 

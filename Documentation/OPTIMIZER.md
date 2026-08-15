@@ -136,6 +136,59 @@ improvement.
 Centring is off by default because it changes every contrast residual and therefore every
 committed regression value.
 
+### Controlling astigmatism
+
+The contrast merit minimizes `sum(sagittal^2) + sum(tangential^2)`. At a fixed total that
+barely discriminates how astigmatism is split between the two meridians, and a designer
+discriminates sharply. On the Leica 75/2 a solve produced this at 50 cycles/mm:
+
+```text
+field    0.0    0.2    0.4    0.6    0.7    0.8    0.9    1.0
+sag     .447   .407   .453   .295   .177   .156   .288   .565
+tan     .447   .413   .531   .657   .706   .725   .627   .539
+sum     .894   .820   .984   .952   .883   .881   .915  1.104
+```
+
+The sum stays within 15 percent of itself across the whole field while the difference goes
+from zero to 0.57. The lens is not worse in that zone, it is lopsided there, and nothing in
+the merit had an opinion about that.
+
+`GoalContrastBalance` supplies the opinion. Its value is the difference between what the
+two orientations contribute to the merit,
+
+```text
+sum_wavelengths w ( sum_samples r_sagittal^2 - sum_samples r_tangential^2 )
+```
+
+against a target of zero, positive when sagittal is the worse meridian. Defining it on the
+residuals rather than on raw wavefront differences means it follows whatever those already
+account for, including residual centring and the frequency calibration. It is smooth and
+quadratic, with no modulus and no square root, so it has none of the conditioning problems
+of a goal built on the OTF itself.
+
+Enable it per field, since the outermost field usually wants leniency:
+
+```java
+.contrastBalanceGoals(new boolean[] {false, true, true, true, false})
+.contrastBalanceGoals(fields, 0.05)
+```
+
+One flag per configured field, in field order; false leaves that field's astigmatism
+entirely unconstrained. The goal applies to every configured contrast frequency, so it adds
+one residual per enabled field per frequency.
+
+**Set the weight from a measurement, not from the default.** A balance residual is a
+difference of sums of squares, so it is large exactly where a per-sample contrast residual
+is small. On the Leica starting design at 10/30/50 cycles/mm over 11 fields, the balance
+block at weight 1.0 came to 43.6 against the contrast block's 52.6 — 83 percent of the
+optical merit, from 33 residuals against 14256. `NOMINAL_BALANCE_WEIGHT` is 0.1, which puts
+it near 8 percent there, but nothing in this goal adapts to the design the way the
+fractional design-preservation constraints do.
+
+Be clear about what this is. Residual centring corrects an error in the merit; this does
+not. It tells the optimizer a design preference it has no way to infer — that astigmatism
+should be shared between the meridians rather than dumped on one of them.
+
 ### Operating range and limitation
 
 The proxy is most faithful in the small-phase regime:

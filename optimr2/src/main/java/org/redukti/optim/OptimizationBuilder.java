@@ -39,6 +39,22 @@ public final class OptimizationBuilder {
      */
     public static final double NOMINAL_CONSTRAINT_WEIGHT = 1.0;
 
+    /**
+     * Default strength for {@link #contrastBalanceGoals(boolean[])}.
+     *
+     * <p>Much smaller than {@link #NOMINAL_CONSTRAINT_WEIGHT}, and for a concrete reason:
+     * a balance residual is a difference of sums of squares, so it is large where a
+     * per-sample contrast residual is small. Measured on the Leica 75/2 starting design at
+     * 10/30/50 cyc/mm over 11 fields, the balance block at weight 1.0 came to 43.6 against
+     * the contrast block's 52.6 - 83% of the optical merit from 33 residuals against
+     * 14256. It would have run the solve.
+     *
+     * <p>0.1 puts it near 8% there, which is visible without dominating. It is a starting
+     * point, not a normalization: unlike the constraints, nothing here adapts to the
+     * design. Check the actual share on your own case before trusting it.
+     */
+    public static final double NOMINAL_BALANCE_WEIGHT = 0.1;
+
     private static final int RAY_FAN_SAMPLES = 10;
 
     private final Prescription prescription;
@@ -69,6 +85,8 @@ public final class OptimizationBuilder {
     private int contrastSpokes = 12;
     private boolean calibrateContrastFrequency = false;
     private boolean centerContrastResiduals = false;
+    private boolean[] contrastBalanceFields;
+    private double contrastBalanceWeight = NOMINAL_BALANCE_WEIGHT;
     private VigType vigType = VigType.SetPupil;
     private boolean freezeVignetting = false;
     private Double thicknessConstraintWeight;
@@ -344,6 +362,45 @@ public final class OptimizationBuilder {
         if (goals == null)
             throw new IllegalArgumentException("contrast goals must not be null");
         this.contrastGoals.addAll(Arrays.asList(goals));
+        return this;
+    }
+
+    /**
+     * Hold sagittal and tangential contrast in balance at the selected fields, at the
+     * nominal balance weight. One flag per configured field, in field order; a false
+     * leaves that field's astigmatism entirely unconstrained, which is usually what the
+     * outermost field wants.
+     *
+     * <p>Applies to every configured contrast frequency, so this adds one residual per
+     * enabled field per frequency. See {@link GoalContrastBalance} for what it measures
+     * and why the contrast merit does not already care.
+     */
+    public OptimizationBuilder contrastBalanceGoals(boolean[] fields) {
+        return contrastBalanceGoals(fields, NOMINAL_BALANCE_WEIGHT);
+    }
+
+    /**
+     * Hold sagittal and tangential contrast in balance at the selected fields, at a chosen
+     * weight.
+     *
+     * <p>The weight needs setting deliberately, because the scale is nothing like the
+     * per-sample contrast residuals: a balance residual is a difference of sums of squares,
+     * of order 0.1 to 3 waves squared on the test lenses, so a handful of them can outweigh
+     * thousands of contrast residuals. See {@link #NOMINAL_BALANCE_WEIGHT} for the measured
+     * example. Compare the two blocks' sum-of-squares contributions on your own case rather
+     * than assuming the default is proportionate.
+     *
+     * @param fields one flag per configured field, in field order
+     * @param weight relative strength
+     */
+    public OptimizationBuilder contrastBalanceGoals(boolean[] fields, double weight) {
+        if (fields == null)
+            throw new IllegalArgumentException("contrast balance field flags must not be null");
+        if (!Double.isFinite(weight) || weight < 0.0)
+            throw new IllegalArgumentException(
+                    "contrast balance weight must be finite and non-negative");
+        this.contrastBalanceFields = fields.clone();
+        this.contrastBalanceWeight = weight;
         return this;
     }
 
@@ -661,6 +718,20 @@ public final class OptimizationBuilder {
             }
         }
 
+        if (contrastBalanceFields != null) {
+            double[] wavelengthWeights = new double[prescription._wvls.length];
+            for (int w = 0; w < wavelengthWeights.length; w++)
+                wavelengthWeights[w] = weighted ? prescription._wts[w] : 1.0;
+            for (int contrast_index = 0; contrast_index < contrastGoals.size(); contrast_index++) {
+                ContrastGoals curve = contrastGoals.get(contrast_index);
+                for (int field = 0; field < fields.length; field++) {
+                    if (!contrastBalanceFields[field]) continue;
+                    result.add(new GoalContrastBalance(analysis, contrast_index, curve.frequency,
+                            field + 1, wavelengthWeights, contrastBalanceWeight));
+                }
+            }
+        }
+
         if (spotRmsGoals != null) {
             for (int field = 0; field < fields.length; field++)
                 result.add(new GoalSpotRMS(analysis, field + 1,
@@ -721,6 +792,15 @@ public final class OptimizationBuilder {
     private void validate() {
         if (fields == null || fields.length == 0)
             throw new IllegalArgumentException("at least one field is required");
+        if (contrastBalanceFields != null) {
+            if (contrastBalanceFields.length != fields.length)
+                throw new IllegalArgumentException(
+                        "contrast balance needs one flag per field: " + fields.length
+                                + " fields but " + contrastBalanceFields.length + " flags");
+            if (contrastGoals.isEmpty())
+                throw new IllegalArgumentException(
+                        "contrast balance goals require contrast goals to balance");
+        }
         for (double field : fields)
             if (!Double.isFinite(field) || field < 0.0 || field > 1.0)
                 throw new IllegalArgumentException("fields must be finite values between 0 and 1");

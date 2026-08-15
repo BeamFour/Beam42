@@ -320,6 +320,151 @@ class OptimizationBuilderTest {
     }
 
     @Test
+    void contrastBalanceGoalsAreBuiltPerEnabledFieldAndFrequency() {
+        var setup = OptimizationBuilder.builder(prescription())
+                .fields(0.0, 0.5, 1.0)
+                .mtfFrequencies(10, 20)
+                .contrastSampling(2, 4)
+                .contrastGoals(
+                        OptimizationBuilder.contrast(10, new double[]{1, 1, 1}),
+                        OptimizationBuilder.contrast(20, new double[]{1, 1, 1}))
+                // Outer field left unconstrained, as leniency there is usual.
+                .contrastBalanceGoals(new boolean[]{true, true, false}, 4.0)
+                .build();
+
+        GoalContrastBalance[] balance = Arrays.stream(setup.goals())
+                .filter(GoalContrastBalance.class::isInstance)
+                .map(GoalContrastBalance.class::cast)
+                .toArray(GoalContrastBalance[]::new);
+
+        // Two enabled fields times two frequencies, and nothing for the disabled field.
+        assertEquals(4, balance.length);
+        assertArrayEquals(new int[]{0, 1, 0, 1},
+                Arrays.stream(balance).mapToInt(goal -> goal._field).toArray());
+        assertArrayEquals(new int[]{10, 10, 20, 20},
+                Arrays.stream(balance).mapToInt(goal -> goal._frequency).toArray());
+        for (var goal : balance) {
+            assertEquals(0.0, goal._target);
+            assertEquals(4.0, goal._weight);
+        }
+    }
+
+    @Test
+    void contrastBalanceRejectsAFlagPerFieldMismatch() {
+        IllegalArgumentException tooFew = assertThrows(IllegalArgumentException.class, () ->
+                OptimizationBuilder.builder(prescription())
+                        .fields(0.0, 0.5, 1.0)
+                        .mtfFrequencies(10)
+                        .contrastSampling(2, 4)
+                        .contrastGoals(OptimizationBuilder.contrast(10, new double[]{1, 1, 1}))
+                        .contrastBalanceGoals(new boolean[]{true, true})
+                        .build());
+        assertTrue(tooFew.getMessage().contains("one flag per field"));
+
+        assertThrows(IllegalArgumentException.class, () ->
+                OptimizationBuilder.builder(prescription())
+                        .fields(0.0)
+                        .mtfFrequencies(10)
+                        .contrastBalanceGoals(new boolean[]{true})
+                        .build(),
+                "balance without contrast goals has nothing to balance");
+    }
+
+    /**
+     * The point of the goal: zero when the two meridians contribute equally, and signed by
+     * which one is worse. It must not care about the overall aberration level, only the
+     * split - that is what the contrast merit already handles.
+     */
+    @Test
+    void contrastBalanceReadsZeroWhenMeridiansAreEqualAndSignedOtherwise() {
+        var setup = OptimizationBuilder.builder(prescription())
+                .fields(0.0, 1.0)
+                .mtfFrequencies(10)
+                // Unweighted so the goal's wavelength pooling and the sum below coincide;
+                // weighted pooling is covered separately.
+                .weighted(false)
+                .contrastSampling(2, 4)
+                .contrastGoals(OptimizationBuilder.contrast(10, new double[]{1, 1}))
+                .contrastBalanceGoals(new boolean[]{true, true})
+                .build();
+        setup.analysis().compute();
+
+        GoalContrastBalance onAxis = Arrays.stream(setup.goals())
+                .filter(GoalContrastBalance.class::isInstance)
+                .map(GoalContrastBalance.class::cast)
+                .filter(goal -> goal._field == 0)
+                .findFirst().orElseThrow();
+
+        // On axis the two meridians are identical by rotational symmetry, so a balance
+        // goal there is satisfied however aberrated the lens is.
+        assertEquals(0.0, onAxis.value(), 1.0e-12);
+
+        double sagittal = blockSumOfSquares(setup, Orientation.SAGITTAL, 1);
+        double tangential = blockSumOfSquares(setup, Orientation.TANGENTIAL, 1);
+        GoalContrastBalance offAxis = Arrays.stream(setup.goals())
+                .filter(GoalContrastBalance.class::isInstance)
+                .map(GoalContrastBalance.class::cast)
+                .filter(goal -> goal._field == 1)
+                .findFirst().orElseThrow();
+        assertEquals(sagittal - tangential, offAxis.value(), 1.0e-9,
+                "balance must equal the difference the two meridians contribute to the merit");
+    }
+
+    /**
+     * The goal pools per-wavelength blocks using the same wavelength weights the merit
+     * applies to the contrast residuals, so an unweighted setup is the case where this
+     * plain sum matches.
+     */
+    @Test
+    void contrastBalancePoolsWavelengthsWithTheConfiguredWeights() {
+        var setup = OptimizationBuilder.builder(prescription())
+                .fields(0.0, 1.0)
+                .mtfFrequencies(10)
+                .weighted(true)   // prescription weights are 1.0, 0.5, 0.25
+                .contrastSampling(2, 4)
+                .contrastGoals(OptimizationBuilder.contrast(10, new double[]{1, 1}))
+                .contrastBalanceGoals(new boolean[]{false, true})
+                .build();
+        setup.analysis().compute();
+
+        var balance = Arrays.stream(setup.goals())
+                .filter(GoalContrastBalance.class::isInstance)
+                .map(GoalContrastBalance.class::cast)
+                .findFirst().orElseThrow();
+
+        double[] weights = {1.0, 0.5, 0.25};
+        double expected = 0.0;
+        for (int w = 0; w < weights.length; w++) {
+            double sagittal = wavelengthSumOfSquares(setup, Orientation.SAGITTAL, 1, w);
+            double tangential = wavelengthSumOfSquares(setup, Orientation.TANGENTIAL, 1, w);
+            expected += weights[w] * (sagittal - tangential);
+        }
+        assertEquals(expected, balance.value(), 1.0e-9);
+    }
+
+    private static double wavelengthSumOfSquares(
+            OptimizationBuilder.OptimizationSetup setup, int orientation, int field, int wavelength) {
+        return Arrays.stream(setup.goals())
+                .filter(GoalContrast.class::isInstance)
+                .map(GoalContrast.class::cast)
+                .filter(goal -> goal._field == field && goal._orientation == orientation
+                        && goal._wavelength_index == wavelength)
+                .mapToDouble(goal -> goal.value() * goal.value())
+                .sum();
+    }
+
+    /** Sum of squares of the merit's own contrast residuals for one field and orientation. */
+    private static double blockSumOfSquares(
+            OptimizationBuilder.OptimizationSetup setup, int orientation, int field) {
+        return Arrays.stream(setup.goals())
+                .filter(GoalContrast.class::isInstance)
+                .map(GoalContrast.class::cast)
+                .filter(goal -> goal._field == field && goal._orientation == orientation)
+                .mapToDouble(goal -> goal.value() * goal.value())
+                .sum();
+    }
+
+    @Test
     void usesGaussianQuadratureByDefault() {
         Analysis analysis = OptimizationBuilder.builder(prescription())
                 .fields(0.0)

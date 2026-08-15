@@ -122,15 +122,15 @@ public class LeicaApo75mmMandler {
                                                                      double[] wights) {
         double[] fields = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
         double[] fieldWeights = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
-        double[] sagittalWeights   = {2.0, 2.0, 2.0, 2.0, 2.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0};
+        double[] sagittalWeights   = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
         double[] tangentialWeights = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
-
+        boolean[] correctAstigmatism = {true, true, true, true, true, true, true, true, true, true, false};
         return OptimizationBuilder.builder(prescription)
                 .fields(fields)
                 .mtfFrequencies(10, 20, 40)
                 .varyAllCurvatures()
                 .varyAllThicknesses()
-                .weighted(true)
+                .weighted(false)
                 .dLineOnly(dLineOnly)
                 .applyCurvatureConstraints()
                 .applyThicknessConstraints(5.0)
@@ -145,11 +145,13 @@ public class LeicaApo75mmMandler {
                                 sagittalWeights,
                                 tangentialWeights))
                 .calibrateContrastFrequency(true)
+                .centerContrastResiduals(true)
                 .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 39.38, 1.0))
                 .vignetting(VigType.SetVig)
                 .freezeVignetting()
                 .checkSpotApertures(false)
                 .applyEdgeThicknessConstraints()
+                .contrastBalanceGoals(correctAstigmatism, 4.0)
                 .build();
     }
 

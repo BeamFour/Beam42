@@ -217,6 +217,14 @@ regression is `tan@40` at field 3 (0.567 → 0.539) — the field crippled by is
 > sagittal is unchanged to five decimals. See
 > [the sagittal/tangential balance](#why-this-may-bear-on-the-sagittal-drop) below.
 
+The wording above is intentionally reference-relative. For the reference wavelength this
+is exactly the centred variance. The same reference offset is applied to every other
+wavelength, so the combined polychromatic block remains a second moment about the
+reference image rather than a variance about a combined spectral mean. That is deliberate:
+it matches Beam42's polychromatic spot convention and preserves lateral colour. Earlier
+documentation described every wavelength block simply as a variance; `OPTIMIZER.md` now
+records the narrower contract.
+
 The modulus of the OTF is
 
 ```
@@ -1118,6 +1126,33 @@ measurement and defects that need a fix, because they want different kinds of ef
 Work that landed after the findings above and does not belong to any one of them.
 [OPTIMIZER.md](OPTIMIZER.md) is the reference for how these behave; this section records
 only why they exist and what they change about the review.
+
+### Reference-wavelength centring and contrast balance
+
+Finding 3 is now implemented as an opt-in reference-relative centring operation. For each
+(frequency, field, orientation), `ContrastAnalysis` measures the quadrature-weighted mean
+of the reference-wavelength wavefront differences and subtracts that one offset from every
+wavelength. Common image displacement disappears, while wavelength-dependent displacement
+remains as lateral colour. The distinction matters in the documentation: this is the exact
+centred variance of the reference block, but the polychromatic residual set is a second
+moment about the reference image, not about a combined wavelength-weighted centroid.
+
+Correcting the spurious tangential mean changes the relative sagittal/tangential pressure
+without directly changing sagittal residual values. `GoalContrastBalance` was therefore
+added as a separate, explicit design preference: for each enabled field and contrast
+frequency it drives the difference between the two orientations' weighted residual-energy
+contributions toward zero. It uses the same wavelength weights and the same per-field
+sagittal/tangential weights as `GoalContrast`, so it cannot silently substitute its own
+orientation policy for the merit it is balancing.
+
+The balance value is quadratic in the wavefront differences; because LM squares every goal
+residual, its contribution to the final least-squares merit is quartic. Its scale is unlike
+the per-sample contrast residuals, so `NOMINAL_BALANCE_WEIGHT` is only a starting point and
+the aggregate balance and contrast contributions should be measured for each prescription.
+The builder enables it with `contrastBalanceGoals(...)`, one flag per field, and adds one
+goal per enabled field per configured contrast frequency. This does not correct another
+error in the merit: unlike centring, it deliberately expresses a preference that the two
+meridians should carry comparable weighted contrast error.
 
 ### Design-preservation constraints
 

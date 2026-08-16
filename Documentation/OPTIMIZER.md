@@ -179,6 +179,14 @@ the configured sagittal/tangential field weights. Its value is smooth and quadra
 no modulus and no square root. Since the least-squares solver squares every goal value,
 its final merit contribution is quartic in the wavefront differences.
 
+The weights in that expression are exactly the weights used by the ordinary contrast
+goals. If a field gives sagittal contrast weight 2 and tangential weight 0.5, balance is
+reached when those *weighted merit contributions* are equal, not when the two unweighted
+residual energies are equal. A zero orientation weight removes that orientation from both
+the ordinary contrast block and the balance comparison. This keeps the balance goal from
+quietly imposing a different sagittal/tangential weighting policy from the contrast merit
+it accompanies.
+
 Enable it per field, since the outermost field usually wants leniency:
 
 ```java
@@ -186,9 +194,10 @@ Enable it per field, since the outermost field usually wants leniency:
 .contrastBalanceGoals(fields, 0.05)
 ```
 
-One flag per configured field, in field order; false leaves that field's astigmatism
-entirely unconstrained. The goal applies to every configured contrast frequency, so it adds
-one residual per enabled field per frequency.
+One flag per configured field, in field order; false adds no explicit balance constraint at
+that field. The ordinary contrast residuals still constrain the two meridians independently.
+The goal applies to every configured contrast frequency, so it adds one residual per enabled
+field per frequency.
 
 **Set the weight from a measurement, not from the default.** A balance residual is a
 difference of sums of squares, so it is large exactly where a per-sample contrast residual

@@ -199,6 +199,27 @@ that field. The ordinary contrast residuals still constrain the two meridians in
 The goal applies to every configured contrast frequency, so it adds one residual per enabled
 field per frequency.
 
+**Leave it off on axis.** At field zero the two meridians are identical by rotational
+symmetry, so there is nothing to balance and the value reduces to
+
+```text
+(w_sagittal - w_tangential) * S
+```
+
+where `S` is the axial residual energy. With equal orientation weights that is exactly
+zero and the goal is inert. With unequal weights it is not: it silently becomes a second
+axial contrast goal of strength `w_sagittal - w_tangential`, which is normally a number
+that fell out of a field taper rather than a decision about axial emphasis. Measured on the
+Leica 75/2 with weights 8 and 4 on axis, it contributed 50.3 of a 802.6 merit — 6.3 percent,
+none of it balance.
+
+It also behaves unlike the contrast goals it is shadowing. `S` is already a sum of squares,
+so this residual is quadratic where the per-sample residuals are linear: it pushes hardest
+while axial aberration is large and fades quadratically as the design improves. If axial
+emphasis is what is wanted, raise the field-zero entries in the sagittal and tangential
+weight arrays instead. Those act through the ordinary residuals, scale predictably, and do
+not evaporate on convergence.
+
 **Set the weight from a measurement, not from the default.** A balance residual is a
 difference of sums of squares, so it is large exactly where a per-sample contrast residual
 is small. On the Leica starting design at 10/30/50 cycles/mm over 11 fields, the balance

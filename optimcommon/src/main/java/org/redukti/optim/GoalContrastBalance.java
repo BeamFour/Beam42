@@ -28,9 +28,26 @@ import org.redukti.mathlib.LMLSolver;
  * square root, so unlike the phasor MTF goal that was tried and reverted it has no kink to
  * fall into.
  *
- * <p>Two things to be clear about. This is a design preference, not a correction: it tells
- * the optimizer something it cannot infer, rather than fixing an error. And it is one
- * residual against the thousands in a contrast merit, so its weight has to be set
+ * <p>The orientation weights are the ones the ordinary contrast goals use, so the ratio
+ * {@code w_sagittal / w_tangential} <em>is</em> the instruction for how the two meridians
+ * should differ: balance is reached when the weighted contributions match, not when the
+ * two residual energies do. Weights of 0.5 and 0.1 ask for tangential to carry five times
+ * the energy of sagittal, and the goal will deliver that.
+ *
+ * <p><b>Not meaningful on axis.</b> At field zero the meridians are identical by
+ * rotational symmetry, so there is nothing to balance and the value reduces to
+ * {@code (w_sagittal - w_tangential) * S}, where {@code S} is the axial residual energy.
+ * Equal weights make that exactly zero and the goal inert; unequal weights turn it into a
+ * second axial contrast goal whose strength is a number that usually fell out of a field
+ * taper rather than a decision. On the Leica 75/2 with weights 8 and 4 it came to 6.3% of
+ * the merit, none of it balance. It is also shaped unlike the goals it shadows - {@code S}
+ * is already a sum of squares, so this residual is quadratic where the per-sample ones are
+ * linear, and it fades quadratically as the design improves. Prefer raising the field-zero
+ * contrast weights if axial emphasis is what is wanted.
+ *
+ * <p>Two further things to be clear about. This is a design preference, not a correction:
+ * it tells the optimizer something it cannot infer, rather than fixing an error. And it is
+ * one residual against the thousands in a contrast merit, so its weight has to be set
  * deliberately - see {@link OptimizationBuilder#contrastBalanceGoals(boolean[], double)}.
  */
 public class GoalContrastBalance extends Goal {

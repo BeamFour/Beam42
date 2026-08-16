@@ -367,13 +367,18 @@ public final class OptimizationBuilder {
 
     /**
      * Hold sagittal and tangential contrast in balance at the selected fields, at the
-     * nominal balance weight. One flag per configured field, in field order; a false
-     * leaves that field's astigmatism entirely unconstrained, which is usually what the
-     * outermost field wants.
+     * nominal balance weight. One flag per configured field, in field order; a false adds
+     * no explicit balance constraint there, which is usually what the outermost field
+     * wants. The ordinary contrast residuals still constrain both meridians.
      *
      * <p>Applies to every configured contrast frequency, so this adds one residual per
      * enabled field per frequency. See {@link GoalContrastBalance} for what it measures
      * and why the contrast merit does not already care.
+     *
+     * <p>Two settings that surprise: the sagittal and tangential contrast weights set the
+     * <em>ratio</em> this goal targets rather than merely prioritising a meridian, and on
+     * axis it cannot balance anything - with unequal weights it quietly becomes an axial
+     * contrast goal instead. Both are covered on {@link GoalContrastBalance}.
      */
     public OptimizationBuilder contrastBalanceGoals(boolean[] fields) {
         return contrastBalanceGoals(fields, NOMINAL_BALANCE_WEIGHT);

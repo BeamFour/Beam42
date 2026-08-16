@@ -126,8 +126,8 @@ public class LeicaApo75mmMandler {
                                                                      double[] wights) {
         double[] fields = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
         double[] fieldWeights = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
-        double[] sagittalWeights   = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
-        double[] tangentialWeights = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+        double[] sagittalWeights   = {8.0, 8.0, 8.0, 8.0, 8.0, 8.0, 4.0, 2.0, 1.0, 0.5, 0.1};
+        double[] tangentialWeights = {4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 1.0, 1.0, 0.5, 0.1, 0.1};
         boolean[] correctAstigmatism = {true, true, true, true, true, true, true, true, true, true, false};
         return OptimizationBuilder.builder(prescription)
                 .fields(fields)
@@ -141,15 +141,16 @@ public class LeicaApo75mmMandler {
                 .contrastSampling(6, 12)
                 .contrastGoals(
                         contrast(10,
-                                fieldWeights),
+                                sagittalWeights,
+                                tangentialWeights),
                         contrast(20,
                                 sagittalWeights,
                                 tangentialWeights),
                         contrast(40,
                                 sagittalWeights,
                                 tangentialWeights))
-                .calibrateContrastFrequency(true)
-                .centerContrastResiduals(true)
+                .calibrateContrastFrequency(false)
+                .centerContrastResiduals(false)
                 //.additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 39.38, 1.0))
                 .vignetting(VigType.SetVig)
                 .freezeVignetting()

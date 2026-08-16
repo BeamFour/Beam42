@@ -61,7 +61,7 @@ public class ZeissOtusML50mm {
                 // do not generally need them.
                 .rayAberrationGoals()
                 .contrastSampling(6, 12)
-                .calibrateContrastFrequency(true)
+                .calibrateContrastFrequency(false)
                 .contrastGoals(
                         contrast(10, fieldWeights),
                         contrast(30, fieldWeights),

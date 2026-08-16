@@ -85,7 +85,7 @@ public class LeicaApo75mmMandler {
                                                                      boolean weighted,
                                                                      boolean dLineOnly,
                                                                      double[] weights) {
-        double[] fieldWeights = {1.0, 1.0, 1.0, 1.0, 1.0};
+        double[] fieldWeights = {1.0, 1.0, 2.0, 1.0, 1.0};
         return OptimizationBuilder.builder(prescription)
                 //.fields(0.0, 0.2, 0.4, 0.75, 1.0)
                 //.fields(0.0, 0.1, 0.4, 0.75, 1.0)
@@ -93,25 +93,29 @@ public class LeicaApo75mmMandler {
                 .mtfFrequencies(10, 20, 40)
                 .varyAllCurvatures()
                 .varyAllThicknesses()
-                .weighted(weighted)
+                .weighted(true)
                 .dLineOnly(dLineOnly)
                 .applyCurvatureConstraints()
                 .applyThicknessConstraints()
+                .applyEdgeThicknessConstraints()
                 .mtfGoals(
                         mtf(10,
-                                new double[]{95, 95, 91, 85, 82},
-                                new double[]{95, 95, 91, 85, 75},
+                                new double[]{90, 95, 91, 85, 82},
+                                new double[]{90, 95, 91, 85, 75},
                                 fieldWeights),
                         mtf(20,
-                                new double[]{85, 85, 80, 70, 62},
-                                new double[]{85, 85, 80, 70, 58},
+                                new double[]{80, 80, 80, 70, 62},
+                                new double[]{80, 80, 80, 70, 58},
                                 fieldWeights),
                         mtf(40,
-                                new double[]{65, 65, 64, 40, 42},
-                                new double[]{65, 65, 64, 40, 15},
+                                new double[]{60, 60, 64, 40, 42},
+                                new double[]{60, 60, 64, 40, 15},
                                 fieldWeights))
                 .gaussianQuadratureSampling(6, 12)
-                .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 39.38, 1.0))
+                .vignetting(VigType.SetVig)
+                .freezeVignetting()
+                .checkSpotApertures(false)
+                //.additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 39.38, 1.0))
                 .build();
     }
 
@@ -146,7 +150,7 @@ public class LeicaApo75mmMandler {
                                 tangentialWeights))
                 .calibrateContrastFrequency(true)
                 .centerContrastResiduals(true)
-                .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 39.38, 1.0))
+                //.additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 39.38, 1.0))
                 .vignetting(VigType.SetVig)
                 .freezeVignetting()
                 .checkSpotApertures(false)

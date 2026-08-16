@@ -1,0 +1,83 @@
+package org.redukti.examples;
+
+import org.redukti.importers.obench.OpticalBenchDataImporter;
+import org.redukti.optim.GoalParax;
+import org.redukti.optim.OptimizationBuilder;
+import org.redukti.optim.ParaxHelper;
+import org.redukti.spec.Prescription;
+import org.redukti.spec.VigType;
+
+import static org.redukti.optim.OptimizationBuilder.contrast;
+
+public class Nikkor58mmSato {
+
+    static Prescription getPrescription(String specfile, boolean weighted,
+                                        boolean dLineOnly) throws Exception {
+        OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
+        specs.parse_file(specfile);
+        return Prescription.build_prescription(specs, true, weighted, dLineOnly);
+    }
+
+    static OptimizationBuilder.OptimizationSetup createContrastSetup(Prescription prescription, boolean weighted,
+                                                                     boolean dLineOnly) {
+        double[] fields = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99};
+        double[] sagittalWeights   = {3.0, 3.0, 3.0, 3.0, 3.0, 4.0, 4.0, 4.0, 2.0, 1.0, 1.0};
+        double[] tangentialWeights = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.5};
+        boolean[] correctAstigmatism = {true, true, true, true, true, true, true, true, true, true, true};
+
+        return OptimizationBuilder.builder(prescription)
+                .fields(fields)
+                .mtfFrequencies(10, 30, 50)
+                .varyExistingAspherics()
+                .varyAllCurvatures()
+                .varyAllThicknesses()
+                // Everything is free, so hold the layout: without these the solver
+                // collapses air spaces and pushes elements through the stop.
+                .applyCurvatureConstraints()
+                .applyThicknessConstraints()
+                .applyEdgeThicknessConstraints()
+                .weighted(false)
+                .dLineOnly(dLineOnly)
+                .contrastSampling(6, 12)
+                .calibrateContrastFrequency(false)
+                .vignetting(VigType.SetVig)
+                .freezeVignetting()
+                .checkSpotApertures(false)
+                .contrastGoals(
+                        contrast(10,
+                                sagittalWeights,
+                                tangentialWeights),
+                        contrast(30,
+                                sagittalWeights,
+                                tangentialWeights),
+                        contrast(50,
+                                sagittalWeights,
+                                tangentialWeights))
+                .contrastBalanceGoals(correctAstigmatism, 4.0)
+                .build();
+    }
+
+    public static void main(String[] args) throws Exception {
+        boolean weighted = false;
+        boolean dLineOnly = false;
+        String specfile = ExampleFinder.geoPathToExample("Examples/jfotoptix/nikkor-58mm-f1.4g/JP2013-019993_Example01.txt");
+        var prescription = getPrescription(specfile, weighted, dLineOnly);
+        var setup = createContrastSetup(prescription, weighted, dLineOnly);
+        var analysis = setup.analysis();
+        var meritFunction = setup.meritFunction(false);
+        analysis.compute();
+        var solver = meritFunction.getSolver();
+
+        if (analysis._ray_aberrations != null) {
+            System.out.println("Aberrations:\n");
+            System.out.println(analysis._ray_aberrations.list_ray_fans());
+        }
+        System.out.println("Before:\n");
+        System.out.println(meritFunction);
+        var status = solver.solve();
+        System.out.println("Status = " + status);
+        System.out.println("After:\n");
+        System.out.println(meritFunction);
+        System.out.println(prescription);
+    }
+}

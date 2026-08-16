@@ -32,6 +32,21 @@ import static org.redukti.optim.OptimizationBuilder.mtf;
  *
  * The parameters for Leitz glass 554666 are not available, However, CORNING
  * B52-67 appears to be replica of this glass type with ne 1.55416 and ve 66.66.
+ *
+ * This extremely rare Elcan-R 75 mm f/2 (optical formula C-341) was developed by
+ * Ernst Leitz Canada (ELCAN) in the early 1970s specifically for the US Navy’s
+ * "High Resolution Small Format Camera System." Only approximately 20 units
+ * were ever produced. Designed by Professor Dr. Walter Mandler, this lens is part
+ * of a family of apochromatic R-mount optics engineered for exceptional colour
+ * and infrared correction, delivering sharp, distortion-free images across a
+ * broad spectral range.
+ *
+ * Over the past 20 years, only four examples of the Elcan-R 75mm f/2 have been
+ * recorded at auctions, underscoring both its rarity and historical significance.
+ * The offered example is in beautiful condition, with very good optics. It is
+ * one of the rarest Leica lenses ever made.
+ *
+ * Source https://www.leitz-auction.com/en/Elcan-R-2-75mm-US-Navy/A02373
  */
 public class LeicaApo75mmMandler {
 

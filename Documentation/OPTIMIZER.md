@@ -86,14 +86,16 @@ loss of contrast.
 
 ### Residual centring
 
-The sum above is the un-centred second moment, and it decomposes as
+For a single wavelength block the sum above is the un-centred second moment, and it
+decomposes as
 
 ```text
 sum_p w_p deltaW(p)^2 = Var(deltaW) + mean(deltaW)^2
 ```
 
-Only the first term belongs there. The OTF modulus depends on the *variance* of the phase
-difference, through `|OTF| = |<exp(i Phi)>| ~ 1 - Var(Phi)/2`. A constant `deltaW` across
+Only the first term describes the monochromatic loss of contrast. The OTF modulus depends
+on the *variance* of the phase difference, through
+`|OTF| = |<exp(i Phi)>| ~ 1 - Var(Phi)/2`. A constant `deltaW` across
 the pupil is wavefront tilt, which displaces the image: it moves the phase transfer
 function and leaves the modulus untouched. The geometric MTF used to validate the
 surrogate is translation invariant too, since spot analysis measures about the centroid.
@@ -104,8 +106,10 @@ Enable centring through the builder:
 .centerContrastResiduals(true)
 ```
 
-The residual becomes `sqrt(w_p) (deltaW(p) - deltaW_bar)`, where `deltaW_bar` is the
-quadrature-weighted mean over the valid samples of the block.
+For the reference wavelength the residual becomes
+`sqrt(w_p) (deltaW(p) - deltaW_bar_ref)`, where `deltaW_bar_ref` is its
+quadrature-weighted mean over the valid samples. The same reference-wavelength offset is
+then subtracted from every other wavelength.
 
 Two properties are worth knowing before enabling it.
 
@@ -114,12 +118,17 @@ shear direction rather than being constant, so its mean over a symmetric pupil i
 zero. Only the constant part goes; defocus, coma, spherical and astigmatism keep their
 full contribution.
 
-**The mean is subtracted per (frequency, field, orientation), not per wavelength.** A tilt
+**The reference-wavelength mean is subtracted per (frequency, field, orientation), not a
+separate mean per wavelength.** A tilt
 common to every wavelength is a harmless image shift. A tilt that differs between
 wavelengths is lateral colour, and that genuinely does reduce polychromatic MTF, because
 the per-wavelength complex transfer functions acquire different phases and partly cancel.
 Subtracting the reference wavelength's mean from every wavelength discards the common part
-and preserves the difference.
+and preserves every wavelength's displacement relative to the reference. This follows the
+same reference-image convention as Beam42's polychromatic spot analysis. It is exactly the
+centred variance for the reference wavelength; across all wavelengths it is a second
+moment about that reference image, deliberately retaining lateral colour rather than the
+variance about a combined polychromatic mean.
 
 The sagittal mean is identically zero on a rotationally symmetric system, since `deltaW`
 is odd about the shear centre, so in practice only tangential residuals move. That does
@@ -129,7 +138,7 @@ against each other through the astigmatic focus split. Measured on the Leica 75/
 raises sagittal's weight relative to tangential by a factor of about 2 at fields 0.7
 through 1.0.
 
-There is a second reason to prefer it. The `mean^2` term is *reducible* by adding tilt,
+There is a second reason to prefer it. The common `mean^2` term is *reducible* by adding tilt,
 which costs no MTF, so leaving it in offers the solver merit reduction that buys no optical
 improvement.
 
@@ -157,14 +166,18 @@ the merit had an opinion about that.
 two orientations contribute to the merit,
 
 ```text
-sum_wavelengths w ( sum_samples r_sagittal^2 - sum_samples r_tangential^2 )
+sum_wavelengths w (
+    w_sagittal sum_samples r_sagittal^2
+  - w_tangential sum_samples r_tangential^2
+)
 ```
 
 against a target of zero, positive when sagittal is the worse meridian. Defining it on the
 residuals rather than on raw wavefront differences means it follows whatever those already
-account for, including residual centring and the frequency calibration. It is smooth and
-quadratic, with no modulus and no square root, so it has none of the conditioning problems
-of a goal built on the OTF itself.
+account for, including residual centring, frequency calibration, wavelength weights and
+the configured sagittal/tangential field weights. Its value is smooth and quadratic, with
+no modulus and no square root. Since the least-squares solver squares every goal value,
+its final merit contribution is quartic in the wavefront differences.
 
 Enable it per field, since the outermost field usually wants leniency:
 

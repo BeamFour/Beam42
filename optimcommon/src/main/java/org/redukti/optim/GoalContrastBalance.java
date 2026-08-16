@@ -15,11 +15,14 @@ import org.redukti.mathlib.LMLSolver;
  * <p>This supplies the opinion. The value is the difference between what the two
  * orientations contribute to the merit,
  *
- * <pre>{@code sum_wavelengths w * ( sum_samples r_sagittal^2 - sum_samples r_tangential^2 )}</pre>
+ * <pre>{@code sum_wavelengths w * (
+ *     w_sagittal * sum_samples r_sagittal^2
+ *   - w_tangential * sum_samples r_tangential^2 )}</pre>
  *
  * <p>against a target of zero. Defining it on the residuals rather than on the raw
  * wavefront differences means it automatically follows whatever those residuals already
- * account for - residual centering, quadrature weights, the frequency calibration.
+ * account for - residual centering, quadrature weights, wavelength and orientation
+ * weights, and the frequency calibration.
  *
  * <p>It is smooth and quadratic in the wavefront differences, with no modulus and no
  * square root, so unlike the phasor MTF goal that was tried and reverted it has no kink to
@@ -37,6 +40,8 @@ public class GoalContrastBalance extends Goal {
     /** Zero based, as stored; the constructor takes a one based field. */
     public final int _field;
     private final double[] _wavelength_weights;
+    private final double _sagittal_weight;
+    private final double _tangential_weight;
 
     /**
      * @param field              one based, as for every other field-addressed goal
@@ -44,6 +49,16 @@ public class GoalContrastBalance extends Goal {
      */
     public GoalContrastBalance(Analysis analysis, int contrast_index, int frequency,
                                int field, double[] wavelengthWeights, double weight) {
+        this(analysis, contrast_index, frequency, field, wavelengthWeights, 1.0, 1.0, weight);
+    }
+
+    /**
+     * @param sagittalWeight    field/orientation weight used by the sagittal contrast goals
+     * @param tangentialWeight  field/orientation weight used by the tangential contrast goals
+     */
+    public GoalContrastBalance(Analysis analysis, int contrast_index, int frequency,
+                               int field, double[] wavelengthWeights,
+                               double sagittalWeight, double tangentialWeight, double weight) {
         super(analysis, 0.0, weight);
         if (contrast_index < 0)
             throw new IllegalArgumentException("contrast index must be non-negative");
@@ -51,10 +66,16 @@ public class GoalContrastBalance extends Goal {
             throw new IllegalArgumentException("field is one based and must be positive");
         if (wavelengthWeights == null || wavelengthWeights.length == 0)
             throw new IllegalArgumentException("balance needs at least one wavelength weight");
+        if (!Double.isFinite(sagittalWeight) || sagittalWeight < 0.0
+                || !Double.isFinite(tangentialWeight) || tangentialWeight < 0.0)
+            throw new IllegalArgumentException(
+                    "contrast orientation weights must be finite and non-negative");
         _contrast_index = contrast_index;
         _frequency = frequency;
         _field = field - 1;
         _wavelength_weights = wavelengthWeights.clone();
+        _sagittal_weight = sagittalWeight;
+        _tangential_weight = tangentialWeight;
     }
 
     @Override
@@ -81,7 +102,8 @@ public class GoalContrastBalance extends Goal {
                 tangential += rt * rt;
                 sampled = true;
             }
-            difference += _wavelength_weights[wi] * (sagittal - tangential);
+            difference += _wavelength_weights[wi]
+                    * (_sagittal_weight * sagittal - _tangential_weight * tangential);
         }
         if (!sampled || !Double.isFinite(difference)) return LMLSolver.BIGVAL;
         return difference;

@@ -442,6 +442,30 @@ class OptimizationBuilderTest {
         assertEquals(expected, balance.value(), 1.0e-9);
     }
 
+    @Test
+    void contrastBalanceIncludesSagittalAndTangentialFieldWeights() {
+        var setup = OptimizationBuilder.builder(prescription())
+                .fields(0.0, 1.0)
+                .mtfFrequencies(10)
+                .weighted(false)
+                .contrastSampling(2, 4)
+                .contrastGoals(OptimizationBuilder.contrast(10,
+                        new double[]{1.0, 2.5}, new double[]{1.0, 0.4}))
+                .contrastBalanceGoals(new boolean[]{false, true})
+                .build();
+        setup.analysis().compute();
+
+        var balance = Arrays.stream(setup.goals())
+                .filter(GoalContrastBalance.class::isInstance)
+                .map(GoalContrastBalance.class::cast)
+                .findFirst().orElseThrow();
+
+        double sagittal = blockSumOfSquares(setup, Orientation.SAGITTAL, 1);
+        double tangential = blockSumOfSquares(setup, Orientation.TANGENTIAL, 1);
+        assertEquals(2.5 * sagittal - 0.4 * tangential, balance.value(), 1.0e-9,
+                "balance must include the contrast merit's field/orientation weights");
+    }
+
     private static double wavelengthSumOfSquares(
             OptimizationBuilder.OptimizationSetup setup, int orientation, int field, int wavelength) {
         return Arrays.stream(setup.goals())

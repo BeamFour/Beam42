@@ -727,7 +727,9 @@ public final class OptimizationBuilder {
                 for (int field = 0; field < fields.length; field++) {
                     if (!contrastBalanceFields[field]) continue;
                     result.add(new GoalContrastBalance(analysis, contrast_index, curve.frequency,
-                            field + 1, wavelengthWeights, contrastBalanceWeight));
+                            field + 1, wavelengthWeights,
+                            curve.sagittalWeights[field], curve.tangentialWeights[field],
+                            contrastBalanceWeight));
                 }
             }
         }

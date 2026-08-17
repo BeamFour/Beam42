@@ -2,7 +2,7 @@
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
-|US | US20260086320 | EX 5 | 20123 | Takuro Ono,Kosuke MACHIDA | Nikon Corp | [link](https://patents.google.com/patent/US20260086320A1/en) |
+|US | US20260086320 | EX 5 | 2023 | Takuro Ono,Kosuke MACHIDA | Nikon Corp | [link](https://patents.google.com/patent/US20260086320A1/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

@@ -21,9 +21,9 @@ public class GenericContrastOpt {
     static OptimizationBuilder.OptimizationSetup createContrastSetup(Prescription prescription, boolean weighted,
                                                                      boolean dLineOnly) {
         double[] fields = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
-        double[] fieldWeights = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
-        double[] sagittalWeights   = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+        double[] sagittalWeights   = {3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 2.0, 2.0, 2.0, 2.0};
         double[] tangentialWeights = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+        boolean[] correctAstigmatism = {true, true, true, true, true, true, true, true, true, false, false};
 
         return OptimizationBuilder.builder(prescription)
                 .fields(fields)
@@ -31,28 +31,28 @@ public class GenericContrastOpt {
                 .varyExistingAspherics()
                 .varyAllCurvatures()
                 .varyAllThicknesses()
-                // Everything is free, so hold the layout: without these the solver
-                // collapses air spaces and pushes elements through the stop.
                 .applyCurvatureConstraints()
                 .applyThicknessConstraints()
                 .applyEdgeThicknessConstraints()
-                .weighted(true)
+                .weighted(false)
                 .dLineOnly(dLineOnly)
                 .contrastSampling(6, 12)
-                .calibrateContrastFrequency(true)
+                .calibrateContrastFrequency(false)
+                .centerContrastResiduals(false)
                 .vignetting(VigType.SetVig)
                 .freezeVignetting()
                 .checkSpotApertures(false)
                 .contrastGoals(
                         contrast(10,
-                                fieldWeights),
-                        contrast(20,
                                 sagittalWeights,
                                 tangentialWeights),
-                        contrast(40,
+                        contrast(30,
+                                sagittalWeights,
+                                tangentialWeights),
+                        contrast(50,
                                 sagittalWeights,
                                 tangentialWeights))
-                //.additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 38.1031, 1.0))
+                .contrastBalanceGoals(correctAstigmatism, 1.0)
                 .build();
     }
 

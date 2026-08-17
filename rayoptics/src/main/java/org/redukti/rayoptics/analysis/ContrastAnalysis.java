@@ -135,7 +135,7 @@ public class ContrastAnalysis {
      * need per-ray aiming and is left uncorrected. Cost is four rays per field and
      * wavelength against the couple of hundred used for the samples.
      */
-    private static double exit_pupil_frequency_calibration(
+    static double exit_pupil_frequency_calibration(
             OpticalModel opticalModel, Field field, double wavelength,
             double shift, int axis, ContrastOptions options) {
         if (!options.calibrateFrequency || !(shift > 0.0)) return 1.0;
@@ -143,13 +143,21 @@ public class ContrastAnalysis {
         if (!(required > 0.0)) return 1.0;
 
         var traceOptions = options.traceOptions.copy();
-        traceOptions.check_apertures = false;
         traceOptions.pupil_type = PupilType.REL_PUPIL;
         traceOptions.apply_vignetting = false;
 
+        // Set the pupil up exactly as SequentialModel.trace_contrast does for the sampling
+        // rays: take the reference image point from the central wavelength, then establish
+        // this wavelength's chief ray and reference sphere against that point. Probing
+        // through a differently configured pupil would measure a mapping the samples never
+        // see, which is the one way this correction could do harm rather than nothing.
         double focus = opticalModel.optical_spec.defocus().get_focus();
-        // Establish the same ray aiming the sampling trace will use.
-        Trace.setup_pupil_coords(opticalModel, field, wavelength, focus, null, null);
+        var reference = Trace.setup_pupil_coords(opticalModel, field,
+                opticalModel.seq_model.central_wavelength(), focus, null, null);
+        var coordinates = Trace.setup_pupil_coords(opticalModel, field, wavelength, focus,
+                reference.ref_sphere.image_pt.project_xy(), null);
+        field.chief_ray = coordinates.chief_ray_pkg;
+        field.ref_sphere = coordinates.ref_sphere;
 
         double half = 0.5 * shift;
         Double low = image_direction(opticalModel, field, wavelength, traceOptions, axis,

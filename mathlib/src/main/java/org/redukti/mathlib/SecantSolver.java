@@ -19,8 +19,7 @@ public class SecantSolver {
         }
         double p = 0.0;
         for (int i = 0; i < maxiter; i++) {
-            double diff = Math.abs(q1 - q0);
-            if (diff < tol) {
+            if (q1 == q0) {
                 return new RootResult((p1 + p0) / 2.0, false, i);
             } else {
                 if (Math.abs(q1) > Math.abs(q0)) {

@@ -71,8 +71,12 @@ public class PupilSpec {
         ValueKey pupil_key = null;
 
         if (ValueKey.NA == pupil_value_key) {
+            var obj_img_rindx = optical_spec.obj_img_rindex();
+            var n_obj = obj_img_rindx.first;
+            var n_img = obj_img_rindx.second;
             var na = pupil_value;
-            var slope = Etendue.na2slp(na);
+            var n = pupil_oi_key == ImageKey.Object ? n_obj : n_img;
+            var slope = Etendue.na2slp(na, n);
             pupil_key = ValueKey.Slope;
             pupil_value = slope;
         }

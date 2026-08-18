@@ -4,10 +4,14 @@
 package org.redukti.rayoptics.raytr;
 
 public class RayResultWithZEnp {
-    public final double z_enp;
+    /**
+     * Entrance pupil distance wrt the 1st interface, or null if no pupil
+     * location could be found for the field. Upstream returns None here.
+     */
+    public final Double z_enp;
     public final RayResult rr;
 
-    public RayResultWithZEnp(double z_enp, RayResult rr) {
+    public RayResultWithZEnp(Double z_enp, RayResult rr) {
         this.z_enp = z_enp;
         this.rr = rr;
     }

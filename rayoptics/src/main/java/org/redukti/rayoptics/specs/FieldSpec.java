@@ -327,8 +327,9 @@ public class FieldSpec {
                 else {
                     obj_pt = fld_coord;
                 }
-                obj_dir = pt1.minus(obj_pt).normalize();
             }
+            // applies to both the image and object keyed branches above
+            obj_dir = pt1.minus(obj_pt).normalize();
         }
         return new Coord(obj_pt,obj_dir);
     }

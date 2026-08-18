@@ -179,9 +179,11 @@ public class Wideangle {
         int trial = 0;
         // if the trace succeeds 5 times in a row, go on to the next phase
         int successes = 0;
+        // last ray result seen, reported to the caller when no pupil is found
+        RayResult rr = null;
         while (keep_going && trial < 64 && first_surf_misses < 2) {
             var coord_rr = enp_z_coordinate(z_enp,sm,stop_idx,dir0,fod.obj_dist,wvl);
-            var rr = coord_rr.rr;
+            rr = coord_rr.rr;
             var final_coord = coord_rr.stop_coord;
             if (rr.err == null) {
                 var ht_at_stop = final_coord.y;
@@ -251,6 +253,9 @@ public class Wideangle {
             trial += 1;
         }
 
+        if (start_z == null || end_z == null)
+            return new RayResultWithZEnp(null, rr);
+
         var z_enp_a = start_z.z_enp;
         var ht_at_stop_a = start_z.ht_at_stop;
         var z_enp_b = end_z.z_enp;
@@ -268,7 +273,7 @@ public class Wideangle {
                 z_enp = x;
                 var coord_rr = enp_z_coordinate(z_enp,sm,stop_idx,dir0,fod.obj_dist,wvl);
                 var final_coord = coord_rr.stop_coord;
-                var rr = coord_rr.rr;
+                rr = coord_rr.rr;
                 if (rr.err == null) {
                     var ht_at_stop = final_coord.y;
                     if (start_z == null)
@@ -276,6 +281,8 @@ public class Wideangle {
                     end_z = new ZEnpStopHt(z_enp,ht_at_stop);
                 }
             }
+            if (start_z == null || end_z == null)
+                return new RayResultWithZEnp(null, rr);
             a = start_z.z_enp;
             b = end_z.z_enp;
         }
@@ -342,7 +349,7 @@ public class Wideangle {
                     var z_enp_cntr = z_enp_edge_a + (z_enp_edge_b - z_enp_edge_a)/2;
                     var coord_rr = enp_z_coordinate(z_enp_cntr,sm,stop_idx,dir0,fod.obj_dist,wvl);
                     var final_coord = coord_rr.stop_coord;
-                    var rr = coord_rr.rr;
+                    rr = coord_rr.rr;
                     var ht_at_stop = final_coord.y;
                     // logger.debug(f"  fld: {fld.yv:3.1f}:   {z_enp_edge_a=:8.4f}  "
                     //                    f"{z_enp_edge_b=:8.4f}  {z_enp_cntr=:8.4f}  "
@@ -353,7 +360,7 @@ public class Wideangle {
         }
         // compute the straightline crossing pt given the interval
         double z_estimate;
-        if (M.isZero(end_z.ht_at_stop - start_z.ht_at_stop)) {
+        if (M.is_fuzzy_zero(end_z.ht_at_stop - start_z.ht_at_stop)) {
             z_estimate = start_z.z_enp;
         }
         else {
@@ -367,9 +374,16 @@ public class Wideangle {
         //    logger.debug(f"  ht_at_stop: start_z={start_z[1]:10.5f} "
         //                 f"end_z={end_z[1]:10.5f}")
 
-        var result = find_z_enp_on_interval(opm,stop_idx,a,b,z_estimate,fld,wvl);
+        Pair<Vector3,RayResult> result;
+        try {
+            result = find_z_enp_on_interval(opm,stop_idx,a,b,z_estimate,fld,wvl);
+        }
+        catch (IndexOutOfBoundsException | IllegalArgumentException e) {
+            // upstream: except (IndexError, ValueError): return None, rr
+            return new RayResultWithZEnp(null, rr);
+        }
         var start_coord = result.first;
-        var rr = result.second;
+        rr = result.second;
         z_enp = start_coord.z;
         var final_coord = Lists.get(rr.pkg.ray,stop_idx).p;
         var ht_at_stop = final_coord.y;
@@ -478,7 +492,11 @@ public class Wideangle {
                 start_coords = new Vector3(0.,0.,z_enp);
             }
             catch (TraceException ray_err) {
+                // the objective records the ray result on every evaluation;
+                // hold on to the last one so the caller still has ray data.
+                rr = fn.rr;
                 converged = false;
+                start_coords = new Vector3(0.,0.,z_enp);
             }
             if (!converged) {
                 //                logger.debug(f'  {results.method} converged: '
@@ -487,13 +505,21 @@ public class Wideangle {
                 //                             f'{z_enp=:9.4f}')
                 try {
                     var result = BrentSolver.find_root(start_z, end_z, fn);
-                    z_enp = result.root;
-                    converged = result.converged;
-                    start_coords = new Vector3(0.,0.,z_enp);
+                    if (result.converged) {
+                        z_enp = result.root;
+                        converged = true;
+                        start_coords = new Vector3(0.,0.,z_enp);
+                    }
+                    // else keep the estimate from the secant iteration, as
+                    // upstream does when brentq fails to converge. A bad
+                    // bracket makes BrentSolver report root=0, which must not
+                    // be taken as an answer.
                 }
-                catch (Exception e) {
-                    throw new IllegalStateException();
+                catch (TraceException ray_err) {
+                    // ditto - retain the secant estimate rather than failing
                 }
+                if (fn.rr != null)
+                    rr = fn.rr;
             }
         }
         else
@@ -666,15 +692,16 @@ public class Wideangle {
 
         if (stop_idx != null) {
             // do 1D iteration if field and target points are zero in x
+            var func = new Eval_Z_Enp_Function(seq_model,stop_idx,dir0,obj_dist,wvl,y_target);
             try {
-                var func = new Eval_Z_Enp_Function(seq_model,stop_idx,dir0,obj_dist,wvl,y_target);
                 var result = SecantSolver.find_root(func,z_enp,50,1.48e-8);
                 z_enp = result.root;
-                rr = func.rr;
             }
             catch (TraceException ray_err) {
-                z_enp = 0.0;
+                // upstream falls back to the last iterate; keep the incoming
+                // estimate rather than collapsing z_enp to zero.
             }
+            rr = func.rr;
         }
         else
             z_enp = fod.enp_dist;

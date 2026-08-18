@@ -10,6 +10,23 @@ public class M {
         return Math.abs(d) <= EPSILON;
     }
 
+    /**
+     * Test for |x| < fuzz.
+     * <p>
+     * The choice of fuzz depends on the context of the test. The default is
+     * appropriate for ignoring small double precision rounding errors. Chunkier
+     * values are appropriate for different calculations: ray trace values are
+     * typically good to 1e-10 to 1e-12, geometric modelling or rendering might
+     * be as loose as 1e-8 or 1e-6.
+     */
+    public static boolean is_fuzzy_zero(double x, double fuzz) {
+        return Math.abs(x) < fuzz;
+    }
+
+    public static boolean is_fuzzy_zero(double x) {
+        return is_fuzzy_zero(x, 1e-14);
+    }
+
     public static boolean is_kinda_big(double x) {
         return is_kinda_big(x, 1e8);
     }

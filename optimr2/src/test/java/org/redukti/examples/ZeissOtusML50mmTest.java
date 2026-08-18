@@ -120,31 +120,33 @@ class ZeissOtusML50mmTest {
         double[] hexapolarSpotRms = SpotAnalysis.eval(
                         analysis._opt_model, new SpotOptions().use_hexapolar().num_rays(64))
                 .spot_results.stream().mapToDouble(spot -> spot.get_mean_radius()).toArray();
-        assertEquals(0.0064364267, finalRms, 1.0e-6);
+        assertEquals(0.0064421892, finalRms, 1.0e-6);
         assertArrayEquals(new double[]{
-                        2.39790133, 3.48696497, 3.91691417, 4.18073223},
+                        2.40662875, 3.49223050, 3.93119025, 4.14613250},
                 spotRms, 1.0e-6);
         // LensTool2 uses SpotOptions' 64-ray Hexapolar default. Keep this
         // second absolute regression so its report can be compared directly.
         assertArrayEquals(new double[]{
-                        2.42367915, 3.73286600, 4.03288050, 4.22870275},
+                        2.43522950, 3.73536776, 4.04455940, 4.19332571},
                 hexapolarSpotRms, 1.0e-6);
         assertArrayEquals(new double[]{
-                        0.91055107, 0.86919063, 0.79900446, 0.80860358},
+                        0.90740169, 0.86771300, 0.79763510, 0.80930062},
                 sagittal40, 1.0e-6);
         assertArrayEquals(new double[]{
-                        0.91055107, 0.82205323, 0.80111212, 0.75423138},
+                        0.90740169, 0.82112093, 0.80055082, 0.75854305},
                 tangential40, 1.0e-6);
 
         // Retain a direct A/B assertion as well as the absolute values above.
+        // The comparison arrays are the gaussian-quadrature test's expected
+        // values; keep them in step when those are regenerated.
         assertAllLessThan(spotRms,
-                new double[]{5.83978998, 7.20583613, 7.53832391, 8.69058359},
+                new double[]{5.77765598, 7.31854410, 7.71931778, 8.90432789},
                 "spot RMS");
         assertAllGreaterThan(sagittal40,
-                new double[]{0.59088210, 0.59802511, 0.52815747, 0.62313845},
+                new double[]{0.59327340, 0.59652846, 0.52547396, 0.61176714},
                 "40 cycle/mm sagittal MTF");
         assertAllGreaterThan(tangential40,
-                new double[]{0.59088210, 0.54005008, 0.47372891, 0.32960330},
+                new double[]{0.59327340, 0.53765177, 0.45867084, 0.31407528},
                 "40 cycle/mm tangential MTF");
         System.out.println("Contrast Otus: elapsedMs=" + elapsedMillis
                 + " initialRms=" + initialRms + " finalRms=" + finalRms);
@@ -177,21 +179,21 @@ class ZeissOtusML50mmTest {
         assertTrue(status > 0, "Optimizer failed with status " + status);
         assertTrue(finalRms < initialRms,
                 () -> "Expected RMS merit to improve from " + initialRms + " but got " + finalRms);
-        assertEquals(0.0160522, finalRms, 1.0e-6);
+        assertEquals(0.0159792774, finalRms, 1.0e-6);
 
         var analysis = setup.analysis();
-        assertEquals(50.1770744, analysis._pfo[ParaxHelper.Effective_focal_length], 1.0e-6);
-        assertEquals(1.43832395, analysis._pfo[ParaxHelper.Fno], 1.0e-6);
+        assertEquals(50.17930093, analysis._pfo[ParaxHelper.Effective_focal_length], 1.0e-6);
+        assertEquals(1.43833782, analysis._pfo[ParaxHelper.Fno], 1.0e-6);
         assertArrayEquals(new double[]{
-                        5.83978998, 7.20583613, 7.53832391, 8.69058359},
+                        5.77765598, 7.31854410, 7.71931778, 8.90432789},
                 java.util.Arrays.stream(analysis._spots)
                         .mapToDouble(spot -> spot.get_mean_radius()).toArray(),
                 1.0e-6);
         assertArrayEquals(new double[]{
-                        0.59088210, 0.59802511, 0.52815747, 0.62313845},
+                        0.59327340, 0.59652846, 0.52547396, 0.61176714},
                 analysis._mtfs[2].sag_mtf_by_field, 1.0e-6);
         assertArrayEquals(new double[]{
-                        0.59088210, 0.54005008, 0.47372891, 0.32960330},
+                        0.59327340, 0.53765177, 0.45867084, 0.31407528},
                 analysis._mtfs[2].tan_mtf_by_field, 1.0e-6);
     }
 

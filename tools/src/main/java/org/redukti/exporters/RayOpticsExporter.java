@@ -2,6 +2,7 @@ package org.redukti.exporters;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.rayoptics.seq.Glass;
+import org.redukti.spec.Prescription;
 import org.redukti.util.Args;
 
 import java.io.File;
@@ -159,18 +160,72 @@ public class RayOpticsExporter {
         return sb.toString();
     }
 
+    /**
+     * Render the model both ray-optics and Beam43 should build, from a single
+     * {@link ModelSpec} op list so the two cannot describe different systems.
+     */
+    static String generate_comparable(Args arguments) throws Exception {
+        var specs = new OpticalBenchDataImporter.LensSpecifications();
+        specs.parse_file(arguments.specfile);
+        var prescription = Prescription.build_prescription(
+                specs, arguments.use_glass_types, false, arguments.only_d_line);
+        var spec = new ModelSpec(prescription, arguments.scenario, null,
+                arguments.vig_type, arguments.wide_angle);
+        if (arguments.generate_java) {
+            var class_name = java_class_name(arguments.specfile);
+            return new JavaModelWriter(GENERATED_PACKAGE, class_name).write(spec);
+        }
+        return new PythonModelWriter().write(spec);
+    }
+
+    static final String GENERATED_PACKAGE = "org.redukti.compare.models";
+
+    /** Turns a spec file name into a legal, stable Java identifier. */
+    static String java_class_name(String specfile) {
+        var base = new File(specfile).getName();
+        int dot = base.lastIndexOf('.');
+        if (dot > 0)
+            base = base.substring(0, dot);
+        var sb = new StringBuilder();
+        boolean capitalize = true;
+        for (int i = 0; i < base.length(); i++) {
+            char c = base.charAt(i);
+            if (Character.isLetterOrDigit(c)) {
+                sb.append(capitalize ? Character.toUpperCase(c) : c);
+                capitalize = false;
+            }
+            else {
+                capitalize = true;
+            }
+        }
+        if (sb.length() == 0 || Character.isDigit(sb.charAt(0)))
+            sb.insert(0, "Model");
+        return sb.toString();
+    }
+
     public static void main(String[] args) throws Exception {
         Args arguments = Args.parseArguments(args);
         if (arguments.specfile == null) {
-            System.err.println("Usage: --specfile inputfile [--scenario num]");
+            System.err.println("Usage: --specfile inputfile [--scenario num] [-o outfilename] \\");
+            System.err.println("       [--generate-java] [--only-d-line] [--dont-use-glass-types] \\");
+            System.err.println("       [--vig-type " + Args.vig_type_names() + "] [--wide-angle|--no-wide-angle] \\");
+            System.err.println("       [--legacy-notebook]");
+            System.err.println("       --generate-java emits Java model building code instead of Python");
+            System.err.println("       --legacy-notebook emits the original plotting script");
             System.exit(1);
         }
-        OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
-        specs.parse_file(arguments.specfile);
-        RayOpticsExporter exporter = new RayOpticsExporter();
+        String output;
+        if (arguments.legacy_notebook) {
+            var specs = new OpticalBenchDataImporter.LensSpecifications();
+            specs.parse_file(arguments.specfile);
+            output = new RayOpticsExporter().generate(specs, arguments.scenario, arguments.use_glass_types);
+        }
+        else {
+            output = generate_comparable(arguments);
+        }
         if (arguments.outputFile != null)
-            Files.writeString(new File(arguments.outputFile).toPath(),exporter.generate(specs, arguments.scenario, arguments.use_glass_types), StandardOpenOption.CREATE);
-        System.out.println(exporter.generate(specs, arguments.scenario, arguments.use_glass_types));
+            Files.writeString(new File(arguments.outputFile).toPath(), output, StandardOpenOption.CREATE);
+        System.out.println(output);
     }
 
 }

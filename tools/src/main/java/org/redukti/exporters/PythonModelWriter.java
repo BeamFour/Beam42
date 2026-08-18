@@ -122,7 +122,18 @@ public class PythonModelWriter {
         };
     }
 
+    /**
+     * Shortest round tripping decimal, matching Python's repr.
+     * <p>
+     * Double.toString spells the non-finite values Infinity, -Infinity and NaN,
+     * none of which are Python names - a plane surface recorded as an infinite
+     * radius would emit a script that dies with a NameError.
+     */
     static String num(double value) {
+        if (Double.isNaN(value))
+            return "float('nan')";
+        if (Double.isInfinite(value))
+            return value > 0 ? "float('inf')" : "float('-inf')";
         return Double.toString(value);
     }
 

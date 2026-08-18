@@ -151,8 +151,16 @@ public class JavaModelWriter {
      * Rendered the same way as the Python side: shortest round tripping decimal.
      * Java needs a trailing d so that values outside int range, and any future
      * integral valued literal, stay double typed.
+     * <p>
+     * Double.toString spells the non-finite values Infinity, -Infinity and NaN,
+     * which are not Java literals - a plane surface recorded as an infinite
+     * radius would emit source that does not compile.
      */
     static String num(double value) {
+        if (Double.isNaN(value))
+            return "Double.NaN";
+        if (Double.isInfinite(value))
+            return value > 0 ? "Double.POSITIVE_INFINITY" : "Double.NEGATIVE_INFINITY";
         return Double.toString(value) + "d";
     }
 

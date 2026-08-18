@@ -57,3 +57,6 @@ build
 **/target/
 .run
 
+
+# Local-only notes containing machine-specific paths
+*.local.md

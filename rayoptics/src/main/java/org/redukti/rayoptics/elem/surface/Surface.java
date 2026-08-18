@@ -82,6 +82,11 @@ public class Surface extends Interface {
     }
 
     @Override
+    public double profile_cv() {
+        return profile.cv;
+    }
+
+    @Override
     public double optical_power() {
         return delta_n * profile.cv;
     }

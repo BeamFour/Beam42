@@ -42,6 +42,11 @@ public final class Args {
     public boolean generate_java = false;
     /** Emit the original plotting notebook script rather than a comparison model. */
     public boolean legacy_notebook = false;
+    /**
+     * Path to the upstream reference values produced by dump_reference.py. When
+     * set, the exporter emits a JUnit regression test instead of a model builder.
+     */
+    public String reference_file = null;
 
     public static Args parseArguments(String[] args) {
         Args arguments = new Args();
@@ -114,6 +119,10 @@ public final class Args {
             }
             else if (arg1.equals("--legacy-notebook")) {
                 arguments.legacy_notebook = true;
+            }
+            else if (arg1.equals("--reference")) {
+                arguments.reference_file = arg2;
+                i++;
             }
         }
         return arguments;

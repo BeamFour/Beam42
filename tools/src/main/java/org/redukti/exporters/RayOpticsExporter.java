@@ -171,6 +171,12 @@ public class RayOpticsExporter {
                 specs, arguments.use_glass_types, false, arguments.only_d_line);
         var spec = new ModelSpec(prescription, arguments.scenario, null,
                 arguments.vig_type, arguments.wide_angle);
+        if (arguments.reference_file != null) {
+            var class_name = java_class_name(arguments.specfile) + "UpstreamTest";
+            var reference = read_reference(arguments.reference_file);
+            return new JavaTestWriter(GENERATED_TEST_PACKAGE, class_name,
+                    new File(arguments.specfile).getName()).write(spec, reference);
+        }
         if (arguments.generate_java) {
             var class_name = java_class_name(arguments.specfile);
             return new JavaModelWriter(GENERATED_PACKAGE, class_name).write(spec);
@@ -179,6 +185,31 @@ public class RayOpticsExporter {
     }
 
     static final String GENERATED_PACKAGE = "org.redukti.compare.models";
+    static final String GENERATED_TEST_PACKAGE = "org.redukti.rayoptics.upstream";
+
+    /**
+     * Reads the flat key=value file produced by dump_reference.py. Deliberately
+     * not java.util.Properties: that would silently accept a duplicate key and
+     * mangle a backslash, and the file is machine written so anything malformed
+     * is a bug worth failing on.
+     */
+    static java.util.Map<String, String> read_reference(String path) throws Exception {
+        var values = new java.util.LinkedHashMap<String, String>();
+        for (String line : Files.readAllLines(new File(path).toPath())) {
+            line = line.trim();
+            if (line.isEmpty() || line.startsWith("#"))
+                continue;
+            int eq = line.indexOf('=');
+            if (eq < 0)
+                throw new IllegalArgumentException("Malformed reference line: " + line);
+            var key = line.substring(0, eq);
+            if (values.put(key, line.substring(eq + 1)) != null)
+                throw new IllegalArgumentException("Duplicate reference key: " + key);
+        }
+        if (values.isEmpty())
+            throw new IllegalArgumentException("No reference values in " + path);
+        return values;
+    }
 
     /** Turns a spec file name into a legal, stable Java identifier. */
     static String java_class_name(String specfile) {

@@ -29,6 +29,78 @@ def build(path):
     return opm
 
 
+FAN_NUM_RAYS = 21
+
+
+def collect_fans(opm):
+    """Transverse ray aberration and OPD along x and y pupil fans.
+
+    Mirrors SequentialModel.trace_fan on the Java side, which is the entry point
+    the optimizer's ray-aberration and MTF goals go through. The important
+    detail to match is that every wavelength is evaluated against the *central*
+    wavelength's reference image point, so the fans share one origin rather than
+    each re-centring on its own chief ray.
+
+    focus_fan returns OPD already divided by nm_to_sys_units, i.e. in waves,
+    which is what WavefrontAberrationAnalysis.opd does too.
+    """
+    from rayoptics.raytr import analyses
+    from rayoptics.raytr import trace
+
+    out = {}
+    osp = opm['optical_spec']
+    foc = osp['focus'].get_focus()
+    wavelengths = osp['wvls'].wavelengths
+    central_wvl = osp['wvls'].central_wvl
+
+    for fi, fld in enumerate(osp['fov'].fields):
+        ref_sphere, _ = trace.setup_pupil_coords(opm, fld, central_wvl, foc)
+        ref_img_pt = ref_sphere[0][:2]
+        for wi, wvl in enumerate(wavelengths):
+            for xy in (0, 1):
+                fan_pkg = analyses.trace_fan(opm, fld, wvl, foc, xy,
+                                             image_pt_2d=ref_img_pt,
+                                             num_rays=FAN_NUM_RAYS)
+                data = analyses.focus_fan(opm, fan_pkg, fld, wvl, foc,
+                                          image_pt_2d=ref_img_pt)
+                # focus_fan yields ((px, py), (t_abr_x, t_abr_y, opd)) for a
+                # traced ray and a flat (px, py, nan) for one that failed. A
+                # partial fan is skipped rather than recorded, because the Java
+                # side drops failed rays instead of padding them and the two
+                # would no longer be index aligned.
+                rays = []
+                for item in data:
+                    if len(item) != 2:
+                        rays = None
+                        break
+                    _, values = item
+                    rays.append((float(values[xy]), float(values[2])))
+                if rays is None or len(rays) != FAN_NUM_RAYS:
+                    continue
+                # The pupil coordinate is recorded as the nominal fan abscissa,
+                # accumulated exactly as both sides step it, rather than as the
+                # value focus_fan reports.
+                #
+                # Upstream's Field.apply_vignetting does `vig_pupil = pupil[:]`,
+                # which for a numpy array is a view rather than a copy, so it
+                # scales the caller's array in place and trace_ray_fan - which
+                # records the pupil after tracing - captures the vignetted
+                # coordinate. Beam43's apply_vignetting copies, so its fan_x
+                # keeps the nominal value. The rays traced are identical either
+                # way; only the recorded abscissa differs. Comparing the nominal
+                # value keeps this as an index-alignment check without importing
+                # the aliasing quirk.
+                nominal = -1.0
+                step = 2.0 / (FAN_NUM_RAYS - 1)
+                for i, (t_abr, opd) in enumerate(rays):
+                    key = f'fan.{fi}.{wi}.{xy}.{i}'
+                    out[f'{key}.pupil'] = nominal
+                    out[f'{key}.t_abr'] = t_abr
+                    out[f'{key}.opd'] = opd
+                    nominal += step
+    return out
+
+
 def collect(opm):
     out = {}
     sm, osp = opm['seq_model'], opm['optical_spec']
@@ -61,6 +133,8 @@ def collect(opm):
         else:
             out[f'aim.{i}.x'] = float(aim[0])
             out[f'aim.{i}.y'] = float(aim[1])
+
+    out.update(collect_fans(opm))
 
     from rayoptics.parax.thirdorder import compute_third_order
     df = compute_third_order(opm)

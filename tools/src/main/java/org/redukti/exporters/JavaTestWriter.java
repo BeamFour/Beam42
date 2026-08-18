@@ -47,6 +47,7 @@ public class JavaTestWriter {
         paraxial(reference, sb);
         vignetting(reference, sb);
         chief_ray_aiming(reference, sb);
+        aberration_fans(reference, sb);
         seidel(reference, sb);
         sb.append("}\n");
         return sb.toString();
@@ -58,10 +59,13 @@ public class JavaTestWriter {
           .append("import org.junit.jupiter.api.Test;\n")
           .append("import org.redukti.rayoptics.elem.profiles.EvenPolynomial;\n")
           .append("import org.redukti.rayoptics.elem.profiles.RadialPolynomial;\n")
+          .append("import org.redukti.rayoptics.analysis.TransverseRayAberrationAnalysis;\n")
+          .append("import org.redukti.rayoptics.analysis.WavefrontAberrationAnalysis;\n")
           .append("import org.redukti.rayoptics.optical.OpticalModel;\n")
           .append("import org.redukti.rayoptics.parax.ThirdOrder;\n")
           .append("import org.redukti.rayoptics.parax.ThirdOrderData;\n")
           .append("import org.redukti.rayoptics.raytr.Trace;\n")
+          .append("import org.redukti.rayoptics.raytr.TraceOptions;\n")
           .append("import org.redukti.rayoptics.raytr.VigCalc;\n")
           .append("import org.redukti.rayoptics.seq.SurfaceData;\n")
           .append("import org.redukti.rayoptics.specs.FieldSpec;\n")
@@ -182,6 +186,77 @@ public class JavaTestWriter {
                   .append(literal(e.getValue())).append(", fields[").append(index)
                   .append("].aim_info[").append(component).append("], ")
                   .append(SOLVER_TOL).append(");\n");
+            }
+        }
+        sb.append("    }\n\n");
+    }
+
+    /**
+     * Transverse ray aberration and OPD along the x and y pupil fans, per field
+     * and wavelength. These are what the optimizer's ray-aberration and MTF
+     * goals are built on, so they are the layer where a regression would show up
+     * as a moved optimum rather than as an obviously wrong number.
+     * <p>
+     * The pupil coordinate is asserted alongside each value. Failed rays are
+     * dropped rather than padded on the Java side, so if a ray that traced when
+     * the reference was captured later fails, the fans stop being index aligned
+     * - checking the pupil makes that surface as a failure instead of silently
+     * comparing different rays.
+     */
+    private void aberration_fans(Map<String, String> ref, StringBuilder sb) {
+        var entries = sorted(ref, "fan.");
+        if (entries.isEmpty())
+            return;
+        // fan.<field>.<wavelength>.<xy>.<ray>.<quantity>
+        Map<String, Map<Integer, double[]>> fans = new LinkedHashMap<>();
+        for (var e : entries.entrySet()) {
+            var p = e.getKey().split("\\.");
+            var fan_key = p[1] + "." + p[2] + "." + p[3];
+            var ray = Integer.parseInt(p[4]);
+            var slot = switch (p[5]) {
+                case "pupil" -> 0;
+                case "t_abr" -> 1;
+                case "opd" -> 2;
+                default -> throw new IllegalArgumentException("Unknown fan quantity " + p[5]);
+            };
+            fans.computeIfAbsent(fan_key, k -> new java.util.TreeMap<>())
+                .computeIfAbsent(ray, k -> new double[3])[slot] = Double.parseDouble(e.getValue());
+        }
+
+        sb.append("    @Test\n")
+          .append("    public void aberration_fans() {\n")
+          .append("        var opm = build();\n")
+          .append("        var options = new TraceOptions();\n");
+        for (var fan : fans.entrySet()) {
+            var p = fan.getKey().split("\\.");
+            var fi = p[0];
+            var wi = p[1];
+            var xy = p[2];
+            var tag = "f" + fi + "w" + wi + "xy" + xy;
+            sb.append("\n        var abr").append(tag)
+              .append(" = TransverseRayAberrationAnalysis.eval_abr_fan(opm, ").append(fi)
+              .append(", ").append(xy).append(", ").append(fan.getValue().size())
+              .append(", false, options).fans.get(").append(wi).append(");\n")
+              .append("        var opd").append(tag)
+              .append(" = WavefrontAberrationAnalysis.eval_opd_fan(opm, ").append(fi)
+              .append(", ").append(xy).append(", ").append(fan.getValue().size())
+              .append(", false, options).fans.get(").append(wi).append(");\n")
+              .append("        Assertions.assertEquals(").append(fan.getValue().size())
+              .append(", abr").append(tag).append(".fan_y.size(), \"fan ").append(fan.getKey())
+              .append(" ray count\");\n");
+            for (var ray : fan.getValue().entrySet()) {
+                var i = ray.getKey();
+                var v = ray.getValue();
+                var label = "fan." + fan.getKey() + "." + i;
+                sb.append("        assertClose(\"").append(label).append(".pupil\", ")
+                  .append(JavaModelWriter.num(v[0])).append(", abr").append(tag)
+                  .append(".fan_x.get(").append(i).append("), ").append(SOLVER_TOL).append(");\n")
+                  .append("        assertClose(\"").append(label).append(".t_abr\", ")
+                  .append(JavaModelWriter.num(v[1])).append(", abr").append(tag)
+                  .append(".fan_y.get(").append(i).append("), ").append(SOLVER_TOL).append(");\n")
+                  .append("        assertClose(\"").append(label).append(".opd\", ")
+                  .append(JavaModelWriter.num(v[2])).append(", opd").append(tag)
+                  .append(".fan_y.get(").append(i).append("), ").append(SOLVER_TOL).append(");\n");
             }
         }
         sb.append("    }\n\n");

@@ -86,6 +86,26 @@ public class Field {
         y *= scale_factor;
     }
 
+    /**
+     * Scale relative pupil coordinates by this field's vignetting factors,
+     * returning a new array. The argument is not modified.
+     * <p>
+     * This differs from upstream, deliberately. Upstream writes
+     * {@code vig_pupil = pupil[:]}, which for a numpy array is a view rather
+     * than a copy, so scaling {@code vig_pupil} also scales the caller's array
+     * in place. Callers that read their pupil array back after tracing see the
+     * vignetted value there: {@code analyses.trace_ray_fan} records the pupil
+     * after calling {@code trace_safe} and so reports vignetted fan
+     * coordinates, where this implementation reports the nominal ones.
+     * <p>
+     * The rays traced are the same either way - only what a caller observes in
+     * its own array differs - but it is visible when comparing fan data against
+     * upstream, where a first ray at nominal -1.0 shows up there as
+     * -1 * (1 - vlx). See tools/src/main/python/README.md.
+     *
+     * @param pupil relative pupil coordinates, unmodified by this call
+     * @return a new array with the vignetting factors applied
+     */
     public double[] apply_vignetting(double[] pupil) {
         double[] vig_pupil = Arrays.copyOf(pupil, pupil.length);
         vig_pupil[0] *= vignetting_scale_x(pupil[0]);

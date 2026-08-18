@@ -50,8 +50,25 @@ Values are inlined rather than loaded from a fixture at run time so that when a 
 a number, the diff names the quantity and shows the delta. Regenerate rather than edit.
 
 The generated test asserts, in separate methods so a failure names the layer that moved:
-first order data, paraxial `ax`/`pr` rays per surface, vignetting factors, chief ray aiming,
-and Seidel coefficients per surface including aspheric contributions and the sum.
+
+| Method | Covers |
+| --- | --- |
+| `first_order_data` | every `FirstOrderData` field |
+| `paraxial_rays` | `ax` and `pr` ray `ht`, `slp`, `aoi` per surface |
+| `vignetting_factors` | `vlx`, `vux`, `vly`, `vuy` per field |
+| `chief_ray_aiming` | `z_enp` for wide angle models, the aim point otherwise |
+| `aberration_fans` | transverse ray aberration and OPD per field, wavelength, x/y fan and ray |
+| `seidel_coefficients` | per surface including aspheric contributions, plus the sum |
+
+`aberration_fans` is the one the optimizer leans on most — its ray-aberration and MTF goals
+are built on those quantities, so a regression there shows up as a moved optimum rather than
+as an obviously wrong number. It goes through the same entry points the optimizer does,
+`TransverseRayAberrationAnalysis.eval_abr_fan` and `WavefrontAberrationAnalysis.eval_opd_fan`,
+and OPD is compared in waves on both sides.
+
+`chief_ray_aiming` is the only assertion that reaches `find_real_enp_rev1` directly on a wide
+angle model. Vignetting depends on it too, but only at solver tolerance, so without this a
+regression in the wide angle search could slip through.
 
 Tolerances are split by kind. Analytic quantities use 1e-12 relative; in practice they agree
 bit for bit. Vignetting and aiming use 1e-6, which is not an arbitrary loosening — it is the
@@ -121,6 +138,23 @@ path.
 pair into `opticalglass.modelglass.ModelGlass`, a Buchdahl fit, while `Glass` uses a GNU
 Optical fit. They agree only at d, where both return `nd` by construction. Away from the
 reference wavelength, any difference is the dispersion model rather than the code under test.
+
+**Upstream's `apply_vignetting` mutates its argument; Beam43's does not.** Upstream does
+`vig_pupil = pupil[:]`, which for a numpy array is a view rather than a copy, so it scales
+the caller's array in place. `trace_ray_fan` records the pupil *after* tracing and therefore
+captures the vignetted coordinate; Beam43 copies, so its `fan_x` keeps the nominal value.
+
+The rays traced are identical either way — only the recorded abscissa differs — but it looks
+alarming when it surfaces:
+
+```
+fan.0.0.0.0.pupil ==> expected: <-1.0003278333220664> but was: <-1.0>
+```
+
+which is `-1 x (1 - vlx)`. `dump_reference.py` records the nominal fan abscissa, accumulated
+the way both sides step it, so the pupil assertion still guards index alignment without
+depending on the quirk. Beam43's copying behaviour is the sane one and should stay; just do
+not expect a caller's pupil array to come back modified.
 
 **Record which upstream a fixture came from.** Upstream moves under the port — that is how
 the `obj_na` and euler-convention defects arose — so a regenerated fixture should be a

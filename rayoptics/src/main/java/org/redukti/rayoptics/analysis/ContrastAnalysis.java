@@ -29,7 +29,7 @@ public class ContrastAnalysis {
                         opticalModel, fields[fieldIndex], wavelength, shift, Orientation.Y, options);
                 var traced = opticalModel.seq_model.trace_contrast(
                         (rays, field, tracedWavelength, focus) -> sample(
-                                opticalModel, rays, field, tracedWavelength, focus),
+                                opticalModel, rays, field, tracedWavelength, focus, options),
                         fieldIndex, wavelengthIndex,
                         options.numRings, options.numSpokes,
                         new Vector2(sagittalShift, 0.0), new Vector2(0.0, tangentialShift),
@@ -187,7 +187,7 @@ public class ContrastAnalysis {
     private static ContrastAnalysisResult.Sample sample(
             OpticalModel opticalModel, ContrastRayTriplet rays,
             org.redukti.rayoptics.specs.Field field,
-            double wavelength, double focus) {
+            double wavelength, double focus, ContrastOptions options) {
         if (rays.reference() == null || rays.sagittal() == null || rays.tangential() == null) {
             return new ContrastAnalysisResult.Sample(
                     rays.pupil(), 0.0, 0.0, rays.weight(), false, failure(rays));
@@ -200,10 +200,59 @@ public class ContrastAnalysis {
                 rays.tangential().input_pupil) - reference;
         boolean valid = Double.isFinite(reference)
                 && Double.isFinite(sagittal) && Double.isFinite(tangential);
-        return new ContrastAnalysisResult.Sample(
+        var sample = new ContrastAnalysisResult.Sample(
                 rays.pupil(), sagittal, tangential, rays.weight(), valid,
                 valid ? null : new ContrastAnalysisResult.Failure(
                         "OPD", "NonFiniteWavefrontDifference", -1));
+
+        if (!options.measureFrequency) return sample;
+        var shear = measure_shear(opticalModel, rays, field, wavelength);
+        sample = sample.withShear(shear);
+        if (!options.normalizeFrequency || !valid) return sample;
+        return sample.withDifferences(
+                normalize(sagittal, shear.sagittalFrequency(), options.spatialFrequency),
+                normalize(tangential, shear.tangentialFrequency(), options.spatialFrequency));
+    }
+
+    /**
+     * The exit-pupil coordinate of the reference ray, the shear its two partners actually
+     * produced there, and the spatial frequency each pair realised.
+     *
+     * <p>The chief ray and reference sphere on {@code field} are the ones the OPD
+     * evaluation just used, so the pupil coordinates are consistent with the wavefront
+     * differences they accompany.
+     */
+    static ContrastAnalysisResult.Shear measure_shear(
+            OpticalModel opticalModel, ContrastRayTriplet rays,
+            org.redukti.rayoptics.specs.Field field, double wavelength) {
+        var chiefRay = field.chief_ray;
+        var refSphere = field.ref_sphere;
+        var reference = PupilShear.exit_pupil_coord(rays.reference(), chiefRay, refSphere);
+        var sagittal = PupilShear.exit_pupil_coord(rays.sagittal(), chiefRay, refSphere);
+        var tangential = PupilShear.exit_pupil_coord(rays.tangential(), chiefRay, refSphere);
+        var sagittalFrequency = PupilShear.realized_frequency(
+                opticalModel, rays.reference(), rays.sagittal(), wavelength, Orientation.X);
+        var tangentialFrequency = PupilShear.realized_frequency(
+                opticalModel, rays.reference(), rays.tangential(), wavelength, Orientation.Y);
+        return new ContrastAnalysisResult.Shear(
+                reference,
+                reference != null && sagittal != null ? sagittal.minus(reference) : null,
+                reference != null && tangential != null ? tangential.minus(reference) : null,
+                sagittalFrequency != null ? sagittalFrequency : Double.NaN,
+                tangentialFrequency != null ? tangentialFrequency : Double.NaN);
+    }
+
+    /**
+     * Rescale a wavefront difference from the frequency the pair realised to the one that
+     * was requested. Leaves the difference alone if the measurement failed, or if the
+     * discrepancy is large enough that the first-order rescaling is not trustworthy -
+     * the same guard rail {@link #exit_pupil_frequency_calibration} uses.
+     */
+    private static double normalize(double difference, double realized, double requested) {
+        if (!Double.isFinite(realized) || !(realized > 0.0) || !(requested > 0.0))
+            return difference;
+        double scale = requested / realized;
+        return scale > 0.5 && scale < 2.0 ? difference * scale : difference;
     }
 
     private static ContrastAnalysisResult.Failure failure(ContrastRayTriplet rays) {

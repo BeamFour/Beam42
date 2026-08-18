@@ -10,6 +10,8 @@ public class ContrastOptions {
     TraceOptions traceOptions = new TraceOptions();
     boolean calibrateFrequency = false;
     boolean centerResiduals = false;
+    boolean measureFrequency = false;
+    boolean normalizeFrequency = false;
 
     /**
      * @param spatialFrequency image-space spatial frequency in cycles per
@@ -76,6 +78,49 @@ public class ContrastOptions {
      */
     public ContrastOptions calibrate_frequency(boolean value) {
         calibrateFrequency = value;
+        return this;
+    }
+
+    /**
+     * Record, for every sample, the exit-pupil coordinate of its reference ray and the
+     * spatial frequency its two pairs actually realised.
+     *
+     * <p>Diagnostic only: it populates {@link ContrastAnalysisResult.Shear} and changes no
+     * residual. Where {@link #calibrate_frequency(boolean)} infers a single scale from one
+     * probe pair per field, wavelength and direction, this measures every pair directly,
+     * so it shows the variation across the pupil that a single scale cannot represent.
+     *
+     * <p>Costs no extra rays - both quantities come from rays the samples already trace.
+     */
+    public ContrastOptions measure_frequency(boolean value) {
+        measureFrequency = value;
+        return this;
+    }
+
+    /**
+     * Rescale each wavefront difference to the frequency that was requested, using that
+     * sample's own realised frequency.
+     *
+     * <p>This is the per-sample alternative to {@link #calibrate_frequency(boolean)}.
+     * Rather than adjusting the entrance-pupil shift so the pair lands on the right
+     * frequency - which is exact only on average, because the entrance-to-exit pupil
+     * mapping is non-linear - it accepts whatever frequency the pair realised and
+     * corrects the wavefront difference for it:
+     *
+     * <pre>dW &lt;- dW * (nu_requested / nu_realized)</pre>
+     *
+     * <p>To first order in the shear this is exact, since {@code dW ~ s.dW/ds}; the
+     * residual error is second order in the frequency discrepancy, which is a few percent.
+     * The two mechanisms compose: calibration removes the bulk field-dependent bias and
+     * leaves a smaller discrepancy for this to correct, which keeps the rescaling well
+     * inside its first-order regime.
+     *
+     * <p>Implies {@link #measure_frequency(boolean)}. Off by default: like calibration it
+     * changes every contrast residual.
+     */
+    public ContrastOptions normalize_frequency(boolean value) {
+        normalizeFrequency = value;
+        if (value) measureFrequency = true;
         return this;
     }
 }

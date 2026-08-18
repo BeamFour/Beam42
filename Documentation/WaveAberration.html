@@ -1,0 +1,906 @@
+<title>Equally Inclined Chords</title>
+
+<style>
+  :root {
+    --paper:      #F1F3F6;
+    --surface:    #FFFFFF;
+    --surface-2:  #E7EBF1;
+    --ink:        #10151C;
+    --ink-2:      #4C5666;
+    --ink-3:      #788394;
+    --rule:       #D3DAE4;
+    --rule-soft:  #E2E7EE;
+    --chief:      #1B5C9E;
+    --ray:        #A32255;
+    --accent:     #1B5C9E;
+    --code-bg:    #E9EDF3;
+    --warn-bg:    #F6EEDF;
+    --warn-ink:   #6B4E14;
+    --warn-rule:  #D8C08A;
+    --ok-bg:      #E4EEE6;
+    --ok-ink:     #2C5537;
+    --ok-rule:    #A9C6B2;
+
+    --serif: "Palatino Linotype", Palatino, "Iowan Old Style", "Book Antiqua", Georgia, serif;
+    --sans:  "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    --mono:  "Cascadia Mono", Consolas, "SFMono-Regular", "Liberation Mono", monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #0E1218;
+      --surface:    #151B23;
+      --surface-2:  #1C242F;
+      --ink:        #E4E9F1;
+      --ink-2:      #A3AEBF;
+      --ink-3:      #7A8598;
+      --rule:       #29323F;
+      --rule-soft:  #202833;
+      --chief:      #74AAE2;
+      --ray:        #E87BA5;
+      --accent:     #74AAE2;
+      --code-bg:    #1A222C;
+      --warn-bg:    #241E12;
+      --warn-ink:   #DCC189;
+      --warn-rule:  #4A3D1E;
+      --ok-bg:      #14211A;
+      --ok-ink:     #9CC9AC;
+      --ok-rule:    #2C4635;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:      #0E1218;
+    --surface:    #151B23;
+    --surface-2:  #1C242F;
+    --ink:        #E4E9F1;
+    --ink-2:      #A3AEBF;
+    --ink-3:      #7A8598;
+    --rule:       #29323F;
+    --rule-soft:  #202833;
+    --chief:      #74AAE2;
+    --ray:        #E87BA5;
+    --accent:     #74AAE2;
+    --code-bg:    #1A222C;
+    --warn-bg:    #241E12;
+    --warn-ink:   #DCC189;
+    --warn-rule:  #4A3D1E;
+    --ok-bg:      #14211A;
+    --ok-ink:     #9CC9AC;
+    --ok-rule:    #2C4635;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.62;
+    margin: 0;
+    padding: 0;
+  }
+
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 56px 28px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .masthead {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 28px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .eyebrow {
+    font-family: var(--sans);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(34px, 5.4vw, 54px);
+    font-weight: 400;
+    line-height: 1.06;
+    letter-spacing: -0.015em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .standfirst {
+    font-size: 19px;
+    color: var(--ink-2);
+    max-width: 62ch;
+    margin: 0;
+  }
+  .sourceline {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-3);
+    margin: 0;
+    max-width: 70ch;
+  }
+
+  section {
+    display: grid;
+    grid-template-columns: 148px minmax(0, 1fr);
+    gap: 0 36px;
+    padding: 40px 0;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  section:last-of-type { border-bottom: none; }
+
+  .rail {
+    font-family: var(--sans);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--ink-3);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 6px;
+  }
+  .rail .num {
+    font-family: var(--serif);
+    font-size: 30px;
+    line-height: 1;
+    color: var(--rule);
+    font-variant-numeric: tabular-nums;
+  }
+  .rail .tag { display: block; letter-spacing: 0.05em; }
+  .rail .tag b { color: var(--ink-2); font-weight: 600; }
+
+  .body { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+  .body > * { margin: 0; }
+  .body p, .body li { max-width: 66ch; }
+
+  h2 {
+    font-family: var(--serif);
+    font-size: 27px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  h3 {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    margin: 10px 0 0;
+  }
+
+  code, .mono { font-family: var(--mono); font-size: 0.87em; }
+  p code, li code, td code {
+    background: var(--code-bg);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+  var { font-style: italic; font-family: var(--serif); }
+  .ray-c   { color: var(--ray); }
+  .chief-c { color: var(--chief); }
+
+  .eq {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    border-radius: 2px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-x: auto;
+  }
+  .eq .formula { font-size: 19px; line-height: 1.7; white-space: nowrap; }
+  .eq .where {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-2);
+    white-space: normal;
+  }
+  .eq .ref {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  pre {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.65;
+    margin: 0;
+    color: var(--ink);
+  }
+  pre .cm { color: var(--ink-3); }
+
+  table { border-collapse: collapse; width: 100%; font-family: var(--sans); font-size: 14px; }
+  .tablewrap { overflow-x: auto; }
+  th, td {
+    text-align: left;
+    padding: 9px 14px 9px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: top;
+  }
+  th {
+    font-size: 11.5px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 600;
+    border-bottom: 1px solid var(--rule);
+  }
+  td.m { white-space: nowrap; font-family: var(--mono); font-size: 12.5px; }
+
+  ul, ol { padding-left: 1.15em; display: flex; flex-direction: column; gap: 9px; margin: 0; }
+
+  figure { margin: 6px 0; display: flex; flex-direction: column; gap: 12px; }
+  figure svg { max-width: 100%; height: auto; display: block; }
+  .figframe {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 18px 14px;
+    overflow-x: auto;
+  }
+  figcaption {
+    font-family: var(--sans);
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--ink-2);
+    max-width: 68ch;
+  }
+
+  .note, .ok {
+    border-radius: 2px;
+    padding: 14px 18px;
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .note { background: var(--warn-bg); border: 1px solid var(--warn-rule); color: var(--warn-ink); }
+  .ok   { background: var(--ok-bg);   border: 1px solid var(--ok-rule);   color: var(--ok-ink); }
+  .note b, .ok b { font-weight: 700; }
+  .note code, .ok code { background: transparent; padding: 0; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .swatch { width: 22px; height: 3px; border-radius: 2px; display: inline-block; }
+
+  @media (max-width: 760px) {
+    section { grid-template-columns: 1fr; gap: 0; padding: 32px 0; }
+    .rail {
+      flex-direction: row;
+      align-items: baseline;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding-bottom: 14px;
+    }
+    .rail .num { font-size: 22px; }
+    body { font-size: 16.5px; }
+    .wrap { padding: 36px 20px 72px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">rayoptics · raytr/WaveAbr.java</div>
+    <h1>Equally Inclined Chords</h1>
+    <p class="standfirst">How Hopkins turns two traced rays into an optical path difference without ever
+      constructing a wavefront — and where the Java follows his paper exactly, where it simplifies, and
+      where it disagrees.</p>
+    <p class="sourceline">Checked line by line against H. H. Hopkins, <i>Calculation of the aberrations and
+      image assessment for a general optical system</i>, Optica Acta <b>28</b>:5 (1981) 667–714, in
+      <span class="mono">Documentation/</span>. Equation numbers below are the paper's.</p>
+  </header>
+
+  <!-- ================= 1 ================= -->
+  <section>
+    <div class="rail">
+      <div class="num">01</div>
+      <span class="tag"><b>Paper §3</b><br>eq. 3.1, 3.4</span>
+    </div>
+    <div class="body">
+      <h2>What the OPD actually is</h2>
+      <p>Hopkins opens by defining the wave aberration as a difference of two optical path lengths, taken
+        between two reference spheres:</p>
+      <div class="eq">
+        <div class="ref">eq. 3.1</div>
+        <div class="formula"><var>W′</var> = [ <span class="chief-c">E P₁ P₂ … P<sub>k</sub> E′</span> ] − [ <span class="ray-c">B P₁ P₂ … P<sub>k</sub> B′</span> ]</div>
+        <div class="where"><span class="chief-c">QEP₁…P<sub>k</sub>E′</span> is the <b>principal ray</b> (the chief ray);
+          <span class="ray-c">QBP₁…P<sub>k</sub>B′</span> is a general <b>aperture ray</b>. <var>B</var> and <var>B′</var> are where
+          the two rays cut the object- and image-side reference spheres, centred on <var>Q</var> and the chosen
+          image point.</div>
+      </div>
+      <p>Note the order: <b>principal minus aperture</b>. That single detail fixes the sign convention of every
+        formula downstream, and of <code>WaveAbr</code>'s return value.</p>
+      <p>Two things make (3.1) awkward to evaluate by brute force, and the paper's abstract names both:</p>
+      <ul>
+        <li><b>Indeterminacies.</b> With the object, image or either pupil at infinity, the individual path
+          lengths and pupil coordinates diverge. Hopkins' stated goal is formulae that "never involve
+          indeterminacies".</li>
+        <li><b>Cancellation.</b> The paths run to hundreds of millimetres; their difference is a fraction of a
+          micron. Forming the large sums first throws away most of the significant digits — a serious matter
+          in 1981, a mild one now.</li>
+      </ul>
+      <p>His answer is a construction that produces the <em>difference</em> region by region, without ever
+        building the large sums.</p>
+    </div>
+  </section>
+
+  <!-- ================= 2 ================= -->
+  <section>
+    <div class="rail">
+      <div class="num">02</div>
+      <span class="tag"><b>eq. 3.9</b><br><code>eic_distance()</code></span>
+    </div>
+    <div class="body">
+      <h2>The equally inclined chord</h2>
+      <p>Take any two lines with unit directions <b>d</b> and <b>d₀</b>, and a point <var>P</var> on the first,
+        <var>P₀</var> on the second. Hopkins draws a chord from <var>P₀</var> to a point <var>P̃</var> on the
+        first line such that the chord is <em>equally inclined</em> to both. With <var>P̃</var> = <var>P</var> −
+        <var>e</var><b>d</b>, that condition is</p>
+      <div class="eq">
+        <div class="formula"><b>d</b>·( <var>P̃</var> − <var>P₀</var> ) = <b>d₀</b>·( <var>P₀</var> − <var>P̃</var> )
+          &nbsp;&nbsp;⟺&nbsp;&nbsp; ( <b>d</b> + <b>d₀</b> ) · ( <var>P̃</var> − <var>P₀</var> ) = 0</div>
+        <div class="where">The chord is perpendicular to the bisector of the two directions. Solving for
+          <var>e</var> gives eq. 3.9.</div>
+      </div>
+      <div class="eq">
+        <div class="ref">eq. 3.9 &nbsp;·&nbsp; <span class="mono">WaveAbr.eic_distance</span></div>
+        <div class="formula"><var>e</var> &nbsp;=&nbsp; ( <b>d</b> + <b>d₀</b> ) · ( <var>P</var> − <var>P₀</var> ) &nbsp;/&nbsp; ( 1 + <b>d</b> · <b>d₀</b> )</div>
+        <div class="where">Hopkins: "valid independent of the location of the origin and the orientation of the
+          coordinate system employed"; and since it applies to any pair of points, the later formulae "apply to
+          any form of surface". The Java is a direct transcription.</div>
+      </div>
+
+      <div class="ok">
+        <b>A correction worth making explicit.</b> The definition is the equal-inclination condition above,
+        which is meaningful for <em>skew</em> lines that never meet — and Hopkins stresses that his formulae
+        "apply equally to skew rays". The familiar picture of two points equidistant from a crossing point is
+        the intersecting special case, not the definition. It is still the right intuition, because it is what
+        makes the path-difference property obvious.
+      </div>
+
+      <figure>
+        <div class="figframe">
+          <svg viewBox="0 0 720 300" role="img" aria-label="Two rays crossing at X. The chord from P-nought to P-tilde is perpendicular to the bisector direction d plus d-nought, which for intersecting rays makes P-tilde and P-nought equidistant from X. The distance e along the ray from P-tilde to the traced point P is what equation 3.9 returns.">
+            <defs>
+              <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+              </marker>
+              <marker id="ahs" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+              </marker>
+            </defs>
+
+            <g stroke-width="2" fill="none">
+              <line x1="80" y1="70" x2="700" y2="185" stroke="var(--ray)" marker-end="url(#ah)" color="var(--ray)"/>
+              <line x1="80" y1="250" x2="700" y2="158" stroke="var(--chief)" marker-end="url(#ah)" color="var(--chief)"/>
+            </g>
+
+            <g stroke="currentColor" stroke-width="1" stroke-dasharray="3 4" opacity="0.45">
+              <line x1="423.3" y1="133.6" x2="620" y2="170"/>
+              <line x1="422.2" y1="199.3" x2="620" y2="170"/>
+            </g>
+            <path d="M 423.3 133.6 A 200 200 0 0 0 422.2 199.3" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 5" opacity="0.5"/>
+
+            <!-- chord -->
+            <line x1="423.3" y1="133.6" x2="422.2" y2="199.3" stroke="currentColor" stroke-width="2.5"/>
+            <!-- bisector at chord midpoint -->
+            <line x1="422.75" y1="166.45" x2="497" y2="167.8" stroke="currentColor" stroke-width="1.5" opacity="0.8" marker-end="url(#ahs)"/>
+            <path d="M 422.9 154.5 L 434.9 154.7 L 434.7 166.7" fill="none" stroke="currentColor" stroke-width="1" opacity="0.6"/>
+
+            <!-- e segment -->
+            <line x1="423.3" y1="133.6" x2="502.7" y2="148.3" stroke="var(--ray)" stroke-width="6" opacity="0.28"/>
+
+            <g stroke="none">
+              <circle cx="620" cy="170" r="4.5" fill="currentColor"/>
+              <circle cx="423.3" cy="133.6" r="4.5" fill="var(--ray)"/>
+              <circle cx="502.7" cy="148.3" r="4.5" fill="var(--ray)"/>
+              <circle cx="422.2" cy="199.3" r="4.5" fill="var(--chief)"/>
+            </g>
+
+            <g font-family="Georgia, serif" font-size="15" fill="currentColor">
+              <text x="632" y="166">X</text>
+              <text x="404" y="122" text-anchor="middle" fill="var(--ray)">P̃</text>
+              <text x="509" y="139" fill="var(--ray)">P</text>
+              <text x="404" y="219" text-anchor="middle" fill="var(--chief)">P₀</text>
+              <text x="455" y="128" fill="var(--ray)" font-style="italic">e</text>
+              <text x="504" y="173" font-size="13">d + d₀</text>
+            </g>
+            <g font-family="Segoe UI, system-ui, sans-serif" font-size="12.5" fill="currentColor" opacity="0.75">
+              <text x="92" y="60" fill="var(--ray)">aperture ray  (P, d)</text>
+              <text x="92" y="270" fill="var(--chief)">principal ray  (P₀, d₀)</text>
+              <text x="530" y="203" font-size="11.5">equal distances from X</text>
+              <text x="330" y="176" text-anchor="end" font-size="11.5">chord ⟂ bisector</text>
+              <line x1="334" y1="172" x2="416" y2="172" stroke="currentColor" stroke-width="1" opacity="0.6"/>
+            </g>
+          </svg>
+        </div>
+        <figcaption><var>P₀</var> is given; <var>P̃</var> is its equally inclined partner. Equation 3.9 returns
+          <var>e</var>, the distance along the ray from <var>P̃</var> back to the traced point <var>P</var> —
+          positive when <var>P̃P</var> runs with <b>d</b>. The dashed arc shows the equidistance that follows
+          when the rays actually meet.</figcaption>
+      </figure>
+
+      <h3>Why this is the whole trick</h3>
+      <p>If the two rays leave a common wavefront, the path difference accumulated as far as an equally
+        inclined pair <em>does not depend on which pair you choose</em>. Writing <var>L</var>, <var>L₀</var>
+        for the paths as far as <var>X</var>, the paths to a pair at distance <var>a</var> from <var>X</var>
+        are <var>L</var> + <var>na</var> and <var>L₀</var> + <var>na</var>; the <var>na</var> cancels for every
+        <var>a</var>. An EIC pair is therefore a stand-in for a common wavefront, computable from ray data
+        alone. So <var>n·e</var> <em>is</em> an optical path difference.</p>
+
+      <h3>Two degenerate cases the formula survives</h3>
+      <ul>
+        <li><b>Parallel rays</b> (object at infinity). With <b>d</b> = <b>d₀</b> it collapses to
+          <var>e</var> = <b>d</b>·(<var>P</var> − <var>P₀</var>), the projection of the ray separation onto the
+          common direction — the plane-wavefront path difference.</li>
+        <li><b>Nearly parallel rays</b>, which is the normal case. Imposing the chord condition the other way
+          round yields a denominator 1 − <b>d</b>·<b>d₀</b>, which vanishes there. Hopkins'
+          <nobr>1 + <b>d</b>·<b>d₀</b> = 2cos²(θ/2)</nobr> tends to 2 instead.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= 3 ================= -->
+  <section>
+    <div class="rail">
+      <div class="num">03</div>
+      <span class="tag"><b>eq. 3.10 – 3.22</b><br>the master equation</span>
+    </div>
+    <div class="body">
+      <h2>Hopkins' assembled formula, and the Java</h2>
+      <p>Equation (3.5) splits (3.1) into object space, the interior, and image space. Applying equally
+        inclined chords to the first and last gives (3.10) and (3.11), and the result is stated twice — as
+        (3.14), then in its computational form:</p>
+      <div class="eq">
+        <div class="ref">eq. 3.22</div>
+        <div class="formula"><var>W′</var> = −<var>n₁</var><var>ẽ₁</var> − <var>P</var> + <var>n<sub>k</sub></var><var>ẽ<sub>k</sub></var> + <var>P̄</var> + <var>δΩ′</var>,
+          &nbsp;&nbsp;&nbsp; <var>δΩ′</var> = −<var>n<sub>k</sub></var><var>e′</var></div>
+        <div class="where"><var>P</var> is the aperture ray's interior sum, <var>P̄</var> the principal ray's.
+          Hopkins names <var>Ω′</var> = <var>W′</var> − <var>δΩ′</var> the <b>invariant aberration</b> — the
+          aberration referred to any sphere through <var>E′</var> and <var>B̃′</var> — and <var>δΩ′</var> the
+          focal-shift term.</div>
+      </div>
+      <p>Now the Java, from <code>wave_abr_full_calc_finite_pup</code>:</p>
+      <pre>var opd = -n_obj*e1 - ray_op + n_img*ekp + cr_op - n_img*ep;</pre>
+      <div class="ok">
+        <b>Term for term, this is (3.22).</b> <code>e1</code> ↔ <var>ẽ₁</var> (3.12), <code>ray_op</code> ↔
+        <var>P</var>, <code>ekp</code> ↔ <var>ẽ<sub>k</sub></var> (3.13), <code>cr_op</code> ↔ <var>P̄</var>,
+        <code>-n_img*ep</code> ↔ <var>δΩ′</var>. Nothing is rearranged and no sign is flipped. The value
+        <code>WaveAbr</code> returns <em>is</em> Hopkins' <var>W′</var>.
+      </div>
+
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Region</th><th>Hopkins</th><th>Java</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>object → surface 1</td>
+              <td class="m">−n₁ẽ₁ &nbsp;(3.10, 3.12)</td>
+              <td class="m">-n_obj*e1</td>
+            </tr>
+            <tr>
+              <td>surface 1 → surface k</td>
+              <td class="m">P̄ − P &nbsp;(3.8, 3.18, 3.19)</td>
+              <td class="m">cr_op - ray_op</td>
+            </tr>
+            <tr>
+              <td>surface k → pupil</td>
+              <td class="m">+n<sub>k</sub>ẽ<sub>k</sub> &nbsp;(3.11, 3.13)</td>
+              <td class="m">n_img*ekp</td>
+            </tr>
+            <tr>
+              <td>pupil → reference sphere</td>
+              <td class="m">δΩ′ = −n<sub>k</sub>e′ &nbsp;(3.15, 4.6)</td>
+              <td class="m">-n_img*ep</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Object space (eq. 3.12)</h3>
+      <pre><span class="cm">// eq 3.12</span>
+var e1 = eic_distance(new RayData(ray.get(1).p, ray.get(0).d),
+                      new RayData(cr_ray.get(1).p, cr_ray.get(0).d));</pre>
+      <p>The mismatched indices are deliberate. <code>ray[1].p</code> is the surface-1 intersection point;
+        <code>ray[0].d</code> is the object-space direction. Together they are Hopkins'
+        (<var>X₁</var>, <var>Y₁</var>, <var>Z₁</var>) and (<var>L₁</var>, <var>M₁</var>, <var>N₁</var>), and the
+        difference is taken as aperture minus principal, matching (3.12). Because only directions and finite
+        surface points appear, it evaluates cleanly for the test model's object distance of 10<sup>10</sup> mm.</p>
+
+      <h3>Image space (eq. 3.13)</h3>
+      <pre><span class="cm">// eq 3.13</span>
+var ekp = eic_distance(new RayData(Lists.get(ray,k).p, Lists.get(ray,k).d),
+                       new RayData(Lists.get(cr_ray,k).p, Lists.get(cr_ray,k).d));</pre>
+      <p><code>k = -2</code>, the last real surface, with the directions <em>after</em> refraction — Hopkins'
+        primed direction cosines (<var>L′<sub>k</sub></var>, <var>M′<sub>k</sub></var>, <var>N′<sub>k</sub></var>).</p>
+
+      <h3>The interior term, where the port simplifies</h3>
+      <p>Hopkins does <em>not</em> define <var>P</var> as a raw path sum. From (3.8), <var>P</var> =
+        Σ<var>n<sub>s</sub></var>(<var>D<sub>s</sub></var> − <var>d<sub>s</sub></var>) — the interior path
+        <em>minus the axial path</em> — and (3.17)–(3.19) reduce even that to a telescoping sum of chords drawn
+        equally inclined to the ray and the axis, evaluated by (3.20)/(3.21). He points out that the axial path
+        Σ<var>n<sub>s</sub>d<sub>s</sub></var> "never appears explicitly in the formulae".</p>
+      <p>The port takes the direct route. <code>op_delta</code> from <code>RayTrace.trace_raw</code> is the raw
+        Σ<var>n<sub>i</sub>d<sub>i</sub></var>:</p>
+      <pre>if (in_gap_range(first_surf, last_surf, surf-1, false))
+    opl += before.Indx * dst_b4;</pre>
+      <p>With <code>first_surf = 1</code> and <code>last_surf = k</code> this accumulates gaps 1 … <var>k</var>−1 —
+        object and image space are deliberately excluded, because <var>ẽ₁</var> and <var>ẽ<sub>k</sub></var> own
+        them. This is the most common source of confusion when reading the routine.</p>
+      <p>The two definitions give the same answer, because the axial term cancels in the difference:
+        <var>P̄</var> − <var>P</var> = Σ<var>n̄</var>(<var>D̄</var>−<var>d</var>) − Σ<var>n</var>(<var>D</var>−<var>d</var>)
+        = Σ<var>n̄D̄</var> − Σ<var>nD</var>. What is lost is only conditioning: the port subtracts two sums of
+        order 10² mm to recover a difference of order 10⁻⁴ mm, which costs about six decimal digits. In double
+        precision that leaves ten, so it does not matter — but it is why Hopkins bothered, and why
+        <code>eic_distance_from_axis</code> exists.</p>
+
+      <div class="note">
+        <b>The unused function, explained.</b> <code>RayTrace.eic_distance_from_axis</code> is Hopkins
+        (3.20)/(3.21) — equation 3.9 with the second line taken to be the axis
+        (<var>L₀</var>=<var>M₀</var>=0, <var>N₀</var>=1, origin at the vertex). Nothing calls it. It is not
+        stray code: it is the one piece of Hopkins' conditioning strategy the port chose not to implement, and
+        it is unreachable precisely because <code>op_delta</code> takes the raw sum instead.
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 4 ================= -->
+  <section>
+    <div class="rail">
+      <div class="num">04</div>
+      <span class="tag"><b>Paper §4, §5</b><br><code>transfer_to_exit_pupil</code><br><code>calculate_reference_sphere</code></span>
+    </div>
+    <div class="body">
+      <h2>The exit pupil and the reference sphere</h2>
+      <p>In the paper, <var>E′</var> is where the principal ray cuts an <b>estimated</b> exit pupil plane at a
+        chosen distance <var>l̄′<sub>k</sub></var> = (<var>A<sub>k</sub>E′</var>). Hopkins is emphatic that the
+        estimate need not be good — "It is again no matter whether the estimate of β′, or of h̄′<sub>k</sub>,
+        is good or bad" — and (4.1) explains why: <var>Ω′</var> is "the wavefront aberration referred to any
+        sphere which passes through the points <var>E′</var> and <var>B̃′</var>". Only the focal-shift term
+        <var>δΩ′</var> notices where you put the pupil.</p>
+      <p>The port instead <em>solves</em> for the pupil: it walks the chief ray to its axis crossing.</p>
+      <pre>double h = b4_pt.y;
+double u = b4_dir.y;
+if (Math.abs(u) &lt; 1e-14) exp_dst = exp_dst_parax;
+else                     exp_dst = -h / u;</pre>
+      <p>This is a legitimate specialisation rather than a contradiction — for a centred system the chief ray's
+        axis crossing is the real exit pupil for that field point, which is a better-conditioned choice than an
+        arbitrary estimate, and (4.1) guarantees it cannot change <var>Ω′</var>. For an axial field the chief
+        ray runs along the axis and never crosses it, so <var>u</var> ≈ 0 and the code falls back to the
+        paraxial <code>fod.exp_dist</code>.</p>
+      <p>The reference sphere then follows the paper exactly: centre at the chosen image point <var>Q̄′</var>,
+        radius (<var>E′Q̄′</var>).</p>
+      <div class="eq">
+        <div class="formula"><var>R′</var> = | <var>Q̄′</var> − <span class="mono">exp_pt</span> | &nbsp;&nbsp;&nbsp;&nbsp;
+          <b>ref_dir</b> = ( <var>Q̄′</var> − <span class="mono">exp_pt</span> ) / <var>R′</var></div>
+        <div class="where">Hopkins' (<var>L′</var>, <var>M′</var>, <var>N′</var>) are the direction cosines of
+          <var>E′Q̄′</var> — that is exactly <code>ref_dir</code>, and <var>N′</var> = <code>ref_dir.z</code>.
+          Remember that pairing; it matters in §5. The chief ray therefore meets the sphere at the pupil
+          centre — verified numerically as |<var>Q̄′</var>−<span class="mono">exp_pt</span>| − <var>R′</var> = 0
+          to machine precision.</div>
+      </div>
+
+      <div class="note">
+        <b>Limitation worth knowing.</b> <code>transfer_to_exit_pupil</code> uses only the <var>y</var>
+        components — the commented-out lines just above show the intended <var>x</var>²+<var>y</var>² form, and
+        the comment <code>// handle field points in the YZ plane</code> is accurate. Field points with a
+        non-zero <var>x</var> component are not covered by this pupil-crossing solve. Hopkins' whole apparatus
+        is built for skew principal rays, so this restriction is the port's, not his.
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 5 ================= -->
+  <section>
+    <div class="rail">
+      <div class="num">05</div>
+      <span class="tag"><b>eq. 4.2 – 4.6, 4.21</b><br><code>ep</code></span>
+    </div>
+    <div class="body">
+      <h2>From the chord to the sphere</h2>
+      <p>The EIC construction lands the ray at <var>B̃′</var>, the partner of the pupil centre <var>E′</var> —
+        not on the reference sphere. <var>e′</var> = (<var>B̃′B′</var>) closes that gap. The code builds
+        <var>B̃′</var> first:</p>
+      <pre>var dst        = ekp - cr_exp_dist;
+var eic_exp_pt = b4_pt.minus(b4_dir.times(dst));
+var p_coord    = eic_exp_pt.minus(cr_exp_pt);</pre>
+      <p>The chief ray reaches <var>E′</var> after <code>cr_exp_dist</code>; the ray reaches
+        <code>eic_exp_pt</code> after <code>cr_exp_dist − ekp</code>. The travel distances differ by exactly
+        <code>−ekp</code>, which is the definition of an EIC pair — the same condition Hopkins imposes in (5.6)
+        to find <var>B̃′</var>'s <var>z</var> coordinate. <code>p_coord</code> is his
+        (<var>X̃′</var>−<var>X′</var>, …), the ray's exit-pupil coordinate measured from the pupil centre; in the
+        test system its length at full aperture is <span class="mono">11.3905</span> against a paraxial
+        <code>fod.exp_radius</code> of <span class="mono">11.3541</span>.</p>
+
+      <p>Intersecting the ray with the sphere, Hopkins' (4.2) gives the quadratic (4.3), with the auxiliary
+        quantities (4.4) and (4.5):</p>
+      <div class="eq">
+        <div class="ref">eq. 4.3 – 4.5</div>
+        <div class="formula"><var>e′</var>² − 2(<var>R′F</var>)<var>e′</var> + (<var>R′J</var>) = 0</div>
+        <div class="formula"><var>F</var> = Σ<var>L̄′L′</var> − (1/<var>R′</var>)Σ<var>L′<sub>k</sub></var>(<var>X̃′</var>−<var>X′</var>) &nbsp;&nbsp;&nbsp;&nbsp;
+          <var>J</var> = (1/<var>R′</var>)Σ(<var>X̃′</var>−<var>X′</var>)² − 2Σ<var>L̄′</var>(<var>X̃′</var>−<var>X′</var>)</div>
+        <div class="where">The Java is a literal transcription of both. And <var>J</var> has a clean reading:
+          <var>J·R′</var> = |<var>B̃′</var> − <var>Q̄′</var>|² − <var>R′</var>², i.e. how far off the sphere the
+          EIC point already sits. It is small — of order 10<sup>−3</sup> in the test system while
+          <var>F</var> ≈ 1 — which is the whole point of the construction.</div>
+      </div>
+      <p>Hopkins then picks the root: "the negative sign has to be chosen, since <var>e′</var>=0 when
+        <var>B′</var> coincides with <var>E′</var>: in this case <var>J</var>=0". He multiplies through by the
+        conjugate — because <var>R′F</var> ≈ 66 and the root ≈ 4×10<sup>−4</sup>, the direct form would subtract
+        two numbers agreeing to eleven digits — and arrives at:</p>
+      <div class="eq">
+        <div class="ref">eq. 4.6</div>
+        <div class="formula"><var>e′</var> &nbsp;=&nbsp; <var>J</var> &nbsp;/&nbsp; { <var>F</var> + √( <var>F</var>² − <var>J</var>/<var>R′</var> ) }</div>
+      </div>
+      <p>The Java:</p>
+      <pre>var sign_soln = ref_dir.z * Lists.get(cr.ray,-1).d.z &lt; 0 ? -1 : 1;
+var denom     = F + sign_soln*Math.sqrt(F*F + J/ref_sphere_radius);
+var ep        = denom == 0 ? 0.0 : J/denom;</pre>
+
+      <div class="note">
+        <b>The one substantive disagreement.</b> Hopkins has <var>F</var>² <b>−</b> <var>J</var>/<var>R′</var>;
+        the code has <code>F*F + J/ref_sphere_radius</code>. Deriving the roots of (4.3) independently confirms
+        the paper: the discriminant must be <var>F</var>² − <var>J</var>/<var>R′</var>. Instrumenting the
+        JP2018-189733 test model across three fields, the exact form lands the ray on the reference sphere to
+        1×10<sup>−14</sup> mm, while the code's form misses by 2×10<sup>−9</sup> to 2×10<sup>−7</sup> mm. The two
+        agree to first order in <var>J</var> and diverge by roughly
+        <var>J</var>²/(4<var>F</var>³<var>R′</var>), so the worst-case OPD error in that model is
+        <b>0.0004 waves</b> — far below the 10<sup>−6</sup> relative tolerance of the upstream regression
+        tests, and invisible in a plot. The same form appears upstream in the Python, so this is inherited, not
+        introduced by the port.
+      </div>
+
+      <h3>What <code>sign_soln</code> is standing in for</h3>
+      <p>There is no outer sign in (4.6): after rationalisation the denominator is always
+        <var>F</var> + √(…). Hopkins' orientation dependence lives <em>inside</em> the radical instead. Equation
+        (4.21) restates (4.6) in reduced coordinates as</p>
+      <div class="eq">
+        <div class="ref">eq. 4.21, with (2.10), (2.11), (4.8), (4.20)</div>
+        <div class="formula"><var>e′</var> = <var>J</var> / { <var>F</var> + √( <var>F</var>² − (<var>N′</var>/<var>R′</var>)<var>J</var> ) }</div>
+        <div class="where">The paper writes the coefficient as
+          <var>n<sub>k</sub>u′<sub>k</sub>u′<sub>k</sub>N′</var>/<var>H′</var>; chaining (4.8) <var>h′</var>/<var>R′</var> = <var>u′<sub>k</sub></var>
+          with (2.11) 1/<var>h′</var> = −<var>n<sub>k</sub>u′<sub>k</sub></var>/<var>H′</var> identifies it as
+          −<var>N′</var>/<var>R′</var>, consistent with (4.6) whenever <var>N′</var> = 1.</div>
+      </div>
+      <p>And <var>N′</var> is the <var>z</var> direction cosine of <var>E′Q̄′</var> — that is
+        <code>ref_dir.z</code>, the very quantity <code>sign_soln</code> tests. So the code has taken Hopkins'
+        <var>N′</var> out of the radical and turned it into a discrete ±1 on the outside. For an ordinary system
+        <var>N′</var> ≈ +1 and the two arrangements agree; after an odd number of mirrors they do not. Writing
+        the denominator as <code>F + sqrt(F*F - ref_dir.z*J/R)</code> would reproduce (4.21) directly and make
+        <code>sign_soln</code> unnecessary.</p>
+      <div class="ok">
+        Neither point is worth changing on its own — the measured error is four ten-thousandths of a wave, the
+        regression suite pins the current values, and this is upstream behaviour. They are recorded here so the
+        next reader who compares the code against the paper does not have to re-derive the discrepancy.
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 6 ================= -->
+  <section>
+    <div class="rail">
+      <div class="num">06</div>
+      <span class="tag"><b>Assembled</b><br>sign convention</span>
+    </div>
+    <div class="body">
+      <h2>The whole calculation, in one picture</h2>
+
+      <figure>
+        <div class="figframe">
+          <svg viewBox="0 0 740 300" role="img" aria-label="An aperture ray and a principal ray leave the object point, pass through the system, and reach the reference sphere. Four brackets label the four terms of the OPD sum: minus n1 times e1 in object space, P-bar minus P inside the system, plus n-k times e-k in image space, and minus n-k times e-prime from the equally inclined chord point to the reference sphere.">
+            <defs>
+              <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+              </marker>
+            </defs>
+
+            <line x1="30" y1="150" x2="720" y2="150" stroke="currentColor" stroke-width="1" stroke-dasharray="6 6" opacity="0.3"/>
+
+            <rect x="200" y="52" width="180" height="196" fill="var(--surface-2)" stroke="var(--rule)" stroke-width="1"/>
+            <text x="290" y="44" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif" font-size="12" fill="currentColor" opacity="0.7">surfaces 1 … k</text>
+
+            <path d="M 510 150 A 180 180 0 0 0 555 268" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.55"/>
+            <path d="M 510 150 A 180 180 0 0 1 555 32" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.55"/>
+
+            <polyline points="45,95 200,120 380,138 510,150" fill="none" stroke="var(--chief)" stroke-width="2"/>
+            <line x1="510" y1="150" x2="686" y2="150" stroke="var(--chief)" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#ah2)" color="var(--chief)"/>
+
+            <polyline points="45,95 200,70 380,72 522,110" fill="none" stroke="var(--ray)" stroke-width="2"/>
+            <line x1="522" y1="110" x2="686" y2="150" stroke="var(--ray)" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#ah2)" color="var(--ray)"/>
+
+            <circle cx="516" cy="108.5" r="4" fill="none" stroke="var(--ray)" stroke-width="2"/>
+            <circle cx="522" cy="110" r="4" fill="var(--ray)"/>
+
+            <g stroke="none">
+              <circle cx="45" cy="95" r="4.5" fill="currentColor"/>
+              <circle cx="510" cy="150" r="4.5" fill="var(--chief)"/>
+              <circle cx="686" cy="150" r="4.5" fill="currentColor"/>
+            </g>
+
+            <g stroke="currentColor" stroke-width="1" opacity="0.45">
+              <line x1="200" y1="52" x2="200" y2="248"/>
+              <line x1="380" y1="52" x2="380" y2="248"/>
+            </g>
+
+            <g font-family="Georgia, serif" font-size="14" fill="currentColor">
+              <text x="34" y="84" text-anchor="middle">Q</text>
+              <text x="512" y="172" fill="var(--chief)">E′</text>
+              <text x="500" y="102" fill="var(--ray)" font-size="13">B̃′</text>
+              <text x="530" y="128" fill="var(--ray)" font-size="13">B′</text>
+              <text x="694" y="146">Q̄′</text>
+            </g>
+
+            <g stroke="currentColor" stroke-width="1.2" opacity="0.55" fill="none">
+              <path d="M 48 272 L 48 278 L 197 278 L 197 272"/>
+              <path d="M 203 272 L 203 278 L 377 278 L 377 272"/>
+              <path d="M 383 272 L 383 278 L 513 278 L 513 272"/>
+              <path d="M 519 272 L 519 278 L 560 278 L 560 272"/>
+            </g>
+            <g font-family="Segoe UI, system-ui, sans-serif" font-size="12" fill="currentColor" text-anchor="middle">
+              <text x="122" y="294">−n₁ẽ₁</text>
+              <text x="290" y="294">P̄ − P</text>
+              <text x="448" y="294">+n&#8339;ẽ&#8339;</text>
+              <text x="600" y="294" text-anchor="start">δΩ′ = −n&#8339;e′</text>
+            </g>
+
+            <g font-family="Segoe UI, system-ui, sans-serif" font-size="11.5" fill="currentColor" opacity="0.7">
+              <text x="600" y="248">reference sphere,</text>
+              <text x="600" y="262">radius R′ about Q̄′</text>
+            </g>
+          </svg>
+        </div>
+        <figcaption>Each region contributes one term of (3.22). The open circle just short of the sphere is
+          <var>B̃′</var>, the equally inclined partner of <var>E′</var>; <var>e′</var> closes the last small
+          gap to <var>B′</var> on the sphere.</figcaption>
+      </figure>
+
+      <div class="legend">
+        <span><i class="swatch" style="background: var(--ray)"></i> aperture ray</span>
+        <span><i class="swatch" style="background: var(--chief)"></i> principal (chief) ray</span>
+      </div>
+
+      <h3>Sign convention</h3>
+      <p>Because the Java reproduces (3.22) unchanged, the returned value carries (3.1)'s ordering:</p>
+      <div class="eq">
+        <div class="formula"><span class="mono">opd</span> = <var>W′</var> = [ principal ray ] − [ aperture ray ]</div>
+        <div class="where">A positive OPD means the aperture ray's optical path to the reference sphere is
+          <em>shorter</em> than the chief ray's. Several later texts define <var>W</var> with the opposite
+          sign; if you compare against another package, check this first.</div>
+      </div>
+      <p><code>WavefrontAberrationAnalysis.opd</code> then scales by <code>1/nm_to_sys_units(wvl)</code> to give
+        waves, which is what the fan plots and the regression tests carry.</p>
+    </div>
+  </section>
+
+  <!-- ================= 7 ================= -->
+  <section>
+    <div class="rail">
+      <div class="num">07</div>
+      <span class="tag"><b>Biggest divergence</b><br><code>wave_abr_full_calc_inf_ref</code></span>
+    </div>
+    <div class="body">
+      <h2>Where the port stops following the paper</h2>
+      <p>Everything above covers §3 and the first half of §4 — equations (3.1) through (4.6). The port
+        implements that faithfully. It implements almost nothing of what comes after, and that is the single
+        largest structural difference between the two.</p>
+      <p>The second half of §4 exists because (4.4) and (4.5) are <em>not</em> determinate as written. Hopkins
+        says so plainly: "when the exit pupil <var>E′</var> is at infinity the quantities
+        Σ(<var>X̃′</var>−<var>X′</var>)², Σ<var>L̄′</var>(<var>X̃′</var>−<var>X′</var>) and <var>R′</var> all
+        become infinite." His fix is the reduced coordinates of (4.7)–(4.12), normalised by the paraxial ray
+        height <var>h′</var>, leading to the determinate forms</p>
+      <div class="eq">
+        <div class="ref">eq. 4.25, 4.28 — not implemented</div>
+        <div class="formula"><var>F</var> = Σ<var>L̄′L′</var> + <var>N′u′<sub>k</sub></var>Σ<var>L̄′<sub>k</sub></var>(<var>x̃′</var>−<var>x′</var>)</div>
+        <div class="where">and a three-term form for <var>J</var> built on the Lagrange invariant <var>H′</var>,
+          which Hopkins notes "is always finite, and not of great magnitude". These stay bounded when
+          <var>h′</var> and <var>R′</var> do not.</div>
+      </div>
+      <p>The Java uses the direct forms (4.4) and (4.5) with a literal <code>ref_sphere_radius</code>, and
+        therefore inherits exactly the indeterminacy the reduced coordinates were invented to remove. It
+        handles that with a branch:</p>
+      <pre>if (M.is_kinda_big(ref_sphere.ref_sphere_radius))   <span class="cm">// R &gt; 1e8</span>
+    return wave_abr_full_calc_inf_ref(...);
+else
+    return wave_abr_full_calc_finite_pup(...);</pre>
+      <p>and the infinite branch is not Hopkins at all. It cites Mikš, <i>Dependence of the wave-front
+        aberration on the radius of the reference sphere</i> (JOSA A <b>19</b>, 1187). Object space is unchanged —
+        <var>ẽ₁</var> is still (3.12) — but the sphere intersection is replaced by:</p>
+      <ul>
+        <li><code>ray_dist_to_perp_from_origin</code> returns <b>d</b>·(−<b>p</b>), the distance to the foot of
+          the perpendicular from the image-space origin. Added to <code>ray_op</code> it gives <code>V_B</code>,
+          a path referred to that plane rather than to a sphere.</li>
+        <li><code>dist_to_shortest_join</code> finds the common perpendicular between the two rays;
+          <code>rF0</code> is its midpoint — the best available "where they cross" for skew rays.</li>
+        <li><code>W0</code> refers both paths to <code>rF0</code>; <code>W_inf</code> adds the shift to the actual
+          image point, with a <code>1.0 + d_b4·d_cr_b4</code> denominator — equation 3.9 in a different costume.</li>
+      </ul>
+      <p>So the port reaches the same destination by a different road. It is worth being clear that this is a
+        deliberate substitution and not an omission: implementing (4.25)/(4.28) would need
+        <var>h′</var>, <var>u′<sub>k</sub></var>, <var>H′</var> and the reduced pupil coordinates threaded
+        through the trace, which is a much larger change than adding one branch.</p>
+
+      <h3>Also not implemented</h3>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Paper</th><th>Subject</th><th>Status in the port</th></tr></thead>
+          <tbody>
+            <tr><td class="m">§4 (4.7–4.28)</td><td>Reduced coordinates; determinate <var>F</var>, <var>J</var></td><td>Replaced by the Mikš branch</td></tr>
+            <tr><td class="m">§5 (5.5–5.9)</td><td>Exit pupil coordinates; reduced transverse aberration <var>δG′₀</var>, <var>δH′₀</var></td><td>Transverse aberration computed directly, not in reduced form</td></tr>
+            <tr><td class="m">§6</td><td>Focal shift formulae</td><td>Handled by the <code>foc</code> argument to <code>calculate_reference_sphere</code></td></tr>
+            <tr><td class="m">§7</td><td>Chromatic aberration, Conrady formula</td><td>Not present</td></tr>
+            <tr><td class="m">§8</td><td>Opening formulae for ray-tracing with (<var>h₁</var>, <var>u₁</var>)</td><td>Not present; the port aims rays via <code>iterate_ray</code> instead</td></tr>
+            <tr><td class="m">§9</td><td>Point spread function, OTF</td><td>Separate code paths, not derived from this routine</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 8 ================= -->
+  <section>
+    <div class="rail">
+      <div class="num">08</div>
+      <span class="tag"><b>Reading notes</b></span>
+    </div>
+    <div class="body">
+      <h2>Loose ends</h2>
+      <ul>
+        <li><b>Dead assignments.</b> Both <code>wave_abr_full_calc_*</code> methods assign the parameter
+          <code>wvl</code> from <code>cr.wvl</code> and then <code>ray_pkg.wvl</code>, and never read it.
+          Several unpacked locals (<code>fld</code>, <code>foc</code>, <code>cr_b4_pt</code>,
+          <code>lcl_tfrm_last</code> in the finite branch) are likewise unused — artifacts of mirroring the
+          Python tuple unpacking.</li>
+        <li><b>The phase-element hook is commented out</b> in <code>trace_raw</code>. Where upstream adds a
+          phase contribution to <code>op_delta</code> for diffractive surfaces, this port has the Python in a
+          block comment; <code>RaySeg</code> carries a matching <code>// TODO phase</code>. Hopkins' §1 lists
+          holographic images and diffraction gratings among the cases his formulae cover, so this is a real gap
+          rather than a hypothetical one.</li>
+        <li><b>Ordering constraint.</b> <code>opd()</code> reads <code>fld.chief_ray</code> and
+          <code>fld.ref_sphere</code> off the field object. Those are populated by
+          <code>setup_pupil_coords</code>, so the chief ray must be traced and the sphere built before any ray's
+          OPD can be evaluated.</li>
+      </ul>
+
+      <h3>Where to look, in order</h3>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>File</th><th>What it holds</th><th>Paper</th></tr></thead>
+          <tbody>
+            <tr><td class="m">raytr/WaveAbr.java</td><td>eq. 3.9, both OPD branches, the reference sphere</td><td>§3, §4</td></tr>
+            <tr><td class="m">raytr/RayTrace.java</td><td><code>trace_raw</code>, <code>op_delta</code>, the unused <code>eic_distance_from_axis</code></td><td>(3.8), (3.20), (3.21)</td></tr>
+            <tr><td class="m">raytr/Trace.java</td><td><code>trace_chief_ray</code>, <code>get_chief_ray_pkg</code>, <code>setup_pupil_coords</code></td><td>§2, §5</td></tr>
+            <tr><td class="m">analysis/WavefrontAberrationAnalysis.java</td><td>Conversion to waves, the OPD fan driver</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</div>

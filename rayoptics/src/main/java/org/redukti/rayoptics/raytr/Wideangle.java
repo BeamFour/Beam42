@@ -698,8 +698,8 @@ public class Wideangle {
                 z_enp = result.root;
             }
             catch (TraceException ray_err) {
-                // upstream falls back to the last iterate; keep the incoming
-                // estimate rather than collapsing z_enp to zero.
+                z_enp = z_enp_0;
+                // Preserve the caller's estimate rather than replacing it with zero.
             }
             rr = func.rr;
         }

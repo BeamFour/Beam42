@@ -1,3 +1,8 @@
+# Zeiss Otus ML 85mm f1.4
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|JP | JP2026-093473 | 1 | 2024 | Shibata | Cosina Inc | [link](https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2026-093473/11/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -66,7 +71,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | img_ht | 21.845
 | obj_ang | 14.84
 | obj_na | 0
-| img_na | -0.326|
+| img_na | -0.345|
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
@@ -95,4 +100,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./JP2026-093473_Example01.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-08-17
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-08-18

@@ -62,3 +62,14 @@ originY	346.53
 ppmm	7.559
 [notes]
 Bill: Patent supplies 1st and last diameters.
+[patent info]
+country	JP
+number	JP2026-093473
+example	1
+year applied	2024
+inventors	Shibata
+current assignee	Cosina Inc
+original assignee	Cosina Inc
+link	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2026-093473/11/en
+[report data]
+lens name	Zeiss Otus ML 85mm f1.4

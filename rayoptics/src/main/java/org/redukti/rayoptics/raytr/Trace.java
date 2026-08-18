@@ -218,8 +218,7 @@ public class Trace {
         // if wide_angle, don't try to intercept object and don't disallow
         // propagation against z_dir; this will be the case for rays exceeding
         // 90 degrees at the first surface.
-        var options = new RayTraceOptions();
-        options.check_apertures = trace_options.check_apertures;
+        var options = new RayTraceOptions(trace_options);
         if (opt_model.optical_spec.fov.is_wide_angle)
             options.intersect_obj = false;
         else {

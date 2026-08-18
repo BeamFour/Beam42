@@ -227,6 +227,20 @@ public class Matrix3 {
     }
 
     /**
+     * Rotating (intrinsic) frame x-y-z euler angles to a rotation matrix,
+     * i.e. transforms3d's euler2mat(ai, aj, ak, axes='rxyz'), which is
+     * Rx(ai) * Ry(aj) * Rz(ak).
+     * <p>
+     * {@link #euler2mat(Vector3)} is the static (extrinsic) frame form,
+     * transforms3d's default axes='sxyz' = Rz(ak) * Ry(aj) * Rx(ai). The two
+     * agree when only one angle is non-zero and differ for compound rotations.
+     * They are related by rxyz(e) == sxyz(-e).transpose().
+     */
+    public static Matrix3 euler2mat_rxyz(Vector3 euler) {
+        return euler2mat(euler.negate()).transpose();
+    }
+
+    /**
      * rotate around vert axis
      */
     public static Matrix3 yaw(double angle) {

@@ -157,7 +157,7 @@ public class VigCalc {
         options.output_filter = null;
         options.rayerr_filter = "full";
         options.apply_vignetting = false;
-        options.check_apertures = true;
+        options.check_apertures = false;
         var ray_result = Trace.trace_safe(opm,start_coords,fld_0,cwl,options);
         var ray_pkg = ray_result.pkg;
         var ray_err = ray_result.err;

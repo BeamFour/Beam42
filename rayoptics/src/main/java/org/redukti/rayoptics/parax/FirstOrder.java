@@ -79,7 +79,6 @@ public class FirstOrder {
                     stop = 1;
                 ybar1 = 0;
                 ubar1 = 1.0;
-                enp_dist = 0.0;
             }
         }
 
@@ -280,8 +279,8 @@ public class FirstOrder {
             fod.exp_radius = 1e10;
         }
         // compute object and image space numerical apertures
-        fod.obj_na = n_0 * Math.sin(Math.atan(Lists.get(sm.z_dir, 0).value * Lists.get(ax_ray, 0).slp));
-        fod.img_na = n_k * Math.sin(Math.atan(Lists.get(sm.z_dir, -1).value * Lists.get(ax_ray, -1).slp));
+        fod.obj_na = n_0 * Lists.get(sm.z_dir, 0).value * Lists.get(ax_ray, 0).slp;
+        fod.img_na = n_k * Lists.get(sm.z_dir, -1).value * Lists.get(ax_ray, -1).slp;
 
         return new ParaxData(ax_ray, pr_ray, fod);
     }

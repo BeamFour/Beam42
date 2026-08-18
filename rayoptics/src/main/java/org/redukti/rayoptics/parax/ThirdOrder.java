@@ -49,6 +49,8 @@ public class ThirdOrder {
             if (seq_model.ifcs.get(c).profile instanceof EvenPolynomial) {
                 aspheric_seidel_contribution(seq_model,parax_data,c,n_before,n_after,data);
             }
+            p = c;
+            n_before = n_after;
         }
         return third_order;
     }

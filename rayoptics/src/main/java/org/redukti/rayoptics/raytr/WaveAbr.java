@@ -342,9 +342,9 @@ public class WaveAbr {
             var rt = lcl_tfrm_last.rt;
             var t = lcl_tfrm_last.t;
 
-            p_b4 = rt.multiply(Lists.get(ray,k).p).minus(t);
+            p_b4 = rt.multiply(Lists.get(ray,k).p.minus(t));
             d_b4 = rt.multiply(Lists.get(ray,k).d);
-            p_cr_b4 = rt.multiply(Lists.get(cr_ray,k).p).minus(t);
+            p_cr_b4 = rt.multiply(Lists.get(cr_ray,k).p.minus(t));
             d_cr_b4 = rt.multiply(Lists.get(cr_ray,k).d);
         }
         else {
@@ -365,7 +365,7 @@ public class WaveAbr {
         var V_B = ray_op + op_b4;
         var V_BE = cr_op + op_cr_b4;
 
-        var W0 = V_B - V_BE + n_img + d_b4.minus(d_cr_b4).dot(rF0);
+        var W0 = V_B - V_BE + n_img * d_b4.minus(d_cr_b4).dot(rF0);
 
         var ta = Lists.get(ray,-1).p.minus(image_pt);
         var numer = d_cr_b4.minus(d_b4.times(d_b4.dot(d_cr_b4))).dot(ta);

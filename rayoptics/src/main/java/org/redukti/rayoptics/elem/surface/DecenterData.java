@@ -52,7 +52,7 @@ public class DecenterData {
 
     public void update() {
         if (euler.any())
-            rot_mat = Matrix3.euler2mat(convertl2r().deg2rad());
+            rot_mat =  Matrix3.euler2mat_rxyz(convertl2r().deg2rad());
         else
             rot_mat = null;
     }

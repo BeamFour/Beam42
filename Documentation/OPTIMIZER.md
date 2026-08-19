@@ -319,19 +319,42 @@ historical values.
 ### Per-sample frequency normalization
 
 Calibration fixes the mean of a block and cannot touch its spread. That the spread
-survives is not an inference; every sample's realized frequency can be measured directly,
-because two rays converging on the image form fringes at
+survives is not an inference; every sample's realized frequency can be measured directly.
+`PupilShear` provides two measurements of it, and they are not equivalent.
+
+The first uses ray directions. Two rays converging on the image form fringes at
 
 ```text
 frequency = n_img * abs(delta direction cosine) / lambda
 ```
 
-and both direction cosines are already available on rays the samples trace. The relation
-holds wherever the exit pupil happens to lie, which is why no pupil location is needed to
-evaluate it. It is the direction-cosine form of the reduced spatial frequency in H. H.
-Hopkins, *Calculation of the aberrations and image assessment for a general optical
-system*, Optica Acta 28:5 (1981), section 10; `PupilShear` implements it, alongside the
-exit-pupil coordinate of section 5.
+and both direction cosines are already available on rays the samples trace, wherever the
+exit pupil happens to lie. `PupilShear.realized_frequency` computes this, and
+`calibrate_frequency` uses the same metric for its probe pair.
+
+The second uses exit-pupil separation, which is what H. H. Hopkins, *Calculation of the
+aberrations and image assessment for a general optical system*, Optica Acta 28:5 (1981),
+actually defines the OTF over. His (10.26) shears the pupil function in reduced exit-pupil
+coordinates and (10.28) fixes the scale, so the OTF variable is a separation on the
+exit-pupil reference sphere:
+
+```text
+frequency = n_img * abs(delta p) / (lambda * R')
+```
+
+`PupilShear.realized_frequency_vector` computes this from the section 5 exit-pupil
+coordinates, and returns both components.
+
+**The direction-cosine metric is not the OTF frequency.** A ray's image-space direction is
+the wavefront normal, so a direction-cosine difference carries the pupil separation *plus*
+the difference in wavefront slope between the two points -- transverse ray aberration,
+which is exactly what optimization changes. The two agree for an unaberrated system.
+Measured divergence runs from 0.1 percent on axis to 2.7 percent at full field tangential
+on the Otus 50/1.4, which is the same order as the spread normalization exists to correct.
+This is REVIEW.md finding 9, and it applies equally to `calibrate_frequency`, whose probe
+uses the same metric: the 8.5 percent to 0.08 percent improvement recorded under finding 7
+shows the probe reproducing the direction-cosine metric, not that the pair achieved the
+requested separation in Hopkins' coordinates. `ContrastProbe19` measures both.
 
 Enable the correction through the builder:
 
@@ -429,6 +452,14 @@ still works there.
 
 Normalization is off by default because, like calibration and centring, it changes every
 contrast residual and therefore every committed regression value.
+
+**It should stay off for production optimization until the metric question is settled.**
+The rescaling is currently driven by `realized_frequency`, the direction-cosine metric,
+which the paragraphs above show is not Hopkins' OTF coordinate. The correct sequence is to
+drive both the normalization and the calibration probe from
+`realized_frequency_vector`, keep the result diagnostic while it is checked against an
+independent MTF, and only then consider enabling either for real work.
+`measure_frequency` is safe to use throughout, since it changes no residual.
 
 ## The pupil the merit sees
 

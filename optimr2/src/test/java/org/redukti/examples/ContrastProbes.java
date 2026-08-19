@@ -27,7 +27,7 @@ public final class ContrastProbes {
      * least-squares contrast merit tracks MTF.
      */
     public static String leicaInputPath() {
-        return resolve("Examples/jfotoptix/leica-r-apo-75mm-f2-mandler/specs.txt");
+        return resolve("Examples/jfotoptix/leica-r-apo-75mm-f2-mandler/specs-original.txt");
     }
 
     private static String resolve(String relative) {

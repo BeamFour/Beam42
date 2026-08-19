@@ -166,6 +166,7 @@ public class LeicaApo75mmMandler {
                                 tangentialWeights))
                 .calibrateContrastFrequency(false)
                 .centerContrastResiduals(false)
+                .aimContrastAtExitPupil(false)
                 //.additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 39.38, 1.0))
                 .vignetting(VigType.SetVig)
                 .freezeVignetting()
@@ -198,7 +199,7 @@ public class LeicaApo75mmMandler {
         boolean weighted = false;
         boolean dLineOnly = false;
         double[] fieldWeights = {1.0, 1.0, 1.0, 1.0};
-        String specfile = ExampleFinder.geoPathToExample("Examples/jfotoptix/leica-r-apo-75mm-f2-mandler/specs.txt");
+        String specfile = ExampleFinder.geoPathToExample("Examples/jfotoptix/leica-r-apo-75mm-f2-mandler/specs-original.txt");
         var prescription = getPrescription(specfile, weighted, dLineOnly);
         var setup = createContrastSetup(prescription, weighted, dLineOnly, fieldWeights);
         var analysis = setup.analysis();

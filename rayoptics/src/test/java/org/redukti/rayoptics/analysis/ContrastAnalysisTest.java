@@ -6,6 +6,8 @@ import org.redukti.rayoptics.util.Orientation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ContrastAnalysisTest {
@@ -97,5 +99,77 @@ class ContrastAnalysisTest {
                 "a clipped calibration probe should fall back to no correction");
         assertTrue(Math.abs(unchecked - 1.0) > 1.0e-6,
                 "disabling aperture checks should allow the calibration probes to trace");
+    }
+
+    @Test
+    void measuringFrequencyReportsRealisedShearWithoutChangingResiduals() {
+        var model = MtfTest.buildTestModel();
+        var plain = ContrastAnalysis.eval(model, new ContrastOptions(40.0).num_rings(2).num_spokes(6));
+        var measured = ContrastAnalysis.eval(model,
+                new ContrastOptions(40.0).num_rings(2).num_spokes(6).measure_frequency(true));
+
+        for (int f = 0; f < plain.fields.size(); f++) {
+            for (int w = 0; w < plain.fields.get(f).wavelengths().size(); w++) {
+                var before = plain.fields.get(f).wavelengths().get(w).samples();
+                var after = measured.fields.get(f).wavelengths().get(w).samples();
+                for (int i = 0; i < before.size(); i++) {
+                    assertEquals(before.get(i).sagittalDifference(),
+                            after.get(i).sagittalDifference(), 0.0,
+                            "measurement alone must not change a residual");
+                    assertEquals(before.get(i).tangentialDifference(),
+                            after.get(i).tangentialDifference(), 0.0);
+                    var shear = after.get(i).shear();
+                    assertNotNull(shear, "measurement should populate the shear");
+                    assertNotNull(shear.pupilCoord());
+                    assertTrue(Double.isFinite(shear.sagittalFrequency()));
+                    assertTrue(Double.isFinite(shear.tangentialFrequency()));
+                    // The realised frequency is close to, but not equal to, the request:
+                    // that gap is what normalisation corrects.
+                    assertTrue(Math.abs(shear.sagittalFrequency() / 40.0 - 1.0) < 0.5,
+                            "realised frequency should be within the usable band of the request");
+                }
+                assertNull(before.get(0).shear(), "shear is not measured unless asked for");
+            }
+        }
+    }
+
+    @Test
+    void normalisingFrequencyRescalesEachResidualByItsOwnRealisedFrequency() {
+        var model = MtfTest.buildTestModel();
+        var measured = ContrastAnalysis.eval(model,
+                new ContrastOptions(40.0).num_rings(2).num_spokes(6).measure_frequency(true));
+        var normalized = ContrastAnalysis.eval(model,
+                new ContrastOptions(40.0).num_rings(2).num_spokes(6).normalize_frequency(true));
+
+        boolean anyChanged = false;
+        for (int f = 0; f < measured.fields.size(); f++) {
+            for (int w = 0; w < measured.fields.get(f).wavelengths().size(); w++) {
+                var before = measured.fields.get(f).wavelengths().get(w).samples();
+                var after = normalized.fields.get(f).wavelengths().get(w).samples();
+                for (int i = 0; i < before.size(); i++) {
+                    if (!before.get(i).valid()) continue;
+                    double realised = before.get(i).shear().sagittalFrequency();
+                    assertEquals(before.get(i).sagittalDifference() * (40.0 / realised),
+                            after.get(i).sagittalDifference(), 1.0e-12,
+                            "each residual should be scaled by requested/realised");
+                    if (Math.abs(after.get(i).sagittalDifference()
+                            - before.get(i).sagittalDifference()) > 1.0e-12) {
+                        anyChanged = true;
+                    }
+                }
+            }
+        }
+        assertTrue(anyChanged, "normalisation should actually move some residual");
+    }
+
+    @Test
+    void normalisationImpliesMeasurementAndBothDefaultOff() {
+        var options = new ContrastOptions(40.0);
+        assertFalse(options.measureFrequency);
+        assertFalse(options.normalizeFrequency);
+
+        options.normalize_frequency(true);
+        assertTrue(options.measureFrequency,
+                "normalisation needs the measurement it is based on");
     }
 }

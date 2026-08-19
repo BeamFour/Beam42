@@ -351,10 +351,35 @@ the difference in wavefront slope between the two points -- transverse ray aberr
 which is exactly what optimization changes. The two agree for an unaberrated system.
 Measured divergence runs from 0.1 percent on axis to 2.7 percent at full field tangential
 on the Otus 50/1.4, which is the same order as the spread normalization exists to correct.
-This is REVIEW.md finding 9, and it applies equally to `calibrate_frequency`, whose probe
-uses the same metric: the 8.5 percent to 0.08 percent improvement recorded under finding 7
-shows the probe reproducing the direction-cosine metric, not that the pair achieved the
-requested separation in Hopkins' coordinates. `ContrastProbe19` measures both.
+This is REVIEW.md finding 9. `ContrastProbe19` measures both metrics;
+`frequency_metric(FrequencyMetric.EXIT_PUPIL)` switches the corrections onto the
+exit-pupil one.
+
+The consequence for `calibrate_frequency` is not the obvious one, and is worth stating
+before the normalization case below. Scoring all three configurations on the exit-pupil
+metric, which is the yardstick that matters, `ContrastProbe21` gives for the Otus 50/1.4
+at full field tangential, 10 cycles/mm:
+
+```text
+calibration off        0.8301
+calibrated by direction 0.9993
+calibrated by pupil     1.0141
+```
+
+Calibration on the direction metric lands within 0.1 percent of correct; switching it to
+the exit-pupil metric makes it *worse*. The reason is that the shipped configuration
+carries two errors that happen to cancel. The probe measures at plus and minus half a
+shift about the pupil centre, while the samples are spread across the pupil, so its scale
+is about 3 percent off for the sample population; the direction metric is about 3 percent
+high in the same block. Correcting one without the other breaks the cancellation.
+
+That cancellation is a property of these lenses, not a principle - on a design where the
+probe's centring bias were smaller, the metric error would show through undamped. The
+robust fix is to set the scale from the sample population on the exit-pupil metric rather
+than from a centre probe on either, which costs one extra evaluation pass. Until that is
+done, `calibrate_frequency` should be left on its default `RAY_DIRECTION` metric: it is
+empirically the better of the two available settings, for a reason that does not
+generalise.
 
 Enable the correction through the builder:
 
@@ -487,6 +512,13 @@ a third wrong recovers only about two thirds of it. That is a much weaker case t
 original 17 percent suggested. Rescaling a finite difference is the wrong instrument; the
 exact treatment aims each displaced ray until its exit-pupil coordinate has the requested
 separation, and uses that ray's OPD directly.
+
+Unlike the calibration case above, the metric switch here is a straight improvement rather
+than a cancellation being broken, because normalization is per sample and carries no
+centring bias to cancel against. `normalize_frequency(true)` with
+`frequency_metric(EXIT_PUPIL)` is the honest configuration of the option as it stands. It
+remains off by default, and the rescaling error above is the reason to be cautious about
+turning it on rather than the metric.
 
 `measure_frequency` is unaffected by all of this and is safe to use throughout, since it
 changes no residual. It is the recommended way to inspect a design.

@@ -160,15 +160,33 @@ public class ContrastAnalysis {
         field.ref_sphere = coordinates.ref_sphere;
 
         double half = 0.5 * shift;
-        Double low = image_direction(opticalModel, field, wavelength, traceOptions, axis,
-                axis == Orientation.X ? new Vector2(-half, 0.0) : new Vector2(0.0, -half));
-        Double high = image_direction(opticalModel, field, wavelength, traceOptions, axis,
-                axis == Orientation.X ? new Vector2(half, 0.0) : new Vector2(0.0, half));
+        var lowPupil = axis == Orientation.X ? new Vector2(-half, 0.0) : new Vector2(0.0, -half);
+        var highPupil = axis == Orientation.X ? new Vector2(half, 0.0) : new Vector2(0.0, half);
+        var low = Trace.trace_safe(opticalModel, lowPupil, field, wavelength, traceOptions).pkg;
+        var high = Trace.trace_safe(opticalModel, highPupil, field, wavelength, traceOptions).pkg;
         if (low == null || high == null) return 1.0;
 
-        double realized = Math.abs(high - low);
+        // Both metrics reduce to a ratio of requested to realised, but they are expressed
+        // in different units: RAY_DIRECTION works in direction cosines, where the request
+        // is lambda*nu, and EXIT_PUPIL works in cycles per unit length directly.
+        double realized;
+        double target;
+        if (options.frequencyMetric == FrequencyMetric.EXIT_PUPIL) {
+            var vector = PupilShear.realized_frequency_vector(opticalModel, low, high,
+                    field.chief_ray, field.ref_sphere, wavelength);
+            if (vector == null) return 1.0;
+            realized = Math.abs(axis == Orientation.X ? vector.x : vector.y);
+            target = options.spatialFrequency;
+        } else {
+            var d0 = image_direction(opticalModel, low, axis);
+            var d1 = image_direction(opticalModel, high, axis);
+            if (d0 == null || d1 == null) return 1.0;
+            realized = Math.abs(d1 - d0);
+            target = required;
+        }
+
         if (!Double.isFinite(realized) || realized < 1.0e-12) return 1.0;
-        double scale = required / realized;
+        double scale = target / realized;
         // A correction this far from unity says the probe failed rather than that the
         // pupil mapping is unusual; leave the shift alone rather than destabilise the merit.
         return scale > 0.5 && scale < 2.0 ? scale : 1.0;
@@ -176,9 +194,7 @@ public class ContrastAnalysis {
 
     /** Direction cosine of the traced ray in image space, or null if it did not get there. */
     private static Double image_direction(
-            OpticalModel opticalModel, Field field, double wavelength,
-            TraceOptions traceOptions, int axis, Vector2 pupil) {
-        var pkg = Trace.trace_safe(opticalModel, pupil, field, wavelength, traceOptions).pkg;
+            OpticalModel opticalModel, org.redukti.rayoptics.raytr.RayPkg pkg, int axis) {
         if (pkg == null || pkg.ray == null || pkg.ray.size() < 2) return null;
         var segment = Lists.get(pkg.ray, -2);
         return axis == Orientation.X ? segment.d.x : segment.d.y;
@@ -209,9 +225,14 @@ public class ContrastAnalysis {
         var shear = measure_shear(opticalModel, rays, field, wavelength);
         sample = sample.withShear(shear);
         if (!options.normalizeFrequency || !valid) return sample;
+        boolean pupilMetric = options.frequencyMetric == FrequencyMetric.EXIT_PUPIL;
+        double sagittalRealized = pupilMetric
+                ? shear.sagittalPupilFrequencyOnAxis() : shear.sagittalFrequency();
+        double tangentialRealized = pupilMetric
+                ? shear.tangentialPupilFrequencyOnAxis() : shear.tangentialFrequency();
         return sample.withDifferences(
-                normalize(sagittal, shear.sagittalFrequency(), options.spatialFrequency),
-                normalize(tangential, shear.tangentialFrequency(), options.spatialFrequency));
+                normalize(sagittal, sagittalRealized, options.spatialFrequency),
+                normalize(tangential, tangentialRealized, options.spatialFrequency));
     }
 
     /**

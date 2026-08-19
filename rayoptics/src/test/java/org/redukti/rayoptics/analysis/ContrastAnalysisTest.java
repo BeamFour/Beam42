@@ -1,7 +1,9 @@
 package org.redukti.rayoptics.analysis;
 
 import org.junit.jupiter.api.Test;
+import org.redukti.mathlib.Vector2;
 import org.redukti.rayoptics.raytr.Trace;
+import org.redukti.rayoptics.raytr.TraceOptions;
 import org.redukti.rayoptics.util.Orientation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,8 +11,65 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ContrastAnalysisTest {
+
+    @Test
+    void exitPupilAimingRealisesBothRequestedShearVectors() {
+        var model = MtfTest.buildTestModel();
+        int fieldIndex = 1;
+        int wavelengthIndex = 1;
+        double wavelength = model.optical_spec.wvls.wavelengths[wavelengthIndex];
+        double normalizedShift = ContrastAnalysis.normalized_entry_pupil_shift(
+                model, wavelength, 40.0);
+        double physicalShift = normalizedShift
+                * Math.abs(model.optical_spec.parax_data.fod.exp_radius);
+
+        var traced = model.seq_model.trace_contrast(
+                (rays, field, wvl, focus) -> {
+                    assertNull(rays.referenceError());
+                    assertNull(rays.sagittalError());
+                    assertNull(rays.tangentialError());
+                    var reference = PupilShear.exit_pupil_sphere_coord(
+                            rays.reference(), field.chief_ray, field.ref_sphere);
+                    var sagittal = PupilShear.exit_pupil_sphere_coord(
+                            rays.sagittal(), field.chief_ray, field.ref_sphere);
+                    var tangential = PupilShear.exit_pupil_sphere_coord(
+                            rays.tangential(), field.chief_ray, field.ref_sphere);
+                    assertNotNull(reference);
+                    assertNotNull(sagittal);
+                    assertNotNull(tangential);
+                    return new double[]{
+                            sagittal.x - reference.x,
+                            sagittal.y - reference.y,
+                            tangential.x - reference.x,
+                            tangential.y - reference.y};
+                }, fieldIndex, wavelengthIndex, 1, 6,
+                new Vector2(normalizedShift, 0.0),
+                new Vector2(0.0, normalizedShift),
+                new TraceOptions(), true);
+
+        double tolerance = Math.max(1.0e-9,
+                Math.abs(model.optical_spec.parax_data.fod.exp_radius) * 2.0e-7);
+        for (double[] separation : traced.get(0).samples()) {
+            assertEquals(physicalShift, separation[0], tolerance);
+            assertEquals(0.0, separation[1], tolerance);
+            assertEquals(0.0, separation[2], tolerance);
+            assertEquals(physicalShift, separation[3], tolerance);
+        }
+    }
+
+    @Test
+    void exitPupilAimingCannotBeCombinedWithBlockCalibration() {
+        var model = MtfTest.buildTestModel();
+        var options = new ContrastOptions(40.0)
+                .aim_exit_pupil(true)
+                .calibrate_frequency(true);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> ContrastAnalysis.eval(model, options));
+    }
 
     @Test
     void convertsImageFrequencyToNormalizedPupilShift() {

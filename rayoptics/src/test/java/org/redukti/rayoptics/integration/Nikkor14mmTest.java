@@ -3,6 +3,9 @@ package org.redukti.rayoptics.integration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.redukti.mathlib.Vector3;
+import org.redukti.mathlib.Vector2;
+import org.redukti.rayoptics.analysis.ContrastAnalysis;
+import org.redukti.rayoptics.analysis.PupilShear;
 import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrderData;
@@ -12,6 +15,8 @@ import org.redukti.rayoptics.seq.SurfaceData;
 import org.redukti.rayoptics.specs.*;
 import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.Pair;
+
+import java.util.List;
 
 public class Nikkor14mmTest {
 
@@ -166,6 +171,37 @@ public class Nikkor14mmTest {
             fld.ref_sphere = t.ref_sphere;
         }
 
+        // At 57.68 degrees the entrance-to-exit-pupil map is sufficiently aberrated
+        // to distinguish a rigid entrance-pupil displacement from direct aiming. Verify
+        // both that the old construction misses the requested two-dimensional shear and
+        // that inverse aiming reaches it on the exit-pupil reference sphere.
+        int fieldIndex = 1;
+        int wavelengthIndex = osp.wvls.reference_wvl;
+        double wavelength = osp.wvls.wavelengths[wavelengthIndex];
+        double normalizedShift = ContrastAnalysis.normalized_entry_pupil_shift(
+                opm, wavelength, 40.0);
+        double requestedShift = normalizedShift * Math.abs(fod.exp_radius);
+        Vector2 sagittalShift = new Vector2(normalizedShift, 0.0);
+        Vector2 tangentialShift = new Vector2(0.0, normalizedShift);
+
+        var unaimed = sm.trace_contrast(
+                Nikkor14mmTest::exitPupilSeparations,
+                fieldIndex, wavelengthIndex, 1, 6,
+                sagittalShift, tangentialShift, new TraceOptions(), false);
+        var aimed = sm.trace_contrast(
+                Nikkor14mmTest::exitPupilSeparations,
+                fieldIndex, wavelengthIndex, 1, 6,
+                sagittalShift, tangentialShift, new TraceOptions(), true);
+
+        double unaimedError = maxSeparationError(unaimed.get(0).samples(), requestedShift);
+        double aimedError = maxSeparationError(aimed.get(0).samples(), requestedShift);
+        Assertions.assertTrue(unaimedError > 0.5,
+                "wide-angle unaimed shear should expose pupil mapping error: " + unaimedError);
+        Assertions.assertTrue(aimedError < 2.0e-6,
+                "aimed shear should reach the reference-sphere target: " + aimedError);
+        Assertions.assertTrue(aimedError * 100_000.0 < unaimedError,
+                "aiming should improve wide-angle shear by at least five orders of magnitude");
+
         var result = Wideangle.eval_real_image_ht(opm,osp.fov.fields[1],587.5618);
         var expect_pt = new Vector3(0.0, -2866312975.4227800369262695,  419590299.1519107818603516);
         var expect_dir = new Vector3(-0.,  0.2866312938130761,  0.9580409706307147);
@@ -173,6 +209,33 @@ public class Nikkor14mmTest {
         Assertions.assertEquals(expect_z_enp,result.z_enp,1e-5);
         Assertions.assertTrue(expect_pt.isEqual(result.ray_data.pt,1e-7));
         Assertions.assertTrue(expect_dir.isEqual(result.ray_data.dir,1e-7));
+    }
+
+    private static double[] exitPupilSeparations(
+            ContrastRayTriplet rays, Field field, double wavelength, double focus) {
+        Assertions.assertNull(rays.referenceError());
+        Assertions.assertNull(rays.sagittalError());
+        Assertions.assertNull(rays.tangentialError());
+        Vector3 reference = PupilShear.exit_pupil_sphere_coord(
+                rays.reference(), field.chief_ray, field.ref_sphere);
+        Vector3 sagittal = PupilShear.exit_pupil_sphere_coord(
+                rays.sagittal(), field.chief_ray, field.ref_sphere);
+        Vector3 tangential = PupilShear.exit_pupil_sphere_coord(
+                rays.tangential(), field.chief_ray, field.ref_sphere);
+        Assertions.assertNotNull(reference);
+        Assertions.assertNotNull(sagittal);
+        Assertions.assertNotNull(tangential);
+        return new double[]{sagittal.x - reference.x, sagittal.y - reference.y,
+                tangential.x - reference.x, tangential.y - reference.y};
+    }
+
+    private static double maxSeparationError(List<double[]> separations, double requested) {
+        double maximum = 0.0;
+        for (double[] separation : separations) {
+            maximum = Math.max(maximum, Math.hypot(separation[0] - requested, separation[1]));
+            maximum = Math.max(maximum, Math.hypot(separation[2], separation[3] - requested));
+        }
+        return maximum;
     }
 
     static boolean compare(RaySeg s1, RaySeg s2) {

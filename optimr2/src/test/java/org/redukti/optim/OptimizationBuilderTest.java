@@ -589,6 +589,28 @@ class OptimizationBuilderTest {
     }
 
     @Test
+    void configuresExitPupilContrastAimingAndRejectsCalibrationCombination() {
+        var setup = OptimizationBuilder.builder(prescription())
+                .fields(0.0)
+                .mtfFrequencies(20)
+                .aimContrastAtExitPupil()
+                .contrastGoals(OptimizationBuilder.contrast(20, new double[]{1.0}))
+                .build();
+
+        assertTrue(setup.analysis()._contrast_aim_exit_pupil);
+        assertFalse(setup.analysis()._contrast_calibrate_frequency);
+
+        assertThrows(IllegalArgumentException.class, () ->
+                OptimizationBuilder.builder(prescription())
+                        .fields(0.0)
+                        .mtfFrequencies(20)
+                        .aimContrastAtExitPupil()
+                        .calibrateContrastFrequency(true)
+                        .contrastGoals(OptimizationBuilder.contrast(20, new double[]{1.0}))
+                        .build());
+    }
+
+    @Test
     void validatesContrastConfiguration() {
         assertThrows(IllegalArgumentException.class, () ->
                 OptimizationBuilder.builder(prescription()).contrastSampling(0, 6));

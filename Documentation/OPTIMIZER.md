@@ -10,7 +10,7 @@ prescription is already reasonably corrected and the phase differences are small
 
 A contrast sample is one location `p = (x, y)` in the entrance pupil at which the
 wavefront is compared with slightly displaced copies of itself. The OTF shear is
-physically defined at the exit pupil, but Beam43 launches rays in entrance-pupil
+physically defined at the exit pupil, but Beam42 launches rays in entrance-pupil
 coordinates. The optional frequency calibration described below rescales those launch
 coordinates so that the ray pairs realise the requested image-space frequency.
 
@@ -293,7 +293,7 @@ Enable the correction through the builder:
 .calibrateContrastFrequency(true)
 ```
 
-For every field and wavelength, Beam43 traces a centred probe pair separately in the
+For every field and wavelength, Beam42 traces a centred probe pair separately in the
 sagittal and tangential directions. Two rays produce image-space fringes at the requested
 frequency when their image-space direction cosines differ by
 
@@ -312,9 +312,154 @@ across individual samples remains. It can be measured diagnostically, but correc
 properly requires aiming the displaced ray to the requested exit-pupil separation.
 
 Calibration is off by default because it changes the sampled frequencies and therefore
-the numerical merit function. It should normally be enabled for new contrast-
-optimization work, while old regression cases may leave it disabled to preserve their
+the numerical merit function. It is cheaper than direct aiming and can remove much of a
+wide-field bias, but it is not the preferred reference for new accuracy work: its probe
+uses an image-ray direction metric and one scale cannot represent the nonlinear
+two-dimensional pupil map. Old regression cases may leave it disabled to preserve their
 historical values.
+
+### Direct exit-pupil aiming
+
+The direct correction is available as an opt-in alternative to block calibration:
+
+```java
+.aimContrastAtExitPupil()
+```
+
+For every quadrature reference ray, Beam42 computes its coordinate on the finite
+exit-pupil reference sphere. It then inverse-aims each sagittal and tangential partner
+with a two-dimensional Newton iteration until the partner has the requested vector
+separation there. Solving both coordinates matters: pupil aberration can rotate or skew
+an entrance-pupil displacement, so correcting only its nominal axis is insufficient.
+The OPD is evaluated from the newly traced partner ray; no finite OPD difference is
+rescaled.
+
+#### Relation to Hopkins' OTF coordinates
+
+Hopkins writes the two-dimensional transfer function as a pupil autocorrelation. In the
+notation of equations (10.22) and (10.26) of [Calculation of the Aberrations and Image
+Assessment for a General Optical System](https://doi.org/10.1364/AO.473823),
+the essential form is
+
+```text
+               1
+D(s,t) = ------------- integral-over-overlap
+             A(s,t)
+
+          f(x + s/2, y + t/2) f*(x - s/2, y - t/2) dx dy
+```
+
+Thus `(s,t)` is a vector separation between two pupil-function samples, not a ray angle
+or a transverse image aberration. Hopkins states after (10.28) that `(x,y)` denotes the
+difference of exit-pupil coordinates obtained from ray tracing. The discussion after
+(10.30) further stresses that the pupil surface must be identified with the reference
+sphere rather than an arbitrary pupil plane.
+
+Beam42 traces a reference sample at `p` and a partner at `p + delta`, instead of the
+symmetric `p - delta/2` and `p + delta/2` notation above. A translation of the integration
+variable makes these equivalent over the common overlap. For image-space frequency
+`nu`, wavelength `lambda` expressed in system units, and working f-number `F#`, the
+normalized separation is
+
+```text
+delta = 2 lambda F# nu
+```
+
+and Beam42 asks for the following physical vector on the exit-pupil reference sphere:
+
+```text
+Delta X_sag = R_exit (delta, 0)
+Delta X_tan = R_exit (0, delta)
+```
+
+where `R_exit` is the paraxial exit-pupil radius and `X(u)` is the reference-sphere
+coordinate reached by a ray launched at normalized entrance-pupil coordinate `u`.
+
+#### Reference-sphere coordinate
+
+`ExitPupilAiming.sphere_coord()` first reconstructs the equally-inclined-chord coordinate
+`c` relative to the chief-ray exit-pupil centre. It then intersects the transformed ray
+direction `d` with the finite reference sphere. In the implementation, with reference
+direction `r` and signed sphere radius `R`,
+
+```text
+F  = r.d - d.c/R
+J  = c.c/R - 2 r.c
+ep = J / (F + sqrt(F^2 - J/R))
+X  = c + ep d
+```
+
+The rationalized expression for `ep` avoids the cancellation of the equivalent quadratic
+root. Afocal systems have no finite reference sphere and therefore cannot use this mode.
+
+#### Inverse aiming
+
+For a reference ray launched at `p`, and requested physical separation `Delta X`, the
+partner's target is
+
+```text
+T = X(p) + Delta X.
+```
+
+The unknown is the two-component normalized entrance-pupil coordinate `u`. Beam42 solves
+
+```text
+G(u) = (Xx(u) - Tx, Xy(u) - Ty) = (0,0).
+```
+
+It starts from the traditional rigid entrance-pupil guess `u0 = p + delta`. At each
+iteration it traces two finite-difference probes to form the full 2-by-2 Jacobian
+`J = dG/du`, solves
+
+```text
+J du = -G,
+```
+
+and uses backtracking until the reference-sphere error decreases. The full matrix is
+important: it corrects both scale error along the requested axis and pupil-aberration
+induced cross-axis shear. The current limits are ten Newton iterations and a convergence
+tolerance of `2e-7 R_exit`. Failure to trace, a singular inverse map, or failure to
+converge becomes an ordinary failed contrast partner ray with its context preserved.
+
+After convergence, the contrast residual uses the actual finite wavefront difference
+
+```text
+dW = W(u) - W(p),
+```
+
+not a rescaled version of the OPD from the original guessed ray. This distinction matters
+because `W(p + delta) - W(p)` is nonlinear for a finite shear.
+
+This is more faithful to the reduced exit-pupil coordinate used by the Hopkins OTF than
+`calibrateContrastFrequency(true)`, but it is also more expensive because each partner
+can require several trial traces. The two options are mutually exclusive. A failed or
+unavailable inverse map is reported as a failed contrast ray, preserving the fixed merit
+layout and the existing failure diagnostics.
+
+This first implementation retains Gaussian quadrature for the reference rays in the
+entrance pupil and the existing entrance-pupil overlap construction. It corrects the
+partner separation, but it does not remap the quadrature nodes or integration weights
+into a uniform exit-pupil quadrature. It is therefore an important correction rather
+than a complete exit-pupil OTF integral, and should be compared against independently
+calculated MTF before becoming the default.
+
+#### Regression evidence
+
+The tests compare the maximum two-dimensional error of both sagittal and tangential
+pairs over several pupil azimuths at 40 cycles/mm:
+
+| Lens and field | Rigid entrance shift | Block calibration | Direct aiming |
+| --- | ---: | ---: | ---: |
+| Nikkor Z 14-30 mm at 57.68 degrees | 0.69209 mm | not measured | 0.00000119 mm |
+| US 3,549,241 Example 5 at 45 degrees | 0.63498 mm | 0.09335 mm | 0.00000129 mm |
+
+The second case shows the distinction clearly. Block calibration removes about 85 percent
+of the maximum error, so it is useful, but its residual is still about 72,000 times the
+direct-aiming residual. These tests validate the ray-pair coordinate construction; they
+do not claim that the resulting optimized MTF must improve. On the Leica APO 75/2 the
+final independently measured MTF difference was small and mixed, which is consistent
+with the remaining quadrature approximation and with optimization finding a nearby
+design basin.
 
 ### Per-sample frequency measurement
 
@@ -330,6 +475,11 @@ That populates `ContrastAnalysisResult.Shear` for every sample with the referenc
 exit-pupil coordinate, the shear each partner produced there, and both realized
 frequencies. Neither option costs an extra ray; both quantities come from rays the samples
 already trace.
+
+The currently reported `sagittalFrequency` and `tangentialFrequency` use image-ray
+direction differences, not the reduced exit-pupil separation used by direct aiming.
+They remain useful diagnostics, but are not an independent validation of the aimed
+Hopkins frequency coordinate.
 
 ## The pupil the merit sees
 

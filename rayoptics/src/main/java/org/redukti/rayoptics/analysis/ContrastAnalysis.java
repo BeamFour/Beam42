@@ -15,6 +15,10 @@ import java.util.ArrayList;
 public class ContrastAnalysis {
 
     public static ContrastAnalysisResult eval(OpticalModel opticalModel, ContrastOptions options) {
+        if (options.aimExitPupil && options.calibrateFrequency) {
+            throw new IllegalArgumentException(
+                    "Exit-pupil aiming cannot be combined with contrast frequency calibration");
+        }
         var result = new ContrastAnalysisResult(options.spatialFrequency);
         var fields = opticalModel.optical_spec.fov.fields;
         var wavelengths = opticalModel.optical_spec.wvls.wavelengths;
@@ -33,7 +37,7 @@ public class ContrastAnalysis {
                         fieldIndex, wavelengthIndex,
                         options.numRings, options.numSpokes,
                         new Vector2(sagittalShift, 0.0), new Vector2(0.0, tangentialShift),
-                        options.traceOptions);
+                        options.traceOptions, options.aimExitPupil);
                 wavelengthResults.add(new ContrastAnalysisResult.WavelengthResult(
                         wavelength, shift, traced.get(0).samples()));
             }

@@ -759,6 +759,19 @@ public class Trace {
             OpticalModel opt_model, TraceRingsDef grid_rng, Integer num_spokes,
             Vector2 sagittal_shift, Vector2 tangential_shift,
             Field fld, double wvl, TraceOptions trace_options) {
+        return trace_contrast(opt_model, grid_rng, num_spokes,
+                sagittal_shift, tangential_shift, fld, wvl, trace_options, false);
+    }
+
+    /**
+     * Trace contrast triplets, optionally inverse-aiming each displaced partner at its
+     * requested coordinate separation on the exit-pupil reference sphere.
+     */
+    public static List<ContrastRayTriplet> trace_contrast(
+            OpticalModel opt_model, TraceRingsDef grid_rng, Integer num_spokes,
+            Vector2 sagittal_shift, Vector2 tangential_shift,
+            Field fld, double wvl, TraceOptions trace_options,
+            boolean aim_exit_pupil) {
         trace_options = trace_options.copy();
         // The quadrature generator explicitly maps samples into the physical
         // vignetted pupil. Applying Field vignetting in trace_base as well
@@ -779,8 +792,34 @@ public class Trace {
             var sagittalPupil = pupil.plus(sagittal_shift);
             var tangentialPupil = pupil.plus(tangential_shift);
             var reference = trace_safe(opt_model, pupil, fld, wvl, trace_options);
-            var sagittal = trace_safe(opt_model, sagittalPupil, fld, wvl, trace_options);
-            var tangential = trace_safe(opt_model, tangentialPupil, fld, wvl, trace_options);
+            RayResult sagittal;
+            RayResult tangential;
+            if (aim_exit_pupil && reference.pkg != null) {
+                var referenceCoordinate = ExitPupilAiming.sphere_coord(
+                        reference.pkg, fld.chief_ray, fld.ref_sphere);
+                if (referenceCoordinate == null) {
+                    var error = new ExitPupilAiming.ExitPupilAimException(
+                            "Reference ray has no finite exit-pupil coordinate");
+                    error.surf = -1;
+                    sagittal = new RayResult(null, error);
+                    tangential = new RayResult(null, error);
+                } else {
+                    double exitRadius = Math.abs(opt_model.optical_spec.parax_data.fod.exp_radius);
+                    var sagittalTarget = new Vector2(
+                            referenceCoordinate.x + sagittal_shift.x * exitRadius,
+                            referenceCoordinate.y + sagittal_shift.y * exitRadius);
+                    var tangentialTarget = new Vector2(
+                            referenceCoordinate.x + tangential_shift.x * exitRadius,
+                            referenceCoordinate.y + tangential_shift.y * exitRadius);
+                    sagittal = ExitPupilAiming.aim(opt_model, sagittalPupil, sagittalTarget,
+                            fld, wvl, trace_options).ray();
+                    tangential = ExitPupilAiming.aim(opt_model, tangentialPupil, tangentialTarget,
+                            fld, wvl, trace_options).ray();
+                }
+            } else {
+                sagittal = trace_safe(opt_model, sagittalPupil, fld, wvl, trace_options);
+                tangential = trace_safe(opt_model, tangentialPupil, fld, wvl, trace_options);
+            }
             samples.add(new ContrastRayTriplet(
                     pupil, reference.pkg, sagittal.pkg, tangential.pkg,
                     reference.err, sagittal.err, tangential.err, point.weight()));

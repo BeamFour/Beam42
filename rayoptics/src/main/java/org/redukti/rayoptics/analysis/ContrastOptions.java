@@ -9,6 +9,7 @@ public class ContrastOptions {
     Integer numSpokes = 6;
     TraceOptions traceOptions = new TraceOptions();
     boolean calibrateFrequency = false;
+    boolean aimExitPupil = false;
     boolean centerResiduals = false;
     boolean measureFrequency = false;
 
@@ -77,6 +78,20 @@ public class ContrastOptions {
      */
     public ContrastOptions calibrate_frequency(boolean value) {
         calibrateFrequency = value;
+        return this;
+    }
+
+    /**
+     * Inverse-aim every displaced contrast ray so its separation from the reference ray
+     * is the requested vector on the exit-pupil reference sphere.
+     *
+     * <p>This is the physically direct alternative to block calibration. It retains the
+     * entrance-pupil quadrature for the reference rays, but does not approximate the
+     * partner ray with a rigid entrance-pupil displacement. It is unavailable for afocal
+     * systems and cannot be combined with {@link #calibrate_frequency(boolean)}.
+     */
+    public ContrastOptions aim_exit_pupil(boolean value) {
+        aimExitPupil = value;
         return this;
     }
 

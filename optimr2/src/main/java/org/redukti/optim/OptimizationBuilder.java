@@ -84,6 +84,7 @@ public final class OptimizationBuilder {
     private int contrastRings = 6;
     private int contrastSpokes = 12;
     private boolean calibrateContrastFrequency = false;
+    private boolean aimContrastAtExitPupil = false;
     private boolean centerContrastResiduals = false;
     private boolean[] contrastBalanceFields;
     private double contrastBalanceWeight = NOMINAL_BALANCE_WEIGHT;
@@ -227,6 +228,23 @@ public final class OptimizationBuilder {
      */
     public OptimizationBuilder calibrateContrastFrequency(boolean value) {
         calibrateContrastFrequency = value;
+        return this;
+    }
+
+    /**
+     * Iteratively aim each sheared contrast ray so its separation from the reference
+     * ray is realised on the exit-pupil reference sphere. This directly accounts for
+     * pupil aberration, including cross-axis displacement.
+     *
+     * <p>This is mutually exclusive with {@link #calibrateContrastFrequency(boolean)}.
+     * Off by default because it changes the sampled rays and costs additional traces.
+     */
+    public OptimizationBuilder aimContrastAtExitPupil() {
+        return aimContrastAtExitPupil(true);
+    }
+
+    public OptimizationBuilder aimContrastAtExitPupil(boolean value) {
+        aimContrastAtExitPupil = value;
         return this;
     }
 
@@ -596,9 +614,13 @@ public final class OptimizationBuilder {
 
     private void configureContrastAnalysis(Analysis analysis, List<Goal> goals) {
         if (contrastGoals.isEmpty()) return;
+        if (calibrateContrastFrequency && aimContrastAtExitPupil)
+            throw new IllegalArgumentException(
+                    "Contrast frequency calibration and exit-pupil aiming are mutually exclusive");
         int[] frequencies = contrastGoals.stream().mapToInt(goal -> goal.frequency).toArray();
         analysis.using_contrast_analysis(frequencies, contrastRings, contrastSpokes);
         analysis.calibrating_contrast_frequency(calibrateContrastFrequency);
+        analysis.aiming_contrast_at_exit_pupil(aimContrastAtExitPupil);
         analysis.centering_contrast_residuals(centerContrastResiduals);
     }
 

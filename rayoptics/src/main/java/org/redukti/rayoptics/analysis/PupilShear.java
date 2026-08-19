@@ -1,10 +1,10 @@
 package org.redukti.rayoptics.analysis;
 
-import org.redukti.mathlib.M;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.elem.transform.Transform;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.ChiefRayPkg;
+import org.redukti.rayoptics.raytr.ExitPupilAiming;
 import org.redukti.rayoptics.raytr.RayData;
 import org.redukti.rayoptics.raytr.RayPkg;
 import org.redukti.rayoptics.raytr.ReferenceSphere;
@@ -18,9 +18,9 @@ import org.redukti.rayoptics.util.Orientation;
  * <p>Both quantities are needed by contrast optimization and neither is otherwise
  * reachable: the OTF is the autocorrelation of the exit pupil, but rays are aimed in
  * <em>entrance</em> pupil coordinates, and pupil aberration makes the mapping between the
- * two non-linear. See H. H. Hopkins, <i>Calculation of the aberrations and image
- * assessment for a general optical system</i>, Optica Acta <b>28</b>:5 (1981) 667-714,
- * &sect;5 and &sect;10.
+ * two non-linear. See H. H. Hopkins,
+ * <a href="https://doi.org/10.1364/AO.473823"><i>Calculation of the aberrations and
+ * image assessment for a general optical system</i></a>, &sect;5 and &sect;10.
  *
  * <p>This is a separate file rather than an addition to
  * {@link org.redukti.rayoptics.raytr.WaveAbr} because that file is a port of upstream
@@ -51,30 +51,7 @@ public class PupilShear {
      */
     public static Vector3 exit_pupil_coord(
             RayPkg ray_pkg, ChiefRayPkg chief_ray_pkg, ReferenceSphere ref_sphere) {
-        if (ray_pkg == null || ray_pkg.ray == null || ray_pkg.ray.size() < 2) return null;
-        if (chief_ray_pkg == null || ref_sphere == null) return null;
-        if (M.is_kinda_big(ref_sphere.ref_sphere_radius)) return null;
-
-        var cr_ray = chief_ray_pkg.chief_ray.ray;
-        if (cr_ray == null || cr_ray.size() < 2) return null;
-        var cr_exp_seg = chief_ray_pkg.cr_exp_seg;
-
-        int k = -2; // last interface in sequence
-        var ray = ray_pkg.ray;
-
-        // eq 3.13: the equally inclined chord distance at the last surface
-        var ekp = WaveAbr.eic_distance(
-                new RayData(Lists.get(ray, k).p, Lists.get(ray, k).d),
-                new RayData(Lists.get(cr_ray, k).p, Lists.get(cr_ray, k).d));
-
-        var after = Transform.transform_after_surface(
-                cr_exp_seg.ifc, new RayData(Lists.get(ray, k).p, Lists.get(ray, k).d));
-
-        // Walk back along the ray to the point equally inclined with the chief ray's
-        // pupil crossing: the two travel distances then differ by exactly -ekp.
-        var dst = ekp - cr_exp_seg.exp_dst;
-        var eic_exp_pt = after.pt.minus(after.dir.times(dst));
-        return eic_exp_pt.minus(cr_exp_seg.exp_pt);
+        return ExitPupilAiming.chord_coord(ray_pkg, chief_ray_pkg, ref_sphere);
     }
 
     /**
@@ -139,24 +116,7 @@ public class PupilShear {
      */
     public static Vector3 exit_pupil_sphere_coord(
             RayPkg ray_pkg, ChiefRayPkg chief_ray_pkg, ReferenceSphere ref_sphere) {
-        var p_coord = exit_pupil_coord(ray_pkg, chief_ray_pkg, ref_sphere);
-        if (p_coord == null) return null;
-
-        int k = -2;
-        var seg = Lists.get(ray_pkg.ray, k);
-        var d = Transform.transform_after_surface(
-                chief_ray_pkg.cr_exp_seg.ifc, new RayData(seg.p, seg.d)).dir;
-
-        double R = ref_sphere.ref_sphere_radius;
-        var ref_dir = ref_sphere.ref_dir;
-        double F = ref_dir.dot(d) - d.dot(p_coord) / R;
-        double J = p_coord.dot(p_coord) / R - 2.0 * ref_dir.dot(p_coord);
-
-        double discriminant = F * F - J / R;
-        if (discriminant < 0.0) return null;
-        double denom = F + Math.sqrt(discriminant);
-        double ep = denom == 0.0 ? 0.0 : J / denom;
-        return p_coord.plus(d.times(ep));
+        return ExitPupilAiming.sphere_coord(ray_pkg, chief_ray_pkg, ref_sphere);
     }
 
     /** Direction cosine of the ray after the last surface, in image-space coordinates. */

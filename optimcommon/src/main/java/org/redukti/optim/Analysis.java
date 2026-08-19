@@ -30,6 +30,8 @@ public class Analysis {
     public int _contrast_num_spokes = 6;
     /** See {@link ContrastOptions#calibrate_frequency(boolean)}; off by default. */
     public boolean _contrast_calibrate_frequency = false;
+    /** See {@link ContrastOptions#aim_exit_pupil(boolean)}; off by default. */
+    public boolean _contrast_aim_exit_pupil = false;
     /** See {@link ContrastOptions#center_residuals(boolean)}; off by default. */
     public boolean _contrast_center_residuals = false;
     public boolean _compute_spots = true;
@@ -103,6 +105,11 @@ public class Analysis {
     /** See {@link ContrastOptions#calibrate_frequency(boolean)}. */
     public Analysis calibrating_contrast_frequency(boolean value) {
         _contrast_calibrate_frequency = value;
+        return this;
+    }
+    /** See {@link ContrastOptions#aim_exit_pupil(boolean)}. */
+    public Analysis aiming_contrast_at_exit_pupil(boolean value) {
+        _contrast_aim_exit_pupil = value;
         return this;
     }
     /** See {@link ContrastOptions#center_residuals(boolean)}. */
@@ -255,6 +262,7 @@ public class Analysis {
                     .num_rings(_contrast_num_rings)
                     .num_spokes(_contrast_num_spokes)
                     .calibrate_frequency(_contrast_calibrate_frequency)
+                    .aim_exit_pupil(_contrast_aim_exit_pupil)
                     .center_residuals(_contrast_center_residuals);
             _contrasts[i] = ContrastAnalysis.eval(_opt_model, options);
         }

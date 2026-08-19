@@ -25,9 +25,9 @@ that landed afterwards and does not belong to any single finding.
 | [4](#4-the-three-frequencies-are-near-collinear--two-thirds-of-the-ray-budget-is-wasted) | Frequencies near-collinear | **Open** |
 | [5](#5-high-frequencies-fail-without-a-diagnostic) | High-frequency degeneracy | **Partly fixed** — the silent collapse now throws; the ~0.707×cutoff ceiling remains |
 | [6](#6-the-least-squares-reduction-only-tracks-mtf-in-the-small-phase-regime) | Least-squares only valid at small phase | **Open, but downgraded.** The diagnosis stands; the regression that motivated it turned out to be defocus — see the [postscript](#postscript-the-motivating-regression-was-defocus) |
-| [7](#7-the-shear-is-applied-at-the-entrance-pupil-not-the-exit-pupil) | Shear applied at entrance, not exit, pupil | **Mitigated, opt-in.** `calibrate_frequency` removes the field bias (8.5% → 0.08%); exact fix pending upstream |
+| [7](#7-the-shear-is-applied-at-the-entrance-pupil-not-the-exit-pupil) | Shear applied at entrance, not exit, pupil | **Fixed, opt-in.** `aimContrastAtExitPupil()` inverse-aims every partner to its requested reference-sphere separation; block calibration remains a cheaper approximation |
 | [8](#8-vignetting-is-a-moving-mode-dependent-reference-frame) | Vignetting is a moving, mode-dependent reference frame | **Partly addressed.** Mode is configurable and the factors can be frozen; the perverse incentive it exposes is unmeasured |
-| [9](#9-frequency-normalization-uses-ray-direction-not-hopkins-exit-pupil-shear) | Frequency normalization used image-ray direction rather than exit-pupil separation | **Reverted.** The residual rescaling and its public options were removed; the raw reference-sphere coordinate helper was retained for a future exit-pupil aiming implementation |
+| [9](#9-frequency-normalization-uses-ray-direction-not-hopkins-exit-pupil-shear) | Frequency normalization used image-ray direction rather than exit-pupil separation | **Resolved by tracing.** Residual rescaling remains removed; direct two-dimensional reference-sphere aiming now traces the ray whose OPD is required |
 
 Findings 6 and 8 are two attempts at the same symptom — a Leica 75/2 mid-field sagittal
 MTF drop — and neither currently explains it. Finding 6 blamed the least-squares
@@ -952,8 +952,8 @@ diagnostics, but the quantity named `realized_frequency` is not the spatial freq
 coordinate in Hopkins' OTF definition. The normalization option was subsequently removed;
 the diagnostic measurement remains.
 
-Hopkins writes the two-dimensional OTF as the autocorrelation of the pupil function
-(10.22 and 10.26):
+[Hopkins](https://doi.org/10.1364/AO.473823) writes the two-dimensional OTF as the
+autocorrelation of the pupil function (10.22 and 10.26):
 
 ```
 D(s,t) = (1/A) ∫∫ f(x+s/2,y+t/2) f*(x-s/2,y-t/2) dx dy
@@ -1025,11 +1025,65 @@ at `(s,0)` or `(0,t)`.
    exit-pupil reference-sphere coordinate has the requested vector separation. Then use
    the OPD of that ray directly rather than rescaling a finite OPD difference afterwards.
 
+### Implemented opt-in correction
+
+Step 4 is now implemented behind `OptimizationBuilder.aimContrastAtExitPupil()`. Each
+partner ray is inverse-aimed in both entrance-pupil coordinates to the requested vector
+separation on the exit-pupil reference sphere, and its traced OPD is used directly.
+Regression coverage checks the achieved sagittal and tangential sphere-coordinate
+separations, including the nominally zero cross-axis component. The option is mutually
+exclusive with `calibrateContrastFrequency(true)`.
+
+This follows the independent variables in Hopkins (10.22) and (10.26): `(s,t)` is the
+separation of two pupil-function samples in the overlap of displaced pupils. The text
+after (10.28) identifies `(x',y')` as differences of exit-pupil coordinates calculated
+by ray tracing, and the conclusion after (10.30) explicitly identifies the pupil surface
+with the reference sphere rather than the pupil plane. Beam43 therefore constructs the
+target from traced sphere coordinates rather than from image-ray direction:
+
+```text
+delta = 2 lambda F# frequency
+target = X(reference) + R_exit delta_vector
+```
+
+For the partner's normalized entrance-pupil coordinate `u`, the solver finds
+
+```text
+G(u) = X(u) - target = 0
+```
+
+using a full 2-by-2 finite-difference Newton Jacobian and backtracking. The initial guess
+is the old rigid entrance-pupil displacement. Solving both components corrects rotation
+and cross-axis shear as well as the requested-axis scale. On convergence the residual is
+formed from the newly traced finite OPD difference; it is not obtained by multiplying an
+OPD measured at the wrong shear. The tolerance is `2e-7` of the paraxial exit-pupil radius
+and failures retain the ordinary contrast-ray failure context.
+
+Two deliberately wide-angle regressions now validate the construction at 40 cycles/mm:
+
+| Model | Field | Rigid error | Calibrated error | Aimed error |
+| --- | ---: | ---: | ---: | ---: |
+| Nikkor Z 14-30 mm | 57.68 degrees | 0.69209 mm | - | 0.00000119 mm |
+| US 3,549,241 Example 5 | 45 degrees | 0.63498 mm | 0.09335 mm | 0.00000129 mm |
+
+The US patent case is also a direct comparison with the older calibration. Its sagittal
+and tangential scale factors are approximately 1.358 and 1.969. Calibration removes
+about 85 percent of the worst vector error but leaves a 0.093 mm across-pupil residual;
+direct aiming is about 72,000 times more accurate. This is the expected distinction
+between one centre-derived scalar per direction and solving the nonlinear vector map at
+every quadrature sample.
+
+The remaining qualification is quadrature: reference nodes and weights are still formed
+in the entrance pupil, as is the common-overlap contraction. A complete Hopkins pupil
+integral would map the integration measure and overlap into reduced exit-pupil
+coordinates as well. The new option fixes the ray-pair frequency coordinate, not that
+larger integration problem, so it remains opt-in pending comparisons on real designs.
+
 `measure_frequency` remains useful as a diagnostic of the current ray-direction metric.
 The normalization API and residual rescaling were removed rather than left available in
-an unsafe configuration. `exit_pupil_sphere_coord` was retained as the coordinate
-foundation for the proposed exit-pupil aiming implementation. `calibrate_frequency`
-remains a separate, opt-in block-level approximation and carries the qualification above.
+an unsafe configuration. `exit_pupil_sphere_coord` is now the coordinate foundation for
+the implemented aiming path. `calibrate_frequency` remains a separate, opt-in block-level
+approximation and carries the qualification above.
 
 ## Smaller items
 

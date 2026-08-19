@@ -272,6 +272,7 @@ public class ContrastAnalysis {
                               org.redukti.rayoptics.raytr.RayPkg ray,
                               org.redukti.rayoptics.specs.Field field,
                               double wavelength, double focus, Vector2 pupil) {
+        // below xy is set to 0 as it is not used by the opd calculation
         return WavefrontAberrationAnalysis.opd(
                 opticalModel, pupil, 0, ray, field, wavelength, focus);
     }

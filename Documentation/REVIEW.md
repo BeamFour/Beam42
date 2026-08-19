@@ -1056,8 +1056,12 @@ using a full 2-by-2 finite-difference Newton Jacobian and backtracking. The init
 is the old rigid entrance-pupil displacement. Solving both components corrects rotation
 and cross-axis shear as well as the requested-axis scale. On convergence the residual is
 formed from the newly traced finite OPD difference; it is not obtained by multiplying an
-OPD measured at the wrong shear. The tolerance is `2e-7` of the paraxial exit-pupil radius
-and failures retain the ordinary contrast-ray failure context.
+OPD measured at the wrong shear. The solver targets `2e-7` of the paraxial exit-pupil
+radius; a stalled result within `1e-6` is accepted, while larger misses retain the ordinary
+contrast-ray failure context. The acceptance floor was added after the dense 6-by-12
+Nikkor 18 mm pattern produced 117 false failures: the first reported non-convergence was
+only `2.02e-6 mm` from its target, but numerical roundoff prevented another decreasing
+Newton step.
 
 Two deliberately wide-angle regressions now validate the construction at 40 cycles/mm:
 

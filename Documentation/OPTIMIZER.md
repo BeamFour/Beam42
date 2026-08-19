@@ -417,8 +417,10 @@ J du = -G,
 
 and uses backtracking until the reference-sphere error decreases. The full matrix is
 important: it corrects both scale error along the requested axis and pupil-aberration
-induced cross-axis shear. The current limits are ten Newton iterations and a convergence
-tolerance of `2e-7 R_exit`. Failure to trace, a singular inverse map, or failure to
+induced cross-axis shear. The current limit is ten Newton iterations. The solver targets
+`2e-7 R_exit`; if numerical roundoff prevents another decreasing step, a result within
+`1e-6 R_exit` is still accepted. The latter is about 6 nm for a 6 mm exit-pupil radius
+and remains negligible compared with a contrast shear. Failure to trace, a singular inverse map, or failure to
 converge becomes an ordinary failed contrast partner ray with its context preserved.
 
 After convergence, the contrast residual uses the actual finite wavefront difference

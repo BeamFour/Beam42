@@ -4,10 +4,15 @@ import org.junit.jupiter.api.Test;
 import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.integration.US003549241Example05;
+import org.redukti.rayoptics.raytr.VigCalc;
+import org.redukti.rayoptics.specs.FieldSpec;
+import org.redukti.rayoptics.specs.ImageKey;
+import org.redukti.rayoptics.specs.ValueKey;
 import org.redukti.rayoptics.raytr.ContrastRayTriplet;
 import org.redukti.rayoptics.raytr.TraceOptions;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.util.Orientation;
+import org.redukti.rayoptics.util.Pair;
 
 import java.util.List;
 
@@ -16,6 +21,39 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class US003549241Example05Test {
+
+    @Test
+    void denseOptimizerPatternCanAimEveryConfiguredFieldAndWavelength() {
+        var model = US003549241Example05.build();
+        double[] fields = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+        model.optical_spec.fov = new FieldSpec(model.optical_spec,
+                new Pair<>(ImageKey.Object, ValueKey.Angle), 45.0, fields, true, true);
+        model.update_model();
+        VigCalc.set_pupil(model);
+        model.update_model();
+
+        for (int fieldIndex = 0; fieldIndex < fields.length; fieldIndex++) {
+            for (int wavelengthIndex = 0;
+                 wavelengthIndex < model.optical_spec.wvls.wavelengths.length;
+                 wavelengthIndex++) {
+                double wavelength = model.optical_spec.wvls.wavelengths[wavelengthIndex];
+                double shift = ContrastAnalysis.normalized_entry_pupil_shift(
+                        model, wavelength, 20.0);
+                var traced = model.seq_model.trace_contrast(
+                        (rays, field, wvl, focus) -> rays,
+                        fieldIndex, wavelengthIndex, 6, 12,
+                        new Vector2(shift, 0.0), new Vector2(0.0, shift),
+                        new TraceOptions(), true);
+                for (var rays : traced.get(0).samples()) {
+                    String context = "field=" + fields[fieldIndex]
+                            + ", wavelength=" + wavelength + ", pupil=" + rays.pupil();
+                    assertNull(rays.referenceError(), context);
+                    assertNull(rays.sagittalError(), context + ", " + rays.sagittalError());
+                    assertNull(rays.tangentialError(), context + ", " + rays.tangentialError());
+                }
+            }
+        }
+    }
 
     @Test
     void exitPupilAimingCorrectsFullFieldShear() {

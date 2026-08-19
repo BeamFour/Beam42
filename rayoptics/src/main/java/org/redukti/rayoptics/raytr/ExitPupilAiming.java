@@ -41,7 +41,8 @@ public final class ExitPupilAiming {
         // Sub-micrometre accuracy on a typical photographic exit pupil is already
         // far below the frequency resolution useful to the contrast merit function.
         // A tighter threshold stalls on trace/intersection roundoff for off-axis rays.
-        double tolerance = Math.max(1.0e-10, pupilRadius * 2.0e-7);
+        double targetTolerance = Math.max(1.0e-10, pupilRadius * 2.0e-7);
+        double acceptableTolerance = Math.max(targetTolerance, pupilRadius * 1.0e-6);
         Vector2 pupil = initialPupil;
         Evaluation current = evaluate(
                 opticalModel, pupil, target, field, wavelength, traceOptions);
@@ -54,7 +55,7 @@ public final class ExitPupilAiming {
 
         for (int iteration = 0; iteration <= MAX_ITERATIONS; iteration++) {
             double error = current.residual.len();
-            if (error <= tolerance) {
+            if (error <= targetTolerance) {
                 return new Result(pupil, current.ray, current.coordinate, iteration, error);
             }
             if (iteration == MAX_ITERATIONS) break;
@@ -98,6 +99,10 @@ public final class ExitPupilAiming {
             current = accepted;
         }
 
+        double finalError = current.residual.len();
+        if (finalError <= acceptableTolerance)
+            return new Result(pupil, current.ray, current.coordinate,
+                    MAX_ITERATIONS, finalError);
         return failed(pupil, new ExitPupilAimException(
                 "Exit-pupil aiming did not converge; residual=" + current.residual.len()
                         + ", pupil=" + pupil));

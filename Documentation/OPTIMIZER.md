@@ -308,13 +308,127 @@ which is small compared with the full contrast sampling pattern.
 This is a calibration rather than an exact construction in exit-pupil coordinates. It
 removes the dominant field- and direction-dependent frequency bias, but uses one scale
 factor for the complete pupil. Residual variation caused by nonlinear pupil mapping
-across individual samples remains. Correcting that last component would require aiming
-each partner ray iteratively and would be substantially more expensive.
+across individual samples remains, and is now measurable: see *Per-sample frequency
+normalization* below, which corrects it without aiming any ray.
 
 Calibration is off by default because it changes the sampled frequencies and therefore
 the numerical merit function. It should normally be enabled for new contrast-
 optimization work, while old regression cases may leave it disabled to preserve their
 historical values.
+
+### Per-sample frequency normalization
+
+Calibration fixes the mean of a block and cannot touch its spread. That the spread
+survives is not an inference; every sample's realized frequency can be measured directly,
+because two rays converging on the image form fringes at
+
+```text
+frequency = n_img * abs(delta direction cosine) / lambda
+```
+
+and both direction cosines are already available on rays the samples trace. The relation
+holds wherever the exit pupil happens to lie, which is why no pupil location is needed to
+evaluate it. It is the direction-cosine form of the reduced spatial frequency in H. H.
+Hopkins, *Calculation of the aberrations and image assessment for a general optical
+system*, Optica Acta 28:5 (1981), section 10; `PupilShear` implements it, alongside the
+exit-pupil coordinate of section 5.
+
+Enable the correction through the builder:
+
+```java
+.normalizeContrastFrequency(true)
+```
+
+Each residual is then rescaled to the frequency that was requested, using that sample's
+own realized frequency rather than the block average:
+
+```text
+deltaW <- deltaW * (frequency_requested / frequency_realized)
+```
+
+The measurement is also available on its own, as a diagnostic that changes no residual.
+It is an analysis-level option rather than a builder one, since it does not affect
+optimization:
+
+```java
+new ContrastOptions(frequency).measure_frequency(true)
+```
+
+That populates `ContrastAnalysisResult.Shear` for every sample with the reference ray's
+exit-pupil coordinate, the shear each partner produced there, and both realized
+frequencies. Neither option costs an extra ray; both quantities come from rays the samples
+already trace.
+
+**This is a companion to calibration, not a replacement for it.** The two act at different
+points. Calibration is pre-trace: it rescales the pupil shift, which moves the overlap
+centre of the quadrature pattern and relocates every sample, measured at up to 2.4 percent
+of the pupil radius. Normalization is post-trace: it moves no ray and changes no sample
+position or weight. It is also the gentler intervention on Jacobian smoothness for that
+reason.
+
+**Normalization alone is the wrong configuration.** The rescaling is first order in the
+shear, so it needs the discrepancy already small. Uncalibrated on the Otus 50/1.4 the
+realized frequency runs 15 percent low at full field tangential, and a 1.17 rescale is
+outside the range where `deltaW` is proportional to the shear. Calibrated, the same block
+runs within a few percent and the rescaling is well inside its valid regime.
+
+### When per-sample normalization is worth enabling
+
+It scales with lens speed and field, since pupil aberration is what drives it. Measured
+with calibration enabled, at 10 cycles/mm over a 6x12 pattern, as the ratio of realized to
+requested frequency:
+
+```text
+lens                fld   dir    spread   range              block SOS change
+Leica R APO 75/2    1.00  tan     0.19%   0.991 .. 1.001     +0.2%
+Leica R APO 75/2    0.85  sag     1.43%   0.941 .. 1.001     +8.2%
+Zeiss Otus 50/1.4   1.00  sag     0.72%   0.993 .. 1.029     -1.6%
+Zeiss Otus 50/1.4   1.00  tan     4.79%   0.987 .. 1.167    -16.6%
+```
+
+The Leica tangential block needs nothing: one scale factor represents it. The Otus
+tangential block at full field spans a 17 percent range, which no single scale can
+describe, and normalizing moves its sum of squares by 17 percent. The two lenses also
+differ in which orientation is the problem, so it is not enough to check one of them.
+
+Note that the sum-of-squares effect is much larger than the spread alone suggests. The
+per-sample discrepancy correlates with residual magnitude: the samples carrying the
+largest `deltaW` sit where the frequency error is worst, so the correction is concentrated
+rather than averaged away. The consequence is a reweighting *within* a block, which moves
+the optimum, not a uniform rescale of the block, which would not.
+
+Note also that the effect changes sign with calibration. Uncalibrated, normalizing raises
+the Otus tangential sum of squares by about 20 percent; calibrated, it lowers it by about
+17 percent. Calibration slightly overshoots for exactly the high-residual samples, because
+its probe pair sits at half-shift from the pupil centre and is not representative of where
+the samples are. The two options must therefore be evaluated as a pair rather than
+independently.
+
+To decide for a given design, run the probe against its prescription:
+
+```text
+org.redukti.examples.ContrastPupilShearProbe <path-to-prescription>
+```
+
+With calibration on, read the `bias` column first: it should be under about 1 percent, and
+if it is not then calibration is the thing to fix. Then read `spread` and `range`. Below
+about 0.5 percent spread with the range inside one percent, normalization buys nothing.
+Above one to two percent spread, or a range wider than about five percent, enable it.
+
+Three limitations are worth knowing. The rescaling is skipped for any sample whose scale
+factor falls outside 0.5 to 2.0, the same guard rail calibration uses; the worst factor
+observed is 1.22, so there is margin, but a design with heavy pupil aberration could reach
+it and the guard is a discontinuity in the merit. The correction is first order, and
+Hopkins' section 10.30 gives the exact form, since each ray also yields the partial
+derivatives of the wavefront with respect to the reduced pupil coordinates as its
+transverse ray aberration; that is the upgrade path if the first-order form proves
+insufficient. Finally, the exit-pupil coordinate is unavailable for an afocal system,
+where the reference sphere is infinite and Hopkins' section 5.4 would be needed instead;
+the frequency measurement does not depend on the reference sphere, so normalization itself
+still works there.
+
+Normalization is off by default because, like calibration and centring, it changes every
+contrast residual and therefore every committed regression value.
 
 ## The pupil the merit sees
 

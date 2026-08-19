@@ -12,7 +12,6 @@ public class ContrastOptions {
     boolean centerResiduals = false;
     boolean measureFrequency = false;
     boolean normalizeFrequency = false;
-    FrequencyMetric frequencyMetric = FrequencyMetric.RAY_DIRECTION;
 
     /**
      * @param spatialFrequency image-space spatial frequency in cycles per
@@ -122,26 +121,6 @@ public class ContrastOptions {
     public ContrastOptions normalize_frequency(boolean value) {
         normalizeFrequency = value;
         if (value) measureFrequency = true;
-        return this;
-    }
-
-    /**
-     * Which measurement of realised frequency drives
-     * {@link #calibrate_frequency(boolean)} and {@link #normalize_frequency(boolean)}.
-     *
-     * <p>Defaults to {@link FrequencyMetric#RAY_DIRECTION}, which is what every committed
-     * regression value was produced with. {@link FrequencyMetric#EXIT_PUPIL} is the
-     * coordinate Hopkins' OTF is actually defined over; see REVIEW.md finding 9 and
-     * {@code ContrastProbe21}.
-     *
-     * <p>This selects only the metric. It does not enable either correction, and has no
-     * effect unless one of them is on. Both metrics are recorded on
-     * {@link ContrastAnalysisResult.Shear} whenever {@link #measure_frequency(boolean)} is
-     * enabled, whichever is selected here.
-     */
-    public ContrastOptions frequency_metric(FrequencyMetric value) {
-        if (value == null) throw new IllegalArgumentException("Frequency metric cannot be null");
-        frequencyMetric = value;
         return this;
     }
 }

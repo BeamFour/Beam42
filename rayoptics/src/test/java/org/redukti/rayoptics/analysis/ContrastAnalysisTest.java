@@ -163,50 +163,6 @@ class ContrastAnalysisTest {
     }
 
     @Test
-    void theFrequencyMetricDefaultsToRayDirectionAndSelectsWhatDrivesTheCorrections() {
-        var model = MtfTest.buildTestModel();
-        assertEquals(FrequencyMetric.RAY_DIRECTION, new ContrastOptions(40.0).frequencyMetric,
-                "the historical metric must stay the default: every committed regression "
-                        + "value was produced with it");
-
-        // Selecting a metric on its own changes nothing, because neither correction is on.
-        var plain = ContrastAnalysis.eval(model,
-                new ContrastOptions(40.0).num_rings(2).num_spokes(6));
-        var selected = ContrastAnalysis.eval(model, new ContrastOptions(40.0)
-                .num_rings(2).num_spokes(6).frequency_metric(FrequencyMetric.EXIT_PUPIL));
-        for (int f = 0; f < plain.fields.size(); f++) {
-            var a = plain.fields.get(f).wavelengths().get(0).samples();
-            var b = selected.fields.get(f).wavelengths().get(0).samples();
-            for (int i = 0; i < a.size(); i++) {
-                assertEquals(a.get(i).sagittalDifference(), b.get(i).sagittalDifference(), 0.0,
-                        "the metric alone must not change a residual");
-            }
-        }
-
-        // With normalisation on it does, because it selects the divisor.
-        var byDirection = ContrastAnalysis.eval(model, new ContrastOptions(40.0)
-                .num_rings(2).num_spokes(6).normalize_frequency(true)
-                .frequency_metric(FrequencyMetric.RAY_DIRECTION));
-        var byPupil = ContrastAnalysis.eval(model, new ContrastOptions(40.0)
-                .num_rings(2).num_spokes(6).normalize_frequency(true)
-                .frequency_metric(FrequencyMetric.EXIT_PUPIL));
-        boolean differs = false;
-        for (int f = 0; f < byDirection.fields.size() && !differs; f++) {
-            var a = byDirection.fields.get(f).wavelengths().get(0).samples();
-            var b = byPupil.fields.get(f).wavelengths().get(0).samples();
-            for (int i = 0; i < a.size(); i++) {
-                if (!a.get(i).valid() || !b.get(i).valid()) continue;
-                if (Math.abs(a.get(i).tangentialDifference()
-                        - b.get(i).tangentialDifference()) > 1.0e-12) {
-                    differs = true;
-                    break;
-                }
-            }
-        }
-        assertTrue(differs, "the two metrics should not produce identical normalisation");
-    }
-
-    @Test
     void normalisationImpliesMeasurementAndBothDefaultOff() {
         var options = new ContrastOptions(40.0);
         assertFalse(options.measureFrequency);

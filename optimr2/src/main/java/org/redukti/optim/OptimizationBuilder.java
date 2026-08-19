@@ -1,6 +1,5 @@
 package org.redukti.optim;
 
-import org.redukti.rayoptics.analysis.FrequencyMetric;
 import org.redukti.rayoptics.seq.Glass;
 import org.redukti.rayoptics.util.Orientation;
 import org.redukti.spec.Prescription;
@@ -86,7 +85,6 @@ public final class OptimizationBuilder {
     private int contrastSpokes = 12;
     private boolean calibrateContrastFrequency = false;
     private boolean normalizeContrastFrequency = false;
-    private FrequencyMetric contrastFrequencyMetric = FrequencyMetric.RAY_DIRECTION;
     private boolean centerContrastResiduals = false;
     private boolean[] contrastBalanceFields;
     private double contrastBalanceWeight = NOMINAL_BALANCE_WEIGHT;
@@ -259,34 +257,6 @@ public final class OptimizationBuilder {
      */
     public OptimizationBuilder normalizeContrastFrequency(boolean value) {
         normalizeContrastFrequency = value;
-        return this;
-    }
-
-    /**
-     * Which measurement of realised frequency drives
-     * {@link #calibrateContrastFrequency(boolean)} and
-     * {@link #normalizeContrastFrequency(boolean)}.
-     *
-     * <p>Selects the metric only. It enables neither correction and has no effect unless
-     * one of them is on.
-     *
-     * <p>Defaults to {@link FrequencyMetric#RAY_DIRECTION}, which is what every committed
-     * regression value was produced with. {@link FrequencyMetric#EXIT_PUPIL} is the
-     * coordinate Hopkins' OTF is defined over, and the two differ by up to 2.7 percent at
-     * full field tangential on the Otus 50/1.4.
-     *
-     * <p><b>The better choice is not the same for the two corrections.</b> Measured on the
-     * exit-pupil metric, calibration at full field tangential lands at 0.9993 on
-     * {@code RAY_DIRECTION} and 1.0141 on {@code EXIT_PUPIL}: the shipped configuration
-     * carries a metric error and a probe-centring error of about 3 percent each, with
-     * opposite signs, and switching the metric alone breaks the cancellation. Normalization
-     * has no centring bias to cancel against, so there the switch is a straight
-     * improvement. Since one setting governs both, prefer {@code RAY_DIRECTION} when only
-     * calibration is enabled. See REVIEW.md finding 9 and {@code ContrastProbe21}.
-     */
-    public OptimizationBuilder contrastFrequencyMetric(FrequencyMetric value) {
-        if (value == null) throw new IllegalArgumentException("Frequency metric cannot be null");
-        contrastFrequencyMetric = value;
         return this;
     }
 
@@ -660,7 +630,6 @@ public final class OptimizationBuilder {
         analysis.using_contrast_analysis(frequencies, contrastRings, contrastSpokes);
         analysis.calibrating_contrast_frequency(calibrateContrastFrequency);
         analysis.normalizing_contrast_frequency(normalizeContrastFrequency);
-        analysis.contrast_frequency_metric(contrastFrequencyMetric);
         analysis.centering_contrast_residuals(centerContrastResiduals);
     }
 

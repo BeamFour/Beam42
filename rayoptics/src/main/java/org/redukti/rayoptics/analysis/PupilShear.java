@@ -19,7 +19,7 @@ import org.redukti.rayoptics.util.Orientation;
  * reachable: the OTF is the autocorrelation of the exit pupil, but rays are aimed in
  * <em>entrance</em> pupil coordinates, and pupil aberration makes the mapping between the
  * two non-linear. See H. H. Hopkins,
- * <a href="https://doi.org/10.1364/AO.473823"><i>Calculation of the aberrations and
+ * <a href="https://doi.org/10.1080/713820605"><i>Calculation of the aberrations and
  * image assessment for a general optical system</i></a>, &sect;5 and &sect;10.
  *
  * <p>This is a separate file rather than an addition to

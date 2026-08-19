@@ -952,7 +952,7 @@ diagnostics, but the quantity named `realized_frequency` is not the spatial freq
 coordinate in Hopkins' OTF definition. The normalization option was subsequently removed;
 the diagnostic measurement remains.
 
-[Hopkins](https://doi.org/10.1364/AO.473823) writes the two-dimensional OTF as the
+[Hopkins](https://doi.org/10.1080/713820605) writes the two-dimensional OTF as the
 autocorrelation of the pupil function (10.22 and 10.26):
 
 ```

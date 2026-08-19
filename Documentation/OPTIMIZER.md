@@ -338,7 +338,7 @@ rescaled.
 
 Hopkins writes the two-dimensional transfer function as a pupil autocorrelation. In the
 notation of equations (10.22) and (10.26) of [Calculation of the Aberrations and Image
-Assessment for a General Optical System](https://doi.org/10.1364/AO.473823),
+Assessment for a General Optical System](https://doi.org/10.1080/713820605),
 the essential form is
 
 ```text

@@ -8,7 +8,9 @@ Review of the contrast-optimization implementation on branch `contrast_opt`, aga
 Test case: `ZeissOtusML50mmTest.optimizesPatentPrescriptionUsingContrast()`
 
 Findings 1–7 were written against the state of the branch at the time of the review;
-finding 8 was added on 2026-08-15. Everything below has been revisited as of that date.
+finding 8 was added on 2026-08-15 and finding 9 on 2026-08-19. Everything through
+finding 8 was revisited as of 2026-08-15; finding 9 reviews the frequency-normalization
+work added afterwards and narrows the conclusion previously drawn in finding 7.
 See [Open questions](#open-questions) for what is unresolved and
 [Changes since this review was written](#changes-since-this-review-was-written) for work
 that landed afterwards and does not belong to any single finding.
@@ -25,6 +27,7 @@ that landed afterwards and does not belong to any single finding.
 | [6](#6-the-least-squares-reduction-only-tracks-mtf-in-the-small-phase-regime) | Least-squares only valid at small phase | **Open, but downgraded.** The diagnosis stands; the regression that motivated it turned out to be defocus — see the [postscript](#postscript-the-motivating-regression-was-defocus) |
 | [7](#7-the-shear-is-applied-at-the-entrance-pupil-not-the-exit-pupil) | Shear applied at entrance, not exit, pupil | **Mitigated, opt-in.** `calibrate_frequency` removes the field bias (8.5% → 0.08%); exact fix pending upstream |
 | [8](#8-vignetting-is-a-moving-mode-dependent-reference-frame) | Vignetting is a moving, mode-dependent reference frame | **Partly addressed.** Mode is configurable and the factors can be frozen; the perverse incentive it exposes is unmeasured |
+| [9](#9-frequency-normalization-uses-ray-direction-not-hopkins-exit-pupil-shear) | Frequency normalization uses image-ray direction rather than exit-pupil separation | **Open; do not enable for production optimization yet.** The exit-pupil coordinates are available, but the reported frequency and residual scaling are not the OTF coordinates defined by Hopkins |
 
 Findings 6 and 8 are two attempts at the same symptom — a Leica 75/2 mid-field sagittal
 MTF drop — and neither currently explains it. Finding 6 blamed the least-squares
@@ -941,6 +944,89 @@ residuals to 14256 while the constraint count stayed at ~29; see items 2 and 3 u
 [open questions](#open-questions).
 
 ---
+
+## 9. Frequency normalization uses ray direction, not Hopkins' exit-pupil shear
+
+The frequency-measurement and normalization options added after finding 7 expose useful
+diagnostics, but the quantity currently named `realized_frequency` is not the spatial
+frequency coordinate in Hopkins' OTF definition.
+
+Hopkins writes the two-dimensional OTF as the autocorrelation of the pupil function
+(10.22 and 10.26):
+
+```
+D(s,t) = (1/A) ∫∫ f(x+s/2,y+t/2) f*(x-s/2,y-t/2) dx dy
+```
+
+The independent variables `(s,t)` are separations in *reduced exit-pupil coordinates*.
+The paper is explicit in (10.9), (10.28), and the discussion following (10.30) that these
+coordinates are measured on the exit-pupil reference sphere relative to the principal
+ray. Identifying them with a convenient pupil plane is not generally valid.
+
+`PupilShear.exit_pupil_coord` is therefore the right foundation: it reconstructs the
+equally-inclined-chord point on the reference sphere for each traced ray. However,
+`PupilShear.realized_frequency` does not use the separation of those coordinates. It uses
+the difference between the two rays' image-space direction cosines:
+
+```java
+double component = axis == Orientation.X ? delta.x : delta.y;
+return n_img * Math.abs(component) / wavelength;
+```
+
+For an aberration-free paraxial system, direction difference is proportional to pupil
+separation, so this produces a plausible answer. In an aberrated system the direction
+difference also contains wavefront slope -- equivalently transverse ray aberration. The
+reported independent frequency therefore changes when the aberration being optimized
+changes. That is precisely the coupling the exit-pupil autocorrelation avoids.
+
+This also narrows finding 7's conclusion. The reported 8.5% to 0.08% improvement showed
+that `calibrate_frequency` made the entrance-pupil probe reproduce the requested
+*direction-cosine metric*. It did not establish that the pair had the requested separation
+in Hopkins' reduced exit-pupil coordinates. Both the field-level
+`exit_pupil_frequency_calibration` and the per-sample measurement currently use the same
+metric, so their agreement is internally consistent but is not an independent validation
+of the OTF frequency.
+
+### Scaling the OPD is only a first-order approximation
+
+With `normalize_frequency(true)`, each sampled wavefront difference is changed by
+
+```
+dW <- dW * (frequency_requested / frequency_realized)
+```
+
+Even after replacing the frequency measurement with the correct exit-pupil separation,
+this is exact only in the infinitesimal-shear limit:
+
+```
+W(p + ds) - W(p) ≈ ds . grad(W)
+```
+
+For the finite shears used at useful MTF frequencies, higher-order wavefront terms mean
+that multiplying an already traced difference does not reconstruct the difference at a
+different shear. A real pupil mapping can also rotate or skew a nominal x or y entrance-
+pupil displacement. Retaining only the requested-axis component loses that cross-axis
+part; the actual OTF sample is then at a two-dimensional frequency `(s,t)`, not exactly
+at `(s,0)` or `(0,t)`.
+
+### Recommended next steps
+
+1. Keep the measurement facility, but derive the realized reduced shear from
+   `shiftedExitPupilCoord - referenceExitPupilCoord`, normalized with Hopkins' exit-pupil
+   scale. Retain both vector components.
+2. Rename the current direction-cosine result to something explicit such as
+   `imageRayFrequency` if it remains useful diagnostically; it should not be presented as
+   the OTF frequency.
+3. Initially make the exit-pupil result diagnostic only and add a regression test against
+   the ideal paraxial case plus a pupil-aberrated off-axis case. The existing tests prove
+   that the programmed ratio is applied, not that the ratio represents Hopkins' shear.
+4. For an exact correction, solve or aim each displaced entrance-pupil ray until its
+   exit-pupil reference-sphere coordinate has the requested vector separation. Then use
+   the OPD of that ray directly rather than rescaling a finite OPD difference afterwards.
+
+Until that work is done, `measure_frequency` is useful as a diagnostic of the current
+ray-direction metric, but `normalize_frequency` should remain off for production
+optimization. `calibrate_frequency` should carry the same qualification.
 
 ## Smaller items
 

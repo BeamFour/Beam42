@@ -32,8 +32,6 @@ public class Analysis {
     public boolean _contrast_calibrate_frequency = false;
     /** See {@link ContrastOptions#center_residuals(boolean)}; off by default. */
     public boolean _contrast_center_residuals = false;
-    /** See {@link ContrastOptions#normalize_frequency(boolean)}; off by default. */
-    public boolean _contrast_normalize_frequency = false;
     public boolean _compute_spots = true;
     public boolean _compute_ray_aberrations = true;
     public boolean _compute_mtf = true;
@@ -110,11 +108,6 @@ public class Analysis {
     /** See {@link ContrastOptions#center_residuals(boolean)}. */
     public Analysis centering_contrast_residuals(boolean value) {
         _contrast_center_residuals = value;
-        return this;
-    }
-    /** See {@link ContrastOptions#normalize_frequency(boolean)}. */
-    public Analysis normalizing_contrast_frequency(boolean value) {
-        _contrast_normalize_frequency = value;
         return this;
     }
     public Analysis required_analyses(boolean spots, boolean rayAberrations, boolean mtf) {
@@ -262,8 +255,7 @@ public class Analysis {
                     .num_rings(_contrast_num_rings)
                     .num_spokes(_contrast_num_spokes)
                     .calibrate_frequency(_contrast_calibrate_frequency)
-                    .center_residuals(_contrast_center_residuals)
-                    .normalize_frequency(_contrast_normalize_frequency);
+                    .center_residuals(_contrast_center_residuals);
             _contrasts[i] = ContrastAnalysis.eval(_opt_model, options);
         }
     }

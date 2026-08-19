@@ -132,44 +132,4 @@ class ContrastAnalysisTest {
             }
         }
     }
-
-    @Test
-    void normalisingFrequencyRescalesEachResidualByItsOwnRealisedFrequency() {
-        var model = MtfTest.buildTestModel();
-        var measured = ContrastAnalysis.eval(model,
-                new ContrastOptions(40.0).num_rings(2).num_spokes(6).measure_frequency(true));
-        var normalized = ContrastAnalysis.eval(model,
-                new ContrastOptions(40.0).num_rings(2).num_spokes(6).normalize_frequency(true));
-
-        boolean anyChanged = false;
-        for (int f = 0; f < measured.fields.size(); f++) {
-            for (int w = 0; w < measured.fields.get(f).wavelengths().size(); w++) {
-                var before = measured.fields.get(f).wavelengths().get(w).samples();
-                var after = normalized.fields.get(f).wavelengths().get(w).samples();
-                for (int i = 0; i < before.size(); i++) {
-                    if (!before.get(i).valid()) continue;
-                    double realised = before.get(i).shear().sagittalFrequency();
-                    assertEquals(before.get(i).sagittalDifference() * (40.0 / realised),
-                            after.get(i).sagittalDifference(), 1.0e-12,
-                            "each residual should be scaled by requested/realised");
-                    if (Math.abs(after.get(i).sagittalDifference()
-                            - before.get(i).sagittalDifference()) > 1.0e-12) {
-                        anyChanged = true;
-                    }
-                }
-            }
-        }
-        assertTrue(anyChanged, "normalisation should actually move some residual");
-    }
-
-    @Test
-    void normalisationImpliesMeasurementAndBothDefaultOff() {
-        var options = new ContrastOptions(40.0);
-        assertFalse(options.measureFrequency);
-        assertFalse(options.normalizeFrequency);
-
-        options.normalize_frequency(true);
-        assertTrue(options.measureFrequency,
-                "normalisation needs the measurement it is based on");
-    }
 }

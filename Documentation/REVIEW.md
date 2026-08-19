@@ -27,7 +27,7 @@ that landed afterwards and does not belong to any single finding.
 | [6](#6-the-least-squares-reduction-only-tracks-mtf-in-the-small-phase-regime) | Least-squares only valid at small phase | **Open, but downgraded.** The diagnosis stands; the regression that motivated it turned out to be defocus — see the [postscript](#postscript-the-motivating-regression-was-defocus) |
 | [7](#7-the-shear-is-applied-at-the-entrance-pupil-not-the-exit-pupil) | Shear applied at entrance, not exit, pupil | **Mitigated, opt-in.** `calibrate_frequency` removes the field bias (8.5% → 0.08%); exact fix pending upstream |
 | [8](#8-vignetting-is-a-moving-mode-dependent-reference-frame) | Vignetting is a moving, mode-dependent reference frame | **Partly addressed.** Mode is configurable and the factors can be frozen; the perverse incentive it exposes is unmeasured |
-| [9](#9-frequency-normalization-uses-ray-direction-not-hopkins-exit-pupil-shear) | Frequency normalization uses image-ray direction rather than exit-pupil separation | **Open; do not enable for production optimization yet.** The exit-pupil coordinates are available, but the reported frequency and residual scaling are not the OTF coordinates defined by Hopkins |
+| [9](#9-frequency-normalization-uses-ray-direction-not-hopkins-exit-pupil-shear) | Frequency normalization used image-ray direction rather than exit-pupil separation | **Reverted.** The residual rescaling and its public options were removed; the raw reference-sphere coordinate helper was retained for a future exit-pupil aiming implementation |
 
 Findings 6 and 8 are two attempts at the same symptom — a Leica 75/2 mid-field sagittal
 MTF drop — and neither currently explains it. Finding 6 blamed the least-squares
@@ -947,9 +947,10 @@ residuals to 14256 while the constraint count stayed at ~29; see items 2 and 3 u
 
 ## 9. Frequency normalization uses ray direction, not Hopkins' exit-pupil shear
 
-The frequency-measurement and normalization options added after finding 7 expose useful
-diagnostics, but the quantity currently named `realized_frequency` is not the spatial
-frequency coordinate in Hopkins' OTF definition.
+The frequency-measurement and normalization options added after finding 7 exposed useful
+diagnostics, but the quantity named `realized_frequency` is not the spatial frequency
+coordinate in Hopkins' OTF definition. The normalization option was subsequently removed;
+the diagnostic measurement remains.
 
 Hopkins writes the two-dimensional OTF as the autocorrelation of the pupil function
 (10.22 and 10.26):
@@ -989,7 +990,7 @@ of the OTF frequency.
 
 ### Scaling the OPD is only a first-order approximation
 
-With `normalize_frequency(true)`, each sampled wavefront difference is changed by
+The reverted `normalize_frequency(true)` option changed each sampled wavefront difference by
 
 ```
 dW <- dW * (frequency_requested / frequency_realized)
@@ -1024,9 +1025,11 @@ at `(s,0)` or `(0,t)`.
    exit-pupil reference-sphere coordinate has the requested vector separation. Then use
    the OPD of that ray directly rather than rescaling a finite OPD difference afterwards.
 
-Until that work is done, `measure_frequency` is useful as a diagnostic of the current
-ray-direction metric, but `normalize_frequency` should remain off for production
-optimization. `calibrate_frequency` should carry the same qualification.
+`measure_frequency` remains useful as a diagnostic of the current ray-direction metric.
+The normalization API and residual rescaling were removed rather than left available in
+an unsafe configuration. `exit_pupil_sphere_coord` was retained as the coordinate
+foundation for the proposed exit-pupil aiming implementation. `calibrate_frequency`
+remains a separate, opt-in block-level approximation and carries the qualification above.
 
 ## Smaller items
 

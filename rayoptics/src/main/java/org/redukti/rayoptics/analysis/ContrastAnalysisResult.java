@@ -32,10 +32,6 @@ public class ContrastAnalysisResult {
             return new Sample(pupil, sagittalDifference, tangentialDifference,
                     weight, valid, failure, value);
         }
-
-        public Sample withDifferences(double sagittal, double tangential) {
-            return new Sample(pupil, sagittal, tangential, weight, valid, failure, shear);
-        }
     }
 
     /**

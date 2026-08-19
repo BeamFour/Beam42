@@ -1,7 +1,6 @@
 package org.redukti.rayoptics.analysis;
 
 import org.redukti.mathlib.M;
-import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.elem.transform.Transform;
 import org.redukti.rayoptics.optical.OpticalModel;
@@ -93,9 +92,9 @@ public class PupilShear {
      * difference in wavefront slope between the two pupil points - transverse ray
      * aberration, which is what optimization changes. The two coincide only for an
      * unaberrated system. Measured divergence runs from 0.1 percent on axis to 2.7 percent
-     * at full field tangential on the Otus 50/1.4; see {@code ContrastProbe19} and
-     * REVIEW.md finding 9. Use {@link #realized_frequency_vector} where the OTF
-     * coordinate is what is wanted.
+     * at full field tangential on the Otus 50/1.4; see REVIEW.md finding 9. Use
+     * {@link #exit_pupil_sphere_coord} as the coordinate foundation when the OTF pupil
+     * separation is what is wanted.
      *
      * <p>Directions are taken after the last surface, in image-space coordinates, so a
      * tilted or decentred final surface is handled correctly.
@@ -158,49 +157,6 @@ public class PupilShear {
         double denom = F + Math.sqrt(discriminant);
         double ep = denom == 0.0 ? 0.0 : J / denom;
         return p_coord.plus(d.times(ep));
-    }
-
-    /**
-     * The two-dimensional spatial frequency a pair of rays realises, measured as the
-     * separation of their coordinates on the exit-pupil reference sphere.
-     *
-     * <p>This is the quantity Hopkins' OTF is a function of. His (10.26) shears the pupil
-     * function in reduced exit-pupil coordinates, and (10.28) fixes the scale, which
-     * unreduces to a separation of {@code lambda.nu.R'/(N'.n)} on the sphere. Taking the
-     * transverse components of that separation directly, as here, absorbs the {@code N'}
-     * obliquity automatically:
-     *
-     * <pre>nu = n . |delta p| / (lambda . R')</pre>
-     *
-     * <p>It differs from {@link #realized_frequency} in what it is sensitive to. A ray's
-     * image-space direction is the wavefront normal, so a direction-cosine difference
-     * carries both the pupil separation and the difference in wavefront slope between the
-     * two points - that is, transverse ray aberration. The two agree for an unaberrated
-     * system and diverge as aberration grows, and only this one is independent of the
-     * aberration being optimized.
-     *
-     * <p>Both components are returned. A real pupil mapping can rotate or skew a nominal
-     * x or y entrance-pupil displacement, in which case the pair samples the OTF at a
-     * two-dimensional frequency rather than on the requested axis, and the cross component
-     * is how much.
-     *
-     * @return (x, y) frequency components in cycles per system length unit, or null if
-     *         either coordinate is unavailable
-     */
-    public static Vector2 realized_frequency_vector(
-            OpticalModel opt_model, RayPkg reference, RayPkg shifted,
-            ChiefRayPkg chief_ray_pkg, ReferenceSphere ref_sphere, double wvl) {
-        var p0 = exit_pupil_sphere_coord(reference, chief_ray_pkg, ref_sphere);
-        var p1 = exit_pupil_sphere_coord(shifted, chief_ray_pkg, ref_sphere);
-        if (p0 == null || p1 == null) return null;
-
-        double wavelength = opt_model.nm_to_sys_units(wvl);
-        if (!(wavelength > 0.0)) return null;
-        double n_img = Math.abs(opt_model.optical_spec.parax_data.fod.n_img);
-        double scale = n_img / (wavelength * ref_sphere.ref_sphere_radius);
-
-        var delta = p1.minus(p0);
-        return new Vector2(scale * delta.x, scale * delta.y);
     }
 
     /** Direction cosine of the ray after the last surface, in image-space coordinates. */

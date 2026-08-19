@@ -84,7 +84,6 @@ public final class OptimizationBuilder {
     private int contrastRings = 6;
     private int contrastSpokes = 12;
     private boolean calibrateContrastFrequency = false;
-    private boolean normalizeContrastFrequency = false;
     private boolean centerContrastResiduals = false;
     private boolean[] contrastBalanceFields;
     private double contrastBalanceWeight = NOMINAL_BALANCE_WEIGHT;
@@ -228,35 +227,6 @@ public final class OptimizationBuilder {
      */
     public OptimizationBuilder calibrateContrastFrequency(boolean value) {
         calibrateContrastFrequency = value;
-        return this;
-    }
-
-    /**
-     * Correct each contrast residual for the frequency its own ray pair actually
-     * realised, rather than for the block average.
-     *
-     * <p>This is the per-sample companion to
-     * {@link #calibrateContrastFrequency(boolean)}, not a replacement for it. Calibration
-     * acts before the trace - it rescales the pupil shift, which relocates every sample by
-     * up to 2.4% of the pupil radius - and can only correct the block mean. This acts
-     * after the trace, moves no rays, and corrects what each pair individually did.
-     *
-     * <p>Enable it when a block's realised frequency varies materially across the pupil,
-     * which calibration cannot represent with one scale. Measured with calibration on:
-     * 0.2% spread tangential on the Leica 75/2, where it is not worth having, against 4.8%
-     * spread and a 0.987-1.167 range at full field tangential on the Otus 50/1.4, where a
-     * single scale is meaningless and the block's sum of squares moves 17%. Run
-     * {@code ContrastPupilShearProbe} against the design to decide.
-     *
-     * <p>Use it <em>with</em> calibration, not instead of it. The correction is first
-     * order in the shear, so it needs the discrepancy already small; uncalibrated, ratios
-     * reach 0.82 on the Otus and the rescaling leaves its own valid range.
-     *
-     * <p>Off by default because it changes every contrast residual. See
-     * {@link ContrastOptions#normalize_frequency(boolean)}.
-     */
-    public OptimizationBuilder normalizeContrastFrequency(boolean value) {
-        normalizeContrastFrequency = value;
         return this;
     }
 
@@ -629,7 +599,6 @@ public final class OptimizationBuilder {
         int[] frequencies = contrastGoals.stream().mapToInt(goal -> goal.frequency).toArray();
         analysis.using_contrast_analysis(frequencies, contrastRings, contrastSpokes);
         analysis.calibrating_contrast_frequency(calibrateContrastFrequency);
-        analysis.normalizing_contrast_frequency(normalizeContrastFrequency);
         analysis.centering_contrast_residuals(centerContrastResiduals);
     }
 

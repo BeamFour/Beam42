@@ -208,10 +208,7 @@ public class ContrastAnalysis {
         if (!options.measureFrequency) return sample;
         var shear = measure_shear(opticalModel, rays, field, wavelength);
         sample = sample.withShear(shear);
-        if (!options.normalizeFrequency || !valid) return sample;
-        return sample.withDifferences(
-                normalize(sagittal, shear.sagittalFrequency(), options.spatialFrequency),
-                normalize(tangential, shear.tangentialFrequency(), options.spatialFrequency));
+        return sample;
     }
 
     /**
@@ -240,19 +237,6 @@ public class ContrastAnalysis {
                 reference != null && tangential != null ? tangential.minus(reference) : null,
                 sagittalFrequency != null ? sagittalFrequency : Double.NaN,
                 tangentialFrequency != null ? tangentialFrequency : Double.NaN);
-    }
-
-    /**
-     * Rescale a wavefront difference from the frequency the pair realised to the one that
-     * was requested. Leaves the difference alone if the measurement failed, or if the
-     * discrepancy is large enough that the first-order rescaling is not trustworthy -
-     * the same guard rail {@link #exit_pupil_frequency_calibration} uses.
-     */
-    private static double normalize(double difference, double realized, double requested) {
-        if (!Double.isFinite(realized) || !(realized > 0.0) || !(requested > 0.0))
-            return difference;
-        double scale = requested / realized;
-        return scale > 0.5 && scale < 2.0 ? difference * scale : difference;
     }
 
     private static ContrastAnalysisResult.Failure failure(ContrastRayTriplet rays) {

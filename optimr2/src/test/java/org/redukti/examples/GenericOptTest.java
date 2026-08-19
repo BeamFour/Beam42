@@ -24,7 +24,7 @@ class GenericOptTest {
         assertTrue(message.contains("contrast samples contain failed rays"), message);
         assertTrue(message.contains("TraceTIRException at surface 15"), message);
         assertTrue(message.contains("field=1.0"), message);
-        assertTrue(message.contains("frequency=10.0 cycles/mm"), message);
+        assertTrue(message.contains("frequency=20.0 cycles/mm"), message);
     }
 
     private static Path repositoryRoot() {

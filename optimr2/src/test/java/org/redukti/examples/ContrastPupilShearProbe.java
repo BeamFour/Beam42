@@ -13,9 +13,8 @@ import org.redukti.importers.obench.OpticalBenchDataImporter;
  * Does the frequency each contrast sample actually probes vary across the pupil, and by
  * enough to matter?
  *
- * <p>Not one of the numbered REVIEW.md probes. This exists to decide whether
- * {@link ContrastOptions#normalize_frequency(boolean)} is worth keeping, by measuring the
- * thing {@link ContrastOptions#calibrate_frequency(boolean)} cannot see. Calibration
+ * <p>Not one of the numbered REVIEW.md probes. This measures the variation that
+ * {@link ContrastOptions#calibrate_frequency(boolean)} cannot see. Calibration
  * infers one scale per field, wavelength and direction from a single probe pair; if the
  * entrance-to-exit pupil mapping were linear that would be exact, and every sample in a
  * block would report the same realised frequency. The spread reported here is the part of
@@ -28,9 +27,9 @@ import org.redukti.importers.obench.OpticalBenchDataImporter;
  *   <li><b>spread</b> - standard deviation of the same ratio across the pupil, as a
  *       percentage. What calibration cannot correct.</li>
  *   <li><b>range</b> - min to max of the ratio, which is what an outlier sample sees.</li>
- *   <li><b>dSOS</b> - percentage change in the block's sum of squares from normalising
- *       each sample to its own realised frequency. This is the merit-function
- *       consequence, and the number to judge the option by.</li>
+ *   <li><b>dSOS</b> - the historical, hypothetical change in the block's sum of squares
+ *       from rescaling each sample to its measured frequency. The production
+ *       normalization option was removed because this finite-OPD rescaling is not exact.</li>
  * </ul>
  */
 public class ContrastPupilShearProbe {

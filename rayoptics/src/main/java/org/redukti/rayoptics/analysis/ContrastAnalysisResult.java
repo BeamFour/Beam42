@@ -51,28 +51,7 @@ public class ContrastAnalysisResult {
      * @see PupilShear
      */
     public record Shear(Vector3 pupilCoord, Vector3 sagittalOffset, Vector3 tangentialOffset,
-                        double sagittalFrequency, double tangentialFrequency,
-                        Vector2 sagittalPupilFrequency, Vector2 tangentialPupilFrequency) {
-
-        /**
-         * The two frequency metrics are not equivalent, and the difference is not noise.
-         * {@code sagittalFrequency} and {@code tangentialFrequency} come from ray
-         * directions; the {@code *PupilFrequency} pair are separations on the exit-pupil
-         * reference sphere, which is the coordinate Hopkins' OTF is defined over. Only the
-         * latter is independent of the aberration being optimized. See REVIEW.md finding 9
-         * and {@link PupilShear#realized_frequency}.
-         *
-         * <p>The pupil frequencies are two-dimensional. The component on the requested
-         * axis is the frequency the pair sampled; the cross component is how far off that
-         * axis the exit-pupil mapping put it.
-         */
-        public double sagittalPupilFrequencyOnAxis() {
-            return sagittalPupilFrequency == null ? Double.NaN : Math.abs(sagittalPupilFrequency.x);
-        }
-
-        public double tangentialPupilFrequencyOnAxis() {
-            return tangentialPupilFrequency == null ? Double.NaN : Math.abs(tangentialPupilFrequency.y);
-        }
+                        double sagittalFrequency, double tangentialFrequency) {
     }
 
     public record Failure(String ray, String exceptionType, int surface) {

@@ -234,17 +234,12 @@ public class ContrastAnalysis {
                 opticalModel, rays.reference(), rays.sagittal(), wavelength, Orientation.X);
         var tangentialFrequency = PupilShear.realized_frequency(
                 opticalModel, rays.reference(), rays.tangential(), wavelength, Orientation.Y);
-        var sagittalPupil = PupilShear.realized_frequency_vector(
-                opticalModel, rays.reference(), rays.sagittal(), chiefRay, refSphere, wavelength);
-        var tangentialPupil = PupilShear.realized_frequency_vector(
-                opticalModel, rays.reference(), rays.tangential(), chiefRay, refSphere, wavelength);
         return new ContrastAnalysisResult.Shear(
                 reference,
                 reference != null && sagittal != null ? sagittal.minus(reference) : null,
                 reference != null && tangential != null ? tangential.minus(reference) : null,
                 sagittalFrequency != null ? sagittalFrequency : Double.NaN,
-                tangentialFrequency != null ? tangentialFrequency : Double.NaN,
-                sagittalPupil, tangentialPupil);
+                tangentialFrequency != null ? tangentialFrequency : Double.NaN);
     }
 
     /**

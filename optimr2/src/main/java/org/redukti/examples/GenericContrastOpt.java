@@ -21,9 +21,9 @@ public class GenericContrastOpt {
     static OptimizationBuilder.OptimizationSetup createContrastSetup(Prescription prescription, boolean weighted,
                                                                      boolean dLineOnly) {
         double[] fields = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
-        double[] sagittalWeights   = {3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 2.0, 2.0, 2.0, 2.0};
+        double[] sagittalWeights   = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
         double[] tangentialWeights = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
-        boolean[] correctAstigmatism = {true, true, true, true, true, true, true, true, true, false, false};
+        boolean[] correctAstigmatism = {false, true, true, true, true, true, true, true, true, false, false};
 
         return OptimizationBuilder.builder(prescription)
                 .fields(fields)
@@ -39,6 +39,7 @@ public class GenericContrastOpt {
                 .contrastSampling(6, 12)
                 .calibrateContrastFrequency(false)
                 .centerContrastResiduals(false)
+                .aimContrastAtExitPupil(false)
                 .vignetting(VigType.SetVig)
                 .freezeVignetting()
                 .checkSpotApertures(false)

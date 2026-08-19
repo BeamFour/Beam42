@@ -453,13 +453,43 @@ still works there.
 Normalization is off by default because, like calibration and centring, it changes every
 contrast residual and therefore every committed regression value.
 
-**It should stay off for production optimization until the metric question is settled.**
-The rescaling is currently driven by `realized_frequency`, the direction-cosine metric,
-which the paragraphs above show is not Hopkins' OTF coordinate. The correct sequence is to
-drive both the normalization and the calibration probe from
-`realized_frequency_vector`, keep the result diagnostic while it is checked against an
-independent MTF, and only then consider enabling either for real work.
-`measure_frequency` is safe to use throughout, since it changes no residual.
+**It should stay off, and not merely pending validation.** `ContrastProbe20` measures the
+two things the option rests on, and both fail by enough to matter. The status of the
+option is that its mechanism is correct and its physics is not.
+
+*The target is wrong.* The rescaling is driven by `realized_frequency`, the direction-
+cosine metric, which the paragraphs above show is not Hopkins' OTF coordinate. Re-forming
+the same residuals against `realized_frequency_vector` changes the worst block by 12
+percent. On the Otus 50/1.4 at full field tangential, 10 cycles/mm, the block sum of
+squares moves as:
+
+```text
+raw                     1.78699
+normalized by direction 1.48963   (-16.6%)
+normalized by pupil     1.67422   ( -6.3%)
+```
+
+The correction that should be applied is about -6 percent; the option applies about -17.
+It overshoots by a factor of two and a half, in exactly the block it exists to fix.
+
+*The rescaling is only partly valid.* `dW <- dW * ratio` assumes `dW` is proportional to
+the shear. Tracing pairs at a shear and at that shear stretched by a known amount, and
+comparing the wavefront difference that actually results against the one the rescaling
+assumes, gives a mean error of about a quarter of the applied correction at 10 cycles/mm
+and up to a half at 40. The error grows linearly with the size of the correction, which is
+the signature of the quadratic term in the wavefront. So a correction of a few percent
+arrives with roughly a third of itself in error.
+
+These compound rather than cancel, and both are largest at full field, tangential, on a
+fast lens - the case the option was added for. Note the consequence for the fix: once the
+metric is corrected the remaining discrepancy is around 6 percent, and a rescaling that is
+a third wrong recovers only about two thirds of it. That is a much weaker case than the
+original 17 percent suggested. Rescaling a finite difference is the wrong instrument; the
+exact treatment aims each displaced ray until its exit-pupil coordinate has the requested
+separation, and uses that ray's OPD directly.
+
+`measure_frequency` is unaffected by all of this and is safe to use throughout, since it
+changes no residual. It is the recommended way to inspect a design.
 
 ## The pupil the merit sees
 

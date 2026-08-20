@@ -3,6 +3,7 @@ package org.redukti.examples;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.optim.*;
 import org.redukti.spec.Prescription;
+import org.redukti.spec.VigType;
 
 import static org.redukti.optim.OptimizationBuilder.contrast;
 import static org.redukti.optim.OptimizationBuilder.mtf;
@@ -103,9 +104,12 @@ public class NoctNikkor58mm {
                                                                      boolean weighted,
                                                                      boolean dLineOnly,
                                                                      double[] fieldWeights) {
+        double[] sagittalWeights   = {16.0, 16.0, 8.0, 1.0};
+        double[] tangentialWeights = {8.0, 4.0, 1.0, 1.0};
+        boolean[] correctAstigmatism = {true, true, false, false};
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
-                .mtfFrequencies(10, 30, 50)
+                .mtfFrequencies(30)
                 .varyAllCurvatures()
                 .additionalVariables(
                         new VarAsphK(prescription, 0),
@@ -113,16 +117,20 @@ public class NoctNikkor58mm {
                         new VarAsphCoeff(prescription,0,2,1E9),
                         new VarAsphCoeff(prescription,0,3,1E11),
                         new VarAsphCoeff(prescription,0,4,1E14))
-                .weighted(weighted)
+                .weighted(false)
                 .dLineOnly(dLineOnly)
                 .applyCurvatureConstraints()
+                .applyEdgeThicknessConstraints()
+                .applyThicknessConstraints()
                 .contrastSampling(6, 12)
                 .contrastGoals(
-                        contrast(10, fieldWeights),
-                        contrast(30, fieldWeights),
-                        contrast(50, fieldWeights))
-                .calibrateContrastFrequency(true)
-                .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 37.78, 1.0))
+                        contrast(30, sagittalWeights, tangentialWeights))
+                .centerContrastResiduals(false)
+                .aimContrastAtExitPupil(false)
+                .vignetting(VigType.SetVig)
+                .freezeVignetting()
+                .checkSpotApertures(false)
+                .contrastBalanceGoals(correctAstigmatism, 4.0)
                 .build();
     }
 
@@ -156,7 +164,7 @@ public class NoctNikkor58mm {
         String specfile = ExampleFinder.geoPathToExample("Examples/jfotoptix/nikkor-58mm-f1.2/version5/Noct-Nikkor-58mmf1.2.txt");
         //String specfile = ExampleFinder.geoPathToExample("Examples/jfotoptix/nikkor-58mm-f1.2/version19/specs.txt");
         var prescription = getPrescription(specfile, weighted, dLineOnly);
-        var setup = createSpotDeviationSetup(prescription, weighted, dLineOnly, fieldWeights);
+        var setup = createContrastSetup(prescription, weighted, dLineOnly, fieldWeights);
         var analysis = setup.analysis();
         var meritFunction = setup.meritFunction(false);
         analysis.compute();

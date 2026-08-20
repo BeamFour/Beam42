@@ -532,10 +532,61 @@
       </ul>
 
       <h3>The code is the formula verbatim</h3>
-      <pre>double e = (r.dir.plus(r0.dir).dot(r.pt.minus(r0.pt)))
-         / (1. + r.dir.dot(r0.dir));</pre>
-      <p>which is <nobr>( <b>d</b> + <b>d₀</b> )·( <var>P</var> − <var>P₀</var> ) / ( 1 + <b>d</b>·<b>d₀</b> )</nobr>,
+      <pre>public static double eic_distance(RayData r, RayData r0) {
+    double e = (r.dir.plus(r0.dir).dot(r.pt.minus(r0.pt)))
+             / (1. + r.dir.dot(r0.dir));
+    return e;
+}</pre>
+      <p>The two <code>RayData</code> arguments are the two rays of the pair, and each carries exactly the
+        point-and-direction pair the derivation needs — nothing else. <code>r</code> is the ray being
+        evaluated, <code>r0</code> the reference it is measured against:</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Paper</th><th>Java</th><th>What it holds</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="m">P</td><td class="m">r.pt</td>
+              <td>the aperture ray's point of incidence on the surface</td>
+            </tr>
+            <tr>
+              <td class="m">d = (L, M, N)</td><td class="m">r.dir</td>
+              <td>its unit direction cosine there</td>
+            </tr>
+            <tr>
+              <td class="m">P₀</td><td class="m">r0.pt</td>
+              <td>the principal ray's point of incidence on the <em>same</em> surface</td>
+            </tr>
+            <tr>
+              <td class="m">d₀ = (L₀, M₀, N₀)</td><td class="m">r0.dir</td>
+              <td>its unit direction cosine there</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>So <code>r.pt.minus(r0.pt)</code> is <nobr>(<var>P</var> − <var>P₀</var>)</nobr>,
+        <code>r.dir.plus(r0.dir)</code> is <nobr>(<b>d</b> + <b>d₀</b>)</nobr>, and
+        <code>r.dir.dot(r0.dir)</code> is <nobr><b>d</b>·<b>d₀</b></nobr> — the expression is
+        <nobr>( <b>d</b> + <b>d₀</b> )·( <var>P</var> − <var>P₀</var> ) / ( 1 + <b>d</b>·<b>d₀</b> )</nobr>
         term for term.</p>
+
+      <div class="note">
+        <b>The argument order carries the sign.</b> Swapping <code>r</code> and <code>r0</code> negates the
+        result: <nobr>(<var>P</var> − <var>P₀</var>)</nobr> reverses while
+        <nobr>(<b>d</b> + <b>d₀</b>)</nobr> and the denominator do not. Since <var>n·e</var> is an optical path
+        difference, that sign propagates all the way to the sign convention of <var>W′</var> — so the aperture
+        ray goes first and the principal ray second, everywhere.
+      </div>
+
+      <p>Two things <code>RayData</code> deliberately does not carry: a wavelength and a path length. Equation
+        3.9 is pure geometry, which is why Hopkins can say it applies "to any pair of points" and hence to any
+        form of surface. Note also that its own javadoc names the members
+        <span class="mono">(p, d)</span> and <span class="mono">(p0, d0)</span> while the fields are
+        <code>pt</code> and <code>dir</code>; they are the same things.</p>
+
+      <p>One wrinkle appears at the call sites rather than here. <code>RaySeg</code> stores the direction
+        <em>after</em> an interface, so building the object-space <code>RayData</code> for surface 1 pairs
+        <code>ray[1].p</code> with <code>ray[0].d</code> — a point from one segment with a direction from the
+        previous one. That is deliberate, and §3 covers it.</p>
     </div>
   </section>
 

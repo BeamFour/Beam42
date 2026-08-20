@@ -1,8 +1,8 @@
-# Nikkor Z 70-200mm f/2.8 VR S
+# Nikkor Z 70-200mm f/2.8 VR S II
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
-|US | US20210349293 | 1 | 2018 | Takeru Uehara | Nikon Corp | [link](https://patents.google.com/patent/US20210349293A1/en) |
+|EU | WO 2026/172598 | 1 | 2025 | TAKAHASHI Akino | Nikon Corp | [link](https://patentscope.wipo.int/search/en/detail.jsf?docId=WO2026172598) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

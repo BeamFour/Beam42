@@ -105,7 +105,7 @@ public class NoctNikkor58mm {
                                                                      boolean dLineOnly,
                                                                      double[] fieldWeights) {
         double[] sagittalWeights   = {16.0, 16.0, 8.0, 1.0};
-        double[] tangentialWeights = {8.0, 4.0, 1.0, 1.0};
+        double[] tangentialWeights = {8.0, 4.0, 1.0, 0.1};
         boolean[] correctAstigmatism = {true, true, false, false};
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)

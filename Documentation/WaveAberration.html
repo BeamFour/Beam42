@@ -360,16 +360,68 @@
     </div>
     <div class="body">
       <h2>The equally inclined chord</h2>
-      <p>Take any two lines with unit directions <b>d</b> and <b>d₀</b>, and a point <var>P</var> on the first,
-        <var>P₀</var> on the second. Hopkins draws a chord from <var>P₀</var> to a point <var>P̃</var> on the
-        first line such that the chord is <em>equally inclined</em> to both. With <var>P̃</var> = <var>P</var> −
-        <var>e</var><b>d</b>, that condition is</p>
+      <h3>What you start from</h3>
+      <p>Four quantities, all of them straight out of the ray trace:</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th></th><th>ray <var>r</var> — the aperture ray</th><th>ray <var>r₀</var> — the principal ray</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>a point on it</td>
+              <td class="m">P = (X, Y, Z)</td>
+              <td class="m">P₀ = (X₀, Y₀, Z₀)</td>
+            </tr>
+            <tr>
+              <td>its unit direction</td>
+              <td class="m">d = (L, M, N)</td>
+              <td class="m">d₀ = (L₀, M₀, N₀)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>In practice <var>P</var> and <var>P₀</var> are the two rays' intersections with the <em>same</em>
+        surface, and <b>d</b>, <b>d₀</b> their direction cosines there, in whatever rectangular frame the trace
+        happens to use. Two things you are never given, and never need: where the two rays cross, and any
+        wavefront. That is what makes the construction usable.</p>
+
+      <h3>The one unknown</h3>
+      <p><var>P₀</var> stays put. You slide along ray <var>r</var> only, looking for the point <var>P̃</var>
+        whose chord back to <var>P₀</var> is equally inclined to both rays — so there is one unknown and one
+        equation. Parametrise the slide:</p>
+      <div class="eq">
+        <div class="formula"><var>P̃</var> = <var>P</var> − <var>e</var><b>d</b>
+          &nbsp;&nbsp;&nbsp;&nbsp; that is &nbsp; ( <var>X</var> − <var>Le</var>, <var>Y</var> − <var>Me</var>, <var>Z</var> − <var>Ne</var> )</div>
+        <div class="where"><var>e</var> is the distance from <var>P̃</var> back to <var>P</var>, positive when
+          that step runs along <b>+d</b>. It is the quantity eq. 3.9 returns.</div>
+      </div>
+
+      <h3>The condition, and why it has a sign flip</h3>
+      <p>Hopkins writes the equal-inclination requirement as
+        <span class="mono">Σ L {(X − Le) − X₀} = Σ L₀ {X₀ − (X − Le)}</span>, which in vectors is</p>
       <div class="eq">
         <div class="formula"><b>d</b>·( <var>P̃</var> − <var>P₀</var> ) = <b>d₀</b>·( <var>P₀</var> − <var>P̃</var> )
           &nbsp;&nbsp;⟺&nbsp;&nbsp; ( <b>d</b> + <b>d₀</b> ) · ( <var>P̃</var> − <var>P₀</var> ) = 0</div>
-        <div class="where">The chord is perpendicular to the bisector of the two directions. Solving for
-          <var>e</var> gives eq. 3.9.</div>
+        <div class="where">The chord is reversed on the right, and the two statements are equivalent. The
+          second is the one worth remembering: <b>the chord is perpendicular to the bisector of the two ray
+          directions</b>.</div>
       </div>
+      <p>That reversal is not a slip. Picture the intersecting case: the rays cross at <var>X</var>, and
+        <var>P̃</var>, <var>P₀</var> sit equidistant from it, so triangle <var>X P̃ P₀</var> is isosceles. Its
+        two base angles are equal — but they sit at opposite ends of the base and open <em>toward</em> each
+        other. Traversing the chord <var>P₀</var>→<var>P̃</var> makes the same angle with <b>d</b> that
+        traversing <var>P̃</var>→<var>P₀</var> makes with <b>d₀</b>. Hence one direction each way.</p>
+
+      <h3>Solving for <var>e</var></h3>
+      <p>One substitution and one dot product. Put <var>P̃</var> = <var>P</var> − <var>e</var><b>d</b> into the
+        condition and expand:</p>
+      <div class="eq">
+        <div class="formula">( <b>d</b> + <b>d₀</b> ) · ( <var>P</var> − <var>e</var><b>d</b> − <var>P₀</var> ) = 0</div>
+        <div class="formula">( <b>d</b> + <b>d₀</b> )·( <var>P</var> − <var>P₀</var> ) &nbsp;−&nbsp; <var>e</var> ( <b>d</b> + <b>d₀</b> )·<b>d</b> &nbsp;=&nbsp; 0</div>
+        <div class="where">The coefficient of <var>e</var> collapses, because <b>d</b> is a unit vector:
+          <nobr>( <b>d</b> + <b>d₀</b> )·<b>d</b> = <b>d</b>·<b>d</b> + <b>d₀</b>·<b>d</b> = 1 + <b>d</b>·<b>d₀</b></nobr>.</div>
+        <div class="formula">( <b>d</b> + <b>d₀</b> )·( <var>P</var> − <var>P₀</var> ) &nbsp;=&nbsp; <var>e</var> ( 1 + <b>d</b>·<b>d₀</b> )</div>
+      </div>
+      <p>Divide, and that is the paper's result:</p>
       <div class="eq">
         <div class="ref">eq. 3.9 &nbsp;·&nbsp; <span class="mono">WaveAbr.eic_distance</span></div>
         <div class="formula"><var>e</var> &nbsp;=&nbsp; ( <b>d</b> + <b>d₀</b> ) · ( <var>P</var> − <var>P₀</var> ) &nbsp;/&nbsp; ( 1 + <b>d</b> · <b>d₀</b> )</div>
@@ -456,15 +508,34 @@
         <var>a</var>. An EIC pair is therefore a stand-in for a common wavefront, computable from ray data
         alone. So <var>n·e</var> <em>is</em> an optical path difference.</p>
 
-      <h3>Two degenerate cases the formula survives</h3>
+      <h3>Three checks that it is the right quantity</h3>
       <ul>
+        <li><b>Intersecting rays give the equidistance result — it is not assumed.</b> Put the crossing at
+          <var>X</var> and write <var>P</var> = <var>X</var> + <var>a</var><b>d</b>,
+          <var>P₀</var> = <var>X</var> + <var>a₀</var><b>d₀</b>, with <var>a</var>, <var>a₀</var> signed
+          distances from <var>X</var>. The numerator becomes
+          <nobr><var>a</var> + <var>a</var>(<b>d₀</b>·<b>d</b>) − <var>a₀</var>(<b>d</b>·<b>d₀</b>) − <var>a₀</var></nobr>
+          = <nobr>(<var>a</var> − <var>a₀</var>)(1 + <b>d</b>·<b>d₀</b>)</nobr>, so
+          <var>e</var> = <var>a</var> − <var>a₀</var>. Then <var>P̃</var> sits at distance
+          <var>a</var> − (<var>a</var> − <var>a₀</var>) = <var>a₀</var> from <var>X</var> — the same distance as
+          <var>P₀</var>. The isosceles picture falls out of the algebra.</li>
         <li><b>Parallel rays</b> (object at infinity). With <b>d</b> = <b>d₀</b> it collapses to
           <var>e</var> = <b>d</b>·(<var>P</var> − <var>P₀</var>), the projection of the ray separation onto the
-          common direction — the plane-wavefront path difference.</li>
-        <li><b>Nearly parallel rays</b>, which is the normal case. Imposing the chord condition the other way
-          round yields a denominator 1 − <b>d</b>·<b>d₀</b>, which vanishes there. Hopkins'
-          <nobr>1 + <b>d</b>·<b>d₀</b> = 2cos²(θ/2)</nobr> tends to 2 instead.</li>
+          common direction — the plane-wavefront path difference. No special case needed.</li>
+        <li><b>Nearly parallel rays</b>, which is the normal case, are where the denominator earns its keep.
+          Impose the condition without the sign flip — <nobr><b>d</b>·(<var>P̃</var> − <var>P₀</var>) = <b>d₀</b>·(<var>P̃</var> − <var>P₀</var>)</nobr>
+          — and you get a perfectly valid construction with
+          <nobr><var>e</var> = (<b>d</b> − <b>d₀</b>)·(<var>P</var> − <var>P₀</var>) / (1 − <b>d</b>·<b>d₀</b>)</nobr>,
+          whose denominator <em>vanishes</em> as the rays become parallel. Hopkins'
+          <nobr>1 + <b>d</b>·<b>d₀</b> = 2cos²(θ/2)</nobr> tends to 2 instead. He chose the form that is best
+          conditioned exactly where optical systems sit.</li>
       </ul>
+
+      <h3>The code is the formula verbatim</h3>
+      <pre>double e = (r.dir.plus(r0.dir).dot(r.pt.minus(r0.pt)))
+         / (1. + r.dir.dot(r0.dir));</pre>
+      <p>which is <nobr>( <b>d</b> + <b>d₀</b> )·( <var>P</var> − <var>P₀</var> ) / ( 1 + <b>d</b>·<b>d₀</b> )</nobr>,
+        term for term.</p>
     </div>
   </section>
 

@@ -37,7 +37,7 @@ public class ContrastAnalysis {
                         fieldIndex, wavelengthIndex,
                         options.numRings, options.numSpokes,
                         new Vector2(sagittalShift, 0.0), new Vector2(0.0, tangentialShift),
-                        options.traceOptions, options.aimExitPupil);
+                        options.spatialFrequency, options.traceOptions, options.aimExitPupil);
                 wavelengthResults.add(new ContrastAnalysisResult.WavelengthResult(
                         wavelength, shift, traced.get(0).samples()));
             }

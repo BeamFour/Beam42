@@ -23,9 +23,6 @@ class ContrastAnalysisTest {
         double wavelength = model.optical_spec.wvls.wavelengths[wavelengthIndex];
         double normalizedShift = ContrastAnalysis.normalized_entry_pupil_shift(
                 model, wavelength, 40.0);
-        double physicalShift = normalizedShift
-                * Math.abs(model.optical_spec.parax_data.fod.exp_radius);
-
         var traced = model.seq_model.trace_contrast(
                 (rays, field, wvl, focus) -> {
                     assertNull(rays.referenceError());
@@ -48,7 +45,11 @@ class ContrastAnalysisTest {
                 }, fieldIndex, wavelengthIndex, 1, 6,
                 new Vector2(normalizedShift, 0.0),
                 new Vector2(0.0, normalizedShift),
-                new TraceOptions(), true);
+                40.0, new TraceOptions(), true);
+
+        double physicalShift = org.redukti.rayoptics.raytr.ExitPupilAiming
+                .referenceSphereShift(model, model.optical_spec.fov.fields[fieldIndex],
+                        wavelength, 40.0);
 
         double tolerance = Math.max(1.0e-9,
                 Math.abs(model.optical_spec.parax_data.fod.exp_radius) * 2.0e-7);

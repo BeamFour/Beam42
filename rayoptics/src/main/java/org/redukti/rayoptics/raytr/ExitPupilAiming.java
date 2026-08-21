@@ -18,6 +18,31 @@ public final class ExitPupilAiming {
     private ExitPupilAiming() {
     }
 
+    /**
+     * Physical separation on the finite reference sphere corresponding to an
+     * image-space spatial frequency.
+     *
+     * <p>Two image-space ray directions form fringes of frequency {@code nu} when
+     * {@code n*|delta d| = lambda*nu}. On a reference sphere of radius {@code R},
+     * the corresponding pupil-coordinate separation is {@code R*lambda*nu/n}.
+     * This avoids converting through the paraxial exit-pupil radius and f-number.
+     */
+    public static double referenceSphereShift(
+            OpticalModel opticalModel, Field field, double wavelength,
+            double spatialFrequency) {
+        if (field.ref_sphere == null
+                || M.is_kinda_big(field.ref_sphere.ref_sphere_radius)) {
+            throw new IllegalArgumentException("Finite reference sphere required");
+        }
+        double wavelengthInSystemUnits = opticalModel.nm_to_sys_units(wavelength);
+        double imageIndex = Math.abs(opticalModel.optical_spec.parax_data.fod.n_img);
+        if (!(imageIndex > 0.0)) {
+            throw new IllegalArgumentException("Positive image-space index required");
+        }
+        return wavelengthInSystemUnits * Math.abs(spatialFrequency)
+                * Math.abs(field.ref_sphere.ref_sphere_radius) / imageIndex;
+    }
+
     /** Result of aiming one ray at a transverse coordinate on the reference sphere. */
     public record Result(Vector2 pupil, RayResult ray, Vector3 exitCoordinate,
                          int iterations, double error) {

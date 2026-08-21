@@ -927,13 +927,14 @@ public class SequentialModel {
             Vector2 sagittal_shift, Vector2 tangential_shift,
             TraceOptions trace_options) {
         return trace_contrast(callback, fi, wl, num_rings, num_spokes,
-                sagittal_shift, tangential_shift, trace_options, false);
+                sagittal_shift, tangential_shift, 0.0, trace_options, false);
     }
 
     public <T> List<ContrastTraceByWvl<T>> trace_contrast(
             ContrastTraceCallback<T> callback, int fi, Integer wl,
             int num_rings, Integer num_spokes,
             Vector2 sagittal_shift, Vector2 tangential_shift,
+            double spatial_frequency,
             TraceOptions trace_options, boolean aim_exit_pupil) {
         var osp = opt_model.optical_spec;
         var wavelengths = osp.wvls.wavelengths;
@@ -955,9 +956,18 @@ public class SequentialModel {
                     opt_model, field, wavelength, focus, referenceImagePoint, null);
             field.chief_ray = coordinates.chief_ray_pkg;
             field.ref_sphere = coordinates.ref_sphere;
+            Vector2 sagittalExitShift = null;
+            Vector2 tangentialExitShift = null;
+            if (aim_exit_pupil) {
+                double physicalShift = ExitPupilAiming.referenceSphereShift(
+                        opt_model, field, wavelength, spatial_frequency);
+                sagittalExitShift = new Vector2(physicalShift, 0.0);
+                tangentialExitShift = new Vector2(0.0, physicalShift);
+            }
             var rays = Trace.trace_contrast(
                     opt_model, definition, num_spokes,
                     sagittal_shift, tangential_shift,
+                    sagittalExitShift, tangentialExitShift,
                     field, wavelength, trace_options, aim_exit_pupil);
             var samples = new ArrayList<T>(rays.size());
             for (var ray : rays) {

@@ -359,21 +359,38 @@ Beam42 traces a reference sample at `p` and a partner at `p + delta`, instead of
 symmetric `p - delta/2` and `p + delta/2` notation above. A translation of the integration
 variable makes these equivalent over the common overlap. For image-space frequency
 `nu`, wavelength `lambda` expressed in system units, and working f-number `F#`, the
-normalized separation is
+traditional normalized entrance-pupil separation is
 
 ```text
 delta = 2 lambda F# nu
 ```
 
-and Beam42 asks for the following physical vector on the exit-pupil reference sphere:
+This remains the initial guess supplied to the inverse aiming solve. The physical target
+is derived directly on the field- and wavelength-specific reference sphere. Two
+image-space directions form fringes of frequency `nu` when
 
 ```text
-Delta X_sag = R_exit (delta, 0)
-Delta X_tan = R_exit (0, delta)
+n_img |Delta d| = lambda nu.
 ```
 
-where `R_exit` is the paraxial exit-pupil radius and `X(u)` is the reference-sphere
-coordinate reached by a ray launched at normalized entrance-pupil coordinate `u`.
+On a reference sphere of radius `R`, the corresponding pupil-coordinate separation is
+
+```text
+Delta = |R| lambda nu / |n_img|,
+```
+
+so Beam42 asks for
+
+```text
+Delta X_sag = (Delta, 0)
+Delta X_tan = (0, Delta).
+```
+
+Earlier versions multiplied `delta` by the paraxial exit-pupil radius. That is equivalent
+only under the paraxial identity `|R| = 2 |n_img| F# R_exit`. Using `R` directly avoids
+mixing a field-specific traced reference sphere with a paraxial pupil radius. `X(u)` is
+the reference-sphere coordinate reached by a ray launched at normalized entrance-pupil
+coordinate `u`.
 
 #### Reference-sphere coordinate
 

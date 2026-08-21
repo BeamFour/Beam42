@@ -43,7 +43,7 @@ class US003549241Example05Test {
                         (rays, field, wvl, focus) -> rays,
                         fieldIndex, wavelengthIndex, 6, 12,
                         new Vector2(shift, 0.0), new Vector2(0.0, shift),
-                        new TraceOptions(), true);
+                        20.0, new TraceOptions(), true);
                 for (var rays : traced.get(0).samples()) {
                     String context = "field=" + fields[fieldIndex]
                             + ", wavelength=" + wavelength + ", pupil=" + rays.pupil();
@@ -63,8 +63,6 @@ class US003549241Example05Test {
         double wavelength = model.optical_spec.wvls.wavelengths[wavelengthIndex];
         double normalizedShift = ContrastAnalysis.normalized_entry_pupil_shift(
                 model, wavelength, 40.0);
-        double requestedShift = normalizedShift
-                * Math.abs(model.optical_spec.parax_data.fod.exp_radius);
         Vector2 sagittalShift = new Vector2(normalizedShift, 0.0);
         Vector2 tangentialShift = new Vector2(0.0, normalizedShift);
         Field field = model.optical_spec.fov.fields[fieldIndex];
@@ -72,11 +70,11 @@ class US003549241Example05Test {
         var unaimed = model.seq_model.trace_contrast(
                 US003549241Example05Test::exitPupilSeparations,
                 fieldIndex, wavelengthIndex, 1, 6,
-                sagittalShift, tangentialShift, new TraceOptions(), false);
+                sagittalShift, tangentialShift, 40.0, new TraceOptions(), false);
         var aimed = model.seq_model.trace_contrast(
                 US003549241Example05Test::exitPupilSeparations,
                 fieldIndex, wavelengthIndex, 1, 6,
-                sagittalShift, tangentialShift, new TraceOptions(), true);
+                sagittalShift, tangentialShift, 40.0, new TraceOptions(), true);
 
         var calibrationOptions = new ContrastOptions(40.0).calibrate_frequency(true);
         double sagittalScale = ContrastAnalysis.exit_pupil_frequency_calibration(
@@ -87,7 +85,14 @@ class US003549241Example05Test {
                 US003549241Example05Test::exitPupilSeparations,
                 fieldIndex, wavelengthIndex, 1, 6,
                 sagittalShift.times(sagittalScale), tangentialShift.times(tangentialScale),
-                new TraceOptions(), false);
+                40.0, new TraceOptions(), false);
+
+        double requestedShift = org.redukti.rayoptics.raytr.ExitPupilAiming
+                .referenceSphereShift(model, field, wavelength, 40.0);
+        double legacyParaxialShift = normalizedShift
+                * Math.abs(model.optical_spec.parax_data.fod.exp_radius);
+        assertTrue(Math.abs(requestedShift - legacyParaxialShift) > 0.01,
+                "wide-angle reference-sphere scale should differ from the paraxial pupil scale");
 
         double unaimedError = maxSeparationError(unaimed.get(0).samples(), requestedShift);
         double calibratedError = maxSeparationError(
@@ -98,15 +103,16 @@ class US003549241Example05Test {
                 "unaimed shear should expose pupil mapping error: " + unaimedError);
         assertTrue(calibratedError < unaimedError * 0.2,
                 "block calibration should materially improve the shear: " + calibratedError);
-        assertTrue(calibratedError > 0.05,
+        assertTrue(calibratedError > 0.02,
                 "block calibration should retain its across-pupil approximation error: "
                         + calibratedError);
         assertTrue(aimedError < 2.0e-6,
                 "aimed shear should reach the reference-sphere target: " + aimedError);
         assertTrue(aimedError * 100_000.0 < unaimedError,
                 "aiming should improve full-field shear by at least five orders of magnitude");
-        assertTrue(aimedError * 50_000.0 < calibratedError,
-                "direct aiming should be substantially more accurate than block calibration");
+        assertTrue(aimedError * 10_000.0 < calibratedError,
+                "direct aiming should be substantially more accurate than block calibration: "
+                        + aimedError + " against " + calibratedError);
     }
 
     private static double[] exitPupilSeparations(

@@ -760,7 +760,8 @@ public class Trace {
             Vector2 sagittal_shift, Vector2 tangential_shift,
             Field fld, double wvl, TraceOptions trace_options) {
         return trace_contrast(opt_model, grid_rng, num_spokes,
-                sagittal_shift, tangential_shift, fld, wvl, trace_options, false);
+                sagittal_shift, tangential_shift, null, null,
+                fld, wvl, trace_options, false);
     }
 
     /**
@@ -770,8 +771,14 @@ public class Trace {
     public static List<ContrastRayTriplet> trace_contrast(
             OpticalModel opt_model, TraceRingsDef grid_rng, Integer num_spokes,
             Vector2 sagittal_shift, Vector2 tangential_shift,
+            Vector2 sagittal_exit_shift, Vector2 tangential_exit_shift,
             Field fld, double wvl, TraceOptions trace_options,
             boolean aim_exit_pupil) {
+        if (aim_exit_pupil
+                && (sagittal_exit_shift == null || tangential_exit_shift == null)) {
+            throw new IllegalArgumentException(
+                    "Physical exit-pupil shifts are required when aiming is enabled");
+        }
         trace_options = trace_options.copy();
         // The quadrature generator explicitly maps samples into the physical
         // vignetted pupil. Applying Field vignetting in trace_base as well
@@ -804,13 +811,12 @@ public class Trace {
                     sagittal = new RayResult(null, error);
                     tangential = new RayResult(null, error);
                 } else {
-                    double exitRadius = Math.abs(opt_model.optical_spec.parax_data.fod.exp_radius);
                     var sagittalTarget = new Vector2(
-                            referenceCoordinate.x + sagittal_shift.x * exitRadius,
-                            referenceCoordinate.y + sagittal_shift.y * exitRadius);
+                            referenceCoordinate.x + sagittal_exit_shift.x,
+                            referenceCoordinate.y + sagittal_exit_shift.y);
                     var tangentialTarget = new Vector2(
-                            referenceCoordinate.x + tangential_shift.x * exitRadius,
-                            referenceCoordinate.y + tangential_shift.y * exitRadius);
+                            referenceCoordinate.x + tangential_exit_shift.x,
+                            referenceCoordinate.y + tangential_exit_shift.y);
                     sagittal = ExitPupilAiming.aim(opt_model, sagittalPupil, sagittalTarget,
                             fld, wvl, trace_options).ray();
                     tangential = ExitPupilAiming.aim(opt_model, tangentialPupil, tangentialTarget,

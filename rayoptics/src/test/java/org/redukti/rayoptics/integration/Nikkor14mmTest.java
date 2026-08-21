@@ -180,18 +180,20 @@ public class Nikkor14mmTest {
         double wavelength = osp.wvls.wavelengths[wavelengthIndex];
         double normalizedShift = ContrastAnalysis.normalized_entry_pupil_shift(
                 opm, wavelength, 40.0);
-        double requestedShift = normalizedShift * Math.abs(fod.exp_radius);
         Vector2 sagittalShift = new Vector2(normalizedShift, 0.0);
         Vector2 tangentialShift = new Vector2(0.0, normalizedShift);
 
         var unaimed = sm.trace_contrast(
                 Nikkor14mmTest::exitPupilSeparations,
                 fieldIndex, wavelengthIndex, 1, 6,
-                sagittalShift, tangentialShift, new TraceOptions(), false);
+                sagittalShift, tangentialShift, 40.0, new TraceOptions(), false);
         var aimed = sm.trace_contrast(
                 Nikkor14mmTest::exitPupilSeparations,
                 fieldIndex, wavelengthIndex, 1, 6,
-                sagittalShift, tangentialShift, new TraceOptions(), true);
+                sagittalShift, tangentialShift, 40.0, new TraceOptions(), true);
+
+        double requestedShift = ExitPupilAiming.referenceSphereShift(
+                opm, osp.fov.fields[fieldIndex], wavelength, 40.0);
 
         double unaimedError = maxSeparationError(unaimed.get(0).samples(), requestedShift);
         double aimedError = maxSeparationError(aimed.get(0).samples(), requestedShift);

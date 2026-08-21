@@ -7,7 +7,7 @@ Angle of View	33.44	12.72
 F-Number	2.9	2.9
 Image Height	43.28	43.28
 Magnification	0	0
-Bf	37.13	37.13
+Bf	37.13	37.115
 d5	1.48	42.97
 d9	8.46	13.14
 d11	20.31	1.81

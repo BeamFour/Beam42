@@ -17,7 +17,7 @@ na obj        3.345e-09
 n obj             1.000
 img_dist          37.12
 img_ht            21.62
-exp_dist         -88.85
+exp_dist         -88.84
 exp_radius        21.72
 na img          -0.1725
 n img             1.000

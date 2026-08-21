@@ -1,4 +1,8 @@
 # Canon RF 70-200mm F2.8 L IS USM
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|JP | JP 2021-056407 | 3 | 2019 | Makoto Nakahara,Shunji Iwamoto,Masato Katayose | Canon Inc | [link](https://patents.google.com/patent/JP2021056407A/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 

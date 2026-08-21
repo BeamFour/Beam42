@@ -71,6 +71,15 @@ originX	17.56
 originY	111.98
 ppmm	2.265
 [notes]
+[patent info]
+country	JP
+number	JP 2021-056407
+example	3
+year applied	2019
+inventors	Makoto Nakahara,Shunji Iwamoto,Masato Katayose
+current assignee	Canon Inc
+original assignee	Canon Inc
+link	https://patents.google.com/patent/JP2021056407A/en
 [report data]
 lens name	Canon RF 70-200mm F2.8 L IS USM
 scenarios	0	2

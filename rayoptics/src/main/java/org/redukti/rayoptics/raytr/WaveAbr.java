@@ -277,11 +277,12 @@ public class WaveAbr {
         var J = p_coord.dot(p_coord)/ref_sphere_radius - 2.0*ref_dir.dot(p_coord);
 
         var sign_soln = ref_dir.z*Lists.get(cr.ray,-1).d.z < 0 ? -1 : 1;
-        var denom = F + sign_soln*Math.sqrt(F*F + J/ref_sphere_radius);
+        var denom = F + sign_soln*Math.sqrt(F*F - J/ref_sphere_radius);
         var ep = denom == 0 ? 0.0  : J/denom;
 
         var n_obj = Math.abs(fod.n_obj);
         var n_img = Math.abs(fod.n_img);
+        // OPD = -n_obj e1 + (cr_op - ray_op) + n_img(ekp - ep)
         var opd = -n_obj*e1 - ray_op + n_img*ekp + cr_op - n_img*ep;
 
         return opd;

@@ -14,6 +14,8 @@ import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.Pair;
 
+import java.util.List;
+
 public class WaveAbr {
 
     /**
@@ -238,52 +240,52 @@ public class WaveAbr {
      *         opd: OPD of ray wrt chief ray at **fld**
      */
     private static double wave_abr_full_calc_finite_pup(FirstOrderData fod, Field fld, double wvl, double foc, RayPkg ray_pkg, ChiefRayPkg chief_ray_pkg, ReferenceSphere ref_sphere) {
-        var image_pt = ref_sphere.image_pt;
-        var ref_dir = ref_sphere.ref_dir;
-        var ref_sphere_radius = ref_sphere.ref_sphere_radius;
-        var lcl_tfrm_last = ref_sphere.lcl_tfrm_last;
-        var cr = chief_ray_pkg.chief_ray;
-        var cr_exp_seg = chief_ray_pkg.cr_exp_seg;
-        var cr_ray = cr.ray;
-        var cr_op = cr.op_delta;
-        wvl = cr.wvl;
-        var cr_exp_pt =  cr_exp_seg.exp_pt;
-        var cr_exp_dir = cr_exp_seg.exp_dir;
-        var cr_exp_dist = cr_exp_seg.exp_dst;
-        var ifc = cr_exp_seg.ifc;
-        var cr_b4_pt = cr_exp_seg.b4_pt;
-        var cr_b4_dir = cr_exp_seg.b4_dir;
-        var ray = ray_pkg.ray;
-        var ray_op = ray_pkg.op_delta;
-        wvl = ray_pkg.wvl;
+        Vector3 ref_dir = ref_sphere.ref_dir;
+        double ref_sphere_radius = ref_sphere.ref_sphere_radius;
+        RayPkg cr = chief_ray_pkg.chief_ray;
+        ChiefRayExitPupilSegment cr_exp_seg = chief_ray_pkg.cr_exp_seg;
+        List<RaySeg> cr_ray = cr.ray;
+        double cr_op = cr.op_delta;
+        Vector3 cr_exp_pt =  cr_exp_seg.exp_pt;
+        double cr_exp_dist = cr_exp_seg.exp_dst;
+        Interface ifc = cr_exp_seg.ifc;
+        List<RaySeg> ray = ray_pkg.ray;
+        double ray_op = ray_pkg.op_delta;
 
-        int k = -2; // last interface in sequence
+        final int k = -2; // last interface in sequence
 
         // eq 3.12
-        var e1 = eic_distance(new RayData(ray.get(1).p, ray.get(0).d),
+        double e1 = eic_distance(new RayData(ray.get(1).p, ray.get(0).d),
                               new RayData(cr_ray.get(1).p, cr_ray.get(0).d));
         // eq 3.13
-        var ekp = eic_distance(new RayData(Lists.get(ray,k).p, Lists.get(ray,k).d),
+        double ekp = eic_distance(new RayData(Lists.get(ray,k).p, Lists.get(ray,k).d),
                               new RayData(Lists.get(cr_ray,k).p, Lists.get(cr_ray,k).d));
 
-        var tafter =Transform.transform_after_surface(ifc, new RayData(Lists.get(ray,k).p,Lists.get(ray,k).d));
-        var b4_pt = tafter.pt;
-        var b4_dir = tafter.dir;
-        var dst = ekp - cr_exp_dist;
-        var eic_exp_pt = b4_pt.minus(b4_dir.times(dst));
-        var p_coord = eic_exp_pt.minus(cr_exp_pt);
+        RayData tafter =Transform.transform_after_surface(ifc, new RayData(Lists.get(ray,k).p,Lists.get(ray,k).d));
+        // cr_exp_pt = Ē′ in HH paper
+        // eic_exp_pt = B̃′ in HH paper
+        Vector3 b4_pt = tafter.pt;                  // Test-ray point at the last optical surface, expressed in image-gap coordinates
+        Vector3 b4_dir = tafter.dir;                // Test-ray direction after the last optical surface, expressed in image-gap coordinates
+        // -dst = cr_exp_dist - ekp is the signed distance from b4_pt to B̃′ along b4_dir.
+        double dst = ekp - cr_exp_dist;
+        Vector3 eic_exp_pt = b4_pt.minus(b4_dir.times(dst));    // B̃′: EIC point on the test ray near the exit pupil
+        Vector3 p_coord = eic_exp_pt.minus(cr_exp_pt);          // Vector Ē′B̃′ = B̃′ - Ē′
 
-        var F = ref_dir.dot(b4_dir) - b4_dir.dot(p_coord)/ref_sphere_radius;
-        var J = p_coord.dot(p_coord)/ref_sphere_radius - 2.0*ref_dir.dot(p_coord);
+        // eq 4.4
+        double F = ref_dir.dot(b4_dir) - b4_dir.dot(p_coord)/ref_sphere_radius;
+        // eq 4.5
+        double J = p_coord.dot(p_coord)/ref_sphere_radius - 2.0*ref_dir.dot(p_coord);
 
-        var sign_soln = ref_dir.z*Lists.get(cr.ray,-1).d.z < 0 ? -1 : 1;
-        var denom = F + sign_soln*Math.sqrt(F*F - J/ref_sphere_radius);
-        var ep = denom == 0 ? 0.0  : J/denom;
+        double sign_soln = ref_dir.z*Lists.get(cr.ray,-1).d.z < 0 ? -1 : 1;
+        // denominator in eq 4.6
+        double denom = F + sign_soln*Math.sqrt(F*F - J/ref_sphere_radius);
+        // Eq 4.6: signed distance e′ from B̃′ along the test ray to its reference-sphere intersection B′.
+        double ep = denom == 0 ? 0.0  : J/denom;
 
-        var n_obj = Math.abs(fod.n_obj);
-        var n_img = Math.abs(fod.n_img);
+        double n_obj = Math.abs(fod.n_obj);
+        double n_img = Math.abs(fod.n_img);
         // OPD = -n_obj e1 + (cr_op - ray_op) + n_img(ekp - ep)
-        var opd = -n_obj*e1 - ray_op + n_img*ekp + cr_op - n_img*ep;
+        double opd = -n_obj*e1 - ray_op + n_img*ekp + cr_op - n_img*ep;
 
         return opd;
     }

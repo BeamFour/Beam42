@@ -11,6 +11,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /** Regression tests for the finite-reference-sphere correction in {@link WaveAbr}. */
 class WaveAbrFinitePupilTest {
 
+    /**
+     * Small debugger entry point for following one off-axis sample through
+     * wave_abr_full_calc_finite_pup().
+     */
+    @Test
+    void calculatesFinitePupilOpdForSingleOffAxisSampleRay() {
+        var fixture = tracedOffAxisRay();
+        var fod = fixture.model.optical_spec.parax_data.fod;
+        var field = fixture.field;
+        var sampleRay = fixture.ray;
+        var chiefRay = fixture.setup.chief_ray_pkg;
+        var referenceSphere = fixture.setup.ref_sphere;
+
+        // wave_abr_full_calc() dispatches to wave_abr_full_calc_finite_pup()
+        // because this fixture has a finite reference-sphere radius. Put a
+        // breakpoint on the following line and step into that private method.
+        double opd = WaveAbr.wave_abr_full_calc(fod, field, fixture.wavelength,
+                fixture.focus, sampleRay, chiefRay, referenceSphere);
+
+        assertTrue(Double.isFinite(referenceSphere.ref_sphere_radius));
+        assertTrue(Double.isFinite(opd));
+    }
+
     @Test
     void hopkinsDiscriminantPlacesChordPointOnReferenceSphere() {
         var fixture = tracedOffAxisRay();

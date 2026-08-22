@@ -57,8 +57,18 @@ The generated test asserts, in separate methods so a failure names the layer tha
 | `paraxial_rays` | `ax` and `pr` ray `ht`, `slp`, `aoi` per surface |
 | `vignetting_factors` | `vlx`, `vux`, `vly`, `vuy` per field |
 | `chief_ray_aiming` | `z_enp` for wide angle models, the aim point otherwise |
+| `ray_trace_f<field>_p<pupil>` | full ray segments through every surface - point, direction, distance, surface normal - plus `op_delta` |
 | `aberration_fans` | transverse ray aberration and OPD per field, wavelength, x/y fan and ray |
 | `seidel_coefficients` | per surface including aspheric contributions, plus the sum |
+
+`ray_trace_*` is the only assertion that reaches the trace kernel directly - `bend`,
+`reflect`, the surface intersections and the per-surface transforms. Everything else
+exercises those through aggregates, where a defect shows up indirectly if at all. One test
+method is emitted per ray: a single method holding every assertion would run to thousands of
+statements and risk the 64KB limit on compiled method size, and splitting means a failure
+names which ray diverged. `RAY_PUPILS` in `dump_reference.py` controls how many rays; one is
+enough to detect a kernel regression, the rest add diagnostic breadth at the cost of
+generated file size.
 
 `aberration_fans` is the one the optimizer leans on most — its ray-aberration and MTF goals
 are built on those quantities, so a regression there shows up as a moved optimum rather than
@@ -70,11 +80,26 @@ and OPD is compared in waves on both sides.
 angle model. Vignetting depends on it too, but only at solver tolerance, so without this a
 regression in the wide angle search could slip through.
 
-Tolerances are split by kind. Analytic quantities use 1e-12 relative; in practice they agree
-bit for bit. Vignetting and aiming use 1e-6, which is not an arbitrary loosening — it is the
-tolerance the vignetting search itself converges to, since `iterate_pupil_ray` and upstream's
-`newton` both stop at `|p - p1| < 1e-6`. Two correct implementations can land either side of
-a root pinned only that far. Measured residual is around 7e-8.
+Tolerances are split by kind, and none of them is an arbitrary loosening.
+
+Analytic quantities use 1e-12 relative; in practice they agree bit for bit.
+
+Vignetting and aiming use 1e-6, the tolerance the vignetting search itself converges to:
+`iterate_pupil_ray` and upstream's `newton` both stop at `|p - p1| < 1e-6`, so two correct
+implementations can land either side of a root pinned only that far. Measured residual is
+around 7e-8.
+
+Ray data also uses 1e-6, because it is downstream of *two* iterated solves — `iterate_ray`
+for the chief ray aim point and `calc_vignetted_ray` for the vignetting factors — and can be
+no more exact than the starting ray it is traced from. The residual propagates linearly
+rather than amplifying: on the Otus outer field `vuy` differs by 6.7e-8 relative, giving
+3.4e-8 on the pupil coordinate, which over a 17.5mm entrance pupil radius is 5.9e-7mm of ray
+height, against a largest observed difference of 5.7e-7. `op_delta` agrees to a few times
+1e-9. All of it remains six orders tighter than any real kernel defect would produce.
+
+Worth knowing if you are tempted to tighten these: tracing with `apply_vignetting=False` does
+*not* buy precision, because the aim point is still iterated, and it costs coverage — unscaled
+marginal rays at the outer fields get blocked and drop out of the comparison.
 
 Add a new lens by running the script and committing the result. Pick lenses that exercise
 something distinct — the current four cover the three aspheric coefficient conventions plus

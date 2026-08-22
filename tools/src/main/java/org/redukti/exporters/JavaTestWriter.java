@@ -28,6 +28,24 @@ public class JavaTestWriter {
      * to the last bit. Compare them as converging to the same root.
      */
     private static final String SOLVER_TOL = "1.0e-6";
+    /**
+     * Ray data cannot be compared more tightly than the starting ray it is
+     * traced from, and that starting ray comes from two iterated results.
+     * trace_base aims through Field.aim_info, which iterate_ray solves for, and
+     * scales the pupil by the vignetting factors, which calc_vignetted_ray
+     * solves for. Neither agrees with upstream beyond solver tolerance.
+     * <p>
+     * The residual propagates linearly rather than amplifying. On the Otus outer
+     * field, vuy differs by 6.7e-8 relative, so the vignetted pupil coordinate
+     * differs by 3.4e-8, which over a 17.5mm entrance pupil radius is 5.9e-7mm
+     * of ray height - and the largest observed ray position difference is
+     * 5.7e-7. op_delta differs by at most a few times 1e-9 relative.
+     * <p>
+     * 1e-6 sits about an order of magnitude above that, and still pins the
+     * kernel: a defect in bend, reflect, the intersections or the transforms
+     * moves ray data by far more than this.
+     */
+    private static final String RAY_TOL = "1.0e-6";
 
     private final String package_name;
     private final String class_name;
@@ -47,6 +65,7 @@ public class JavaTestWriter {
         paraxial(reference, sb);
         vignetting(reference, sb);
         chief_ray_aiming(reference, sb);
+        ray_trace(reference, sb);
         aberration_fans(reference, sb);
         seidel(reference, sb);
         sb.append("}\n");
@@ -260,6 +279,83 @@ public class JavaTestWriter {
             }
         }
         sb.append("    }\n\n");
+    }
+
+    /**
+     * Full ray segments through every surface, per field and pupil point.
+     * <p>
+     * This is the only assertion that reaches the trace kernel directly - bend,
+     * reflect, the surface intersections and the per-surface transforms.
+     * Everything else exercises those through aggregates, where a defect shows
+     * up indirectly if at all.
+     * <p>
+     * Emitted as one test method per ray rather than one for all of them. A
+     * single method holding every assertion would run to thousands of
+     * statements and risk the 64KB limit on compiled method size; splitting
+     * also means a failure names which ray diverged.
+     */
+    private void ray_trace(Map<String, String> ref, StringBuilder sb) {
+        var entries = sorted(ref, "ray.");
+        if (entries.isEmpty())
+            return;
+        // group by field.pupil
+        Map<String, Map<String, String>> rays = new LinkedHashMap<>();
+        for (var e : entries.entrySet()) {
+            var rest = e.getKey().substring("ray.".length());
+            var p = rest.split("\\.", 3);
+            rays.computeIfAbsent(p[0] + "." + p[1], k -> new LinkedHashMap<>())
+                .put(p[2], e.getValue());
+        }
+
+        for (var ray : rays.entrySet()) {
+            var ids = ray.getKey().split("\\.");
+            var fi = ids[0];
+            var pi = ids[1];
+            var values = ray.getValue();
+            var pupil_x = values.get("pupil.x");
+            var pupil_y = values.get("pupil.y");
+            var segments = values.get("num_segments");
+            if (pupil_x == null || pupil_y == null || segments == null)
+                throw new IllegalStateException("Incomplete ray reference for " + ray.getKey());
+
+            sb.append("    @Test\n")
+              .append("    public void ray_trace_f").append(fi).append("_p").append(pi).append("() {\n")
+              .append("        var opm = build();\n")
+              .append("        var fld = opm.optical_spec.fov.fields[").append(fi).append("];\n")
+              .append("        var wvl = opm.seq_model.central_wavelength();\n")
+              .append("        var pkg = Trace.trace_base(opm, new double[]{")
+              .append(literal(pupil_x)).append(", ").append(literal(pupil_y))
+              .append("}, fld, wvl, new TraceOptions());\n")
+              .append("        Assertions.assertEquals(").append(segments)
+              .append(", pkg.ray.size(), \"ray.").append(ray.getKey()).append(" segment count\");\n")
+              .append("        assertClose(\"ray.").append(ray.getKey()).append(".op_delta\", ")
+              .append(literal(values.get("op_delta"))).append(", pkg.op_delta, ")
+              .append(RAY_TOL).append(");\n");
+
+            int count = Integer.parseInt(segments);
+            for (int si = 0; si < count; si++) {
+                sb.append("        var s").append(si).append(" = pkg.ray.get(").append(si).append(");\n");
+                for (var part : new String[][]{{"p", "p"}, {"d", "d"}, {"n", "nrml"}}) {
+                    for (var axis : new String[]{"x", "y", "z"}) {
+                        var key = si + "." + part[0] + "." + axis;
+                        var v = values.get(key);
+                        if (v == null)
+                            continue;
+                        sb.append("        assertClose(\"ray.").append(ray.getKey()).append('.').append(key)
+                          .append("\", ").append(literal(v)).append(", s").append(si)
+                          .append('.').append(part[1]).append('.').append(axis)
+                          .append(", ").append(RAY_TOL).append(");\n");
+                    }
+                }
+                var dst = values.get(si + ".dst");
+                if (dst != null) {
+                    sb.append("        assertClose(\"ray.").append(ray.getKey()).append('.').append(si)
+                      .append(".dst\", ").append(literal(dst)).append(", s").append(si)
+                      .append(".dst, ").append(RAY_TOL).append(");\n");
+                }
+            }
+            sb.append("    }\n\n");
+        }
     }
 
     private void seidel(Map<String, String> ref, StringBuilder sb) {

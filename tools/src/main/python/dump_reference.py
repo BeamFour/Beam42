@@ -31,6 +31,58 @@ def build(path):
 
 FAN_NUM_RAYS = 21
 
+# Relative pupil points traced surface by surface: the chief ray, the upper
+# meridional marginal, and a sagittal marginal that produces skew rays at any
+# non-zero field. Trim this list if the generated tests get unwieldy - one ray
+# is enough to detect a kernel regression, the rest add diagnostic breadth.
+RAY_PUPILS = [(0., 0.), (0., 1.), (1., 0.)]
+
+
+def collect_rays(opm):
+    """Full ray segments and accumulated optical path, per field and pupil point.
+
+    This is the only thing that pins the trace kernel directly - bend, reflect,
+    the surface intersections and the per-surface transforms. Everything else
+    reaches those through aggregates, where a defect shows up indirectly if at
+    all.
+
+    op_delta is the optical path with respect to equally inclined chords, which
+    the chief ray entry (pupil 0,0) covers.
+    """
+    import numpy as np
+    from rayoptics.raytr import trace
+    from rayoptics.raytr.traceerror import TraceError
+
+    out = {}
+    osp = opm['optical_spec']
+    wvl = osp['wvls'].central_wvl
+
+    for fi, fld in enumerate(osp['fov'].fields):
+        for pi, pupil in enumerate(RAY_PUPILS):
+            try:
+                # Vignetting left on, matching the Java TraceOptions default.
+                # Turning it off does not buy any precision - see below - and
+                # costs coverage, since unscaled marginal rays at the outer
+                # fields get blocked and drop out of the comparison entirely.
+                ray, op_delta, _ = trace.trace_base(opm, np.array(pupil), fld, wvl)
+            except TraceError:
+                continue  # a blocked or missed ray has nothing comparable
+            key = f'ray.{fi}.{pi}'
+            # The pupil point is recorded so the generator can emit the same
+            # trace call rather than having to know RAY_PUPILS itself.
+            out[f'{key}.pupil.x'] = float(pupil[0])
+            out[f'{key}.pupil.y'] = float(pupil[1])
+            out[f'{key}.op_delta'] = float(op_delta)
+            out[f'{key}.num_segments'] = len(ray)
+            for si, seg in enumerate(ray):
+                p, d, dst, nrml = seg[0], seg[1], seg[2], seg[3]
+                for axis, v in enumerate('xyz'):
+                    out[f'{key}.{si}.p.{v}'] = float(p[axis])
+                    out[f'{key}.{si}.d.{v}'] = float(d[axis])
+                    out[f'{key}.{si}.n.{v}'] = float(nrml[axis])
+                out[f'{key}.{si}.dst'] = float(dst)
+    return out
+
 
 def collect_fans(opm):
     """Transverse ray aberration and OPD along x and y pupil fans.
@@ -135,6 +187,7 @@ def collect(opm):
             out[f'aim.{i}.y'] = float(aim[1])
 
     out.update(collect_fans(opm))
+    out.update(collect_rays(opm))
 
     from rayoptics.parax.thirdorder import compute_third_order
     df = compute_third_order(opm)

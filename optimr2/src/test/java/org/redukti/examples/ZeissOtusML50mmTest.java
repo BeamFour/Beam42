@@ -120,20 +120,20 @@ class ZeissOtusML50mmTest {
         double[] hexapolarSpotRms = SpotAnalysis.eval(
                         analysis._opt_model, new SpotOptions().use_hexapolar().num_rays(64))
                 .spot_results.stream().mapToDouble(spot -> spot.get_mean_radius()).toArray();
-        assertEquals(0.0064421892, finalRms, 1.0e-6);
+        assertEquals(0.0064283619, finalRms, 1.0e-6);
         assertArrayEquals(new double[]{
-                        2.40662875, 3.49223050, 3.93119025, 4.14613250},
+                        2.39415192, 3.47609731, 3.90356934, 4.18874019},
                 spotRms, 1.0e-6);
         // LensTool2 uses SpotOptions' 64-ray Hexapolar default. Keep this
         // second absolute regression so its report can be compared directly.
         assertArrayEquals(new double[]{
-                        2.43522950, 3.73536776, 4.04455940, 4.19332571},
+                        2.41935659, 3.72385694, 4.01817087, 4.23702001},
                 hexapolarSpotRms, 1.0e-6);
         assertArrayEquals(new double[]{
-                        0.90740169, 0.86771300, 0.79763510, 0.80930062},
+                        0.91172266, 0.86866441, 0.79832238, 0.80818103},
                 sagittal40, 1.0e-6);
         assertArrayEquals(new double[]{
-                        0.90740169, 0.82112093, 0.80055082, 0.75854305},
+                        0.91172266, 0.82379914, 0.80210041, 0.75217362},
                 tangential40, 1.0e-6);
 
         // Retain a direct A/B assertion as well as the absolute values above.

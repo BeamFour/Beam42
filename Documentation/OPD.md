@@ -77,6 +77,9 @@ calculation, not additional physical surfaces traversed by the rays. In particul
 the output chord point `B~'` is near the reference sphere, but the ideal comparison ends
 at `B'`, the exact ray-sphere intersection.
 
+"EIC" is the abbreviation used in the implementation for *equally inclined chord*.
+Hopkins describes this construction, but does not necessarily use the acronym EIC.
+
 The computational decomposition is:
 
 ```text
@@ -198,6 +201,78 @@ actual endpoints lie on the reference sphere rather than at a common point. The 
 equally inclined chord construction still provides the required differential path. It
 locates the auxiliary chord point `B~'` close to the sphere without constructing and
 subtracting the full image-space distances.
+
+### Construction of the output chord point `B~'`
+
+The chief ray first establishes the exit-pupil centre `Ebar'`. In image-gap
+coordinates it is
+
+```text
+Ebar' = cr_b4_pt + cr_b4_dir * cr_exp_dist.
+```
+
+In the implementation this point is `cr_exp_pt`. The quantities `cr_b4_pt` and
+`cr_b4_dir` are respectively the chief-ray point at the last optical surface and its
+outgoing image-space direction. `cr_exp_dist` is the signed distance along that ray to
+the exit-pupil centre.
+
+For the test ray, `b4_pt` is its point at the last optical surface expressed in
+image-gap coordinates, and `b4_dir` is its outgoing direction. The corresponding EIC
+point `B~'` is constructed as
+
+```text
+B~' = b4_pt + b4_dir * (cr_exp_dist - ekp)
+    = b4_pt - b4_dir * (ekp - cr_exp_dist).
+```
+
+The second form is the one used by the code:
+
+```java
+double dst = ekp - cr_exp_dist;
+Vector3 eic_exp_pt = b4_pt.minus(b4_dir.times(dst));
+```
+
+The minus sign therefore does not necessarily mean propagation towards the lens. It
+appears because `dst` is defined in the opposite order: the actual signed distance
+from `b4_pt` to `B~'` is `cr_exp_dist - ekp`.
+
+A negative `cr_exp_dist` is valid. It means that the exit pupil is virtual and is
+found by extending the emerging chief ray backwards from the last surface. This can
+be seen directly from the pupil-crossing calculation. If the chief ray has transverse
+height `h` and transverse direction component `u` after the last surface, then
+
+```text
+h + u*cr_exp_dist = 0,
+cr_exp_dist = -h/u.
+```
+
+The test-ray point `B~'` lies in the same exit-pupil region as `Ebar'`, but the two
+points are not generally in the same plane. The code consequently retains their full
+three-dimensional displacement:
+
+```java
+Vector3 p_coord = eic_exp_pt.minus(cr_exp_pt);
+```
+
+or, in the Hopkins geometry,
+
+```text
+p = B~' - Ebar'.
+```
+
+Thus `p_coord` contains the differences in all three coordinates, including a
+generally non-zero `z` component. It is not merely an `(x,y)` coordinate obtained by
+intersecting every ray with a fixed flat pupil plane.
+
+The code-to-geometry correspondence is:
+
+| Code | Hopkins geometry |
+| --- | --- |
+| `cr_exp_pt` | `Ebar'`, the chief-ray exit-pupil point |
+| `eic_exp_pt` | `B~'`, the EIC point on the test ray |
+| `p_coord` | `B~' - Ebar'`, the three-dimensional chord vector |
+| `ep` | Signed distance `B~'B'` along the test ray |
+| `eic_exp_pt + ep*b4_dir` | `B'`, the test ray's reference-sphere intersection |
 
 ## Exact reference-sphere correction: `ep`
 
@@ -323,7 +398,7 @@ The sphere correction is also the ordinary ray-sphere quadratic used by Optiland
 For coefficients `a = 1`, `b = -2RF`, and `c = RJ`, the standard discriminant
 `b^2 - 4ac` reduces to `4R^2(F^2 - J/R)`.
 
-## Upstream compatibility note
+## Upstream correction
 
 The original Python `ray-optics` implementation historically used
 
@@ -333,7 +408,14 @@ sqrt(F**2 + J/ref_sphere_radius)
 
 in `wave_abr_full_calc_finite_pup()`. With the definitions of `F` and `J` above, direct
 expansion of the sphere equation and the geometric invariant require the minus sign.
-Tests whose purpose is exact comparison with historical upstream numerical results will
-therefore differ when the geometrically exact expression is used. Such compatibility
-expectations should be kept distinct from tests of the reference-sphere invariant until
-the upstream issue is resolved.
+The issue was subsequently acknowledged and corrected upstream. Beam42 likewise uses
+the corrected expression
+
+```python
+sqrt(F**2 - J/ref_sphere_radius)
+```
+
+Historical numerical expectations recorded from the former upstream implementation
+can differ from the corrected results and should be updated or explicitly identified
+as comparisons with the former behaviour. The reference-sphere geometric invariant
+tests the corrected calculation independently of such stored numerical values.

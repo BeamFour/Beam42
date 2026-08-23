@@ -39,6 +39,31 @@ public class GeoMTFByFieldPlot {
             Rgb.rgb_green,
     };
 
+    // Names of the above, in the same order, for describing the plot in text
+    static final String[] FREQ_COLOR_NAMES = {
+            "red",
+            "blue",
+            "black",
+            "magenta",
+            "cyan",
+            "green",
+    };
+
+    /**
+     * Describes which color the plot gives each frequency, e.g. for the default
+     * frequencies "10=red,30=blue,50=black". Kept next to FREQ_COLORS so a
+     * report can never claim a color the plot did not actually use.
+     */
+    public static String freq_legend(int[] freqs) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < freqs.length; i++) {
+            if (i > 0)
+                sb.append(",");
+            sb.append(freqs[i]).append("=").append(FREQ_COLOR_NAMES[i % FREQ_COLOR_NAMES.length]);
+        }
+        return sb.toString();
+    }
+
     public String plot() {
         Plot plot = new Plot();
         plot.set_title("MTF");

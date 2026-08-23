@@ -16,6 +16,13 @@ public final class Args {
     public boolean do_ray_aberrations = false;
     public boolean do_mono_chrome_mtfs = false;
     /**
+     * Spatial frequencies in cycles/mm at which the MTF is reported. The
+     * default is what every report under Examples/ uses, so that lenses stay
+     * comparable across reports; override it only when checking a design
+     * against a manufacturer's own choice of frequencies.
+     */
+    public int[] mtf_freqs = default_mtf_freqs();
+    /**
      * Ray pattern used for spot diagrams, one of the
      * {@link SpotOptions}.PATTERN_* constants. Defaults to hexapolar, which is
      * also {@link SpotOptions}' own default.
@@ -94,6 +101,10 @@ public final class Args {
             else if (arg1.equals("--output-wavelength-mtfs")) {
                 arguments.do_mono_chrome_mtfs = true;
             }
+            else if (arg1.equals("--mtf")) {
+                arguments.mtf_freqs = parse_mtf_freqs(arg2);
+                i++;
+            }
             else if (arg1.equals("--use-spot-pattern")) {
                 arguments.spot_pattern = parse_spot_pattern(arg2);
                 i++;
@@ -126,6 +137,43 @@ public final class Args {
             }
         }
         return arguments;
+    }
+
+    /** The MTF frequencies used by every report under Examples/. */
+    public static int[] default_mtf_freqs() {
+        return new int[] {10, 30, 50};
+    }
+
+    /**
+     * Parses a comma separated list of spatial frequencies in cycles/mm, e.g.
+     * "10,20,40". As with the other typed options a bad value is rejected
+     * rather than defaulted, since silently reporting the standard 10/30/50
+     * would look like a valid answer to a question that was never asked.
+     */
+    public static int[] parse_mtf_freqs(String value) {
+        if (value == null)
+            throw new IllegalArgumentException(
+                    "--mtf requires a comma separated list of frequencies in cycles/mm, e.g. 10,30,50");
+        String[] parts = value.split(",");
+        int[] freqs = new int[parts.length];
+        for (int i = 0; i < parts.length; i++) {
+            String part = parts[i].trim();
+            int freq;
+            try {
+                freq = Integer.parseInt(part);
+            }
+            catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Unrecognized --mtf frequency '" + part
+                        + "' in '" + value + "', expected a comma separated list such as 10,30,50");
+            }
+            if (freq <= 0)
+                throw new IllegalArgumentException("--mtf frequency must be positive, got " + freq);
+            freqs[i] = freq;
+        }
+        if (freqs.length == 0)
+            throw new IllegalArgumentException(
+                    "--mtf requires at least one frequency, e.g. 10,30,50");
+        return freqs;
     }
 
     /**

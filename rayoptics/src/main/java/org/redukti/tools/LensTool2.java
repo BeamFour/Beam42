@@ -131,15 +131,17 @@ public class LensTool2 {
         spotResultsMarkdownTable(spotAnalysisResult,sb);
     }
 
-    public static void addMTFsToREADME(StringBuilder sb,  String scenario_filesuffix) {
+    public static void addMTFsToREADME(StringBuilder sb,  String scenario_filesuffix, int[] mtf_freqs) {
+        // describe the frequencies actually plotted, not the default ones
+        String freq_legend = GeoMTFByFieldPlot.freq_legend(mtf_freqs);
         sb.append("## Polychromatic Geometric MTF\n");
         sb.append(String.format("![Polychromatic Geometrical MTF](./mtf%s.svg)\n", scenario_filesuffix));
-        sb.append("* 10=red,30=blue,50=black cycles/mm\n");
+        sb.append(String.format("* %s cycles/mm\n", freq_legend));
         sb.append("* Solid lines represent sagittal, dashed lines tangential\n");
         sb.append("* To generate above, MTFs for wavelengths 587.5618(d), 486.1327(F), 656.2725(C) were calculated across 10 fields, and then averaged\n");
         sb.append("## Polychromatic Geometric MTF (Weighted)\n");
         sb.append(String.format("![Polychromatic Geometrical MTF Weighted](./mtf-w%s.svg)\n", scenario_filesuffix));
-        sb.append("* 10=red,30=blue,50=black cycles/mm\n");
+        sb.append(String.format("* %s cycles/mm\n", freq_legend));
         sb.append("* Solid lines represent sagittal, dashed lines tangential\n");
         sb.append("* To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average\n");
     }
@@ -199,7 +201,7 @@ public class LensTool2 {
                 mtfs.add(polyMtfForField);
             }
         }
-        int[] freqs = {10,30,50};
+        int[] freqs = arguments.mtf_freqs;
         var mtfResults = new ArrayList<MTFResultByFreq>();
         for (var freq: freqs)
             mtfResults.add(new MTFResultByFreq(mtfs,freq));
@@ -270,8 +272,10 @@ public class LensTool2 {
         if (arguments.specfile == null) {
             System.err.println("Usage: --specfile inputfile [--scenario num] [--dump-system] [--only-d-line] [-o outfilename] [--dont-use-glass-types] \\");
             System.err.println("       [--output-ray-aberration-plots] [--output-wavelength-mtfs] [--auto-size-spot-diagrams] [--do-wideangle-layout] \\");
-            System.err.println("       [--use-spot-pattern " + Args.spot_pattern_names() + "] [--vig-type " + Args.vig_type_names() + "] [--wide-angle|--no-wide-angle]");
+            System.err.println("       [--use-spot-pattern " + Args.spot_pattern_names() + "] [--vig-type " + Args.vig_type_names() + "] [--wide-angle|--no-wide-angle] \\");
+            System.err.println("       [--mtf freq,freq,...]");
             System.err.println("       --scenario defaults to 0");
+            System.err.println("       --mtf takes spatial frequencies in cycles/mm and defaults to 10,30,50, which is what the reports under Examples/ use");
             System.err.println("       Output file will be created in the same location as the specfile");
             System.exit(1);
         }
@@ -313,7 +317,7 @@ public class LensTool2 {
                 addSpotDiagramsToREADME(SB,scenario_filesuffix);
                 addFodToREADME(SB,fod);
                 addSpotReportToREADME(SB,spotAnalysis);
-                addMTFsToREADME(SB,scenario_filesuffix);
+                addMTFsToREADME(SB,scenario_filesuffix,arguments.mtf_freqs);
                 generateMTFs(opm, arguments, fields, prescription.get_wvl_wts(), "mtf", scenario_filesuffix);
                 if (arguments.do_ray_aberrations)
                     generateRayAberrationPlots(opm, arguments, scenario_filesuffix);

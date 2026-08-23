@@ -1,9 +1,11 @@
-package org.redukti.rayoptics.analysis;
+package org.redukti.rayoptics.integration;
 
 import org.junit.jupiter.api.Test;
 import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
-import org.redukti.rayoptics.integration.US003549241Example05;
+import org.redukti.rayoptics.analysis.ContrastAnalysis;
+import org.redukti.rayoptics.analysis.ContrastOptions;
+import org.redukti.rayoptics.raytr.ExitPupilAiming;
 import org.redukti.rayoptics.raytr.VigCalc;
 import org.redukti.rayoptics.specs.FieldSpec;
 import org.redukti.rayoptics.specs.ImageKey;
@@ -87,8 +89,8 @@ class US003549241Example05Test {
                 sagittalShift.times(sagittalScale), tangentialShift.times(tangentialScale),
                 40.0, new TraceOptions(), false);
 
-        double requestedShift = org.redukti.rayoptics.raytr.ExitPupilAiming
-                .referenceSphereShift(model, field, wavelength, 40.0);
+        double requestedShift = ExitPupilAiming.referenceSphereShift(
+                model, field, wavelength, 40.0);
         double legacyParaxialShift = normalizedShift
                 * Math.abs(model.optical_spec.parax_data.fod.exp_radius);
         assertTrue(Math.abs(requestedShift - legacyParaxialShift) > 0.01,
@@ -120,11 +122,11 @@ class US003549241Example05Test {
         assertNull(rays.referenceError());
         assertNull(rays.sagittalError());
         assertNull(rays.tangentialError());
-        Vector3 reference = PupilShear.exit_pupil_sphere_coord(
+        Vector3 reference = ExitPupilAiming.sphere_coord(
                 rays.reference(), field.chief_ray, field.ref_sphere);
-        Vector3 sagittal = PupilShear.exit_pupil_sphere_coord(
+        Vector3 sagittal = ExitPupilAiming.sphere_coord(
                 rays.sagittal(), field.chief_ray, field.ref_sphere);
-        Vector3 tangential = PupilShear.exit_pupil_sphere_coord(
+        Vector3 tangential = ExitPupilAiming.sphere_coord(
                 rays.tangential(), field.chief_ray, field.ref_sphere);
         assertNotNull(reference);
         assertNotNull(sagittal);

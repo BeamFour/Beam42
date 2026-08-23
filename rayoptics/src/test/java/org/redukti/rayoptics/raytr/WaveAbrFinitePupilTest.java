@@ -46,9 +46,10 @@ class WaveAbrFinitePupilTest {
         assertEquals(0.0, residual, 1.0e-11,
                 "F^2 - J/R must put the displaced chord point on the reference sphere");
 
-        // This is the expression presently used by wave_abr_full_calc_finite_pup().
-        // It is retained here to demonstrate that changing '-' to '+' is not an
-        // equivalent sign convention: the resulting point is not on the sphere.
+        // The '+' form is what this calculation used before the sign fix, and what
+        // upstream ray-optics carried until commit 2de1e18 ("Fix sign error in OPD
+        // closing equation. Fixes #221"). It is kept here to demonstrate that the two
+        // are not equivalent sign conventions: the resulting point is not on the sphere.
         double upstreamEp = sphereDistance(geometry, true);
         double upstreamResidual = sphereResidual(geometry, upstreamEp);
         assertTrue(Math.abs(upstreamResidual) > 1.0e-6,
@@ -76,8 +77,9 @@ class WaveAbrFinitePupilTest {
         double actual = WaveAbr.wave_abr_full_calc(fod, fixture.field, fixture.wavelength,
                 fixture.focus, fixture.ray, chief, sphere);
 
-        // This assertion intentionally fails while WaveAbr uses F^2 + J/R. It directly
-        // connects the geometric invariant above to the public OPD calculation.
+        // This connects the geometric invariant above to the public OPD calculation:
+        // it passes only while WaveAbr terminates the ray on the reference sphere, and
+        // would fail if the discriminant reverted to F^2 + J/R.
         assertEquals(expected, actual, 1.0e-12,
                 "finite-pupil OPD must terminate the ray on the reference sphere");
     }

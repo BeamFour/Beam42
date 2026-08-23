@@ -2,6 +2,7 @@ package org.redukti.rayoptics.analysis;
 
 import org.junit.jupiter.api.Test;
 import org.redukti.mathlib.Vector2;
+import org.redukti.rayoptics.raytr.ExitPupilAiming;
 import org.redukti.rayoptics.raytr.Trace;
 import org.redukti.rayoptics.raytr.TraceOptions;
 import org.redukti.rayoptics.util.Orientation;
@@ -28,11 +29,11 @@ class ContrastAnalysisTest {
                     assertNull(rays.referenceError());
                     assertNull(rays.sagittalError());
                     assertNull(rays.tangentialError());
-                    var reference = PupilShear.exit_pupil_sphere_coord(
+                    var reference = ExitPupilAiming.sphere_coord(
                             rays.reference(), field.chief_ray, field.ref_sphere);
-                    var sagittal = PupilShear.exit_pupil_sphere_coord(
+                    var sagittal = ExitPupilAiming.sphere_coord(
                             rays.sagittal(), field.chief_ray, field.ref_sphere);
-                    var tangential = PupilShear.exit_pupil_sphere_coord(
+                    var tangential = ExitPupilAiming.sphere_coord(
                             rays.tangential(), field.chief_ray, field.ref_sphere);
                     assertNotNull(reference);
                     assertNotNull(sagittal);
@@ -47,9 +48,8 @@ class ContrastAnalysisTest {
                 new Vector2(0.0, normalizedShift),
                 40.0, new TraceOptions(), true);
 
-        double physicalShift = org.redukti.rayoptics.raytr.ExitPupilAiming
-                .referenceSphereShift(model, model.optical_spec.fov.fields[fieldIndex],
-                        wavelength, 40.0);
+        double physicalShift = ExitPupilAiming.referenceSphereShift(
+                model, model.optical_spec.fov.fields[fieldIndex], wavelength, 40.0);
 
         double tolerance = Math.max(1.0e-9,
                 Math.abs(model.optical_spec.parax_data.fod.exp_radius) * 2.0e-7);

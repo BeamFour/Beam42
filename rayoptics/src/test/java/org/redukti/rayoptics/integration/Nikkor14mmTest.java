@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.redukti.mathlib.Vector3;
 import org.redukti.mathlib.Vector2;
 import org.redukti.rayoptics.analysis.ContrastAnalysis;
-import org.redukti.rayoptics.analysis.PupilShear;
 import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrderData;
@@ -218,11 +217,11 @@ public class Nikkor14mmTest {
         Assertions.assertNull(rays.referenceError());
         Assertions.assertNull(rays.sagittalError());
         Assertions.assertNull(rays.tangentialError());
-        Vector3 reference = PupilShear.exit_pupil_sphere_coord(
+        Vector3 reference = ExitPupilAiming.sphere_coord(
                 rays.reference(), field.chief_ray, field.ref_sphere);
-        Vector3 sagittal = PupilShear.exit_pupil_sphere_coord(
+        Vector3 sagittal = ExitPupilAiming.sphere_coord(
                 rays.sagittal(), field.chief_ray, field.ref_sphere);
-        Vector3 tangential = PupilShear.exit_pupil_sphere_coord(
+        Vector3 tangential = ExitPupilAiming.sphere_coord(
                 rays.tangential(), field.chief_ray, field.ref_sphere);
         Assertions.assertNotNull(reference);
         Assertions.assertNotNull(sagittal);

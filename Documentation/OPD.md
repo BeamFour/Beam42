@@ -1,7 +1,9 @@
 # Optical path difference and the finite reference sphere
 
 This note explains the finite-pupil optical path difference calculation in
-`WaveAbr.wave_abr_full_calc_finite_pup()`. The calculation follows H. H. Hopkins,
+`WaveAbr.wave_abr_calc_finite_pupil()`, which computes the geometry and returns it as a
+`FinitePupilWaveAberrationResult`. `wave_abr_full_calc_finite_pup()` is the thin wrapper
+that combines those components into the scalar OPD. The calculation follows H. H. Hopkins,
 [Calculation of the aberrations and image assessment for a general optical
 system](https://doi.org/10.1080/713820605), particularly his use of equally inclined
 chords.
@@ -286,7 +288,9 @@ Let
 p = p_coord                 B~' relative to the chief-ray exit-pupil point
 d = b4_dir                  test-ray unit direction after the last surface
 r = ref_dir                 direction toward the reference-sphere centre
-R = ref_sphere_radius       signed sphere radius
+R = ref_sphere_radius       sphere radius (a length, always non-negative:
+                            calculate_reference_sphere() sets it from
+                            ref_sphere_vec.length())
 e = ep                      required signed distance along the test ray.
 ```
 
@@ -382,16 +386,30 @@ discriminant can be hidden.
 
 ## Relationship to exit-pupil aiming
 
-`ExitPupilAiming.chord_coord()` reconstructs the same auxiliary `p_coord` used by the
-finite-pupil OPD calculation. `ExitPupilAiming.sphere_coord()` then computes
+Contrast aiming needs the actual per-ray coordinate on the reference sphere, whereas the
+OPD needs only the scalars `ekp` and `ep`. Both come from the same geometry, so it is
+computed once and shared rather than reconstructed.
 
-```text
-p_coord + ep*b4_dir
+`wave_abr_calc_finite_pupil()` therefore returns `B'` alongside the scalars:
+
+```java
+ray_exit_pupil_coord = p_coord.plus(b4_dir.times(ep));
 ```
 
-because contrast aiming needs the actual per-ray coordinate on the reference sphere.
-`WaveAbr` needs only `ekp` and `ep` for the scalar optical-path calculation. These are
-two consumers of the same geometry.
+as the `ray_exit_pupil_coord` component of `FinitePupilWaveAberrationResult`, expressed
+relative to the chief-ray exit-pupil point `Ebar'`. `ExitPupilAiming.sphere_coord()` is a
+thin accessor over it:
+
+```java
+return WaveAbr.wave_abr_calc_finite_pupil(rayPkg, chiefRayPkg, referenceSphere)
+              .ray_exit_pupil_coord();
+```
+
+so the ray coordinate that `ExitPupilAiming.aim()` drives to its target is by construction
+the same point the OPD is measured to. An earlier arrangement kept a second copy of the
+chord and sphere arithmetic inside `ExitPupilAiming`; that duplication has been removed,
+which matters because the two copies could otherwise disagree about the discriminant sign
+discussed below.
 
 The sphere correction is also the ordinary ray-sphere quadratic used by Optiland's
 [`reference_geometry.py`](https://github.com/optiland/optiland/blob/master/optiland/wavefront/reference_geometry.py#L43).
@@ -408,12 +426,31 @@ sqrt(F**2 + J/ref_sphere_radius)
 
 in `wave_abr_full_calc_finite_pup()`. With the definitions of `F` and `J` above, direct
 expansion of the sphere equation and the geometric invariant require the minus sign.
-The issue was subsequently acknowledged and corrected upstream. Beam42 likewise uses
-the corrected expression
+
+The issue was acknowledged and corrected upstream in ray-optics commit `2de1e18`,
+"Fix sign error in OPD closing equation. Fixes #221" (M. Hayford, 21 August 2026), which
+changed both `waveabr.py` and `waveabr_hhh.py`. Beam42 likewise uses the corrected
+expression
 
 ```python
 sqrt(F**2 - J/ref_sphere_radius)
 ```
+
+Hopkins gives the same root twice, and the second form independently confirms the sign.
+Equation 4.6 is the plain statement used here. Equation 4.21 restates it in reduced
+coordinates, and upstream's `waveabr_hhh.py` implements that form literally:
+
+```python
+ep = J/(F + sqrt(F**2 + J*(n_img*ax_k[slp]*pr_k[slp]*ref_dir[2] / H)))
+```
+
+The `+` there is not a contradiction. Chaining Hopkins 4.8 (`h'/R' = u'_k`) with 2.10
+(`H' = -n_k h' ubar'_k`) identifies the bracketed coefficient
+`n_k u'_k ubar'_k N'/H'` as `-N'/R'`, so the radicand is `F^2 - N'J/R'`. With `N' = 1`
+that is exactly 4.6. `N'` is the z direction cosine of the line from the exit-pupil centre
+to the reference image point, so the two forms diverge only when that direction is
+reversed, as after an odd number of mirrors. Beam42 instead carries the orientation in
+`sign_soln`, outside the radical.
 
 Historical numerical expectations recorded from the former upstream implementation
 can differ from the corrected results and should be updated or explicitly identified

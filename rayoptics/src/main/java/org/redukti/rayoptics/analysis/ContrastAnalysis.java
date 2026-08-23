@@ -139,7 +139,7 @@ public class ContrastAnalysis {
      * need per-ray aiming and is left uncorrected. Cost is four rays per field and
      * wavelength against the couple of hundred used for the samples.
      */
-    static double exit_pupil_frequency_calibration(
+    public static double exit_pupil_frequency_calibration(
             OpticalModel opticalModel, Field field, double wavelength,
             double shift, int axis, ContrastOptions options) {
         if (!options.calibrateFrequency || !(shift > 0.0)) return 1.0;

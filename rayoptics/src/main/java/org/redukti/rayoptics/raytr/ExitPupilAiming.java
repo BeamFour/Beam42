@@ -3,11 +3,9 @@ package org.redukti.rayoptics.raytr;
 import org.redukti.mathlib.M;
 import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
-import org.redukti.rayoptics.elem.transform.Transform;
 import org.redukti.rayoptics.exceptions.TraceException;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.specs.Field;
-import org.redukti.rayoptics.util.Lists;
 
 /** Inverse entrance-to-exit-pupil mapping used by contrast tracing. */
 public final class ExitPupilAiming {
@@ -165,7 +163,7 @@ public final class ExitPupilAiming {
         var testRay = rayPkg.ray;
         if (testRay.size() != chiefRay.size()) return null;
 
-        return WaveAbr.wave_abr_calc_finite_pupil(rayPkg, chiefRayPkg, referenceSphere).ray_exit_pupil_pt();
+        return WaveAbr.wave_abr_calc_finite_pupil(rayPkg, chiefRayPkg, referenceSphere).ray_exit_pupil_coord();
     }
 
     /** A ray traced successfully, but its requested exit-pupil coordinate was not found. */

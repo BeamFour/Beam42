@@ -221,8 +221,8 @@ public class WaveAbr {
 
     /**
      * Given a ray, a chief ray and an image pt, compute the data required to calculate the
-     * optical path difference. A by-product of the calculation is the estimated position where the
-     * aperture ray intersects the exit pupil reference sphere.
+     * optical path difference. A by-product of the calculation is the coordinate of the test ray’s
+     * reference-sphere intersection relative to the chief-ray exit-pupil point.
      *
      *     The main references for the calculations are in the H. H. Hopkins paper
      *     `Calculation of the Aberrations and Image Assessment for a General Optical
@@ -281,21 +281,18 @@ public class WaveAbr {
         // denominator in eq 4.6
         double ep;
         double discriminant = F*F - J/ref_sphere_radius;
-        Vector3 ray_exit_pupil_pt = null;
+        Vector3 ray_exit_pupil_coord = null;
         if (discriminant < 0) {
-            // ep is a small correction so it seems that if we have an error here
-            // it is reasonable to set it to 0 as we do not have an easy way to report an
-            // error.
-            ep = 0;
+            ep = Double.NaN;
         }
         else {
             double denom = F + sign_soln * Math.sqrt(discriminant);
             // Eq 4.6: signed distance e′ from B̃′ along the test ray to its reference-sphere intersection B′.
             ep = denom == 0 ? 0.0 : J / denom;
-            ray_exit_pupil_pt = p_coord.plus(b4_dir.times(ep));
+            ray_exit_pupil_coord = p_coord.plus(b4_dir.times(ep));
         }
         return new FinitePupilWaveAberrationResult(ray_pkg, chief_ray_pkg, ref_sphere,
-                e1, ekp, ep, ray_exit_pupil_pt, ray_op,cr_op);
+                e1, ekp, ep, ray_exit_pupil_coord, ray_op,cr_op);
     }
 
     /**

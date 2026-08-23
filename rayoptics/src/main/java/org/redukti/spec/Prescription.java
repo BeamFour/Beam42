@@ -241,6 +241,35 @@ public class Prescription {
         return build_prescription(specs,use_glass_types,wvls,wts,0);
     }
     /**
+     * The angle of view is not optional: the field of view is derived from it, so a
+     * prescription that omits it fails much further down with a NullPointerException
+     * that names neither the missing entry nor the file it should have been in.
+     * Checking here reports it while the input is still in hand.
+     *
+     * @param specs Specs obtained from OpticalBench format
+     * @param scenario Scenario whose angle of view is wanted
+     * @return The full angle of view in degrees, always positive
+     */
+    private static double require_angle_of_view_in_degrees(OpticalBenchDataImporter.LensSpecifications specs, int scenario) {
+        var view_angles = specs.find_variable("Angle of View");
+        if (view_angles == null)
+            throw new IllegalArgumentException(
+                    "The prescription does not specify 'Angle of View'; add it to the [variable distances] section as the full angle of view in degrees");
+        if (scenario >= view_angles.num_values())
+            throw new IllegalArgumentException(
+                    "The prescription specifies 'Angle of View' for " + view_angles.num_values()
+                            + " scenario(s), but scenario " + scenario + " was requested");
+        // Anything unparseable, such as the 'undefined' placeholder these files use for
+        // scenarios that were never filled in, reads back as 0.0 rather than failing
+        double angle_of_view = specs.get_angle_of_view_in_degrees(scenario);
+        if (!(angle_of_view > 0.0))
+            throw new IllegalArgumentException(
+                    "The prescription specifies 'Angle of View' as '" + view_angles.get_value(scenario)
+                            + "' for scenario " + scenario + "; expected the full angle of view in degrees, which must be positive");
+        return angle_of_view;
+    }
+
+    /**
      * Helper to build a Prescription from OpticalBench file.
      *
      * @param specs Specs obtained from OpticalBench format
@@ -255,7 +284,7 @@ public class Prescription {
         var prescription = new Prescription(
                 specs.get_focal_length(),
                 specs.get_f_number(default_scenario),
-                specs.get_angle_of_view_in_degrees(default_scenario),
+                require_angle_of_view_in_degrees(specs, default_scenario),
                 specs.get_image_height(),
                 wvls,
                 wts);
@@ -360,7 +389,8 @@ public class Prescription {
                 int scenario = _configurations[i];
                 _focal_length_by_scenario[i] = specs.get_focal_length(scenario);
                 _f_number_by_scenario[i] = specs.get_f_number(scenario);
-                _angle_of_views_by_scenario[i] = specs.get_angle_of_view_in_degrees(scenario);
+                // every configured scenario needs its own angle of view, not just the default one
+                _angle_of_views_by_scenario[i] = require_angle_of_view_in_degrees(specs, scenario);
             }
         }
         return this;

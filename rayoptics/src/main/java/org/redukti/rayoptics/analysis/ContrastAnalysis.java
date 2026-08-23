@@ -208,39 +208,7 @@ public class ContrastAnalysis {
                 rays.pupil(), sagittal, tangential, rays.weight(), valid,
                 valid ? null : new ContrastAnalysisResult.Failure(
                         "OPD", "NonFiniteWavefrontDifference", -1));
-
-        if (!options.measureFrequency) return sample;
-        var shear = measure_shear(opticalModel, rays, field, wavelength);
-        sample = sample.withShear(shear);
         return sample;
-    }
-
-    /**
-     * The exit-pupil coordinate of the reference ray, the shear its two partners actually
-     * produced there, and the spatial frequency each pair realised.
-     *
-     * <p>The chief ray and reference sphere on {@code field} are the ones the OPD
-     * evaluation just used, so the pupil coordinates are consistent with the wavefront
-     * differences they accompany.
-     */
-    static ContrastAnalysisResult.Shear measure_shear(
-            OpticalModel opticalModel, ContrastRayTriplet rays,
-            org.redukti.rayoptics.specs.Field field, double wavelength) {
-        var chiefRay = field.chief_ray;
-        var refSphere = field.ref_sphere;
-        var reference = PupilShear.exit_pupil_coord(rays.reference(), chiefRay, refSphere);
-        var sagittal = PupilShear.exit_pupil_coord(rays.sagittal(), chiefRay, refSphere);
-        var tangential = PupilShear.exit_pupil_coord(rays.tangential(), chiefRay, refSphere);
-        var sagittalFrequency = PupilShear.realized_frequency(
-                opticalModel, rays.reference(), rays.sagittal(), wavelength, Orientation.X);
-        var tangentialFrequency = PupilShear.realized_frequency(
-                opticalModel, rays.reference(), rays.tangential(), wavelength, Orientation.Y);
-        return new ContrastAnalysisResult.Shear(
-                reference,
-                reference != null && sagittal != null ? sagittal.minus(reference) : null,
-                reference != null && tangential != null ? tangential.minus(reference) : null,
-                sagittalFrequency != null ? sagittalFrequency : Double.NaN,
-                tangentialFrequency != null ? tangentialFrequency : Double.NaN);
     }
 
     private static ContrastAnalysisResult.Failure failure(ContrastRayTriplet rays) {

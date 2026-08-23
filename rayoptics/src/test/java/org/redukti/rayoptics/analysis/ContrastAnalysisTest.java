@@ -160,36 +160,4 @@ class ContrastAnalysisTest {
         assertTrue(Math.abs(unchecked - 1.0) > 1.0e-6,
                 "disabling aperture checks should allow the calibration probes to trace");
     }
-
-    @Test
-    void measuringFrequencyReportsRealisedShearWithoutChangingResiduals() {
-        var model = MtfTest.buildTestModel();
-        var plain = ContrastAnalysis.eval(model, new ContrastOptions(40.0).num_rings(2).num_spokes(6));
-        var measured = ContrastAnalysis.eval(model,
-                new ContrastOptions(40.0).num_rings(2).num_spokes(6).measure_frequency(true));
-
-        for (int f = 0; f < plain.fields.size(); f++) {
-            for (int w = 0; w < plain.fields.get(f).wavelengths().size(); w++) {
-                var before = plain.fields.get(f).wavelengths().get(w).samples();
-                var after = measured.fields.get(f).wavelengths().get(w).samples();
-                for (int i = 0; i < before.size(); i++) {
-                    assertEquals(before.get(i).sagittalDifference(),
-                            after.get(i).sagittalDifference(), 0.0,
-                            "measurement alone must not change a residual");
-                    assertEquals(before.get(i).tangentialDifference(),
-                            after.get(i).tangentialDifference(), 0.0);
-                    var shear = after.get(i).shear();
-                    assertNotNull(shear, "measurement should populate the shear");
-                    assertNotNull(shear.pupilCoord());
-                    assertTrue(Double.isFinite(shear.sagittalFrequency()));
-                    assertTrue(Double.isFinite(shear.tangentialFrequency()));
-                    // The realised frequency is close to, but not equal to, the request:
-                    // that gap is what normalisation corrects.
-                    assertTrue(Math.abs(shear.sagittalFrequency() / 40.0 - 1.0) < 0.5,
-                            "realised frequency should be within the usable band of the request");
-                }
-                assertNull(before.get(0).shear(), "shear is not measured unless asked for");
-            }
-        }
-    }
 }

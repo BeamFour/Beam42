@@ -13,11 +13,6 @@
         <module>beam42</module>
         <module>rayoptics</module>
         <module>mathlib</module>
-        <module>render</module>
-        <module>tools</module>
-        <module>optimcommon</module>
-        <module>optimr</module>
-        <module>optimr2</module>
     </modules>
 
     <!-- Optionally define shared properties or dependency versions -->

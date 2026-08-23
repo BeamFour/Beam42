@@ -68,10 +68,8 @@ public class VigCalc {
         var stop_surf = sm.stop_surface;
         if (stop_surf != null && include_list.contains(stop_surf)) {
             Double max_ap = max_aperture_at_surf(List.of(rayset.get(0)),stop_surf);
-            if (max_ap != null) {
-                System.out.println("Setting stop aperture to " + max_ap);
+            if (max_ap != null)
                 sm.ifcs.get(stop_surf).set_max_aperture(max_ap);
-            }
         }
         for (var i: include_list) {
             if (!Objects.equals(i,stop_surf)) {
@@ -95,8 +93,16 @@ public class VigCalc {
      *     :class:`~.elements.ElementModel` via
      *     :meth:`~.elements.ElementModel.sync_to_seq`.
      */
+    public static void set_ape(OpticalModel opm, List<Integer> avoid_list, List<Integer> include_list) {
+        set_clear_apertures(opm, avoid_list, include_list);
+        // Upstream follows this with em.sync_to_seq(sm) to push the new
+        // apertures into the element model. Beam43 needs no equivalent: its
+        // layout reads Interface.max_aperture and surface_od() live at render
+        // time rather than caching them, so there is nothing to go stale.
+    }
+
     public static void set_ape(OpticalModel opm) {
-        set_clear_apertures(opm,null,null);
+        set_ape(opm, null, null);
     }
 
     /**

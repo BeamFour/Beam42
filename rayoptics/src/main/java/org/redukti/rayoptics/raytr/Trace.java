@@ -392,7 +392,9 @@ public class Trace {
      * returns a list of RayPkgs for the boundary rays for field fld
      */
     public static List<RayPkg> trace_boundary_rays_at_field(OpticalModel opt_model, Field fld, double wvl, TraceOptions trace_options) {
-        trace_options.rayerr_filter = "full";
+        // default it, rather than override a filter the caller chose
+        if (trace_options.rayerr_filter == null)
+            trace_options.rayerr_filter = "full";
         var ref_sphere_cr = setup_pupil_coords(opt_model,fld,wvl,0.0,null,null);
         fld.chief_ray = ref_sphere_cr.chief_ray_pkg;
         fld.ref_sphere = ref_sphere_cr.ref_sphere;

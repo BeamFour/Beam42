@@ -1,6 +1,7 @@
 package org.redukti.spec;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
+import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.seq.Glass;
 
 import java.util.ArrayList;
@@ -367,6 +368,113 @@ public class Prescription {
 
     public String get_title() {
         return _title;
+    }
+
+    /** Decimal places used when writing computed apertures back. */
+    public static final int APERTURE_DECIMALS = 4;
+
+    /**
+     * Copy computed apertures from a traced model back into this prescription.
+     * <p>
+     * Building a model never writes back, so a prescription keeps whatever
+     * apertures it was authored with until this is called deliberately. Use it
+     * after the model has been given real apertures, by
+     * {@link org.redukti.rayoptics.raytr.VigCalc#set_ape} for every surface or
+     * {@link org.redukti.rayoptics.raytr.VigCalc#set_stop_aperture} for the stop
+     * alone.
+     * <p>
+     * Diameters are taken from {@code Interface.surface_od()}, which is what the
+     * layout and the Zemax exporter already use, and rounded so that rewriting a
+     * prescription does not churn every diameter into full double precision.
+     * <p>
+     * Surfaces here are indexed as in {@link #_surfaces}. The model carries an
+     * object and an image interface either side of them, so prescription surface
+     * {@code i} is model interface {@code i + 1} - the lists taken by
+     * {@link org.redukti.rayoptics.raytr.VigCalc#set_clear_apertures} are model
+     * indices and are offset by one from these.
+     *
+     * @param opm          a model built from this prescription
+     * @param config       configuration index the model was built for
+     * @param avoid_list   prescription surfaces to leave alone, or null
+     * @param include_list prescription surfaces to update, or null for all.
+     *                     Ignored when {@code avoid_list} is given.
+     * @param decimals     decimal places to round to
+     * @return the number of surfaces whose diameter changed
+     * @throws IllegalArgumentException if the model was not built from this
+     *                                  prescription, or config is out of range
+     */
+    public int update_apertures_from(OpticalModel opm, int config,
+                                     List<Integer> avoid_list,
+                                     List<Integer> include_list,
+                                     int decimals) {
+        var ifcs = opm.seq_model.ifcs;
+        if (ifcs.size() != _surfaces.length + 2)
+            throw new IllegalArgumentException(
+                    "Model has " + ifcs.size() + " interfaces, expected "
+                    + (_surfaces.length + 2) + " for this prescription's "
+                    + _surfaces.length + " surfaces. The model must be built "
+                    + "from this prescription.");
+
+        List<Integer> targets;
+        if (avoid_list != null) {
+            targets = new ArrayList<>();
+            for (int i = 0; i < _surfaces.length; i++) {
+                if (!avoid_list.contains(i))
+                    targets.add(i);
+            }
+        }
+        else if (include_list != null) {
+            targets = include_list;
+        }
+        else {
+            targets = new ArrayList<>();
+            for (int i = 0; i < _surfaces.length; i++)
+                targets.add(i);
+        }
+
+        int changed = 0;
+        for (int i : targets) {
+            if (i < 0 || i >= _surfaces.length)
+                throw new IllegalArgumentException("Surface index out of range: " + i);
+            var surface = _surfaces[i];
+            double diameter = round(ifcs.get(i + 1).surface_od() * 2.0, decimals);
+            boolean modified = false;
+
+            // Only stops carry per-configuration diameters - a glass element's
+            // aperture is fixed - but some prescriptions vary the stop when
+            // zooming or focusing close, so that entry has to move too.
+            if (surface._diameter_by_scenario != null) {
+                if (config < 0 || config >= surface._diameter_by_scenario.length)
+                    throw new IllegalArgumentException(
+                            "Config " + config + " out of range for surface " + i
+                            + ", which has " + surface._diameter_by_scenario.length
+                            + " configurations");
+                if (surface._diameter_by_scenario[config] != diameter) {
+                    surface._diameter_by_scenario[config] = diameter;
+                    modified = true;
+                }
+            }
+            // _diameter is the default-scenario value, which config 0 stands
+            // for, and the only value when there is no per-config array.
+            if ((surface._diameter_by_scenario == null || config == 0)
+                    && surface._diameter != diameter) {
+                surface._diameter = diameter;
+                modified = true;
+            }
+            if (modified)
+                changed++;
+        }
+        return changed;
+    }
+
+    /** Update every surface for the given configuration. */
+    public int update_apertures_from(OpticalModel opm, int config) {
+        return update_apertures_from(opm, config, null, null, APERTURE_DECIMALS);
+    }
+
+    private static double round(double value, int decimals) {
+        double scale = Math.pow(10, decimals);
+        return Math.round(value * scale) / scale;
     }
 
     public int get_num_configurations() {

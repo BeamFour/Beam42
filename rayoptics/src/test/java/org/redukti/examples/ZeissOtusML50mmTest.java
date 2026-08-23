@@ -55,6 +55,11 @@ class ZeissOtusML50mmTest {
      * behaviour on a fixed configuration, so it has to own that configuration.
      *
      * <p>Change it only deliberately, and regenerate the expected values when you do.
+     *
+     * <p>Note that {@code mtfFrequencies} is <em>not</em> part of the merit here: with
+     * only contrast and ray-aberration goals, {@code configureRequiredAnalyses} turns the
+     * spot and MTF analyses off for the solve. Those frequencies serve the post-solve
+     * measurement below, where the cost of an extra frequency is a table lookup.
      */
     private static OptimizationSetup frozenContrastSetup(Prescription prescription) {
         double[] fieldWeights = {1.0, 1.0, 1.0, 1.0};
@@ -71,11 +76,34 @@ class ZeissOtusML50mmTest {
                 // Ray fans are opt-in now; they were unconditional when these values
                 // were generated, so keep them to preserve the merit.
                 .rayAberrationGoals()
-                .contrastSampling(6, 12)
-                .contrastGoals(
-                        contrast(10, fieldWeights),
-                        contrast(20, fieldWeights),
-                        contrast(40, fieldWeights))
+                .contrastSampling(4, 8)
+                // One frequency, not three. Each entry costs a full
+                // ContrastAnalysis.eval per merit evaluation - 4 fields x 3
+                // wavelengths x rings x spokes samples x 3 rays - and that trace
+                // dominates the solve. Measured here, solve time only:
+                //
+                //   3 freqs, 6x12   381 s
+                //   1 freq,  6x12   189 s
+                //   1 freq,  4x8     73 s
+                //
+                // All three reach the same lens; the spot RMS and MTF asserted
+                // below move by ~1-4% between them, and 4x8 is marginally the
+                // best of the three at fields 1-3. REVIEW.md section 4 explains
+                // why one frequency suffices: at 3% of cutoff the residual is a
+                // scaled OPD gradient, and cos(r20, r40) = 0.9993, so the extra
+                // frequencies add ray cost and no new direction.
+                //
+                // On 4x8 - below the 6x12 that REVIEW.md section 2 established
+                // as converged at 40 cyc/mm. Re-measured at 20 cyc/mm on the
+                // OPTIMIZED design, where section 2's grid-fitting shows up,
+                // sigma(dW) against a converged 20x40 is +2 to +15%, i.e. 4x8
+                // reads the wavefront error slightly HIGH. The 3x6 pathology
+                // that motivated section 2 was the opposite sign, -10 to -45%:
+                // a merit flattered by its own quadrature. Overestimating is not
+                // that exploit, and the independent spot/MTF numbers below
+                // confirm the lens did not degrade. Field 0.7 sagittal is the
+                // one place 4x8 reads low (-9%); watch it if this is retuned.
+                .contrastGoals(contrast(20, fieldWeights))
                 .build();
     }
 
@@ -120,20 +148,20 @@ class ZeissOtusML50mmTest {
         double[] hexapolarSpotRms = SpotAnalysis.eval(
                         analysis._opt_model, new SpotOptions().use_hexapolar().num_rays(64))
                 .spot_results.stream().mapToDouble(spot -> spot.get_mean_radius()).toArray();
-        assertEquals(0.0064283619, finalRms, 1.0e-6);
+        assertEquals(0.0071142877, finalRms, 1.0e-6);
         assertArrayEquals(new double[]{
-                        2.39415192, 3.47609731, 3.90356934, 4.18874019},
+                        2.40301416, 3.42632001, 3.82472092, 3.96369239},
                 spotRms, 1.0e-6);
         // LensTool2 uses SpotOptions' 64-ray Hexapolar default. Keep this
         // second absolute regression so its report can be compared directly.
         assertArrayEquals(new double[]{
-                        2.41935659, 3.72385694, 4.01817087, 4.23702001},
+                        2.43550353, 3.57432255, 3.90360756, 4.00575676},
                 hexapolarSpotRms, 1.0e-6);
         assertArrayEquals(new double[]{
-                        0.91172266, 0.86866441, 0.79832238, 0.80818103},
+                        0.90924673, 0.86955926, 0.79496499, 0.79446263},
                 sagittal40, 1.0e-6);
         assertArrayEquals(new double[]{
-                        0.91172266, 0.82379914, 0.80210041, 0.75217362},
+                        0.90924673, 0.80797417, 0.80535821, 0.78698894},
                 tangential40, 1.0e-6);
 
         // Retain a direct A/B assertion as well as the absolute values above.
@@ -196,6 +224,7 @@ class ZeissOtusML50mmTest {
                         0.59327340, 0.53765177, 0.45867084, 0.31407528},
                 analysis._mtfs[2].tan_mtf_by_field, 1.0e-6);
     }
+
 
     private static void assertAllGreaterThan(double[] actual, double[] comparison, String label) {
         assertEquals(comparison.length, actual.length);

@@ -206,6 +206,46 @@ regression is `tan@40` at field 3 (0.567 → 0.539) — the field crippled by is
 
 8×16 reproduces 6×12, so **6×12 is converged**; there is no reason to go finer.
 
+### Re-measured at 20 cyc/mm: 4×8 is adequate there
+
+Everything above is a **40 cyc/mm** result — `ContrastProbe3` hardcodes
+`new ContrastOptions(40.0)` and sweeps 3×6, 6×12, 12×24, 20×40, so 4×8 was never
+tested at any frequency and 20 cyc/mm was never tested at any sampling.
+
+Note first that the obvious inference — lower frequency, coarser grid — does **not**
+follow. By §4, `ΔW ≈ s·∂W/∂y`: halving the frequency scales the residual down but
+leaves its pupil-space structure identical, and `cos(r20, r40) = 0.99932` confirms the
+two patterns are the same to 0.07%. Whatever resolves 40 is what resolves 20.
+
+Measured directly, on the **optimized** design (where §2's pathology appears), σ(ΔW)
+tangential per field at 20 cyc/mm:
+
+| sampling | fld 0 | fld 0.3 | fld 0.7 | fld 1.0 |
+| --- | --- | --- | --- | --- |
+| 4×8 | 0.0331 | 0.0512 | 0.0497 | 0.0427 |
+| 6×12 | 0.0336 | 0.0520 | 0.0451 | 0.0402 |
+| 12×24 | 0.0325 | 0.0503 | 0.0435 | 0.0394 |
+| 20×40 (converged) | 0.0323 | 0.0501 | 0.0433 | 0.0392 |
+
+4×8 lands +2 to +15% against converged, and 6×12 +3 to +4% — both **high**. That sign
+is the point. The 3×6 failure that motivated this section was −10 to −45%: a merit
+flattered by its own quadrature, which is what the optimizer can exploit. Reading the
+wavefront error slightly high is not that failure mode. The one place 4×8 reads low is
+field 0.7 *sagittal* (0.0449 vs 0.0492, −9%), worth watching if this is retuned.
+
+End to end on the Otus, `optimizesPatentPrescriptionUsingContrast`, solve time only:
+
+| configuration | solve | spot RMS | sag@40 | tan@40 |
+| --- | --- | --- | --- | --- |
+| 3 freqs, 6×12 | 381 s | 2.394, 3.476, 3.904, 4.189 | .912 .869 .798 .808 | .912 .824 .802 .752 |
+| freq 20, 6×12 | 189 s | 2.426, 3.438, 3.926, 4.048 | .909 .865 .779 .796 | .909 .809 .803 .782 |
+| freq 20, 4×8 | **73 s** | 2.403, 3.426, 3.825, 3.964 | .909 .870 .795 .794 | .909 .808 .805 .787 |
+
+5.2× faster and the lens is, if anything, slightly better — 4×8 gives the best spot RMS
+of the three at fields 0.3, 0.7 and 1.0. The test now uses freq 20 at 4×8. **The builder
+default is unchanged at 6×12**, which remains the right default: this measures one lens
+at one frequency, and the margin at field 0.7 sagittal is not wide enough to generalize.
+
 ---
 
 ## 3. The residual is the un-centred second moment, not the variance

@@ -947,10 +947,20 @@ residuals to 14256 while the constraint count stayed at ~29; see items 2 and 3 u
 
 ## 9. Frequency normalization uses ray direction, not Hopkins' exit-pupil shear
 
+**Severity: moderate for the opt-in normalization path; the shipped default never used it.**
+
+> **RESOLVED.** The diagnosis stood and the offending code is gone. `normalize_frequency`,
+> `measure_frequency` and `realized_frequency` have all been removed rather than left
+> available in an unsafe configuration, and step 4 below — direct exit-pupil aiming — is
+> implemented opt-in. The class `PupilShear` named throughout the original text no longer
+> exists; the exit-pupil coordinate is now produced by
+> `WaveAbr.wave_abr_calc_finite_pupil()` as a by-product of the OPD and read through
+> `ExitPupilAiming.sphere_coord()`. Names below are kept as they were when the finding was
+> written, with current equivalents noted.
+
 The frequency-measurement and normalization options added after finding 7 exposed useful
-diagnostics, but the quantity named `realized_frequency` is not the spatial frequency
-coordinate in Hopkins' OTF definition. The normalization option was subsequently removed;
-the diagnostic measurement remains.
+diagnostics, but the quantity named `realized_frequency` was not the spatial frequency
+coordinate in Hopkins' OTF definition.
 
 [Hopkins](https://doi.org/10.1080/713820605) writes the two-dimensional OTF as the
 autocorrelation of the pupil function (10.22 and 10.26):
@@ -964,10 +974,12 @@ The paper is explicit in (10.9), (10.28), and the discussion following (10.30) t
 coordinates are measured on the exit-pupil reference sphere relative to the principal
 ray. Identifying them with a convenient pupil plane is not generally valid.
 
-`PupilShear.exit_pupil_coord` is therefore the right foundation: it reconstructs the
-equally-inclined-chord point on the reference sphere for each traced ray. However,
-`PupilShear.realized_frequency` does not use the separation of those coordinates. It uses
-the difference between the two rays' image-space direction cosines:
+The exit-pupil coordinate is therefore the right foundation: it reconstructs the
+equally-inclined-chord point on the reference sphere for each traced ray. This was
+`PupilShear.exit_pupil_coord` when the finding was written, and is now
+`ExitPupilAiming.sphere_coord`. However, `PupilShear.realized_frequency` did not use the
+separation of those coordinates. It used the difference between the two rays' image-space
+direction cosines:
 
 ```java
 double component = axis == Orientation.X ? delta.x : delta.y;
@@ -975,10 +987,17 @@ return n_img * Math.abs(component) / wavelength;
 ```
 
 For an aberration-free paraxial system, direction difference is proportional to pupil
-separation, so this produces a plausible answer. In an aberrated system the direction
+separation, so this produced a plausible answer. In an aberrated system the direction
 difference also contains wavefront slope -- equivalently transverse ray aberration. The
-reported independent frequency therefore changes when the aberration being optimized
-changes. That is precisely the coupling the exit-pupil autocorrelation avoids.
+reported independent frequency therefore changed when the aberration being optimized
+changed. That is precisely the coupling the exit-pupil autocorrelation avoids.
+
+Measured before removal, the two metrics diverged by 0.1 percent on axis rising to
+2.7 percent at full field tangential on the Otus 50/1.4 — the same order as the
+across-pupil spread the normalization existed to correct. Perturbing a rear surface, which
+moves the wavefront while leaving the paraxial exit pupil nearly fixed, moved the
+direction-cosine metric about nine times as far as the exit-pupil one, which is the
+predicted coupling showing up directly.
 
 This also narrows finding 7's conclusion. The reported 8.5% to 0.08% improvement showed
 that `calibrate_frequency` made the entrance-pupil probe reproduce the requested
@@ -1010,20 +1029,54 @@ pupil displacement. Retaining only the requested-axis component loses that cross
 part; the actual OTF sample is then at a two-dimensional frequency `(s,t)`, not exactly
 at `(s,0)` or `(0,t)`.
 
-### Recommended next steps
+### Recommended next steps, and what became of them
 
-1. Keep the measurement facility, but derive the realized reduced shear from
+1. ~~Keep the measurement facility, but derive the realized reduced shear from
    `shiftedExitPupilCoord - referenceExitPupilCoord`, normalized with Hopkins' exit-pupil
-   scale. Retain both vector components.
-2. Rename the current direction-cosine result to something explicit such as
+   scale. Retain both vector components.~~ **Superseded by 4.** Once aiming placed each ray
+   on its requested separation directly, a measurement of how far it missed had nothing
+   left to correct.
+2. ~~Rename the current direction-cosine result to something explicit such as
    `imageRayFrequency` if it remains useful diagnostically; it should not be presented as
-   the OTF frequency.
-3. Initially make the exit-pupil result diagnostic only and add a regression test against
-   the ideal paraxial case plus a pupil-aberrated off-axis case. The existing tests prove
-   that the programmed ratio is applied, not that the ratio represents Hopkins' shear.
+   the OTF frequency.~~ **Removed instead.** With normalization gone the method had no
+   caller, and a public method returning something that looks like the OTF frequency but
+   is not invites exactly the mistake this finding records.
+3. ~~Initially make the exit-pupil result diagnostic only and add a regression test against
+   the ideal paraxial case plus a pupil-aberrated off-axis case.~~ **Done, in the stronger
+   form.** The regressions below assert the achieved sphere-coordinate separation itself
+   rather than a ratio, on two wide-angle cases.
 4. For an exact correction, solve or aim each displaced entrance-pupil ray until its
    exit-pupil reference-sphere coordinate has the requested vector separation. Then use
    the OPD of that ray directly rather than rescaling a finite OPD difference afterwards.
+   **Implemented — see below.**
+
+### Prerequisite: the reference-sphere coordinate was itself wrong
+
+Everything above assumes the exit-pupil coordinate is computed correctly. It was not.
+`wave_abr_full_calc_finite_pup()` closed the ray onto the reference sphere with
+
+```java
+Math.sqrt(F*F + J/ref_sphere_radius)
+```
+
+where expanding the sphere equation with the code's own definitions of `F` and `J`
+requires a minus sign, as Hopkins gives in (4.6). The two agree to first order in `J`, so
+the error stayed small — measured at 2e-9 to 2e-7 mm off the sphere, worst case about
+0.0004 waves — and was invisible against the regression tolerances. It nonetheless meant
+the coordinate this finding proposes to build on did not lie on the reference sphere at
+all.
+
+Fixed in Beam43 commit `53eded59`, and independently upstream in ray-optics commit
+`2de1e18`, "Fix sign error in OPD closing equation. Fixes #221". Hopkins states the same
+root twice and the second form confirms the sign: (4.21) restates (4.6) in reduced
+coordinates, and upstream's `waveabr_hhh.py` implements it as
+`sqrt(F**2 + J*(n_img*ax_k[slp]*pr_k[slp]*ref_dir[2] / H))`, whose bracketed coefficient
+chains through (4.8) and (2.10) to `-N'/R'`. `WaveAbrFinitePupilTest` now asserts the
+sphere-equation residual directly, and asserts that the `+` form measurably fails it. See
+`Documentation/OPD.md` for the full derivation.
+
+The chief ray hides this: for it `p`, `J` and `ep` are all zero, so a test that samples
+only the chief ray cannot detect the wrong discriminant.
 
 ### Implemented opt-in correction
 
@@ -1083,11 +1136,23 @@ integral would map the integration measure and overlap into reduced exit-pupil
 coordinates as well. The new option fixes the ray-pair frequency coordinate, not that
 larger integration problem, so it remains opt-in pending comparisons on real designs.
 
-`measure_frequency` remains useful as a diagnostic of the current ray-direction metric.
-The normalization API and residual rescaling were removed rather than left available in
-an unsafe configuration. `exit_pupil_sphere_coord` is now the coordinate foundation for
-the implemented aiming path. `calibrate_frequency` remains a separate, opt-in block-level
+The normalization API and residual rescaling were removed rather than left available in an
+unsafe configuration, and `measure_frequency` and `realized_frequency` went with them: with
+aiming placing each ray on its target directly, a diagnostic of the metric they used had no
+remaining consumer. `ExitPupilAiming.sphere_coord()` is the coordinate foundation for the
+implemented aiming path, reading the coordinate that `WaveAbr.wave_abr_calc_finite_pupil()`
+already computes for the OPD, so the point aiming drives to a target and the point the OPD
+is measured to cannot diverge. `calibrate_frequency` remains a separate, opt-in block-level
 approximation and carries the qualification above.
+
+One caveat on that qualification, measured before the direction-cosine metric was removed.
+Scored on the exit-pupil metric, block calibration landed at 0.9993 on the Otus 50/1.4 at
+full field tangential — close to correct despite using the wrong metric, because its
+centre-derived probe is unrepresentative of the sample population by about the same 3
+percent in the opposite direction. The two errors cancelled. Re-deriving the probe on the
+exit-pupil metric alone moved it to 1.0141, which is worse. That cancellation is a property
+of the lenses tested, not a principle, so `calibrate_frequency`'s accuracy should not be
+assumed to carry to other designs; direct aiming has no such dependence.
 
 ## Smaller items
 
@@ -1192,6 +1257,12 @@ Done:
 3. ~~**Stop the degenerate high-frequency case failing silently**~~ (§5).
 3a. ~~**Correct the entrance-pupil shear bias** (§7)~~ — available, opt-in, pending the
     exact exit-pupil treatment from upstream.
+4. ~~**Fix the reference-sphere closing discriminant** (§9)~~ — `F^2 - J/R`, matching
+    Hopkins (4.6); also fixed upstream as issue #221. `WaveAbrFinitePupilTest` asserts the
+    sphere-equation residual so it cannot regress silently.
+5. ~~**Replace shear rescaling with direct exit-pupil aiming** (§9)~~ — opt-in via
+    `aimContrastAtExitPupil()`; the direction-cosine metric and the normalization API were
+    removed rather than corrected.
 
 ## Open questions
 

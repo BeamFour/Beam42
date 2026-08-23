@@ -1283,6 +1283,24 @@ assumed to carry to other designs; direct aiming has no such dependence.
   so every asserted number, and an experiment did in fact surface as a test failure.
   `frozenContrastSetup` and `frozenDirectSetup` now declare the configuration inside the
   test, with a comment saying to regenerate the values deliberately when changing it.
+- **An MTF goal only constrains the frequency it names.** `frozenDirectSetup` was reduced
+  from three goal frequencies to one. Unlike the contrast case this saves nothing per
+  evaluation — `computeMTFs` does one FFT per *field* and each frequency is a lookup — and
+  the less constrained merit actually converges slower. Measured, direct test:
+
+  | goals | solve | spot RMS | sag@40 | tan@40 |
+  | --- | --- | --- | --- | --- |
+  | 10/20/40 | 61 s | 5.78, 7.32, 7.72, 8.90 | .593 .597 .525 .612 | .593 .538 .459 .314 |
+  | 20 only | 108 s | 6.57, 6.35, 7.36, 9.07 | .640 .640 .515 .444 | .640 .649 .368 **.082** |
+  | 40 only | 97 s | 5.42, 6.74, 6.93, 6.88 | .649 .691 .547 .696 | .649 .580 .515 .382 |
+
+  At 20 only, `finalRms` *improves* to 0.0046 from 0.0160 while the lens degrades — full
+  field tangential MTF at 40 cyc/mm falls to 0.082, beside a contrast reversal, because
+  nothing constrains 40 any more. A clean illustration of the point made throughout this
+  document: the merit is not the lens. 40 only is now used, and beats the three-goal
+  baseline on all twelve measured numbers. Note this is the opposite of §4's result for
+  *contrast* frequencies, where collinearity makes the extra frequencies genuinely
+  redundant; MTF goals are targets, not sampled residuals, and do not share that property.
 
 ---
 

@@ -31,13 +31,29 @@ class ZeissOtusML50mmTest {
                 .weighted(false)
                 .dLineOnly(false)
                 .rayAberrationGoals()
+                // A single goal frequency, like the contrast test - but at 40,
+                // not 20. This is NOT the saving the contrast test got: MTF
+                // frequencies are nearly free once the per-field FFT has run
+                // (see computeMTFs), so dropping goals does not cut the cost of
+                // an evaluation. It only reshapes the merit, 8 residuals instead
+                // of 24, and the less constrained problem actually takes longer
+                // to converge - 97 s against 61 s for the three goals.
+                //
+                // It is kept because the lens is better on all twelve measured
+                // numbers below. The frequency matters, though; measured:
+                //
+                //   goals        solve  spot RMS full fld  sag@40 full  tan@40 full
+                //   10/20/40      61 s       8.90              .612         .314
+                //   20 only      108 s       9.07              .444         .082
+                //   40 only       97 s       6.88              .696         .382
+                //
+                // With the goal at 20, finalRms *improves* to 0.0046 while the
+                // lens degrades: nothing constrains 40 cyc/mm any more and the
+                // full-field tangential MTF falls to 0.082, next to a contrast
+                // reversal. Goal at the frequency you care about, or measure the
+                // one you did not constrain. 10 and 20 are still measured here,
+                // for the assertions and the contrast test's comparison.
                 .mtfGoals(
-                        OptimizationBuilder.mtf(10,
-                                new double[]{93, 93, 94, 93},
-                                new double[]{93, 93, 90, 82}),
-                        OptimizationBuilder.mtf(20,
-                                new double[]{85, 85, 85, 80},
-                                new double[]{85, 85, 78, 62}),
                         OptimizationBuilder.mtf(40,
                                 new double[]{65, 65, 64, 58},
                                 new double[]{65, 62, 45, 38}))
@@ -168,13 +184,13 @@ class ZeissOtusML50mmTest {
         // The comparison arrays are the gaussian-quadrature test's expected
         // values; keep them in step when those are regenerated.
         assertAllLessThan(spotRms,
-                new double[]{5.77765598, 7.31854410, 7.71931778, 8.90432789},
+                new double[]{5.42166951, 6.74053288, 6.92564049, 6.87614585},
                 "spot RMS");
         assertAllGreaterThan(sagittal40,
-                new double[]{0.59327340, 0.59652846, 0.52547396, 0.61176714},
+                new double[]{0.64949397, 0.69084539, 0.54741863, 0.69640215},
                 "40 cycle/mm sagittal MTF");
         assertAllGreaterThan(tangential40,
-                new double[]{0.59327340, 0.53765177, 0.45867084, 0.31407528},
+                new double[]{0.64949397, 0.57967420, 0.51503656, 0.38198031},
                 "40 cycle/mm tangential MTF");
         System.out.println("Contrast Otus: elapsedMs=" + elapsedMillis
                 + " initialRms=" + initialRms + " finalRms=" + finalRms);
@@ -207,21 +223,21 @@ class ZeissOtusML50mmTest {
         assertTrue(status > 0, "Optimizer failed with status " + status);
         assertTrue(finalRms < initialRms,
                 () -> "Expected RMS merit to improve from " + initialRms + " but got " + finalRms);
-        assertEquals(0.0159792774, finalRms, 1.0e-6);
+        assertEquals(0.0118734292, finalRms, 1.0e-6);
 
         var analysis = setup.analysis();
-        assertEquals(50.17930093, analysis._pfo[ParaxHelper.Effective_focal_length], 1.0e-6);
-        assertEquals(1.43833782, analysis._pfo[ParaxHelper.Fno], 1.0e-6);
+        assertEquals(50.15110204, analysis._pfo[ParaxHelper.Effective_focal_length], 1.0e-6);
+        assertEquals(1.43889571, analysis._pfo[ParaxHelper.Fno], 1.0e-6);
         assertArrayEquals(new double[]{
-                        5.77765598, 7.31854410, 7.71931778, 8.90432789},
+                        5.42166951, 6.74053288, 6.92564049, 6.87614585},
                 java.util.Arrays.stream(analysis._spots)
                         .mapToDouble(spot -> spot.get_mean_radius()).toArray(),
                 1.0e-6);
         assertArrayEquals(new double[]{
-                        0.59327340, 0.59652846, 0.52547396, 0.61176714},
+                        0.64949397, 0.69084539, 0.54741863, 0.69640215},
                 analysis._mtfs[2].sag_mtf_by_field, 1.0e-6);
         assertArrayEquals(new double[]{
-                        0.59327340, 0.53765177, 0.45867084, 0.31407528},
+                        0.64949397, 0.57967420, 0.51503656, 0.38198031},
                 analysis._mtfs[2].tan_mtf_by_field, 1.0e-6);
     }
 

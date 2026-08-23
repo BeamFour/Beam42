@@ -240,33 +240,44 @@ public class Prescription {
         }
         return build_prescription(specs,use_glass_types,wvls,wts,0);
     }
+    /** Names of the [variable distances] entries a prescription cannot be built without */
+    private final static String FOCAL_LENGTH = "Focal Length";
+    private final static String F_NUMBER = "F-Number";
+    private final static String ANGLE_OF_VIEW = "Angle of View";
+
     /**
-     * The angle of view is not optional: the field of view is derived from it, so a
-     * prescription that omits it fails much further down with a NullPointerException
-     * that names neither the missing entry nor the file it should have been in.
-     * Checking here reports it while the input is still in hand.
+     * Focal length, f-number and angle of view are not optional: the optical model is
+     * built from them, so a prescription that omits one fails much further down with a
+     * NullPointerException that names neither the missing entry nor the file it should
+     * have been in. Checking here reports it while the input is still in hand.
+     * <p>
+     * Image height is deliberately not checked - unlike these three it has a documented
+     * default (35mm), so leaving it out is a legitimate choice rather than an omission.
      *
      * @param specs Specs obtained from OpticalBench format
-     * @param scenario Scenario whose angle of view is wanted
-     * @return The full angle of view in degrees, always positive
+     * @param name Name of the entry in the [variable distances] section
+     * @param expected What the entry should hold, used in the error message
+     * @param scenario Scenario whose value is wanted
+     * @return The value for that scenario, always positive
      */
-    private static double require_angle_of_view_in_degrees(OpticalBenchDataImporter.LensSpecifications specs, int scenario) {
-        var view_angles = specs.find_variable("Angle of View");
-        if (view_angles == null)
+    private static double require_positive_value(OpticalBenchDataImporter.LensSpecifications specs, String name, String expected, int scenario) {
+        var variable = specs.find_variable(name);
+        if (variable == null)
             throw new IllegalArgumentException(
-                    "The prescription does not specify 'Angle of View'; add it to the [variable distances] section as the full angle of view in degrees");
-        if (scenario >= view_angles.num_values())
+                    "The prescription does not specify '" + name + "'; add it to the [variable distances] section as "
+                            + expected);
+        if (scenario >= variable.num_values())
             throw new IllegalArgumentException(
-                    "The prescription specifies 'Angle of View' for " + view_angles.num_values()
+                    "The prescription specifies '" + name + "' for " + variable.num_values()
                             + " scenario(s), but scenario " + scenario + " was requested");
         // Anything unparseable, such as the 'undefined' placeholder these files use for
         // scenarios that were never filled in, reads back as 0.0 rather than failing
-        double angle_of_view = specs.get_angle_of_view_in_degrees(scenario);
-        if (!(angle_of_view > 0.0))
+        double value = variable.get_value_as_double(scenario);
+        if (!(value > 0.0))
             throw new IllegalArgumentException(
-                    "The prescription specifies 'Angle of View' as '" + view_angles.get_value(scenario)
-                            + "' for scenario " + scenario + "; expected the full angle of view in degrees, which must be positive");
-        return angle_of_view;
+                    "The prescription specifies '" + name + "' as '" + variable.get_value(scenario)
+                            + "' for scenario " + scenario + "; expected " + expected + ", which must be positive");
+        return value;
     }
 
     /**
@@ -282,9 +293,9 @@ public class Prescription {
         // We use default values variables that can change in a multi-configuration setup.
         // The defaults are useful as they are the ones that are manipulated during optimization
         var prescription = new Prescription(
-                specs.get_focal_length(),
-                specs.get_f_number(default_scenario),
-                require_angle_of_view_in_degrees(specs, default_scenario),
+                require_positive_value(specs, FOCAL_LENGTH, "the focal length in mm", default_scenario),
+                require_positive_value(specs, F_NUMBER, "the f-number", default_scenario),
+                require_positive_value(specs, ANGLE_OF_VIEW, "the full angle of view in degrees", default_scenario),
                 specs.get_image_height(),
                 wvls,
                 wts);
@@ -387,10 +398,10 @@ public class Prescription {
             _angle_of_views_by_scenario = new double[_configurations.length];
             for (int i = 0; i < _configurations.length; i++) {
                 int scenario = _configurations[i];
-                _focal_length_by_scenario[i] = specs.get_focal_length(scenario);
-                _f_number_by_scenario[i] = specs.get_f_number(scenario);
-                // every configured scenario needs its own angle of view, not just the default one
-                _angle_of_views_by_scenario[i] = require_angle_of_view_in_degrees(specs, scenario);
+                // every configured scenario needs its own values, not just the default one
+                _focal_length_by_scenario[i] = require_positive_value(specs, FOCAL_LENGTH, "the focal length in mm", scenario);
+                _f_number_by_scenario[i] = require_positive_value(specs, F_NUMBER, "the f-number", scenario);
+                _angle_of_views_by_scenario[i] = require_positive_value(specs, ANGLE_OF_VIEW, "the full angle of view in degrees", scenario);
             }
         }
         return this;

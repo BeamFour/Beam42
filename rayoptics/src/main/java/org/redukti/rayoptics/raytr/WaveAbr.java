@@ -220,6 +220,85 @@ public class WaveAbr {
     }
 
     /**
+     * Given a ray, a chief ray and an image pt, compute the data required to calculate the
+     * optical path difference. A by-product of the calculation is the estimated position where the
+     * aperture ray intersects the exit pupil reference sphere.
+     *
+     *     The main references for the calculations are in the H. H. Hopkins paper
+     *     `Calculation of the Aberrations and Image Assessment for a General Optical
+     *     System <https://doi.org/10.1080/713820605>`_
+     *
+     *     Args:
+     *         ray_pkg: input tuple of ray, ray_op, wvl
+     *         chief_ray_pkg: input tuple of chief_ray, cr_exp_seg
+     *         ref_sphere: input tuple of image_pt, ref_dir, ref_sphere_radius
+     *
+     *     Returns:
+     *         various components required to calculate OPD
+     *
+     * Note that this is refactored from upstream wave_abr_full_calc_finite_pup because it is
+     * useful to be able to reuse the calculation to obtain the aperture ray's
+     * intersection with the reference sphere.
+     */
+    public static FinitePupilWaveAberrationResult wave_abr_calc_finite_pupil(RayPkg ray_pkg, ChiefRayPkg chief_ray_pkg, ReferenceSphere ref_sphere) {
+        Vector3 ref_dir = ref_sphere.ref_dir;
+        double ref_sphere_radius = ref_sphere.ref_sphere_radius;
+        RayPkg cr = chief_ray_pkg.chief_ray;
+        ChiefRayExitPupilSegment cr_exp_seg = chief_ray_pkg.cr_exp_seg;
+        List<RaySeg> cr_ray = cr.ray;
+        double cr_op = cr.op_delta;
+        Vector3 cr_exp_pt =  cr_exp_seg.exp_pt;
+        double cr_exp_dist = cr_exp_seg.exp_dst;
+        Interface ifc = cr_exp_seg.ifc;
+        List<RaySeg> ray = ray_pkg.ray;
+        double ray_op = ray_pkg.op_delta;
+
+        final int k = -2; // last interface in sequence
+
+        // eq 3.12
+        double e1 = eic_distance(new RayData(ray.get(1).p, ray.get(0).d),
+                new RayData(cr_ray.get(1).p, cr_ray.get(0).d));
+        // eq 3.13
+        double ekp = eic_distance(new RayData(Lists.get(ray,k).p, Lists.get(ray,k).d),
+                new RayData(Lists.get(cr_ray,k).p, Lists.get(cr_ray,k).d));
+
+        RayData tafter =Transform.transform_after_surface(ifc, new RayData(Lists.get(ray,k).p,Lists.get(ray,k).d));
+        // cr_exp_pt = Ē′ in HH paper
+        // eic_exp_pt = B̃′ in HH paper
+        Vector3 b4_pt = tafter.pt;                  // Test-ray point at the last optical surface, expressed in image-gap coordinates
+        Vector3 b4_dir = tafter.dir;                // Test-ray direction after the last optical surface, expressed in image-gap coordinates
+        // -dst = cr_exp_dist - ekp is the signed distance from b4_pt to B̃′ along b4_dir.
+        double dst = ekp - cr_exp_dist;
+        Vector3 eic_exp_pt = b4_pt.minus(b4_dir.times(dst));    // B̃′: EIC point on the test ray near the exit pupil
+        Vector3 p_coord = eic_exp_pt.minus(cr_exp_pt);          // Vector Ē′B̃′ = B̃′ - Ē′
+
+        // eq 4.4
+        double F = ref_dir.dot(b4_dir) - b4_dir.dot(p_coord)/ref_sphere_radius;
+        // eq 4.5
+        double J = p_coord.dot(p_coord)/ref_sphere_radius - 2.0*ref_dir.dot(p_coord);
+
+        double sign_soln = ref_dir.z*Lists.get(cr.ray,-1).d.z < 0 ? -1 : 1;
+        // denominator in eq 4.6
+        double ep;
+        double discriminant = F*F - J/ref_sphere_radius;
+        Vector3 ray_exit_pupil_pt = null;
+        if (discriminant < 0) {
+            // ep is a small correction so it seems that if we have an error here
+            // it is reasonable to set it to 0 as we do not have an easy way to report an
+            // error.
+            ep = 0;
+        }
+        else {
+            double denom = F + sign_soln * Math.sqrt(discriminant);
+            // Eq 4.6: signed distance e′ from B̃′ along the test ray to its reference-sphere intersection B′.
+            ep = denom == 0 ? 0.0 : J / denom;
+            ray_exit_pupil_pt = p_coord.plus(b4_dir.times(ep));
+        }
+        return new FinitePupilWaveAberrationResult(ray_pkg, chief_ray_pkg, ref_sphere,
+                e1, ekp, ep, ray_exit_pupil_pt, ray_op,cr_op);
+    }
+
+    /**
      * Given a ray, a chief ray and an image pt, evaluate the OPD.
      *
      *     The main references for the calculations are in the H. H. Hopkins paper
@@ -240,53 +319,11 @@ public class WaveAbr {
      *         opd: OPD of ray wrt chief ray at **fld**
      */
     private static double wave_abr_full_calc_finite_pup(FirstOrderData fod, Field fld, double wvl, double foc, RayPkg ray_pkg, ChiefRayPkg chief_ray_pkg, ReferenceSphere ref_sphere) {
-        Vector3 ref_dir = ref_sphere.ref_dir;
-        double ref_sphere_radius = ref_sphere.ref_sphere_radius;
-        RayPkg cr = chief_ray_pkg.chief_ray;
-        ChiefRayExitPupilSegment cr_exp_seg = chief_ray_pkg.cr_exp_seg;
-        List<RaySeg> cr_ray = cr.ray;
-        double cr_op = cr.op_delta;
-        Vector3 cr_exp_pt =  cr_exp_seg.exp_pt;
-        double cr_exp_dist = cr_exp_seg.exp_dst;
-        Interface ifc = cr_exp_seg.ifc;
-        List<RaySeg> ray = ray_pkg.ray;
-        double ray_op = ray_pkg.op_delta;
-
-        final int k = -2; // last interface in sequence
-
-        // eq 3.12
-        double e1 = eic_distance(new RayData(ray.get(1).p, ray.get(0).d),
-                              new RayData(cr_ray.get(1).p, cr_ray.get(0).d));
-        // eq 3.13
-        double ekp = eic_distance(new RayData(Lists.get(ray,k).p, Lists.get(ray,k).d),
-                              new RayData(Lists.get(cr_ray,k).p, Lists.get(cr_ray,k).d));
-
-        RayData tafter =Transform.transform_after_surface(ifc, new RayData(Lists.get(ray,k).p,Lists.get(ray,k).d));
-        // cr_exp_pt = Ē′ in HH paper
-        // eic_exp_pt = B̃′ in HH paper
-        Vector3 b4_pt = tafter.pt;                  // Test-ray point at the last optical surface, expressed in image-gap coordinates
-        Vector3 b4_dir = tafter.dir;                // Test-ray direction after the last optical surface, expressed in image-gap coordinates
-        // -dst = cr_exp_dist - ekp is the signed distance from b4_pt to B̃′ along b4_dir.
-        double dst = ekp - cr_exp_dist;
-        Vector3 eic_exp_pt = b4_pt.minus(b4_dir.times(dst));    // B̃′: EIC point on the test ray near the exit pupil
-        Vector3 p_coord = eic_exp_pt.minus(cr_exp_pt);          // Vector Ē′B̃′ = B̃′ - Ē′
-
-        // eq 4.4
-        double F = ref_dir.dot(b4_dir) - b4_dir.dot(p_coord)/ref_sphere_radius;
-        // eq 4.5
-        double J = p_coord.dot(p_coord)/ref_sphere_radius - 2.0*ref_dir.dot(p_coord);
-
-        double sign_soln = ref_dir.z*Lists.get(cr.ray,-1).d.z < 0 ? -1 : 1;
-        // denominator in eq 4.6
-        double denom = F + sign_soln*Math.sqrt(F*F - J/ref_sphere_radius);
-        // Eq 4.6: signed distance e′ from B̃′ along the test ray to its reference-sphere intersection B′.
-        double ep = denom == 0 ? 0.0  : J/denom;
-
+        FinitePupilWaveAberrationResult result = wave_abr_calc_finite_pupil(ray_pkg,chief_ray_pkg,ref_sphere);
         double n_obj = Math.abs(fod.n_obj);
         double n_img = Math.abs(fod.n_img);
         // OPD = -n_obj e1 + (cr_op - ray_op) + n_img(ekp - ep)
-        double opd = -n_obj*e1 - ray_op + n_img*ekp + cr_op - n_img*ep;
-
+        double opd = -n_obj*result.e1() - result.ray_op() + n_img*result.ekp() + result.cr_op() - n_img*result.ep();
         return opd;
     }
 

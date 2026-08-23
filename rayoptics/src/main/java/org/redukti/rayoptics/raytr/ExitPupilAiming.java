@@ -152,47 +152,20 @@ public final class ExitPupilAiming {
                 new Vector2(coordinate.x - target.x, coordinate.y - target.y));
     }
 
-    /** Equally-inclined-chord coordinate relative to the exit-pupil centre. */
-    public static Vector3 chord_coord(
-            RayPkg rayPkg, ChiefRayPkg chiefRayPkg, ReferenceSphere referenceSphere) {
-        if (rayPkg == null || rayPkg.ray == null || rayPkg.ray.size() < 2) return null;
-        if (chiefRayPkg == null || referenceSphere == null) return null;
-        if (M.is_kinda_big(referenceSphere.ref_sphere_radius)) return null;
-
-        var chiefRay = chiefRayPkg.chief_ray.ray;
-        if (chiefRay == null || chiefRay.size() < 2) return null;
-        var chiefExit = chiefRayPkg.cr_exp_seg;
-        int k = -2;
-        var ray = rayPkg.ray;
-        double ekp = WaveAbr.eic_distance(
-                new RayData(Lists.get(ray, k).p, Lists.get(ray, k).d),
-                new RayData(Lists.get(chiefRay, k).p, Lists.get(chiefRay, k).d));
-        var after = Transform.transform_after_surface(
-                chiefExit.ifc, new RayData(Lists.get(ray, k).p, Lists.get(ray, k).d));
-        double distance = ekp - chiefExit.exp_dst;
-        return after.pt.minus(after.dir.times(distance)).minus(chiefExit.exp_pt);
-    }
-
-    /** Coordinate on the exit-pupil reference sphere relative to its pupil centre. */
     public static Vector3 sphere_coord(
             RayPkg rayPkg, ChiefRayPkg chiefRayPkg, ReferenceSphere referenceSphere) {
-        Vector3 coordinate = chord_coord(rayPkg, chiefRayPkg, referenceSphere);
-        if (coordinate == null) return null;
+        if (rayPkg == null || rayPkg.ray == null) return null;
+        if (chiefRayPkg == null || referenceSphere == null) return null;
+        if (M.is_kinda_big(referenceSphere.ref_sphere_radius)) return null;
+        // The checks below are just sanity checks, as they are inadequate.
+        // We assume that chief ray must have reached the image plane or else
+        // we could not have got here.
+        var chiefRay = chiefRayPkg.chief_ray.ray;
+        if (chiefRay == null || chiefRay.size() < 2) return null;
+        var testRay = rayPkg.ray;
+        if (testRay.size() != chiefRay.size()) return null;
 
-        int k = -2;
-        var segment = Lists.get(rayPkg.ray, k);
-        Vector3 direction = Transform.transform_after_surface(
-                chiefRayPkg.cr_exp_seg.ifc, new RayData(segment.p, segment.d)).dir;
-        double radius = referenceSphere.ref_sphere_radius;
-        Vector3 referenceDirection = referenceSphere.ref_dir;
-        double f = referenceDirection.dot(direction) - direction.dot(coordinate) / radius;
-        double j = coordinate.dot(coordinate) / radius
-                - 2.0 * referenceDirection.dot(coordinate);
-        double discriminant = f * f - j / radius;
-        if (discriminant < 0.0) return null;
-        double denominator = f + Math.sqrt(discriminant);
-        double ep = denominator == 0.0 ? 0.0 : j / denominator;
-        return coordinate.plus(direction.times(ep));
+        return WaveAbr.wave_abr_calc_finite_pupil(rayPkg, chiefRayPkg, referenceSphere).ray_exit_pupil_pt();
     }
 
     /** A ray traced successfully, but its requested exit-pupil coordinate was not found. */

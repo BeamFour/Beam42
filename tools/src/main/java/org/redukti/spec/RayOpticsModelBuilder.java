@@ -69,8 +69,21 @@ public class RayOpticsModelBuilder {
                 opm.update_model();
             }
             case SetApertures -> {
-                VigCalc.set_ape(opm);
+                // Vignetting first. set_ape sizes each aperture to just pass the
+                // boundary rays, so running it first - against unvignetted rays -
+                // leaves apertures wide enough that nothing clips, and the
+                // vignetting that follows comes out zero on the unclipped side.
                 VigCalc.set_vig(opm,false);
+                VigCalc.set_ape(opm);
+                opm.update_model();
+            }
+            case SetFnum -> {
+                // Trust the quoted f/#: size the stop to satisfy it (which
+                // recalculates vignetting), then size everything else to pass
+                // the resulting rays. set_ape re-derives the same stop diameter,
+                // so it does not need excluding.
+                VigCalc.set_stop_aperture(opm);
+                VigCalc.set_ape(opm);
                 opm.update_model();
             }
             case SetVig -> {

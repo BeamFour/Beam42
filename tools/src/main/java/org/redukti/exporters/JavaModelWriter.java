@@ -142,7 +142,8 @@ public class JavaModelWriter {
             case SetVig -> "VigCalc.set_vig(opm, false);";
             case SetPupil -> "VigCalc.set_pupil(opm);";
             case SetStopAperture -> "VigCalc.set_stop_aperture(opm);";
-            case SetApertures -> "VigCalc.set_ape(opm); VigCalc.set_vig(opm, false);";
+            case SetApertures -> "VigCalc.set_vig(opm, false); VigCalc.set_ape(opm);";
+            case SetFnum -> "VigCalc.set_stop_aperture(opm); VigCalc.set_ape(opm);";
             case None -> throw new IllegalStateException("VigType.None should not be emitted");
         };
     }

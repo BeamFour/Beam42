@@ -117,7 +117,10 @@ public class PythonModelWriter {
             case SetVig -> "set_vignetting(opm)";
             case SetPupil -> "set_pupil(opm)";
             case SetStopAperture -> "set_stop_aperture(opm)";
-            case SetApertures -> "set_apertures(opm)";
+            // upstream set_apertures is vigcalc.set_ape alone, so the vignetting
+            // step has to be spelled out to match the Java ordering
+            case SetApertures -> "set_vignetting(opm)\nset_apertures(opm)";
+            case SetFnum -> "set_stop_aperture(opm)\nset_apertures(opm)";
             case None -> throw new IllegalStateException("VigType.None should not be emitted");
         };
     }

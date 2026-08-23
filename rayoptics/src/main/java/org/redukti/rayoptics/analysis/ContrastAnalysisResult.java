@@ -17,37 +17,10 @@ public class ContrastAnalysisResult {
 
     public record Sample(Vector2 pupil, double sagittalDifference,
                          double tangentialDifference, double weight, boolean valid,
-                         Failure failure, Shear shear) {
-
-        /** A sample with no shear measurement, which is the default. */
-        public Sample(Vector2 pupil, double sagittalDifference, double tangentialDifference,
-                      double weight, boolean valid, Failure failure) {
-            this(pupil, sagittalDifference, tangentialDifference, weight, valid, failure, null);
-        }
+                         Failure failure) {
 
         public double sagittalResidual() { return Math.sqrt(weight) * sagittalDifference; }
         public double tangentialResidual() { return Math.sqrt(weight) * tangentialDifference; }
-
-        public Sample withShear(Shear value) {
-            return new Sample(pupil, sagittalDifference, tangentialDifference,
-                    weight, valid, failure, value);
-        }
-    }
-
-    /**
-     * What one sample's ray pair actually did in the exit pupil, as opposed to what the
-     * entrance-pupil shift asked for.
-     *
-     * <p>Populated only when {@link ContrastOptions#measure_frequency(boolean)} is
-     * enabled. {@code pupilCoord} is the reference ray's exit-pupil coordinate; the two
-     * frequencies are what the sagittal and tangential pairs realised. Any field may be
-     * null or NaN if the rays did not reach the image, or if the reference sphere is
-     * infinite.
-     *
-     * @see PupilShear
-     */
-    public record Shear(Vector3 pupilCoord, Vector3 sagittalOffset, Vector3 tangentialOffset,
-                        double sagittalFrequency, double tangentialFrequency) {
     }
 
     public record Failure(String ray, String exceptionType, int surface) {

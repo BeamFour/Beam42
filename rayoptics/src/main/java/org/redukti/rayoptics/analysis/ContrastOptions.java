@@ -11,7 +11,6 @@ public class ContrastOptions {
     boolean calibrateFrequency = false;
     boolean aimExitPupil = false;
     boolean centerResiduals = false;
-    boolean measureFrequency = false;
 
     /**
      * @param spatialFrequency image-space spatial frequency in cycles per
@@ -92,22 +91,6 @@ public class ContrastOptions {
      */
     public ContrastOptions aim_exit_pupil(boolean value) {
         aimExitPupil = value;
-        return this;
-    }
-
-    /**
-     * Record, for every sample, the exit-pupil coordinate of its reference ray and the
-     * spatial frequency its two pairs actually realised.
-     *
-     * <p>Diagnostic only: it populates {@link ContrastAnalysisResult.Shear} and changes no
-     * residual. Where {@link #calibrate_frequency(boolean)} infers a single scale from one
-     * probe pair per field, wavelength and direction, this measures every pair directly,
-     * so it shows the variation across the pupil that a single scale cannot represent.
-     *
-     * <p>Costs no extra rays - both quantities come from rays the samples already trace.
-     */
-    public ContrastOptions measure_frequency(boolean value) {
-        measureFrequency = value;
         return this;
     }
 }

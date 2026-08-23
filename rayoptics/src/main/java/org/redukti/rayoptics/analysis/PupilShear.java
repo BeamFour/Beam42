@@ -31,30 +31,6 @@ import org.redukti.rayoptics.util.Orientation;
 public class PupilShear {
 
     /**
-     * The ray's exit-pupil coordinate, measured from the exit pupil centre.
-     *
-     * <p>This is Hopkins' {@code (X'-x', Y'-y', Z'-z')}: the position of the equally
-     * inclined chord point {@code B~'} relative to the chief ray's pupil crossing
-     * {@code E'}, in the coordinate frame after the last surface. Its length at full
-     * aperture reproduces {@code fod.exp_radius} to the accuracy of the paraxial
-     * approximation, but unlike {@code exp_radius} it is the real, per-ray, aberrated
-     * coordinate.
-     *
-     * <p>Hopkins normalises this by the paraxial pupil ray height {@code h'} to obtain
-     * reduced coordinates (his 5.1) which stay finite when the pupil recedes. This method
-     * returns the unreduced form and reports {@code null} for an infinite reference
-     * sphere, because the reference sphere the coordinate is measured against does not
-     * exist in that case. An afocal system needs Hopkins (5.4) instead.
-     *
-     * @return the exit-pupil coordinate, or null if the reference sphere is infinite or
-     *         the ray did not reach the last surface
-     */
-    public static Vector3 exit_pupil_coord(
-            RayPkg ray_pkg, ChiefRayPkg chief_ray_pkg, ReferenceSphere ref_sphere) {
-        return ExitPupilAiming.chord_coord(ray_pkg, chief_ray_pkg, ref_sphere);
-    }
-
-    /**
      * The image-space spatial frequency a pair of rays actually realises, in cycles per
      * system length unit.
      *

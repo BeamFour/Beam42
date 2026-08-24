@@ -12,7 +12,6 @@
     <modules>
         <module>beam42</module>
         <module>rayoptics</module>
-        <module>mathlib</module>
     </modules>
 
     <!-- Optionally define shared properties or dependency versions -->

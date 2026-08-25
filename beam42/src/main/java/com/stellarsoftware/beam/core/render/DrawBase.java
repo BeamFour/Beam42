@@ -421,13 +421,13 @@ public abstract class DrawBase implements B4constants
 
     public int getIXPIX(double x)  // annoPoints->pixel
     {
-        return (int)(imid + x);
+        return (int) Math.round(imid + x);
     }
 
 
     public int getIYPIX(double y)  // annoPoints->pixel
     {
-        return (int)(jmid - y);
+        return (int) Math.round(jmid - y);
     }
 
 

@@ -801,8 +801,8 @@ abstract class GPanel extends JPanel implements B4constants, Printable
             z -= drawBase.uzcenter;             // for stereo balance
             float  fline = 0.0f;       // for line widths
 
-            int ipx = drawBase.getIXPIX( (int) (x - STEREO*dStereo*z));
-            int ipy = drawBase.getIYPIX( (int) y);
+            int ipx = drawBase.getIXPIX(x - STEREO*dStereo*z);
+            int ipy = drawBase.getIYPIX(y);
 
             int opint = aList.get(t).getO(); 
             int opcode = opint % 1000;  

@@ -709,7 +709,9 @@ public class SequentialModel {
 
         @Override
         public GridItem apply(Vector2 p, RayPkg pkg) {
-            return fct.apply(p,wi,pkg,fld,wvl,foc);
+            if (fct != null)
+                return fct.apply(p,wi,pkg,fld,wvl,foc);
+            return new GridItem(p,pkg);
         }
     }
 
@@ -732,7 +734,9 @@ public class SequentialModel {
 
         @Override
         public GridItem apply(Vector2 p, RayPkg pkg) {
-            var result = fct.apply(opt_model,p,wi,pkg,fld,wvl,foc);
+            Double result = (fct == null)
+                            ? null
+                            : fct.apply(opt_model,p,wi,pkg,fld,wvl,foc);
             if (result != null)
                 return new GridItem(p, pkg, result);
             else
@@ -796,7 +800,7 @@ public class SequentialModel {
                 if (y_val != null && Math.abs(y_val) > max_y_val)
                     max_y_val = Math.abs(y_val);
             }
-            fans.add(new TraceFanPoints(wvl,f_x,f_y));
+            fans.add(new TraceFanPoints(wvl,f_x,f_y,fan));
         }
         return new TraceFanResult(fld,fi,xy,fans,max_rho_val,max_y_val);
     }

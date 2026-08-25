@@ -64,6 +64,13 @@ public class WvlSpec {
             spectral_wts[i] = wlwts[i].wt;
         }
     }
+    public int wl_index(double wvl) {
+        for (int i = 0; i < wavelengths.length; i++) {
+            if (wavelengths[i] == wvl)
+                return i;
+        }
+        throw new IllegalArgumentException("Wavelength "+ wvl + " is not defined");
+    }
 
     /**
      * Return wvl in nm, where wvl can be a spectral line

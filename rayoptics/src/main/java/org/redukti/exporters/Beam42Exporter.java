@@ -3,7 +3,9 @@ package org.redukti.exporters;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.mathlib.M;
+import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
+import org.redukti.rayoptics.layout.LayoutOptions;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.*;
 import org.redukti.rayoptics.seq.Glass;
@@ -264,19 +266,19 @@ public class Beam42Exporter {
 
     public static final double REFERENCE_RAY_PLANE_CLEARANCE = 10.0;
 
-    static void create_rings(OpticalModel opt_model, Field fld, double wvl,double clearance, List<RayStart> rayStarts) {
-        var grid_def = new TraceRingsDef();
-        grid_def.num_rings = 5;
-        var gridList = Trace.trace_rings(opt_model,grid_def,fld,wvl,0.0,
-                    null,false,new TraceOptions());
-        for (var gridItem: gridList) {
-            RayPkg pkg = gridItem.ray_pkg;
-            Vector3 hit = pkg.ray.get(1).p;
-            Vector3 direction = pkg.ray.get(0).d.normalize();
-            if (direction.z <= 1.0e-14)
-                throw new IllegalArgumentException("Ray does not propagate towards positive z");
-            Vector3 position = hit.minus(direction.times(clearance / direction.z));
-            rayStarts.add(new RayStart(wvl, position, direction));
+    static void create_rings(OpticalModel opt_model, int fi, double wvl, double clearance, List<RayStart> rayStarts) {
+        var wlindex = opt_model.optical_spec.wvls.wl_index(wvl);
+        var traced = opt_model.seq_model.trace_gaussian_quadrature(null,fi,wlindex,3,6,false,new TraceOptions());
+        for (var gridByWvl: traced) {
+            for (var gridItem: gridByWvl.grid) {
+                RayPkg pkg = gridItem.ray_pkg;
+                Vector3 hit = pkg.ray.get(1).p;
+                Vector3 direction = pkg.ray.get(0).d.normalize();
+                if (direction.z <= 1.0e-14)
+                    throw new IllegalArgumentException("Ray does not propagate towards positive z");
+                Vector3 position = hit.minus(direction.times(clearance / direction.z));
+                rayStarts.add(new RayStart(wvl, position, direction));
+            }
         }
     }
 
@@ -290,9 +292,49 @@ public class Beam42Exporter {
             var fld = fov.fields[i];
             List<RayStart> rayStarts = new ArrayList<>();
             for (var wvl: wavelengths) {
-                create_rings(model,fld,wvl,REFERENCE_RAY_PLANE_CLEARANCE,rayStarts);
+                create_rings(model,i,wvl,REFERENCE_RAY_PLANE_CLEARANCE,rayStarts);
             }
             Helper.createOutputFile(Helper.getOutputPath(arguments, labels[i] + ".RAY"), generate_rays_table(rayStarts));
+        }
+    }
+
+    /** Maps layout ray settings onto the tracing subsystem's options. */
+    private static TraceOptions traceOptions() {
+        TraceOptions result = new TraceOptions();
+        result.check_apertures = true;
+        result.rayerr_filter = "full";
+        return result;
+    }
+
+    static void create_ray_fans(OpticalModel opt_model, int fi, int xy, double wvl, double clearance, List<RayStart> rayStarts) {
+        var traced = opt_model.seq_model.trace_fan(null,fi,xy,9,false,traceOptions());
+        for (var fanItem: traced.fans) {
+            for (var gridItem: fanItem.fan) {
+                RayPkg pkg = gridItem.ray_pkg;
+                Vector3 hit = pkg.ray.get(1).p;
+                Vector3 direction = pkg.ray.get(0).d.normalize();
+                if (direction.z <= 1.0e-14)
+                    throw new IllegalArgumentException("Ray does not propagate towards positive z");
+                Vector3 position = hit.minus(direction.times(clearance / direction.z));
+                rayStarts.add(new RayStart(wvl, position, direction));
+            }
+        }
+    }
+
+    static void generate_ray_fan_table(Prescription prescription, int scenario, double[] fields, String[] labels, Args arguments) throws IOException {
+        var model = new RayOpticsModelBuilder(prescription).build_optical_model(true,fields,false,VigType.SetPupil,true,scenario);
+        var fov = model.optical_spec.fov;
+        double[] wavelengths = arguments.only_d_line
+                ? new double[]{Glass.d}
+                : new double[]{Glass.d, Glass.F, Glass.C};
+        for (int fi = 0; fi < fov.fields.length; fi++) {
+            List<RayStart> rayStarts = new ArrayList<>();
+            for (var wvl: wavelengths) {
+                for (int xy = 0; xy < 2; xy++) {
+                    create_ray_fans(model, fi, xy, wvl, REFERENCE_RAY_PLANE_CLEARANCE, rayStarts);
+                }
+            }
+            Helper.createOutputFile(Helper.getOutputPath(arguments, labels[fi] + ".RAY"), generate_rays_table(rayStarts));
         }
     }
 
@@ -349,6 +391,7 @@ public class Beam42Exporter {
 
         Helper.createOutputFile(Helper.getOutputPath(arguments, ".OPT"), exporter.generate(prescription, arguments.scenario));
         generate_rays_table(prescription,arguments.scenario,new double[] {0.0,1.0},new String[] {"","-SKEW"},arguments);
+        generate_ray_fan_table(prescription,arguments.scenario,new double[] {0.0,1.0},new String[] {"-FAN","-FAN-SKEW"},arguments);
         generate_med_table(prescription,arguments);
     }
 }

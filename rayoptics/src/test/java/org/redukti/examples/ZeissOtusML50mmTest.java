@@ -223,9 +223,8 @@ class ZeissOtusML50mmTest {
         assertTrue(status > 0, "Optimizer failed with status " + status);
         assertTrue(finalRms < initialRms,
                 () -> "Expected RMS merit to improve from " + initialRms + " but got " + finalRms);
-        assertEquals(0.0118734292, finalRms, 1.0e-6);
-
         var analysis = setup.analysis();
+        assertEquals(0.0118734292, finalRms, 1.0e-6);
         assertEquals(50.15110204, analysis._pfo[ParaxHelper.Effective_focal_length], 1.0e-6);
         assertEquals(1.43889571, analysis._pfo[ParaxHelper.Fno], 1.0e-6);
         assertArrayEquals(new double[]{

@@ -72,6 +72,7 @@ public final class OptimizationBuilder {
     private int hexapolarSpotRays = 64;
     private int gaussianQuadratureRings = 14;
     private int gaussianQuadratureSpokes = 20;
+    private double gaussianQuadratureInnerRadius = 0.0;
     private boolean checkSpotApertures = true;
     private double[] spotDeviationXWeights;
     private double[] spotDeviationYWeights;
@@ -167,11 +168,21 @@ public final class OptimizationBuilder {
      * geometric-MTF analyses. Contrast uses its separate sheared-pupil pattern.
      */
     public OptimizationBuilder gaussianQuadratureSampling(int rings, int spokes) {
-        if (rings < 1 || spokes < 1)
+        return gaussianQuadratureSampling(rings, spokes, 0.0);
+    }
+
+    /** Configure Gaussian quadrature for a concentric annular pupil. */
+    public OptimizationBuilder gaussianQuadratureSampling(
+            int rings, int spokes, double innerPupilRadius) {
+        if (rings < 1 || spokes < 3)
             throw new IllegalArgumentException(
-                    "Gaussian-quadrature rings and spokes must be at least 1");
+                    "Gaussian quadrature requires at least 1 ring and 3 spokes");
+        if (!Double.isFinite(innerPupilRadius)
+                || innerPupilRadius < 0.0 || innerPupilRadius >= 1.0)
+            throw new IllegalArgumentException("Inner pupil radius must be finite and in [0, 1)");
         this.gaussianQuadratureRings = rings;
         this.gaussianQuadratureSpokes = spokes;
+        this.gaussianQuadratureInnerRadius = innerPupilRadius;
         return this;
     }
 
@@ -641,14 +652,16 @@ public final class OptimizationBuilder {
         boolean hasSpotMaxRadiusGoal = goals.stream().anyMatch(GoalSpotMaxRadius.class::isInstance);
         if (addSpotDeviationGoals) {
             analysis.using_gauss_quadrature_pattern(
-                            gaussianQuadratureRings, gaussianQuadratureSpokes)
+                            gaussianQuadratureRings, gaussianQuadratureSpokes,
+                            gaussianQuadratureInnerRadius)
                     .retaining_failed_spot_rays(true);
         }
         else if (useHexapolarSpotPattern || hasSpotMaxRadiusGoal)
             analysis.using_hexapolar_pattern(hexapolarSpotRays);
         else
             analysis.using_gauss_quadrature_pattern(
-                    gaussianQuadratureRings, gaussianQuadratureSpokes);
+                    gaussianQuadratureRings, gaussianQuadratureSpokes,
+                    gaussianQuadratureInnerRadius);
     }
 
     private List<Var> buildVariables() {

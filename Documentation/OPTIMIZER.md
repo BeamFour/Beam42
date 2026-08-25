@@ -744,6 +744,11 @@ default remains 14 rings by 20 spokes; 6 by 12 gives 72 pupil rays and 144 resid
 field and wavelength when a smaller optimization merit is wanted. Contrast retains a
 separate `contrastSampling` setting because it integrates over the overlap of sheared
 pupils rather than the ordinary spot pupil.
+
+For a concentric annular entrance pupil, pass its normalized inner radius as a third
+argument, for example `gaussianQuadratureSampling(6, 12, 0.50)`. See
+[`GAUSSIAN_QUADRATURE.md`](GAUSSIAN_QUADRATURE.md) for the formula, vignetting
+weighting, spoke-count guidance, and the exact scope relative to the reference paper.
 Sampling must remain fixed throughout an optimization; failed rays therefore retain
 their sample positions and report an invalid goal instead of being removed and shifting
 the remaining goal indices.

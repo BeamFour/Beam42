@@ -23,6 +23,8 @@ public class Analysis {
     public int _num_rays = 64;
     public int _num_rings = 14;
     public int _num_spokes = 20;
+    /** Normalized central obscuration radius for the ordinary spot quadrature. */
+    public double _inner_pupil_radius = 0.0;
     public boolean _append_failed_spot_rays = false;
     /** Whether ordinary spot rays are rejected by physical surface apertures. */
     public boolean _check_spot_apertures = true;
@@ -78,9 +80,20 @@ public class Analysis {
         this(prescription,fields,freqs,0);
     }
     public Analysis using_gauss_quadrature_pattern(int num_rings, int num_spokes) {
+        return using_gauss_quadrature_pattern(num_rings, num_spokes, 0.0);
+    }
+    public Analysis using_gauss_quadrature_pattern(
+            int num_rings, int num_spokes, double innerPupilRadius) {
+        if (num_rings < 1 || num_spokes < 3)
+            throw new IllegalArgumentException(
+                    "Gaussian quadrature requires at least 1 ring and 3 spokes");
+        if (!Double.isFinite(innerPupilRadius)
+                || innerPupilRadius < 0.0 || innerPupilRadius >= 1.0)
+            throw new IllegalArgumentException("Inner pupil radius must be finite and in [0, 1)");
         _spot_pattern = SpotOptions.PATTERN_GAUSS_QUADRATURE;
         _num_rings = num_rings;
         _num_spokes = num_spokes;
+        _inner_pupil_radius = innerPupilRadius;
         return this;
     }
     public Analysis retaining_failed_spot_rays(boolean value) {
@@ -236,6 +249,7 @@ public class Analysis {
             if (_spot_pattern == SpotOptions.PATTERN_GAUSS_QUADRATURE) {
                 options = new SpotOptions().use_gaussian_quadrature()
                         .num_rings(_num_rings).num_spokes(_num_spokes)
+                        .inner_pupil_radius(_inner_pupil_radius)
                         .append_failed_rays(_append_failed_spot_rays)
                         .check_apertures(_check_spot_apertures);
             }

@@ -41,9 +41,10 @@ public class SpotAnalysis {
 
     public static List<TraceGridByWvl> eval_gaussian_quadrature(
             OpticalModel opt_model, int fi, Integer wl, int num_rings,
-            Integer num_spokes, boolean append_if_none, TraceOptions trace_options) {
+            Integer num_spokes, double innerPupilRadius,
+            boolean append_if_none, TraceOptions trace_options) {
         return opt_model.seq_model.trace_gaussian_quadrature(
-                SpotAnalysis::spot, fi, wl, num_rings, num_spokes,
+                SpotAnalysis::spot, fi, wl, num_rings, num_spokes, innerPupilRadius,
                 append_if_none, trace_options);
     }
 
@@ -60,6 +61,7 @@ public class SpotAnalysis {
             else if (options.is_gauss_quadrature())
                 result.add(f, eval_gaussian_quadrature(
                         opt_model, fi, null, num_rays, options._num_spokes,
+                        options._inner_pupil_radius,
                         options._append_failed_rays, trace_options), ref_wvl);
             else
                 // hexapolar

@@ -4,6 +4,8 @@ public class TraceRingsDef {
     public double cx = 0;
     public double cy = 0;
     public int num_rings = 21;
+    /** Normalized inner radius; zero selects a filled circular pupil. */
+    public double min_radius = 0.0;
     public double max_radius = 1.0;
     public int num_points_in_ring_one = 6;
     public boolean hexapolar = true;

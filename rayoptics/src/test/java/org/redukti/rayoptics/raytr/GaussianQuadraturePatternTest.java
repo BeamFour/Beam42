@@ -56,6 +56,23 @@ class GaussianQuadraturePatternTest {
     }
 
     @Test
+    void integratesLowOrderAnnularMoments() {
+        TraceRingsDef definition = new TraceRingsDef();
+        definition.min_radius = 0.5;
+        List<Trace.GaussianQuadraturePoint> points =
+                Trace.generate_gaussian_quadrature(definition, 3, 12);
+
+        double meanR2 = points.stream().mapToDouble(point -> {
+            double r2 = point.pupil().x * point.pupil().x
+                    + point.pupil().y * point.pupil().y;
+            return point.weight() * r2;
+        }).sum();
+        assertEquals((1.0 + 0.25) / 2.0, meanR2, 1.0e-14);
+        assertTrue(points.stream().allMatch(point ->
+                point.pupil().x * point.pupil().x + point.pupil().y * point.pupil().y > 0.25));
+    }
+
+    @Test
     void appliesPupilScaleAndOffset() {
         TraceRingsDef definition = new TraceRingsDef();
         definition.cx = 2.0;
@@ -81,6 +98,11 @@ class GaussianQuadraturePatternTest {
                 () -> Trace.generate_gaussian_quadrature(definition, 0, null));
         assertThrows(IllegalArgumentException.class,
                 () -> Trace.generate_gaussian_quadrature(definition, 1, 0));
+        assertThrows(IllegalArgumentException.class,
+                () -> Trace.generate_gaussian_quadrature(definition, 1, 2));
+        definition.min_radius = 1.0;
+        assertThrows(IllegalArgumentException.class,
+                () -> Trace.generate_gaussian_quadrature(definition, 1, 3));
     }
 
     @Test

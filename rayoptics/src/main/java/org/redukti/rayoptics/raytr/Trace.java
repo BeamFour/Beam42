@@ -1026,22 +1026,31 @@ public class Trace {
     }
 
     /**
-     * Generates a Gaussian quadrature pattern over a circular pupil.
+     * Generates a Gaussian quadrature pattern over a circular or concentric
+     * annular pupil.
      *
      * <p>The radial coordinates are Gauss-Legendre nodes transformed from
-     * {@code [-1, 1]} to squared pupil radius {@code [0, 1]}. Each radial node
+     * {@code [-1, 1]} to squared pupil radius
+     * {@code [min_radius^2, max_radius^2]}. Each radial node
      * is repeated at uniformly spaced angles. The returned weights are
      * normalized to sum to one, so they integrate a pupil average rather than
      * the area (pi) of the unit disk.</p>
      *
-     * <p>Based on William H. Peirce, "Numerical Integration Over the Planar
-     * Annulus", Journal of the Society for Industrial and Applied Mathematics,
-     * Vol. 5, No. 2 (1957), pp. 66-73.</p>
+     * <p>Based on B. J. Bauman, H. Xiao, "Gaussian Quadrature for Optical Design
+     * with Non-circular Pupils and Fields, and Broad Wavelength Ranges".</p>
+     *
+     * <p>Also see https://optics.ansys.com/hc/en-us/articles/42661826659347-How-to-use-vignetting-factors</p>
      */
     static List<GaussianQuadraturePoint> generate_gaussian_quadrature(
             TraceRingsDef grid_rng, int num_rings, Integer num_spokes) {
-        if (num_rings < 1 || (num_spokes != null && num_spokes < 1)) {
-            throw new IllegalArgumentException("The number of rings and spokes must be at least 1");
+        if (num_rings < 1 || (num_spokes != null && num_spokes < 3)) {
+            throw new IllegalArgumentException(
+                    "The number of rings must be at least 1 and spokes must be at least 3");
+        }
+        if (!Double.isFinite(grid_rng.min_radius) || !Double.isFinite(grid_rng.max_radius)
+                || grid_rng.min_radius < 0.0 || grid_rng.max_radius <= grid_rng.min_radius) {
+            throw new IllegalArgumentException(
+                    "Pupil radii must be finite and satisfy 0 <= min_radius < max_radius");
         }
 
         int spokes = num_spokes == null ? 4 * (num_rings + 1) : num_spokes;
@@ -1053,8 +1062,11 @@ public class Trace {
             double cosTheta = Math.cos(theta);
             double sinTheta = Math.sin(theta);
             for (int ring = 0; ring < num_rings; ring++) {
-                double radius = grid_rng.max_radius
-                        * Math.sqrt(0.5 + 0.5 * nodesAndWeights[0][ring]);
+                double radialFraction = 0.5 + 0.5 * nodesAndWeights[0][ring];
+                double innerRadiusSquared = grid_rng.min_radius * grid_rng.min_radius;
+                double outerRadiusSquared = grid_rng.max_radius * grid_rng.max_radius;
+                double radius = Math.sqrt(innerRadiusSquared
+                        + radialFraction * (outerRadiusSquared - innerRadiusSquared));
                 Vector2 pupil = new Vector2(
                         grid_rng.cx + radius * cosTheta,
                         grid_rng.cy + radius * sinTheta);

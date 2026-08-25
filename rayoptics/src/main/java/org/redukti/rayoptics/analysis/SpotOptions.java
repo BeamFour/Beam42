@@ -14,6 +14,7 @@ public class SpotOptions {
     boolean _append_failed_rays = false;
     int _num_rays_or_rings;
     Integer _num_spokes = null;
+    double _inner_pupil_radius = 0.0;
 
     public SpotOptions(boolean useGaussGuadrature) {
         // Spot analysis historically checked the physical surface apertures.
@@ -51,7 +52,18 @@ public class SpotOptions {
         return this;
     }
     public SpotOptions num_spokes(Integer spokes) {
+        if (spokes != null && spokes < 3)
+            throw new IllegalArgumentException("Gaussian quadrature requires at least 3 spokes");
         this._num_spokes = spokes;
+        return this;
+    }
+    /**
+     * Select a concentric annular pupil using a normalized inner radius in [0,1).
+     */
+    public SpotOptions inner_pupil_radius(double radius) {
+        if (!Double.isFinite(radius) || radius < 0.0 || radius >= 1.0)
+            throw new IllegalArgumentException("Inner pupil radius must be finite and in [0, 1)");
+        this._inner_pupil_radius = radius;
         return this;
     }
     public SpotOptions use_centroid(boolean value) {

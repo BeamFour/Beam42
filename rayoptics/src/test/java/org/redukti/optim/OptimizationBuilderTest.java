@@ -499,15 +499,17 @@ class OptimizationBuilderTest {
         assertEquals(SpotOptions.PATTERN_GAUSS_QUADRATURE, analysis._spot_pattern);
         assertEquals(14, analysis._num_rings);
         assertEquals(20, analysis._num_spokes);
+        assertEquals(0.0, analysis._inner_pupil_radius);
 
         Analysis configured = OptimizationBuilder.builder(prescription())
                 .fields(0.0)
                 .mtfFrequencies(10)
-                .gaussianQuadratureSampling(3, 8)
+                .gaussianQuadratureSampling(3, 8, 0.5)
                 .build()
                 .analysis();
         assertEquals(3, configured._num_rings);
         assertEquals(8, configured._num_spokes);
+        assertEquals(0.5, configured._inner_pupil_radius);
     }
 
     @Test

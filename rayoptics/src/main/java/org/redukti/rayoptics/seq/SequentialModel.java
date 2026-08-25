@@ -889,11 +889,19 @@ public class SequentialModel {
     }
 
     public List<TraceGridByWvl> trace_gaussian_quadrature(
+        TraceGridCallback fct, int fi, Integer wl, int num_rings,
+        Integer num_spokes, boolean append_if_none, TraceOptions trace_options) {
+        return trace_gaussian_quadrature(fct, fi, wl, num_rings, num_spokes,
+                0.0, append_if_none, trace_options);
+    }
+
+    public List<TraceGridByWvl> trace_gaussian_quadrature(
         TraceGridCallback fct,
         int fi,
         Integer wl,
         int num_rings,
         Integer num_spokes,
+        double innerPupilRadius,
         boolean append_if_none,
         TraceOptions trace_options) {
         var osp = opt_model.optical_spec;
@@ -910,6 +918,7 @@ public class SequentialModel {
         List<TraceGridByWvl> grids = new ArrayList<>();
         var grid_def = new TraceRingsDef();
         grid_def.num_rings = num_rings;
+        grid_def.min_radius = innerPupilRadius;
         for (int wi = 0; wi < wv_list.length; wi++) {
             wvl = wv_list[wi];
             var grid = Trace.trace_gaussian_quadrature(

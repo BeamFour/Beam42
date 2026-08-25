@@ -218,6 +218,8 @@ public class Beam42Exporter {
             new ColumnDef("V0", 20, M.decimal_format(12)),
             new ColumnDef("W0", 20, M.decimal_format(21)),
             new ColumnDef("xfinal", 16, null),
+            new ColumnDef("yfinal", 16, null),
+            new ColumnDef("zfinal", 16, null),
             new ColumnDef("notes", 30, null),
     };
 
@@ -229,7 +231,9 @@ public class Beam42Exporter {
     static final int RAY_V0_col = 5;
     static final int RAY_W0_col = 6;
     static final int RAY_xfinal_col = 7;
-    static final int RAY_notes_col = 8;
+    static final int RAY_yfinal_col = 8;
+    static final int RAY_zfinal_col = 9;
+    static final int RAY_notes_col = 10;
 
     record RayStart(double wvl, Vector3 position, Vector3 direction) {}
 
@@ -257,6 +261,8 @@ public class Beam42Exporter {
                     .append(ray_columns[RAY_V0_col].pad(rayStart.direction.y())).append(":")
                     .append(ray_columns[RAY_W0_col].pad(rayStart.direction.z())).append(":")
                     .append(ray_columns[RAY_xfinal_col].pad("")).append(":")
+                    .append(ray_columns[RAY_yfinal_col].pad("")).append(":")
+                    .append(ray_columns[RAY_zfinal_col].pad("")).append(":")
                     .append(ray_columns[RAY_notes_col].pad("")).append(":")
                     .append(" ").append(System.lineSeparator());
 

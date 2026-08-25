@@ -398,7 +398,7 @@ public class DrawLayout extends DrawBase   // implements B4constants via GPanel
             rymin = Math.min(rymin, RT13.raystarts[k][RY]);
             rymax = Math.max(rymax, RT13.raystarts[k][RY]);
             rzmin = Math.min(rzmin, RT13.raystarts[k][RZ]);
-            rzmax = Math.max(rxmax, RT13.raystarts[k][RZ]);
+            rzmax = Math.max(rzmax, RT13.raystarts[k][RZ]);
 
             xmin  = Math.min(xmin, RT13.raystarts[k][RX]);
             xmax  = Math.max(xmax, RT13.raystarts[k][RX]);

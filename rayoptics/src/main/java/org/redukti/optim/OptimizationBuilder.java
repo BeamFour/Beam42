@@ -89,6 +89,7 @@ public final class OptimizationBuilder {
     private boolean centerContrastResiduals = false;
     private boolean[] contrastBalanceFields;
     private double contrastBalanceWeight = NOMINAL_BALANCE_WEIGHT;
+    private int scenario = 0;
     private VigType vigType = VigType.SetPupil;
     private boolean freezeVignetting = false;
     private Double thicknessConstraintWeight;
@@ -136,6 +137,27 @@ public final class OptimizationBuilder {
     /** Restrict enabled ray-aberration goals to the Fraunhofer d-line. */
     public OptimizationBuilder dLineOnly(boolean dLineOnly) {
         this.dLineOnly = dLineOnly;
+        return this;
+    }
+
+    /**
+     * Which configuration of a multi-configuration prescription to optimize; zero based,
+     * and zero for a single-configuration lens.
+     *
+     * <p>A zoom prescription carries a thickness per configuration on the varying spaces,
+     * and its own focal length, f-number and angle of view. This selects all of them
+     * together: the analysis builds the model for that configuration, thickness variables
+     * read and write that configuration's value, and the paraxial anchors target that
+     * configuration's focal length and f-number.
+     *
+     * <p>Configurations are optimized one at a time. Nothing here couples them, so a space
+     * moved for one configuration is not reconciled against the others - that has to be
+     * checked separately.
+     */
+    public OptimizationBuilder scenario(int scenario) {
+        if (scenario < 0)
+            throw new IllegalArgumentException("scenario must be non-negative, got " + scenario);
+        this.scenario = scenario;
         return this;
     }
 
@@ -319,8 +341,46 @@ public final class OptimizationBuilder {
     private double thicknessOf(int surface) {
         var definition = prescription._surfaces[surface];
         return definition._thickness_by_scenario != null
-                ? definition._thickness_by_scenario[0]
+                ? definition._thickness_by_scenario[scenario]
                 : definition._thickness;
+    }
+
+    /** Effective focal length this scenario is anchored to. */
+    private double focalLengthOf() {
+        return prescription._focal_length_by_scenario != null
+                ? prescription._focal_length_by_scenario[scenario]
+                : prescription._focal_length;
+    }
+
+    /** F-number this scenario is anchored to. */
+    private double fNumberOf() {
+        return prescription._f_number_by_scenario != null
+                ? prescription._f_number_by_scenario[scenario]
+                : prescription._fno;
+    }
+
+    /**
+     * Reject a scenario the prescription does not define, rather than letting it surface
+     * as an array index failure from somewhere inside the solve.
+     */
+    private void validateScenario() {
+        if (scenario == 0) return;
+        int available = scenarioCount();
+        if (scenario >= available)
+            throw new IllegalArgumentException("scenario " + scenario
+                    + " requested but the prescription defines " + available
+                    + (available == 1 ? " (it is not multi-configuration)" : ""));
+    }
+
+    /** Number of configurations the prescription defines; 1 when it is not a zoom. */
+    private int scenarioCount() {
+        int count = 1;
+        if (prescription._focal_length_by_scenario != null)
+            count = Math.max(count, prescription._focal_length_by_scenario.length);
+        for (var surface : prescription._surfaces)
+            if (surface._thickness_by_scenario != null)
+                count = Math.max(count, surface._thickness_by_scenario.length);
+        return count;
     }
 
     /**
@@ -606,7 +666,7 @@ public final class OptimizationBuilder {
 
     public OptimizationSetup build() {
         validate();
-        Analysis analysis = new Analysis(prescription, copy(fields), copy(mtfFrequencies));
+        Analysis analysis = new Analysis(prescription, copy(fields), copy(mtfFrequencies), scenario);
         List<Var> variables = buildVariables();
         List<Goal> goals = buildGoals(analysis, variables);
         if (goals.size() < variables.size())
@@ -682,11 +742,11 @@ public final class OptimizationBuilder {
                 // A zero thickness is a coincident surface, not a space to open up, and
                 // it gives the fractional ConstraintThickness no base to work from.
                 if (thicknessOf(surface) != 0.0)
-                    result.add(new VarThickness(prescription, surface));
+                    result.add(new VarThickness(prescription, surface, scenario));
             }
         } else {
             for (int surface : thicknessSurfaces)
-                result.add(new VarThickness(prescription, surface));
+                result.add(new VarThickness(prescription, surface, scenario));
         }
         if (includeExistingAspherics) {
             for (int surfaceId = 0; surfaceId < prescription._surfaces.length; surfaceId++) {
@@ -803,8 +863,8 @@ public final class OptimizationBuilder {
 
         // Anchor first-order properties to the requested prescription values.
         result.add(new GoalParax(analysis, ParaxHelper.Effective_focal_length,
-                prescription._focal_length, 1.0));
-        result.add(new GoalParax(analysis, ParaxHelper.Fno, prescription._fno, 1.0));
+                focalLengthOf(), 1.0));
+        result.add(new GoalParax(analysis, ParaxHelper.Fno, fNumberOf(), 1.0));
 
         if (addRayAberrationGoals) {
             for (int field = 1; field <= fields.length; field++) {
@@ -834,6 +894,7 @@ public final class OptimizationBuilder {
     private void validate() {
         if (fields == null || fields.length == 0)
             throw new IllegalArgumentException("at least one field is required");
+        validateScenario();
         if (contrastBalanceFields != null) {
             if (contrastBalanceFields.length != fields.length)
                 throw new IllegalArgumentException(

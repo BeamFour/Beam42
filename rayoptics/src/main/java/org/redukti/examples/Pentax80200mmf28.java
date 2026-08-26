@@ -26,8 +26,8 @@ public class Pentax80200mmf28 {
 
         return OptimizationBuilder.builder(prescription)
                 .fields(fields)
-                .mtfFrequencies(50)
-                .scenario(1)
+                .mtfFrequencies(10,30,50)
+                .scenario(0)
 //                .varyExistingAspherics()
 //                .varyAllCurvatures()
 //                .varyAllThicknesses()
@@ -45,12 +45,12 @@ public class Pentax80200mmf28 {
                 .freezeVignetting()
                 .checkSpotApertures(false)
                 .contrastGoals(
-//                        contrast(10,
-//                                sagittalWeights,
-//                                tangentialWeights),
-//                        contrast(30,
-//                                sagittalWeights,
-//                                tangentialWeights),
+                        contrast(10,
+                                sagittalWeights,
+                                tangentialWeights),
+                        contrast(30,
+                                sagittalWeights,
+                                tangentialWeights),
                         contrast(50,
                                 sagittalWeights,
                                 tangentialWeights))

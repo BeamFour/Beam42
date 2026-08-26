@@ -106,6 +106,15 @@ originY	81.52
 ppmm	1.684
 [notes]
 Bill: Patent diameters including AS
+[patent info]
+country	US
+number	US 2025/0155694
+example	1
+year applied	2023
+inventors	Junya Ichimura
+current assignee	Canon Inc
+original assignee	Canon Inc
+link	https://patents.google.com/patent/US20250155694A1/en
 [report data]
 lens name	Canon RF 70-200mm F2.8 L IS USM Z
 scenarios	0	2

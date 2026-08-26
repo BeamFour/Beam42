@@ -1,4 +1,8 @@
 # Canon RF 70-200mm F2.8 L IS USM Z
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | US 2025/0155694 | 1 | 2023 | Junya Ichimura | Canon Inc | [link](https://patents.google.com/patent/US20250155694A1/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -180,4 +184,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./US20250155694_Example01P.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-08-21
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-08-26

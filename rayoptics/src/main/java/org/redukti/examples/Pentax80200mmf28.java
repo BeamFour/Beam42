@@ -1,6 +1,7 @@
 package org.redukti.examples;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
+import org.redukti.optim.ConfigurationReport;
 import org.redukti.optim.OptimizationBuilder;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.VigType;
@@ -62,6 +63,10 @@ public class Pentax80200mmf28 {
         boolean dLineOnly = false;
         var prescription = getPrescription(ExampleFinder.geoPathToExample("Examples/jfotoptix/pentax-80-200mm-f2.8/US005572276_Example05P.txt"), weighted, dLineOnly);
         var setup = createContrastSetup(prescription, weighted, dLineOnly);
+        // Only the zoom spaces carry a value per configuration; everything else is shared,
+        // so measure every configuration before and after and check nothing regressed.
+        var before = ConfigurationReport.capture(prescription,
+                new double[]{0.0, 0.3, 0.5, 0.7, 1.0}, new int[]{10, 30, 50});
         var analysis = setup.analysis();
         var meritFunction = setup.meritFunction(false);
         analysis.compute();
@@ -78,5 +83,9 @@ public class Pentax80200mmf28 {
         System.out.println("After:\n");
         System.out.println(meritFunction);
         System.out.println(prescription);
+
+        var after = ConfigurationReport.capture(prescription,
+                new double[]{0.0, 0.3, 0.5, 0.7, 1.0}, new int[]{10, 30, 50});
+        System.out.println(ConfigurationReport.compare(before, after));
     }
 }

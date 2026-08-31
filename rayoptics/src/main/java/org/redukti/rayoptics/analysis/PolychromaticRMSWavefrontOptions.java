@@ -10,7 +10,9 @@ public class PolychromaticRMSWavefrontOptions {
     TraceOptions traceOptions = new TraceOptions();
 
     public PolychromaticRMSWavefrontOptions() {
-        traceOptions.check_apertures = true;
+        // Gaussian quadrature integrates the vignetting-factor pupil. Deleting rays
+        // clipped by surface apertures invalidates its circular/elliptical-pupil weights.
+        traceOptions.check_apertures = false;
     }
 
     public PolychromaticRMSWavefrontOptions num_rings(int value) {
@@ -20,8 +22,8 @@ public class PolychromaticRMSWavefrontOptions {
     }
 
     public PolychromaticRMSWavefrontOptions num_spokes(Integer value) {
-        if (value != null && value < 1)
-            throw new IllegalArgumentException("Number of spokes must be at least 1");
+        if (value != null && value < 3)
+            throw new IllegalArgumentException("Number of spokes must be at least 3");
         numSpokes = value;
         return this;
     }
@@ -35,7 +37,7 @@ public class PolychromaticRMSWavefrontOptions {
 
     public PolychromaticRMSWavefrontOptions trace_options(TraceOptions value) {
         if (value == null) throw new IllegalArgumentException("Trace options cannot be null");
-        traceOptions = value;
+        traceOptions = value.copy();
         return this;
     }
 

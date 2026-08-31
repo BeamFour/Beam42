@@ -12,6 +12,8 @@ import org.redukti.rayoptics.raytr.TraceRingsDef;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 class PolychromaticRMSWavefrontProbe2Test {
 
     private record Sample(double weight, double opd) {}
@@ -133,11 +135,9 @@ class PolychromaticRMSWavefrontProbe2Test {
         System.out.println("--- degenerate: all spectral weights zero");
         var model = MtfTest.buildTestModel();
         model.optical_spec.wvls.spectral_wts = new double[]{0.0, 0.0, 0.0};
-        var r = PolychromaticRMSWavefrontAnalysis.eval(model,
-                new PolychromaticRMSWavefrontOptions().num_rings(2).num_spokes(6));
-        for (int fi = 0; fi < r.fields().size(); fi++)
-            System.out.printf("  field %d rms=%s totalWeight=%s validSamples=%d%n",
-                    fi, r.fields().get(fi).rmsWaves(), r.fields().get(fi).totalWeight(),
-                    r.fields().get(fi).validSamples());
+        var error = assertThrows(IllegalArgumentException.class,
+                () -> PolychromaticRMSWavefrontAnalysis.eval(model,
+                        new PolychromaticRMSWavefrontOptions().num_rings(2).num_spokes(6)));
+        System.out.println("  rejected: " + error.getMessage());
     }
 }

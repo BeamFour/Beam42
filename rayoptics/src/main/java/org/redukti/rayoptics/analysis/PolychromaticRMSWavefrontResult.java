@@ -1,6 +1,6 @@
 package org.redukti.rayoptics.analysis;
 
-import org.redukti.rayoptics.specs.Field;
+import org.redukti.rayoptics.specs.ReadOnlyField;
 
 import java.util.List;
 
@@ -15,11 +15,25 @@ public record PolychromaticRMSWavefrontResult(List<FieldResult> fields) {
             double wavelength,
             double spectralWeight,
             double pupilWeight,
+            double weightedSum,
             double weightedSquareSum,
+            double centeredWeightedSquareSum,
             int validSamples) {
 
-        /** Monochromatic RMS over the valid pupil samples, in waves. */
+        /** Weighted mean OPD before piston removal, in waves. */
+        public double meanWaves() {
+            return pupilWeight > 0.0 ? weightedSum / pupilWeight : Double.NaN;
+        }
+
+        /** Chief-referenced monochromatic RMS with piston removed, in waves. */
         public double rmsWaves() {
+            return pupilWeight > 0.0
+                    ? Math.sqrt(centeredWeightedSquareSum / pupilWeight)
+                    : Double.NaN;
+        }
+
+        /** RMS of the raw chief-ray OPDs without piston removal, in waves. */
+        public double unreferencedRmsWaves() {
             return pupilWeight > 0.0
                     ? Math.sqrt(weightedSquareSum / pupilWeight)
                     : Double.NaN;
@@ -27,7 +41,7 @@ public record PolychromaticRMSWavefrontResult(List<FieldResult> fields) {
     }
 
     public record FieldResult(
-            Field field,
+            ReadOnlyField field,
             double rmsWaves,
             double totalWeight,
             int validSamples,

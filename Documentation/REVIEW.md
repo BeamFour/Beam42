@@ -11,6 +11,10 @@ Findings 1–7 were written against the state of the branch at the time of the r
 finding 8 was added on 2026-08-15 and finding 9 on 2026-08-19. Everything through
 finding 8 was revisited as of 2026-08-15; finding 9 reviews the frequency-normalization
 work added afterwards and narrows the conclusion previously drawn in finding 7.
+Finding 10 was added on 2026-08-31 and reviews a different class,
+`PolychromaticRMSWavefrontAnalysis`. Its headline was written, retracted, and reinstated
+the same day as successively better sources were consulted; the section keeps that history
+visible rather than presenting only the conclusion.
 See [Open questions](#open-questions) for what is unresolved and
 [Changes since this review was written](#changes-since-this-review-was-written) for work
 that landed afterwards and does not belong to any single finding.
@@ -28,6 +32,7 @@ that landed afterwards and does not belong to any single finding.
 | [7](#7-the-shear-is-applied-at-the-entrance-pupil-not-the-exit-pupil) | Shear applied at entrance, not exit, pupil | **Fixed, opt-in.** `aimContrastAtExitPupil()` inverse-aims every partner to its requested reference-sphere separation; block calibration remains a cheaper approximation |
 | [8](#8-vignetting-is-a-moving-mode-dependent-reference-frame) | Vignetting is a moving, mode-dependent reference frame | **Partly addressed.** Mode is configurable and the factors can be frozen; the perverse incentive it exposes is unmeasured |
 | [9](#9-frequency-normalization-uses-ray-direction-not-hopkins-exit-pupil-shear) | Frequency normalization used image-ray direction rather than exit-pupil separation | **Resolved by tracing.** Residual rescaling remains removed; direct two-dimensional reference-sphere aiming now traces the ray whose OPD is required |
+| [10](#10-polychromaticrmswavefrontanalysis-implements-zemaxs-unreferenced-metric-not-its-chief-ray-reference) | `PolychromaticRMSWavefrontAnalysis` omits the mean OPD, and runs GQ over a clipped pupil | **Open, two parts.** It computes Zemax's *Unreferenced* metric, not the chief-ray reference it documents: the manual subtracts the mean OPD under both references. 2.01× on axis. Separately, GQ with `check_apertures` on is the case both the manual and `GAUSSIAN_QUADRATURE.md` rule out, and the clipped fields do not converge |
 
 Findings 6 and 8 are two attempts at the same symptom — a Leica 75/2 mid-field sagittal
 MTF drop — and neither currently explains it. Finding 6 blamed the least-squares
@@ -38,7 +43,10 @@ collapsed for unrelated reasons. [Open questions](#open-questions) has the curre
 
 Read that as a caution about this document generally: findings 1, 2, 5 and 7 rest on
 direct measurement and have held up. The chain of explanations for the sagittal drop has
-been revised three times.
+been revised three times, and finding 10's headline was retracted and then reinstated
+within a day — first asserted from convention, then withdrawn on an incomplete online help
+page, then confirmed by the manual in `Documentation/`. Consult the primary source before
+the secondary one, and treat an argument from what a source omits as weak.
 
 ## Code under review
 
@@ -55,6 +63,15 @@ Line references are as of 2026-08-15.
 | [Analysis.java:126](../optimcommon/src/main/java/org/redukti/optim/Analysis.java:126) | analysis driver — one `ContrastAnalysis.eval` per frequency |
 | [OptimizationBuilder.java:544](../optimr2/src/main/java/org/redukti/optim/OptimizationBuilder.java:544) | contrast goal construction |
 | [LMDerMeritFunction.java:116](../optimr2/src/main/java/org/redukti/optim/LMDerMeritFunction.java:116) | `buildJacobian` — added after the review, see §5 and the changes section |
+
+Finding 10 reviews a separate class, as of 2026-08-31:
+
+| File | Role |
+| --- | --- |
+| [PolychromaticRMSWavefrontAnalysis.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/PolychromaticRMSWavefrontAnalysis.java) | per-field polychromatic RMS wavefront value |
+| [PolychromaticRMSWavefrontOptions.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/PolychromaticRMSWavefrontOptions.java) | sampling and aperture configuration |
+| [PolychromaticRMSWavefrontResult.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/PolychromaticRMSWavefrontResult.java) | per-field / per-wavelength result container |
+| [Trace.java:720](../rayoptics/src/main/java/org/redukti/rayoptics/raytr/Trace.java:720) | `trace_gaussian_quadrature` — the sampling it uses |
 
 ## Verdict
 
@@ -1194,6 +1211,267 @@ exit-pupil metric alone moved it to 1.0141, which is worse. That cancellation is
 of the lenses tested, not a principle, so `calibrate_frequency`'s accuracy should not be
 assumed to carry to other designs; direct aiming has no such dependence.
 
+## 10. `PolychromaticRMSWavefrontAnalysis` implements Zemax's *Unreferenced* metric, not its chief-ray reference
+
+**Severity: medium.** Added 2026-08-31.
+
+This finding is about a different class from the rest of the document —
+[PolychromaticRMSWavefrontAnalysis.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/PolychromaticRMSWavefrontAnalysis.java),
+reviewed on request while it was still uncommitted and had no callers.
+
+> **Provenance, because this section changed its mind twice in one day.** It was first
+> written claiming the missing mean subtraction was a defect. It was then retracted on the
+> strength of the online *RMS vs Field* help page, whose chief-ray bullet describes only
+> where the reference sphere is centred and gives a polychromatic formula that looks
+> un-centred. The offline manual (`Documentation/ZemaxManual.pdf`) settles it in the
+> opposite direction, explicitly and three times over, so the retraction is itself
+> withdrawn and the original finding stands. The online page was not wrong, only
+> incomplete: its `OPDᵢⱼ` is the *already-referenced* OPD, which it says depends on the
+> reference in force. The lesson is recorded rather than tidied away — an inference from
+> "what the online page did not mention" was strong enough to overturn a correct finding.
+
+### What the manual actually says
+
+Three independent statements, all from `Documentation/ZemaxManual.pdf`:
+
+- *RMS vs Field*, **Refer To** (p154). Both reference points subtract out wavefront piston;
+  the centroid mode additionally subtracts the tilt, which yields smaller values.
+- *Comments about RMS wavefront computations* (p155). For RMS wavefront computations ZEMAX
+  always subtracts out the mean OPD. The centroid reference additionally needs the shifted,
+  tilted reference sphere of Rimmer, *Analysis of Perturbed Lens Systems*, Applied Optics
+  **9**(3) p533 (1970).
+- *OPTIMIZATION REFERENCE POINTS* (p484), which names three options, not two:
+
+  | Zemax name | Mean subtracted | Tilt subtracted |
+  | --- | --- | --- |
+  | Centroid | yes | yes |
+  | Chief | yes | no |
+  | Unreferenced | **no** | no |
+
+  and gives the reason the chief-ray mode still subtracts the mean: the point at which the
+  OPD is defined to be zero is arbitrary. *Unreferenced* is described as the OPD with
+  respect to the chief ray used without subtracting the mean wavefront or tilt.
+
+`sqrt(Σ w·OPD² / Σ w)` over chief-ray-referenced OPDs, with no mean removed, is the third
+row. So the class does implement a Zemax metric — just not the one its javadoc claims. It
+is *Unreferenced*, which Zemax exposes only as an optimization reference point; the *RMS vs
+Field* analysis offers only chief ray and centroid, both mean-subtracted.
+
+The decision to prefer the chief ray over the centroid, to align with `ContrastAnalysis`,
+is untouched by this. That decision is about tilt. Zemax's guidance is that the centroid is
+generally preferred and yields more meaningful results when coma is present, but it also
+notes the chief-ray reference often gives better mid-frequency MTF, so the choice is a real
+trade-off and not a defect. Piston is not a trade-off: p484 lists mean and tilt together as
+things that do not degrade image quality.
+
+**§3's argument does transfer after all,** which is why the wrong retraction is worth
+recording. The class is currently minimizing a quantity that includes a term reducible by
+adding piston, which costs no image quality — §3's spurious-gradient bullet exactly.
+
+### Measured
+
+Re-traced through the same code path the analysis uses, keeping the raw OPDs, on
+`MtfTest.buildTestModel()` (Nikkor Z 58mm f/0.95 at paraxial focus), 6 rings × 12 spokes:
+
+| field | wvl | OPD at pupil centre | weighted mean | as computed | own mean removed |
+| --- | --- | --- | --- | --- | --- |
+| 0 | 587.6 | 0.000000 | −0.329112 | 0.395592 | 0.219495 |
+| 0 | 486.1 | 0.000000 | 1.689675 | 1.888898 | 0.844356 |
+| 0 | 656.3 | 0.000000 | −2.280081 | 2.669313 | 1.387970 |
+| 0 | poly | | | **1.901724** | **0.946498** |
+| 1 | poly | | | 1.727832 | 1.242289 |
+| 2 | poly | | | 2.056781 | 1.665376 |
+
+The pupil-centre column confirms the geometry: the OPD is exactly zero at every
+wavelength's own chief ray, so the chromatic piston relative to the primary wavelength is
+already removed by the per-wavelength reference sphere. What sits under the mean is the
+aberration's own offset, mostly defocus.
+
+On axis the un-centred value is **2.01×** the centred one, and that is the pure-defocus
+limit rather than a coincidence: for `W = aρ²` over a filled circular pupil `√⟨W²⟩ = a/√3`
+while the standard deviation is `a/(2√3)`. Field 0 is close to pure chromatic defocus and
+lands at 2.009. Even the monochromatic axial figure — the one number here with a
+well-known published counterpart — is overstated by 80%, 0.396 waves against 0.219.
+
+Note also that these values are still not the centroid-referenced number, which removes
+tilt as well and is lower again: `centroid ≤ 0.946 ≤ 1.902` on axis.
+
+### Per-wavelength mean or one pooled mean? Measured, and not resolved from the manual
+
+The two candidate fixes are not close to each other:
+
+| field | as computed | pooled mean removed | per-wavelength mean removed |
+| --- | --- | --- | --- |
+| 0 | 1.901724 | 1.876861 | 0.946498 |
+| 1 | 1.727832 | 1.545177 | 1.242289 |
+| 2 | 2.056781 | 1.677766 | 1.665376 |
+
+A single pooled mean per field barely moves field 0 (1.9017 → 1.8769), because the three
+wavelengths' means are −0.33, +1.69 and −2.28 and their weighted average is −0.31. Only
+per-wavelength removal halves it.
+
+Which one Zemax does is not settled by the manual. p484 describes the centroid reference as
+the centroid of all the data coming from that field point, which reads as pooled across
+wavelengths, and the online polychromatic formula sums over both indices at once. Against
+that, Zemax references every wavelength to the *primary wavelength's* chief ray, so its
+non-primary OPDs still carry chromatic piston and a pooled mean removes only the common
+part — whereas this class has already zeroed each wavelength at its own chief ray, so there
+is no chromatic piston left for a pooled mean to take out. Given that construction,
+per-wavelength removal is the coherent completion of it: `Σ w·OPD` alongside `Σ w·OPD²` per
+wavelength, subtract `mean²` before pooling. Wavelengths are mutually incoherent, so a
+constant phase at one of them cannot beat against another; there is no colour-dependent
+piston effect worth preserving, which is the disanalogy with §3's decision to keep
+colour-dependent *tilt*.
+
+Settling this against an actual OpticStudio RWRH number is the check that has not been
+done.
+
+### 10a. Gaussian quadrature with aperture checking is the case the manual rules out
+
+The manual is as direct here as it is about piston, and *Selecting the pupil integration
+method* (p485) draws the line precisely where this codebase's own
+[GAUSSIAN_QUADRATURE.md](GAUSSIAN_QUADRATURE.md) already draws it:
+
+- GQ assumes the pupil is a circle or an ellipse. If surface apertures vignette enough rays
+  to alter the effective pupil shape, GQ should not be used; modest central obscurations are
+  the one noted exception.
+- GQ works fine with vignetting *factors*, because the ray pattern is simply redistributed
+  from a circle to an ellipse.
+- The RA method with *Delete Vignetted* is what accounts for surface-aperture clipping, at
+  the cost of more rays. The manual's bottom line is not to use RA unless surface apertures
+  are in play.
+
+That maps one-to-one onto `GAUSSIAN_QUADRATURE.md`, which says the vignetting-factor
+mapping needs no area Jacobian precisely because it agrees with the OpticStudio
+vignetting-factor workflow, and which already prescribes dense aperture-checked sampling
+when vignetting factors do not adequately describe the transmitted pupil. Zemax's operand
+set splits the same way: RWRH/RWRE are the GQ forms, documented as accurate for unvignetted
+circular pupils, while RWCH/RWCE are the rectangular-grid forms that consider vignetting.
+
+[PolychromaticRMSWavefrontOptions.java:13](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/PolychromaticRMSWavefrontOptions.java:13)
+sets `check_apertures = true` by default and `trace_gaussian_quadrature` honours it, so the
+default configuration is GQ over a surface-aperture-clipped pupil — the combination both
+documents exclude. `trace_contrast`, by contrast, defaults it off. The vignetting-factor
+half of the design is correct and blessed by both references; it is only the aperture check
+that is out of bounds.
+
+Field 2 loses 8% of its quadrature weight and 2.9% of its value:
+
+| field | apertures on | n | apertures off | n | Δ |
+| --- | --- | --- | --- | --- | --- |
+| 0 | 1.901724 | 216 | 1.901724 | 216 | 0.00% |
+| 1 | 1.727832 | 204 | 1.715999 | 216 | +0.69% |
+| 2 | 2.056781 | 198 | 2.117583 | 216 | −2.87% |
+
+The convergence failure is the sharper symptom, and it is exactly the diagnostic p485
+prescribes — raise the ring count until the merit function stops moving by more than about
+a percent. Field 0, where nothing is clipped, converges to six digits by 4×8. The clipped
+fields never settle, and the 14×20 default is still 0.2% off 20×32:
+
+| rings × spokes | field 0 | field 1 | field 2 |
+| --- | --- | --- | --- |
+| 2×6 | 1.897244 | 1.630756 | 2.375105 |
+| 4×8 | 1.901721 | 1.760648 | 2.178533 |
+| 6×12 | 1.901724 | 1.727832 | 2.056781 |
+| 8×16 | 1.901725 | 1.736885 | 2.041259 |
+| 14×20 | 1.901725 | 1.730403 | 2.010460 |
+| 20×32 | 1.901725 | 1.734606 | 2.009759 |
+
+By the manual's own test, fields 1 and 2 fail it and field 0 passes — which is the signature
+of a non-elliptical pupil, not of insufficient sampling. Adding rings does not fix it. This
+is the opposite conclusion to §2, and for a reason §2 did not have to contend with: there
+the integrand was smooth and more samples genuinely helped.
+
+Worth noting separately that the 14×20 default is very heavy against Zemax practice — p485
+puts the accurately integrated aberration order at `2n−1` for `n` rings and says six arms
+is almost always plenty. `GAUSSIAN_QUADRATURE.md` records 14×20 as retained for
+compatibility rather than as an accuracy claim.
+
+Two ways out, and they are not equivalent:
+
+- **Turn aperture checking off**, as `ContrastOptions` does. GQ then integrates the
+  vignetting-factor pupil it was constructed for and the rule is valid again, but the metric
+  stops accounting for rays a real aperture would block.
+- **Switch to a rectangular array when apertures clip**, which is what both references
+  prescribe. `Trace.trace_grid` / `TraceGridDef` is the existing RA-shaped path; unweighted
+  samples over a uniform grid tolerate a clipped boundary because they carry no quadrature
+  weights that assume one. It costs the ray budget GQ was chosen to save.
+
+Recording it as open rather than recommending one: the right answer depends on whether this
+metric is for reporting or for driving an optimizer, and on whether the designs of interest
+actually clip.
+
+### 10b. The result is not a pure function of `(model, options)`
+
+`Trace.get_chief_ray_pkg` re-aims the chief ray only when `fld.chief_ray == null`;
+otherwise it reuses the cached `aim_info`. So the aim point belongs to whichever wavelength
+touched the field first. Consecutive calls agree, but pre-seeding the fields at 656.3 nm —
+as any prior monochromatic analysis would — moves the answer:
+
+| field | fresh | repeat | pre-seeded at 656.3 nm | Δ |
+| --- | --- | --- | --- | --- |
+| 0 | 1.901723934 | 1.901723934 | 1.901723934 | 0.0 |
+| 1 | 1.727831546 | 1.727831546 | 1.728276147 | +4.4e−04 |
+| 2 | 2.056781284 | 2.056781284 | 2.056275247 | −5.1e−04 |
+
+Note also that `eval` sets up the primary chief ray at the central wavelength
+([line 39](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/PolychromaticRMSWavefrontAnalysis.java:39))
+and discards the package, so the `wi = 0` iteration re-aims at `wavelengths[0]` and
+overwrites `aim_info`. Only masked in the test model because its `reference_wvl` is 0.
+3e−04 waves is well below reporting resolution but is the kind of hidden state that poisons
+a finite-difference Jacobian.
+
+### 10c. All-zero spectral weights give a silent NaN
+
+`validateSpectralWeight` accepts zero for every wavelength; `totalWeight` is then 0 and
+`rmsWaves()` is NaN, while `validSamples` reports 36. A caller using `validSamples > 0` as a
+health check is misled. Same NaN if every ray fails.
+
+### 10d. Smaller items, all cheap
+
+- `num_spokes(2)` is accepted by the builder and then rejected by
+  `generate_gaussian_quadrature`. The builder's `< 1` check should be `< 3`.
+- `check_apertures(boolean)` mutates the `TraceOptions` instance the caller handed to
+  `trace_options(...)` — confirmed by probe. `trace_options` should `.copy()`.
+- `spectral_wts` and `wavelengths` are independently mutable public arrays on `WvlSpec`;
+  the loop indexes `spectral_wts[wi]` off `wavelengths.length` and throws AIOOBE on a
+  mismatch.
+- `validateSpectralWeight` runs inside both loops, so a bad weight surfaces only after the
+  first field's chief ray has been traced.
+- `Trace.setup_pupil_coords` is not wrapped, so a chief-ray failure at an extreme field
+  aborts the whole evaluation, even though the pupil samples themselves go through
+  `trace_safe`.
+- `FieldResult` hands callers a live `Field` whose `chief_ray` and `ref_sphere` have moved
+  on to the last wavelength by the time they read it — `Field.chief_ray`'s javadoc says
+  "traced in the central wavelength", and after `eval` it holds 656.2725. `ReadOnlyField`
+  exists for this.
+
+### What is right
+
+The polychromatic structure matches both the reference and
+`SequentialModel.trace_contrast_by_wvl`: one primary-wavelength image point shared by all
+wavelengths, each wavelength given its own chief ray and reference sphere, quadrature
+weights renormalized over the samples that survived. The vignetting-factor pupil mapping is
+the workflow p485 explicitly blesses. The spectral-weight scale cancels between numerator
+and denominator, so unnormalized weights are handled correctly. The records are
+defensive-copied, and the existing unit tests cover the weighting algebra and the
+shared-image-point contract properly. Every defect above is in the last step of the
+reduction or in configuration defaults, not in the ray tracing or the pupil geometry.
+
+### What was not measured
+
+One design (the f/0.95 Nikkor test model), at paraxial focus, three fields, three
+wavelengths of equal weight. The 2.01× ratio is the pure-defocus limit and will be smaller
+for a well-corrected system near best focus; the general statement is that the ratio lies
+in [1, 2] for defocus-like error and is aberration-dependent, which is what makes the
+missing mean a reweighting rather than a scale factor.
+
+No comparison against an actual OpticStudio number was made under any reference. That is
+the check that would close both open questions at once — whether the mean is pooled or
+per-wavelength, and how far the clipped GQ value actually is from a converged RA baseline.
+Neither has been done, and this section has now been wrong once for want of exactly that
+kind of check.
+
 ## Smaller items
 
 - **`dLineOnly` is ignored for contrast goals.** *Still open.*
@@ -1540,6 +1818,21 @@ module's classpath and can reach the package-private helpers on `ZeissOtusML50mm
 | [ContrastProbe14.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe14.java) | §8 — **refutes** its own hypothesis: contrast sampling coverage is 82-95% and identical in x and y, so the contraction does not starve the sagittal direction. Kept as the record of a ruled-out cause |
 | [ContrastProbe15.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe15.java) | §8 — the three-mode comparison and the on-axis symmetry violation under `Paraxial` |
 | [ContrastProbe16.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe16.java) | §8 — vignetting drift per Jacobian step, and the smoothness sweep showing it is differentiable |
+
+Finding 10's probes break this convention: they are JUnit tests in the `rayoptics` module,
+because the class under review and its test model (`MtfTest.buildTestModel`) both live
+there. They print rather than assert.
+
+| Probe | Evidence it produced |
+| --- | --- |
+| [PolychromaticRMSWavefrontProbeTest.java](../rayoptics/src/test/java/org/redukti/rayoptics/analysis/PolychromaticRMSWavefrontProbeTest.java) | §10 — the pooled-mean column of the pooled-vs-per-wavelength comparison; the fresh/repeat/pre-seeded table (§10b); pupil-weight budget; options validation gaps (§10d) |
+| [PolychromaticRMSWavefrontProbe2Test.java](../rayoptics/src/test/java/org/redukti/rayoptics/analysis/PolychromaticRMSWavefrontProbe2Test.java) | §10 — the per-wavelength mean/pupil-centre OPD table and the per-wavelength column of the pooled-vs-per-wavelength comparison; aperture on/off and sampling convergence (§10a); the all-zero-weight NaN (§10c) |
+
+Run them with:
+
+```
+/c/Software/apache-maven-3.9.9/bin/mvn -o -q test -Dtest='PolychromaticRMSWavefrontProbe*Test' -Dsurefire.failIfNoSpecifiedTests=false
+```
 
 `ContrastProbes.java` in the same package holds the shared prescription-path lookups.
 Probes 1–8 use the Otus; 9–13 use the Leica 75/2; 14–16 run both. The Otus figures in §7

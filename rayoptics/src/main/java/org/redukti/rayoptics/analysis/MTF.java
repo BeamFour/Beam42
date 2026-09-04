@@ -4,7 +4,6 @@ import org.redukti.rayoptics.util.Orientation;
 
 public class MTF extends BaseMTF {
 
-    public final Histogram h2d;
 
     // line spreads get padded to twice the size to improve FFT correctness
     public double[] padded_lsf_x;
@@ -12,17 +11,16 @@ public class MTF extends BaseMTF {
 
     public MTF(Histogram h2d) {
         super(h2d.num_bins * 2, h2d.pixel_size);
-        this.h2d = h2d;
         padded_lsf_x = new double[fft_size];
         padded_lsf_y = new double[fft_size];
-        compute_mtfs();
+        compute_mtfs(h2d);
     }
 
     private void pad_lfs(double[] lsf, double[] padded_lsf) {
         // pad the LSF with zeroes
         // This is to ensure FFT computation is correct
-        for (int i = 0; i < h2d.num_bins; i++)
-            padded_lsf[i + h2d.num_bins/2] = lsf[i];
+        for (int i = 0; i < fft_size / 2; i++)
+            padded_lsf[i + fft_size / 4] = lsf[i];
     }
 
     private void compute_mtf(int xy) {
@@ -36,7 +34,7 @@ public class MTF extends BaseMTF {
         compute_fft(xy);
     }
 
-    private void compute_mtfs() {
+    private void compute_mtfs(Histogram h2d) {
         pad_lfs(h2d.lsf_x,padded_lsf_x);
         pad_lfs(h2d.lsf_y,padded_lsf_y);
         compute_mtf(0);

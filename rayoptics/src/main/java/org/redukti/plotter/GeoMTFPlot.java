@@ -7,6 +7,7 @@ import org.redukti.data.Range;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.analysis.MonochromaticGeometricMTF;
 import org.redukti.rayoptics.specs.Field;
+import org.redukti.rayoptics.specs.FieldSnapshot;
 import org.redukti.render.plotting.Plot;
 import org.redukti.render.plotting.PlotAxes;
 import org.redukti.render.plotting.PlotRenderer;
@@ -16,10 +17,14 @@ import org.redukti.render.rendering.Rgb;
 
 public class GeoMTFPlot {
 
-    public final Field fld;
+    public final FieldSnapshot fld;
     public final MonochromaticGeometricMTF geo_mtf;
 
     public GeoMTFPlot(Field fld, MonochromaticGeometricMTF geo_mtf) {
+        this(new FieldSnapshot(fld), geo_mtf);
+    }
+
+    public GeoMTFPlot(FieldSnapshot fld, MonochromaticGeometricMTF geo_mtf) {
         this.fld = fld;
         this.geo_mtf = geo_mtf;
     }

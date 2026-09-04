@@ -4,6 +4,7 @@ import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.raytr.TraceGridByWvl;
 import org.redukti.rayoptics.specs.Field;
+import org.redukti.rayoptics.specs.FieldSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ public class SpotAnalysisResult {
     }
 
     public static class SpotResultsForField {
-        public Field fld;
+        public final FieldSnapshot fld;
         public Vector3 image_pt;
         public List<TraceGridByWvl> trace_results;
         public List<SpotIntercepts> intercepts = new ArrayList<>();
@@ -26,7 +27,7 @@ public class SpotAnalysisResult {
         public double mean_radius;
 
         public SpotResultsForField(Field fld, List<TraceGridByWvl> trace_results, double ref_wvl, boolean use_centroid) {
-            this.fld = fld;
+            this.fld = new FieldSnapshot(fld);
             this.image_pt = fld.ref_sphere.image_pt;
             this.trace_results = trace_results;
             Vector2 centroid = null;

@@ -3,6 +3,7 @@ package org.redukti.rayoptics.analysis;
 import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.specs.Field;
+import org.redukti.rayoptics.specs.FieldSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +68,16 @@ public class ContrastAnalysisResult {
         }
     }
 
-    public record FieldResult(Field field, List<WavelengthResult> wavelengths) {
+    public static final class FieldResult {
+        private final FieldSnapshot field;
+        private final List<WavelengthResult> wavelengths;
+
+        public FieldResult(Field field, List<WavelengthResult> wavelengths) {
+            this.field = field == null ? null : new FieldSnapshot(field);
+            this.wavelengths = wavelengths;
+        }
+
+        public FieldSnapshot field() { return field; }
+        public List<WavelengthResult> wavelengths() { return wavelengths; }
     }
 }

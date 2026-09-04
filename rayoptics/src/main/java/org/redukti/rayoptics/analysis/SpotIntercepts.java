@@ -9,10 +9,8 @@ public class SpotIntercepts {
     public final double[] y;
     public final double[] weights;
     public final boolean[] valid;
-    public final TraceGridByWvl trace_data;
 
     public SpotIntercepts(TraceGridByWvl trace_data) {
-        this.trace_data = trace_data;
         this.wvl = trace_data.wvl;
         this.x = new double[trace_data.grid.size()];
         this.y = new double[trace_data.grid.size()];
@@ -30,7 +28,7 @@ public class SpotIntercepts {
     public Vector2 compute_centroid() {
         double cx = 0, cy = 0;
         double totalWeight = 0.0;
-        for (int i = 0; i < trace_data.grid.size(); i++) {
+        for (int i = 0; i < x.length; i++) {
             if (!valid[i]) continue;
             cx += this.weights[i] * this.x[i];
             cy += this.weights[i] * this.y[i];
@@ -43,7 +41,7 @@ public class SpotIntercepts {
     }
 
     public void adjust_to_centroid(Vector2 centroid) {
-        for (int i = 0; i < trace_data.grid.size(); i++) {
+        for (int i = 0; i < x.length; i++) {
             if (!valid[i]) continue;
             this.x[i] -= centroid.x;
             this.y[i] -= centroid.y;

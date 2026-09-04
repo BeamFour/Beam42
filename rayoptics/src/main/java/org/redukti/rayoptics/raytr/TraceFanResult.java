@@ -1,13 +1,14 @@
 package org.redukti.rayoptics.raytr;
 
 import org.redukti.rayoptics.specs.Field;
+import org.redukti.rayoptics.specs.FieldSnapshot;
 
 import java.util.List;
 
 public class TraceFanResult {
 
     public RayFanType type;
-    public Field fld;
+    public final FieldSnapshot fld;
     public int fi;
     /**
      * xy determines whether x (=0) or y (=1) fan
@@ -18,7 +19,7 @@ public class TraceFanResult {
     public double max_y_val;
 
     public TraceFanResult(Field fld,int fi, int xy, List<TraceFanPoints> fans, double max_rho_val, double max_y_val) {
-        this.fld = fld;
+        this.fld = fld == null ? null : new FieldSnapshot(fld);
         this.fi = fi;
         this.xy = xy;
         this.fans = fans;

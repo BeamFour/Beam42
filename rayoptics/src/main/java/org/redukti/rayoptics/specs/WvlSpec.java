@@ -9,7 +9,6 @@ import java.util.Map;
 public class WvlSpec {
 
     static Map<String, Double> spectra;
-    static Map<String, Double> spectra_uc;
 
     static {
         spectra = new HashMap<>();
@@ -28,11 +27,6 @@ public class WvlSpec {
         spectra.put("g", 435.8343);
         spectra.put("h", 404.6561);
         spectra.put("i", 365.014);
-
-        spectra_uc = new HashMap<>();
-        for (String k: spectra.keySet()) {
-            spectra_uc.put(k.toUpperCase(), spectra.get(k));
-        }
     }
 
     public int reference_wvl;
@@ -75,11 +69,11 @@ public class WvlSpec {
     /**
      * Return wvl in nm, where wvl can be a spectral line
      *
-     * @param key a string with a spectral line identifier. Case insensitive
+     * @param key a string with a spectral line identifier. Case sensitive
      * @return float: the wavelength in nm
      */
     public static double get_wavelength(String key) {
-        Double d = spectra_uc.get(key.toUpperCase());
+        Double d = spectra.get(key);
         if (d == null)
             throw new IllegalArgumentException("Unknown wavelength '" + key + "'");
         return d;

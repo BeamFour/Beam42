@@ -25,6 +25,7 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class LensTool2 {
 
@@ -280,6 +281,7 @@ public class LensTool2 {
             System.exit(1);
         }
         try {
+            long startTime = System.nanoTime();
             final double[] fields = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
             VigType vigType = VigType.SetPupil;
             OpticalBenchDataImporter.LensSpecifications specs = getSpecsFromFile(arguments.specfile);
@@ -329,6 +331,8 @@ public class LensTool2 {
             createREADME(SB,
                     arguments.specfile,
                     Helper.getOutputFileWithPath(arguments.specfile, "README.md", arguments.outdir));
+            long finishTime = System.nanoTime();
+            System.out.println("Finished in " + TimeUnit.NANOSECONDS.toSeconds(finishTime-startTime) + " secs");
         }
         catch (Exception e) {
             System.err.println("Failed due to: " + e.getMessage());

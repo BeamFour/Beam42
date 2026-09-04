@@ -86,6 +86,9 @@ public class SequentialModel {
      */
     public List<double[]> rndx = new ArrayList<>();
 
+    /** Bounded because callers can request paths with arbitrary slice arguments. */
+    private final PathCache pathCache = new PathCache();
+
     public SequentialModel(OpticalModel opm, boolean do_init) {
         this.opt_model = opm;
         if (do_init)
@@ -135,6 +138,11 @@ public class SequentialModel {
      * @return (* * ifcs, gaps, lcl_tfrms, rndx, z_dir * *)
      */
     public List<PathSeg> path(Double wl, Integer start, Integer stop, Integer step) {
+        PathCache.Key key = new PathCache.Key(wl, start, stop, step);
+        List<PathSeg> cached = pathCache.find(key);
+        if (cached != null)
+            return cached;
+
         if (wl == null)
             wl = central_wavelength();
         Integer gap_start;
@@ -152,13 +160,13 @@ public class SequentialModel {
         for (double[] narr: rndx_list) {
             rndx.add(narr[wl_idx]);
         }
-        return zip_longest(
+        return pathCache.store(key, zip_longest(
                 Lists.slice(ifcs, start, stop, step),
                 Lists.slice(gaps, gap_start, stop, step),
                 Lists.slice(lcl_tfrms, start, stop, step),
                 rndx,
                 Lists.slice(z_dir, start, stop, step)
-        );
+        ));
     }
     public List<PathSeg> path() {
         return path(null,null,null,null);
@@ -330,6 +338,7 @@ public class SequentialModel {
         for (int i = 0; i < wvls.length; i++)
             rindex[i] = gap.medium.rindex(wvls[i]);
         rndx.add(idx, rindex);
+        pathCache.clear();
 
         //         if ifc.interact_mode == 'reflect':
         //            self.update_reflections(start=idx)
@@ -427,6 +436,10 @@ public class SequentialModel {
 
         this.gbl_tfrms = this.compute_global_coords();
         this.lcl_tfrms = this.compute_local_transforms();
+
+        // Keep this last so work performed during the update cannot leave a
+        // stale path behind.
+        pathCache.clear();
 
         // self.seq_def.update()
     }

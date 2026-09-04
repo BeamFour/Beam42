@@ -147,7 +147,8 @@ public class SequentialModel {
         int wl_idx = index_for_wavelength(wl);
         /* extract the refractive index for given wavelength and list of surfaces */
         List<double[]> rndx_list = Lists.slice(rndx, start, stop, step);
-        List<Double> rndx = new ArrayList<>();
+        ArrayList<Double> rndx = new ArrayList<>();
+        rndx.ensureCapacity(rndx_list.size());
         for (double[] narr: rndx_list) {
             rndx.add(narr[wl_idx]);
         }
@@ -578,9 +579,10 @@ public class SequentialModel {
                                             List<Tfm3d> lcl_tfrms,
                                             List<Double> rndx,
                                             List<ZDir> z_dir) {
-        List<PathSeg> list = new ArrayList<>();
+        ArrayList<PathSeg> list = new ArrayList<>();
         List<Integer> sizes = List.of(ifcs.size(), gaps.size(), lcl_tfrms.size(), rndx.size(), z_dir.size());
         int maxSize = sizes.stream().max(Comparator.naturalOrder()).orElse(0);
+        list.ensureCapacity(maxSize);
         for (int i = 0; i < maxSize; i++) {
             Interface ifc = i < ifcs.size() ? ifcs.get(i) : null;
             Gap gap = i < gaps.size() ? gaps.get(i) : null;
@@ -595,9 +597,10 @@ public class SequentialModel {
     public static List<PathSeg> zip_longest(List<Interface> ifcs,
                                                 List<Gap> gaps,
                                                 List<ZDir> z_dir) {
-        List<PathSeg> list = new ArrayList<>();
+        ArrayList<PathSeg> list = new ArrayList<>();
         List<Integer> sizes = List.of(ifcs.size(), gaps.size(), z_dir.size());
         int maxSize = sizes.stream().max(Comparator.naturalOrder()).orElse(0);
+        list.ensureCapacity(maxSize);
         for (int i = 0; i < maxSize; i++) {
             Interface ifc = i < ifcs.size() ? ifcs.get(i) : null;
             Gap gap = i < gaps.size() ? gaps.get(i) : null;

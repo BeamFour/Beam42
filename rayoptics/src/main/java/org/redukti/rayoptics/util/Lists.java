@@ -6,7 +6,8 @@ import java.util.List;
 public class Lists {
 
     public static <E> List<E> slice(List<E> inputList, Integer start_, Integer stop_, Integer step_) {
-        List<E> newList = new ArrayList<>();
+        ArrayList<E> newList = new ArrayList<>();
+        newList.ensureCapacity(inputList.size());
         int step = step_ == null ? 1 : step_;
         int length = inputList.size();
         int start, stop;

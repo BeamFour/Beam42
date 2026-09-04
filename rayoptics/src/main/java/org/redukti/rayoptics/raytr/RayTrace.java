@@ -164,8 +164,8 @@ public class RayTrace {
         int first_surf = options.first_surf != null ? options.first_surf : 0;
         Integer last_surf = options.last_surf;
 
-        List<RaySeg> ray = new ArrayList<>();
-
+        ArrayList<RaySeg> ray = new ArrayList<>();
+        ray.ensureCapacity(path.size());
         Iterator<PathSeg> iter = path.iterator();
 
         // trace object surface

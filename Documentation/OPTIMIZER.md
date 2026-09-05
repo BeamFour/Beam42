@@ -570,6 +570,64 @@ commercial optimizers. The trade-off is that nothing then catches factors which 
 or have gone stale: rays that the real lens blocks still contribute, so the merit can
 optimize light the lens does not pass.
 
+### Investigation: updating vignetting during optimization
+
+[Optimize the Apertures, Not the Vignetting Factors](https://www.linkedin.com/pulse/optimize-apertures-vignetting-factors-javier-ruiz-uw0yf/)
+argues that a sparsely sampled optimization merit should evaluate the vignetted pupil.
+Vignetting factors remap normalized pupil coordinates into an ellipse fitted to the
+surviving pupil. This is a sampling aid rather than a change to the optical system: with
+a sufficiently dense pupil grid, an analysis should converge to the same result without
+the remapping.
+
+For Gaussian/Forbes quadrature the remapping is particularly important. Sampling the
+complete entrance pupil directly can leave many nodes outside a cat's-eye-shaped
+transmitted pupil. Discarding those rays biases the quadrature and can make the merit
+change merely because the set of surviving samples changed. Vignetting factors allow a
+small, fixed-size sample set to represent the transmitted pupil much more accurately.
+They improve RMS convergence much more readily than a worst-ray quantity such as maximum
+geometric spot radius, which still requires adequate sampling near the pupil boundary.
+
+The article recommends recalculating the factors as the design evolves, rather than
+necessarily freezing them at the start. That differs from Beam42's current optional
+`freezeVignetting()` strategy. Freezing is reasonable for a local refinement in which the
+prescription and its clipping change little, and it prevents the optimizer from improving
+the merit simply by reducing the transmitted pupil. Its weakness is that the assumed
+pupil becomes stale when the design moves substantially. This is especially relevant to
+global optimization and to any future support for varying clear-aperture semi-diameters.
+
+The physical variables should be the surface clear-aperture semi-diameters, not the
+vignetting factors themselves. Factors are only an elliptical approximation to the
+surviving pupil, and arbitrary optimized factors need not correspond to any realizable
+set of apertures. If apertures become variables, relative illumination or throughput also
+needs a constraint so that the optimizer cannot obtain better image quality merely by
+discarding more of the pupil.
+
+Vignetting remapping and physical aperture checking are separate operations:
+
+- vignetting factors move sparse pupil samples into an approximation of the transmitted
+  pupil;
+- aperture checking verifies that each remapped ray actually passes every physical
+  aperture, since the fitted ellipse is not the exact cat's-eye boundary.
+
+The desired end state may therefore be to apply current vignetting factors and also check
+physical apertures during optimization. A failed ray must not simply be omitted from an
+RMS or contrast calculation: doing so changes the population being optimized and can
+reward additional clipping.
+
+This needs investigation before changing the default. In particular, compare the
+following policies on local and large-displacement optimizations:
+
+1. factors measured and frozen at the starting prescription;
+2. factors recalculated for every merit-function evaluation;
+3. the same two policies with physical aperture checking enabled;
+4. dense, non-remapped analysis of each final prescription as the reference result.
+
+Record merit continuity, failed-ray counts, independently measured spot RMS and MTF,
+relative illumination, and the drift between frozen factors and factors recalculated for
+the final prescription. This should establish whether dynamic factors give a more
+accurate merit without introducing finite-difference noise or allowing uncontrolled
+throughput loss.
+
 ## Preserving the starting lens design
 
 Contrast optimization has a broad, smooth capture range and can substantially rearrange
@@ -772,3 +830,7 @@ When comparing contrast optimization across prescriptions, record:
 The per-group RMS `deltaW` is particularly useful for identifying when the contrast
 goal is acting as a faithful MTF refiner and when it has moved outside its reliable
 small-phase operating range.
+
+
+# Useful links
+* https://www.linkedin.com/pulse/optimize-apertures-vignetting-factors-javier-ruiz-uw0yf/

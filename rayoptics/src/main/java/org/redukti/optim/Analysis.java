@@ -8,6 +8,10 @@ import org.redukti.spec.RayOpticsModelBuilder;
 import org.redukti.spec.VigType;
 
 public class Analysis {
+    private long evaluationCount;
+
+    /** Number of compute attempts, including failed traces and Jacobian probes. */
+    public long getEvaluationCount() { return evaluationCount; }
 
     public Prescription _prescription;
     public double[] _fields;
@@ -242,6 +246,7 @@ public class Analysis {
     }
 
     public void compute() {
+        evaluationCount++;
         _opt_model = build_vignetted_model();
         _pfo = ParaxHelper.asArray(_opt_model.optical_spec.parax_data.fod);
         if (_compute_spots) {

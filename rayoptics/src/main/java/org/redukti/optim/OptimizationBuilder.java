@@ -1103,5 +1103,17 @@ public final class OptimizationBuilder {
         public LMDerMeritFunction meritFunction(boolean useNative) {
             return new LMDerMeritFunction(analysis, variables, goals, useNative);
         }
+
+        public DampedLeastSquaresSolver dampedLeastSquaresSolver(
+                org.redukti.mathlib.DampedLeastSquares.Options options) {
+            return new DampedLeastSquaresSolver(analysis, variables, goals, options);
+        }
+
+        public DampedLeastSquaresSolver dampedLeastSquaresSolver(
+                org.redukti.mathlib.DampedLeastSquares.Options options,
+                java.util.function.Function<double[], double[]> equalities,
+                java.util.function.Function<double[], double[]> inequalities) {
+            return new DampedLeastSquaresSolver(analysis, variables, goals, options, equalities, inequalities);
+        }
     }
 }

@@ -18,6 +18,78 @@ import static org.redukti.optim.OptimizationBuilder.contrast;
 
 class ZeissOtusML50mmTest {
 
+    /** Opt-in experiment; keeps the absolute LMDER regression tests unchanged. */
+    @Test
+    void comparesDampedLeastSquaresWithLmder() throws Exception {
+        org.junit.jupiter.api.Assumptions.assumeTrue(Boolean.getBoolean("optimization.compareSolvers"));
+        String scenario = System.getProperty("optimization.comparisonScenario", "contrast");
+        assertTrue(scenario.equals("contrast") || scenario.equals("direct"));
+        String[] solvers = System.getProperty("optimization.comparisonSolvers",
+                "lmder,dls-default,dls-adaptive").split(",");
+        Path output = repositoryRoot().resolve("rayoptics/target/solver-comparison/" + scenario);
+        Files.createDirectories(output);
+        StringBuilder csv = new StringBuilder("solver,variables,goals,seconds,analysisEvaluations,initialRms,finalRms,status,stopReason,iterations,residualCalls,jacobianCalls,efl,fno,spot0,spot03,spot07,spot1,sag40_0,sag40_03,sag40_07,sag40_1,tan40_0,tan40_03,tan40_07,tan40_1\n");
+        Double referenceInitial = null;
+        for (String name : solvers) {
+            assertTrue(java.util.Set.of("lmder", "dls-default", "dls-adaptive").contains(name));
+            var prescription = ZeissOtusML50mm.getPrescription(repositoryRoot().resolve(
+                    "Examples/jfotoptix/cosina-otus-ml-50mm-f1.4/JP2026-105585_Example01.txt").toString(), false, false);
+            var setup = scenario.equals("contrast") ? frozenContrastSetup(prescription) : frozenDirectSetup(prescription);
+            var analysis = setup.analysis();
+            var merit = setup.meritFunction(false);
+            // Warm up the same initial analysis outside the measured solve.
+            for (int warmup = 0; warmup < 5; warmup++) analysis.compute();
+            double initial = merit.getRMS();
+            if (referenceInitial == null) referenceInitial = initial;
+            else assertEquals(referenceInitial, initial, 1e-14, "Starting merits must match");
+            var options = new org.redukti.mathlib.DampedLeastSquares.Options();
+            if (name.equals("dls-adaptive")) {
+                options.dampingMode = org.redukti.mathlib.DampedLeastSquares.DampingMode.SENSITIVITY;
+                options.adaptiveDamping = true;
+                options.maxIterations = Integer.getInteger("optimization.dlsIterations", 100);
+            }
+            var dls = name.equals("lmder") ? null : setup.dampedLeastSquaresSolver(options);
+            org.redukti.optim.Solver solver = dls == null ? merit.getSolver() : dls;
+            long before = analysis.getEvaluationCount();
+            long started = System.nanoTime();
+            System.out.println("COMPARISON starting " + scenario + " " + name
+                    + " vars=" + setup.variables().length + " goals=" + setup.goals().length + " initialRms=" + initial);
+            int status = solver.solve();
+            double seconds = (System.nanoTime() - started) / 1e9;
+            long evaluations = analysis.getEvaluationCount() - before;
+            double finalRms = merit.getRMS();
+            String reason = dls == null ? "MINPACK info=" + status : dls.result().message();
+            System.out.println("COMPARISON finished " + scenario + " " + name + " seconds=" + seconds
+                    + " evaluations=" + evaluations + " finalRms=" + finalRms + " stop=" + reason);
+            Files.writeString(output.resolve(name + "-prescription.txt"), prescription.toString());
+            if (dls != null) {
+                StringBuilder history = new StringBuilder("iteration,cost,alpha,stepNorm,dampingAttempts\n");
+                int iteration = 0;
+                for (var h : dls.result().history()) history.append(++iteration).append(',').append(h.cost())
+                        .append(',').append(h.alpha()).append(',').append(h.stepNorm()).append(',')
+                        .append(h.dampingAttempts()).append('\n');
+                Files.writeString(output.resolve(name + "-history.csv"), history);
+            }
+            // Optical measurements are independent of the contrast merit and outside the solve timer.
+            analysis.required_analyses(true, true, true);
+            analysis.compute();
+            csv.append(name).append(',').append(setup.variables().length).append(',').append(setup.goals().length)
+                    .append(',').append(seconds).append(',').append(evaluations).append(',').append(initial)
+                    .append(',').append(finalRms).append(',').append(status).append(',').append(reason)
+                    .append(',').append(dls == null ? "" : dls.result().iterations())
+                    .append(',').append(dls == null ? "" : dls.result().nfev())
+                    .append(',').append(dls == null ? "" : dls.result().njev())
+                    .append(',').append(analysis._pfo[ParaxHelper.Effective_focal_length])
+                    .append(',').append(analysis._pfo[ParaxHelper.Fno]);
+            for (var spot : analysis._spots) csv.append(',').append(spot.get_mean_radius());
+            for (double value : analysis._mtfs[2].sag_mtf_by_field) csv.append(',').append(value);
+            for (double value : analysis._mtfs[2].tan_mtf_by_field) csv.append(',').append(value);
+            csv.append('\n');
+            Files.writeString(output.resolve("results.csv"), csv);
+            assertTrue(Double.isFinite(finalRms) && finalRms < initial, "Expected merit reduction for " + name);
+        }
+    }
+
     /** The direct spot/MTF configuration the gaussian-quadrature expectations assume. */
     private static OptimizationSetup frozenDirectSetup(Prescription prescription) {
         return OptimizationBuilder.builder(prescription)

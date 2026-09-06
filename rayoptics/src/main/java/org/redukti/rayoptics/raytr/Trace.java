@@ -12,6 +12,7 @@ import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.specs.Coord;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.specs.FieldSpec;
+import org.redukti.rayoptics.specs.VignettingMapping;
 import org.redukti.rayoptics.util.Lists;
 
 import java.util.*;
@@ -209,7 +210,7 @@ public class Trace {
         double[] pupil_coords = pupil;
         if (trace_options.pupil_type == PupilType.REL_PUPIL) {
             if (trace_options.apply_vignetting)
-                pupil_coords = fld.apply_vignetting(pupil);
+                pupil_coords = fld.apply_vignetting(pupil, trace_options.vignetting_mapping);
         }
         Coord coord = opt_model.optical_spec.ray_start_from_osp(pupil_coords,fld,trace_options.pupil_type);
         var pt0 = coord.pt;
@@ -795,7 +796,8 @@ public class Trace {
 
         var samples = new ArrayList<ContrastRayTriplet>();
         var points = generate_contrast_quadrature(
-                grid_rng, num_spokes, sagittal_shift, tangential_shift, fld);
+                grid_rng, num_spokes, sagittal_shift, tangential_shift, fld,
+                trace_options.vignetting_mapping);
         for (var point : points) {
             var pupil = point.pupil();
             var sagittalPupil = pupil.plus(sagittal_shift);
@@ -856,14 +858,23 @@ public class Trace {
     static List<GaussianQuadraturePoint> generate_contrast_quadrature(
             TraceRingsDef grid_rng, Integer num_spokes,
             Vector2 sagittal_shift, Vector2 tangential_shift, Field fld) {
+        return generate_contrast_quadrature(grid_rng, num_spokes,
+                sagittal_shift, tangential_shift, fld, VignettingMapping.Piecewise);
+    }
+
+    static List<GaussianQuadraturePoint> generate_contrast_quadrature(
+            TraceRingsDef grid_rng, Integer num_spokes,
+            Vector2 sagittal_shift, Vector2 tangential_shift, Field fld,
+            VignettingMapping mapping) {
         var nominal = generate_gaussian_quadrature(
                 grid_rng, grid_rng.num_rings, num_spokes);
         var nominalCenter = new Vector2(grid_rng.cx, grid_rng.cy);
-        var physicalCenter = apply_vignetting(nominalCenter, fld);
+        var physicalCenter = apply_vignetting(nominalCenter, fld, mapping);
         var overlapCenter = physicalCenter.minus(
                 sagittal_shift.plus(tangential_shift).times(0.5));
 
-        if (!valid_contrast_point(overlapCenter, sagittal_shift, tangential_shift, fld)) {
+        if (!valid_contrast_point(
+                overlapCenter, sagittal_shift, tangential_shift, fld, mapping)) {
             throw new IllegalArgumentException(
                     "The requested contrast shear has no common vignetted pupil overlap");
         }
@@ -873,11 +884,11 @@ public class Trace {
         // inside the bisection loop.
         var offsets = new ArrayList<Vector2>(nominal.size());
         for (var point : nominal)
-            offsets.add(apply_vignetting(point.pupil(), fld).minus(physicalCenter));
+            offsets.add(apply_vignetting(point.pupil(), fld, mapping).minus(physicalCenter));
 
         double contraction = 1.0;
         if (!valid_contrast_pattern(offsets, overlapCenter, contraction,
-                sagittal_shift, tangential_shift, fld)) {
+                sagittal_shift, tangential_shift, fld, mapping)) {
             double low = 0.0;
             double high = 1.0;
             // Converge to machine precision: the contraction must be a
@@ -886,7 +897,7 @@ public class Trace {
             for (int iteration = 0; iteration < 60; iteration++) {
                 double trial = 0.5 * (low + high);
                 if (valid_contrast_pattern(offsets, overlapCenter, trial,
-                        sagittal_shift, tangential_shift, fld)) {
+                        sagittal_shift, tangential_shift, fld, mapping)) {
                     low = trial;
                 } else {
                     high = trial;
@@ -906,7 +917,8 @@ public class Trace {
         for (int i = 0; i < nominal.size(); i++) {
             var point = nominal.get(i);
             var pupil = overlapCenter.plus(offsets.get(i).times(contraction));
-            double weight = point.weight() * vignetting_jacobian(point.pupil(), fld);
+            double weight = point.weight()
+                    * vignetting_jacobian(point.pupil(), fld, mapping);
             points.add(new GaussianQuadraturePoint(pupil, weight));
             weightSum += weight;
         }
@@ -922,10 +934,12 @@ public class Trace {
 
     private static boolean valid_contrast_pattern(
             List<Vector2> offsets, Vector2 overlapCenter, double contraction,
-            Vector2 sagittalShift, Vector2 tangentialShift, Field fld) {
+            Vector2 sagittalShift, Vector2 tangentialShift, Field fld,
+            VignettingMapping mapping) {
         for (var offset : offsets) {
             var pupil = overlapCenter.plus(offset.times(contraction));
-            if (!valid_contrast_point(pupil, sagittalShift, tangentialShift, fld)) {
+            if (!valid_contrast_point(
+                    pupil, sagittalShift, tangentialShift, fld, mapping)) {
                 return false;
             }
         }
@@ -933,13 +947,27 @@ public class Trace {
     }
 
     private static boolean valid_contrast_point(
-            Vector2 pupil, Vector2 sagittalShift, Vector2 tangentialShift, Field fld) {
-        return inside_vignetted_pupil(pupil, fld)
-                && inside_vignetted_pupil(pupil.plus(sagittalShift), fld)
-                && inside_vignetted_pupil(pupil.plus(tangentialShift), fld);
+            Vector2 pupil, Vector2 sagittalShift, Vector2 tangentialShift, Field fld,
+            VignettingMapping mapping) {
+        return inside_vignetted_pupil(pupil, fld, mapping)
+                && inside_vignetted_pupil(pupil.plus(sagittalShift), fld, mapping)
+                && inside_vignetted_pupil(pupil.plus(tangentialShift), fld, mapping);
     }
 
     static boolean inside_vignetted_pupil(Vector2 pupil, Field fld) {
+        return inside_vignetted_pupil(pupil, fld, VignettingMapping.Piecewise);
+    }
+
+    static boolean inside_vignetted_pupil(
+            Vector2 pupil, Field fld, VignettingMapping mapping) {
+        if (mapping == VignettingMapping.AffineEllipse) {
+            double xScale = Field.affine_vignetting_scale(fld.vlx, fld.vux);
+            double yScale = Field.affine_vignetting_scale(fld.vly, fld.vuy);
+            if (!(xScale > 0.0) || !(yScale > 0.0)) return false;
+            double x = (pupil.x - Field.vignetting_offset(fld.vlx, fld.vux)) / xScale;
+            double y = (pupil.y - Field.vignetting_offset(fld.vly, fld.vuy)) / yScale;
+            return x * x + y * y <= 1.0 + 1.0e-14;
+        }
         double xScale = fld.vignetting_scale_x(pupil.x);
         double yScale = fld.vignetting_scale_y(pupil.y);
         if (!(xScale > 0.0) || !(yScale > 0.0)) {
@@ -950,13 +978,18 @@ public class Trace {
         return x * x + y * y <= 1.0 + 1.0e-14;
     }
 
-    private static Vector2 apply_vignetting(Vector2 pupil, Field fld) {
-        double[] vignetted = fld.apply_vignetting(pupil.as_array());
+    private static Vector2 apply_vignetting(
+            Vector2 pupil, Field fld, VignettingMapping mapping) {
+        double[] vignetted = fld.apply_vignetting(pupil.as_array(), mapping);
         return new Vector2(vignetted[0], vignetted[1]);
     }
 
     /** Area element of {@link Field#apply_vignetting} at a nominal pupil point. */
-    private static double vignetting_jacobian(Vector2 pupil, Field fld) {
+    private static double vignetting_jacobian(
+            Vector2 pupil, Field fld, VignettingMapping mapping) {
+        if (mapping == VignettingMapping.AffineEllipse)
+            return Field.affine_vignetting_scale(fld.vlx, fld.vux)
+                    * Field.affine_vignetting_scale(fld.vly, fld.vuy);
         return fld.vignetting_scale_x(pupil.x) * fld.vignetting_scale_y(pupil.y);
     }
 

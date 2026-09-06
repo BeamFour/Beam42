@@ -107,10 +107,30 @@ public class Field {
      * @return a new array with the vignetting factors applied
      */
     public double[] apply_vignetting(double[] pupil) {
+        return apply_vignetting(pupil, VignettingMapping.Piecewise);
+    }
+
+    /** Map a normalized coordinate using either the upstream or translated-ellipse model. */
+    public double[] apply_vignetting(double[] pupil, VignettingMapping mapping) {
         double[] vig_pupil = Arrays.copyOf(pupil, pupil.length);
+        if (mapping == VignettingMapping.AffineEllipse) {
+            vig_pupil[0] = vignetting_offset(vlx, vux)
+                    + pupil[0] * affine_vignetting_scale(vlx, vux);
+            vig_pupil[1] = vignetting_offset(vly, vuy)
+                    + pupil[1] * affine_vignetting_scale(vly, vuy);
+            return vig_pupil;
+        }
         vig_pupil[0] *= vignetting_scale_x(pupil[0]);
         vig_pupil[1] *= vignetting_scale_y(pupil[1]);
         return vig_pupil;
+    }
+
+    public static double affine_vignetting_scale(double lower, double upper) {
+        return 1.0 - 0.5 * (lower + upper);
+    }
+
+    public static double vignetting_offset(double lower, double upper) {
+        return 0.5 * (lower - upper);
     }
 
     /**

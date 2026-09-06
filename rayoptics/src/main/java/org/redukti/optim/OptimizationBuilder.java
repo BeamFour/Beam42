@@ -2,6 +2,7 @@ package org.redukti.optim;
 
 import org.redukti.rayoptics.seq.Glass;
 import org.redukti.rayoptics.util.Orientation;
+import org.redukti.rayoptics.specs.VignettingMapping;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.VigType;
 
@@ -92,6 +93,7 @@ public final class OptimizationBuilder {
     private int scenario = 0;
     private VigType vigType = VigType.SetPupil;
     private boolean freezeVignetting = false;
+    private VignettingMapping vignettingMapping = VignettingMapping.Piecewise;
     private Double thicknessConstraintWeight;
     private Double edgeThicknessConstraintWeight;
     private Double curvatureConstraintWeight;
@@ -183,6 +185,21 @@ public final class OptimizationBuilder {
     public OptimizationBuilder freezeVignetting(boolean freeze) {
         this.freezeVignetting = freeze;
         return this;
+    }
+
+    /**
+     * Select how the four measured directional vignetting factors map pupil samples.
+     * The default preserves upstream ray-optics' piecewise mapping.
+     */
+    public OptimizationBuilder vignettingMapping(VignettingMapping mapping) {
+        this.vignettingMapping = mapping == null
+                ? VignettingMapping.Piecewise : mapping;
+        return this;
+    }
+
+    /** Experimental translated-ellipse interpretation of the measured factors. */
+    public OptimizationBuilder affineEllipseVignetting() {
+        return vignettingMapping(VignettingMapping.AffineEllipse);
     }
 
     /**
@@ -676,7 +693,8 @@ public final class OptimizationBuilder {
                             + "; add optical goals or enable rayAberrationGoals()");
         analysis.vignetting(vigType)
                 .freezing_vignetting(freezeVignetting)
-                .checking_spot_apertures(checkSpotApertures);
+                .checking_spot_apertures(checkSpotApertures)
+                .using_vignetting_mapping(vignettingMapping);
         configureSpotPattern(analysis, goals);
         configureContrastAnalysis(analysis, goals);
         configureRequiredAnalyses(analysis, goals);

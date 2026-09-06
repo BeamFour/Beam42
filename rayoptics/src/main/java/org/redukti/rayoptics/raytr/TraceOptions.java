@@ -4,6 +4,7 @@
 package org.redukti.rayoptics.raytr;
 
 import org.redukti.mathlib.Vector2;
+import org.redukti.rayoptics.specs.VignettingMapping;
 
 public class TraceOptions {
 
@@ -17,6 +18,9 @@ public class TraceOptions {
      * if True, apply the `fld` vignetting factors to **pupil**
      */
     public boolean apply_vignetting = true;
+
+    /** Interpretation of the field's four directional vignetting factors. */
+    public VignettingMapping vignetting_mapping = VignettingMapping.Piecewise;
 
     public PupilType pupil_type = PupilType.REL_PUPIL;
 
@@ -43,6 +47,7 @@ public class TraceOptions {
         traceOptions.pt_inside_fuzz = this.pt_inside_fuzz;
         traceOptions.check_apertures = this.check_apertures;
         traceOptions.apply_vignetting = this.apply_vignetting;
+        traceOptions.vignetting_mapping = this.vignetting_mapping;
         traceOptions.pupil_type = this.pupil_type;
         traceOptions.output_filter = this.output_filter;
         traceOptions.rayerr_filter = this.rayerr_filter;

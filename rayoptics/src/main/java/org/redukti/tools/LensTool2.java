@@ -13,6 +13,7 @@ import org.redukti.rayoptics.layout.LayoutOptions;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrderData;
 import org.redukti.rayoptics.raytr.TraceOptions;
+import org.redukti.rayoptics.specs.VignettingMapping;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.RayOpticsModelBuilder;
 import org.redukti.spec.VigType;
@@ -214,13 +215,17 @@ public class LensTool2 {
     }
 
     private static void generateRayAberrationPlots(OpticalModel opm, Args arguments, String filname_suffix) throws Exception {
-        var rayAber = TransverseRayAberrationAnalysis.eval(opm, 21, false, new TraceOptions());
+        TraceOptions traceOptions = traceOptions(
+                arguments.vignetting_mapping, arguments.apply_vignetting);
+        var rayAber = TransverseRayAberrationAnalysis.eval(opm, 21, false, traceOptions);
         for (var fan_results: rayAber.results) {
             String filename = suffixed_name("rayabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag"), filname_suffix, ".svg");
             var output_file = Helper.getOutputFileWithPath(arguments.specfile,filename,arguments.outdir);
             Helper.createOutputFile(output_file, new RayAberrationPlot(rayAber).plot(fan_results, 0));
         }
-        var opdAber = WavefrontAberrationAnalysis.eval(opm, 21, false, new TraceOptions());
+        var opdAber = WavefrontAberrationAnalysis.eval(
+                opm, 21, false, traceOptions(
+                        arguments.vignetting_mapping, arguments.apply_vignetting));
         for (var fan_results: opdAber.results) {
             String filename = suffixed_name("opdabbr-fld" + fan_results.fi + "-" + (fan_results.xy == 1? "tan" : "sag"), filname_suffix, ".svg");
             var output_file = Helper.getOutputFileWithPath(arguments.specfile,filename,arguments.outdir);
@@ -229,12 +234,22 @@ public class LensTool2 {
     }
 
     private static SpotOptions spotOptions(Args arguments) {
-        SpotOptions options = new SpotOptions();
+        SpotOptions options = new SpotOptions()
+                .vignetting_mapping(arguments.vignetting_mapping)
+                .apply_vignetting(arguments.apply_vignetting);
         if (arguments.spot_pattern == SpotOptions.PATTERN_GAUSS_QUADRATURE)
             return options.use_gaussian_quadrature();
         if (arguments.spot_pattern == SpotOptions.PATTERN_GRID)
             return options.use_grid().num_rays(arguments.spot_grid_size);
         return options.use_hexapolar();
+    }
+
+    private static TraceOptions traceOptions(
+            VignettingMapping mapping, boolean applyVignetting) {
+        TraceOptions options = new TraceOptions();
+        options.vignetting_mapping = mapping;
+        options.apply_vignetting = applyVignetting;
+        return options;
     }
 
     private static OpticalModel createLayoutSystem(
@@ -282,7 +297,7 @@ public class LensTool2 {
         if (arguments.specfile == null) {
             System.err.println("Usage: --specfile inputfile [--scenario num] [--dump-system] [--only-d-line] [-o outfilename] [--dont-use-glass-types] \\");
             System.err.println("       [--output-ray-aberration-plots] [--output-wavelength-mtfs] [--auto-size-spot-diagrams] [--do-wideangle-layout] \\");
-            System.err.println("       [--use-spot-pattern " + Args.spot_pattern_names() + "] [--spot-grid-size count] [--vig-type " + Args.vig_type_names() + "] [--wide-angle|--no-wide-angle] \\");
+            System.err.println("       [--use-spot-pattern " + Args.spot_pattern_names() + "] [--spot-grid-size count] [--vig-type " + Args.vig_type_names() + "] [--vignetting-mapping " + Args.vignetting_mapping_names() + "] [--no-vignetting-remap] [--wide-angle|--no-wide-angle] \\");
             System.err.println("       [--mtf freq,freq,...]");
             System.err.println("       --scenario defaults to 0");
             System.err.println("       --mtf takes spatial frequencies in cycles/mm and defaults to 10,30,50, which is what the reports under Examples/ use");

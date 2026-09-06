@@ -1,6 +1,7 @@
 package org.redukti.rayoptics.analysis;
 
 import org.redukti.rayoptics.raytr.TraceOptions;
+import org.redukti.rayoptics.specs.VignettingMapping;
 
 public class SpotOptions {
 
@@ -80,6 +81,17 @@ public class SpotOptions {
      */
     public SpotOptions check_apertures(boolean value) {
         this._trace_options.check_apertures = value;
+        return this;
+    }
+    /** Select how the four directional factors are mapped onto the pupil. */
+    public SpotOptions vignetting_mapping(VignettingMapping value) {
+        _trace_options.vignetting_mapping = value == null
+                ? VignettingMapping.Piecewise : value;
+        return this;
+    }
+    /** Whether normalized pupil samples are remapped using the field factors. */
+    public SpotOptions apply_vignetting(boolean value) {
+        _trace_options.apply_vignetting = value;
         return this;
     }
     public boolean is_gauss_quadrature() {

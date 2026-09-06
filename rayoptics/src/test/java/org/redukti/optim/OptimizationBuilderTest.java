@@ -4,6 +4,7 @@ import org.redukti.rayoptics.util.Orientation;
 import org.junit.jupiter.api.Test;
 import org.redukti.rayoptics.analysis.SpotOptions;
 import org.redukti.rayoptics.seq.Glass;
+import org.redukti.rayoptics.specs.VignettingMapping;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.VigType;
 import org.redukti.spec.SurfaceType;
@@ -203,6 +204,18 @@ class OptimizationBuilderTest {
                 .analysis();
         assertEquals(VigType.Paraxial, configured._vig_type);
         assertTrue(configured._freeze_vignetting);
+
+        Analysis affine = OptimizationBuilder.builder(prescription())
+                .fields(0.0)
+                .mtfFrequencies(10)
+                .affineEllipseVignetting()
+                .build()
+                .analysis();
+        assertEquals(VignettingMapping.AffineEllipse, affine._vignetting_mapping);
+        assertEquals(VignettingMapping.Piecewise,
+                OptimizationBuilder.builder(prescription())
+                        .fields(0.0).mtfFrequencies(10).build()
+                        .analysis()._vignetting_mapping);
     }
 
     @Test

@@ -3,6 +3,7 @@ package org.redukti.optim;
 import org.redukti.rayoptics.analysis.*;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.TraceOptions;
+import org.redukti.rayoptics.specs.VignettingMapping;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.RayOpticsModelBuilder;
 import org.redukti.spec.VigType;
@@ -28,6 +29,8 @@ public class Analysis {
     public boolean _append_failed_spot_rays = false;
     /** Whether ordinary spot rays are rejected by physical surface apertures. */
     public boolean _check_spot_apertures = true;
+    /** How four directional vignetting factors map the sampled pupil. */
+    public VignettingMapping _vignetting_mapping = VignettingMapping.Piecewise;
     public int _contrast_num_rings = 3;
     public int _contrast_num_spokes = 6;
     /** See {@link ContrastOptions#calibrate_frequency(boolean)}; off by default. */
@@ -102,6 +105,10 @@ public class Analysis {
     }
     public Analysis checking_spot_apertures(boolean value) {
         _check_spot_apertures = value;
+        return this;
+    }
+    public Analysis using_vignetting_mapping(VignettingMapping value) {
+        _vignetting_mapping = value == null ? VignettingMapping.Piecewise : value;
         return this;
     }
     public Analysis using_hexapolar_pattern(int num_rays) {
@@ -251,11 +258,13 @@ public class Analysis {
                         .num_rings(_num_rings).num_spokes(_num_spokes)
                         .inner_pupil_radius(_inner_pupil_radius)
                         .append_failed_rays(_append_failed_spot_rays)
-                        .check_apertures(_check_spot_apertures);
+                        .check_apertures(_check_spot_apertures)
+                        .vignetting_mapping(_vignetting_mapping);
             }
             else {
                 options = new SpotOptions().use_hexapolar().num_rays(_num_rays)
-                        .check_apertures(_check_spot_apertures);
+                        .check_apertures(_check_spot_apertures)
+                        .vignetting_mapping(_vignetting_mapping);
             }
             var spotAnalysis = SpotAnalysis.eval(_opt_model,options);
             _spots = spotAnalysis.spot_results.toArray(new SpotAnalysisResult.SpotResultsForField[0]);
@@ -266,10 +275,14 @@ public class Analysis {
             _mtfs = null;
         }
         // We set append_if_none to retain failed fan rays; their goals apply a penalty.
-        _ray_aberrations = _compute_ray_aberrations
-                ? TransverseRayAberrationAnalysis.eval(
-                        _opt_model, NUM_TRANSVERSE_RAYS, true, new TraceOptions())
-                : null;
+        if (_compute_ray_aberrations) {
+            TraceOptions rayAberrationOptions = new TraceOptions();
+            rayAberrationOptions.vignetting_mapping = _vignetting_mapping;
+            _ray_aberrations = TransverseRayAberrationAnalysis.eval(
+                    _opt_model, NUM_TRANSVERSE_RAYS, true, rayAberrationOptions);
+        } else {
+            _ray_aberrations = null;
+        }
         _contrasts = new ContrastAnalysisResult[_contrast_freqs.length];
         for (int i = 0; i < _contrast_freqs.length; i++) {
             var options = new ContrastOptions(_contrast_freqs[i])
@@ -277,7 +290,8 @@ public class Analysis {
                     .num_spokes(_contrast_num_spokes)
                     .calibrate_frequency(_contrast_calibrate_frequency)
                     .aim_exit_pupil(_contrast_aim_exit_pupil)
-                    .center_residuals(_contrast_center_residuals);
+                    .center_residuals(_contrast_center_residuals)
+                    .vignetting_mapping(_vignetting_mapping);
             _contrasts[i] = ContrastAnalysis.eval(_opt_model, options);
         }
     }

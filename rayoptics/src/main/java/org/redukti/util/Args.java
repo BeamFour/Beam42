@@ -1,6 +1,7 @@
 package org.redukti.util;
 
 import org.redukti.rayoptics.analysis.SpotOptions;
+import org.redukti.rayoptics.specs.VignettingMapping;
 import org.redukti.spec.VigType;
 
 public final class Args {
@@ -39,6 +40,10 @@ public final class Args {
      * tool up to this field is a no-op.
      */
     public VigType vig_type = VigType.SetPupil;
+    /** How the four directional vignetting factors map normalized pupil samples. */
+    public VignettingMapping vignetting_mapping = VignettingMapping.Piecewise;
+    /** Apply the measured factors to analysis pupil coordinates. */
+    public boolean apply_vignetting = true;
     /**
      * Forces the field spec's wide angle ray aiming on or off. Null leaves it
      * derived from the half angle of view, which is the existing behaviour.
@@ -124,6 +129,13 @@ public final class Args {
             else if (arg1.equals("--vig-type")) {
                 arguments.vig_type = parse_vig_type(arg2);
                 i++;
+            }
+            else if (arg1.equals("--vignetting-mapping")) {
+                arguments.vignetting_mapping = parse_vignetting_mapping(arg2);
+                i++;
+            }
+            else if (arg1.equals("--no-vignetting-remap")) {
+                arguments.apply_vignetting = false;
             }
             else if (arg1.equals("--wide-angle")) {
                 arguments.wide_angle = Boolean.TRUE;
@@ -212,6 +224,22 @@ public final class Args {
             sb.append(to_kebab_case(vig_type.name()));
         }
         return sb.toString();
+    }
+
+    public static VignettingMapping parse_vignetting_mapping(String value) {
+        if (value == null)
+            throw new IllegalArgumentException(
+                    "--vignetting-mapping requires one of: " + vignetting_mapping_names());
+        String normalized = value.replace("-", "").replace("_", "");
+        for (VignettingMapping mapping : VignettingMapping.values()) {
+            if (mapping.name().equalsIgnoreCase(normalized)) return mapping;
+        }
+        throw new IllegalArgumentException("Unrecognized --vignetting-mapping '" + value
+                + "', expected one of: " + vignetting_mapping_names());
+    }
+
+    public static String vignetting_mapping_names() {
+        return "piecewise, affine-ellipse";
     }
 
     /**

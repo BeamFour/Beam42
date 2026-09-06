@@ -628,6 +628,47 @@ the final prescription. This should establish whether dynamic factors give a mor
 accurate merit without introducing finite-difference noise or allowing uncontrolled
 throughput loss.
 
+An experimental translated-ellipse mapping is available without changing the default:
+
+```java
+.affineEllipseVignetting()
+```
+
+For a report on an existing prescription, LensTool2 exposes the same experiment as
+
+```text
+--vignetting-mapping affine-ellipse
+```
+
+It applies to hexapolar, grid and Gaussian spot/MTF sampling. Use a separate output
+directory when comparing it with the default `piecewise` mapping so that the generated
+reports are not overwritten.
+
+For a dense reference calculation, retain `SetPupil` so the pupil scale and reported
+factors are identical to the sparse runs, but disable their coordinate remapping:
+
+```text
+--vig-type set-pupil --no-vignetting-remap --use-spot-pattern grid --spot-grid-size 128
+```
+
+LensTool2's grid defaults to 64 by 64 points across the entrance-pupil square; use
+`--spot-grid-size` to increase it. It always checks physical surface apertures. Points
+outside the unit pupil or blocked by the lens are rejected. Compare at least two grid
+sizes before treating the result as converged ground truth.
+
+The existing four axial boundary rays are retained. If the measured positive and
+negative X extents are `a = 1 - vux` and `b = 1 - vlx`, the alternative map is
+
+```text
+x' = (a - b)/2 + x (a + b)/2
+```
+
+with the analogous expression in Y. It therefore matches all four measured extrema but
+maps the nominal pupil centre to the centre of one translated ellipse. The default
+piecewise map instead keeps zero fixed and scales each half-axis independently. This is
+an experiment in how the measured factors are interpreted; it does not yet perform a
+least-squares ellipse fit to a densely traced cat's-eye boundary.
+
 ## Preserving the starting lens design
 
 Contrast optimization has a broad, smooth capture range and can substantially rearrange

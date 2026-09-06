@@ -1,6 +1,7 @@
 package org.redukti.rayoptics.analysis;
 
 import org.redukti.rayoptics.raytr.TraceOptions;
+import org.redukti.rayoptics.specs.VignettingMapping;
 
 /** Options for pupil-autocorrelation contrast analysis. */
 public class ContrastOptions {
@@ -58,6 +59,13 @@ public class ContrastOptions {
     /** Whether traced contrast rays are also rejected by surface apertures. */
     public ContrastOptions check_apertures(boolean value) {
         traceOptions.check_apertures = value;
+        return this;
+    }
+
+    /** Select how the four directional factors are mapped onto the pupil. */
+    public ContrastOptions vignetting_mapping(VignettingMapping value) {
+        traceOptions.vignetting_mapping = value == null
+                ? VignettingMapping.Piecewise : value;
         return this;
     }
 

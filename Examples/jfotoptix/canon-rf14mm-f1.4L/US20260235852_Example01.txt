@@ -102,3 +102,14 @@ originY	318.50
 ppmm	9.440
 [notes]
 Bill: Computed d0 from S and Total Length.
+[patent info]
+country	US
+number	US20260235852
+example	1
+year applied	2023
+inventors	WATANABE TATSURO
+current assignee	Canon Inc
+original assignee	Canon Inc
+link	https://worldwide.espacenet.com/patent/search?q=pn%3DUS20260235852A1
+[report data]
+lens name	Canon RF 14mm F1.4 L VCM

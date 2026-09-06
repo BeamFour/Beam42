@@ -28,6 +28,8 @@ public final class Args {
      * also {@link SpotOptions}' own default.
      */
     public int spot_pattern = SpotOptions.PATTERN_HEXAPOLAR;
+    /** Number of samples along each dimension of a rectangular spot grid. */
+    public int spot_grid_size = 64;
     public boolean auto_size_spots = false;
     public boolean do_wideangle_layout = false;
     public boolean force = false;
@@ -107,6 +109,10 @@ public final class Args {
             }
             else if (arg1.equals("--use-spot-pattern")) {
                 arguments.spot_pattern = parse_spot_pattern(arg2);
+                i++;
+            }
+            else if (arg1.equals("--spot-grid-size")) {
+                arguments.spot_grid_size = parse_positive_int(arg1, arg2);
                 i++;
             }
             else if (arg1.equals("--auto-size-spot-diagrams")) {
@@ -239,6 +245,21 @@ public final class Args {
     /** The accepted --use-spot-pattern spellings, for usage and error messages. */
     public static String spot_pattern_names() {
         return "hex, grid, gaussian";
+    }
+
+    private static int parse_positive_int(String option, String value) {
+        if (value == null)
+            throw new IllegalArgumentException(option + " requires a positive integer");
+        try {
+            int parsed = Integer.parseInt(value);
+            if (parsed < 2)
+                throw new IllegalArgumentException(option + " must be at least 2, got " + parsed);
+            return parsed;
+        }
+        catch (NumberFormatException e) {
+            throw new IllegalArgumentException(option + " requires a positive integer, got '"
+                    + value + "'");
+        }
     }
 
     private static String to_kebab_case(String name) {

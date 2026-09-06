@@ -106,7 +106,7 @@ Bill: Computed d0 from S and Total Length.
 country	US
 number	US20260235852
 example	1
-year applied	2023
+year applied	2025
 inventors	WATANABE TATSURO
 current assignee	Canon Inc
 original assignee	Canon Inc

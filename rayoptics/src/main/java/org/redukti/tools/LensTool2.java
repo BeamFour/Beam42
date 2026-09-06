@@ -159,7 +159,7 @@ public class LensTool2 {
 
 
     private static SpotAnalysisResult generateSpotDiagrams(OpticalModel opm,Args arguments,boolean standardSize, String filename_suffix) throws Exception {
-        var spotAnalysis = SpotAnalysis.eval(opm,new SpotOptions());
+        var spotAnalysis = SpotAnalysis.eval(opm, spotOptions(arguments));
         Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile,suffixed_name("spot-report",filename_suffix,".txt"),arguments.outdir), spotAnalysis.toString());
         for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
             var spotFld = spotAnalysis.spot_results.get(i);
@@ -179,7 +179,7 @@ public class LensTool2 {
     }
 
     private static void generateMTFs(OpticalModel opm, Args arguments, double[] fields, Map<Double,Double> wv_wts, String outname, String filename_suffix) throws Exception {
-        var spotAnalysis = SpotAnalysis.eval(opm,new SpotOptions());
+        var spotAnalysis = SpotAnalysis.eval(opm, spotOptions(arguments));
         var mtfs = new ArrayList<PolyMTF>();
         for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
             var spotFld = spotAnalysis.spot_results.get(i);
@@ -228,6 +228,15 @@ public class LensTool2 {
         }
     }
 
+    private static SpotOptions spotOptions(Args arguments) {
+        SpotOptions options = new SpotOptions();
+        if (arguments.spot_pattern == SpotOptions.PATTERN_GAUSS_QUADRATURE)
+            return options.use_gaussian_quadrature();
+        if (arguments.spot_pattern == SpotOptions.PATTERN_GRID)
+            return options.use_grid().num_rays(arguments.spot_grid_size);
+        return options.use_hexapolar();
+    }
+
     private static OpticalModel createLayoutSystem(
             Prescription prescription,
             int config,
@@ -273,7 +282,7 @@ public class LensTool2 {
         if (arguments.specfile == null) {
             System.err.println("Usage: --specfile inputfile [--scenario num] [--dump-system] [--only-d-line] [-o outfilename] [--dont-use-glass-types] \\");
             System.err.println("       [--output-ray-aberration-plots] [--output-wavelength-mtfs] [--auto-size-spot-diagrams] [--do-wideangle-layout] \\");
-            System.err.println("       [--use-spot-pattern " + Args.spot_pattern_names() + "] [--vig-type " + Args.vig_type_names() + "] [--wide-angle|--no-wide-angle] \\");
+            System.err.println("       [--use-spot-pattern " + Args.spot_pattern_names() + "] [--spot-grid-size count] [--vig-type " + Args.vig_type_names() + "] [--wide-angle|--no-wide-angle] \\");
             System.err.println("       [--mtf freq,freq,...]");
             System.err.println("       --scenario defaults to 0");
             System.err.println("       --mtf takes spatial frequencies in cycles/mm and defaults to 10,30,50, which is what the reports under Examples/ use");
@@ -283,7 +292,7 @@ public class LensTool2 {
         try {
             long startTime = System.nanoTime();
             final double[] fields = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
-            VigType vigType = VigType.SetPupil;
+            VigType vigType = arguments.vig_type;
             OpticalBenchDataImporter.LensSpecifications specs = getSpecsFromFile(arguments.specfile);
             var prescription = createPrescription(specs,arguments.use_glass_types,arguments.only_d_line);
             String prescription_output = prescription.to_opt_bench_str(new StringBuilder()).toString();

@@ -79,6 +79,35 @@ class OptimizationBuilderTest {
         assertArrayEquals(new int[]{1}, edgeBoundGaps(crossed));
     }
 
+    private static int[] edgeConstraintGaps(OptimizationBuilder.OptimizationSetup setup) {
+        return Arrays.stream(setup.goals()).filter(ConstraintEdgeThickness.class::isInstance)
+                .map(ConstraintEdgeThickness.class::cast).mapToInt(g -> g._surface_id).toArray();
+    }
+
+    /**
+     * The penalty form had the same gap the bound form did: it only looked at
+     * {@link VarThickness}, so a curvature-only setup - the very case curvature-driven
+     * crossing arises in - got no edge constraint at all.
+     */
+    @Test void edgeConstraintsCoverBothGapsBesideAVariedSurface() {
+        var p = edgeBoundPrescription();
+        var curvatureOnly = OptimizationBuilder.builder(p).fields(0).mtfFrequencies(10)
+                .varyCurvatures(1).applyEdgeThicknessConstraints().rayAberrationGoals().build();
+        assertArrayEquals(new int[]{0, 1}, edgeConstraintGaps(curvatureOnly));
+
+        var asphericOnly = OptimizationBuilder.builder(p).fields(0).mtfFrequencies(10)
+                .additionalVariables(new VarAsphK(p, 1))
+                .applyEdgeThicknessConstraints().rayAberrationGoals().build();
+        assertArrayEquals(new int[]{0, 1}, edgeConstraintGaps(asphericOnly));
+
+        // And the penalty and bound forms must select the same gaps, from the same code.
+        var both = OptimizationBuilder.builder(p).fields(0).mtfFrequencies(10)
+                .varyCurvatures(1).varyThicknesses(0)
+                .applyEdgeThicknessConstraints().boundEdgeThicknesses(.5)
+                .rayAberrationGoals().build();
+        assertArrayEquals(edgeConstraintGaps(both), edgeBoundGaps(both));
+    }
+
     @Test void curvatureBoundsBoxEachVariedSurfaceFromBothSides() {
         var p = edgeBoundPrescription();
         var setup = OptimizationBuilder.builder(p).fields(0).mtfFrequencies(10)

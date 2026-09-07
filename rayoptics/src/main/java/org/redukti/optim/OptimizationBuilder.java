@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Builds the repetitive variables and goals used by an optical optimization.
@@ -616,6 +617,10 @@ public final class OptimizationBuilder {
      * away from the axis once curvature moves - the failure mode that produced overlapping
      * first and second surfaces on the Leica 75/2 with thickness constraints already in
      * place. Use both when curvatures and thicknesses are varied together.
+     *
+     * <p>Applies to the gap after a varied thickness <em>and</em> to both gaps beside a
+     * surface with a varied radius, conic constant or aspheric coefficient; see
+     * {@link #edgeAffectedGaps}. A setup that varies no thickness at all is still covered.
      */
     public OptimizationBuilder applyEdgeThicknessConstraints() {
         return applyEdgeThicknessConstraints(NOMINAL_CONSTRAINT_WEIGHT);
@@ -754,6 +759,41 @@ public final class OptimizationBuilder {
                 buildBounds(variables).toArray(new Bound[0]));
     }
 
+    /**
+     * The gaps whose edge separation some varied parameter can move, sorted and
+     * deduplicated: the gap a varied thickness <em>is</em>, and <em>both</em> gaps beside
+     * a surface whose shape is varied.
+     *
+     * <p>The second half is easy to miss and was missed here originally, in both the
+     * penalty and the bound form. The separation is
+     * {@code gap(h) = t + sag_next(h) - sag_this(h)}, so moving a radius, conic constant
+     * or aspheric coefficient closes the gap on either side of that surface with no
+     * thickness variable involved anywhere. A setup that varies curvatures and aspherics
+     * but no thicknesses therefore got <em>no</em> edge protection at all, silently -
+     * which is precisely the configuration in which curvature is the only freedom, and
+     * curvature-driven crossing is the failure the edge constraint exists to catch.
+     *
+     * <p>Out-of-range gap indices produced at either end of the surface list are left in
+     * and rejected by the caller's {@code is_constrainable} / {@code is_boundable} check.
+     */
+    private static Set<Integer> edgeAffectedGaps(List<Var> variables) {
+        Set<Integer> gaps = new TreeSet<>();
+        for (Var variable : variables) {
+            if (variable instanceof VarThickness thickness) {
+                gaps.add(thickness._surface_id);
+                continue;
+            }
+            int surface;
+            if (variable instanceof VarRadius radius) surface = radius._surface_id;
+            else if (variable instanceof VarAsphK conic) surface = conic._surface_id;
+            else if (variable instanceof VarAsphCoeff coefficient) surface = coefficient._surface_id;
+            else continue;
+            gaps.add(surface - 1);
+            gaps.add(surface);
+        }
+        return gaps;
+    }
+
     /** Built from the variable list, like the constraint goals, so a bound attaches to
      * exactly what is free to move, and while the prescription still holds its start. */
     private List<Bound> buildBounds(List<Var> variables) {
@@ -765,23 +805,7 @@ public final class OptimizationBuilder {
                             scenario, thicknessBoundFraction));
         }
         if (edgeThicknessBoundFraction != null) {
-            // A surface shape changes the separation on both sides, even when
-            // neither axial thickness is varied. Sort and deduplicate the gaps.
-            Set<Integer> gaps = new java.util.TreeSet<>();
-            for (Var variable : variables) {
-                if (variable instanceof VarThickness thickness) {
-                    gaps.add(thickness._surface_id);
-                    continue;
-                }
-                int surface;
-                if (variable instanceof VarRadius radius) surface = radius._surface_id;
-                else if (variable instanceof VarAsphK conic) surface = conic._surface_id;
-                else if (variable instanceof VarAsphCoeff coefficient) surface = coefficient._surface_id;
-                else continue;
-                gaps.add(surface - 1);
-                gaps.add(surface);
-            }
-            for (int gap : gaps)
+            for (int gap : edgeAffectedGaps(variables))
                 if (BoundEdgeThickness.is_boundable(prescription, scenario, gap))
                     result.add(BoundEdgeThickness.fractionOfCurrent(prescription, gap,
                             scenario, edgeThicknessBoundFraction));
@@ -894,10 +918,9 @@ public final class OptimizationBuilder {
                             thicknessConstraintWeight));
         }
         if (edgeThicknessConstraintWeight != null) {
-            for (Var variable : variables)
-                if (variable instanceof VarThickness thickness
-                        && ConstraintEdgeThickness.is_constrainable(analysis, thickness._surface_id))
-                    result.add(new ConstraintEdgeThickness(analysis, thickness._surface_id,
+            for (int gap : edgeAffectedGaps(variables))
+                if (ConstraintEdgeThickness.is_constrainable(analysis, gap))
+                    result.add(new ConstraintEdgeThickness(analysis, gap,
                             edgeThicknessConstraintWeight));
         }
         if (curvatureConstraintWeight != null) {

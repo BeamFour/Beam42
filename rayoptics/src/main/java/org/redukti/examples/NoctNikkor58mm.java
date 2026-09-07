@@ -119,9 +119,16 @@ public class NoctNikkor58mm {
                         new VarAsphCoeff(prescription,0,4,1E14))
                 .weighted(false)
                 .dLineOnly(dLineOnly)
+                // Hard bounds instead of the weighted penalties. Only
+                // dampedLeastSquaresSolver() honours these; LMDER ignores them.
+                // boundThicknesses does nothing here - no thickness is varied - but
+                // boundEdgeThicknesses still applies, to both gaps beside every varied
+                // surface, because curvature moves the sag on both sides.
                 .applyCurvatureConstraints()
                 .applyEdgeThicknessConstraints()
-                .applyThicknessConstraints()
+                //.applyThicknessConstraints()
+//                .boundEdgeThicknesses(0.5)
+//                .boundCurvatures(0.2)
                 .contrastSampling(6, 12)
                 .contrastGoals(
                         contrast(30, sagittalWeights, tangentialWeights))
@@ -200,11 +207,19 @@ public class NoctNikkor58mm {
         String specfile = ExampleFinder.geoPathToExample("Examples/jfotoptix/nikkor-58mm-f1.2/version5/Noct-Nikkor-58mmf1.2.txt");
         //String specfile = ExampleFinder.geoPathToExample("Examples/jfotoptix/nikkor-58mm-f1.2/version19/specs.txt");
         var prescription = getPrescription(specfile, weighted, dLineOnly);
-        var setup = createContrastSetup2(prescription, weighted, dLineOnly, fieldWeights);
+        var setup = createContrastSetup(prescription, weighted, dLineOnly, fieldWeights);
         var analysis = setup.analysis();
         var meritFunction = setup.meritFunction(false);
         analysis.compute();
-        var solver = meritFunction.getSolver();
+        // meritFunction.getSolver() is LMDER, which ignores bounds entirely. Use the DLS
+        // solver to have them honoured; it picks Beam42's bounded defaults automatically
+        // when the setup carries bounds. Status is 1 converged, 2 out of iterations,
+        // 0 failed - not MINPACK codes.
+        var solver = setup.bounds().length == 0
+                ? meritFunction.getSolver()
+                : setup.dampedLeastSquaresSolver();
+        System.out.println("Solver = " + solver.getClass().getSimpleName()
+                + ", bounds = " + setup.bounds().length);
 
         if (analysis._ray_aberrations != null) {
             System.out.println("Aberrations:\n");
@@ -214,6 +229,13 @@ public class NoctNikkor58mm {
         System.out.println(meritFunction);
         var status = solver.solve();
         System.out.println("Status = " + status);
+        if (solver instanceof DampedLeastSquaresSolver dls) {
+            System.out.println("Stopped: " + dls.result().message()
+                    + " after " + dls.result().iterations() + " accepted iterations");
+            for (Bound bound : dls.bounds())
+                if (bound.value() < 1e-6)
+                    System.out.println("  active bound: " + bound);
+        }
         System.out.println("After:\n");
         System.out.println(meritFunction);
         System.out.println(prescription);

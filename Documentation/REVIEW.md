@@ -1449,6 +1449,24 @@ They are penalties, not bounds. Nothing prevents a strong enough optical gradien
 moving a parameter a long way, thickness constraints hold axial centre thickness rather
 than edge separation, and a final prescription still needs a mechanical check.
 
+#### Corrected: the edge constraint used to miss curvature-only setups (2026-09-07)
+
+`applyEdgeThicknessConstraints()` selected the gaps to constrain by iterating the variable
+list for `VarThickness`, so it attached a constraint to the gap a varied thickness *is* and
+to nothing else. But `gap(h) = t + sag_next(h) - sag_this(h)`, and a varied radius, conic
+or aspheric coefficient moves the sag on *both* sides of its surface with no thickness
+variable anywhere. A setup varying curvatures and aspherics but no thicknesses therefore
+got **no edge constraint at all**, silently — the configuration in which curvature is the
+only freedom, and so exactly the one the constraint was written for. It worked on the Leica
+only because that setup also calls `varyAllThicknesses()`, which covered every gap by
+accident of a different variable.
+
+Both the penalty and the bound form had it; both now share one gap-selection routine
+(`OptimizationBuilder.edgeAffectedGaps`) so they cannot drift apart again. Of the examples
+in the tree, only `NoctNikkor58mm` was affected — it is the only one calling the constraint
+without varying a thickness — where the count went from 0 to 12. The Leica measurements
+above are unchanged: with every thickness varied, the gap set is identical before and after.
+
 #### Measured: hard bounds are correct but the constrained solver cannot use them (2026-09-07)
 
 `Bound`, `BoundThickness` and `BoundEdgeThickness` are the hard-constraint form —

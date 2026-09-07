@@ -684,8 +684,10 @@ public final class OptimizationBuilder {
     }
 
     /**
-     * Forbid the edge separation of any varied gap from falling below {@code fraction} of
+     * Forbid the edge separation of any affected gap from falling below {@code fraction} of
      * where it started, measured at the smaller of the two bounding semi-diameters.
+     * Includes the gap after a varied thickness and both gaps adjacent to a surface
+     * with a varied radius, conic constant, or aspheric coefficient.
      *
      * <p>This is the constraint the penalty version cannot express. A weighted residual
      * anchored to the starting separation charges for opening the edge as much as for
@@ -737,10 +739,25 @@ public final class OptimizationBuilder {
                             scenario, thicknessBoundFraction));
         }
         if (edgeThicknessBoundFraction != null) {
-            for (Var variable : variables)
-                if (variable instanceof VarThickness thickness
-                        && BoundEdgeThickness.is_boundable(prescription, scenario, thickness._surface_id))
-                    result.add(BoundEdgeThickness.fractionOfCurrent(prescription, thickness._surface_id,
+            // A surface shape changes the separation on both sides, even when
+            // neither axial thickness is varied. Sort and deduplicate the gaps.
+            Set<Integer> gaps = new java.util.TreeSet<>();
+            for (Var variable : variables) {
+                if (variable instanceof VarThickness thickness) {
+                    gaps.add(thickness._surface_id);
+                    continue;
+                }
+                int surface;
+                if (variable instanceof VarRadius radius) surface = radius._surface_id;
+                else if (variable instanceof VarAsphK conic) surface = conic._surface_id;
+                else if (variable instanceof VarAsphCoeff coefficient) surface = coefficient._surface_id;
+                else continue;
+                gaps.add(surface - 1);
+                gaps.add(surface);
+            }
+            for (int gap : gaps)
+                if (BoundEdgeThickness.is_boundable(prescription, scenario, gap))
+                    result.add(BoundEdgeThickness.fractionOfCurrent(prescription, gap,
                             scenario, edgeThicknessBoundFraction));
         }
         return result;

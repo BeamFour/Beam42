@@ -20,6 +20,71 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 class OptimizationBuilderTest {
 
+    private static Prescription edgeBoundPrescription() {
+        return new Prescription(50, 1.4, 40, 43.28, false)
+                .surf(50, 5, 30, 1.5, 50)
+                .surf(-50, 20, 30)
+                .asph(SurfaceType.ASPH_EVEN, 0, new double[]{0, 0})
+                .stop(1, 20)
+                .surf(0, 5, 30).build();
+    }
+
+    private static int[] edgeBoundGaps(OptimizationBuilder.OptimizationSetup setup) {
+        return Arrays.stream(setup.bounds()).filter(BoundEdgeThickness.class::isInstance)
+                .map(BoundEdgeThickness.class::cast).mapToInt(b -> b._surface_id).toArray();
+    }
+
+    @Test void curvatureOnlyVariablesBoundBothAdjacentEdges() {
+        var p = edgeBoundPrescription();
+        var setup = OptimizationBuilder.builder(p).fields(0).mtfFrequencies(10).varyCurvatures(1).boundEdgeThicknesses(.5).build();
+        assertArrayEquals(new int[]{0, 1}, edgeBoundGaps(setup));
+        BoundEdgeThickness first = (BoundEdgeThickness) setup.bounds()[0];
+        assertTrue(first.value() > 0);
+        var radius = new VarRadius(p, 1);
+        radius.set_scaled_value(-20);
+        radius.write_to_prescription();
+        assertTrue(first.value() < 0, "The bound must detect closure caused by curvature alone");
+    }
+
+    @Test void asphericOnlyVariablesBoundBothAdjacentEdges() {
+        for (boolean conic : new boolean[]{true, false}) {
+            var p = edgeBoundPrescription();
+            Var variable = conic ? new VarAsphK(p, 1) : new VarAsphCoeff(p, 1, 1, 1e6);
+            var setup = OptimizationBuilder.builder(p).fields(0).mtfFrequencies(10).additionalVariables(variable)
+                    .boundEdgeThicknesses(.5).build();
+            assertArrayEquals(new int[]{0, 1}, edgeBoundGaps(setup));
+        }
+    }
+
+    @Test void overlappingVariablesCreateEachEdgeBoundOnlyOnce() {
+        var p = edgeBoundPrescription();
+        var setup = OptimizationBuilder.builder(p).fields(0).mtfFrequencies(10).rayAberrationGoals()
+                .varyCurvatures(0, 1).varyThicknesses(0, 1)
+                .additionalVariables(new VarAsphK(p, 1), new VarAsphCoeff(p, 1, 1, 1e6))
+                .boundThicknesses(.5).boundEdgeThicknesses(.5).build();
+        assertArrayEquals(new int[]{0, 1}, edgeBoundGaps(setup));
+        assertEquals(2, Arrays.stream(setup.bounds()).filter(BoundThickness.class::isInstance).count());
+        assertEquals(4, setup.bounds().length);
+    }
+
+    @Test void edgeSelectionSkipsOutOfRangeAndInitiallyCrossedGaps() {
+        var p = edgeBoundPrescription();
+        int last = p._surfaces.length - 1;
+        var ends = OptimizationBuilder.builder(p).fields(0).mtfFrequencies(10).varyCurvatures(0, last)
+                .boundEdgeThicknesses(.5).build();
+        assertArrayEquals(new int[]{0, last - 1}, edgeBoundGaps(ends));
+        p._surfaces[0]._thickness = -10;
+        var crossed = OptimizationBuilder.builder(p).fields(0).mtfFrequencies(10).varyCurvatures(1)
+                .boundEdgeThicknesses(.5).build();
+        assertArrayEquals(new int[]{1}, edgeBoundGaps(crossed));
+    }
+
+    @Test void thicknessOnlyVariablesBoundOnlyTheirOwnGap() {
+        var setup = OptimizationBuilder.builder(edgeBoundPrescription()).fields(0).mtfFrequencies(10).varyThicknesses(1)
+                .boundEdgeThicknesses(.5).build();
+        assertArrayEquals(new int[]{1}, edgeBoundGaps(setup));
+    }
+
     private static Prescription prescription() {
         return new Prescription(50.0, 1.4, 40.0, 43.28,
                 new double[]{Glass.d, Glass.F, Glass.C},

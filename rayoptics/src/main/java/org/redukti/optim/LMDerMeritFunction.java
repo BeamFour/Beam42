@@ -246,7 +246,9 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
                     + " contrast samples contain failed rays; " + first);
     }
 
-    private void validateInputs() {
+    /** Computes the starting analysis and rejects a start the merit cannot represent.
+     * Public so solvers other than {@link #getSolver()} can run the same check. */
+    public void validateInputs() {
         analysis.compute();
         validateInitialContrastSamples();
     }

@@ -1449,6 +1449,55 @@ They are penalties, not bounds. Nothing prevents a strong enough optical gradien
 moving a parameter a long way, thickness constraints hold axial centre thickness rather
 than edge separation, and a final prescription still needs a mechanical check.
 
+#### Measured: hard bounds are correct but the constrained solver cannot use them (2026-09-07)
+
+`Bound`, `BoundThickness` and `BoundEdgeThickness` are the hard-constraint form —
+`edge_gap >= floor` rather than a weighted residual — honoured by
+`DampedLeastSquaresSolver` and ignored by `LMDerSolver`, which cannot represent them.
+`LeicaLayoutBoundsTest` measures them against the penalties on this lens, in the full
+11-field contrast configuration (29 variables, 14,331 goals), every row starting at
+optical RMS 0.2372392 and scored on a constraint-free yardstick setup:
+
+| Layout treatment | Evaluations | Optical RMS | min edge (mm) | crossed | Status |
+| --- | ---: | ---: | ---: | ---: | --- |
+| LMDER, thickness penalty 5.0 | 1,423 | 0.0230213 | 0.2953 | 0 | converged |
+| LMDER, all penalties nominal | 1,727 | 0.0217512 | 0.2899 | 0 | converged |
+| DLS, all penalties nominal | 2,474 | **0.0202231** | 0.2969 | 0 | converged |
+| DLS, hard bounds at 0.5 of start | 6,171 | 0.0265324 | 0.1526 | 0 | 100-iteration limit |
+
+What this establishes, and what it does not:
+
+- **The bounds work as constraints.** Nothing crossed, four bounds finished exactly on
+  their floors with correct negative KKT multipliers, and the bounded row is the only one
+  that redistributed rather than merely resisted: gaps 6, 8 and 13 grew to 1.52x, 1.62x
+  and 1.31x of start while four others sat on their floors. The penalty rows held
+  everything inside about ±25% of start, which is a fractional penalty behaving as
+  designed — resisting opening a gap as hard as closing it.
+- **The bounded row above is crippled by a bad starting damping, not by the bounds.** At
+  Prysm's near-zero starting damping it takes a first step of norm 70.8, lands on three
+  constraints at once, and zig-zags for eighty iterations to buy 0.6% of cost. Starting at
+  1e-2 instead — the only change — it reaches **0.0223508** at 200 iterations and is still
+  improving steadily (13.5% of cost in the last fifty), tracking LMDER-nominal's 0.0217512.
+  A near-undamped first step is right for an unconstrained problem and wrong for a bounded
+  one; `boundedDefaultOptions()` now starts bounded problems at 1e-2.
+- **What bounds actually cost is iterations.** 12,342 evaluations against LMDER's 1,727,
+  for a merit still slightly behind and not yet converged. That, rather than any distortion
+  of the design, is the charge against them on this evidence.
+- **Open question 2 did not reproduce here.** Nominal penalty weights at 11 fields held
+  the line and reached a *better* merit than the tuned weights, with no crossings and a
+  healthier minimum edge. The detuning concern stands as an argument but has no failing
+  case on this lens and configuration.
+- **Not varied**: the bound fraction (0.5 throughout), the lens, the merit type, the
+  starting point. A reduced 3-field configuration reaches the *opposite* conclusion —
+  bounds converge and beat the penalty run there — so this result is specific to the full
+  configuration, and one run per row.
+
+A 1 mm trust radius was also tried and failed outright, with the design essentially
+unmoved. The trust radius looks like a defect in its own right: `trustRadii` scales the
+step uniformly *after* the KKT solve, discarding the constraint satisfaction that solve
+established. Full numbers, histories and layout tables in
+[DAMPED_LEAST_SQUARES.md](DAMPED_LEAST_SQUARES.md) and `target/leica-bounds/`.
+
 ### Per-ray spot goals
 
 `GoalSpotRMS` exposes one aggregate radius per field; differentiating a single

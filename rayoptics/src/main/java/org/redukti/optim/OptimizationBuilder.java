@@ -95,6 +95,8 @@ public final class OptimizationBuilder {
     private Double thicknessConstraintWeight;
     private Double edgeThicknessConstraintWeight;
     private Double curvatureConstraintWeight;
+    private Double thicknessBoundFraction;
+    private Double edgeThicknessBoundFraction;
     private final List<MtfGoals> mtfGoals = new ArrayList<>();
     private final List<ContrastGoals> contrastGoals = new ArrayList<>();
     private final List<Var> additionalVariables = new ArrayList<>();
@@ -661,6 +663,46 @@ public final class OptimizationBuilder {
     }
 
     // ------------------------------------------------------------------
+    // Bounds - where the design may not go
+    // ------------------------------------------------------------------
+
+    /**
+     * Forbid any varied axial thickness from falling below {@code fraction} of where it
+     * started. Hard constraint, not a penalty: see {@link Bound}.
+     *
+     * <p>Only a solver with a constrained step honours these - presently
+     * {@link DampedLeastSquaresSolver}. {@link LMDerSolver} ignores them, so a setup meant
+     * for both wants {@link #applyThicknessConstraints()} as well or instead.
+     *
+     * @param fraction floor as a fraction of the starting thickness, in [0, 1)
+     */
+    public OptimizationBuilder boundThicknesses(double fraction) {
+        if (!Double.isFinite(fraction) || fraction < 0.0 || fraction >= 1.0)
+            throw new IllegalArgumentException("thickness bound fraction must be in [0, 1)");
+        this.thicknessBoundFraction = fraction;
+        return this;
+    }
+
+    /**
+     * Forbid the edge separation of any varied gap from falling below {@code fraction} of
+     * where it started, measured at the smaller of the two bounding semi-diameters.
+     *
+     * <p>This is the constraint the penalty version cannot express. A weighted residual
+     * anchored to the starting separation charges for opening the edge as much as for
+     * closing it, and can be outvoted by a large enough optical block; a bound only
+     * forbids the crossing. Gaps that do not start with a positive finite separation are
+     * skipped - see {@link BoundEdgeThickness#is_boundable}.
+     *
+     * @param fraction floor as a fraction of the starting edge separation, in [0, 1)
+     */
+    public OptimizationBuilder boundEdgeThicknesses(double fraction) {
+        if (!Double.isFinite(fraction) || fraction < 0.0 || fraction >= 1.0)
+            throw new IllegalArgumentException("edge thickness bound fraction must be in [0, 1)");
+        this.edgeThicknessBoundFraction = fraction;
+        return this;
+    }
+
+    // ------------------------------------------------------------------
     // Build
     // ------------------------------------------------------------------
 
@@ -680,7 +722,28 @@ public final class OptimizationBuilder {
         configureSpotPattern(analysis, goals);
         configureContrastAnalysis(analysis, goals);
         configureRequiredAnalyses(analysis, goals);
-        return new OptimizationSetup(analysis, variables.toArray(new Var[0]), goals.toArray(new Goal[0]));
+        return new OptimizationSetup(analysis, variables.toArray(new Var[0]), goals.toArray(new Goal[0]),
+                buildBounds(variables).toArray(new Bound[0]));
+    }
+
+    /** Built from the variable list, like the constraint goals, so a bound attaches to
+     * exactly what is free to move, and while the prescription still holds its start. */
+    private List<Bound> buildBounds(List<Var> variables) {
+        List<Bound> result = new ArrayList<>();
+        if (thicknessBoundFraction != null) {
+            for (Var variable : variables)
+                if (variable instanceof VarThickness thickness)
+                    result.add(BoundThickness.fractionOfCurrent(prescription, thickness._surface_id,
+                            scenario, thicknessBoundFraction));
+        }
+        if (edgeThicknessBoundFraction != null) {
+            for (Var variable : variables)
+                if (variable instanceof VarThickness thickness
+                        && BoundEdgeThickness.is_boundable(prescription, scenario, thickness._surface_id))
+                    result.add(BoundEdgeThickness.fractionOfCurrent(prescription, thickness._surface_id,
+                            scenario, edgeThicknessBoundFraction));
+        }
+        return result;
     }
 
     private void configureContrastAnalysis(Analysis analysis, List<Goal> goals) {
@@ -1089,31 +1152,49 @@ public final class OptimizationBuilder {
         private final Analysis analysis;
         private final Var[] variables;
         private final Goal[] goals;
+        private final Bound[] bounds;
 
-        private OptimizationSetup(Analysis analysis, Var[] variables, Goal[] goals) {
+        private OptimizationSetup(Analysis analysis, Var[] variables, Goal[] goals, Bound[] bounds) {
             this.analysis = analysis;
             this.variables = variables;
             this.goals = goals;
+            this.bounds = bounds;
         }
 
         public Analysis analysis() { return analysis; }
         public Var[] variables() { return Arrays.copyOf(variables, variables.length); }
         public Goal[] goals() { return Arrays.copyOf(goals, goals.length); }
+        /** Hard constraints from {@link #boundThicknesses} and {@link #boundEdgeThicknesses}.
+         * Honoured only by {@link DampedLeastSquaresSolver}; {@link LMDerSolver} ignores them. */
+        public Bound[] bounds() { return Arrays.copyOf(bounds, bounds.length); }
 
         public LMDerMeritFunction meritFunction(boolean useNative) {
             return new LMDerMeritFunction(analysis, variables, goals, useNative);
         }
 
+        /**
+         * DLS at Beam42's defaults, which differ when the setup carries bounds: a bounded
+         * problem gets a larger starting damping so the first step does not slam into the
+         * active set. See {@link DampedLeastSquaresSolver#defaultOptions()} and
+         * {@link DampedLeastSquaresSolver#boundedDefaultOptions()}.
+         */
+        public DampedLeastSquaresSolver dampedLeastSquaresSolver() {
+            return dampedLeastSquaresSolver(bounds.length == 0
+                    ? DampedLeastSquaresSolver.defaultOptions()
+                    : DampedLeastSquaresSolver.boundedDefaultOptions());
+        }
+
         public DampedLeastSquaresSolver dampedLeastSquaresSolver(
                 org.redukti.mathlib.DampedLeastSquares.Options options) {
-            return new DampedLeastSquaresSolver(analysis, variables, goals, options);
+            return new DampedLeastSquaresSolver(analysis, variables, goals, options, bounds);
         }
 
         public DampedLeastSquaresSolver dampedLeastSquaresSolver(
                 org.redukti.mathlib.DampedLeastSquares.Options options,
                 java.util.function.Function<double[], double[]> equalities,
                 java.util.function.Function<double[], double[]> inequalities) {
-            return new DampedLeastSquaresSolver(analysis, variables, goals, options, equalities, inequalities);
+            return new DampedLeastSquaresSolver(analysis, variables, goals, options, bounds,
+                    equalities, inequalities);
         }
     }
 }

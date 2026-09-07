@@ -8,10 +8,20 @@ class DampedLeastSquaresSolverTest {
     private static class Fixture extends Analysis {
         double value = 1, computed;
         boolean failAboveTwo;
+        int computes;
         Fixture() { super(null, new double[]{0}, new int[]{1}); }
         @Override public void compute() {
+            computes++;
             if (failAboveTwo && value > 2) throw new IllegalStateException("killed ray");
             computed = value;
+        }
+        /** A ceiling on the raw variable, which stands in for prescription geometry here.
+         * Reads {@code value} directly, never {@code computed}, so it needs no compute. */
+        Bound cap(double maximum) {
+            return new Bound() {
+                public double value() { return maximum - Fixture.this.value; }
+                public String describe() { return "value <= " + maximum; }
+            };
         }
         Var variable() {
             return new Var(null) {
@@ -42,6 +52,40 @@ class DampedLeastSquaresSolverTest {
         assertEquals(1, solver.solve());
         assertEquals(2, f.value, 1e-8);
         assertEquals(f.value, f.computed);
+    }
+
+    @Test void holdsABoundAtTheActiveSet() {
+        var f = new Fixture();
+        var solver = new DampedLeastSquaresSolver(f, new Var[]{f.variable()},
+                new Goal[]{f.goal(4, 1)}, DampedLeastSquaresSolver.defaultOptions(),
+                new Bound[]{f.cap(2.5)});
+        assertEquals(DampedLeastSquaresSolver.CONVERGED, solver.solve());
+        // The unconstrained optimum is 4; the bound is what stops it at 2.5.
+        assertEquals(2.5, f.value, 1e-8);
+        assertEquals(f.value, f.computed, "Analysis must end at the accepted prescription");
+        assertArrayEquals(new int[]{0}, solver.result().activeInequalities());
+    }
+
+    @Test void boundsCostNoAnalysisEvaluations() {
+        var withBound = new Fixture();
+        new DampedLeastSquaresSolver(withBound, new Var[]{withBound.variable()},
+                new Goal[]{withBound.goal(4, 1)}, oneIteration(),
+                new Bound[]{withBound.cap(2.5), withBound.cap(3.0)}).solve();
+        var withCallback = new Fixture();
+        new DampedLeastSquaresSolver(withCallback, new Var[]{withCallback.variable()},
+                new Goal[]{withCallback.goal(4, 1)}, oneIteration(), new Bound[0],
+                x -> new double[0],
+                x -> new double[]{2.5 - withCallback.computed, 3.0 - withCallback.computed}).solve();
+        // Same two constraints. Differencing the callback form costs 2n full analyses
+        // per iteration; the bound form reads the prescription and costs none.
+        assertTrue(withBound.computes < withCallback.computes,
+                withBound.computes + " computes with bounds vs " + withCallback.computes + " with callbacks");
+    }
+
+    private static DampedLeastSquares.Options oneIteration() {
+        var options = DampedLeastSquaresSolver.defaultOptions();
+        options.maxIterations = 1;
+        return options;
     }
 
     @Test void restoresAcceptedPrescriptionAfterKilledRay() {

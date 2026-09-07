@@ -4,6 +4,7 @@ import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
 import org.redukti.rayoptics.elem.profiles.RadialPolynomial;
 import org.redukti.rayoptics.elem.profiles.Spherical;
 import org.redukti.rayoptics.elem.profiles.SurfaceProfile;
+import org.redukti.spec.Prescription;
 import org.redukti.spec.SurfaceType;
 
 /**
@@ -69,14 +70,19 @@ public class ConstraintEdgeThickness extends Constraint {
 
     /** The smaller of the two bounding semi-diameters. */
     private static double default_height(Analysis analysis, int surfaceId) {
-        var surfaces = analysis._prescription._surfaces;
+        return default_height(analysis._prescription, analysis._scenario, surfaceId);
+    }
+
+    /** As above, from the prescription alone, for callers with no {@link Analysis}. */
+    public static double default_height(Prescription prescription, int scenario, int surfaceId) {
+        var surfaces = prescription._surfaces;
         if (surfaceId < 0 || surfaceId >= surfaces.length - 1)
             throw new IllegalArgumentException(
                     "an edge gap needs a following surface, but surface " + surfaceId
                             + " is the last of " + surfaces.length);
         return 0.5 * Math.min(
-                surfaces[surfaceId].get_diameter_by_scenario(analysis._scenario),
-                surfaces[surfaceId + 1].get_diameter_by_scenario(analysis._scenario));
+                surfaces[surfaceId].get_diameter_by_scenario(scenario),
+                surfaces[surfaceId + 1].get_diameter_by_scenario(scenario));
     }
 
     private static double checked_height(double height) {
@@ -93,8 +99,14 @@ public class ConstraintEdgeThickness extends Constraint {
      * solve-ending BIGVAL.
      */
     private static double edge_gap(Analysis analysis, int surfaceId, double height) {
-        var surfaces = analysis._prescription._surfaces;
-        double thickness = surfaces[surfaceId].get_thickness_by_scenario(analysis._scenario);
+        return edge_gap(analysis._prescription, analysis._scenario, surfaceId, height);
+    }
+
+    /** As above, from the prescription alone. No ray trace is involved, which is what
+     * lets {@link BoundEdgeThickness} be differentiated without recomputing Analysis. */
+    public static double edge_gap(Prescription prescription, int scenario, int surfaceId, double height) {
+        var surfaces = prescription._surfaces;
+        double thickness = surfaces[surfaceId].get_thickness_by_scenario(scenario);
         try {
             return thickness
                     + profile(surfaces[surfaceId + 1]).sag(0.0, height)

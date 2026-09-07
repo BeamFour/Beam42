@@ -21,9 +21,21 @@ public final class DampedLeastSquares {
         default double[][] jacobian(double[] x) { return null; }
         default double[] equalities(double[] x) { return new double[0]; }
         default double[] inequalities(double[] x) { return new double[0]; }
+        /** Rows are equalities, columns parameters. Null falls back to central differences,
+         * which costs 2n constraint callbacks per iteration. Supply this whenever a
+         * constraint is cheaper to differentiate than to evaluate 2n times. */
+        default double[][] equalityJacobian(double[] x) { return null; }
+        /** Rows are inequalities, columns parameters. See {@link #equalityJacobian}. */
+        default double[][] inequalityJacobian(double[] x) { return null; }
     }
 
     public enum DampingMode { IDENTITY, SENSITIVITY }
+
+    /** Why the solve stopped. Only {@link #CONVERGED} means a tolerance was met;
+     * {@link #ITERATION_LIMIT} means the budget ran out, which is not the same thing
+     * even when the point is feasible. */
+    public enum Status { RUNNING, CONVERGED, ITERATION_LIMIT, LINE_SEARCH_FAILED,
+        ACTIVE_SET_FAILED, NONFINITE_STEP }
 
     /** Arrays accept either one value or one value per parameter. */
     public static final class Options {
@@ -54,9 +66,16 @@ public final class DampedLeastSquares {
     /** Detached snapshot. Multipliers follow H dx + grad + A^T lambda = 0;
      * active inequality multipliers are consequently nonpositive. */
     public record Result(double[] x, double[] residuals, double cost, double constraintViolation,
-                         boolean success, String message, int iterations, int nfev, int njev, int ncev,
+                         Status status, boolean feasible, String message,
+                         int iterations, int nfev, int njev, int ncev,
                          double[] equalityMultipliers, double[] inequalityMultipliers,
-                         int[] activeInequalities, List<Iteration> history) {}
+                         int[] activeInequalities, List<Iteration> history) {
+        /** True only for a converged, feasible point. Deliberately false when the
+         * iteration limit was reached: Prysm reports that as success whenever the point
+         * is feasible, which for an unconstrained problem is unconditional and silently
+         * blesses an unfinished solve. Use {@link #feasible()} for the Prysm reading. */
+        public boolean success() { return status == Status.CONVERGED && feasible; }
+    }
     public record Iteration(double[] x, double cost, double constraintViolation, double stepNorm,
                             double alpha, double trustScale, double[] dampingDiagonal,
                             int dampingAttempts, int[] activeInequalities) {}
@@ -69,7 +88,8 @@ public final class DampedLeastSquares {
     private final double[] damping, dampingMin, dampingMax, radii;
     private State state;
     private int iterations, nfev, njev, ncev;
-    private boolean done, success;
+    private boolean done;
+    private Status status = Status.RUNNING;
     private String message = "";
     private double[] lambdaEq, lambdaIneq;
     private int[] active = new int[0];
@@ -113,8 +133,8 @@ public final class DampedLeastSquares {
         for (Iteration h : history) snapshot.add(new Iteration(h.x.clone(), h.cost, h.constraintViolation,
                 h.stepNorm, h.alpha, h.trustScale, h.dampingDiagonal.clone(), h.dampingAttempts,
                 h.activeInequalities.clone()));
-        return new Result(state.x.clone(), state.r.clone(), state.cost, state.violation, success,
-                message, iterations, nfev, njev, ncev, lambdaEq.clone(), lambdaIneq.clone(),
+        return new Result(state.x.clone(), state.r.clone(), state.cost, state.violation, status,
+                feasible(), message, iterations, nfev, njev, ncev, lambdaEq.clone(), lambdaIneq.clone(),
                 active.clone(), List.copyOf(snapshot));
     }
 
@@ -123,15 +143,21 @@ public final class DampedLeastSquares {
     /** Performs one accepted iteration, including any damping retries. */
     public Result step() {
         if (done) throw new IllegalStateException("optimizer has finished");
-        if (iterations >= o.maxIterations) { finish(feasible(), "maximum iterations reached"); return result(); }
+        if (iterations >= o.maxIterations) {
+            finish(Status.ITERATION_LIMIT, "maximum iterations reached"); return result();
+        }
         State previous = state;
+        // Built once per accepted iteration, not once per damping attempt. A rejected
+        // line search leaves state.x untouched, so recomputing these would reproduce
+        // them exactly; only the damping diagonal changes on a retry. On a ray-traced
+        // problem each rebuild costs 2n full analyses, which dominated the solve.
+        double[][] j = problem.jacobian(state.x.clone());
+        njev++;
+        if (j == null) j = differentiate(this::residuals, state.r);
+        checkJacobian(j, state.r.length);
+        double[][] ae = constraintJacobian(true);
+        double[][] ai = constraintJacobian(false);
         for (int attempt = 0; ; attempt++) {
-            double[][] j = problem.jacobian(state.x.clone());
-            njev++;
-            if (j == null) j = differentiate(this::residuals, state.r);
-            checkJacobian(j, state.r.length);
-            double[][] ae = differentiate(x -> constraints(x, true), state.eq);
-            double[][] ai = differentiate(x -> constraints(x, false), state.ineq);
             double[] diagonal = damping.clone();
             if (o.dampingMode == DampingMode.SENSITIVITY) {
                 for (int k = 0; k < n; k++) {
@@ -142,7 +168,7 @@ public final class DampedLeastSquares {
                 }
             }
             Direction direction = direction(j, ae, ai, diagonal);
-            if (direction == null) { finish(false, "active set did not converge"); return result(); }
+            if (direction == null) { finish(Status.ACTIVE_SET_FAILED, "active set did not converge"); return result(); }
             lambdaEq = direction.eqMultipliers; lambdaIneq = direction.ineqMultipliers; active = direction.active;
             double[] dx = direction.dx;
             double trustScale = 1;
@@ -150,9 +176,9 @@ public final class DampedLeastSquares {
                 if (Math.abs(dx[k]) > radii[k]) trustScale = Math.min(trustScale, radii[k] / Math.abs(dx[k]));
             for (int k = 0; k < n; k++) dx[k] *= trustScale;
             double stepNorm = norm(dx);
-            if (!Double.isFinite(stepNorm)) { finish(false, "nonfinite step"); return result(); }
+            if (!Double.isFinite(stepNorm)) { finish(Status.NONFINITE_STEP, "nonfinite step"); return result(); }
             if (stepNorm <= o.xtol * (o.xtol + norm(state.x)) && feasible()) {
-                finish(true, "step tolerance reached"); return result();
+                finish(Status.CONVERGED, "step tolerance reached"); return result();
             }
             State trial = null;
             double alpha = 1;
@@ -167,7 +193,7 @@ public final class DampedLeastSquares {
             }
             if (trial == null) {
                 if (!o.adaptiveDamping || attempt >= o.maxDampingAttempts) {
-                    finish(false, "line search failed"); return result();
+                    finish(Status.LINE_SEARCH_FAILED, "line search failed"); return result();
                 }
                 rescale(o.dampingIncrease);
                 continue;
@@ -177,10 +203,10 @@ public final class DampedLeastSquares {
                     alpha, trustScale, diagonal.clone(), attempt, active.clone()));
             if (o.adaptiveDamping) rescale(alpha == 1 ? o.dampingDecrease : o.dampingIncrease);
             if (feasible() && Math.abs(previous.cost - state.cost) <= o.ftol * Math.max(1, Math.abs(previous.cost)))
-                finish(true, "cost tolerance reached");
+                finish(Status.CONVERGED, "cost tolerance reached");
             else if (feasible() && alpha * stepNorm <= o.xtol * (o.xtol + norm(previous.x)))
-                finish(true, "step tolerance reached");
-            else if (iterations >= o.maxIterations) finish(feasible(), "maximum iterations reached");
+                finish(Status.CONVERGED, "step tolerance reached");
+            else if (iterations >= o.maxIterations) finish(Status.ITERATION_LIMIT, "maximum iterations reached");
             return result();
         }
     }
@@ -211,12 +237,24 @@ public final class DampedLeastSquares {
             for (int i = 0; i < ai.length; i++)
                 if (state.ineq[i] + dot(ai[i], dx) < -o.constraintTolerance && working.add(i)) added = true;
             if (added) continue;
+            // Drop one constraint per pass - the one whose multiplier says most clearly
+            // that it wants to be inactive - not every such constraint at once. Prysm
+            // drops them all, which cycles: with a long undamped step every bound looks
+            // violated and is added, the constrained solve then puts them all on their
+            // boundaries with positive multipliers, they are all dropped together, and
+            // the next pass reproduces the original step exactly. Measured on the Leica
+            // 75/2 with 29 bounds, where dropping the whole set never terminated.
             row = n + ae.length;
-            List<Integer> drop = new ArrayList<>();
+            int drop = -1;
+            double largest = o.constraintTolerance;
             for (int i : working) {
-                if (solution[row++] > o.constraintTolerance && state.ineq[i] >= -o.constraintTolerance) drop.add(i);
+                double multiplier = solution[row++];
+                if (multiplier > largest && state.ineq[i] >= -o.constraintTolerance) {
+                    largest = multiplier;
+                    drop = i;
+                }
             }
-            if (!drop.isEmpty()) { working.removeAll(drop); continue; }
+            if (drop >= 0) { working.remove(Integer.valueOf(drop)); continue; }
             double[] le = Arrays.copyOfRange(solution, n, n + ae.length), li = new double[ai.length];
             row = n + ae.length;
             for (int i : working) li[i] = solution[row++];
@@ -258,6 +296,19 @@ public final class DampedLeastSquares {
     private void addConstraint(double[][] matrix, double[] rhs, int row, double[] a, double b) {
         for (int k = 0; k < n; k++) matrix[row][k] = matrix[k][row] = a[k];
         rhs[row] = b;
+    }
+
+    /** A supplied constraint Jacobian if the problem offers one, otherwise central
+     * differences. Not counted in njev, which stays the residual Jacobian count. */
+    private double[][] constraintJacobian(boolean equality) {
+        double[] base = equality ? state.eq : state.ineq;
+        if (base.length == 0) return new double[0][n];
+        double[][] supplied = equality
+                ? problem.equalityJacobian(state.x.clone())
+                : problem.inequalityJacobian(state.x.clone());
+        if (supplied == null) return differentiate(x -> constraints(x, equality), base);
+        checkJacobian(supplied, base.length);
+        return supplied;
     }
 
     private double[][] differentiate(Function<double[], double[]> function, double[] base) {
@@ -302,7 +353,7 @@ public final class DampedLeastSquares {
                 && Double.isFinite(s.cost) && Double.isFinite(s.violation);
     }
     private boolean feasible() { return state.violation <= o.constraintTolerance; }
-    private void finish(boolean ok, String reason) { done = true; success = ok; message = reason; }
+    private void finish(Status reached, String reason) { done = true; status = reached; message = reason; }
     private void rescale(double factor) {
         for (int k = 0; k < n; k++) damping[k] = Math.max(dampingMin[k], Math.min(dampingMax[k], damping[k] * factor));
     }

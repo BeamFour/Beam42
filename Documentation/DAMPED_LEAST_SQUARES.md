@@ -29,9 +29,29 @@ var setup = OptimizationBuilder.builder(prescription)
         // ... variables and optical goals ...
         .boundThicknesses(0.5)        // no axial gap below half its starting value
         .boundEdgeThicknesses(0.5)    // nor any edge separation
+        .boundCurvatures(0.2)         // no surface more than 20% from its start
         .build();
-setup.dampedLeastSquaresSolver().solve();
+setup.dampedLeastSquaresSolver().solve();   // LMDER would ignore the bounds
 ```
+
+Which bound attaches to what, given the variable list:
+
+| Builder call | Bounds created | Attached to |
+| --- | --- | --- |
+| `boundThicknesses(f)` | one per varied thickness | the gap that thickness *is* |
+| `boundEdgeThicknesses(f)` | one per affected gap | the gap after a varied thickness, **and both gaps beside a surface with a varied radius, conic or aspheric coefficient** - curvature moves the sag on both sides even when no thickness is varied |
+| `boundCurvatures(f)` | **two** per varied radius | a floor and a ceiling on that surface's curvature |
+
+The middle row matters more than it looks. A setup that varies curvatures and aspheric
+terms but no thicknesses has no `VarThickness` at all, so `boundThicknesses` produces
+nothing and, before this was fixed, `boundEdgeThicknesses` produced nothing either - the
+setup silently had no layout constraint whatsoever. Check `setup.bounds().length` if in
+doubt.
+
+`boundCurvatures` is the design-preservation bound. The edge bounds stop surfaces passing
+through one another; nothing there stops a surface curling up into a shape that no longer
+resembles the lens it started as while staying clear of its neighbours. On a
+curvature-only setup it is the only bound restraining the shape at all.
 
 `LMDerSolver` ignores bounds; it has no way to represent them. A setup meant for
 both solvers wants `applyThicknessConstraints()` as well or instead.

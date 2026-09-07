@@ -97,6 +97,7 @@ public final class OptimizationBuilder {
     private Double curvatureConstraintWeight;
     private Double thicknessBoundFraction;
     private Double edgeThicknessBoundFraction;
+    private Double curvatureBoundFraction;
     private final List<MtfGoals> mtfGoals = new ArrayList<>();
     private final List<ContrastGoals> contrastGoals = new ArrayList<>();
     private final List<Var> additionalVariables = new ArrayList<>();
@@ -704,6 +705,31 @@ public final class OptimizationBuilder {
         return this;
     }
 
+    /**
+     * Forbid any varied surface from moving more than {@code fraction} away from its
+     * starting <em>curvature</em>, in either direction. Hard constraint, not a penalty.
+     *
+     * <p>This is the design-preservation bound. {@link #boundEdgeThicknesses} stops
+     * surfaces passing through one another; it does not stop a surface curling up into
+     * something that no longer resembles the lens it started as while staying clear of
+     * its neighbours. On a setup that varies only curvatures and aspheric terms, this is
+     * the only bound that restrains the shape at all.
+     *
+     * <p>Two inequalities are created per varied surface, a floor and a ceiling, so the
+     * constraint count is twice the number of {@link VarRadius} variables. The box is
+     * {@code c0 +/- fraction*|c0|}; see {@link BoundCurvature} for why it is expressed in
+     * curvature and why the magnitude is used.
+     *
+     * @param fraction half-width of the box as a fraction of the starting curvature.
+     *                 0.2 keeps every surface within 20% of the shape it began with.
+     */
+    public OptimizationBuilder boundCurvatures(double fraction) {
+        if (!Double.isFinite(fraction) || fraction < 0.0)
+            throw new IllegalArgumentException("curvature bound fraction must be finite and non-negative");
+        this.curvatureBoundFraction = fraction;
+        return this;
+    }
+
     // ------------------------------------------------------------------
     // Build
     // ------------------------------------------------------------------
@@ -759,6 +785,15 @@ public final class OptimizationBuilder {
                 if (BoundEdgeThickness.is_boundable(prescription, scenario, gap))
                     result.add(BoundEdgeThickness.fractionOfCurrent(prescription, gap,
                             scenario, edgeThicknessBoundFraction));
+        }
+        if (curvatureBoundFraction != null) {
+            // Only a varied radius needs a curvature box. A conic or aspheric coefficient
+            // changes the surface away from the axis but leaves the vertex curvature
+            // alone, and their effect on the layout is already covered by the edge bounds.
+            for (Var variable : variables)
+                if (variable instanceof VarRadius radius)
+                    result.addAll(Arrays.asList(BoundCurvature.boxAroundCurrent(
+                            prescription, radius._surface_id, curvatureBoundFraction)));
         }
         return result;
     }
@@ -1181,7 +1216,8 @@ public final class OptimizationBuilder {
         public Analysis analysis() { return analysis; }
         public Var[] variables() { return Arrays.copyOf(variables, variables.length); }
         public Goal[] goals() { return Arrays.copyOf(goals, goals.length); }
-        /** Hard constraints from {@link #boundThicknesses} and {@link #boundEdgeThicknesses}.
+        /** Hard constraints from {@link #boundThicknesses}, {@link #boundEdgeThicknesses}
+         * and {@link #boundCurvatures}.
          * Honoured only by {@link DampedLeastSquaresSolver}; {@link LMDerSolver} ignores them. */
         public Bound[] bounds() { return Arrays.copyOf(bounds, bounds.length); }
 

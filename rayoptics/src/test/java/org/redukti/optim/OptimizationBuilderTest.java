@@ -79,6 +79,44 @@ class OptimizationBuilderTest {
         assertArrayEquals(new int[]{1}, edgeBoundGaps(crossed));
     }
 
+    @Test void curvatureBoundsBoxEachVariedSurfaceFromBothSides() {
+        var p = edgeBoundPrescription();
+        var setup = OptimizationBuilder.builder(p).fields(0).mtfFrequencies(10)
+                .varyCurvatures(1).boundCurvatures(.2).build();
+        var box = Arrays.stream(setup.bounds()).filter(BoundCurvature.class::isInstance)
+                .map(BoundCurvature.class::cast).toArray(BoundCurvature[]::new);
+        assertEquals(2, box.length);
+        assertFalse(box[0]._is_upper);
+        assertTrue(box[1]._is_upper);
+        for (BoundCurvature bound : box)
+            assertTrue(bound.value() > 0, bound + " must start feasible");
+
+        // Surface 1 starts at r = -50, so c0 = -0.02 and the box is [-0.024, -0.016].
+        var radius = new VarRadius(p, 1);
+        radius.set_scaled_value(-40);       // c = -0.025, below the floor
+        radius.write_to_prescription();
+        assertTrue(box[0].value() < 0, "curving up past the floor must read infeasible");
+        assertTrue(box[1].value() > 0);
+        radius.set_scaled_value(-80);       // c = -0.0125, above the ceiling
+        radius.write_to_prescription();
+        assertTrue(box[0].value() > 0);
+        assertTrue(box[1].value() < 0, "flattening past the ceiling must read infeasible");
+    }
+
+    @Test void curvatureBoxIsSymmetricThroughSignAndRejectsFlatSurfaces() {
+        var p = edgeBoundPrescription();
+        // Surface 0 is r = +50, surface 1 is r = -50: opposite signs, same box half-width,
+        // and the lower limit must be the lower one in both cases.
+        for (int surface : new int[]{0, 1}) {
+            var box = BoundCurvature.boxAroundCurrent(p, surface, .2);
+            assertTrue(box[0]._limit < box[1]._limit, "surface " + surface + " limits out of order");
+            assertEquals(2 * .2 / 50.0, box[1]._limit - box[0]._limit, 1e-12);
+        }
+        p._surfaces[1]._radius = 0.0;   // flat: no finite curvature to build a box around
+        assertThrows(IllegalArgumentException.class,
+                () -> BoundCurvature.boxAroundCurrent(p, 1, .2));
+    }
+
     @Test void thicknessOnlyVariablesBoundOnlyTheirOwnGap() {
         var setup = OptimizationBuilder.builder(edgeBoundPrescription()).fields(0).mtfFrequencies(10).varyThicknesses(1)
                 .boundEdgeThicknesses(.5).build();

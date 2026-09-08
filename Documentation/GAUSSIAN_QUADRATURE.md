@@ -1,9 +1,10 @@
 # Gaussian quadrature implementation
 
-This note relates the `rayoptics` pupil sampler to Bauman and Xiao,
-*Gaussian Quadrature for Optical Design with Non-circular Pupils and Fields,
-and Broad Wavelength Ranges* (`Documentation/gaussian-quadrature.pdf`). Equation
-numbers below refer to that paper.
+This note relates the `rayoptics` pupil sampler to B. J. Bauman and H. Xiao,
+[Gaussian quadrature for optical design with noncircular pupils and fields, and
+broad wavelength range](https://doi.org/10.1117/12.872773), Proc. SPIE 7652,
+International Optical Design Conference 2010, 76522S (2010). Equation numbers
+below refer to that paper.
 
 ## Filled circular pupil
 

@@ -67,6 +67,7 @@ holds generated reports for many more lenses.
 
 ## Resources
 
+* [LensTool2 command line tool](Documentation/LENSTOOL2.md) - options and generated outputs.
 * [Introduction to BeamFour (YouTube)](https://youtu.be/-buXsCqEnq8)
 * [r/LensPatents](https://www.reddit.com/r/LensPatents/) - a related Reddit forum on lens patents and designs.
   

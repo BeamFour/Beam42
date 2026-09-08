@@ -170,7 +170,7 @@ public class RayOpticsExporter {
         var prescription = Prescription.build_prescription(
                 specs, arguments.use_glass_types, false, arguments.only_d_line);
         var spec = new ModelSpec(prescription, arguments.scenario, null,
-                arguments.vig_type, arguments.wide_angle);
+                arguments.vig_type, arguments.real_ray_aiming);
         if (arguments.reference_file != null) {
             var class_name = java_class_name(arguments.specfile) + "UpstreamTest";
             var reference = read_reference(arguments.reference_file);
@@ -239,7 +239,7 @@ public class RayOpticsExporter {
         if (arguments.specfile == null) {
             System.err.println("Usage: --specfile inputfile [--scenario num] [-o outfilename] \\");
             System.err.println("       [--generate-java] [--only-d-line] [--dont-use-glass-types] \\");
-            System.err.println("       [--vig-type " + Args.vig_type_names() + "] [--wide-angle|--no-wide-angle] \\");
+            System.err.println("       [--vig-type " + Args.vig_type_names() + "] [--real-ray-aiming|--paraxial-ray-aiming] \\");
             System.err.println("       [--legacy-notebook]");
             System.err.println("       --generate-java emits Java model building code instead of Python");
             System.err.println("       --legacy-notebook emits the original plotting script");

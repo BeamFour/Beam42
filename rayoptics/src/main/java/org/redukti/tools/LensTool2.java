@@ -280,19 +280,22 @@ public class LensTool2 {
     public static void main(String[] args) throws Exception {
         Args arguments = Args.parseArguments(args);
         if (arguments.specfile == null) {
-            System.err.println("Usage: --specfile inputfile [--scenario num] [--dump-system] [--only-d-line] [-o outfilename] [--dont-use-glass-types] \\");
-            System.err.println("       [--output-ray-aberration-plots] [--output-wavelength-mtfs] [--auto-size-spot-diagrams] [--do-wideangle-layout] \\");
-            System.err.println("       [--use-spot-pattern " + Args.spot_pattern_names() + "] [--spot-grid-size count] [--vig-type " + Args.vig_type_names() + "] [--wide-angle|--no-wide-angle] \\");
-            System.err.println("       [--mtf freq,freq,...]");
-            System.err.println("       --scenario defaults to 0");
+            System.err.println("Usage: --specfile inputfile [--outdir dir] [--only-d-line] [--dont-use-glass-types] \\");
+            System.err.println("       [--output-ray-aberration-plots] [--output-wavelength-mtfs] [--auto-size-spot-diagrams] \\");
+            System.err.println("       [--use-spot-pattern " + Args.spot_pattern_names() + "] [--spot-grid-size count] [--vig-type " + Args.vig_type_names() + "] \\");
+            System.err.println("       [--real-ray-aiming|--paraxial-ray-aiming] [--mtf freq,freq,...]");
             System.err.println("       --mtf takes spatial frequencies in cycles/mm and defaults to 10,30,50, which is what the reports under Examples/ use");
-            System.err.println("       Output file will be created in the same location as the specfile");
+            System.err.println("       --real-ray-aiming aims the chief ray by tracing a real ray at the entrance pupil, --paraxial-ray-aiming uses paraxial aiming; real is the default");
+            System.err.println("       Output files are created alongside the specfile unless --outdir is given");
             System.exit(1);
         }
         try {
             long startTime = System.nanoTime();
             final double[] fields = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
             VigType vigType = arguments.vig_type;
+            // Real ray aiming is what makes very wide angle lenses trace correctly,
+            // so it stays on unless the caller asks for paraxial aiming.
+            boolean realRayAiming = arguments.real_ray_aiming == null || arguments.real_ray_aiming;
             OpticalBenchDataImporter.LensSpecifications specs = getSpecsFromFile(arguments.specfile);
             var prescription = createPrescription(specs,arguments.use_glass_types,arguments.only_d_line);
             String prescription_output = prescription.to_opt_bench_str(new StringBuilder()).toString();
@@ -304,7 +307,7 @@ public class LensTool2 {
                 if (prescription.get_num_configurations() > 0)
                     addConfigLabelToREADME(SB,prescription._configuration_names[config]);
                 var scenario_filesuffix = prescription.get_num_configurations() > 0 ? ("-"+config) : "";
-                var opm = createSystem(prescription, true, vigType, true, fields, config);
+                var opm = createSystem(prescription, true, vigType, realRayAiming, fields, config);
                 var sm = opm.seq_model;
                 var osp = opm.optical_spec;
                 var fod = opm.optical_spec.parax_data.fod;
@@ -334,7 +337,7 @@ public class LensTool2 {
                     generateRayAberrationPlots(opm, arguments, scenario_filesuffix);
                 // Generate MTF with weighted average across wavelengths
                 var prescriptionForWeightedMTF = createPrescription(specs, arguments.use_glass_types, true, arguments.only_d_line);
-                opm = createSystem(prescriptionForWeightedMTF, true, vigType, true, fields, config);
+                opm = createSystem(prescriptionForWeightedMTF, true, vigType, realRayAiming, fields, config);
                 generateMTFs(opm, arguments, fields, prescriptionForWeightedMTF.get_wvl_wts(), "mtf-w", scenario_filesuffix);
             }
             createREADME(SB,

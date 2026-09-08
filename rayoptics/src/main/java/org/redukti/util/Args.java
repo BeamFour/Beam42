@@ -6,12 +6,9 @@ import org.redukti.spec.VigType;
 public final class Args {
     public int scenario = 0;
     public String specfile = null;
-    public String outputType = "layout";
     public String outputFile = null;
     public String outdir = null;
-    public boolean dumpSystem = false;
     public boolean use_glass_types = true;
-    public boolean include_lost_rays = false;
     public boolean only_d_line = false;
     public boolean do_ray_aberrations = false;
     public boolean do_mono_chrome_mtfs = false;
@@ -31,7 +28,6 @@ public final class Args {
     /** Number of samples along each dimension of a rectangular spot grid. */
     public int spot_grid_size = 64;
     public boolean auto_size_spots = false;
-    public boolean do_wideangle_layout = false;
     public boolean force = false;
     /**
      * Vignetting calculation applied once the model is built. Defaults to the
@@ -40,13 +36,14 @@ public final class Args {
      */
     public VigType vig_type = VigType.SetPupil;
     /**
-     * Forces the field spec's wide angle ray aiming on or off. Null leaves it
-     * derived from the half angle of view, which is the existing behaviour.
+     * Selects the chief ray aiming algorithm. TRUE aims with a real ray trace
+     * at the entrance pupil (what the model calls a wide angle system), FALSE
+     * uses paraxial aiming. Null leaves it derived from the half angle of view.
      * <p>
-     * This is not {@link #do_wideangle_layout}: that one only affects how the
-     * layout is drawn, this one selects which chief ray aiming algorithm runs.
+     * Real ray aiming is slower but is what makes very wide angle lenses trace
+     * correctly, so it is the default in LensTool2.
      */
-    public Boolean wide_angle = null;
+    public Boolean real_ray_aiming = null;
     /** Emit Java model building code rather than Python. */
     public boolean generate_java = false;
     /** Emit the original plotting notebook script rather than a comparison model. */
@@ -74,22 +71,12 @@ public final class Args {
                 arguments.scenario = Integer.parseInt(arg2);
                 i++;
             }
-            else if (arg1.equals("--output") || arg1.equals("--type")) {
-                arguments.outputType = arg2;
-                i++;
-            }
             else if (arg1.equals("--outdir")) {
                 arguments.outdir = arg2;
                 i++;
             }
             else if (arg1.equals("--dont-use-glass-types")) {
                 arguments.use_glass_types = false;
-            }
-            else if (arg1.equals("--dump-system")) {
-                arguments.dumpSystem = true;
-            }
-            else if (arg1.equals("--exclude-lost-rays")) {
-                arguments.include_lost_rays = false;
             }
             else if (arg1.equals("--force")) {
                 arguments.force = true;
@@ -118,18 +105,15 @@ public final class Args {
             else if (arg1.equals("--auto-size-spot-diagrams")) {
                 arguments.auto_size_spots = true;
             }
-            else if (arg1.equals("--do-wideangle-layout")) {
-                arguments.do_wideangle_layout = true;
-            }
             else if (arg1.equals("--vig-type")) {
                 arguments.vig_type = parse_vig_type(arg2);
                 i++;
             }
-            else if (arg1.equals("--wide-angle")) {
-                arguments.wide_angle = Boolean.TRUE;
+            else if (arg1.equals("--real-ray-aiming")) {
+                arguments.real_ray_aiming = Boolean.TRUE;
             }
-            else if (arg1.equals("--no-wide-angle")) {
-                arguments.wide_angle = Boolean.FALSE;
+            else if (arg1.equals("--paraxial-ray-aiming")) {
+                arguments.real_ray_aiming = Boolean.FALSE;
             }
             else if (arg1.equals("--generate-java")) {
                 arguments.generate_java = true;

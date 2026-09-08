@@ -179,7 +179,8 @@ Two things to watch:
   silently ignored and the lens is treated as having a single configuration
   built from column 0.
 * With no `scenarios` row at all, the tool processes column 0 only and output
-  files carry no numeric suffix.
+  files carry no numeric suffix. That is usually the right thing for a prime,
+  because the first column is normally the infinity object scenario.
 
 ## Options
 
@@ -246,7 +247,7 @@ spec with multiple configurations (a zoom, for instance).
 | File | Always generated | Contents |
 | --- | --- | --- |
 | `README.md` | yes | Markdown report collecting the prescription, diagrams and tables below. |
-| `prescription.txt` | yes | Optical Bench compatible prescription, tab delimited. |
+| `prescription.txt` | yes | Optical Bench compatible prescription, tab delimited, reduced to what was actually used. See below. |
 | `<specfile>.zmx` | yes | Zemax export. |
 | `paraxial<suffix>.txt` | yes | First order / paraxial data. |
 | `vig<suffix>.txt` | yes | Field and vignetting summary. |
@@ -262,6 +263,46 @@ spec with multiple configurations (a zoom, for instance).
 | `mtf-fld<i>-<wavelength><suffix>.svg` | `--output-wavelength-mtfs` | Monochromatic MTF per field and wavelength. |
 | `rayabbr-fld<i>-{tan,sag}<suffix>.svg` | `--output-ray-aberration-plots` | Transverse ray aberration fans. |
 | `opdabbr-fld<i>-{tan,sag}<suffix>.svg` | `--output-ray-aberration-plots` | Wavefront (OPD) fans. |
+
+### `prescription.txt` round trips
+
+The generated prescription is not a copy of the input. It is narrowed to the
+subset `LensTool2` understands and actually used: data the tool does not consume
+and scenarios that were not selected are dropped. What is left is a prescription
+that corresponds exactly to the report beside it.
+
+It can be fed straight back in, and doing so reproduces the run:
+
+```bash
+java -jar rayoptics/target/lenstool.jar --specfile prescription.txt --outdir rerun
+```
+
+Every generated file comes back byte for byte identical, and `prescription.txt`
+regenerates itself unchanged, so it is a fixed point rather than merely
+idempotent in the numbers. Two things do legitimately vary:
+
+* The report footer carries the generation date, `Report / Zemax file generated
+  using Beam42 on <date>`.
+* The Zemax file is named after the input file, so re-running on
+  `prescription.txt` yields `prescription.zmx` and the report links to that name.
+
+### MTF wavelengths and weights
+
+The two MTF by field curves differ only in which wavelengths they combine, and
+both sets are **fixed in the code** - there is no option to choose wavelengths or
+weights.
+
+| Output | Wavelengths | Weights |
+| --- | --- | --- |
+| `mtf` | d, F, C | 1.0, 1.0, 1.0 - equal |
+| `mtf-w` | d, C, e, F, g | 1.0, 0.475, 0.98, 0.49, 0.15 |
+
+`--only-d-line` is the one thing that changes this: it reduces **both** to the d
+line alone, which makes the two outputs identical.
+
+Per wavelength MTF plots, from `--output-wavelength-mtfs`, are **cut off at 100
+cycles/mm**. The limit applies to the plotted data as well as the axis, and is
+not configurable.
 
 ## Behaviour worth knowing
 

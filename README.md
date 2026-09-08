@@ -1,6 +1,7 @@
 # Beam42 Optical Ray Tracer
 
-This project is an attempt to create a basic geometric optical analysis software. My interest is mostly in analysing photographic lens designs.
+This project is an attempt to create a basic geometric optical analysis software. My interest is mostly in analyzing 
+photographic lens designs.
 
 The project combines solutions from the following open source projects:
 
@@ -14,31 +15,37 @@ The project has two fairly independent components:
 ### RayOptics
 
 * This is derived from Michael Hayford's Ray-Optics project. This version is mainly focused on photographic lenses.
+* It features a number of extensions on top of the upstream project.
 * Can import lens specifications in the format supported by [PhotonsToPhotos Optical Bench](https://www.photonstophotos.net/GeneralTopics/Lenses/OpticalBench/OpticalBenchHub.htm).
 * Can export to Zemax, BEAM FOUR, MJH Ray Optics.
 * Features a command line tool that takes in the lens specification and generates the following outputs:
     * Spot diagrams (SVG)
     * Layout diagrams (SVG)
-    * Geometric MTF (SVG)
+    * Geometric MTF by Field plots (SVG)
     * Ray aberration plots
     * OPD plots
     * Paraxial report
     * Zemax file
     * A markdown README that brings together all of the above
+    * For examples see links below.
 * Features an optimizer with the following features
-    * Set variables on surface properties
-    * Fit to spot size or ray aberration goals or MTF targets
-    * Constrain by paraxial parameters
-    * The optimization functions above are available only via Java API calls. There is no UI for this.
-    * Provides Levenberg Marquardt Lampton / Netlib LMDER solvers
-    * Note: There are some optimization functions in BeamFour that do have a UI; but BeamFour is a more general ray tracing and
-      analysis software that doesn't do many things that are typical of photographic lenses
+    * Set variables on surface properties, widths. Aspherics are supported.
+    * Set goals targeting MTF, ray aberrations or spot sizes.
+    * Constrain by paraxial parameters.
+    * Constrain curvatures and thicknesses to avoid altering the design drastically.
+    * Constrain the difference between tangential and sagittal MTF to reduce astigmatism.
+    * Weights can be set to influence the outcome.
+    * The optimization functions are available as Java API calls. There is no UI for this.
+    * The underlying solver is the MinPack Levenberg Marquardt solver, constrains are implemented by assigning weights.
 
 ### BeamFour
 
-* The BeamFour implementation is undergoing refactoring to separate the UI layer from the core ray tracing and analytics functionality. This is still work in progress.
-* Since BeamFour input files are hard to create manually, there is a facility in the RayOptics component to generate BeamFour inputs from a lens specification. This facility is limited to photographic lenses.
-* The MTF feature in BeamFour has been updated to match the RayOptics functionality for computing single wavelength MTFs for a specific field.
+* The BeamFour implementation is undergoing refactoring to separate the UI layer from the core ray tracing and analytics 
+  functionality. This is still work in progress.
+* Since BeamFour input files are hard to create manually, there is a facility in the RayOptics component to generate 
+  BeamFour inputs from a lens specification. This facility is limited to photographic lenses.
+* The MTF feature in BeamFour has been updated to match the RayOptics functionality for computing single wavelength 
+  MTFs for a specific field.
 
 ## Roadmap
 
@@ -61,15 +68,38 @@ The project has two fairly independent components:
   
 ### Literature
 
-* Donald P. Feder, "Optical Calculations with Automatic Computing Machinery," J. Opt. Soc. Am. 41, 630-635 (1951). This short paper provides equations for ray tracing for rotationally symmetric surfaces, including aspherics. Equations are provided in a format suitable for computer programs. Additionally, this paper also covers calculation of image aberrations. Warren J. Smith: Modern Optical Engineering book has a description of the algorithms in this paper. 
+* Donald P. Feder, "Optical Calculations with Automatic Computing Machinery," J. Opt. Soc. Am. 41, 630-635 (1951). 
+  This short paper provides equations for ray tracing for rotationally symmetric surfaces, including aspherics. 
+  Equations are provided in a format suitable for computer programs. Additionally, this paper also covers calculation
+  of image aberrations. Warren J. Smith: Modern Optical Engineering book has a description of the algorithms in this paper. 
 
-* G. H. Spencer and M. V. R. K. Murty, "General Ray-Tracing Procedure," J. Opt. Soc. Am. 52, 672-678 (1962). This paper presents generalized ray tracing equations that cover not only rotationally symmetric surfaces (including aspherics) but also diffraction gratings. The paper allows for surfaces to have their own local axes. **BeamFour implementation of ray tracing is based on this paper**. 
+* G. H. Spencer and M. V. R. K. Murty, "General Ray-Tracing Procedure," J. Opt. Soc. Am. 52, 672-678 (1962).
+  This paper presents generalized ray tracing equations that cover not only rotationally symmetric surfaces 
+  (including aspherics) but also diffraction gratings. The paper allows for surfaces to have their own local axes.
 
-* R. E. Hopkins and R. Hanau, "Fundamental Methods of Ray Tracing," in Military Standardization Handbook: Optical Design, MIL-HDBK 141, U.S. Defense Supply Agency, Washington, DC, 1962. This is the fifth chapter in the document. It covers ray tracing equations for rotationally symmetric surfaces including aspheric surfaces. The equations are presented in a form suited for implementation in computer programs. The final equations in this document are very similar to Feder's equations. This document goes into details of how these equations are derived. Daniel Malacara: Handbook of Optical Design has a description of the ray tracing equations found in this document. 
+* R. E. Hopkins and R. Hanau, "Fundamental Methods of Ray Tracing," in Military Standardization Handbook: Optical 
+  Design, MIL-HDBK 141, U.S. Defense Supply Agency, Washington, DC, 1962. This is the fifth chapter in the document.
+  It covers ray tracing equations for rotationally symmetric surfaces including aspheric surfaces. The equations are 
+  presented in a form suited for implementation in computer programs. The final equations in this document are very 
+  similar to Feder's equations. This document goes into details of how these equations are derived. 
+  Daniel Malacara: Handbook of Optical Design has a description of the ray tracing equations found in this document. 
 
-* Bram de Greve, "Reflections and Refractions in Ray Tracing," 2004. This paper appears to be the source for the refraction equations used by GNU Optical. 
+* Hopkins, H. H. (1981). Calculation of the Aberrations and Image Assessment for a General Optical System. 
+  Optica Acta: International Journal of Optics, 28(5), 667–714. https://doi.org/10.1080/713820605.
+  RayOptics calculation of optical path difference is based on this paper.
 
-* Telescope Optics - GNU Optical source code has references to this, it is unclear whether this is a reference to the book of this name by Rutten and Venrooij. 
+* G. W. Forbes, "Optical system assessment for design: numerical ray tracing in the Gaussian pupil,"
+  J. Opt. Soc. Am. A 5, 1943-1956 (1988) - original paper on Gaussian Quadrature pattern. Very effective!
+
+* Bauman, B J & Xiao, H. Gaussian Quadrature for Optical Design with Non-circular Pupils and Fields, and 
+  Broad Wavelength Ranges, article, June 25, 2010; Livermore, California. 
+  (https://digital.library.unt.edu/ark:/67531/metadc865679/: accessed September 8, 2026), 
+  University of North Texas Libraries, UNT Digital Library, https://digital.library.unt.edu; 
+  crediting UNT Libraries Government Documents Department.
+
+* Contrast Optimization: "A faster and better technique for optimizing on MTF", 
+  Ken Moore, Erin Elliott, Mark Nicholson, Chris Normanshire, Shawn Gay, Jade Aiona. Zemax, LLC.
+  Very effective optimization approach that directly targets MTF.
 
 ## Related Projects
 

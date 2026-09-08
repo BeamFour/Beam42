@@ -73,6 +73,13 @@ Recognised catalog names, matched case insensitively, are `Hoya`, `Ohara`,
 `Schott`, `Hikari`, `CORNING`, `SUMITA` and `CDGM`. Column 8 may be omitted, in
 which case those catalogs are searched in that order for the glass name.
 
+The catalogs are **compiled into the code**, not read at run time. The AGF files
+under `glassdata/` are the source material: `GlassMapGenerator` parses them
+offline and emits `Glass.java`, which registers every glass with its index at
+each wavelength in a static initializer. So a run never touches an AGF file, and
+there is currently no way to point the tool at one - adding or updating a
+catalog means regenerating `Glass.java` and rebuilding.
+
 Worth knowing: the named glass is used **only** if it resolves to a catalog
 entry. If the glass or catalog name is not recognised, the tool falls back
 silently to the tabulated index and Abbe number - there is no warning. Passing

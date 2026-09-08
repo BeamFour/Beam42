@@ -106,6 +106,8 @@ two number approximation, so the polychromatic results are better.
 Recognised catalog names, matched case insensitively, are `Hoya`, `Ohara`,
 `Schott`, `Hikari`, `CORNING`, `SUMITA` and `CDGM`. Column 8 may be omitted, in
 which case those catalogs are searched in that order for the glass name.
+[GLASS_CATALOGS.md](GLASS_CATALOGS.md) lists every glass available, with its
+index at each wavelength.
 
 The catalogs are **compiled into the code**, not read at run time. The AGF files
 under `glassdata/` are the source material: `GlassMapGenerator` parses them
@@ -288,3 +290,85 @@ spec with multiple configurations (a zoom, for instance).
 * **Ray aiming defaults to real.** Real aiming is used unless
   `--paraxial-ray-aiming` is given. Layout diagrams always use real aiming
   regardless of the flag.
+
+## Gotchas when working on prescriptions
+
+A prescription imported straight from the
+[PhotonsToPhotos Optical Bench](https://www.photonstophotos.net/GeneralTopics/Lenses/OpticalBench/OpticalBenchHub.htm)
+will usually produce **poor MTF on the first run**. This is normal and is not
+necessarily a sign that the import went wrong. Patents are not written to be
+manufacturable prescriptions: they quote values to limited precision, they
+sometimes contain outright errors, and the example tabulated is often not the
+configuration the shipping lens actually used.
+
+Recovering a sensible design is an iterative process. Work through these in
+order, checking the MTF after each step, and stop as soon as the result looks
+right. The aim throughout is usually to **reproduce the manufacturer's published
+MTF curves** - those are the reference to judge against, not an abstract notion
+of good performance.
+
+### 1. Assign glass types
+
+Patents quote nd and vd only. Substituting real catalog glasses gives the full
+dispersion curve instead of a two number approximation, which alone often fixes
+a large part of the polychromatic error.
+
+`GlassFinder` automates this. It reads a prescription, matches each surface's nd
+and vd against the catalogs, and writes an enriched copy with columns 7 and 8
+filled in:
+
+```bash
+java -cp rayoptics/target/lenstool.jar org.redukti.tools.GlassFinder --specfile input.txt -o specs.txt
+```
+
+It reports how many surfaces it resolved, for example
+`Selected 12 glass types; 2 ambiguous; 0 unmatched`. Where several catalog
+glasses fit within tolerance and none is an exact match, it leaves the columns
+blank and appends `candidate=...` fields to the row for you to choose from by
+hand. Rows that already name a glass and a recognised catalog are left alone
+unless `--force` is given.
+
+### 2. Optimize the back focus, for a prime
+
+If the design is a prime, the back focus is the single most productive variable
+and is frequently the only thing wrong. Patents often round it, and a small
+error there costs a lot of MTF.
+
+Watch for **a cover glass near the image**. In those designs the distance that
+matters is the one to the cover glass, not the figure the patent labels as back
+focus.
+
+### 3. Optimize the variable thicknesses
+
+If back focus alone does not recover the design, widen the search to the other
+variable airspaces - the rows in `[variable distances]` referenced from the
+thickness column.
+
+This is the usual path for **zooms**, where the airspaces are what define each
+configuration. Note that back focus is not a free variable in a zoom the way it
+is in a prime: it normally has to stay the same across all zoom settings, so it
+cannot simply be optimized per configuration.
+
+### 4. Optimize curvatures and aspherics
+
+Only if the steps above fail. Changing curvatures means you are no longer
+reproducing the patent but redesigning from it, so it is the last resort rather
+than the first tool to reach for.
+
+Steps 2 to 4 use the optimizer, which is a Java API and has no command line
+front end; see [OPTIMIZER.md](OPTIMIZER.md).
+
+### Silent failures to rule out first
+
+Before concluding that a design is genuinely poor, check that the file is being
+read the way you think. Three import problems degrade the model without
+producing any warning:
+
+* A **glass or catalog name that does not resolve** falls back to the tabulated
+  nd and vd. Check `prescription.txt` in the output to see which glasses were
+  actually applied.
+* A **thickness naming a variable that does not exist** silently becomes 0.0,
+  collapsing that airspace.
+* A **`scenarios` and `names` mismatch** in `[report data]` causes every
+  configuration to be ignored, and the lens is analysed as a single
+  configuration built from the first column.

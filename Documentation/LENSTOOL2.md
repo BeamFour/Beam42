@@ -40,10 +40,43 @@ brackets, and lines beginning with `#` are comments.
 | `[descriptive data]` | Optical Bench | `title`, and other free form descriptive fields. |
 | `[constants]` | Optical Bench | Unused by this tool, carried through. |
 | `[variable distances]` | Optical Bench | `Focal Length`, `Angle of View`, `F-Number`, `Image Height`, and the named airspaces (`Bf`, `d12`, ...). Each row may carry **several values**, one per configuration. |
-| `[lens data]` | Optical Bench | The surface table: radius, thickness, index, diameter, Abbe number, glass name. |
+| `[lens data]` | Optical Bench, **extended** | The surface table. Beam42 adds glass and catalog name columns, see below. |
 | `[aspherical data]` | Optical Bench | Aspheric coefficients. |
 | `[patent info]` | **Beam42 extension** | Provenance for the report header. |
 | `[report data]` | **Beam42 extension** | Report title and, importantly, which configurations to process. |
+
+### `[lens data]` glass columns
+
+The surface table is tab delimited, one row per surface:
+
+| Column | Contents |
+| --- | --- |
+| 1 | Surface id, referenced by `[aspherical data]`. |
+| 2 | Radius of curvature, or `Infinity`, or one of `AS` (aperture stop), `FS` (field stop), `CG` (cover glass). |
+| 3 | Thickness to the next surface. May name a variable from `[variable distances]`, e.g. `d12`. |
+| 4 | Refractive index nd. |
+| 5 | Clear diameter. |
+| 6 | Abbe number vd. |
+| 7 | **Beam42 extension** - glass name, e.g. `S-LAH66`. |
+| 8 | **Beam42 extension** - catalog name, e.g. `Ohara`. |
+
+Columns 7 and 8 let a surface name a real catalog glass instead of relying on
+the tabulated nd/vd in columns 4 and 6. The glass is then looked up in the
+catalogs under `glassdata/`, which gives the full dispersion curve rather than a
+two number approximation, so the polychromatic results are better.
+
+```
+1	115.495	7.84	1.85025	70.5	30.05	S-NBH57	Ohara
+```
+
+Recognised catalog names, matched case insensitively, are `Hoya`, `Ohara`,
+`Schott`, `Hikari`, `CORNING`, `SUMITA` and `CDGM`. Column 8 may be omitted, in
+which case those catalogs are searched in that order for the glass name.
+
+Worth knowing: the named glass is used **only** if it resolves to a catalog
+entry. If the glass or catalog name is not recognised, the tool falls back
+silently to the tabulated index and Abbe number - there is no warning. Passing
+`--dont-use-glass-types` forces that same fallback for every surface.
 
 ### `[patent info]`
 
@@ -194,6 +227,12 @@ spec with multiple configurations (a zoom, for instance).
   lens at a finite conjugate. A `Magnification` row in `[variable distances]` is
   carried through to the regenerated prescription but does not build a finite
   conjugate model.
+* **Only one field and pupil specification is supported.** The model is always
+  built with the field as an object space **angle** with **relative** field
+  heights, and the pupil as an image space **f/#**. RayOptics itself also
+  supports image space real height and object or image height for the field, and
+  entrance pupil diameter or numerical aperture for the pupil, but none of those
+  are reachable from this tool.
 * **Fields are fixed.** Analysis runs at eleven relative field heights, 0.0 to
   1.0 in steps of 0.1. Layout diagrams use only 0.0 and 1.0. Neither set is
   configurable from the command line.

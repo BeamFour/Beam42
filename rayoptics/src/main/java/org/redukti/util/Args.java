@@ -6,6 +6,13 @@ import org.redukti.spec.VigType;
 public final class Args {
     public int scenario = 0;
     public String specfile = null;
+    /**
+     * Patent number to fetch from the PhotonsToPhotos Optical Bench instead of
+     * reading a local specfile, e.g. JP1993-034592.
+     */
+    public String patent = null;
+    /** Example number within {@link #patent}, e.g. 2 or 08P. */
+    public String example = null;
     public String outputFile = null;
     public String outdir = null;
     public boolean use_glass_types = true;
@@ -88,6 +95,14 @@ public final class Args {
             }
             else if (arg1.equals("-o")) {
                 arguments.outputFile = arg2;
+                i++;
+            }
+            else if (arg1.equals("--patent")) {
+                arguments.patent = arg2;
+                i++;
+            }
+            else if (arg1.equals("--example")) {
+                arguments.example = arg2;
                 i++;
             }
             else if (arg1.equals("--scenario")) {

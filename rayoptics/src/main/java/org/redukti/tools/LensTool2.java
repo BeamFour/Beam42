@@ -1,6 +1,7 @@
 package org.redukti.tools;
 
 import org.redukti.exporters.ZemaxExporter;
+import org.redukti.importers.obench.ObenchFetcher;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.mathlib.M;
 import org.redukti.plotter.GeoMTFByFieldPlot;
@@ -33,6 +34,39 @@ public class LensTool2 {
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(specfile);
         return specs;
+    }
+
+    /**
+     * When --patent is used, downloads the prescription from the Optical Bench and
+     * saves it next to the other output, so that everything downstream - including
+     * the output file names - works exactly as it does for a local specfile, and
+     * the source the report was built from is kept alongside the report.
+     *
+     * @return false if the lens could not be fetched, having already reported why
+     */
+    private static boolean resolveSpecfile(Args arguments) {
+        if (arguments.patent == null)
+            return true;
+        String url = ObenchFetcher.urlFor(arguments.patent, arguments.example);
+        try {
+            String content = ObenchFetcher.fetch(arguments.patent, arguments.example);
+            Path target = Path.of(arguments.outdir,
+                    ObenchFetcher.fileNameFor(arguments.patent, arguments.example));
+            Files.createDirectories(target.toAbsolutePath().getParent());
+            Files.writeString(target, content);
+            arguments.specfile = target.toString();
+            System.out.println("Fetched " + url);
+            System.out.println("Saved " + target);
+            return true;
+        }
+        catch (ObenchFetcher.NotFoundException e) {
+            System.err.println(e.getMessage());
+            return false;
+        }
+        catch (Exception e) {
+            System.err.println("Could not fetch " + url + ": " + e.getMessage());
+            return false;
+        }
     }
 
     /**
@@ -342,8 +376,24 @@ public class LensTool2 {
 
     public static void main(String[] args) throws Exception {
         Args arguments = Args.parseArguments(args);
-        if (arguments.specfile == null) {
-            System.err.println("Usage: --specfile inputfile [--outdir dir] [--only-d-line] [--dont-use-glass-types] \\");
+        if (arguments.patent != null && arguments.specfile != null) {
+            System.err.println("Use either --specfile or --patent, not both");
+            System.exit(1);
+        }
+        if (arguments.patent != null && arguments.example == null) {
+            System.err.println("--patent also needs --example, e.g. --patent JP1993-034592 --example 2");
+            System.exit(1);
+        }
+        if (arguments.patent != null && arguments.outdir == null) {
+            // A fetched lens has no local file to take its location from, so the
+            // caller has to say where the download and the report should land
+            // rather than have them appear in whatever the working directory is.
+            System.err.println("--patent also needs --outdir, naming the directory to put the lens and its report in");
+            System.exit(1);
+        }
+        if (arguments.specfile == null && arguments.patent == null) {
+            System.err.println("Usage: (--specfile inputfile [--outdir dir] | --patent number --example n --outdir dir) \\");
+            System.err.println("       [--only-d-line] [--dont-use-glass-types] \\");
             System.err.println("       [--output-ray-aberration-plots] [--output-wavelength-mtfs] [--auto-size-spot-diagrams] \\");
             System.err.println("       [--use-spot-pattern " + Args.spot_pattern_names() + "] [--spot-grid-size count] [--vig-type " + Args.vig_type_names() + "] \\");
             System.err.println("       [--real-ray-aiming|--paraxial-ray-aiming] [--mtf freq,freq,...] \\");
@@ -354,9 +404,13 @@ public class LensTool2 {
             System.err.println("       --optimize-goal defaults to contrast; mtf uses the geometric MTF directly, which stalls more easily");
             System.err.println("       --mtf takes spatial frequencies in cycles/mm and defaults to 10,30,50, which is what the reports under Examples/ use");
             System.err.println("       --real-ray-aiming aims the chief ray by tracing a real ray at the entrance pupil, --paraxial-ray-aiming uses paraxial aiming; real is the default");
+            System.err.println("       --patent fetches the prescription from the PhotonsToPhotos Optical Bench, e.g. --patent JP1993-034592 --example 2 --outdir ef14mm");
+            System.err.println("         --outdir is required with --patent: a fetched lens has no local file to take its location from");
             System.err.println("       Output files are created alongside the specfile unless --outdir is given");
             System.exit(1);
         }
+        if (!resolveSpecfile(arguments))
+            System.exit(1);
         if (arguments.update_specfile && !arguments.assign_glass_types) {
             System.err.println("--update-specfile only applies with --assign-glass-types");
             System.exit(1);

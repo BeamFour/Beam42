@@ -26,6 +26,36 @@ The input is a lens specification in the format used by the
 [PhotonsToPhotos Optical Bench](https://www.photonstophotos.net/GeneralTopics/Lenses/OpticalBench/OpticalBenchHub.htm).
 By default every output file is written next to the spec file.
 
+### Fetching a lens from the Optical Bench
+
+Instead of supplying a file you can name a patent and example, and the
+prescription is downloaded from the Optical Bench into a directory you name:
+
+```bash
+java -jar rayoptics/target/lenstool.jar --patent JP1993-034592 --example 2 --outdir ef14mm
+```
+
+The downloaded prescription is saved alongside the report, under the name the
+Optical Bench publishes it as (`JP1993-034592_Example02.txt`), so the report
+always keeps the source it was built from. Output naming then follows that file
+exactly as it would for a local specfile.
+
+An example is padded to two digits to match the site's naming, so `2` and `02`
+are the same lens. Examples that carry a suffix are passed through unchanged, so
+`--example 08P` works.
+
+If the Optical Bench has no such lens the tool says so and stops:
+
+```
+Patent / example not found on the Optical Bench: JP1993-034592 example 47
+(looked for https://www.photonstophotos.net/.../JP1993-034592_Example47.txt)
+```
+
+`--specfile` and `--patent` are alternatives; giving both is an error.
+`--patent` requires both `--example` and `--outdir`: a fetched lens has no local
+file to take its location from, so the destination has to be named rather than
+left to whatever the working directory happens to be.
+
 Running with no arguments prints a usage summary.
 
 ## Input file format
@@ -189,8 +219,9 @@ and the defaults are what the committed examples use.
 
 | Option | Default | Effect |
 | --- | --- | --- |
-| `--specfile <file>` | *required* | The lens specification to analyse. |
-| `--outdir <dir>` | alongside the spec file | Directory for generated output. See the note on the Zemax file below. |
+| `--specfile <file>` | *one of these two* | The lens specification to analyse. |
+| `--patent <number> --example <n>` | *one of these two* | Download the prescription from the Optical Bench instead of reading a file. Requires `--outdir`. |
+| `--outdir <dir>` | alongside the spec file | Directory for generated output. **Required** with `--patent`. See the note on the Zemax file below. |
 | `--only-d-line` | off | Build the prescription and Zemax export for the d line alone instead of the full wavelength set. |
 | `--dont-use-glass-types` | off (glass types used) | Ignore named glass types in the spec and use the tabulated index/dispersion instead. Useful when a catalogue glass is unavailable or suspect. |
 | `--vig-type <type>` | `set-pupil` | Aperture and vignetting calculation run once the model is built. See below. Accepts either the enum spelling (`SetPupil`) or kebab case (`set-pupil`), case insensitive. |

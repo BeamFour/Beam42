@@ -232,6 +232,7 @@ and the defaults are what the committed examples use.
 | `--output-wavelength-mtfs` | off | Additionally emit a per wavelength monochromatic MTF plot for each field. |
 | `--output-ray-aberration-plots` | off | Additionally emit transverse ray aberration **and** wavefront (OPD) fan plots, tangential and sagittal, for each field. |
 | `--assign-glass-types` | off | Match each surface's nd and vd to a catalog glass before analysing, so the model uses the full dispersion curve instead of a two number approximation. Applies to this run only. |
+| `--index-line <d\|e>` | `d` | Which line the prescription's refractive index column is quoted at, for `--assign-glass-types`. See below. |
 | `--force` | off | With `--assign-glass-types`, re-match surfaces that already name a recognised glass. |
 | `--update-specfile` | off | With `--assign-glass-types`, also write the matched prescription back over the input file. Refused on its own. |
 | `--optimize` | off | Run the routine airspace optimization before reporting: the back focus on a prime, the other variable airspaces on a zoom. See below. |
@@ -424,9 +425,10 @@ of good performance.
 
 ### 1. Assign glass types
 
-Patents quote nd and vd only. Substituting real catalog glasses gives the full
-dispersion curve instead of a two number approximation, which alone often fixes
-a large part of the polychromatic error.
+Patents quote a refractive index and an Abbe number only. Substituting real
+catalog glasses gives the full dispersion curve instead of a two number
+approximation, which alone often fixes a large part of the polychromatic error -
+frequently it is the single biggest improvement available.
 
 `LensTool2` can do this for you with `--assign-glass-types`:
 
@@ -440,14 +442,58 @@ glasses are used for **that run only** and the input file is left untouched; add
 `--update-specfile` to write them back. `--force` re-matches surfaces that
 already name a glass.
 
+**Read that tally before going on.** If nearly every surface came back ambiguous
+or unmatched, the prescription is probably quoting its refractive index at the e
+line rather than the d line - see
+[When the index is quoted at the e line](#when-the-index-is-quoted-at-the-e-line).
+Re-run with `--index-line e` before doing anything else: optimizing a design
+whose glasses never resolved means tuning it against the wrong dispersion, and
+any gain you measure is meaningless.
+
 Where several catalog glasses fit within tolerance and none is an exact match,
 the surface is left without a glass and `candidate=...` fields are appended to
-the row, listing each option with its nd and vd offsets, for you to choose from
-by hand.
+the row, listing each option with its offsets, for you to choose from by hand.
+A surface that *was* assigned may also carry `candidate=` fields, listing the
+alternatives that were within tolerance; those are information, not a failure.
 
-Expect equivalent glasses from a different maker: matching is on nd and vd, and
-the catalogs are searched in priority order, so an Ohara S-FPL51 may come back as
-the equivalent Hoya FCD1. That is the same glass optically, not a mismatch.
+**If almost nothing matches, suspect the index line before the catalogs.** A
+handful of unmatched surfaces is ordinary - an obsolete or in-house glass. Nearly
+every surface failing is a systematic problem, and the usual cause is a
+prescription quoting the index at the e line. On the Sony FE 14mm F1.8 GM:
+
+| Matching | Result |
+| --- | --- |
+| d line, the default | `Assigned 0 glass types; 9 ambiguous; 5 unmatched` |
+| `--index-line e` | `Assigned 14 glass types; 0 ambiguous; 0 unmatched` |
+
+Two further signs point the same way: the failures cluster among the high index,
+low Abbe glasses, where a fixed index tolerance bites hardest; and the candidates
+offered are consistently a little *lower* in index than the file's value.
+
+Expect equivalent glasses from a different maker: matching is on the refractive
+index and vd, and the catalogs are searched in priority order, so an Ohara
+S-FPL51 may come back as the equivalent Hoya FCD1. That is the same glass
+optically, not a mismatch.
+
+#### When the index is quoted at the e line
+
+Most prescriptions quote the refractive index at the **d** line, and that is what
+matching assumes. Some patents instead tabulate it at the **e** line, 546.07 nm,
+while still quoting the Abbe number as vd. Matching such a file on the d line
+finds almost nothing, because every index is out by roughly 0.005 to 0.010 - far
+enough to miss, close enough not to look obviously wrong.
+
+`--index-line e` matches the index against ne instead. The Abbe number is still
+matched as vd, since that is what these files quote.
+
+```bash
+java -jar rayoptics/target/lenstool.jar --specfile input.txt --assign-glass-types --index-line e
+```
+
+When it assigns a glass this way it also **rewrites the index and Abbe columns to
+the catalog's d line values**, so the file is left consistently on the d line
+rather than half converted. Without that, anything reading the file later without
+knowing the original convention would build the wrong medium.
 
 The same matching is available standalone, which is useful when you only want to
 enrich a file:

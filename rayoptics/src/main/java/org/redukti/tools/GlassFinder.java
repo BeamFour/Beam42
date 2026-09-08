@@ -22,6 +22,17 @@ public final class GlassFinder {
     public record EnrichmentResult(String text, int selected, int ambiguous, int unmatched) {}
 
     public static EnrichmentResult enrich(String input, boolean force) {
+        return enrich(input, force, Glass.IndexLine.D);
+    }
+
+    /**
+     * @param indexLine which line the prescription's refractive index column is quoted
+     *             at. With {@link Glass.IndexLine#E} the index is matched against
+     *             ne, and a matched surface additionally has its index and Abbe
+     *             columns rewritten to the catalog's d line values, so the file
+     *             is left consistently on the d line rather than half converted.
+     */
+    public static EnrichmentResult enrich(String input, boolean force, Glass.IndexLine indexLine) {
         String newline = input.contains("\r\n") ? "\r\n" : "\n";
         boolean endsWithNewline = input.endsWith("\n");
         String[] lines = input.split("\\r?\\n", -1);
@@ -63,7 +74,7 @@ public final class GlassFinder {
                 continue;
             }
 
-            List<Glass.GlassMatch> matches = Glass.find_glasses(nd, vd);
+            List<Glass.GlassMatch> matches = Glass.find_glasses(nd, vd, indexLine);
             if (matches.isEmpty()) {
                 unmatched++;
                 output.add(line);
@@ -78,6 +89,13 @@ public final class GlassFinder {
                 fields = ensureLength(fields, 8);
                 fields[6] = glass.label;
                 fields[7] = glass.catalog_name;
+                if (indexLine == Glass.IndexLine.E) {
+                    // The columns held ne and vd; restate them at the d line so
+                    // that anything reading this file without knowing the
+                    // original convention still gets the right medium.
+                    fields[3] = format_index(glass.nd);
+                    fields[5] = format_abbe(glass.vd);
+                }
                 selected++;
                 if (matches.size() > 1)
                     fields = appendCandidates(fields, matches);
@@ -129,6 +147,14 @@ public final class GlassFinder {
         return expanded;
     }
 
+    private static String format_index(double value) {
+        return String.format(Locale.ROOT, "%.5f", value);
+    }
+
+    private static String format_abbe(double value) {
+        return String.format(Locale.ROOT, "%.2f", value);
+    }
+
     private static Double parseDouble(String value) {
         try {
             return value.isBlank() ? null : Double.parseDouble(value);
@@ -150,13 +176,15 @@ public final class GlassFinder {
         else
             output = Helper.getOutputFileWithPath(arguments.specfile,"specs.txt",null);
 
-        EnrichmentResult result = enrich(Files.readString(input), arguments.force);
+        EnrichmentResult result = enrich(Files.readString(input), arguments.force,
+                arguments.index_line_value());
         Files.writeString(output, result.text());
         System.out.printf("Selected %d glass types; %d ambiguous; %d unmatched%n",
                 result.selected(), result.ambiguous(), result.unmatched());
     }
 
     private static void usage() {
-        System.err.println("Usage: GlassFinder --specfile input.txt -o output.txt");
+        System.err.println("Usage: GlassFinder --specfile input.txt -o output.txt [--index-line d|e] [--force]");
+        System.err.println("       --index-line e when the prescription quotes the refractive index at the e line");
     }
 }

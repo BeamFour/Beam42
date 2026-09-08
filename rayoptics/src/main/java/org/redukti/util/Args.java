@@ -48,6 +48,12 @@ public final class Args {
      */
     public boolean update_specfile = false;
     /**
+     * Line the prescription's refractive index column is quoted at, "d" or "e".
+     * Some patents tabulate the index at the e line while still quoting the Abbe
+     * number as vd; matching on the wrong line finds nothing.
+     */
+    public String index_line = "d";
+    /**
      * Run the routine airspace optimization before reporting: the back focus on
      * a prime, the variable airspaces other than the back focus on a zoom.
      */
@@ -146,6 +152,10 @@ public final class Args {
             else if (arg1.equals("--assign-glass-types")) {
                 arguments.assign_glass_types = true;
             }
+            else if (arg1.equals("--index-line")) {
+                arguments.index_line = parse_index_line(arg2);
+                i++;
+            }
             else if (arg1.equals("--update-specfile")) {
                 arguments.update_specfile = true;
             }
@@ -178,6 +188,24 @@ public final class Args {
             }
         }
         return arguments;
+    }
+
+    /** The {@link org.redukti.rayoptics.seq.Glass.IndexLine} this maps to. */
+    public org.redukti.rayoptics.seq.Glass.IndexLine index_line_value() {
+        return index_line.equals("e")
+                ? org.redukti.rayoptics.seq.Glass.IndexLine.E
+                : org.redukti.rayoptics.seq.Glass.IndexLine.D;
+    }
+
+    /** Accepts d or e, rejecting anything else rather than defaulting. */
+    public static String parse_index_line(String value) {
+        if (value == null)
+            throw new IllegalArgumentException("--index-line requires a value, one of: d, e");
+        String normalized = value.trim().toLowerCase();
+        if (normalized.equals("d") || normalized.equals("e"))
+            return normalized;
+        throw new IllegalArgumentException(
+                "Unrecognized --index-line '" + value + "', expected one of: d, e");
     }
 
     /** Accepts contrast or mtf, rejecting anything else rather than defaulting. */

@@ -78,7 +78,8 @@ public class LensTool2 {
         if (!arguments.assign_glass_types)
             return getSpecsFromFile(arguments.specfile);
         Path specpath = Path.of(arguments.specfile);
-        var result = GlassFinder.enrich(Files.readString(specpath), arguments.force);
+        var result = GlassFinder.enrich(Files.readString(specpath), arguments.force,
+                arguments.index_line_value());
         System.out.printf("Assigned %d glass types; %d ambiguous; %d unmatched%n",
                 result.selected(), result.ambiguous(), result.unmatched());
         if (result.ambiguous() > 0)
@@ -397,9 +398,10 @@ public class LensTool2 {
             System.err.println("       [--output-ray-aberration-plots] [--output-wavelength-mtfs] [--auto-size-spot-diagrams] \\");
             System.err.println("       [--use-spot-pattern " + Args.spot_pattern_names() + "] [--spot-grid-size count] [--vig-type " + Args.vig_type_names() + "] \\");
             System.err.println("       [--real-ray-aiming|--paraxial-ray-aiming] [--mtf freq,freq,...] \\");
-            System.err.println("       [--assign-glass-types [--force] [--update-specfile]] [--optimize [--optimize-goal contrast|mtf]]");
+            System.err.println("       [--assign-glass-types [--index-line d|e] [--force] [--update-specfile]] [--optimize [--optimize-goal contrast|mtf]]");
             System.err.println("       --assign-glass-types matches each surface's nd/vd to a catalog glass for this run;");
             System.err.println("         --force re-matches surfaces that already name a glass, --update-specfile writes the result back to the specfile");
+            System.err.println("         --index-line e when the prescription quotes the refractive index at the e line rather than the d line");
             System.err.println("       --optimize varies the back focus on a prime, or the other variable airspaces on a zoom, at the central field");
             System.err.println("       --optimize-goal defaults to contrast; mtf uses the geometric MTF directly, which stalls more easily");
             System.err.println("       --mtf takes spatial frequencies in cycles/mm and defaults to 10,30,50, which is what the reports under Examples/ use");

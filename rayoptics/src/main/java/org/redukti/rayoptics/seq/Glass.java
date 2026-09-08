@@ -157,30 +157,58 @@ public class Glass extends Medium {
     }
     public static Map<GlassName, Glass> glasses = new HashMap<>();
     private static final NavigableMap<Double, List<Glass>> glasses_by_nd = new TreeMap<>();
+    private static final NavigableMap<Double, List<Glass>> glasses_by_ne = new TreeMap<>();
+
+    /**
+     * Which line a prescription's refractive index column is quoted at. Most
+     * quote nd, but some patents tabulate the index at the e line while still
+     * quoting the Abbe number as vd, so the two are selected independently.
+     */
+    public enum IndexLine { D, E }
 
     public static void addGlass(Glass glass) {
         glasses.put(new GlassName(glass.catalog_name,glass.label),glass);
         glasses_by_nd.computeIfAbsent(glass.nd, ignored -> new ArrayList<>()).add(glass);
+        glasses_by_ne.computeIfAbsent(glass.ne, ignored -> new ArrayList<>()).add(glass);
     }
 
     public static List<GlassMatch> find_glasses(double nd, double vd) {
-        return find_glasses(nd, vd, DEFAULT_ND_TOLERANCE, DEFAULT_VD_TOLERANCE, 3);
+        return find_glasses(nd, vd, IndexLine.D);
+    }
+
+    public static List<GlassMatch> find_glasses(double n, double vd, IndexLine line) {
+        return find_glasses(n, vd, DEFAULT_ND_TOLERANCE, DEFAULT_VD_TOLERANCE, 3, line);
     }
 
     public static List<GlassMatch> find_glasses(double nd, double vd,
                                                  double nd_tolerance,
                                                  double vd_tolerance,
                                                  int limit) {
-        if (!Double.isFinite(nd) || !Double.isFinite(vd) ||
+        return find_glasses(nd, vd, nd_tolerance, vd_tolerance, limit, IndexLine.D);
+    }
+
+    /**
+     * Finds catalog glasses matching a refractive index and Abbe number. The
+     * index is compared at {@code line}; the Abbe number is always vd, which is
+     * what prescriptions quote even when their index column is at the e line.
+     */
+    public static List<GlassMatch> find_glasses(double n, double vd,
+                                                 double nd_tolerance,
+                                                 double vd_tolerance,
+                                                 int limit,
+                                                 IndexLine line) {
+        if (!Double.isFinite(n) || !Double.isFinite(vd) ||
                 nd_tolerance <= 0.0 || vd_tolerance <= 0.0 || limit <= 0)
             return List.of();
 
         var matches = new ArrayList<GlassMatch>();
-        var candidates = glasses_by_nd.subMap(nd - nd_tolerance, true,
-                nd + nd_tolerance, true);
+        var index = line == IndexLine.E ? glasses_by_ne : glasses_by_nd;
+        var candidates = index.subMap(n - nd_tolerance, true,
+                n + nd_tolerance, true);
         for (var glasses_at_index: candidates.values()) {
             for (Glass glass: glasses_at_index) {
-                double nd_difference = Math.abs(glass.nd - nd);
+                double glass_index = line == IndexLine.E ? glass.ne : glass.nd;
+                double nd_difference = Math.abs(glass_index - n);
                 double vd_difference = Math.abs(glass.vd - vd);
                 if (vd_difference > vd_tolerance)
                     continue;

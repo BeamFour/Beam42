@@ -203,6 +203,8 @@ and the defaults are what the committed examples use.
 | `--assign-glass-types` | off | Match each surface's nd and vd to a catalog glass before analysing, so the model uses the full dispersion curve instead of a two number approximation. Applies to this run only. |
 | `--force` | off | With `--assign-glass-types`, re-match surfaces that already name a recognised glass. |
 | `--update-specfile` | off | With `--assign-glass-types`, also write the matched prescription back over the input file. Refused on its own. |
+| `--optimize` | off | Run the routine airspace optimization before reporting: the back focus on a prime, the other variable airspaces on a zoom. See below. |
+| `--optimize-goal <contrast\|mtf>` | `contrast` | Objective for `--optimize`. |
 | `--real-ray-aiming` / `--paraxial-ray-aiming` | real | Chief ray aiming algorithm. Real aiming traces an actual ray at the entrance pupil; paraxial aiming is faster but does not hold up on very wide angle lenses. Applies to the analysis model, not the layout diagrams. |
 
 Invalid values for `--mtf`, `--vig-type`, `--use-spot-pattern` and
@@ -266,6 +268,44 @@ spec with multiple configurations (a zoom, for instance).
 | `mtf-fld<i>-<wavelength><suffix>.svg` | `--output-wavelength-mtfs` | Monochromatic MTF per field and wavelength. |
 | `rayabbr-fld<i>-{tan,sag}<suffix>.svg` | `--output-ray-aberration-plots` | Transverse ray aberration fans. |
 | `opdabbr-fld<i>-{tan,sag}<suffix>.svg` | `--output-ray-aberration-plots` | Wavefront (OPD) fans. |
+
+### Routine optimization
+
+`--optimize` runs the airspace optimization that an imported patent prescription
+usually needs, before the report is generated, so every output reflects the
+optimized design. What it varies depends on the lens:
+
+| Lens | Varied |
+| --- | --- |
+| Prime | The back focus airspace, located automatically. |
+| Zoom | The variable airspaces other than the back focus, one configuration at a time. |
+
+On a design ending in a cover glass the back focus is taken as the airspace **in
+front of** the cover glass, not the short gap between cover glass and image.
+`CG` rows in `[lens data]` are what makes this exact rather than a guess.
+
+A zoom is optimized one configuration at a time. There is no support yet for a
+variable shared across configurations, so the back focus is deliberately left
+out of the zoom case: it normally has to stay common across zoom settings, and
+nothing here can enforce that.
+
+Effective focal length and f-number are anchored to the prescription throughout,
+so an optimized airspace cannot quietly turn the lens into a different one.
+
+**On the objective.** Both goals target the central field at the `--mtf`
+frequencies. `contrast` is the default because the geometric MTF merit surface is
+rough at the scale the solver steps. Detuning a known good back focus by 1.5 mm
+and asking each objective to recover it:
+
+| Objective | Result |
+| --- | --- |
+| `contrast` | Recovers 37.3265 against a true 37.32, merit 0.750 to 0.019. |
+| `mtf` | Does not move at all: the local gradient points the wrong way and the solver stops at once. |
+
+Sampling the merit against back focus shows why - the contrast merit falls
+smoothly to a single clean minimum at the right place, while the geometric MTF
+merit wanders non-monotonically with local minima throughout. Use
+`--optimize-goal mtf` only if you want to see that directly.
 
 ### `prescription.txt` round trips
 
@@ -391,9 +431,13 @@ If the design is a prime, the back focus is the single most productive variable
 and is frequently the only thing wrong. Patents often round it, and a small
 error there costs a lot of MTF.
 
-Watch for **a cover glass near the image**. In those designs the distance that
-matters is the one to the cover glass, not the figure the patent labels as back
-focus.
+`--optimize` does this for you, including finding the right airspace when there
+is **a cover glass near the image** - in those designs the distance that matters
+is the one to the cover glass, not the figure the patent labels as back focus:
+
+```bash
+java -jar rayoptics/target/lenstool.jar --specfile input.txt --assign-glass-types --optimize
+```
 
 ### 3. Optimize the variable thicknesses
 
@@ -401,10 +445,10 @@ If back focus alone does not recover the design, widen the search to the other
 variable airspaces - the rows in `[variable distances]` referenced from the
 thickness column.
 
-This is the usual path for **zooms**, where the airspaces are what define each
-configuration. Note that back focus is not a free variable in a zoom the way it
-is in a prime: it normally has to stay the same across all zoom settings, so it
-cannot simply be optimized per configuration.
+This is the usual path for **zooms**, and `--optimize` does it automatically on a
+multi configuration prescription. Note that back focus is not a free variable in
+a zoom the way it is in a prime: it normally has to stay the same across all zoom
+settings, so it is left out rather than optimized per configuration.
 
 ### 4. Optimize curvatures and aspherics
 

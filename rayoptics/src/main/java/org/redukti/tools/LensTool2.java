@@ -296,6 +296,46 @@ public class LensTool2 {
         Files.writeString(output, reference);
     }
 
+    /**
+     * Runs the routine airspace optimization. A prime gets its back focus
+     * varied; a zoom gets the other variable airspaces varied, one configuration
+     * at a time, because a variable cannot yet be shared across configurations.
+     */
+    private static void runDefaultOptimizations(Prescription prescription, Args arguments,
+                                                VigType vigType) throws Exception {
+        int backFocus = DefaultOptimizations.findBackFocusSurface(prescription);
+        int configurations = Math.max(prescription.get_num_configurations(), 1);
+        boolean zoom = prescription.get_num_configurations() > 1;
+        for (int config = 0; config < configurations; config++) {
+            int[] surfaces;
+            String what;
+            if (zoom) {
+                surfaces = DefaultOptimizations.findVariableThicknesses(prescription, backFocus);
+                what = "variable airspaces";
+            }
+            else if (backFocus >= 0) {
+                surfaces = new int[]{backFocus};
+                what = "back focus at surface " + (backFocus + 1);
+            }
+            else {
+                System.out.println("Could not identify a back focus airspace to optimize; skipping");
+                return;
+            }
+            if (surfaces.length == 0) {
+                System.out.println("No variable airspaces to optimize; skipping");
+                return;
+            }
+            var objective = arguments.optimize_goal.equals("mtf")
+                    ? DefaultOptimizations.Objective.MTF
+                    : DefaultOptimizations.Objective.CONTRAST;
+            var result = DefaultOptimizations.optimizeThicknesses(prescription, surfaces,
+                    arguments.mtf_freqs, config, vigType, arguments.only_d_line, objective);
+            System.out.printf("Optimized %s for configuration %d on %s: status %d, merit %.6g -> %.6g%s%n",
+                    what, config, arguments.optimize_goal, result.status(), result.before(), result.after(),
+                    result.improved() ? "" : " (no improvement)");
+        }
+    }
+
     private static String suffixed_name(String baseName, String suffix, String ext) {
         return baseName + suffix + ext;
     }
@@ -307,9 +347,11 @@ public class LensTool2 {
             System.err.println("       [--output-ray-aberration-plots] [--output-wavelength-mtfs] [--auto-size-spot-diagrams] \\");
             System.err.println("       [--use-spot-pattern " + Args.spot_pattern_names() + "] [--spot-grid-size count] [--vig-type " + Args.vig_type_names() + "] \\");
             System.err.println("       [--real-ray-aiming|--paraxial-ray-aiming] [--mtf freq,freq,...] \\");
-            System.err.println("       [--assign-glass-types [--force] [--update-specfile]]");
+            System.err.println("       [--assign-glass-types [--force] [--update-specfile]] [--optimize [--optimize-goal contrast|mtf]]");
             System.err.println("       --assign-glass-types matches each surface's nd/vd to a catalog glass for this run;");
             System.err.println("         --force re-matches surfaces that already name a glass, --update-specfile writes the result back to the specfile");
+            System.err.println("       --optimize varies the back focus on a prime, or the other variable airspaces on a zoom, at the central field");
+            System.err.println("       --optimize-goal defaults to contrast; mtf uses the geometric MTF directly, which stalls more easily");
             System.err.println("       --mtf takes spatial frequencies in cycles/mm and defaults to 10,30,50, which is what the reports under Examples/ use");
             System.err.println("       --real-ray-aiming aims the chief ray by tracing a real ray at the entrance pupil, --paraxial-ray-aiming uses paraxial aiming; real is the default");
             System.err.println("       Output files are created alongside the specfile unless --outdir is given");
@@ -328,6 +370,8 @@ public class LensTool2 {
             boolean realRayAiming = arguments.real_ray_aiming == null || arguments.real_ray_aiming;
             OpticalBenchDataImporter.LensSpecifications specs = loadSpecs(arguments);
             var prescription = createPrescription(specs,arguments.use_glass_types,arguments.only_d_line);
+            if (arguments.optimize)
+                runDefaultOptimizations(prescription, arguments, vigType);
             String prescription_output = prescription.to_opt_bench_str(new StringBuilder()).toString();
             Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile, "prescription.txt", arguments.outdir), prescription_output);
             ZemaxExporter zemaxExporter = new ZemaxExporter();

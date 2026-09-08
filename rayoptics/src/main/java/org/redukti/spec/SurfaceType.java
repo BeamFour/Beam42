@@ -14,6 +14,12 @@ public class SurfaceType {
     public double _diameter;
     public boolean _is_aperture_stop;
     public boolean _is_field_stop;
+    /**
+     * Marks a CG row. Needed to locate the back focus: on a design with a cover
+     * glass the gap that matters is the one in front of it, not the short gap
+     * between the cover glass and the image.
+     */
+    public boolean _is_cover_glass;
     public double _nd;
     public double _vd;
     public String _catalog_name;
@@ -58,6 +64,13 @@ public class SurfaceType {
     }
     public boolean is_field_stop() {
         return _is_field_stop;
+    }
+    public boolean is_cover_glass() {
+        return _is_cover_glass;
+    }
+    public SurfaceType set_is_cover_glass(boolean value) {
+        this._is_cover_glass = value;
+        return this;
     }
     public double get_diameter() {
         return _diameter;
@@ -112,6 +125,8 @@ public class SurfaceType {
             sb.append("AS");
         else if (_is_field_stop)
             sb.append("FS");
+        else if (_is_cover_glass)
+            sb.append("CG");
         else
             sb.append(_radius);
         sb.append("\t");
@@ -234,6 +249,8 @@ public class SurfaceType {
             sb.append("AS");
         else if (_is_field_stop)
             sb.append("FS");
+        else if (_is_cover_glass)
+            sb.append("CG");
         else
             sb.append(_radius);
         sb.append(" | ");

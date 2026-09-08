@@ -40,6 +40,17 @@ public final class Args {
      * analysis choice, and overwriting the author's input should be asked for.
      */
     public boolean update_specfile = false;
+    /**
+     * Run the routine airspace optimization before reporting: the back focus on
+     * a prime, the variable airspaces other than the back focus on a zoom.
+     */
+    public boolean optimize = false;
+    /**
+     * Objective for {@link #optimize}: "contrast" or "mtf". Contrast is the
+     * default because the geometric MTF merit surface is rough at the scale the
+     * solver steps, so a solve driven by it stalls in a local minimum.
+     */
+    public String optimize_goal = "contrast";
     public boolean force = false;
     /**
      * Vignetting calculation applied once the model is built. Defaults to the
@@ -123,6 +134,13 @@ public final class Args {
             else if (arg1.equals("--update-specfile")) {
                 arguments.update_specfile = true;
             }
+            else if (arg1.equals("--optimize")) {
+                arguments.optimize = true;
+            }
+            else if (arg1.equals("--optimize-goal")) {
+                arguments.optimize_goal = parse_optimize_goal(arg2);
+                i++;
+            }
             else if (arg1.equals("--vig-type")) {
                 arguments.vig_type = parse_vig_type(arg2);
                 i++;
@@ -145,6 +163,17 @@ public final class Args {
             }
         }
         return arguments;
+    }
+
+    /** Accepts contrast or mtf, rejecting anything else rather than defaulting. */
+    public static String parse_optimize_goal(String value) {
+        if (value == null)
+            throw new IllegalArgumentException("--optimize-goal requires a value, one of: contrast, mtf");
+        String normalized = value.trim().toLowerCase();
+        if (normalized.equals("contrast") || normalized.equals("mtf"))
+            return normalized;
+        throw new IllegalArgumentException(
+                "Unrecognized --optimize-goal '" + value + "', expected one of: contrast, mtf");
     }
 
     /** The MTF frequencies used by every report under Examples/. */

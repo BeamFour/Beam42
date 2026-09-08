@@ -266,7 +266,7 @@ public class OpticalBenchDataImporter {
             return _id;
         }
 
-        boolean is_cover_glass() {
+        public boolean is_cover_glass() {
             return _is_cover_glass;
         }
 

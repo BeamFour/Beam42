@@ -190,6 +190,7 @@ public class Prescription {
         } else {
             surf(radius,thickness,diameter);
         }
+        _surface_list.get(_surface_list.size()-1).set_is_cover_glass(surface.is_cover_glass());
         OpticalBenchDataImporter.AsphericalData aspherical_data = surface.get_aspherical_data();
         if (aspherical_data != null) {
             int asph_type = SurfaceType.ASPH_EVEN;

@@ -34,6 +34,29 @@ public class LensTool2 {
         specs.parse_file(specfile);
         return specs;
     }
+
+    /**
+     * Loads the prescription, optionally running the glass type matcher over it
+     * first. The matched prescription is used for this run only; it replaces the
+     * input file just when --update-specfile asks for that.
+     */
+    private static OpticalBenchDataImporter.LensSpecifications loadSpecs(Args arguments) throws Exception {
+        if (!arguments.assign_glass_types)
+            return getSpecsFromFile(arguments.specfile);
+        Path specpath = Path.of(arguments.specfile);
+        var result = GlassFinder.enrich(Files.readString(specpath), arguments.force);
+        System.out.printf("Assigned %d glass types; %d ambiguous; %d unmatched%n",
+                result.selected(), result.ambiguous(), result.unmatched());
+        if (result.ambiguous() > 0)
+            System.out.println("Ambiguous surfaces carry candidate= fields; pick one by hand for a better fit");
+        if (arguments.update_specfile) {
+            Files.writeString(specpath, result.text());
+            System.out.println("Updated " + specpath);
+        }
+        var specs = new OpticalBenchDataImporter.LensSpecifications();
+        specs.parse_buffer(result.text());
+        return specs;
+    }
     public static Prescription createPrescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types, boolean d_line) {
         return Prescription.build_prescription(specs, use_glass_types, false, d_line);
     }
@@ -283,10 +306,17 @@ public class LensTool2 {
             System.err.println("Usage: --specfile inputfile [--outdir dir] [--only-d-line] [--dont-use-glass-types] \\");
             System.err.println("       [--output-ray-aberration-plots] [--output-wavelength-mtfs] [--auto-size-spot-diagrams] \\");
             System.err.println("       [--use-spot-pattern " + Args.spot_pattern_names() + "] [--spot-grid-size count] [--vig-type " + Args.vig_type_names() + "] \\");
-            System.err.println("       [--real-ray-aiming|--paraxial-ray-aiming] [--mtf freq,freq,...]");
+            System.err.println("       [--real-ray-aiming|--paraxial-ray-aiming] [--mtf freq,freq,...] \\");
+            System.err.println("       [--assign-glass-types [--force] [--update-specfile]]");
+            System.err.println("       --assign-glass-types matches each surface's nd/vd to a catalog glass for this run;");
+            System.err.println("         --force re-matches surfaces that already name a glass, --update-specfile writes the result back to the specfile");
             System.err.println("       --mtf takes spatial frequencies in cycles/mm and defaults to 10,30,50, which is what the reports under Examples/ use");
             System.err.println("       --real-ray-aiming aims the chief ray by tracing a real ray at the entrance pupil, --paraxial-ray-aiming uses paraxial aiming; real is the default");
             System.err.println("       Output files are created alongside the specfile unless --outdir is given");
+            System.exit(1);
+        }
+        if (arguments.update_specfile && !arguments.assign_glass_types) {
+            System.err.println("--update-specfile only applies with --assign-glass-types");
             System.exit(1);
         }
         try {
@@ -296,7 +326,7 @@ public class LensTool2 {
             // Real ray aiming is what makes very wide angle lenses trace correctly,
             // so it stays on unless the caller asks for paraxial aiming.
             boolean realRayAiming = arguments.real_ray_aiming == null || arguments.real_ray_aiming;
-            OpticalBenchDataImporter.LensSpecifications specs = getSpecsFromFile(arguments.specfile);
+            OpticalBenchDataImporter.LensSpecifications specs = loadSpecs(arguments);
             var prescription = createPrescription(specs,arguments.use_glass_types,arguments.only_d_line);
             String prescription_output = prescription.to_opt_bench_str(new StringBuilder()).toString();
             Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile, "prescription.txt", arguments.outdir), prescription_output);

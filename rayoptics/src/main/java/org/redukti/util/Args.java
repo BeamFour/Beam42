@@ -28,6 +28,18 @@ public final class Args {
     /** Number of samples along each dimension of a rectangular spot grid. */
     public int spot_grid_size = 64;
     public boolean auto_size_spots = false;
+    /**
+     * Run the glass type matcher over the prescription before analysing it, so
+     * that surfaces quoting only nd and vd pick up a real catalog glass and its
+     * full dispersion curve.
+     */
+    public boolean assign_glass_types = false;
+    /**
+     * With {@link #assign_glass_types}, also write the enriched prescription
+     * back over the input file. Off by default: assigning glass types is an
+     * analysis choice, and overwriting the author's input should be asked for.
+     */
+    public boolean update_specfile = false;
     public boolean force = false;
     /**
      * Vignetting calculation applied once the model is built. Defaults to the
@@ -104,6 +116,12 @@ public final class Args {
             }
             else if (arg1.equals("--auto-size-spot-diagrams")) {
                 arguments.auto_size_spots = true;
+            }
+            else if (arg1.equals("--assign-glass-types")) {
+                arguments.assign_glass_types = true;
+            }
+            else if (arg1.equals("--update-specfile")) {
+                arguments.update_specfile = true;
             }
             else if (arg1.equals("--vig-type")) {
                 arguments.vig_type = parse_vig_type(arg2);

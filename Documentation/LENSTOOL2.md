@@ -200,6 +200,9 @@ and the defaults are what the committed examples use.
 | `--mtf <f1,f2,...>` | `10,30,50` | Spatial frequencies in cycles/mm for the MTF by field plots. Every report under `Examples/` uses the default, so change it only when comparing against a manufacturer's own choice of frequencies. |
 | `--output-wavelength-mtfs` | off | Additionally emit a per wavelength monochromatic MTF plot for each field. |
 | `--output-ray-aberration-plots` | off | Additionally emit transverse ray aberration **and** wavefront (OPD) fan plots, tangential and sagittal, for each field. |
+| `--assign-glass-types` | off | Match each surface's nd and vd to a catalog glass before analysing, so the model uses the full dispersion curve instead of a two number approximation. Applies to this run only. |
+| `--force` | off | With `--assign-glass-types`, re-match surfaces that already name a recognised glass. |
+| `--update-specfile` | off | With `--assign-glass-types`, also write the matched prescription back over the input file. Refused on its own. |
 | `--real-ray-aiming` / `--paraxial-ray-aiming` | real | Chief ray aiming algorithm. Real aiming traces an actual ray at the entrance pupil; paraxial aiming is faster but does not hold up on very wide angle lenses. Applies to the analysis model, not the layout diagrams. |
 
 Invalid values for `--mtf`, `--vig-type`, `--use-spot-pattern` and
@@ -354,20 +357,33 @@ Patents quote nd and vd only. Substituting real catalog glasses gives the full
 dispersion curve instead of a two number approximation, which alone often fixes
 a large part of the polychromatic error.
 
-`GlassFinder` automates this. It reads a prescription, matches each surface's nd
-and vd against the catalogs, and writes an enriched copy with columns 7 and 8
-filled in:
+`LensTool2` can do this for you with `--assign-glass-types`:
+
+```bash
+java -jar rayoptics/target/lenstool.jar --specfile input.txt --assign-glass-types
+```
+
+It reports what it managed, for example
+`Assigned 17 glass types; 0 ambiguous; 0 unmatched`. By default the matched
+glasses are used for **that run only** and the input file is left untouched; add
+`--update-specfile` to write them back. `--force` re-matches surfaces that
+already name a glass.
+
+Where several catalog glasses fit within tolerance and none is an exact match,
+the surface is left without a glass and `candidate=...` fields are appended to
+the row, listing each option with its nd and vd offsets, for you to choose from
+by hand.
+
+Expect equivalent glasses from a different maker: matching is on nd and vd, and
+the catalogs are searched in priority order, so an Ohara S-FPL51 may come back as
+the equivalent Hoya FCD1. That is the same glass optically, not a mismatch.
+
+The same matching is available standalone, which is useful when you only want to
+enrich a file:
 
 ```bash
 java -cp rayoptics/target/lenstool.jar org.redukti.tools.GlassFinder --specfile input.txt -o specs.txt
 ```
-
-It reports how many surfaces it resolved, for example
-`Selected 12 glass types; 2 ambiguous; 0 unmatched`. Where several catalog
-glasses fit within tolerance and none is an exact match, it leaves the columns
-blank and appends `candidate=...` fields to the row for you to choose from by
-hand. Rows that already name a glass and a recognised catalog are left alone
-unless `--force` is given.
 
 ### 2. Optimize the back focus, for a prime
 

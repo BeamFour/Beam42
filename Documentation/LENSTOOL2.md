@@ -39,11 +39,45 @@ brackets, and lines beginning with `#` are comments.
 | --- | --- | --- |
 | `[descriptive data]` | Optical Bench | `title`, and other free form descriptive fields. |
 | `[constants]` | Optical Bench | Unused by this tool, carried through. |
-| `[variable distances]` | Optical Bench | `Focal Length`, `Angle of View`, `F-Number`, `Image Height`, and the named airspaces (`Bf`, `d12`, ...). Each row may carry **several values**, one per configuration. |
+| `[variable distances]` | Optical Bench | System values and named airspaces. Three rows are mandatory, see below. Each row may carry **several values**, one per configuration. |
 | `[lens data]` | Optical Bench, **extended** | The surface table. Beam42 adds glass and catalog name columns, see below. |
 | `[aspherical data]` | Optical Bench | Aspheric coefficients. |
 | `[patent info]` | **Beam42 extension** | Provenance for the report header. |
 | `[report data]` | **Beam42 extension** | Report title and, importantly, which configurations to process. |
+
+### `[variable distances]`
+
+Each row is a name followed by one value per configuration. Three are
+**mandatory** and the tool fails with an explicit error if any is missing or not
+positive:
+
+| Row | Meaning |
+| --- | --- |
+| `Focal Length` | Effective focal length in mm. |
+| `F-Number` | The f/#, which becomes the pupil specification. |
+| `Angle of View` | **Full** angle of view in degrees, not the half angle. |
+
+```
+Failed due to: The prescription does not specify 'Angle of View'; add it to the
+[variable distances] section as the full angle of view in degrees
+```
+
+Every configuration named in `scenarios` needs its own value in all three rows.
+Note that these files use `undefined` as a placeholder for a column that was
+never filled in; that reads back as zero and is rejected the same way:
+
+```
+Failed due to: The prescription specifies 'F-Number' as 'undefined' for
+scenario 0; expected the f-number, which must be positive
+```
+
+The remaining rows are optional:
+
+| Row | If present | If absent |
+| --- | --- | --- |
+| `Image Height` | Sets the image circle radius. Only the **first** value is read, so it does not vary per configuration even for a zoom. | Defaults to 43.2 mm, i.e. 35 mm format. |
+| `Aperture Diameter` | Overrides the diameter given on the `AS` row, one value per configuration. This is how a zoom varies its stop. | The literal diameter on the `AS` row is used. |
+| Named airspaces (`Bf`, `d12`, `d20`, ...) | Any row whose name appears in a thickness column of `[lens data]`, supplying one thickness per configuration. | A thickness naming a variable that does not exist silently becomes **0.0**, with no warning. |
 
 ### `[lens data]` glass columns
 

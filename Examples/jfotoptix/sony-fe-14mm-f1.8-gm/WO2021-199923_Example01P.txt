@@ -15,32 +15,32 @@ d25	4.78	6.47
 Bf(p)	undefined	undefined
 Bf	15.44	15.44
 [lens data]
-1	32.125	1.87	1.58313	52.78	59.46	BACD12	Hoya	candidate=Hoya/BACD12,nd=1.58313,vd=59.46,dnd=0.00000,dvd=0.04	candidate=Hoya/M-BACD12,nd=1.58313,vd=59.46,dnd=0.00000,dvd=0.04	candidate=Hoya/MC-BACD12,nd=1.58313,vd=59.46,dnd=0.00000,dvd=0.04
+1	32.125	1.87	1.58547	52.78	59.5
 2	15.036	11.07		38.73	
-3	36.239	1.50	1.72916	36.82	54.67	TAC8	Hoya	candidate=Hoya/TAC8,nd=1.72916,vd=54.67,dnd=0.00000,dvd=0.03	candidate=Ohara/LAL18,nd=1.72916,vd=54.68,dnd=0.00000,dvd=0.02	candidate=Ohara/S-LAL18,nd=1.72916,vd=54.68,dnd=0.00000,dvd=0.02
+3	36.239	1.50	1.73234	36.82	54.7
 4	17.755	11.66		29.47	
-5	-57.581	1.50	1.59282	27.14	68.62	FCD505	Hoya	candidate=Hoya/FCD505,nd=1.59282,vd=68.62,dnd=0.00000,dvd=0.02	candidate=Hoya/FCD515,nd=1.59282,vd=68.62,dnd=0.00000,dvd=0.02	candidate=Schott/N-PSK57,nd=1.59240,vd=68.40,dnd=0.00042,dvd=0.20
+5	-57.581	1.50	1.59489	27.14	68.6
 6	31.581	0.00		24.93	
-7	30.073	7.90	1.68893	24.92	31.16	FD8	Hoya	candidate=Hoya/FD8,nd=1.68893,vd=31.16,dnd=0.00000,dvd=0.04	candidate=Schott/SF8,nd=1.68893,vd=31.18,dnd=0.00000,dvd=0.02	candidate=Hikari/SF8,nd=1.68893,vd=31.14,dnd=0.00000,dvd=0.06
+7	30.073	7.90	1.69416	24.92	31.2
 8	-54.912	2.58		23.19	
-9	-27.601	1.20	1.90366	20.98	31.32	TAFD25	Hoya	candidate=Hoya/TAFD25,nd=1.90366,vd=31.32,dnd=0.00000,dvd=0.02	candidate=Hoya/TAFD25L,nd=1.90366,vd=31.32,dnd=0.00000,dvd=0.02	candidate=Ohara/S-LAH95,nd=1.90366,vd=31.34,dnd=0.00000,dvd=0.04
-10	19.770	6.00	1.77047	20.36	29.74	NBFD29	Hoya	candidate=Hoya/NBFD29,nd=1.77047,vd=29.74,dnd=0.00000,dvd=0.04	candidate=CDGM/H-TF29,nd=1.77047,vd=29.81,dnd=0.00002,dvd=0.11
+9	-27.601	1.20	1.91048	20.98	31.3
+10	19.770	6.00	1.77660	20.36	29.7
 11	-114.412	0.60		20.30	
-12	36.344	8.00	1.76802	22.73	49.24	M-TAF101	Hoya	candidate=Hoya/M-TAF101,nd=1.76802,vd=49.24,dnd=0.00000,dvd=0.04	candidate=CDGM/D-LAF050,nd=1.76842,vd=49.28,dnd=0.00040,dvd=0.08	candidate=CDGM/D-LAF050-25,nd=1.76709,vd=49.20,dnd=0.00093,dvd=0.00
+12	36.344	8.00	1.77173	22.73	49.2
 13	-47.160	5.71		23.71	
 14	AS	d14		23.33	
-15	24.591	6.96	1.43700	22.85	95.10	FCD100	Hoya	candidate=Hoya/FCD100,nd=1.43700,vd=95.10,dnd=0.00000,dvd=0.00	candidate=Ohara/FPL53,nd=1.43875,vd=94.96,dnd=0.00175,dvd=0.14	candidate=Ohara/S-FPL53,nd=1.43875,vd=94.95,dnd=0.00175,dvd=0.15
+15	24.591	6.96	1.43810	22.85	95.1
 16	-34.569	0.20		22.04	
-17	106.589	5.92	1.49700	21.96	81.61	FCD1	Hoya	candidate=Hoya/FCD1,nd=1.49700,vd=81.61,dnd=0.00000,dvd=0.01	candidate=Ohara/FPL51,nd=1.49700,vd=81.61,dnd=0.00000,dvd=0.01	candidate=Ohara/S-FPL51,nd=1.49700,vd=81.55,dnd=0.00000,dvd=0.05
-18	-17.865	1.20	1.85451	21.81	25.15	NBFD25	Hoya	candidate=Hoya/NBFD25,nd=1.85451,vd=25.15,dnd=0.00000,dvd=0.05	candidate=Ohara/S-NBH56,nd=1.85478,vd=24.80,dnd=0.00038,dvd=0.40
+17	106.589	5.92	1.49845	21.96	81.6
+18	-17.865	1.20	1.86252	21.81	25.2
 19	55.538	0.75		23.16	
-20	32.194	6.10	1.92286	24.97	20.88	E-FDS1	Hoya	candidate=Hoya/E-FDS1,nd=1.92286,vd=20.88,dnd=0.00000,dvd=0.02	candidate=Hoya/E-FDS1-W,nd=1.92286,vd=20.88,dnd=0.00000,dvd=0.02	candidate=Hoya/M-FDS1,nd=1.92286,vd=20.88,dnd=0.00000,dvd=0.02
+20	32.194	6.10	1.93323	24.97	20.9
 21	-46.433	0.20		24.93	
-22	-123.478	0.90	1.85451	24.11	25.15	NBFD25	Hoya	candidate=Hoya/NBFD25,nd=1.85451,vd=25.15,dnd=0.00000,dvd=0.05	candidate=Ohara/S-NBH56,nd=1.85478,vd=24.80,dnd=0.00038,dvd=0.40
+22	-123.478	0.90	1.86252	24.11	25.2
 23	41.916	2.81		23.40	
-24	-500.000	1.40	1.85135	23.43	40.10	M-TAFD305	Hoya	candidate=Hoya/M-TAFD305,nd=1.85135,vd=40.10,dnd=0.00000,dvd=0.00	candidate=Hoya/MC-TAFD305,nd=1.85135,vd=40.10,dnd=0.00000,dvd=0.00	candidate=Hoya/MP-TAFD305,nd=1.85135,vd=40.10,dnd=0.00000,dvd=0.00
+24	-500.000	1.40	1.85639	23.43	40.1
 25	298.710	d25		23.98	
-26	-418.530	2.10	1.61997	29.30	63.88	PCD40	Hoya	candidate=Hoya/PCD40,nd=1.61997,vd=63.88,dnd=0.00000,dvd=0.02	candidate=CDGM/D-ZPK1A-25,nd=1.61999,vd=63.76,dnd=0.00003,dvd=0.14	candidate=Hoya/MC-PCD4-40,nd=1.61921,vd=63.85,dnd=0.00076,dvd=0.05
+26	-418.530	2.10	1.62228	29.30	63.9
 27	-83.351	Bf		29.92	
 [aspherical data]
 1	32.125	0	-3.2157E-07	-8.9102E-09	7.2086E-12	-4.2574E-15	-2.1368E-19

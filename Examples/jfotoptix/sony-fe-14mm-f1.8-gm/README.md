@@ -29,7 +29,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 24 | -500.0 | 1.4 | 23.43 | 1.85135 | 40.1 | Hoya | M-TAFD305 |
 | 25 | 298.71 | 4.78 | 23.98 |  |  |  |
 | 26 | -418.53 | 2.1 | 29.3 | 1.61997 | 63.88 | Hoya | PCD40 |
-| 27 | -83.351 | 15.44 | 29.92 |  |  |  |
+| 27 | -83.351 | 15.449273931124184 | 29.92 |  |  |  |
 ## Aspherical Data
 | ID  | Type | k   | P1 | P2 | P3 | P4 | P5 | P6 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |

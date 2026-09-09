@@ -68,12 +68,38 @@ brackets, and lines beginning with `#` are comments.
 | Section | Origin | Purpose |
 | --- | --- | --- |
 | `[descriptive data]` | Optical Bench | `title`, and other free form descriptive fields. |
-| `[constants]` | Optical Bench | Unused by this tool, carried through. |
+| `[constants]` | Optical Bench | Selects how `[aspherical data]` coefficients are interpreted: `ODD`, `EVEN A2`, or default `EVEN`. See below. |
 | `[variable distances]` | Optical Bench | System values and named airspaces. Three rows are mandatory, see below. Each row may carry **several values**, one per configuration. |
 | `[lens data]` | Optical Bench, **extended** | The surface table. Beam42 adds glass and catalog name columns, see below. |
 | `[aspherical data]` | Optical Bench | Aspheric coefficients. |
 | `[patent info]` | **Beam42 extension** | Provenance for the report header. |
 | `[report data]` | **Beam42 extension** | Report title and, importantly, which configurations to process. |
+
+### `[constants]` and aspheric types
+
+The importer uses two constants to choose the coefficient convention for
+`[aspherical data]`:
+
+| Constant present | Aspheric type |
+| --- | --- |
+| `AsphericalOddCount` | `ODD` |
+| `AsphericalA2` (without `AsphericalOddCount`) | `EVEN A2` |
+| Neither | `EVEN` |
+
+These are presence checks: the value of `AsphericalOddCount` is not used as a
+count, and it takes precedence if both constants are present. Put `[constants]`
+before `[aspherical data]`, because the importer selects the type as it reads
+each aspheric row. For example:
+
+```text
+[constants]
+AsphericalOddCount	1
+```
+
+Omitting or choosing the wrong constant changes the interpretation of the
+coefficients and therefore the surface shape. The generated `prescription.txt`
+recreates the applicable aspheric constant; other constants are not carried
+through unchanged.
 
 ### `[variable distances]`
 

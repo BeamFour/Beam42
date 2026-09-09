@@ -156,8 +156,19 @@ public class LensTool2 {
 
     public static StringBuilder startREADME(OpticalBenchDataImporter.LensSpecifications specs) {
         Prescription prescription = Prescription.build_prescription(specs,true);
+        return startREADME(prescription);
+    }
+
+    public static StringBuilder startREADME(Prescription prescription) {
         StringBuilder sb = prescription.to_markdown_str(new StringBuilder());
         return sb;
+    }
+
+    /** Use the final geometry, including optimized airspaces, with the weighted spectrum. */
+    static Prescription createWeightedPrescription(Prescription prescription, boolean dLineOnly) throws Exception {
+        var finalSpecs = new OpticalBenchDataImporter.LensSpecifications();
+        finalSpecs.parse_buffer(prescription.to_opt_bench_str(new StringBuilder()).toString());
+        return createPrescription(finalSpecs, true, true, dLineOnly);
     }
 
     public static StringBuilder addConfigLabelToREADME(StringBuilder sb, String label) {
@@ -432,7 +443,8 @@ public class LensTool2 {
             Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile, "prescription.txt", arguments.outdir), prescription_output);
             ZemaxExporter zemaxExporter = new ZemaxExporter();
             Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), zemaxExporter.generate(prescription, arguments.only_d_line));
-            StringBuilder SB = startREADME(specs);
+            StringBuilder SB = startREADME(prescription);
+            var prescriptionForWeightedMTF = createWeightedPrescription(prescription, arguments.only_d_line);
             for (int config = 0; config < Math.max(prescription.get_num_configurations(),1); config++) {
                 if (prescription.get_num_configurations() > 0)
                     addConfigLabelToREADME(SB,prescription._configuration_names[config]);
@@ -466,7 +478,6 @@ public class LensTool2 {
                 if (arguments.do_ray_aberrations)
                     generateRayAberrationPlots(opm, arguments, scenario_filesuffix);
                 // Generate MTF with weighted average across wavelengths
-                var prescriptionForWeightedMTF = createPrescription(specs, arguments.use_glass_types, true, arguments.only_d_line);
                 opm = createSystem(prescriptionForWeightedMTF, true, vigType, realRayAiming, fields, config);
                 generateMTFs(opm, arguments, fields, prescriptionForWeightedMTF.get_wvl_wts(), "mtf-w", scenario_filesuffix);
             }

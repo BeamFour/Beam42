@@ -19,7 +19,7 @@ mvn package
 Then run it against a spec file:
 
 ```bash
-java -jar rayoptics/target/lenstool.jar --specfile Examples/jfotoptix/nikkor-58mm-f1.4g/specs.txt
+java -jar rayoptics/target/lenstool.jar --specfile Examples/jfotoptix/nikkor-58mm-f1.4g/JP2013-019993_Example01.txt
 ```
 
 The input is a lens specification in the format used by the
@@ -346,15 +346,24 @@ subset `LensTool2` understands and actually used: data the tool does not consume
 and scenarios that were not selected are dropped. What is left is a prescription
 that corresponds exactly to the report beside it.
 
-It can be fed straight back in, and doing so reproduces the run:
+It can be fed straight back in. For a run using the default analysis options:
 
 ```bash
 java -jar rayoptics/target/lenstool.jar --specfile prescription.txt --outdir rerun
 ```
 
-Every generated file comes back byte for byte identical, and `prescription.txt`
-regenerates itself unchanged, so it is a fixed point rather than merely
-idempotent in the numbers. Two things do legitimately vary:
+The prescription does not save command line analysis settings. To reproduce a
+non-default run, supply the same `--mtf`, `--only-d-line`, `--vig-type`, ray aiming,
+spot sampling, diagram sizing and optional plot flags again. For example:
+
+```bash
+java -jar rayoptics/target/lenstool.jar --specfile prescription.txt --outdir rerun --mtf 10,40 --use-spot-pattern gaussian --only-d-line
+```
+
+Optimized airspaces and assigned glasses are already saved in the prescription;
+do not repeat `--optimize` or glass assignment to reproduce that geometry.
+With matching analysis settings, the regenerated outputs should reproduce the
+same numerical results. Two output details can still vary:
 
 * The report footer carries the generation date, `Report / Zemax file generated
   using Beam42 on <date>`.

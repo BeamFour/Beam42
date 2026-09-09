@@ -375,10 +375,8 @@ Use `--optimize-goal mtf` only if you want to check that out.
 
 ### `prescription.txt` round trips
 
-The generated prescription is not a copy of the input. It is narrowed to the
-subset `LensTool2` understands and actually used: data the tool does not consume
-and scenarios that were not selected are dropped. What is left is a prescription
-that corresponds exactly to the report beside it.
+`prescription.txt` contains the data and configurations used for the report;
+unused input data is discarded.
 
 It can be fed straight back in. For a run using the default analysis options:
 
@@ -485,33 +483,15 @@ glasses are used for **that run only** and the input file is left untouched; add
 `--update-specfile` to write them back. `--force` re-matches surfaces that
 already name a glass.
 
-**Read that tally before going on.** If nearly every surface came back ambiguous
-or unmatched, the prescription is probably quoting its refractive index at the e
-line rather than the d line - see
+Resolve glass-matching problems before optimizing. If most surfaces are ambiguous
+or unmatched, check
 [When the index is quoted at the e line](#when-the-index-is-quoted-at-the-e-line).
-Re-run with `--index-line e` before doing anything else: optimizing a design
-whose glasses never resolved means tuning it against the wrong dispersion, and
-any gain you measure is meaningless.
 
 Where several catalog glasses fit within tolerance and none is an exact match,
 the surface is left without a glass and `candidate=...` fields are appended to
 the row, listing each option with its offsets, for you to choose from by hand.
 A surface that *was* assigned may also carry `candidate=` fields, listing the
 alternatives that were within tolerance; those are information, not a failure.
-
-**If almost nothing matches, suspect the index line before the catalogs.** A
-handful of unmatched surfaces is ordinary - an obsolete or in-house glass. Nearly
-every surface failing is a systematic problem, and the usual cause is a
-prescription quoting the index at the e line. On the Sony FE 14mm F1.8 GM:
-
-| Matching | Result |
-| --- | --- |
-| d line, the default | `Assigned 0 glass types; 9 ambiguous; 5 unmatched` |
-| `--index-line e` | `Assigned 14 glass types; 0 ambiguous; 0 unmatched` |
-
-Two further signs point the same way: the failures cluster among the high index,
-low Abbe glasses, where a fixed index tolerance bites hardest; and the candidates
-offered are consistently a little *lower* in index than the file's value.
 
 Expect equivalent glasses from a different maker: matching is on the refractive
 index and vd, and the catalogs are searched in priority order, so an Ohara
@@ -522,9 +502,18 @@ optically, not a mismatch.
 
 Most prescriptions quote the refractive index at the **d** line, and that is what
 matching assumes. Some patents instead tabulate it at the **e** line, 546.07 nm,
-while still quoting the Abbe number as vd. Matching such a file on the d line
-finds almost nothing, because every index is out by roughly 0.005 to 0.010 - far
-enough to miss, close enough not to look obviously wrong.
+while still quoting the Abbe number as vd. Matching these against d-line indices
+can leave most surfaces ambiguous or unmatched. A few unmatched surfaces may
+instead indicate obsolete or in-house glasses.
+
+Signs of an index-line mismatch include failures concentrated among high-index,
+low-Abbe glasses and candidate indices consistently below the file's values.
+For example, on the Sony FE 14mm F1.8 GM:
+
+| Matching | Result |
+| --- | --- |
+| d line, the default | `Assigned 0 glass types; 9 ambiguous; 5 unmatched` |
+| `--index-line e` | `Assigned 14 glass types; 0 ambiguous; 0 unmatched` |
 
 `--index-line e` matches the index against ne instead. The Abbe number is still
 matched as vd, since that is what these files quote.
@@ -534,9 +523,7 @@ java -jar rayoptics/target/lenstool.jar --specfile input.txt --assign-glass-type
 ```
 
 When it assigns a glass this way it also **rewrites the index and Abbe columns to
-the catalog's d line values**, so the file is left consistently on the d line
-rather than half converted. Without that, anything reading the file later without
-knowing the original convention would build the wrong medium.
+the catalog's d line values**, so later imports use the correct convention.
 
 The same matching is available standalone, which is useful when you only want to
 enrich a file:
@@ -551,9 +538,8 @@ If the design is a prime, the back focus is the single most productive variable
 and is frequently the only thing wrong. Patents often round it, and a small
 error there costs a lot of MTF.
 
-`--optimize` does this for you, including finding the right airspace when there
-is **a cover glass near the image** - in those designs the distance that matters
-is the one to the cover glass, not the figure the patent labels as back focus:
+`--optimize` locates and adjusts this airspace. See
+[Routine optimization](#routine-optimization) for cover-glass handling.
 
 ```bash
 java -jar rayoptics/target/lenstool.jar --specfile input.txt --assign-glass-types --optimize
@@ -566,9 +552,8 @@ variable airspaces - the rows in `[variable distances]` referenced from the
 thickness column.
 
 This is the usual path for **zooms**, and `--optimize` does it automatically on a
-multi configuration prescription. Note that back focus is not a free variable in
-a zoom the way it is in a prime: it normally has to stay the same across all zoom
-settings, so it is left out rather than optimized per configuration.
+multi configuration prescription. See [Routine optimization](#routine-optimization)
+for the variables selected and the limitation on shared back focus.
 
 ### 4. Optimize curvatures and aspherics
 

@@ -52,9 +52,7 @@ Patent / example not found on the Optical Bench: JP1993-034592 example 47
 ```
 
 `--specfile` and `--patent` are alternatives; giving both is an error.
-`--patent` requires both `--example` and `--outdir`: a fetched lens has no local
-file to take its location from, so the destination has to be named rather than
-left to whatever the working directory happens to be.
+`--patent` requires both `--example` and `--outdir`.
 
 Running with no arguments prints a usage summary.
 
@@ -98,15 +96,14 @@ AsphericalOddCount	1
 
 Omitting or choosing the wrong constant changes the interpretation of the
 coefficients and therefore the surface shape. The generated `prescription.txt`
-recreates the applicable aspheric constant; other constants are not carried
-through unchanged.
+recreates the applicable aspheric constant; other constants are discarded.
 
 See [Aspheric coefficient ordering in the outputs](#aspheric-coefficient-ordering-in-the-outputs)
 for how README and Zemax coefficient lists differ from this input convention.
 
 ### `[variable distances]`
 
-Each row is a name followed by one value per configuration. Three are
+Each row is a name followed by one value per configuration / scenario. Three are
 **mandatory** and the tool fails with an explicit error if any is missing or not
 positive:
 
@@ -121,16 +118,17 @@ Failed due to: The prescription does not specify 'Angle of View'; add it to the
 [variable distances] section as the full angle of view in degrees
 ```
 
-Every configuration named in `scenarios` needs its own value in all three rows.
-Note that these files use `undefined` as a placeholder for a column that was
-never filled in; that reads back as zero and is rejected the same way:
+Every configuration named in `scenarios` (see `[report data]` below) needs its own value in all three rows.
+An Optical Bench file may contain `undefined` for a value not specified in the patent; this causes a failure:
 
 ```
 Failed due to: The prescription specifies 'F-Number' as 'undefined' for
 scenario 0; expected the f-number, which must be positive
 ```
 
-The remaining rows are optional:
+You must manually update the input file in such cases.
+
+The remaining rows in this section are optional:
 
 | Row | If present | If absent |
 | --- | --- | --- |
@@ -169,15 +167,12 @@ which case those catalogs are searched in that order for the glass name.
 index at each wavelength.
 
 The catalogs are **compiled into the code**, not read at run time. The AGF files
-under `glassdata/` are the source material: `GlassMapGenerator` parses them
-offline and emits `Glass.java`, which registers every glass with its index at
-each wavelength in a static initializer. So a run never touches an AGF file, and
-there is currently no way to point the tool at one - adding or updating a
-catalog means regenerating `Glass.java` and rebuilding.
+under `glassdata/` are the source material.
+Glass types must be updated by running a utility and then the jar rebuilt.
 
 Worth knowing: the named glass is used **only** if it resolves to a catalog
 entry. If the glass or catalog name is not recognised, the tool falls back
-silently to the tabulated index and Abbe number - there is no warning. Passing
+to the tabulated index and Abbe number - there is no warning. Passing
 `--dont-use-glass-types` forces that same fallback for every surface.
 
 ### `[patent info]`
@@ -310,25 +305,25 @@ reports under `Examples/` use.
 `<suffix>` is empty for a single configuration lens, or `-0`, `-1`, ... for a
 spec with multiple configurations (a zoom, for instance).
 
-| File | Always generated | Contents |
-| --- | --- | --- |
-| `README.md` | yes | Markdown report collecting the prescription, diagrams and tables below. |
+| File | Always generated | Contents                                                                                            |
+| --- | --- |-----------------------------------------------------------------------------------------------------|
+| `README.md` | yes | Markdown report collecting the prescription, diagrams and tables below.                             |
 | `prescription.txt` | yes | Optical Bench compatible prescription, tab delimited, reduced to what was actually used. See below. |
-| `<specfile>.zmx` | yes | Zemax export. |
-| `paraxial<suffix>.txt` | yes | First order / paraxial data. |
-| `vig<suffix>.txt` | yes | Field and vignetting summary. |
-| `layout<suffix>.svg` | yes | Layout with reference rays. |
-| `layoutonly<suffix>.svg` | yes | Elements only, no rays. |
-| `layout-fan<suffix>.svg` | yes | Layout with a 9 ray fan. Generated but not currently linked from the report. |
-| `spot<suffix>.svg` | yes | Spot diagram, axial field. |
-| `spot-semi-skew<suffix>.svg` | yes | Spot diagram, 0.7 field. |
-| `spot-skew<suffix>.svg` | yes | Spot diagram, full field. |
-| `spot-report<suffix>.txt` | yes | Mean and max spot radius per field. |
-| `mtf<suffix>.svg` / `.csv` | yes | Geometric MTF by field, equal weighted across wavelengths. |
-| `mtf-w<suffix>.svg` / `.csv` | yes | Geometric MTF by field, weighted across wavelengths. |
-| `mtf-fld<i>-<wavelength><suffix>.svg` | `--output-wavelength-mtfs` | Monochromatic MTF per field and wavelength. |
-| `rayabbr-fld<i>-{tan,sag}<suffix>.svg` | `--output-ray-aberration-plots` | Transverse ray aberration fans. |
-| `opdabbr-fld<i>-{tan,sag}<suffix>.svg` | `--output-ray-aberration-plots` | Wavefront (OPD) fans. |
+| `<specfile>.zmx` | yes | Zemax export.                                                                                       |
+| `paraxial<suffix>.txt` | yes | First order / paraxial data.                                                                        |
+| `vig<suffix>.txt` | yes | Field and vignetting summary.                                                                       |
+| `layout<suffix>.svg` | yes | Layout with reference rays.                                                                         |
+| `layoutonly<suffix>.svg` | yes | Elements only, no rays.                                                                             |
+| `layout-fan<suffix>.svg` | yes | Layout with a 9 ray fan. Generated but not currently linked from the report.                        |
+| `spot<suffix>.svg` | yes | Spot diagram, axial field.                                                                          |
+| `spot-semi-skew<suffix>.svg` | yes | Spot diagram, 0.7 field.                                                                            |
+| `spot-skew<suffix>.svg` | yes | Spot diagram, full field.                                                                           |
+| `spot-report<suffix>.txt` | yes | Mean and max spot radius per field.                                                                 |
+| `mtf<suffix>.svg` / `.csv` | yes | Geometric MTF by field, equal weighted across wavelengths.                                          |
+| `mtf-w<suffix>.svg` / `.csv` | yes | Geometric MTF by field, weighted across wavelengths.                                                |
+| `mtf-fld<i>-<wavelength><suffix>.svg` | `--output-wavelength-mtfs` | Monochromatic MTF per field and wavelength. Not included in the README.                             |
+| `rayabbr-fld<i>-{tan,sag}<suffix>.svg` | `--output-ray-aberration-plots` | Transverse ray aberration fans. Not included in the README.                               |
+| `opdabbr-fld<i>-{tan,sag}<suffix>.svg` | `--output-ray-aberration-plots` | Wavefront (OPD) fans. Not included in the README.                                         |
 
 ### Aspheric coefficient ordering in the outputs
 
@@ -375,19 +370,8 @@ Effective focal length and f-number are anchored to the prescription throughout,
 so an optimized airspace cannot quietly turn the lens into a different one.
 
 **On the objective.** Both goals target the central field at the `--mtf`
-frequencies. `contrast` is the default because the geometric MTF merit surface is
-rough at the scale the solver steps. Detuning a known good back focus by 1.5 mm
-and asking each objective to recover it:
-
-| Objective | Result |
-| --- | --- |
-| `contrast` | Recovers 37.3265 against a true 37.32, merit 0.750 to 0.019. |
-| `mtf` | Does not move at all: the local gradient points the wrong way and the solver stops at once. |
-
-Sampling the merit against back focus shows why - the contrast merit falls
-smoothly to a single clean minimum at the right place, while the geometric MTF
-merit wanders non-monotonically with local minima throughout. Use
-`--optimize-goal mtf` only if you want to see that directly.
+frequencies. `contrast` is the default, as it is the more effective option.
+Use `--optimize-goal mtf` only if you want to check that out.
 
 ### `prescription.txt` round trips
 
@@ -440,7 +424,7 @@ not configurable.
 
 ## Behaviour worth knowing
 
-* **Only an object at infinity is supported.** The object gap is fixed at 1e10
+* **Only an object at infinity is supported.** The object distance is fixed at 1e10
   mm and fields are specified as object angles, so the tool cannot analyse a
   lens at a finite conjugate. A `Magnification` row in `[variable distances]` is
   carried through to the regenerated prescription but does not build a finite

@@ -55,6 +55,12 @@ public final class Args {
      */
     public String index_line = "d";
     /**
+     * Line the prescription's Abbe number column is quoted at, "d" or "e".
+     * Independent of {@link #index_line}: Leica patents quote ne with ve, while
+     * a prescription pairing ne with vd is usually a transcription slip.
+     */
+    public String abbe_line = "d";
+    /**
      * Run the routine airspace optimization before reporting: the back focus on
      * a prime, the variable airspaces other than the back focus on a zoom.
      */
@@ -181,6 +187,10 @@ public final class Args {
                 arguments.index_line = parse_index_line(arg2);
                 i++;
             }
+            else if (arg1.equals("--abbe-line")) {
+                arguments.abbe_line = parse_index_line(arg2);
+                i++;
+            }
             else if (arg1.equals("--update-specfile")) {
                 arguments.update_specfile = true;
             }
@@ -229,15 +239,22 @@ public final class Args {
                 : org.redukti.rayoptics.seq.Glass.IndexLine.D;
     }
 
+    /** The {@link org.redukti.rayoptics.seq.Glass.IndexLine} the Abbe column maps to. */
+    public org.redukti.rayoptics.seq.Glass.IndexLine abbe_line_value() {
+        return abbe_line.equals("e")
+                ? org.redukti.rayoptics.seq.Glass.IndexLine.E
+                : org.redukti.rayoptics.seq.Glass.IndexLine.D;
+    }
+
     /** Accepts d or e, rejecting anything else rather than defaulting. */
     public static String parse_index_line(String value) {
         if (value == null)
-            throw new IllegalArgumentException("--index-line requires a value, one of: d, e");
+            throw new IllegalArgumentException("--index-line and --abbe-line require a value, one of: d, e");
         String normalized = value.trim().toLowerCase();
         if (normalized.equals("d") || normalized.equals("e"))
             return normalized;
         throw new IllegalArgumentException(
-                "Unrecognized --index-line '" + value + "', expected one of: d, e");
+                "Unrecognized line '" + value + "', expected one of: d, e");
     }
 
     /** Accepts the number of a [trial n] section. */

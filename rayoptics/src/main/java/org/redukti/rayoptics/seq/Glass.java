@@ -160,9 +160,11 @@ public class Glass extends Medium {
     private static final NavigableMap<Double, List<Glass>> glasses_by_ne = new TreeMap<>();
 
     /**
-     * Which line a prescription's refractive index column is quoted at. Most
-     * quote nd, but some patents tabulate the index at the e line while still
-     * quoting the Abbe number as vd, so the two are selected independently.
+     * Which spectral line a prescription quotes a value at. Applies separately
+     * to the refractive index column and the Abbe number column, because the
+     * two do not always agree: Leica patents quote ne with ve throughout, while
+     * a prescription pairing ne with vd is usually a transcription error - one
+     * that still has to be matched to find the glasses.
      */
     public enum IndexLine { D, E }
 
@@ -177,7 +179,13 @@ public class Glass extends Medium {
     }
 
     public static List<GlassMatch> find_glasses(double n, double vd, IndexLine line) {
-        return find_glasses(n, vd, DEFAULT_ND_TOLERANCE, DEFAULT_VD_TOLERANCE, 3, line);
+        return find_glasses(n, vd, line, IndexLine.D);
+    }
+
+    public static List<GlassMatch> find_glasses(double n, double v,
+                                                 IndexLine indexLine, IndexLine abbeLine) {
+        return find_glasses(n, v, DEFAULT_ND_TOLERANCE, DEFAULT_VD_TOLERANCE, 3,
+                indexLine, abbeLine);
     }
 
     public static List<GlassMatch> find_glasses(double nd, double vd,
@@ -187,29 +195,39 @@ public class Glass extends Medium {
         return find_glasses(nd, vd, nd_tolerance, vd_tolerance, limit, IndexLine.D);
     }
 
-    /**
-     * Finds catalog glasses matching a refractive index and Abbe number. The
-     * index is compared at {@code line}; the Abbe number is always vd, which is
-     * what prescriptions quote even when their index column is at the e line.
-     */
+    /** Matches the index at {@code line} and the Abbe number as vd. */
     public static List<GlassMatch> find_glasses(double n, double vd,
                                                  double nd_tolerance,
                                                  double vd_tolerance,
                                                  int limit,
                                                  IndexLine line) {
-        if (!Double.isFinite(n) || !Double.isFinite(vd) ||
+        return find_glasses(n, vd, nd_tolerance, vd_tolerance, limit, line, IndexLine.D);
+    }
+
+    /**
+     * Finds catalog glasses matching a refractive index and an Abbe number, each
+     * compared at the line it was quoted at.
+     */
+    public static List<GlassMatch> find_glasses(double n, double v,
+                                                 double nd_tolerance,
+                                                 double vd_tolerance,
+                                                 int limit,
+                                                 IndexLine indexLine,
+                                                 IndexLine abbeLine) {
+        if (!Double.isFinite(n) || !Double.isFinite(v) ||
                 nd_tolerance <= 0.0 || vd_tolerance <= 0.0 || limit <= 0)
             return List.of();
 
         var matches = new ArrayList<GlassMatch>();
-        var index = line == IndexLine.E ? glasses_by_ne : glasses_by_nd;
+        var index = indexLine == IndexLine.E ? glasses_by_ne : glasses_by_nd;
         var candidates = index.subMap(n - nd_tolerance, true,
                 n + nd_tolerance, true);
         for (var glasses_at_index: candidates.values()) {
             for (Glass glass: glasses_at_index) {
-                double glass_index = line == IndexLine.E ? glass.ne : glass.nd;
+                double glass_index = indexLine == IndexLine.E ? glass.ne : glass.nd;
+                double glass_abbe = abbeLine == IndexLine.E ? glass.ve : glass.vd;
                 double nd_difference = Math.abs(glass_index - n);
-                double vd_difference = Math.abs(glass.vd - vd);
+                double vd_difference = Math.abs(glass_abbe - v);
                 if (vd_difference > vd_tolerance)
                     continue;
                 double score = Math.pow(nd_difference / nd_tolerance, 2.0)

@@ -251,7 +251,7 @@ and the defaults are what the committed examples use.
 | --- | --- | --- |
 | `--specfile <file>` | *one of these two* | The lens specification to analyse. |
 | `--patent <number> --example <n>` | *one of these two* | Download the prescription from the Optical Bench instead of reading a file. Requires `--outdir`. |
-| `--outdir <dir>` | alongside the spec file | Directory for generated output. **Required** with `--patent`. See the note on the Zemax file below. |
+| `--outdir <dir>` | alongside the spec file | Directory for every generated file, the Zemax export included. **Required** with `--patent`. |
 | `--only-d-line` | off | Build the prescription and Zemax export for the d line alone instead of the full wavelength set. |
 | `--dont-use-glass-types` | off (glass types used) | Ignore named glass types in the spec and use the tabulated index/dispersion instead. Useful when a catalogue glass is unavailable or suspect. |
 | `--vig-type <type>` | `set-pupil` | Aperture and vignetting calculation run once the model is built, for the models the **analysis** outputs are computed from. See below. Accepts either the enum spelling (`SetPupil`) or kebab case (`set-pupil`), case insensitive. |
@@ -263,8 +263,9 @@ and the defaults are what the committed examples use.
 | `--output-pupil-maps` | off | Additionally measure and draw which part of each field's pupil the lens passes, and which surface blocks the rest. See below. |
 | `--pupil-map-samples <n>` | 121 | Samples per axis in a pupil map. Only consulted with `--output-pupil-maps`. Minimum 2. |
 | `--output-ray-aberration-plots` | off | Additionally emit transverse ray aberration **and** wavefront (OPD) fan plots, tangential and sagittal, for each field. |
-| `--assign-glass-types` | off | Match each surface's nd and vd to a catalog glass before analysing, so the model uses the full dispersion curve instead of a two number approximation. Applies to this run only. |
-| `--index-line <d\|e>` | `d` | Which line the prescription's refractive index column is quoted at, for `--assign-glass-types`. See below. |
+| `--assign-glass-types` | off | Match each surface's refractive index and Abbe number to a catalog glass before analysing, so the model uses the full dispersion curve instead of a two number approximation. Applies to this run only. |
+| `--index-line <d\|e>` | `d` | Line the refractive index column is quoted at, for `--assign-glass-types`. See below. |
+| `--abbe-line <d\|e>` | `d` | Line the Abbe number column is quoted at. Independent of `--index-line`. |
 | `--force` | off | With `--assign-glass-types`, re-match surfaces that already name a recognised glass. |
 | `--update-specfile` | off | With `--assign-glass-types`, also write the matched prescription back over the input file. Refused on its own. |
 | `--optimize` | off | Run the routine airspace optimization before reporting: the back focus on a prime, the other variable airspaces on a zoom. See below. |
@@ -504,8 +505,6 @@ not configurable.
 * **Configurations are chosen in the file, not on the command line.** The
   `scenarios` row of `[report data]` selects them; the tool then loops over all
   of them in one run. There is no command line option to report on just one.
-* **`--outdir` does not move the Zemax file.** Every other output honours it,
-  but the `.zmx` is always written next to the spec file.
 * **`--vig-type` does not reach the layout diagrams.** They are always built
   with `SetPupil`; the option only affects the model used for spot, MTF and
   aberration analysis.
@@ -548,9 +547,12 @@ glasses are used for **that run only** and the input file is left untouched; add
 `--update-specfile` to write them back. `--force` re-matches surfaces that
 already name a glass.
 
-Resolve glass-matching problems before optimizing. If most surfaces are ambiguous
-or unmatched, check
-[When the index is quoted at the e line](#when-the-index-is-quoted-at-the-e-line).
+Resolve glass-matching problems before optimizing. Most patents specify using
+nd/vd but Leica always uses ne/ve. Some patents appear to erroneously
+prescribe ne/vd.
+
+If you are working with Leica patents then always specify `--index-line e
+--abbe-line e`. See also [When the index is not quoted at the d line](#when-the-index-is-not-quoted-at-the-d-line).
 
 Where several catalog glasses fit within tolerance and none is an exact match,
 the surface is left without a glass and `candidate=...` fields are appended to
@@ -563,32 +565,49 @@ index and vd, and the catalogs are searched in priority order, so an Ohara
 S-FPL51 may come back as the equivalent Hoya FCD1. That is the same glass
 optically, not a mismatch.
 
-#### When the index is quoted at the e line
+#### When the index is not quoted at the d line
 
-Most prescriptions quote the refractive index at the **d** line, and that is what
-matching assumes. Some patents instead tabulate it at the **e** line, 546.07 nm,
-while still quoting the Abbe number as vd. Matching these against d-line indices
-can leave most surfaces ambiguous or unmatched. A few unmatched surfaces may
-instead indicate obsolete or in-house glasses.
+Most prescriptions quote the refractive index as nd and the Abbe number as vd,
+and that is what matching assumes. Not all do, and the two columns vary
+independently, so they are selected independently:
 
-Signs of an index-line mismatch include failures concentrated among high-index,
-low-Abbe glasses and candidate indices consistently below the file's values.
-For example, on the Sony FE 14mm F1.8 GM:
-
-| Matching | Result |
+| Option | Meaning |
 | --- | --- |
-| d line, the default | `Assigned 0 glass types; 9 ambiguous; 5 unmatched` |
-| `--index-line e` | `Assigned 14 glass types; 0 ambiguous; 0 unmatched` |
+| `--index-line d` *(default)* | The index column is nd. |
+| `--index-line e` | The index column is ne, at 546.07 nm. |
+| `--abbe-line d` *(default)* | The Abbe column is vd. |
+| `--abbe-line e` | The Abbe column is ve. |
 
-`--index-line e` matches the index against ne instead. The Abbe number is still
-matched as vd, since that is what these files quote.
+Two combinations turn up in practice, and they have different causes:
+
+* **ne with ve.** A house convention - Leica patents quote
+  the pair throughout. Use `--index-line e --abbe-line e`.
+* **ne with vd.** Usually a transcription error in a patent rather than
+  anything systematic. Try `--index-line e` alone.
+
+Examples:
+
+| Lens | nd/vd | ne/vd | ne/ve |
+| --- | --- | --- | --- |
+| Leica R Elmarit 28mm f2.8 | 0 assigned | 0 assigned | **8 of 8** |
+| Leica R APO 280mm f2.8 | 0 assigned | - | **8 of 8** |
+| Sony FE 14mm F1.8 GM | 0 assigned | **14 of 14** | 0 assigned |
 
 ```bash
-java -jar rayoptics/target/lenstool.jar --specfile input.txt --assign-glass-types --index-line e
+java -jar rayoptics/target/lenstool.jar --specfile input.txt --assign-glass-types \
+     --index-line e --abbe-line e
 ```
 
-When it assigns a glass this way it also **rewrites the index and Abbe columns to
-the catalog's d line values**, so later imports use the correct convention.
+Whenever either column is at the e line, an assigned surface has its index and
+Abbe columns **rewritten to the catalog's d line values**, so the file is left
+consistently on the d line rather than half converted.
+
+#### When no pairing helps
+
+Be aware that sometimes patents are obfuscated and do not specify exact glass types.
+For such patents, it is necessary to manually select glasses and the patent
+may also need full reoptimization. You can look at the suggested `candidate=`
+glass types.
 
 The same matching is available standalone, which is useful when you only want to
 enrich a file:

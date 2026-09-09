@@ -103,7 +103,7 @@ public class LensTool2 {
         if (!arguments.assign_glass_types)
             return text;
         var result = GlassFinder.enrich(text, arguments.force,
-                arguments.index_line_value());
+                arguments.index_line_value(), arguments.abbe_line_value());
         System.out.printf("Assigned %d glass types; %d ambiguous; %d unmatched%n",
                 result.selected(), result.ambiguous(), result.unmatched());
         if (result.ambiguous() > 0)
@@ -565,10 +565,11 @@ public class LensTool2 {
             System.err.println("       [--output-ray-aberration-plots] [--output-wavelength-mtfs] [--auto-size-spot-diagrams] \\");
             System.err.println("       [--use-spot-pattern " + Args.spot_pattern_names() + "] [--spot-grid-size count] [--vig-type " + Args.vig_type_names() + "] \\");
             System.err.println("       [--real-ray-aiming|--paraxial-ray-aiming] [--mtf freq,freq,...] \\");
-            System.err.println("       [--assign-glass-types [--index-line d|e] [--force] [--update-specfile]] [--optimize [--optimize-goal contrast|mtf] | --optimize trial]");
+            System.err.println("       [--assign-glass-types [--index-line d|e] [--abbe-line d|e] [--force] [--update-specfile]] [--optimize [--optimize-goal contrast|mtf] | --optimize trial]");
             System.err.println("       --assign-glass-types matches each surface's nd/vd to a catalog glass for this run;");
             System.err.println("         --force re-matches surfaces that already name a glass, --update-specfile writes the result back to the specfile");
             System.err.println("         --index-line e when the prescription quotes the refractive index at the e line rather than the d line");
+            System.err.println("         --abbe-line e  when it also quotes the Abbe number as ve; Leica patents use ne with ve, ne with vd is usually an error");
             System.err.println("       --optimize varies the back focus on a prime, or the other variable airspaces on a zoom, at the central field");
             System.err.println("       --optimize-goal defaults to contrast; mtf uses the geometric MTF directly, which stalls more easily");
             System.err.println("       --optimize n runs the specfile's [trial n] section, writes the result as <specfile>-trial<n>.txt and reports on it");
@@ -610,7 +611,13 @@ public class LensTool2 {
             String prescription_output = prescription.to_opt_bench_str(new StringBuilder()).toString();
             Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile, "prescription.txt", arguments.outdir), prescription_output);
             ZemaxExporter zemaxExporter = new ZemaxExporter();
-            Helper.createOutputFile(Helper.getOutputPathChangeExt(arguments.specfile, ".zmx"), zemaxExporter.generate(prescription, arguments.only_d_line));
+            // Named from the specfile but placed like every other output, so that
+            // --outdir keeps the whole report together and a run cannot write over
+            // a Zemax file sitting beside the input.
+            String zmxName = Helper.replaceExtension(Helper.getFilename(arguments.specfile), ".zmx");
+            Helper.createOutputFile(
+                    Helper.getOutputFileWithPath(arguments.specfile, zmxName, arguments.outdir),
+                    zemaxExporter.generate(prescription, arguments.only_d_line));
             StringBuilder SB = startREADME(prescription);
             var prescriptionForWeightedMTF = createWeightedPrescription(prescription, arguments.only_d_line);
             for (int config = 0; config < Math.max(prescription.get_num_configurations(),1); config++) {

@@ -22,7 +22,7 @@ public final class GlassFinder {
     public record EnrichmentResult(String text, int selected, int ambiguous, int unmatched) {}
 
     public static EnrichmentResult enrich(String input, boolean force) {
-        return enrich(input, force, Glass.IndexLine.D);
+        return enrich(input, force, Glass.IndexLine.D, Glass.IndexLine.D);
     }
 
     /**
@@ -33,6 +33,20 @@ public final class GlassFinder {
      *             is left consistently on the d line rather than half converted.
      */
     public static EnrichmentResult enrich(String input, boolean force, Glass.IndexLine indexLine) {
+        return enrich(input, force, indexLine, Glass.IndexLine.D);
+    }
+
+    /**
+     * @param indexLine which line the refractive index column is quoted at
+     * @param abbeLine  which line the Abbe number column is quoted at. The two are
+     *                  independent: Leica quotes ne with ve, whereas ne paired with
+     *                  vd turns up as a transcription slip. Whenever either is the e
+     *                  line, a matched surface has its index and Abbe columns
+     *                  rewritten to the catalog's d line values, so the file is left
+     *                  consistently on the d line rather than half converted.
+     */
+    public static EnrichmentResult enrich(String input, boolean force,
+                                          Glass.IndexLine indexLine, Glass.IndexLine abbeLine) {
         String newline = input.contains("\r\n") ? "\r\n" : "\n";
         boolean endsWithNewline = input.endsWith("\n");
         String[] lines = input.split("\\r?\\n", -1);
@@ -74,7 +88,7 @@ public final class GlassFinder {
                 continue;
             }
 
-            List<Glass.GlassMatch> matches = Glass.find_glasses(nd, vd, indexLine);
+            List<Glass.GlassMatch> matches = Glass.find_glasses(nd, vd, indexLine, abbeLine);
             if (matches.isEmpty()) {
                 unmatched++;
                 output.add(line);
@@ -89,7 +103,7 @@ public final class GlassFinder {
                 fields = ensureLength(fields, 8);
                 fields[6] = glass.label;
                 fields[7] = glass.catalog_name;
-                if (indexLine == Glass.IndexLine.E) {
+                if (indexLine == Glass.IndexLine.E || abbeLine == Glass.IndexLine.E) {
                     // The columns held ne and vd; restate them at the d line so
                     // that anything reading this file without knowing the
                     // original convention still gets the right medium.
@@ -177,14 +191,15 @@ public final class GlassFinder {
             output = Helper.getOutputFileWithPath(arguments.specfile,"specs.txt",null);
 
         EnrichmentResult result = enrich(Files.readString(input), arguments.force,
-                arguments.index_line_value());
+                arguments.index_line_value(), arguments.abbe_line_value());
         Files.writeString(output, result.text());
         System.out.printf("Selected %d glass types; %d ambiguous; %d unmatched%n",
                 result.selected(), result.ambiguous(), result.unmatched());
     }
 
     private static void usage() {
-        System.err.println("Usage: GlassFinder --specfile input.txt -o output.txt [--index-line d|e] [--force]");
+        System.err.println("Usage: GlassFinder --specfile input.txt -o output.txt [--index-line d|e] [--abbe-line d|e] [--force]");
         System.err.println("       --index-line e when the prescription quotes the refractive index at the e line");
+        System.err.println("       --abbe-line e  when it also quotes the Abbe number as ve, as Leica patents do");
     }
 }

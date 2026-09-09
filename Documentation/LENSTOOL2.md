@@ -533,8 +533,9 @@ Only if the steps above fail. Changing curvatures means you are no longer
 reproducing the patent but redesigning from it, so it is the last resort rather
 than the first tool to reach for.
 
-Steps 2 to 4 use the optimizer, which is a Java API and has no command line
-front end; see [OPTIMIZER.md](OPTIMIZER.md).
+Beyond what `--optimize` covers, these steps mean driving the optimizer through
+its Java API - `OptimizationBuilder` - as there is no command line front end for
+varying curvatures or aspherics.
 
 ### Silent failures to rule out first
 

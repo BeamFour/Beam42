@@ -101,6 +101,9 @@ coefficients and therefore the surface shape. The generated `prescription.txt`
 recreates the applicable aspheric constant; other constants are not carried
 through unchanged.
 
+See [Aspheric coefficient ordering in the outputs](#aspheric-coefficient-ordering-in-the-outputs)
+for how README and Zemax coefficient lists differ from this input convention.
+
 ### `[variable distances]`
 
 Each row is a name followed by one value per configuration. Three are
@@ -326,6 +329,27 @@ spec with multiple configurations (a zoom, for instance).
 | `mtf-fld<i>-<wavelength><suffix>.svg` | `--output-wavelength-mtfs` | Monochromatic MTF per field and wavelength. |
 | `rayabbr-fld<i>-{tan,sag}<suffix>.svg` | `--output-ray-aberration-plots` | Transverse ray aberration fans. |
 | `opdabbr-fld<i>-{tan,sag}<suffix>.svg` | `--output-ray-aberration-plots` | Wavefront (OPD) fans. |
+
+### Aspheric coefficient ordering in the outputs
+
+The Zemax file and the generated README's **Aspherical Data** table include the
+full coefficient array, with zeros in unused leading positions. Optical Bench
+input and the generated `prescription.txt` omit those positions:
+
+| Type | Optical Bench / `prescription.txt` coefficient sequence | Zemax parameters / README `P1`, `P2`, ... |
+| --- | --- | --- |
+| `EVEN` | `a, b, ...` | `0, a, b, ...` |
+| `EVEN A2` | `a, b, ...` | `a, b, ...` |
+| `ODD` | `a, b, ...` | `0, 0, a, b, ...` |
+
+Here `a` and `b` stand for the first two supplied polynomial coefficients,
+after the radius and conic constant in an Optical Bench aspheric row. The
+leading zeros are restored on import and omitted again when writing
+`prescription.txt`; they do not represent a change to the surface. Do not copy
+the full README or Zemax sequence into `[aspherical data]` without removing the
+unused leading positions for the selected type. The README labels both even
+variants as `EVEN`, and also pads shorter rows with trailing zeros to align the
+table columns.
 
 ### Routine optimization
 

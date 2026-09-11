@@ -97,15 +97,6 @@ public class Transform3 {
     }
 
     /**
-     * Create an inverse of the transform
-     */
-    public final Transform3 inverse() {
-        Matrix3 rotation_matrix = this.rotation_matrix.inverse();
-        Vector3 translation = rotation_matrix.multiply(this.translation.negate());
-        return new Transform3(translation, rotation_matrix, true);
-    }
-
-    /**
      * Rotate by x, y, and z axis.
      *
      * @param v Vector with angles per axis

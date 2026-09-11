@@ -1,6 +1,5 @@
 package org.redukti.optim;
 
-import org.redukti.mathlib.LMLSolver;
 import org.redukti.mathlib.M;
 import org.redukti.mathlib.MinPack;
 
@@ -8,7 +7,12 @@ import java.util.Arrays;
 
 public class LMDerMeritFunction implements MinPack.Lmder_Function {
 
-    private static final double BIGVAL = LMLSolver.BIGVAL;
+    /**
+     * Residual reported for a goal that cannot be evaluated (a killed ray,
+     * a NaN, an exception in the analysis). Large enough that lmder rejects
+     * the trial step; goals and tests compare against it directly.
+     */
+    public static final double BIGVAL = 9.876543e+99;
     private static final int MAX_JACOBIAN_STEP_REDUCTIONS = 8;
 
     private double weights[];

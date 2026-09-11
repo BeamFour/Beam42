@@ -18,7 +18,7 @@ package org.redukti.optim;
  * has 0.1mm air gaps beside 39mm ones, and surfaces at r=14 beside r=2009. An absolute
  * residual would effectively freeze the small ones and ignore the large.
  *
- * <p>Deliberately never reports {@link org.redukti.mathlib.LMLSolver#BIGVAL}. A goal like
+ * <p>Deliberately never reports {@link LMDerMeritFunction#BIGVAL}. A goal like
  * this exists to steer the solver, not to end the run, and a single BIGVAL raised during
  * a Jacobian probe step aborts the whole solve.
  */

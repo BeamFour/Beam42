@@ -1,7 +1,6 @@
 package org.redukti.optim;
 
 import org.redukti.rayoptics.util.Orientation;
-import org.redukti.mathlib.LMLSolver;
 
 /** One signed, Gaussian-weighted image-plane ray deviation for RMS spot optimization. */
 public class GoalSpotDeviation extends Goal {
@@ -27,13 +26,13 @@ public class GoalSpotDeviation extends Goal {
     @Override
     public double value() {
         if (_analysis._spots == null || _field >= _analysis._spots.length)
-            return LMLSolver.BIGVAL;
+            return LMDerMeritFunction.BIGVAL;
         var field = _analysis._spots[_field];
         if (field == null || _wavelength_index >= field.intercepts.size())
-            return LMLSolver.BIGVAL;
+            return LMDerMeritFunction.BIGVAL;
         var intercepts = field.intercepts.get(_wavelength_index);
         if (_sample_index >= intercepts.x.length || !intercepts.valid[_sample_index])
-            return LMLSolver.BIGVAL;
+            return LMDerMeritFunction.BIGVAL;
         double deviation = _orientation == Orientation.X
                 ? intercepts.x[_sample_index] : intercepts.y[_sample_index];
         // SpotAnalysis stores system units (normally mm); public spot radii and

@@ -1,20 +1,10 @@
-/* Code derived from https://github.com/jvanverth/essentialmath */
-// Portions Copyright 2017-2025 Michael J. Hayford
+// Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 
 package org.redukti.mathlib;
 
-/**
- * Column major 3d matrix where
- *
- * <pre>
- *    0=m00 3=m01 6=m02
- *    1=m10 4=m11 7=m12
- *    2=m20 5=m21 8=m22
- * </pre>
- */
-
+/** A 3x3 matrix; mRC is the element at row R, column C. */
 public class Matrix3 {
 
     public static final Matrix3 IDENTITY = Matrix3.identity();
@@ -63,37 +53,6 @@ public class Matrix3 {
                 0.0, y, 0.0,
                 0.0, 0.0, z
         );
-    }
-
-    public Matrix3 inverse() {
-        // compute determinant
-        double cofactor0 = m11 * m22 - m21 * m12;
-        double cofactor3 = m20 * m12 - m10 * m22;
-        double cofactor6 = m10 * m21 - m20 * m11;
-        double det = m00 * cofactor0 + m01 * cofactor3 + m02 * cofactor6;
-
-        if (M.isZero(det)) {
-            throw new RuntimeException("Determinant is 0; singular matrix");
-        }
-
-        // create adjoint matrix and multiply by 1/det to get inverse
-        double invDet = 1.0f / det;
-        double n00 = invDet * cofactor0;
-        double n10 = invDet * cofactor3;
-        double n20 = invDet * cofactor6;
-
-        double n01 = invDet * (m21 * m02 - m01 * m22);
-        double n11 = invDet * (m00 * m22 - m20 * m02);
-        double n21 = invDet * (m20 * m01 - m00 * m21);
-
-        double n02 = invDet * (m01 * m12 - m11 * m02);
-        double n12 = invDet * (m10 * m02 - m00 * m12);
-        double n22 = invDet * (m00 * m11 - m10 * m01);
-
-        return new Matrix3(
-                n00, n01, n02,
-                n10, n11, n12,
-                n20, n21, n22);
     }
 
     public Matrix3 transpose() {
@@ -152,42 +111,6 @@ public class Matrix3 {
         return to_rotation_matrix(q);
     }
 
-//    /**
-//     * Create rotation matrix
-//     *
-//     * @param zRotation degree in radians
-//     * @param yRotation degree in radians
-//     * @param xRotation degree in radians
-//     * @return Rotation matrix
-//     */
-//    public static Matrix3 rotation(double zRotation, double yRotation, double xRotation) {
-//        double Cx = Math.cos(xRotation);
-//        double Sx = Math.sin(xRotation);
-//
-//        double Cy = Math.cos(yRotation);
-//        double Sy = Math.sin(yRotation);
-//
-//        double Cz = Math.cos(zRotation);
-//        double Sz = Math.sin(zRotation);
-//
-//        double n00 = (Cy * Cz);
-//        double n01 = -(Cy * Sz);
-//        double n02 = Sy;
-//
-//        double n10 = (Sx * Sy * Cz) + (Cx * Sz);
-//        double n11 = -(Sx * Sy * Sz) + (Cx * Cz);
-//        double n12 = -(Sx * Cy);
-//
-//        double n20 = -(Cx * Sy * Cz) + (Sx * Sz);
-//        double n21 = (Cx * Sy * Sz) + (Sx * Cz);
-//        double n22 = (Cx * Cy);
-//
-//        return new Matrix3(
-//                n00, n01, n02,
-//                n10, n11, n12,
-//                n20, n21, n22);
-//    }
-
     public static Matrix3 euler2mat(double roll_angle, double pitch_angle, double yaw_angle) {
         double si = Math.sin(roll_angle),
                 sj = Math.sin(pitch_angle),
@@ -238,72 +161,6 @@ public class Matrix3 {
      */
     public static Matrix3 euler2mat_rxyz(Vector3 euler) {
         return euler2mat(euler.negate()).transpose();
-    }
-
-    /**
-     * rotate around vert axis
-     */
-    public static Matrix3 yaw(double angle) {
-        double sine_theta = Math.sin(angle),
-                cos_theta = Math.cos(angle);
-
-        double n00 = cos_theta;
-        double n10 = sine_theta;
-        double n20 = 0.0f;
-        double n01 = -sine_theta;
-        double n11 = cos_theta;
-        double n21 = 0.0f;
-        double n02 = 0.0f;
-        double n12 = 0.0f;
-        double n22 = 1.0f;
-        return new Matrix3(
-                n00, n01, n02,
-                n10, n11, n12,
-                n20, n21, n22);
-    }
-
-    /**
-     * rotate around sideways axis - i.e. tilt
-     */
-    public static Matrix3 pitch(double angle) {
-        double sine_theta = Math.sin(angle),
-                cos_theta = Math.cos(angle);
-
-        double n00 = cos_theta;
-        double n10 = 0.0f;
-        double n20 = -sine_theta;
-        double n01 = 0.0f;
-        double n11 = 1.0f;
-        double n21 = 0.0f;
-        double n02 = sine_theta;
-        double n12 = 0.0f;
-        double n22 = cos_theta;
-        return new Matrix3(
-                n00, n01, n02,
-                n10, n11, n12,
-                n20, n21, n22);
-    }
-
-    /**
-     * Rotate around forward axis, i.e. turn
-     */
-    public static Matrix3 roll(double angle) {
-        double sine_theta = Math.sin(angle),
-                cos_theta = Math.cos(angle);
-
-        double n00 = 1.0f;
-        double n10 = 0.0f;
-        double n20 = 0.0f;
-        double n01 = 0.0f;
-        double n11 = cos_theta;
-        double n21 = sine_theta;
-        double n02 = 0.0f;
-        double n12 = -sine_theta;
-        double n22 = cos_theta;
-        return new Matrix3(
-                n00, n01, n02,
-                n10, n11, n12,
-                n20, n21, n22);
     }
 
     /** Get rotation matrix for rotation about axis.

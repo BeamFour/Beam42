@@ -1,7 +1,6 @@
 package org.redukti.optim;
 
 import org.junit.jupiter.api.Test;
-import org.redukti.mathlib.LMLSolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -110,7 +109,7 @@ class LMDerMeritFunctionTest {
 
         @Override
         public double value() {
-            return analysis.valid ? analysis.value * analysis.value : LMLSolver.BIGVAL;
+            return analysis.valid ? analysis.value * analysis.value : LMDerMeritFunction.BIGVAL;
         }
     }
 }

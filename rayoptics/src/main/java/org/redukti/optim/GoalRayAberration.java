@@ -1,7 +1,6 @@
 package org.redukti.optim;
 
 import org.redukti.rayoptics.util.Orientation;
-import org.redukti.mathlib.LMLSolver;
 import org.redukti.rayoptics.util.Lists;
 
 /**
@@ -31,9 +30,9 @@ public class GoalRayAberration extends Goal {
             var result = Lists.get(fans.fan_y, _pos);
             return result != null && Double.isFinite(result)
                     ? result
-                    : LMLSolver.BIGVAL;
+                    : LMDerMeritFunction.BIGVAL;
         }
-        return LMLSolver.BIGVAL;
+        return LMDerMeritFunction.BIGVAL;
     }
 
     @Override

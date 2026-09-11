@@ -1,6 +1,5 @@
 package org.redukti.optim;
 
-import org.redukti.mathlib.LMLSolver;
 
 /**
  * Holds sagittal and tangential contrast in balance at one field and frequency.
@@ -98,11 +97,11 @@ public class GoalContrastBalance extends Goal {
     @Override
     public double value() {
         if (_analysis._contrasts == null || _contrast_index >= _analysis._contrasts.length)
-            return LMLSolver.BIGVAL;
+            return LMDerMeritFunction.BIGVAL;
         var contrast = _analysis._contrasts[_contrast_index];
-        if (contrast == null || _field >= contrast.fields.size()) return LMLSolver.BIGVAL;
+        if (contrast == null || _field >= contrast.fields.size()) return LMDerMeritFunction.BIGVAL;
         var wavelengths = contrast.fields.get(_field).wavelengths();
-        if (wavelengths.size() > _wavelength_weights.length) return LMLSolver.BIGVAL;
+        if (wavelengths.size() > _wavelength_weights.length) return LMDerMeritFunction.BIGVAL;
 
         double difference = 0.0;
         boolean sampled = false;
@@ -122,7 +121,7 @@ public class GoalContrastBalance extends Goal {
             difference += _wavelength_weights[wi]
                     * (_sagittal_weight * sagittal - _tangential_weight * tangential);
         }
-        if (!sampled || !Double.isFinite(difference)) return LMLSolver.BIGVAL;
+        if (!sampled || !Double.isFinite(difference)) return LMDerMeritFunction.BIGVAL;
         return difference;
     }
 

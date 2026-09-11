@@ -1,7 +1,6 @@
 package org.redukti.optim;
 
 import org.redukti.rayoptics.util.Orientation;
-import org.redukti.mathlib.LMLSolver;
 
 /** A single weighted pupil phase-difference residual for contrast optimization. */
 public class GoalContrast extends Goal {
@@ -36,15 +35,15 @@ public class GoalContrast extends Goal {
     @Override
     public double value() {
         if (_analysis._contrasts == null || _contrast_index >= _analysis._contrasts.length)
-            return LMLSolver.BIGVAL;
+            return LMDerMeritFunction.BIGVAL;
         var contrast = _analysis._contrasts[_contrast_index];
-        if (contrast == null) return LMLSolver.BIGVAL;
-        if (_field >= contrast.fields.size()) return LMLSolver.BIGVAL;
+        if (contrast == null) return LMDerMeritFunction.BIGVAL;
+        if (_field >= contrast.fields.size()) return LMDerMeritFunction.BIGVAL;
         var wavelengths = contrast.fields.get(_field).wavelengths();
-        if (_wavelength_index >= wavelengths.size()) return LMLSolver.BIGVAL;
+        if (_wavelength_index >= wavelengths.size()) return LMDerMeritFunction.BIGVAL;
         var wavelength = wavelengths.get(_wavelength_index);
-        if (_sample_index >= wavelength.samples().size()) return LMLSolver.BIGVAL;
-        if (!wavelength.samples().get(_sample_index).valid()) return LMLSolver.BIGVAL;
+        if (_sample_index >= wavelength.samples().size()) return LMDerMeritFunction.BIGVAL;
+        if (!wavelength.samples().get(_sample_index).valid()) return LMDerMeritFunction.BIGVAL;
         // Read through the block rather than the sample: the residual carries the block's
         // constant offset, which is zero unless residual centering is enabled.
         return _orientation == Orientation.SAGITTAL

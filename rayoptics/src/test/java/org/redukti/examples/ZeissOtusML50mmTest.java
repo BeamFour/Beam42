@@ -138,7 +138,7 @@ class ZeissOtusML50mmTest {
         double initialRms = meritFunction.getRMS();
         long invalidContrastGoals = java.util.Arrays.stream(setup.goals())
                 .filter(org.redukti.optim.GoalContrast.class::isInstance)
-                .filter(goal -> goal.value() >= org.redukti.mathlib.LMLSolver.BIGVAL)
+                .filter(goal -> goal.value() >= org.redukti.optim.LMDerMeritFunction.BIGVAL)
                 .count();
         assertEquals(0, invalidContrastGoals, "Initial contrast sampling contains failed rays");
         long started = System.nanoTime();

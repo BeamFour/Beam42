@@ -5,7 +5,6 @@ import org.redukti.importers.obench.ObenchFetcher;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.mathlib.M;
 import org.redukti.optim.OptimizationTrial;
-import org.redukti.optim.OptimizedPrescriptionWriter;
 import org.redukti.optim.Var;
 import org.redukti.plotter.GeoMTFByFieldPlot;
 import org.redukti.plotter.GeoMTFPlot;
@@ -421,7 +420,7 @@ public class LensTool2 {
         for (int i = 0; i < variables.length; i++)
             System.out.println("  " + trial.describe(variables[i]) + ": " + start[i]
                     + " -> " + variables[i].get_unscaled_value());
-        String optimized = OptimizedPrescriptionWriter.write(specText, prescription, variables);
+        String optimized = trial.optimizedPrescription(prescription);
         Path specDirectory = Path.of(arguments.specfile).toAbsolutePath().getParent();
         Path directory = arguments.outdir != null ? Path.of(arguments.outdir)
                 : trial.outdir() != null ? specDirectory.resolve(trial.outdir())

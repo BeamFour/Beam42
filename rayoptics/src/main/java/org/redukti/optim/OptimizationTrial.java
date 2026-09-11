@@ -55,8 +55,8 @@ public final class OptimizationTrial {
         PARAXIAL_QUANTITIES.put("opt-inv", ParaxHelper.Optical_invariant);
     }
 
-    /** A [lens data] row as the prescription reader sees it. */
-    private record LensRow(String label, String radius, String thickness) {}
+    /** A [lens data] row; only its radius column matters here, to recognise the stops. */
+    private record LensRow(String radius) {}
 
     /** Values given one per field, kept with their line until the field count is known. */
     private record PerField(double[] values, int line) {}
@@ -84,6 +84,7 @@ public final class OptimizationTrial {
     private final int number;
     private final List<LensRow> lensRows;
     private final int fileAsphereType;
+    private final String section;
     private final Set<String> seen = new HashSet<>();
 
     private String description;
@@ -133,10 +134,11 @@ public final class OptimizationTrial {
     private boolean rayAberrations;
     private final List<ParaxialGoal> paraxialGoals = new ArrayList<>();
 
-    private OptimizationTrial(int number, List<LensRow> lensRows, int fileAsphereType) {
+    private OptimizationTrial(int number, List<LensRow> lensRows, int fileAsphereType, String section) {
         this.number = number;
         this.lensRows = lensRows;
         this.fileAsphereType = fileAsphereType;
+        this.section = section;
     }
 
     // ------------------------------------------------------------------
@@ -151,8 +153,8 @@ public final class OptimizationTrial {
     public static OptimizationTrial parse(String text, int number) {
         String[] lines = text.split("\\r?\\n", -1);
 
-        // The lens data as the prescription reader sees it: it decides which surface a
-        // trial's surface names refer to.
+        // The lens data as the prescription reader sees it: a trial's surface numbers are
+        // positions in it.
         List<LensRow> lensRows = new ArrayList<>();
         boolean odd = false, a2 = false;
         String section = null;
@@ -165,7 +167,7 @@ public final class OptimizationTrial {
                 continue;
             }
             if ("[lens data]".equals(section) && words.length >= 2)
-                lensRows.add(new LensRow(words[0], words[1], words.length >= 3 ? words[2] : ""));
+                lensRows.add(new LensRow(words[1]));
             else if ("[constants]".equals(section)) {
                 if (words[0].equals("AsphericalOddCount"))
                     odd = true;
@@ -180,6 +182,7 @@ public final class OptimizationTrial {
         Map<Integer, Integer> headers = new TreeMap<>();
         List<Integer> trialLines = new ArrayList<>();
         boolean inTrial = false;
+        int start = -1;
         for (int i = 0; i < lines.length; i++) {
             String trimmed = lines[i].trim();
             if (trimmed.startsWith("[")) {
@@ -192,6 +195,8 @@ public final class OptimizationTrial {
                         throw new TrialException("[trial " + found + "] is defined twice, at lines "
                                 + earlier + " and " + (i + 1));
                     inTrial = found == number;
+                    if (inTrial)
+                        start = i;
                 }
                 else if (trimmed.toLowerCase(Locale.ROOT).startsWith("[trial"))
                     throw new TrialException("line " + (i + 1) + ": expected [trial <number>], found "
@@ -207,7 +212,14 @@ public final class OptimizationTrial {
                     : "it defines " + (headers.size() == 1 ? "trial " : "trials ")
                     + String.join(", ", headers.keySet().stream().map(String::valueOf).toList())));
 
-        var trial = new OptimizationTrial(number, lensRows, asphereType);
+        // The section's own text, header to last non-blank line, to carry into the output.
+        int end = start;
+        for (int i = start + 1; i < lines.length && !lines[i].trim().startsWith("["); i++)
+            if (!lines[i].trim().isEmpty())
+                end = i;
+        String sectionText = String.join("\n", Arrays.copyOfRange(lines, start, end + 1));
+
+        var trial = new OptimizationTrial(number, lensRows, asphereType, sectionText);
         for (int i : trialLines)
             trial.read(i + 1, lines[i]);
         trial.finish();
@@ -286,53 +298,60 @@ public final class OptimizationTrial {
         switch (lower(w[1])) {
             case "curvatures" -> {
                 once(line, "vary curvatures");
-                curvatures = selection(line, w, false);
+                curvatures = selection(line, w, true);
             }
             case "thicknesses" -> {
                 once(line, "vary thicknesses");
-                thicknesses = selection(line, w, true);
+                thicknesses = selection(line, w, false);
             }
             case "aspherics" -> aspherics(line, w);
             default -> throw error(line, "cannot vary '" + w[1] + "'; expected curvatures, thicknesses or aspherics");
         }
     }
 
-    private Selection selection(int line, String[] w, boolean thickness) {
+    private Selection selection(int line, String[] w, boolean curvature) {
         if (lower(w[2]).equals("all")) {
             if (w.length == 3)
                 return new Selection(SelectionKind.ALL, new int[0]);
             if (w.length > 4 && lower(w[3]).equals("except"))
-                return new Selection(SelectionKind.ALL_EXCEPT, surfaces(line, w, 4, thickness, false));
+                return new Selection(SelectionKind.ALL_EXCEPT, surfaces(line, w, 4, false));
             throw error(line, "expected 'all' or 'all except <surfaces>'");
         }
-        return new Selection(SelectionKind.LIST, surfaces(line, w, 2, thickness, !thickness));
+        return new Selection(SelectionKind.LIST, surfaces(line, w, 2, curvature));
     }
 
-    private int[] surfaces(int line, String[] w, int from, boolean thickness, boolean curvature) {
+    private int[] surfaces(int line, String[] w, int from, boolean curvature) {
         int[] result = new int[w.length - from];
         Set<Integer> unique = new HashSet<>();
         for (int i = from; i < w.length; i++) {
-            int surface = surface(line, w[i], thickness);
+            int surface = surface(line, w[i]);
             if (!unique.add(surface))
-                throw error(line, "surface " + w[i] + " is listed twice");
+                throw error(line, "surface " + surface + " is listed twice");
             if (curvature && isStop(surface))
-                throw error(line, "surface " + w[i] + " is a stop; it has no curvature to vary");
+                throw error(line, "surface " + surface + " is a stop; it has no curvature to vary");
             result[i - from] = surface;
         }
         return result;
     }
 
-    /** Index of the surface a name refers to: a [lens data] label, or for a thickness a distance name. */
-    private int surface(int line, String name, boolean thickness) {
-        for (int i = 0; i < lensRows.size(); i++)
-            if (lensRows.get(i).label().equals(name))
-                return i;
-        if (thickness)
-            for (int i = 0; i < lensRows.size(); i++)
-                if (lensRows.get(i).thickness().equals(name) && isDistanceName(name))
-                    return i;
-        throw error(line, "there is no surface '" + name + "' in [lens data]"
-                + (thickness ? " and no such distance" : ""));
+    /**
+     * A surface number: the row's position in [lens data], counting from 0 as
+     * {@link OptimizationBuilder} does. The ids in the file's first column are not used;
+     * they need not be numbers, nor in order.
+     */
+    private int surface(int line, String value) {
+        int surface;
+        try {
+            surface = Integer.parseInt(value);
+        }
+        catch (NumberFormatException e) {
+            throw error(line, "expected a surface number, found '" + value
+                    + "'; surfaces are numbered by their position in [lens data], from 0");
+        }
+        if (surface < 0 || surface >= lensRows.size())
+            throw error(line, "there is no surface " + value + "; [lens data] has surfaces 0 to "
+                    + (lensRows.size() - 1));
+        return surface;
     }
 
     private boolean isStop(int surface) {
@@ -348,10 +367,10 @@ public final class OptimizationTrial {
         }
         if (w.length < 4)
             throw error(line, "expected 'vary aspherics existing' or 'vary aspherics <surface> <terms>'");
-        int surface = surface(line, w[2], false);
-        once(line, "vary aspherics " + w[2]);
+        int surface = surface(line, w[2]);
+        once(line, "vary aspherics " + surface);
         if (isStop(surface))
-            throw error(line, "surface " + w[2] + " is a stop; it cannot be aspheric");
+            throw error(line, "surface " + surface + " is a stop; it cannot be aspheric");
         List<Term> terms = new ArrayList<>();
         Set<Integer> powers = new HashSet<>();
         for (int i = 3; i < w.length; i++) {
@@ -877,7 +896,7 @@ public final class OptimizationTrial {
             else {
                 double h = surface._diameter / 2.0;
                 if (!(h > 0.0))
-                    throw error(row.line(), "surface " + lensRows.get(row.surface()).label()
+                    throw error(row.line(), "surface " + row.surface()
                             + " has no diameter to derive a scale from; give " + term.name()
                             + " a scale, as in " + term.name() + ":1e6");
                 scale = Math.pow(10.0, Math.round(term.power() * Math.log10(h)));
@@ -912,19 +931,32 @@ public final class OptimizationTrial {
     /** How a variable is named in the trial's terms, for reporting. */
     public String describe(Var variable) {
         if (variable instanceof VarRadius radius)
-            return "radius " + lensRows.get(radius._surface_id).label();
-        if (variable instanceof VarThickness thickness) {
-            String token = lensRows.get(thickness._surface_id).thickness();
-            return "thickness " + (isDistanceName(token) ? token : lensRows.get(thickness._surface_id).label());
-        }
+            return "radius " + radius._surface_id;
+        if (variable instanceof VarThickness thickness)
+            return "thickness " + thickness._surface_id;
         if (variable instanceof VarAsphK conic)
-            return "K " + lensRows.get(conic._surface_id).label();
+            return "K " + conic._surface_id;
         if (variable instanceof VarAsphCoeff coefficient) {
             int type = coefficient._prescription._surfaces[coefficient._surface_id]._asph_type;
             int power = type == SurfaceType.ASPH_ODD ? coefficient._index + 1 : 2 * (coefficient._index + 1);
-            return "A" + power + " " + lensRows.get(coefficient._surface_id).label();
+            return "A" + power + " " + coefficient._surface_id;
         }
         return variable.toString();
+    }
+
+    /** The trial's section as written in the file, from its header to its last line. */
+    public String section() {
+        return section;
+    }
+
+    /**
+     * The optimized prescription to save: the prescription as Beam42 writes it, followed
+     * by this trial, so the result can be reported on or the trial run again. Surface
+     * positions are the same in both, so the trial still refers to the same surfaces.
+     */
+    public String optimizedPrescription(Prescription prescription) {
+        return prescription.to_opt_bench_str(new StringBuilder())
+                .append('\n').append(section).append('\n').toString();
     }
 
     // ------------------------------------------------------------------
@@ -944,11 +976,6 @@ public final class OptimizationTrial {
             line = line.substring(pos + 1);
         }
         return words.toArray(new String[0]);
-    }
-
-    /** A thickness entry naming a [variable distances] row, as the prescription reader decides it. */
-    static boolean isDistanceName(String token) {
-        return !token.isEmpty() && Character.isAlphabetic(token.charAt(0));
     }
 
     private TrialException error(int line, String message) {

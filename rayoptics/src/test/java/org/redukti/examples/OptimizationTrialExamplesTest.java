@@ -118,8 +118,8 @@ class OptimizationTrialExamplesTest {
                 fields            0 0.3 0.7 1.0
                 frequencies       10 20 40
 
-                vary curvatures   all except 8 11 25
-                vary thicknesses  Bf
+                vary curvatures   all except 7 10 24
+                vary thicknesses  25
                 vary aspherics    existing
 
                 goal mtf   10 sag   93 93 94 93
@@ -143,7 +143,7 @@ class OptimizationTrialExamplesTest {
                 frequencies       10 30 50
 
                 vary curvatures   all
-                vary aspherics    1  K  A4:1e6  A6:1e9  A8:1e11  A10:1e14
+                vary aspherics    0  K  A4:1e6  A6:1e9  A8:1e11  A10:1e14
 
                 constrain curvatures
 
@@ -169,7 +169,7 @@ class OptimizationTrialExamplesTest {
                 vignetting            set-vig frozen
                 check-spot-apertures  no
 
-                vary thicknesses      d8 d15 d20
+                vary thicknesses      7 14 19
 
                 goal contrast         10 30 50
                 goal contrast         balance  all except 0 0.9 1.0   weight 1.0

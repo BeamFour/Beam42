@@ -8,7 +8,6 @@ import org.redukti.spec.SurfaceType;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,9 +15,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class OptimizationTrialTest {
 
-    /** Eleven rows: the stop is 6, surfaces 4, 8 and 10 are flat, and the back focus is named Bf. */
+    /** Eleven surfaces, 0 to 10: the stop is 5, surfaces 3, 7 and 9 are flat, and 10 the last. */
     private static final String SUMMICRON = "Examples/jfotoptix/leica-summicron-50mm-f2/US004123144_Example08P.txt";
-    /** A zoom whose second configuration is the file's scenario 2. */
+    /** Ten surfaces whose ids run 1 to 6, then the stop 6AS, then 7 to 9. */
+    private static final String FD300 = "Examples/jfotoptix/canon-fd300mm-f2.8-fluorite/US003868174_Example01P.txt";
+    /** A zoom of three scenarios, configured as 0 and 2. */
     private static final String ZOOM = "Examples/jfotoptix/canon-rf70-200mm-f2.8LZ/US20250155694_Example01P.txt";
 
     private static String withTrials(String example, String trials) throws Exception {
@@ -39,20 +40,41 @@ class OptimizationTrialTest {
             """;
 
     @Test
-    void resolvesSurfacesByTheirPrescriptionNames() throws Exception {
+    void numbersSurfacesByPosition() throws Exception {
         String text = withTrials(SUMMICRON, "[trial 1]\n" + MTF_FIVE_FIELDS + """
-                vary curvatures   all except 3 7
-                vary thicknesses  Bf 5
+                vary curvatures   all except 2 6
+                vary thicknesses  10 4
                 """);
         var trial = OptimizationTrial.parse(text, 1);
         var setup = trial.builder(prescription(text, trial)).build();
         List<String> names = Arrays.stream(setup.variables()).map(trial::describe).toList();
-        // Surfaces 4, 8 and 10 are flat and 6 is the stop, so "all" leaves them out without
+        // Surfaces 3, 7 and 9 are flat and 5 is the stop, so "all" leaves them out without
         // being told.
-        assertEquals(List.of("radius 1", "radius 2", "radius 5", "radius 9", "radius 11",
-                "thickness Bf", "thickness 5"), names);
+        assertEquals(List.of("radius 0", "radius 1", "radius 4", "radius 8", "radius 10",
+                "thickness 10", "thickness 4"), names);
         assertEquals(10, ((VarThickness) setup.variables()[5])._surface_id);
         assertEquals(4, ((VarThickness) setup.variables()[6])._surface_id);
+    }
+
+    @Test
+    void ignoresTheIdsInTheFile() throws Exception {
+        // Position 6 is the stop, although the row with id 6 is an ordinary surface.
+        assertRejected(FD300, "[trial 1]\n" + MTF_FIVE_FIELDS + "vary curvatures 6\n", "surface 6 is a stop");
+        assertRejected(FD300, "[trial 1]\n" + MTF_FIVE_FIELDS + "vary thicknesses 6AS\n",
+                "expected a surface number, found '6AS'");
+
+        String text = withTrials(FD300, "[trial 1]\n" + MTF_FIVE_FIELDS + """
+                vary curvatures   5 7
+                vary thicknesses  6 9
+                """);
+        var trial = OptimizationTrial.parse(text, 1);
+        var prescription = prescription(text, trial);
+        var variables = trial.builder(prescription).build().variables();
+        assertEquals(List.of("radius 5", "radius 7", "thickness 6", "thickness 9"),
+                Arrays.stream(variables).map(trial::describe).toList());
+        // Surface 5 is the row with id 6, and surface 6 the stop, whose gap is 30.10.
+        assertEquals(-524.3616, prescription._surfaces[5]._radius);
+        assertEquals(30.10, prescription._surfaces[6]._thickness);
     }
 
     @Test
@@ -61,7 +83,7 @@ class OptimizationTrialTest {
                 [trial 1]
                 fields        0 to 1 step 0.1
                 frequencies   20
-                vary thicknesses Bf
+                vary thicknesses 10
                 """);
         var trial = OptimizationTrial.parse(text, 1);
         var setup = trial.builder(prescription(text, trial)).build();
@@ -75,7 +97,7 @@ class OptimizationTrialTest {
                 [trial 1]
                 fields        0
                 frequencies   20
-                vary thicknesses Bf
+                vary thicknesses 10
                 goal paraxial efl 42 weight 2
                 goal paraxial bfl 30
                 """);
@@ -97,7 +119,7 @@ class OptimizationTrialTest {
     @Test
     void makesASphereAsphericWithScaledTerms() throws Exception {
         String text = withTrials(SUMMICRON, "[trial 1]\n" + MTF_FIVE_FIELDS + """
-                vary aspherics 1 K A4 A6:1e9
+                vary aspherics 0 K A4 A6:1e9
                 """);
         var trial = OptimizationTrial.parse(text, 1);
         var prescription = prescription(text, trial);
@@ -114,20 +136,12 @@ class OptimizationTrialTest {
         assertEquals(1e5, a4._scaling_factor);
         assertEquals(2, a6._index);
         assertEquals(1e9, a6._scaling_factor);
-        assertEquals(List.of("K 1", "A4 1", "A6 1"),
+        assertEquals(List.of("K 0", "A4 0", "A6 0"),
                 Arrays.stream(variables).map(trial::describe).toList());
     }
 
-    @Test
-    void writesOnlyTheVariedValues() throws Exception {
-        String text = withTrials(SUMMICRON, "[trial 1]\n" + MTF_FIVE_FIELDS + """
-                vary curvatures   1 3
-                vary thicknesses  1 Bf
-                vary aspherics    1 K A4
-                """);
-        var trial = OptimizationTrial.parse(text, 1);
-        var prescription = prescription(text, trial);
-        var variables = trial.builder(prescription).build().variables();
+    /** Moves every variable, as a solve would, and writes the result to the prescription. */
+    private static void move(Var[] variables) {
         for (Var variable : variables) {
             variable.read_from_prescription();
             double value = variable instanceof VarAsphCoeff ? 1.25e-5
@@ -136,10 +150,35 @@ class OptimizationTrialTest {
             variable.set_unscaled_value(value);
             variable.write_to_prescription();
         }
-        String written = OptimizedPrescriptionWriter.write(text, prescription, variables);
+    }
 
-        // Reads back as the optimized prescription, exactly.
-        var reread = prescription(written, trial);
+    @Test
+    void writesThePrescriptionFollowedByTheTrial() throws Exception {
+        String text = withTrials(SUMMICRON, "[trial 1]\n" + MTF_FIVE_FIELDS + """
+                vary curvatures   0 2
+                vary thicknesses  0 10
+                vary aspherics    0 K A4
+
+
+                [notes]
+                Not part of the trial
+                """);
+        var trial = OptimizationTrial.parse(text, 1);
+        var prescription = prescription(text, trial);
+        move(trial.builder(prescription).build().variables());
+
+        String written = trial.optimizedPrescription(prescription);
+
+        assertTrue(written.startsWith(prescription.to_opt_bench_str(new StringBuilder()).toString()));
+        assertTrue(written.endsWith("\n[trial 1]\n" + MTF_FIVE_FIELDS + """
+                vary curvatures   0 2
+                vary thicknesses  0 10
+                vary aspherics    0 K A4
+                """));
+        // Reads back as the optimized prescription, exactly, and the trial carried over
+        // refers to the same surfaces.
+        var again = OptimizationTrial.parse(written, 1);
+        var reread = prescription(written, again);
         for (int i = 0; i < prescription._surfaces.length; i++) {
             SurfaceType expected = prescription._surfaces[i];
             SurfaceType actual = reread._surfaces[i];
@@ -149,33 +188,18 @@ class OptimizationTrialTest {
             assertEquals(expected._asph_type, actual._asph_type, "asphere type of surface " + i);
             assertArrayEquals(expected._coeffs, actual._coeffs, "coefficients of surface " + i);
         }
-
-        // Nothing else moved: set aside the new aspherical data, and three lines differ -
-        // lens rows 1 and 3, and the Bf distance.
-        List<String> before = List.of(text.split("\n", -1));
-        List<String> after = new ArrayList<>(List.of(written.split("\n", -1)));
-        int header = after.indexOf("[aspherical data]");
-        assertTrue(header > 0);
-        assertTrue(after.get(header + 1).startsWith("1\t"));
-        after.remove(header + 1);
-        after.remove(header);
-        assertEquals(before.size(), after.size());
-        int differing = 0;
-        for (int i = 0; i < before.size(); i++)
-            if (!before.get(i).equals(after.get(i)))
-                differing++;
-        assertEquals(3, differing);
-        assertTrue(written.contains("[trial 1]"));
+        assertEquals(List.of("radius 0", "radius 2", "thickness 0", "thickness 10", "K 0", "A4 0"),
+                Arrays.stream(again.builder(reread).build().variables()).map(again::describe).toList());
     }
 
     @Test
-    void writesAZoomDistanceToItsConfigurationsColumn() throws Exception {
+    void writesAZoomWithItsConfiguredScenariosOnly() throws Exception {
         String text = withTrials(ZOOM, """
                 [trial 1]
                 configuration     1
                 fields            0
                 frequencies       10
-                vary thicknesses  d9 d11
+                vary thicknesses  8 10
                 goal mtf          10 sag 50
                 goal mtf          10 tan 50
                 """);
@@ -187,39 +211,54 @@ class OptimizationTrialTest {
             variable.set_unscaled_value(variable.get_unscaled_value() + 0.5);
             variable.write_to_prescription();
         }
-        String written = OptimizedPrescriptionWriter.write(text, prescription, variables);
-        // Configuration 1 is scenario 2 in this file, the third column of values; the
-        // other configurations' columns are left as they were.
-        String[] d9 = row(written, "d9");
-        assertEquals("8.46", d9[1]);
-        assertEquals("10.54", d9[2]);
-        assertEquals(prescription._surfaces[8]._thickness_by_scenario[1], Double.parseDouble(d9[3]));
-        String[] d11 = row(written, "d11");
-        assertEquals("20.31", d11[1]);
-        assertEquals("8.04", d11[2]);
-        assertEquals(prescription._surfaces[10]._thickness_by_scenario[1], Double.parseDouble(d11[3]));
-        // The file's CRLF line endings are kept.
-        assertFalse(written.replace("\r\n", "").contains("\n"));
-        var reread = prescription(written, trial);
-        assertEquals(prescription._surfaces[8]._thickness_by_scenario[1],
-                reread._surfaces[8]._thickness_by_scenario[1]);
+        String written = trial.optimizedPrescription(prescription);
+
+        // The 120mm scenario is not configured, so it is not written; the configurations
+        // are renumbered from 0 in the same order.
+        assertFalse(written.contains("120.07"), written);
+        assertTrue(written.contains("scenarios\t0\t1\n"), written);
+        var again = OptimizationTrial.parse(written, 1);
+        var reread = prescription(written, again);
+        assertEquals(13.64, reread._surfaces[8]._thickness_by_scenario[1], 1e-12);
         assertEquals(8.46, reread._surfaces[8]._thickness_by_scenario[0]);
+        assertEquals(prescription._surfaces[10]._thickness_by_scenario[1],
+                reread._surfaces[10]._thickness_by_scenario[1]);
+        assertEquals(20.31, reread._surfaces[10]._thickness_by_scenario[0]);
+        // The trial carried over still means configuration 1 and the same surfaces.
+        var moved = again.builder(reread).build().variables();
+        assertEquals(1, ((VarThickness) moved[0])._scenario);
+        assertEquals(8, ((VarThickness) moved[0])._surface_id);
     }
 
-    private static String[] row(String text, String name) {
-        for (String line : text.split("\\r?\\n"))
-            if (line.startsWith(name + "\t"))
-                return line.split("\t", -1);
-        throw new AssertionError("no row " + name);
+    @Test
+    void keepsTheTrialsTextButNotWhatFollows() throws Exception {
+        String text = withTrials(SUMMICRON, """
+                [trial 2]
+                description  Back focus  # tuned by hand
+                fields       0
+                frequencies  20
+
+                vary thicknesses 10
+
+
+                [notes]
+                Not part of the trial
+                """);
+        assertEquals("[trial 2]\ndescription  Back focus  # tuned by hand\nfields       0\n"
+                + "frequencies  20\n\nvary thicknesses 10", OptimizationTrial.parse(text, 2).section());
     }
 
-    private static void assertRejected(String trialText, String message) throws Exception {
-        String text = withTrials(SUMMICRON, trialText);
+    private static void assertRejected(String example, String trialText, String message) throws Exception {
+        String text = withTrials(example, trialText);
         var e = assertThrows(OptimizationTrial.TrialException.class, () -> {
             var trial = OptimizationTrial.parse(text, 1);
             trial.builder(prescription(text, trial)).build();
         });
         assertTrue(e.getMessage().contains(message), e.getMessage());
+    }
+
+    private static void assertRejected(String trialText, String message) throws Exception {
+        assertRejected(SUMMICRON, trialText, message);
     }
 
     @Test
@@ -238,13 +277,17 @@ class OptimizationTrialTest {
         assertRejected("[trial 1]\nfields 0 to 1 step 0.25\nfrequencies 20\n"
                         + "goal mtf 20 sag 50 50 50\ngoal mtf 20 tan 50 50 50 50 50\n",
                 "expected 5 targets, one per field, but found 3");
-        assertRejected("[trial 1]\n" + MTF_FIVE_FIELDS + "vary curvatures 12\n", "there is no surface '12' in [lens data]");
-        assertRejected("[trial 1]\n" + MTF_FIVE_FIELDS + "vary curvatures 6\n", "surface 6 is a stop");
-        assertRejected("[trial 1]\n" + MTF_FIVE_FIELDS + "vary aspherics 1 K:10\n", "K takes no scale");
-        assertRejected("[trial 1]\n" + MTF_FIVE_FIELDS + "vary aspherics 1 A5\n", "A5 is not a term of an even asphere");
+        assertRejected("[trial 1]\n" + MTF_FIVE_FIELDS + "vary curvatures 11\n",
+                "there is no surface 11; [lens data] has surfaces 0 to 10");
+        assertRejected("[trial 1]\n" + MTF_FIVE_FIELDS + "vary curvatures 5\n", "surface 5 is a stop");
+        assertRejected("[trial 1]\n" + MTF_FIVE_FIELDS + "vary thicknesses Bf\n",
+                "expected a surface number, found 'Bf'");
+        assertRejected("[trial 1]\n" + MTF_FIVE_FIELDS + "vary thicknesses 4 04\n", "surface 4 is listed twice");
+        assertRejected("[trial 1]\n" + MTF_FIVE_FIELDS + "vary aspherics 0 K:10\n", "K takes no scale");
+        assertRejected("[trial 1]\n" + MTF_FIVE_FIELDS + "vary aspherics 0 A5\n", "A5 is not a term of an even asphere");
         assertRejected("[trial 1]\nfields 0 0.5\nfrequencies 20\ngoal contrast sag 1 1\n",
                 "contrast settings need a 'goal contrast <frequencies>' line");
-        assertRejected("[trial 1]\nfields 0 0.5\nfrequencies 20\nvary thicknesses Bf\ngoal contrast 20\n"
+        assertRejected("[trial 1]\nfields 0 0.5\nfrequencies 20\nvary thicknesses 10\ngoal contrast 20\n"
                 + "goal contrast balance all except 0.3\n", "there is no field 0.3 in 'fields'");
         assertRejected("[trial 1]\nfields 0\nfrequencies 20\ngoal paraxial focus 3\n", "unknown paraxial quantity 'focus'");
     }

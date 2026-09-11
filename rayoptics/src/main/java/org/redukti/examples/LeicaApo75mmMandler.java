@@ -72,7 +72,7 @@ public class LeicaApo75mmMandler {
                 .applyThicknessConstraints()
                 .gaussianQuadratureSampling(3, 6)
                 .spotDeviationGoals(fieldWeights)
-                .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 39.38, 1.0))
+                .paraxialGoal(ParaxHelper.Back_focal_length, 39.38)
                 .build();
     }
 
@@ -92,7 +92,7 @@ public class LeicaApo75mmMandler {
                 .spotRmsGoals(new double[]{0, 0, 0, 0},
                               fieldWeights)
                 .gaussianQuadratureSampling(6, 12)
-                .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 39.38, 1.0))
+                .paraxialGoal(ParaxHelper.Back_focal_length, 39.38)
                 .build();
     }
 
@@ -130,7 +130,7 @@ public class LeicaApo75mmMandler {
                 .vignetting(VigType.SetVig)
                 .freezeVignetting()
                 .checkSpotApertures(false)
-                //.additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 39.38, 1.0))
+                //.paraxialGoal(ParaxHelper.Back_focal_length, 39.38)
                 .build();
     }
 
@@ -167,7 +167,7 @@ public class LeicaApo75mmMandler {
                 .calibrateContrastFrequency(false)
                 .centerContrastResiduals(false)
                 .aimContrastAtExitPupil(false)
-                //.additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 39.38, 1.0))
+                //.paraxialGoal(ParaxHelper.Back_focal_length, 39.38)
                 .vignetting(VigType.SetVig)
                 .freezeVignetting()
                 .checkSpotApertures(false)
@@ -190,7 +190,7 @@ public class LeicaApo75mmMandler {
                 .rayAberrationGoals()
                 .applyCurvatureConstraints()
                 .applyThicknessConstraints()
-                .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 39.38, 1.0))
+                .paraxialGoal(ParaxHelper.Back_focal_length, 39.38)
                 .build();
     }
 

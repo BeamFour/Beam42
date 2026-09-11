@@ -2,30 +2,25 @@ package org.redukti.examples;
 
 import org.junit.jupiter.api.Test;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
-import org.redukti.optim.Analysis;
 import org.redukti.optim.OptimizationBuilder.OptimizationSetup;
 import org.redukti.optim.OptimizationTrial;
 import org.redukti.spec.Prescription;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.redukti.optim.SetupAssertions.assertSameSetup;
 
 /**
  * The trials in Documentation/OPTIMIZER_SPEC.md build exactly the setups the example
- * programs build in code: the same variables and goals, in the same order, and the same
- * analysis settings.
+ * programs build in code - the same variables and goals, in the same order, and the same
+ * analysis settings - and still do after being written out by the builder and read back.
  */
 class OptimizationTrialExamplesTest {
 
-    private static String withTrial(String example, String trial) throws Exception {
-        return Files.readString(Path.of(ExampleFinder.geoPathToExample(example))) + "\n" + trial;
+    private static String lens(String example) throws Exception {
+        return Files.readString(Path.of(ExampleFinder.geoPathToExample(example)));
     }
 
     private static Prescription prescription(String text, boolean weighted, boolean dLineOnly) throws Exception {
@@ -34,57 +29,23 @@ class OptimizationTrialExamplesTest {
         return Prescription.build_prescription(specs, true, weighted, dLineOnly);
     }
 
-    private static OptimizationSetup trialSetup(String text) throws Exception {
-        var trial = OptimizationTrial.parse(text, 1);
-        return trial.builder(prescription(text, trial.weighted(), trial.dLineOnly())).build();
-    }
+    /** The trial builds the example's setup, before and after a round trip through toTrial. */
+    private static void assertTrialBuilds(String example, String trial, OptimizationSetup expected) throws Exception {
+        String lens = lens(example);
+        var builder = OptimizationTrial.read(lens + "\n" + trial, 1, true);
+        String written = builder.toTrial(1);
+        assertSameSetup(expected, builder.build());
 
-    private static void assertSameSetup(OptimizationSetup expected, OptimizationSetup actual) throws Exception {
-        assertEquals(describe(expected.variables()), describe(actual.variables()));
-        assertEquals(describe(expected.goals()), describe(actual.goals()));
-        assertEquals(describe(expected.analysis()), describe(actual.analysis()));
-    }
-
-    private static List<String> describe(Object[] items) throws Exception {
-        List<String> result = new ArrayList<>();
-        for (Object item : items)
-            result.add(describe(item));
-        return result;
-    }
-
-    /**
-     * Every plain value an object holds - numbers, flags, enums, strings and arrays of
-     * numbers - with its class. References to the prescription, the analysis and other
-     * objects are left out: they differ between the two setups by identity only.
-     */
-    private static String describe(Object item) throws Exception {
-        StringBuilder sb = new StringBuilder(item.getClass().getSimpleName()).append('{');
-        for (Class<?> c = item.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field field : c.getDeclaredFields()) {
-                if (Modifier.isStatic(field.getModifiers()))
-                    continue;
-                Class<?> type = field.getType();
-                boolean plain = type.isPrimitive() || type.isEnum() || type == String.class
-                        || type == Boolean.class || type == Integer.class || type == Double.class
-                        || (type.isArray() && type.getComponentType().isPrimitive());
-                if (!plain)
-                    continue;
-                field.setAccessible(true);
-                Object value = field.get(item);
-                String text;
-                if (value instanceof double[] d) text = Arrays.toString(d);
-                else if (value instanceof int[] i) text = Arrays.toString(i);
-                else if (value instanceof boolean[] b) text = Arrays.toString(b);
-                else text = String.valueOf(value);
-                sb.append(field.getName()).append('=').append(text).append(' ');
-            }
-        }
-        return sb.append('}').toString();
+        var reread = OptimizationTrial.read(lens + "\n" + written, 1, true);
+        assertEquals(written, reread.toTrial(1));
+        assertSameSetup(expected, reread.build());
     }
 
     @Test
     void nikkorZ85mmContrast() throws Exception {
-        String text = withTrial("Examples/jfotoptix/nikkor-85mm-z-f1.2/US20260086320_Example05.txt", """
+        String example = "Examples/jfotoptix/nikkor-85mm-z-f1.2/US20260086320_Example05.txt";
+        var expected = NikkorZ85mmf12.createContrastSetup(prescription(lens(example), false, false), false, false);
+        assertTrialBuilds(example, """
                 [trial 1]
                 description           Contrast, every parameter free
                 fields                0 to 1 step 0.1
@@ -105,14 +66,14 @@ class OptimizationTrialExamplesTest {
                 goal contrast         sag  3 3 3 3 3 3 3 2 2 2 2
                 goal contrast         balance  all except 0.9 1.0   weight 1.0
                 goal contrast         sampling 6 12
-                """);
-        var expected = NikkorZ85mmf12.createContrastSetup(prescription(text, false, false), false, false);
-        assertSameSetup(expected, trialSetup(text));
+                """, expected);
     }
 
     @Test
     void zeissOtusMtf() throws Exception {
-        String text = withTrial("Examples/jfotoptix/cosina-otus-ml-50mm-f1.4/JP2026-105585_Example01.txt", """
+        String example = "Examples/jfotoptix/cosina-otus-ml-50mm-f1.4/JP2026-105585_Example01.txt";
+        var expected = ZeissOtusML50mm.createSetup(prescription(lens(example), true, false), true, false);
+        assertTrialBuilds(example, """
                 [trial 1]
                 description       MTF targets, selected curvatures and the back focus
                 fields            0 0.3 0.7 1.0
@@ -129,36 +90,36 @@ class OptimizationTrialExamplesTest {
                 goal mtf   40 sag   65 65 64 58
                 goal mtf   40 tan   65 62 45 38
                 goal ray-aberrations  yes
-                """);
-        var expected = ZeissOtusML50mm.createSetup(prescription(text, true, false), true, false);
-        assertSameSetup(expected, trialSetup(text));
+                """, expected);
     }
 
     @Test
     void noctNikkorSpotSize() throws Exception {
-        String text = withTrial("Examples/jfotoptix/nikkor-58mm-f1.2/version5/Noct-Nikkor-58mmf1.2.txt", """
+        String example = "Examples/jfotoptix/nikkor-58mm-f1.2/version5/Noct-Nikkor-58mmf1.2.txt";
+        var expected = NoctNikkor58mm.createSpotSizeSetup(prescription(lens(example), true, false), true, false,
+                new double[]{1.0, 1.0, 1.0, 1.0});
+        assertTrialBuilds(example, """
                 [trial 1]
                 description       RMS spot size, aspherising the front surface
                 fields            0 0.3 0.7 1.0
                 frequencies       10 30 50
 
                 vary curvatures   all
-                vary aspherics    0  K  A4:1e6  A6:1e9  A8:1e11  A10:1e14
+                vary aspherics    0  K  1:1e6  2:1e9  3:1e11  4:1e14
 
                 constrain curvatures
 
                 goal spot-rms        15 30 50 70
                 goal spot sampling   gaussian 6 12
                 goal paraxial        bfl 37.78
-                """);
-        var expected = NoctNikkor58mm.createSpotSizeSetup(prescription(text, true, false), true, false,
-                new double[]{1.0, 1.0, 1.0, 1.0});
-        assertSameSetup(expected, trialSetup(text));
+                """, expected);
     }
 
     @Test
     void pentaxZoomWideEnd() throws Exception {
-        String text = withTrial("Examples/jfotoptix/pentax-80-200mm-f2.8/US005572276_Example05P.txt", """
+        String example = "Examples/jfotoptix/pentax-80-200mm-f2.8/US005572276_Example05P.txt";
+        var expected = Pentax80200mmf28.createContrastSetup(prescription(lens(example), false, false), false, false);
+        assertTrialBuilds(example, """
                 [trial 1]
                 description           Moving groups at the wide end
                 configuration         0
@@ -174,8 +135,6 @@ class OptimizationTrialExamplesTest {
                 goal contrast         10 30 50
                 goal contrast         balance  all except 0 0.9 1.0   weight 1.0
                 goal contrast         sampling 6 12
-                """);
-        var expected = Pentax80200mmf28.createContrastSetup(prescription(text, false, false), false, false);
-        assertSameSetup(expected, trialSetup(text));
+                """, expected);
     }
 }

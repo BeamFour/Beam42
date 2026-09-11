@@ -1,7 +1,6 @@
 package org.redukti.examples;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
-import org.redukti.optim.GoalParax;
 import org.redukti.optim.OptimizationBuilder;
 import org.redukti.optim.ParaxHelper;
 import org.redukti.spec.Prescription;
@@ -42,7 +41,7 @@ public class Nikkor28mmf14D {
                         contrast(10, fieldWeights),
                         contrast(30, fieldWeights),
                         contrast(50, fieldWeights))
-                .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 38.1031, 1.0))
+                .paraxialGoal(ParaxHelper.Back_focal_length, 38.1031)
                 .build();
     }
 

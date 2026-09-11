@@ -395,12 +395,9 @@ public class LensTool2 {
      */
     public static String runOptimizationTrial(String specText, Args arguments) throws Exception {
         int number = arguments.optimize_trial;
-        var trial = OptimizationTrial.parse(specText, number);
-        var specs = new OpticalBenchDataImporter.LensSpecifications();
-        specs.parse_buffer(specText);
-        var prescription = createPrescription(specs, arguments.use_glass_types,
-                trial.weighted(), trial.dLineOnly());
-        var setup = trial.builder(prescription).build();
+        var builder = OptimizationTrial.read(specText, number, arguments.use_glass_types);
+        var prescription = builder.prescription();
+        var setup = builder.build();
         var meritFunction = setup.meritFunction(false);
         Var[] variables = setup.variables();
         double[] start = new double[variables.length];
@@ -409,7 +406,7 @@ public class LensTool2 {
             start[i] = variables[i].get_unscaled_value();
         }
         System.out.println("Trial " + number
-                + (trial.description() != null ? ": " + trial.description() : ""));
+                + (builder.description() != null ? ": " + builder.description() : ""));
         System.out.println(variables.length + " variables, " + setup.goals().length + " goals");
         setup.analysis().compute();
         double before = meritFunction.getRMS();
@@ -418,12 +415,15 @@ public class LensTool2 {
         System.out.printf("Status %d, merit %.6g -> %.6g%s%n", status, before, after,
                 after < before ? "" : " (no improvement)");
         for (int i = 0; i < variables.length; i++)
-            System.out.println("  " + trial.describe(variables[i]) + ": " + start[i]
+            System.out.println("  " + OptimizationTrial.describe(variables[i]) + ": " + start[i]
                     + " -> " + variables[i].get_unscaled_value());
-        String optimized = trial.optimizedPrescription(prescription);
+        // The prescription as Beam42 writes it, then the trial as the builder writes it, so the
+        // result can be reported on or the trial run again: surface positions are the same.
+        String optimized = prescription.to_opt_bench_str(new StringBuilder())
+                .append('\n').append(builder.toTrial(number)).toString();
         Path specDirectory = Path.of(arguments.specfile).toAbsolutePath().getParent();
         Path directory = arguments.outdir != null ? Path.of(arguments.outdir)
-                : trial.outdir() != null ? specDirectory.resolve(trial.outdir())
+                : builder.outdir() != null ? specDirectory.resolve(builder.outdir())
                 : specDirectory;
         Files.createDirectories(directory);
         Path output = directory.resolve(

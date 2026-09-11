@@ -36,7 +36,7 @@ public class NoctNikkor58mm {
                 .applyCurvatureConstraints()
                 .gaussianQuadratureSampling(3, 6)
                 .spotDeviationGoals(fieldWeights)
-                .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 37.78, 1.0))
+                .paraxialGoal(ParaxHelper.Back_focal_length, 37.78)
                 .build();
     }
 
@@ -60,7 +60,7 @@ public class NoctNikkor58mm {
                 .spotRmsGoals(new double[]{15, 30, 50, 70},
                               fieldWeights)
                 .gaussianQuadratureSampling(6, 12)
-                .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 37.78, 1.0))
+                .paraxialGoal(ParaxHelper.Back_focal_length, 37.78)
                 .build();
     }
 
@@ -95,7 +95,7 @@ public class NoctNikkor58mm {
                                 new double[]{30, 25, 10, 10},
                                 fieldWeights))
                 .gaussianQuadratureSampling(6, 12)
-                .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 37.78, 1.0))
+                .paraxialGoal(ParaxHelper.Back_focal_length, 37.78)
                 .build();
     }
 
@@ -188,7 +188,7 @@ public class NoctNikkor58mm {
                 .dLineOnly(dLineOnly)
                 .rayAberrationGoals()
                 .applyCurvatureConstraints()
-                .additionalGoals(analysis -> new GoalParax(analysis, ParaxHelper.Back_focal_length, 37.78, 1.0))
+                .paraxialGoal(ParaxHelper.Back_focal_length, 37.78)
                 .build();
     }
 

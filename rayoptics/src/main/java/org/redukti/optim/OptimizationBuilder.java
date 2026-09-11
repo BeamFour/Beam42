@@ -3,6 +3,7 @@ package org.redukti.optim;
 import org.redukti.rayoptics.seq.Glass;
 import org.redukti.rayoptics.util.Orientation;
 import org.redukti.spec.Prescription;
+import org.redukti.spec.SurfaceType;
 import org.redukti.spec.VigType;
 
 import java.util.*;
@@ -53,6 +54,12 @@ public final class OptimizationBuilder {
 
     private static final int RAY_FAN_SAMPLES = 10;
 
+    private static final int DEFAULT_HEXAPOLAR_RAYS = 64;
+    private static final int DEFAULT_GAUSSIAN_QUADRATURE_RINGS = 14;
+    private static final int DEFAULT_GAUSSIAN_QUADRATURE_SPOKES = 20;
+    private static final int DEFAULT_CONTRAST_RINGS = 6;
+    private static final int DEFAULT_CONTRAST_SPOKES = 12;
+
     private final Prescription prescription;
     private double[] fields;
     private int[] mtfFrequencies;
@@ -65,9 +72,9 @@ public final class OptimizationBuilder {
     private boolean dLineOnly;
     private boolean addRayAberrationGoals;
     private boolean useHexapolarSpotPattern;
-    private int hexapolarSpotRays = 64;
-    private int gaussianQuadratureRings = 14;
-    private int gaussianQuadratureSpokes = 20;
+    private int hexapolarSpotRays = DEFAULT_HEXAPOLAR_RAYS;
+    private int gaussianQuadratureRings = DEFAULT_GAUSSIAN_QUADRATURE_RINGS;
+    private int gaussianQuadratureSpokes = DEFAULT_GAUSSIAN_QUADRATURE_SPOKES;
     private double gaussianQuadratureInnerRadius = 0.0;
     private boolean checkSpotApertures = true;
     private double[] spotDeviationXWeights;
@@ -78,8 +85,8 @@ public final class OptimizationBuilder {
     // them, so the merit reads better than the lens is. 6x12 is converged - 8x16
     // reproduces it - and 12 spokes samples the x and y axes alike, so sagittal
     // and tangential residuals stay comparable.
-    private int contrastRings = 6;
-    private int contrastSpokes = 12;
+    private int contrastRings = DEFAULT_CONTRAST_RINGS;
+    private int contrastSpokes = DEFAULT_CONTRAST_SPOKES;
     private boolean calibrateContrastFrequency = false;
     private boolean aimContrastAtExitPupil = false;
     private boolean centerContrastResiduals = false;
@@ -99,11 +106,12 @@ public final class OptimizationBuilder {
     private SpotGoals spotMaxRadiusGoals;
     private int[] curvatureExclusions = new int[0];
     private int[] thicknessExclusions = new int[0];
-    private int[] asphericExclusions = new int[0];
-    private Double focalLengthTarget;
-    private double focalLengthWeight = 1.0;
-    private Double fNumberTarget;
-    private double fNumberWeight = 1.0;
+    /** Aspheric terms varied explicitly, in the order given. */
+    private final List<AsphericTerm> asphericTerms = new ArrayList<>();
+    /** First-order goals, in the order given; efl and fno replace the automatic ones. */
+    private final List<ParaxialGoal> paraxialGoals = new ArrayList<>();
+    private String description;
+    private String outdir;
 
     private OptimizationBuilder(Prescription prescription) {
         if (prescription == null)
@@ -115,6 +123,34 @@ public final class OptimizationBuilder {
 
     public static OptimizationBuilder builder(Prescription prescription) {
         return new OptimizationBuilder(prescription);
+    }
+
+    /** The prescription this builder optimizes. */
+    public Prescription prescription() {
+        return prescription;
+    }
+
+    /** Free text describing the setup: written into a trial, and shown when it runs. */
+    public OptimizationBuilder description(String description) {
+        this.description = description;
+        return this;
+    }
+
+    public String description() {
+        return description;
+    }
+
+    /**
+     * Where LensTool2 puts the output of a run of this setup as a trial, relative to the
+     * prescription's file unless absolute. Only a trial uses it.
+     */
+    public OptimizationBuilder outdir(String outdir) {
+        this.outdir = outdir;
+        return this;
+    }
+
+    public String outdir() {
+        return outdir;
     }
 
     // ------------------------------------------------------------------
@@ -416,19 +452,104 @@ public final class OptimizationBuilder {
 
     public OptimizationBuilder varyExistingAspherics(boolean include) {
         this.includeExistingAspherics = include;
-        this.asphericExclusions = new int[0];
         return this;
     }
 
     /**
-     * Vary the existing aspheric terms of every surface apart from the listed ones. Lets
-     * a caller take over particular surfaces through {@link #additionalVariables(Var...)}
-     * - to add orders, or to choose scaling - without their terms being varied twice.
+     * Vary a surface's conic constant, making the surface an asphere if it is not one.
+     * A surface given explicit terms, here or through
+     * {@link #varyAsphericCoefficient(int, int)}, is left to them rather than to
+     * {@link #varyExistingAspherics()}.
      */
-    public OptimizationBuilder varyExistingAsphericsExcept(int... surfaces) {
-        this.includeExistingAspherics = true;
-        this.asphericExclusions = copy(surfaces);
+    public OptimizationBuilder varyConic(int surface) {
+        return addAsphericTerm(surface, -1, null);
+    }
+
+    /**
+     * Vary one aspheric coefficient, {@code _coeffs[index]} of the surface: on an even
+     * asphere the coefficient of r^(2(index+1)), so index 1 is A4; on an odd asphere the
+     * coefficient of r^(index+1), so index 2 is A3. A spherical surface becomes an asphere of
+     * the type the prescription already uses, even when it has none, and a coefficient the
+     * surface does not have starts at zero.
+     * <p>The variable is the coefficient times a scale, so the solver works with values of
+     * order one. An existing coefficient is scaled by {@link #scalingFor(double)}; one
+     * starting at zero by 10^round(log10 h^n), h being half the surface's diameter and n the
+     * power of r, so that one unit moves the sag at the rim by about one lens unit.
+     */
+    public OptimizationBuilder varyAsphericCoefficient(int surface, int index) {
+        return addAsphericTerm(surface, index, null);
+    }
+
+    /** Vary one aspheric coefficient, as {@link #varyAsphericCoefficient(int, int)}, with the given scale. */
+    public OptimizationBuilder varyAsphericCoefficient(int surface, int index, double scale) {
+        if (!Double.isFinite(scale) || scale <= 0.0)
+            throw new IllegalArgumentException("the scale of an aspheric coefficient must be finite and positive");
+        return addAsphericTerm(surface, index, scale);
+    }
+
+    private OptimizationBuilder addAsphericTerm(int surface, int index, Double scale) {
+        if (surface < 0 || surface >= prescription._surfaces.length)
+            throw new IllegalArgumentException("aspheric surface is out of range: " + surface);
+        var definition = prescription._surfaces[surface];
+        if (definition.is_aperture_stop() || definition.is_field_stop())
+            throw new IllegalArgumentException("surface " + surface + " is a stop; it cannot be aspheric");
+        for (AsphericTerm term : asphericTerms)
+            if (term.surface() == surface && term.index() == index)
+                throw new IllegalArgumentException((index < 0 ? "the conic constant"
+                        : "coefficient " + index) + " of surface " + surface + " is varied twice");
+        if (index >= 0) {
+            powerOf(asphereTypeOf(surface), index);
+            if (scale == null && coefficientOf(surface, index) == 0.0 && !(definition._diameter > 0.0))
+                throw new IllegalArgumentException("surface " + surface + " has no diameter to derive a scale for coefficient "
+                        + index + " from; give the coefficient a scale");
+        }
+        asphericTerms.add(new AsphericTerm(surface, index, scale));
         return this;
+    }
+
+    /** The surface's asphere type, or the one it will be made: the prescription's own, else even. */
+    private int asphereTypeOf(int surface) {
+        var definition = prescription._surfaces[surface];
+        if (definition.is_aspheric())
+            return definition._asph_type;
+        if (prescription.has_odd_aspheric())
+            return SurfaceType.ASPH_ODD;
+        if (prescription.has_even_a2_aspheric())
+            return SurfaceType.ASPH_EVEN_A2;
+        return SurfaceType.ASPH_EVEN;
+    }
+
+    /** The power of r a coefficient multiplies, rejecting an index the asphere type does not have. */
+    private static int powerOf(int asphereType, int index) {
+        switch (asphereType) {
+            case SurfaceType.ASPH_ODD -> {
+                if (index >= 2)
+                    return index + 1;
+                throw new IllegalArgumentException("coefficient " + index
+                        + " is not a term of an odd asphere, whose terms start at index 2, the A3 term");
+            }
+            case SurfaceType.ASPH_EVEN_A2 -> {
+                return 2 * (index + 1);
+            }
+            default -> {
+                if (index >= 1)
+                    return 2 * (index + 1);
+                throw new IllegalArgumentException("coefficient " + index
+                        + " is not a term of an even asphere, whose terms start at index 1, the A4 term");
+            }
+        }
+    }
+
+    private double coefficientOf(int surface, int index) {
+        double[] coefficients = prescription._surfaces[surface]._coeffs;
+        return coefficients != null && index < coefficients.length ? coefficients[index] : 0.0;
+    }
+
+    private boolean hasExplicitAsphericTerms(int surface) {
+        for (AsphericTerm term : asphericTerms)
+            if (term.surface() == surface)
+                return true;
+        return false;
     }
 
     /** Adds caller-defined variables after the automatically generated variables. */
@@ -609,31 +730,28 @@ public final class OptimizationBuilder {
         return this;
     }
 
-    /**
-     * Target and weight for the effective focal length goal every setup carries. Without
-     * this the target is the prescription's focal length for the scenario, at weight 1.
-     */
-    public OptimizationBuilder focalLengthGoal(double target, double weight) {
-        if (!Double.isFinite(target) || target <= 0.0)
-            throw new IllegalArgumentException("focal length target must be finite and positive");
-        if (!Double.isFinite(weight) || weight < 0.0)
-            throw new IllegalArgumentException("focal length weight must be finite and non-negative");
-        this.focalLengthTarget = target;
-        this.focalLengthWeight = weight;
-        return this;
+    /** Target a first-order quantity at weight 1; see {@link #paraxialGoal(int, double, double)}. */
+    public OptimizationBuilder paraxialGoal(int paraxId, double target) {
+        return paraxialGoal(paraxId, target, 1.0);
     }
 
     /**
-     * Target and weight for the f-number goal every setup carries. Without this the
-     * target is the prescription's f-number for the scenario, at weight 1.
+     * Target a first-order quantity. Every setup already holds the effective focal length
+     * and f-number at the prescription's values for the scenario, at weight 1; a goal for
+     * either replaces that one rather than adding a second.
+     * @param paraxId a {@link ParaxHelper} id, such as {@link ParaxHelper#Back_focal_length}
      */
-    public OptimizationBuilder fNumberGoal(double target, double weight) {
-        if (!Double.isFinite(target) || target <= 0.0)
-            throw new IllegalArgumentException("f-number target must be finite and positive");
+    public OptimizationBuilder paraxialGoal(int paraxId, double target, double weight) {
+        if (paraxId < 0 || paraxId >= ParaxHelper.Names.length)
+            throw new IllegalArgumentException("unknown paraxial quantity: " + paraxId);
+        if (!Double.isFinite(target))
+            throw new IllegalArgumentException("paraxial target must be finite");
         if (!Double.isFinite(weight) || weight < 0.0)
-            throw new IllegalArgumentException("f-number weight must be finite and non-negative");
-        this.fNumberTarget = target;
-        this.fNumberWeight = weight;
+            throw new IllegalArgumentException("paraxial weight must be finite and non-negative");
+        for (ParaxialGoal goal : paraxialGoals)
+            if (goal.paraxId() == paraxId)
+                throw new IllegalArgumentException("there is already a goal for " + ParaxHelper.Names[paraxId]);
+        paraxialGoals.add(new ParaxialGoal(paraxId, target, weight));
         return this;
     }
 
@@ -852,7 +970,7 @@ public final class OptimizationBuilder {
         }
         if (includeExistingAspherics) {
             for (int surfaceId = 0; surfaceId < prescription._surfaces.length; surfaceId++) {
-                if (contains(asphericExclusions, surfaceId))
+                if (hasExplicitAsphericTerms(surfaceId))
                     continue;
                 var surface = prescription._surfaces[surfaceId];
                 if (surface._k != 0.0)
@@ -867,7 +985,41 @@ public final class OptimizationBuilder {
                 }
             }
         }
+        result.addAll(explicitAsphericVariables());
         result.addAll(additionalVariables);
+        return result;
+    }
+
+    /**
+     * The variables for the explicitly varied aspheric terms. A spherical surface is made an
+     * asphere, and a coefficient array too short for a term is extended with zeros, so the
+     * variables have somewhere to read from and write to.
+     */
+    private List<Var> explicitAsphericVariables() {
+        List<Var> result = new ArrayList<>();
+        for (AsphericTerm term : asphericTerms) {
+            var surface = prescription._surfaces[term.surface()];
+            if (!surface.is_aspheric())
+                surface._asph_type = asphereTypeOf(term.surface());
+            if (surface._coeffs == null)
+                surface._coeffs = new double[0];
+            if (term.index() < 0) {
+                result.add(new VarAsphK(prescription, term.surface()));
+                continue;
+            }
+            if (surface._coeffs.length <= term.index())
+                surface._coeffs = Arrays.copyOf(surface._coeffs, term.index() + 1);
+            double value = surface._coeffs[term.index()];
+            double scale;
+            if (term.scale() != null)
+                scale = term.scale();
+            else if (value != 0.0)
+                scale = scalingFor(value);
+            else
+                scale = Math.pow(10.0, Math.round(powerOf(surface._asph_type, term.index())
+                        * Math.log10(surface._diameter / 2.0)));
+            result.add(new VarAsphCoeff(prescription, term.surface(), term.index(), scale));
+        }
         return result;
     }
 
@@ -966,10 +1118,8 @@ public final class OptimizationBuilder {
 
         // Anchor first-order properties to the requested prescription values, unless the
         // caller has set targets of its own.
-        result.add(new GoalParax(analysis, ParaxHelper.Effective_focal_length,
-                focalLengthTarget != null ? focalLengthTarget : focalLengthOf(), focalLengthWeight));
-        result.add(new GoalParax(analysis, ParaxHelper.Fno,
-                fNumberTarget != null ? fNumberTarget : fNumberOf(), fNumberWeight));
+        result.add(anchor(analysis, ParaxHelper.Effective_focal_length, focalLengthOf()));
+        result.add(anchor(analysis, ParaxHelper.Fno, fNumberOf()));
 
         if (addRayAberrationGoals) {
             for (int field = 1; field <= fields.length; field++) {
@@ -985,6 +1135,9 @@ public final class OptimizationBuilder {
                 }
             }
         }
+        for (ParaxialGoal goal : paraxialGoals)
+            if (goal.paraxId() != ParaxHelper.Effective_focal_length && goal.paraxId() != ParaxHelper.Fno)
+                result.add(new GoalParax(analysis, goal.paraxId(), goal.target(), goal.weight()));
         for (GoalFactory factory : additionalGoalFactories) {
             Goal goal = factory.create(analysis);
             if (goal == null)
@@ -1058,7 +1211,6 @@ public final class OptimizationBuilder {
         validateSurfaces(thicknessSurfaces, "thickness");
         validateSurfaces(curvatureExclusions, "excluded curvature");
         validateSurfaces(thicknessExclusions, "excluded thickness");
-        validateSurfaces(asphericExclusions, "excluded aspheric");
         if (addRayAberrationGoals && dLineOnly
                 && Arrays.stream(prescription._wvls).noneMatch(w -> sameWavelength(w, Glass.d)))
             throw new IllegalArgumentException("d-line optimization requires the prescription to contain the d-line wavelength");
@@ -1082,6 +1234,14 @@ public final class OptimizationBuilder {
 
     private static boolean sameWavelength(double a, double b) {
         return Math.abs(a - b) < 1.0e-3;
+    }
+
+    /** A first-order goal: the given target and weight, or the prescription's value at weight 1. */
+    private GoalParax anchor(Analysis analysis, int paraxId, double prescribed) {
+        for (ParaxialGoal goal : paraxialGoals)
+            if (goal.paraxId() == paraxId)
+                return new GoalParax(analysis, paraxId, goal.target(), goal.weight());
+        return new GoalParax(analysis, paraxId, prescribed, 1.0);
     }
 
     private static boolean contains(int[] values, int value) {
@@ -1193,6 +1353,200 @@ public final class OptimizationBuilder {
             Arrays.fill(weights, 1.0);
             return weights;
         }
+    }
+
+    /** An explicitly varied aspheric term: the conic constant when index is -1, else _coeffs[index]. */
+    private record AsphericTerm(int surface, int index, Double scale) {}
+
+    /** A first-order goal on a {@link ParaxHelper} quantity. */
+    private record ParaxialGoal(int paraxId, double target, double weight) {}
+
+    // ------------------------------------------------------------------
+    // Writing - the setup as a [trial n] section
+    // ------------------------------------------------------------------
+
+    /**
+     * This setup as a {@code [trial number]} section of a prescription file, which
+     * {@link OptimizationTrial#read} reads back into an equivalent builder. Settings at
+     * their defaults are left out. Variables and goals given as code, through
+     * {@link #additionalVariables(Var...)} or {@link #additionalGoals(GoalFactory...)}, have
+     * no written form, so a builder that uses them cannot be written.
+     */
+    public String toTrial(int number) {
+        if (!additionalVariables.isEmpty() || !additionalGoalFactories.isEmpty())
+            throw new IllegalStateException(
+                    "variables and goals added as code have no written form, so this setup cannot be written as a trial");
+        var sb = new StringBuilder();
+        sb.append("[trial ").append(number).append("]\n");
+        if (description != null)
+            line(sb, "description", description);
+        if (outdir != null)
+            line(sb, "outdir", outdir);
+        if (scenario != 0)
+            line(sb, "configuration", Integer.toString(scenario));
+        if (fields != null)
+            line(sb, "fields", OptimizationTrial.format(fields));
+        if (mtfFrequencies != null)
+            line(sb, "frequencies", OptimizationTrial.format(mtfFrequencies));
+        if (!weighted)
+            line(sb, "weighted", "no");
+        if (dLineOnly)
+            line(sb, "d-line-only", "yes");
+        if (vigType != VigType.SetPupil || freezeVignetting)
+            line(sb, "vignetting", OptimizationTrial.kebab(vigType.name()) + (freezeVignetting ? " frozen" : ""));
+        if (!checkSpotApertures)
+            line(sb, "check-spot-apertures", "no");
+
+        if (allCurvatureSurfaces)
+            line(sb, "vary curvatures", allExcept(curvatureExclusions));
+        else if (curvatureSurfaces.length > 0)
+            line(sb, "vary curvatures", OptimizationTrial.format(curvatureSurfaces));
+        if (allThicknessSurfaces)
+            line(sb, "vary thicknesses", allExcept(thicknessExclusions));
+        else if (thicknessSurfaces.length > 0)
+            line(sb, "vary thicknesses", OptimizationTrial.format(thicknessSurfaces));
+        if (includeExistingAspherics)
+            line(sb, "vary aspherics", "existing");
+        Map<Integer, List<String>> terms = new LinkedHashMap<>();
+        for (AsphericTerm term : asphericTerms)
+            terms.computeIfAbsent(term.surface(), s -> new ArrayList<>()).add(term.index() < 0 ? "K"
+                    : term.index() + (term.scale() != null ? ":" + OptimizationTrial.format(term.scale()) : ""));
+        for (var entry : terms.entrySet())
+            line(sb, "vary aspherics", entry.getKey() + " " + String.join(" ", entry.getValue()));
+
+        if (curvatureConstraintWeight != null)
+            line(sb, "constrain curvatures", OptimizationTrial.format(curvatureConstraintWeight));
+        if (thicknessConstraintWeight != null)
+            line(sb, "constrain thicknesses", OptimizationTrial.format(thicknessConstraintWeight));
+        if (edgeThicknessConstraintWeight != null)
+            line(sb, "constrain edges", OptimizationTrial.format(edgeThicknessConstraintWeight));
+
+        if (!contrastGoals.isEmpty()) {
+            line(sb, "goal contrast", OptimizationTrial.format(
+                    contrastGoals.stream().mapToInt(goal -> goal.frequency).toArray()));
+            contrastWeights(sb, true);
+            contrastWeights(sb, false);
+            if (contrastBalanceFields != null)
+                line(sb, "goal contrast", "balance " + balance() + " weight "
+                        + OptimizationTrial.format(contrastBalanceWeight));
+            if (contrastRings != DEFAULT_CONTRAST_RINGS || contrastSpokes != DEFAULT_CONTRAST_SPOKES)
+                line(sb, "goal contrast", "sampling " + contrastRings + " " + contrastSpokes);
+            if (calibrateContrastFrequency)
+                line(sb, "goal contrast", "calibrate yes");
+            if (aimContrastAtExitPupil)
+                line(sb, "goal contrast", "exit-pupil-aiming yes");
+            if (centerContrastResiduals)
+                line(sb, "goal contrast", "centering yes");
+        }
+        for (MtfGoals goal : mtfGoals) {
+            line(sb, "goal mtf", goal.frequency + " sag " + OptimizationTrial.format(goal.sagittal));
+            line(sb, "goal mtf", goal.frequency + " tan " + OptimizationTrial.format(goal.tangential));
+            if (Arrays.equals(goal.sagittalWeights, goal.tangentialWeights)) {
+                if (!allOnes(goal.sagittalWeights))
+                    line(sb, "goal mtf", goal.frequency + " weights " + OptimizationTrial.format(goal.sagittalWeights));
+            }
+            else {
+                if (!allOnes(goal.sagittalWeights))
+                    line(sb, "goal mtf", goal.frequency + " sag weights " + OptimizationTrial.format(goal.sagittalWeights));
+                if (!allOnes(goal.tangentialWeights))
+                    line(sb, "goal mtf", goal.frequency + " tan weights " + OptimizationTrial.format(goal.tangentialWeights));
+            }
+        }
+        spotGoals(sb, "goal spot-rms", spotRmsGoals);
+        spotGoals(sb, "goal spot-max-radius", spotMaxRadiusGoals);
+        if (addSpotDeviationGoals) {
+            if (Arrays.equals(spotDeviationXWeights, spotDeviationYWeights))
+                line(sb, "goal spot-deviation", OptimizationTrial.format(spotDeviationXWeights));
+            else {
+                line(sb, "goal spot-deviation", "x " + OptimizationTrial.format(spotDeviationXWeights));
+                line(sb, "goal spot-deviation", "y " + OptimizationTrial.format(spotDeviationYWeights));
+            }
+        }
+        if (gaussianQuadratureRings != DEFAULT_GAUSSIAN_QUADRATURE_RINGS
+                || gaussianQuadratureSpokes != DEFAULT_GAUSSIAN_QUADRATURE_SPOKES
+                || gaussianQuadratureInnerRadius != 0.0)
+            line(sb, "goal spot sampling", "gaussian " + gaussianQuadratureRings + " " + gaussianQuadratureSpokes
+                    + (gaussianQuadratureInnerRadius != 0.0
+                    ? " " + OptimizationTrial.format(gaussianQuadratureInnerRadius) : ""));
+        if (useHexapolarSpotPattern)
+            line(sb, "goal spot sampling", "hexapolar " + hexapolarSpotRays);
+        if (addRayAberrationGoals)
+            line(sb, "goal ray-aberrations", "yes");
+        for (ParaxialGoal goal : paraxialGoals)
+            line(sb, "goal paraxial", OptimizationTrial.paraxialName(goal.paraxId()) + " "
+                    + OptimizationTrial.format(goal.target())
+                    + (goal.weight() != 1.0 ? " weight " + OptimizationTrial.format(goal.weight()) : ""));
+        return sb.toString();
+    }
+
+    /** One line of a trial: the keyword padded to a column, then its values. */
+    private static void line(StringBuilder sb, String key, String values) {
+        sb.append(key);
+        int padding = Math.max(1, 22 - key.length());
+        for (int i = 0; i < padding; i++)
+            sb.append(' ');
+        sb.append(values).append('\n');
+    }
+
+    private static String allExcept(int[] exclusions) {
+        return exclusions.length == 0 ? "all" : "all except " + OptimizationTrial.format(exclusions);
+    }
+
+    /** Contrast weights: one row when every frequency shares them, else a row per frequency. */
+    private void contrastWeights(StringBuilder sb, boolean sagittal) {
+        String direction = sagittal ? "sag" : "tan";
+        double[] first = sagittal ? contrastGoals.get(0).sagittalWeights : contrastGoals.get(0).tangentialWeights;
+        boolean shared = contrastGoals.stream().allMatch(goal ->
+                Arrays.equals(sagittal ? goal.sagittalWeights : goal.tangentialWeights, first));
+        if (shared) {
+            if (!allOnes(first))
+                line(sb, "goal contrast", direction + " " + OptimizationTrial.format(first));
+            return;
+        }
+        for (ContrastGoals goal : contrastGoals) {
+            double[] weights = sagittal ? goal.sagittalWeights : goal.tangentialWeights;
+            if (!allOnes(weights))
+                line(sb, "goal contrast", goal.frequency + " " + direction + " " + OptimizationTrial.format(weights));
+        }
+    }
+
+    /** The balanced fields: all, all except the listed field values, or yes/no for each. */
+    private String balance() {
+        boolean all = true, none = true;
+        for (boolean flag : contrastBalanceFields) {
+            all &= flag;
+            none &= !flag;
+        }
+        if (all)
+            return "all";
+        if (none || fields == null || fields.length != contrastBalanceFields.length) {
+            List<String> flags = new ArrayList<>();
+            for (boolean flag : contrastBalanceFields)
+                flags.add(flag ? "yes" : "no");
+            return String.join(" ", flags);
+        }
+        List<String> except = new ArrayList<>();
+        for (int i = 0; i < fields.length; i++)
+            if (!contrastBalanceFields[i])
+                except.add(OptimizationTrial.format(fields[i]));
+        return "all except " + String.join(" ", except);
+    }
+
+    private static void spotGoals(StringBuilder sb, String key, SpotGoals goals) {
+        if (goals == null)
+            return;
+        line(sb, key, OptimizationTrial.format(goals.targets));
+        if (!allOnes(goals.weights))
+            line(sb, key, "weights " + OptimizationTrial.format(goals.weights));
+    }
+
+    private static boolean allOnes(double[] values) {
+        if (values == null)
+            return true;
+        for (double value : values)
+            if (value != 1.0)
+                return false;
+        return true;
     }
 
     @FunctionalInterface

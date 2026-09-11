@@ -265,7 +265,7 @@ is exactly the centred variance. The same reference offset is applied to every o
 wavelength, so the combined polychromatic block remains a second moment about the
 reference image rather than a variance about a combined spectral mean. That is deliberate:
 it matches Beam42's polychromatic spot convention and preserves lateral colour. Earlier
-documentation described every wavelength block simply as a variance; `OPTIMIZER.md` now
+documentation described every wavelength block simply as a variance; `OPTIMIZER_NOTES.md` now
 records the narrower contract.
 
 The modulus of the OTF is
@@ -1400,7 +1400,7 @@ measurement and defects that need a fix, because they want different kinds of ef
 ## Changes since this review was written
 
 Work that landed after the findings above and does not belong to any one of them.
-[OPTIMIZER.md](OPTIMIZER.md) is the reference for how these behave; this section records
+[OPTIMIZER_NOTES.md](OPTIMIZER_NOTES.md) is the reference for how these behave; this section records
 only why they exist and what they change about the review.
 
 ### Reference-wavelength centring and contrast balance

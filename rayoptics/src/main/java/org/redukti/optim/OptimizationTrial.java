@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 /**
  * Reads a {@code [trial n]} section of a prescription file into an
  * {@link OptimizationBuilder}; {@link OptimizationBuilder#toTrial(int)} writes one back.
- * The format is documented in Documentation/OPTIMIZER_SPEC.md.
+ * The format is documented in Documentation/OPTIMIZER.md.
  *
  * <p>Values mean what they mean to the builder: surfaces are its zero-based positions in
  * [lens data], aspheric coefficients its indices into the coefficient array, and so on.
@@ -32,6 +32,9 @@ public final class OptimizationTrial {
 
     private static final Pattern TRIAL_HEADER =
             Pattern.compile("\\[\\s*trial\\s+(\\d+)\\s*\\]", Pattern.CASE_INSENSITIVE);
+
+    private static final Pattern PIPELINE_HEADER =
+            Pattern.compile("\\[\\s*pipeline\\s+(\\d+)\\s*\\]", Pattern.CASE_INSENSITIVE);
 
     /** First-order quantities a paraxial goal can name, in {@link ParaxHelper} ids. */
     private static final Map<String, Integer> PARAXIAL_QUANTITIES = new LinkedHashMap<>();
@@ -71,6 +74,120 @@ public final class OptimizationTrial {
         specs.parse_buffer(text);
         var prescription = Prescription.build_prescription(specs, useGlassTypes, reader.weighted, reader.dLineOnly);
         return reader.apply(prescription);
+    }
+
+    /**
+     * Reads {@code [pipeline number]}, or returns null when the number names a trial rather
+     * than a pipeline: the two share one numbering.
+     *
+     * @throws TrialException if the file defines neither, if both claim the number, or if
+     *                        the pipeline has a problem
+     */
+    public static OptimizationPipeline readPipeline(String text, int number) {
+        String[] lines = text.split("\\r?\\n", -1);
+        Map<Integer, Integer> trials = new TreeMap<>();
+        Map<Integer, Integer> pipelines = new TreeMap<>();
+        int start = -1;
+        for (int i = 0; i < lines.length; i++) {
+            String trimmed = lines[i].trim();
+            if (!trimmed.startsWith("["))
+                continue;
+            Matcher trial = TRIAL_HEADER.matcher(trimmed);
+            if (trial.matches()) {
+                trials.put(Integer.parseInt(trial.group(1)), i + 1);
+                continue;
+            }
+            Matcher pipeline = PIPELINE_HEADER.matcher(trimmed);
+            if (pipeline.matches()) {
+                int found = Integer.parseInt(pipeline.group(1));
+                Integer earlier = pipelines.put(found, i + 1);
+                if (earlier != null)
+                    throw new TrialException("[pipeline " + found + "] is defined twice, at lines "
+                            + earlier + " and " + (i + 1));
+                if (found == number)
+                    start = i;
+            }
+        }
+        for (int both : pipelines.keySet())
+            if (trials.containsKey(both))
+                throw new TrialException("the number " + both + " is used by both [trial " + both
+                        + "] at line " + trials.get(both) + " and [pipeline " + both + "] at line "
+                        + pipelines.get(both) + "; trials and pipelines share one numbering");
+        if (start < 0) {
+            if (trials.containsKey(number))
+                return null;
+            throw new TrialException("there is no [trial " + number + "] or [pipeline " + number
+                    + "] in this prescription; it defines " + defined("trial", trials) + " and "
+                    + defined("pipeline", pipelines));
+        }
+        return readPipeline(lines, start, number, trials.keySet(), pipelines.keySet());
+    }
+
+    private static String defined(String what, Map<Integer, Integer> numbers) {
+        if (numbers.isEmpty())
+            return "no " + what + "s";
+        return (numbers.size() == 1 ? what + " " : what + "s ")
+                + String.join(", ", numbers.keySet().stream().map(String::valueOf).toList());
+    }
+
+    private static OptimizationPipeline readPipeline(String[] lines, int start, int number,
+                                                     Set<Integer> trials, Set<Integer> pipelines) {
+        String description = null;
+        String outdir = null;
+        int[] stages = null;
+        int stagesLine = 0;
+        Set<String> seen = new HashSet<>();
+        for (int i = start + 1; i < lines.length && !lines[i].trim().startsWith("["); i++) {
+            int hash = lines[i].indexOf('#');
+            String text = (hash >= 0 ? lines[i].substring(0, hash) : lines[i]).trim();
+            if (text.isEmpty())
+                continue;
+            int line = i + 1;
+            String[] w = text.split("\\s+");
+            String keyword = lower(w[0]);
+            if (!seen.add(keyword))
+                throw pipelineError(number, line, "'" + keyword + "' is given more than once");
+            switch (keyword) {
+                case "description" -> description = text.substring(w[0].length()).trim();
+                case "outdir" -> {
+                    if (w.length < 2)
+                        throw pipelineError(number, line, "expected 'outdir <directory>'");
+                    outdir = text.substring(w[0].length()).trim();
+                }
+                case "trials" -> {
+                    if (w.length < 2)
+                        throw pipelineError(number, line, "expected 'trials <number> <number> ...'");
+                    stages = new int[w.length - 1];
+                    stagesLine = line;
+                    for (int t = 1; t < w.length; t++) {
+                        int stage;
+                        try {
+                            stage = Integer.parseInt(w[t]);
+                        }
+                        catch (NumberFormatException e) {
+                            throw pipelineError(number, line, "expected a trial number, found '" + w[t] + "'");
+                        }
+                        if (pipelines.contains(stage))
+                            throw pipelineError(number, line, "stage " + stage
+                                    + " is a pipeline; a pipeline runs trials, not other pipelines");
+                        if (!trials.contains(stage))
+                            throw pipelineError(number, line, "there is no [trial " + stage + "] in this prescription");
+                        stages[t - 1] = stage;
+                    }
+                }
+                default -> throw pipelineError(number, line, "unknown keyword '" + w[0]
+                        + "'; a pipeline takes description, outdir and trials");
+            }
+        }
+        if (stages == null)
+            throw new TrialException("pipeline " + number + ": 'trials' is required, naming the trials to run in order");
+        if (stages.length == 0)
+            throw pipelineError(number, stagesLine, "a pipeline needs at least one trial");
+        return new OptimizationPipeline(number, description, outdir, stages);
+    }
+
+    private static TrialException pipelineError(int number, int line, String message) {
+        return new TrialException("pipeline " + number + ", line " + line + ": " + message);
     }
 
     /** How a variable is named when a trial runs: by surface position, as in the trial. */
@@ -117,6 +234,15 @@ public final class OptimizationTrial {
         for (int value : values)
             result.add(Integer.toString(value));
         return String.join(" ", result);
+    }
+
+    /** One line of a trial or pipeline: the keyword padded to a column, then its values. */
+    static void line(StringBuilder sb, String key, String values) {
+        sb.append(key);
+        int padding = Math.max(1, 22 - key.length());
+        for (int i = 0; i < padding; i++)
+            sb.append(' ');
+        sb.append(values).append('\n');
     }
 
     /** SetPupil as set-pupil: the spelling --vig-type and a trial use. */

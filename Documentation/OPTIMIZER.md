@@ -1,836 +1,562 @@
-# Optimizer
+# Optimization Trials
 
-## Goal Contrast
+An optimization trial is a section in a prescription file that describes an optimizer
+run. It says which fields and frequencies are evaluated, what the solver may change,
+what holds the starting design together, and what the run aims for. It does the job
+that otherwise needs an `OptimizationBuilder` program like the ones in the `examples`
+package, and LensTool2 runs it, in both the Java and C++ versions.
 
-Contrast optimization uses pupil wavefront differences as a fast, smooth proxy for
-MTF. It is intended primarily as a refinement method: it works best when the starting
-prescription is already reasonably corrected and the phase differences are small.
+A prescription file can hold any number of trials, numbered `[trial 1]`, `[trial 2]` and
+so on, so the different setups tried on a lens sit next to the lens they belong to.
 
-### What a sample means
+A trial is an `OptimizationBuilder` written as text, and goes both ways:
+`OptimizationTrial.read` reads a trial into a builder, and `OptimizationBuilder.toTrial`
+writes a builder out as a trial. The values in a trial are the values the builder takes in
+code - surfaces are its zero-based positions, aspheric coefficients its coefficient
+indices, MTF targets percentages - so a setup reads the same in either form.
 
-A contrast sample is one location `p = (x, y)` in the entrance pupil at which the
-wavefront is compared with slightly displaced copies of itself. The OTF shear is
-physically defined at the exit pupil, but Beam42 launches rays in entrance-pupil
-coordinates. The optional frequency calibration described below rescales those launch
-coordinates so that the ray pairs realise the requested image-space frequency.
+[OPTIMIZER_NOTES.md](OPTIMIZER_NOTES.md) goes further into what the goals measure and how to weigh
+them against each other.
 
-For each sample, three rays are traced:
+## What a trial says
 
-- a reference ray at `p`;
-- a sagittal partner at `p + (s, 0)`;
-- a tangential partner at `p + (0, s)`.
+A trial has three parts, and the sections below follow them:
 
-The nominal entrance-pupil displacement is
+- **variables**, the parameters the solver may change: radii, thicknesses and aspheric
+  terms;
+- **goals**, what it aims at;
+- **constraints**, what holds the starting design together while it does.
 
-```text
-s = 2 lambda F# frequency
+Each goal contributes one or more *residuals*, each the miss between what the design
+gives and what the goal asks for: `value − target`. The solver, Levenberg-Marquardt,
+minimizes the sum of the squares of all of them, with a goal's weight multiplying its
+squared residual, so weight 4 counts a miss like two of weight 1. What the run prints as
+the merit is the root mean square of the weighted residuals, before and after.
+
+Two things follow from that. A goal that yields many residuals - contrast or spot
+deviation, one per sampled ray - lets the solver see through to what a change is doing:
+it differentiates every residual against every variable, so it learns that moving a
+surface helps these rays and hurts those, and can trade the two off. Aggregate the same
+information into one number, an RMS spot radius say, and that cancellation has already
+happened before the solver sees it; all it can tell is whether the total got better or
+worse. And a block of thousands of residuals outweighs a handful of others unless the
+weights say otherwise, so weights are best compared between blocks, not chosen one goal
+at a time.
+
+A ray that misses a surface, or an analysis that fails, makes a goal report a huge value
+instead, which the solver reads as a rejected step rather than a direction to move in.
+
+### The goals
+
+| Goal | What each residual measures | Target |
+|---|---|---|
+| `goal contrast` | The wavefront difference between a pupil sample and a sheared copy of itself, per field, wavelength, sample and direction. A smooth, well behaved stand-in for MTF at that frequency. | 0 |
+| `goal contrast balance` | The difference between the sagittal and tangential contrast blocks at a field: one residual that holds the two meridians level. | 0 |
+| `goal mtf` | Geometric MTF at a frequency, field and direction, from the spot diagram. One residual each. | your percentage |
+| `goal spot-rms` | RMS spot radius at a field, in microns. One residual per field. | your radius, 0 to minimize |
+| `goal spot-max-radius` | The largest ray miss at a field, in microns. Needs hexapolar sampling, which samples the rim. | your radius |
+| `goal spot-deviation` | The signed X or Y miss of each sampled ray, in microns: the RMS spot broken into its parts, so the solver sees which rays are wrong and in which direction. | 0 |
+| `goal ray-aberrations` | Transverse aberration at each point of the classical sagittal and tangential ray fans. | 0 |
+| `goal paraxial` | A first-order quantity: focal length, back focus, f-number, pupil positions and the rest. | your value |
+
+Every run also anchors the effective focal length and the f-number to the prescription's
+values at weight 1, so a solve cannot quietly rescale the lens. A `goal paraxial efl` or
+`fno` line replaces that anchor.
+
+Which to use: contrast is the refinement tool, and works best on a design that is already
+reasonably corrected, since it assumes small phase differences; the geometric MTF goals
+measure the same thing more directly but their merit surface is rough at the scale the
+solver steps, so a solve driven by them stalls more easily; the spot goals suit a design
+that is still far out. [OPTIMIZER_NOTES.md](OPTIMIZER_NOTES.md) covers what contrast samples mean,
+how many residuals each choice produces, and how to choose between them.
+
+### The constraints
+
+An optical merit function has no opinion about mechanical layout: left alone the solver
+will collapse air spaces and drive elements through one another. Each constraint holds a
+varied parameter near where it started, as a cost rather than a bound - the parameter may
+still move, it just has to earn it.
+
+| Constraint | Holds |
+|---|---|
+| `constrain thicknesses` | Each varied thickness, at its centre. |
+| `constrain edges` | The edge separation of every gap a varied parameter can move, measured at the smaller of the two surfaces' semi-diameters. Complements the one above: two surfaces can keep their centre thickness and still cross further out. |
+| `constrain curvatures` | Each varied surface's curvature - not its radius, which runs away to infinity on a near-flat surface. |
+
+These residuals are *fractional*: the weight is divided by the square of the starting
+value, so a 1% change costs the same on a 0.1mm air gap as on a 39mm back focus, and one
+weight is sensible across a whole prescription. A constraint never reports the huge value
+described above: it exists to steer the solve, not to end it.
+
+The first-order specification is held the same way, by the paraxial goals: the automatic
+focal length and f-number anchors, and any `goal paraxial` line of your own - a back
+focus, say. They hold the design to its basic specs while the optical goals work on it,
+so they are constraints in everything but name, and the format calls them goals only
+because that is how they are built.
+
+They differ from the three above in a way worth knowing. Their residual is the plain
+difference from the target, not a fraction of it, so at the same weight a quantity of
+larger magnitude is held proportionally tighter: a 1% drift is a residual of 0.5 on a
+50mm focal length, but only 0.02 on f/2. Raise the weight on the f-number, or on any
+small quantity, if it moves more than you want.
+
+## Running a trial
+
+```bash
+lenstool2 --specfile lens.txt --optimize 2
 ```
 
-where `lambda` is the wavelength, `F#` is the working f-number, and `frequency` is the
-requested spatial frequency. With calibration disabled, this same nominal displacement
-is used in both directions. With calibration enabled, sagittal and tangential scale
-factors are measured separately for every field and wavelength, so the actual entrance-
-pupil displacements may differ from each other and from `s`.
+LensTool2 then:
 
-The analysis calculates two wavefront differences:
+1. reads `lens.txt` and its `[trial 2]` section;
+2. builds the prescription for the trial's configuration, using the trial's `weighted`
+   and `d-line-only` settings, and runs the solver;
+3. prints the trial's description, the merit function before and after, the solver
+   status, and the final value of every variable;
+4. writes the optimized prescription, `lens-trial2.txt`, to the trial's output directory
+   (see [The optimized prescription](#the-optimized-prescription));
+5. produces the usual report from the optimized prescription in the same directory, as
+   if LensTool2 had been run on `lens-trial2.txt`.
 
-```text
-deltaW_s(p) = W(p + (s, 0)) - W(p)
-deltaW_t(p) = W(p + (0, s)) - W(p)
+The output directory is the `--outdir` given on the command line; without one, the
+trial's own `outdir`; without that, the directory `lens.txt` is in. Giving each trial an
+`outdir` keeps their reports apart, since report files such as `layout.svg` are not
+named after the prescription.
+
+The number is the argument following `--optimize`, when that argument does not start with
+`--`. It may name a `[trial n]` or a [pipeline](#pipelines); the two share one numbering,
+so a number claimed by both is an error, as is one the file does not define.
+`--optimize` without a number keeps its existing meaning, the routine air-space
+optimization controlled by `--optimize-goal`.
+
+## Pipelines
+
+A pipeline runs trials one after another, each starting from the design the one before it
+produced:
+
+```ini
+[pipeline 5]
+description   Zoom: wide, then tele, twice over
+outdir        trials/zoom
+trials        1 2 1 2
 ```
 
-These become two optimizer residuals:
+`lenstool2 --specfile lens.txt --optimize 5` then runs trial 1, trial 2, trial 1 again and
+trial 2 again, and writes `lens-pipeline5.txt`.
 
-```text
-r_s(p) = sqrt(w_p) deltaW_s(p)
-r_t(p) = sqrt(w_p) deltaW_t(p)
+A zoom is what it was made for. Only one configuration is optimized at a time, so the wide
+end is optimized first and the tele end starts from that result. The two configurations
+share every radius and glass thickness, so the second stage partly undoes the first, which
+is why the stages are usually written to alternate until the design settles. Nothing about
+it is specific to zooms: a coarse stage followed by a fine one, or spot goals followed by
+contrast, chain the same way.
+
+| Line | Meaning | Default |
+|---|---|---|
+| `trials` | The trials to run, in order. A trial may appear more than once. | required |
+| `description` | Free text, shown when the pipeline runs. | none |
+| `outdir` | Where the result goes; the stages' own `outdir` lines are not used, since a pipeline writes one result. | the prescription's directory |
+
+- Each stage reads its trial afresh, so a stage's `configuration`, `weighted` and
+  `d-line-only` are its own.
+- A pipeline runs trials, not other pipelines.
+- Only the final design is written. The file carries the prescription, the pipeline, and
+  every trial the pipeline names, so it can run the pipeline again as it stands - which is
+  how you take another two passes at a zoom that has not settled.
+
+## Layout
+
+```ini
+[trial 1]
+description   Contrast, every parameter free
+# Anything after a # is a comment
+fields        0  0.3  0.7  1.0
+frequencies   10 30 50
 ```
 
-Here `w_p` is the Gaussian-quadrature weight of the pupil sample. One sample therefore
-produces three traced rays and two residuals. The sagittal and tangential comparisons
-share the reference ray, saving one ray relative to tracing the two pairs separately.
+- A trial starts at a line `[trial <n>]` and runs to the next line that starts with `[`.
+  `<n>` is a whole number, unique within the file. Trials need not be in order and the
+  numbers need not be consecutive.
+- The prescription reader skips sections it does not know, so a file with trials still
+  works everywhere a prescription does.
+- Each line is a keyword followed by values. Unlike the prescription sections, which
+  must be tab separated, values here may be separated by spaces or tabs.
+- `#` starts a comment that runs to the end of the line. Blank lines are ignored.
+- Keywords and values are case insensitive. Yes/no settings accept `yes`/`no`,
+  `true`/`false` and `on`/`off`.
+- Lines may appear in any order. A setting given twice is an error.
+- Anything the reader does not understand is an error naming the line: an unknown
+  keyword, the wrong number of per-field values, a surface the prescription does not
+  have. Settings that are not given take the defaults listed below.
 
-### Sample and residual counts
+## Referring to surfaces
 
-With the default 6-ring by 12-spoke pattern, each field, wavelength, and frequency uses
+A surface is numbered by its position in `[lens data]`, counting from 0, as
+`OptimizationBuilder` numbers surfaces: the first row is surface 0, and every row counts,
+the aperture stop included. A thickness is numbered by the surface it follows, so
+thickness 25 is the gap after surface 25 - the back focus, when that is the last row.
 
-```text
-6 * 12 = 72 pupil samples
+The ids in the first column of `[lens data]` are not used, nor are the distance names in
+`[variable distances]`. So on a lens whose rows are labelled 1, 2, ..., 16, 16AS, 17, 18,
+surface 16 is the stop, and surface 18 the last. The `prescription.txt` LensTool2 writes
+numbers surfaces from 1, so its surface *n* is a trial's surface *n* − 1.
+
+A surface list takes one of three forms:
+
+| Form | Meaning |
+|---|---|
+| `all` | For curvatures, every surface except the aperture stop, field stops and flat (`Infinity`) surfaces. For thicknesses, every surface whose thickness in the configuration is not zero. |
+| `all except 7 10 24` | The same set without the listed surfaces. |
+| `2 4 5 12` | Exactly these surfaces. A flat surface listed here is varied, and so becomes curved. |
+
+## Settings
+
+| Keyword | Values | Default |
+|---|---|---|
+| `description` | Free text, shown when the trial runs. | none |
+| `outdir` | Directory for the trial's optimized prescription and report, relative to the prescription's directory unless absolute. Created if missing; a command-line `--outdir` takes precedence. | the prescription's directory |
+| `configuration` | Configuration to optimize, counting from 0. Only matters for a zoom. | `0` |
+| `fields` | Relative field heights between 0 and 1, the first being 0. `0 to 1 step 0.1` is shorthand for eleven evenly spaced fields. | required |
+| `frequencies` | Frequencies, in cycles/mm, at which the MTF is measured. | required |
+| `weighted` | `yes` uses the prescription's wavelength weights; `no` weighs every wavelength equally. | `yes` |
+| `d-line-only` | Restrict ray-aberration goals to the d line. | `no` |
+| `vignetting` | A `--vig-type` name (`none`, `paraxial`, `set-vig`, `set-pupil`, ...), optionally followed by `frozen` to measure it once and hold it for the run. | `set-pupil` |
+| `check-spot-apertures` | Whether Gaussian-quadrature spot rays are stopped by surface apertures. | `yes` |
+
+`weighted` and `d-line-only` also shape the prescription used for the run, as the
+example programs do.
+
+## Variables
+
+```ini
+vary curvatures   all except 7 10 24
+vary thicknesses  7 14 19
+vary aspherics    existing
+vary aspherics    0  K  1:1e6  2  3  4
 ```
 
-This produces 144 residuals (72 sagittal and 72 tangential) and traces 216 rays. For
-four fields, three wavelengths, and three frequencies, the full contrast merit contains
+- `vary curvatures <list>` varies the radii of the listed surfaces.
+- `vary thicknesses <list>` varies thicknesses. On a zoom, a thickness that differs
+  between configurations is varied for the trial's configuration only.
+- `vary aspherics existing` makes a variable of every non-zero conic constant and
+  aspheric coefficient already in the prescription. A sphere stays a sphere, and an
+  asphere gains no orders it did not have.
+- `vary aspherics <surface> <terms>` varies the named terms of one surface, adding any
+  it does not have yet, starting from zero. An explicit row for a surface takes
+  precedence over `existing` for that surface.
 
-```text
-72 * 2 * 4 * 3 * 3 = 5184 residuals
+### Aspheric terms
+
+Terms are `K`, the conic constant, and coefficient indices, the index into the surface's
+coefficient array that `VarAsphCoeff` and `varyAsphericCoefficient` take:
+
+| Asphere | Index *i* is the coefficient of | So |
+|---|---|---|
+| even | r<sup>2(*i*+1)</sup> | 1 is A4, 2 is A6, 3 is A8, ... |
+| even with A2 | r<sup>2(*i*+1)</sup> | 0 is A2, 1 is A4, ... |
+| odd | r<sup>*i*+1</sup> | 2 is A3, 3 is A4, ... |
+
+An index the surface's type does not have - 0 on an even asphere without A2, 0 or 1 on
+an odd one - is an error. A spherical surface becomes an asphere of the type the
+prescription already uses, which is even when it has no aspheres.
+
+Each coefficient variable carries a scale, so that the solver works with values of order
+one: the variable is the coefficient times the scale. Give it after a colon, as in
+`2:1e9`. Without one:
+
+- an existing non-zero coefficient uses 10<sup>−floor(log10 |value|)</sup>, as
+  `vary aspherics existing` does;
+- a coefficient starting at zero uses 10<sup>round(log10 h<sup>n</sup>)</sup>, where h
+  is half the surface's diameter from `[lens data]` and n the power of r. One unit of the
+  scaled variable then moves the sag at the rim by about one lens unit. On the
+  Noct-Nikkor's front surface this gives 1e6, 1e8, 1e11 and 1e14 for coefficients 1 to 4,
+  against the hand-chosen 1e6, 1e9, 1e11 and 1e14 in `NoctNikkor58mm`. A surface with no
+  diameter needs explicit scales.
+
+`K` is used unscaled and takes no scale.
+
+## Constraints
+
+```ini
+constrain curvatures    1.0
+constrain thicknesses   1.0
+constrain edges         1.0
 ```
 
-### Physical interpretation
+What each one holds is described in [The constraints](#the-constraints) above. The number
+is the weight, and may be left out; it defaults to 1.0, the builder's nominal weight. See
+"Preserving the starting lens design" in [OPTIMIZER_NOTES.md](OPTIMIZER_NOTES.md) for how the weight
+behaves as it is raised.
 
-If the wavefront difference varies little across the pupil, the two displaced pupil
-wavefronts retain nearly the same shape. Contributions from different parts of the
-pupil then remain comparatively well phased, which generally corresponds to good
-contrast at that frequency.
+## Goals
 
-If `deltaW` varies strongly across the pupil, different pupil regions acquire different
-phases and increasingly cancel in the optical transfer function, reducing MTF.
+What each goal measures is described in [The goals](#the-goals) above; this section is
+the syntax.
 
-`GoalContrast` minimizes the weighted sum
+Every goal line starts with `goal` and the goal type. Per-field rows take exactly one
+value per entry in `fields`, in the same order. Weights left out default to 1.
 
-```text
-sum_p w_p deltaW(p)^2
+### Contrast
+
+```ini
+goal contrast   10 30 50
+goal contrast   sag  3 3 3 3 3 3 3 2 2 2 2
+goal contrast   tan  1 1 1 1 1 1 1 1 1 1 1
+goal contrast   30 tan  1 1 1 1 1 1 1 1 1 0.5 0.5
+goal contrast   balance  all except 0.9 1.0   weight 1.0
+goal contrast   sampling 6 12
 ```
 
-It does not calculate MTF directly. It minimizes a smooth least-squares proxy for the
-loss of contrast.
+| Line | Meaning | Default |
+|---|---|---|
+| `goal contrast <frequencies>` | Frequencies to optimize contrast at. Required for contrast goals. | |
+| `goal contrast sag <weights>` | Sagittal weight per field, for every contrast frequency. | 1 |
+| `goal contrast tan <weights>` | Tangential weight per field, for every contrast frequency. | 1 |
+| `goal contrast <frequency> sag\|tan <weights>` | Weights for one frequency, overriding the rows above. | |
+| `goal contrast balance <fields> [weight <w>]` | Hold sagittal and tangential contrast in balance. `<fields>` is `all`, `all except <field values>`, or one `yes`/`no` per field. | weight 0.1 |
+| `goal contrast sampling <rings> <spokes>` | Pupil sampling for contrast. | `6 12` |
+| `goal contrast calibrate yes\|no` | Correct the pupil shift so each sample realises the requested frequency. | `no` |
+| `goal contrast exit-pupil-aiming yes\|no` | Aim the sheared rays on the exit pupil. Cannot be combined with `calibrate`. | `no` |
+| `goal contrast centering yes\|no` | Subtract the constant part of each contrast block. | `no` |
 
-### Residual centring
+In `balance`, fields are named by their value in `fields`, so nothing has to be
+counted. The weight's scale is unlike the contrast weights'; see "Controlling
+astigmatism" in [OPTIMIZER_NOTES.md](OPTIMIZER_NOTES.md).
 
-For a single wavelength block the sum above is the un-centred second moment, and it
-decomposes as
+### MTF
 
-```text
-sum_p w_p deltaW(p)^2 = Var(deltaW) + mean(deltaW)^2
+```ini
+goal mtf   10 sag   93 93 94 93
+goal mtf   10 tan   93 93 90 82
+goal mtf   10 weights   1 1 2 2
+goal mtf   10 tan weights   1 1 2 4
 ```
 
-Only the first term describes the monochromatic loss of contrast. The OTF modulus depends
-on the *variance* of the phase difference, through
-`|OTF| = |<exp(i Phi)>| ~ 1 - Var(Phi)/2`. A constant `deltaW` across
-the pupil is wavefront tilt, which displaces the image: it moves the phase transfer
-function and leaves the modulus untouched. The geometric MTF used to validate the
-surrogate is translation invariant too, since spot analysis measures about the centroid.
+| Line | Meaning |
+|---|---|
+| `goal mtf <frequency> sag\|tan <targets>` | Target geometric MTF per field, in percent. Both rows are required for each frequency. |
+| `goal mtf <frequency> weights <weights>` | Weights per field for both directions. |
+| `goal mtf <frequency> sag\|tan weights <weights>` | Weights per field for one direction. |
 
-Enable centring through the builder:
+The frequency must be one of `frequencies`.
 
-```java
-.centerContrastResiduals(true)
+### Spot
+
+```ini
+goal spot-rms         15 30 50 70
+goal spot-rms weights 1 1 1 1
+goal spot sampling    gaussian 6 12
 ```
 
-For the reference wavelength the residual becomes
-`sqrt(w_p) (deltaW(p) - deltaW_bar_ref)`, where `deltaW_bar_ref` is its
-quadrature-weighted mean over the valid samples. The same reference-wavelength offset is
-then subtracted from every other wavelength.
+| Line | Meaning | Default |
+|---|---|---|
+| `goal spot-rms <targets>` | Target RMS spot radius per field, in microns. | |
+| `goal spot-max-radius <targets>` | Target maximum spot radius per field, in microns. | |
+| `goal spot-rms\|spot-max-radius weights <weights>` | Weights for those targets. | 1 |
+| `goal spot-deviation <weights>` | Minimize RMS spot size through each ray's signed X and Y deviation, with one weight per field. | |
+| `goal spot-deviation x\|y <weights>` | Separate X and Y weights; both rows are needed. | |
+| `goal spot sampling gaussian <rings> <spokes> [<inner radius>]` | Gaussian-quadrature spot pattern, optionally annular. | `gaussian 14 20` |
+| `goal spot sampling hexapolar <rays>` | Use the hexapolar spot pattern. | |
 
-Two properties are worth knowing before enabling it.
+`spot-max-radius` switches the spot pattern to hexapolar. `spot-deviation` needs the
+Gaussian-quadrature pattern, and cannot be combined with `spot-rms`. The two sampling
+lines are separate settings and may both be given: the Gaussian-quadrature rings and
+spokes are kept even when hexapolar sampling is chosen.
 
-**Defocus is not removed.** Defocus makes `deltaW` vary linearly across the pupil in the
-shear direction rather than being constant, so its mean over a symmetric pupil is already
-zero. Only the constant part goes; defocus, coma, spherical and astigmatism keep their
-full contribution.
+### Ray aberrations
 
-**The reference-wavelength mean is subtracted per (frequency, field, orientation), not a
-separate mean per wavelength.** A tilt
-common to every wavelength is a harmless image shift. A tilt that differs between
-wavelengths is lateral colour, and that genuinely does reduce polychromatic MTF, because
-the per-wavelength complex transfer functions acquire different phases and partly cancel.
-Subtracting the reference wavelength's mean from every wavelength discards the common part
-and preserves every wavelength's displacement relative to the reference. This follows the
-same reference-image convention as Beam42's polychromatic spot analysis. It is exactly the
-centred variance for the reference wavelength; across all wavelengths it is a second
-moment about that reference image, deliberately retaining lateral colour rather than the
-variance about a combined polychromatic mean.
-
-The sagittal mean is identically zero on a rotationally symmetric system, since `deltaW`
-is odd about the shear centre, so in practice only tangential residuals move. That does
-not make the change sagittal-neutral. The tangential block loses up to 57 percent of its
-sum of squares, so the balance between the two orientations shifts, and the two trade
-against each other through the astigmatic focus split. Measured on the Leica 75/2, centring
-raises sagittal's weight relative to tangential by a factor of about 2 at fields 0.7
-through 1.0.
-
-There is a second reason to prefer it. The common `mean^2` term is *reducible* by adding tilt,
-which costs no MTF, so leaving it in offers the solver merit reduction that buys no optical
-improvement.
-
-Centring is off by default because it changes every contrast residual and therefore every
-committed regression value.
-
-### Controlling astigmatism
-
-The contrast merit minimizes `sum(sagittal^2) + sum(tangential^2)`. At a fixed total that
-barely discriminates how astigmatism is split between the two meridians, and a designer
-discriminates sharply. On the Leica 75/2 a solve produced this at 50 cycles/mm:
-
-```text
-field    0.0    0.2    0.4    0.6    0.7    0.8    0.9    1.0
-sag     .447   .407   .453   .295   .177   .156   .288   .565
-tan     .447   .413   .531   .657   .706   .725   .627   .539
-sum     .894   .820   .984   .952   .883   .881   .915  1.104
+```ini
+goal ray-aberrations  yes
 ```
 
-The sum stays within 15 percent of itself across the whole field while the difference goes
-from zero to 0.57. The lens is not worse in that zone, it is lopsided there, and nothing in
-the merit had an opinion about that.
+`yes` adds the ten-sample sagittal and tangential ray fans for every field and
+wavelength, restricted to the d line by `d-line-only`. The default is `no`.
 
-`GoalContrastBalance` supplies the opinion. Its value is the difference between what the
-two orientations contribute to the merit,
+### Paraxial
 
-```text
-sum_wavelengths w (
-    w_sagittal sum_samples r_sagittal^2
-  - w_tangential sum_samples r_tangential^2
-)
+```ini
+goal paraxial   bfl  39.38
+goal paraxial   efl  50    weight 2
 ```
 
-against a target of zero, positive when sagittal is the worse meridian. Defining it on the
-residuals rather than on raw wavefront differences means it follows whatever those already
-account for, including residual centring, frequency calibration, wavelength weights and
-the configured sagittal/tangential field weights. Its value is smooth and quadratic, with
-no modulus and no square root. Since the least-squares solver squares every goal value,
-its final merit contribution is quartic in the wavefront differences.
+`goal paraxial <quantity> <target> [weight <w>]` targets a first-order quantity, with a
+weight of 1 by default. Every run already holds the effective focal length and
+f-number at the prescription's values for the configuration; a trial's `efl` or `fno`
+goal replaces that target rather than adding a second one.
 
-The weights in that expression are exactly the weights used by the ordinary contrast
-goals. If a field gives sagittal contrast weight 2 and tangential weight 0.5, balance is
-reached when those *weighted merit contributions* are equal, not when the two unweighted
-residual energies are equal. A zero orientation weight removes that orientation from both
-the ordinary contrast block and the balance comparison. This keeps the balance goal from
-quietly imposing a different sagittal/tangential weighting policy from the contrast merit
-it accompanies.
+| Quantity | Meaning |
+|---|---|
+| `efl` | Effective focal length |
+| `bfl` | Back focal length |
+| `ffl` | Front focal length |
+| `fno` | f-number at the working conjugates |
+| `img-dist` | Paraxial image distance |
+| `obj-dist` | Object distance |
+| `pp1` | Front principal plane, from the first surface |
+| `ppk` | Rear principal plane, from the last surface |
+| `enp-dist` | Entrance pupil distance, from the first surface |
+| `enp-radius` | Entrance pupil radius |
+| `exp-dist` | Exit pupil distance, from the last surface |
+| `exp-radius` | Exit pupil radius |
+| `img-ht` | Image height |
+| `obj-ang` | Maximum object angle, in degrees |
+| `obj-na` | Numerical aperture in object space |
+| `img-na` | Numerical aperture in image space |
+| `red` | Reduction ratio |
+| `power` | Optical power |
+| `opt-inv` | Optical invariant |
 
-Enable it per field, since the outermost field usually wants leniency:
+## The optimized prescription
 
-```java
-.contrastBalanceGoals(new boolean[] {false, true, true, true, false})
-.contrastBalanceGoals(fields, 0.05)
+The optimized prescription is written to `<prescription>-trial<n>.txt` in the trial's
+output directory (see [Running a trial](#running-a-trial)), replacing any earlier one
+from the same trial. It is the optimized lens as Beam42 writes a prescription - the same
+format as the `prescription.txt` in a LensTool2 report - followed by the trial that was
+run, as the builder writes it, so the file can be reported on, or the trial run again, as
+it stands.
+
+The trial is written back in the builder's own form: settings at their defaults are left
+out, shorthand such as `0 to 1 step 0.1` is written out, and comments and blank lines are
+not kept.
+
+Being Beam42's own format, it holds what Beam42 reads and nothing else, whatever the input
+carried:
+
+- surfaces are labelled 1, 2, 3, ... in order;
+- a zoom keeps only its configured scenarios, renumbered from 0 in the same order, so a
+  trial's `configuration` still means the same zoom position;
+- thicknesses that do not differ between configurations are written as numbers;
+- data derived from the design - total length, principal points, element and group
+  focal lengths - and anything else Beam42 does not use is left out, since it would no
+  longer describe the optimized lens.
+
+Surface positions are unchanged by this, so the trial carried over still refers to the
+same surfaces. Other trials in the input are not carried over. A [pipeline](#pipelines)
+writes `<prescription>-pipeline<n>.txt` the same way, carrying the pipeline and each trial
+it names.
+
+## Examples
+
+The trials below reproduce setups from the `examples` package.
+
+`NikkorZ85mmf12`:
+
+```ini
+[trial 1]
+description           Contrast, every parameter free
+fields                0 to 1 step 0.1
+frequencies           10 30 50
+weighted              no
+vignetting            set-vig frozen
+check-spot-apertures  no
+
+vary curvatures       all
+vary thicknesses      all
+vary aspherics        existing
+
+constrain curvatures
+constrain thicknesses
+constrain edges
+
+goal contrast         10 30 50
+goal contrast         sag  3 3 3 3 3 3 3 2 2 2 2
+goal contrast         balance  all except 0.9 1.0   weight 1.0
+goal contrast         sampling 6 12
 ```
 
-One flag per configured field, in field order; false adds no explicit balance constraint at
-that field. The ordinary contrast residuals still constrain the two meridians independently.
-The goal applies to every configured contrast frequency, so it adds one residual per enabled
-field per frequency.
+`ZeissOtusML50mm`:
 
-**Leave it off on axis.** At field zero the two meridians are identical by rotational
-symmetry, so there is nothing to balance and the value reduces to
+```ini
+[trial 1]
+description       MTF targets, selected curvatures and the back focus
+fields            0 0.3 0.7 1.0
+frequencies       10 20 40
 
-```text
-(w_sagittal - w_tangential) * S
+vary curvatures   all except 7 10 24
+vary thicknesses  25
+vary aspherics    existing
+
+goal mtf   10 sag   93 93 94 93
+goal mtf   10 tan   93 93 90 82
+goal mtf   20 sag   85 85 85 80
+goal mtf   20 tan   85 85 78 62
+goal mtf   40 sag   65 65 64 58
+goal mtf   40 tan   65 62 45 38
+goal ray-aberrations  yes
 ```
 
-where `S` is the axial residual energy. With equal orientation weights that is exactly
-zero and the goal is inert. With unequal weights it is not: it silently becomes a second
-axial contrast goal of strength `w_sagittal - w_tangential`, which is normally a number
-that fell out of a field taper rather than a decision about axial emphasis. Measured on the
-Leica 75/2 with weights 8 and 4 on axis, it contributed 50.3 of a 802.6 merit — 6.3 percent,
-none of it balance.
+`NoctNikkor58mm`:
 
-It also behaves unlike the contrast goals it is shadowing. `S` is already a sum of squares,
-so this residual is quadratic where the per-sample residuals are linear: it pushes hardest
-while axial aberration is large and fades quadratically as the design improves. If axial
-emphasis is what is wanted, raise the field-zero entries in the sagittal and tangential
-weight arrays instead. Those act through the ordinary residuals, scale predictably, and do
-not evaporate on convergence.
+```ini
+[trial 1]
+description       RMS spot size, aspherising the front surface
+fields            0 0.3 0.7 1.0
+frequencies       10 30 50
 
-**Set the weight from a measurement, not from the default.** A balance residual is a
-difference of sums of squares, so it is large exactly where a per-sample contrast residual
-is small. On the Leica starting design at 10/30/50 cycles/mm over 11 fields, the balance
-block at weight 1.0 came to 43.6 against the contrast block's 52.6 — 83 percent of the
-optical merit, from 33 residuals against 14256. `NOMINAL_BALANCE_WEIGHT` is 0.1, which puts
-it near 8 percent there, but nothing in this goal adapts to the design the way the
-fractional design-preservation constraints do.
+vary curvatures   all
+vary aspherics    0  K  1:1e6  2:1e9  3:1e11  4:1e14
 
-Be clear about what this is. Residual centring corrects an error in the merit; this does
-not. It tells the optimizer a design preference it has no way to infer — that astigmatism
-should be shared between the meridians rather than dumped on one of them.
+constrain curvatures
 
-### Operating range and limitation
-
-The proxy is most faithful in the small-phase regime:
-
-```text
-abs(2 pi deltaW) << 1
+goal spot-rms        15 30 50 70
+goal spot sampling   gaussian 6 12
+goal paraxial        bfl 37.78
 ```
 
-Measurements so far suggest that it behaves well when the RMS wavefront difference is
-roughly below 0.1 waves. This explains its good performance when refining an already
-reasonable prescription such as the Otus example.
+`Pentax80200mmf28`:
 
-On a poorly corrected starting prescription, the phase differences may span or wrap
-through one or more cycles. In that regime, the squared wavefront differences no longer
-uniquely determine MTF and can improve while independently measured MTF gets worse.
-Contrast merit should therefore be validated against a separate spot/MTF analysis.
+```ini
+[trial 1]
+description           Moving groups at the wide end
+configuration         0
+fields                0 to 1 step 0.1
+frequencies           10 30 50
+weighted              no
+d-line-only           no
+vignetting            set-vig frozen
+check-spot-apertures  no
 
-### Comparison with Gaussian-quadrature MTF goals
+vary thicknesses      7 14 19
 
-A Gaussian-quadrature geometric MTF goal traces pupil rays to image-plane intercepts,
-constructs a spot distribution, and estimates MTF from that distribution:
-
-```text
-pupil ray -> image intercept -> spot distribution -> estimated MTF
+goal contrast         10 30 50
+goal contrast         balance  all except 0 0.9 1.0   weight 1.0
+goal contrast         sampling 6 12
 ```
 
-Contrast optimization instead compares pairs of wavefront samples separated by the
-frequency-dependent pupil shear:
-
-```text
-paired pupil rays -> OPD difference -> least-squares residual
-```
-
-A contrast sample is therefore associated with one spatial frequency. A spot sample,
-by contrast, can contribute to every MTF frequency calculated from the same spot
-distribution.
-
-Contrast goals are normally much smoother and cheaper to evaluate, but they are a
-surrogate. Gaussian-quadrature MTF provides the more direct result and is useful both as
-an alternative optimization goal and as an independent validation measurement.
-
-### Exit-pupil frequency calibration
-
-The relation
-
-```text
-s = 2 lambda F# frequency
-```
-
-describes the shear of the exit-pupil autocorrelation. `REL_PUPIL`, however, specifies
-where a ray passes through the entrance pupil. Pupil aberration means that a rigid shift
-at the entrance pupil does not generally produce the same normalized shift at the exit
-pupil. Without correction, the realized spatial frequency can therefore vary with field,
-wavelength and direction, with the largest error normally occurring at outer fields.
-
-Enable the correction through the builder:
-
-```java
-.calibrateContrastFrequency(true)
-```
-
-For every field and wavelength, Beam42 traces a centred probe pair separately in the
-sagittal and tangential directions. Two rays produce image-space fringes at the requested
-frequency when their image-space direction cosines differ by
-
-```text
-lambda * frequency
-```
-
-The ratio between that required difference and the measured difference becomes a scale
-factor for the entrance-pupil shift. This costs four probe rays per field and wavelength,
-which is small compared with the full contrast sampling pattern.
-
-This is a calibration rather than an exact construction in exit-pupil coordinates. It
-removes the dominant field- and direction-dependent frequency bias, but uses one scale
-factor for the complete pupil. Residual variation caused by nonlinear pupil mapping
-across individual samples remains. It can be measured diagnostically, but correcting it
-properly requires aiming the displaced ray to the requested exit-pupil separation.
-
-Calibration is off by default because it changes the sampled frequencies and therefore
-the numerical merit function. It is cheaper than direct aiming and can remove much of a
-wide-field bias, but it is not the preferred reference for new accuracy work: its probe
-uses an image-ray direction metric and one scale cannot represent the nonlinear
-two-dimensional pupil map. Old regression cases may leave it disabled to preserve their
-historical values.
-
-### Direct exit-pupil aiming
-
-The direct correction is available as an opt-in alternative to block calibration:
-
-```java
-.aimContrastAtExitPupil()
-```
-
-For every quadrature reference ray, Beam42 computes its coordinate on the finite
-exit-pupil reference sphere. It then inverse-aims each sagittal and tangential partner
-with a two-dimensional Newton iteration until the partner has the requested vector
-separation there. Solving both coordinates matters: pupil aberration can rotate or skew
-an entrance-pupil displacement, so correcting only its nominal axis is insufficient.
-The OPD is evaluated from the newly traced partner ray; no finite OPD difference is
-rescaled.
-
-#### Relation to Hopkins' OTF coordinates
-
-Hopkins writes the two-dimensional transfer function as a pupil autocorrelation. In the
-notation of equations (10.22) and (10.26) of [Calculation of the Aberrations and Image
-Assessment for a General Optical System](https://doi.org/10.1080/713820605),
-the essential form is
-
-```text
-               1
-D(s,t) = ------------- integral-over-overlap
-             A(s,t)
-
-          f(x + s/2, y + t/2) f*(x - s/2, y - t/2) dx dy
-```
-
-Thus `(s,t)` is a vector separation between two pupil-function samples, not a ray angle
-or a transverse image aberration. Hopkins states after (10.28) that `(x,y)` denotes the
-difference of exit-pupil coordinates obtained from ray tracing. The discussion after
-(10.30) further stresses that the pupil surface must be identified with the reference
-sphere rather than an arbitrary pupil plane.
-
-Beam42 traces a reference sample at `p` and a partner at `p + delta`, instead of the
-symmetric `p - delta/2` and `p + delta/2` notation above. A translation of the integration
-variable makes these equivalent over the common overlap. For image-space frequency
-`nu`, wavelength `lambda` expressed in system units, and working f-number `F#`, the
-traditional normalized entrance-pupil separation is
-
-```text
-delta = 2 lambda F# nu
-```
-
-This remains the initial guess supplied to the inverse aiming solve. The physical target
-is derived directly on the field- and wavelength-specific reference sphere. Two
-image-space directions form fringes of frequency `nu` when
-
-```text
-n_img |Delta d| = lambda nu.
-```
-
-On a reference sphere of radius `R`, the corresponding pupil-coordinate separation is
-
-```text
-Delta = |R| lambda nu / |n_img|,
-```
-
-so Beam42 asks for
-
-```text
-Delta X_sag = (Delta, 0)
-Delta X_tan = (0, Delta).
-```
-
-Earlier versions multiplied `delta` by the paraxial exit-pupil radius. That is equivalent
-only under the paraxial identity `|R| = 2 |n_img| F# R_exit`. Using `R` directly avoids
-mixing a field-specific traced reference sphere with a paraxial pupil radius. `X(u)` is
-the reference-sphere coordinate reached by a ray launched at normalized entrance-pupil
-coordinate `u`.
-
-#### Reference-sphere coordinate
-
-`ExitPupilAiming.sphere_coord()` first reconstructs the equally-inclined-chord coordinate
-`c` relative to the chief-ray exit-pupil centre. It then intersects the transformed ray
-direction `d` with the finite reference sphere. In the implementation, with reference
-direction `r` and signed sphere radius `R`,
-
-```text
-F  = r.d - d.c/R
-J  = c.c/R - 2 r.c
-ep = J / (F + sqrt(F^2 - J/R))
-X  = c + ep d
-```
-
-The rationalized expression for `ep` avoids the cancellation of the equivalent quadratic
-root. Afocal systems have no finite reference sphere and therefore cannot use this mode.
-
-#### Inverse aiming
-
-For a reference ray launched at `p`, and requested physical separation `Delta X`, the
-partner's target is
-
-```text
-T = X(p) + Delta X.
-```
-
-The unknown is the two-component normalized entrance-pupil coordinate `u`. Beam42 solves
-
-```text
-G(u) = (Xx(u) - Tx, Xy(u) - Ty) = (0,0).
-```
-
-It starts from the traditional rigid entrance-pupil guess `u0 = p + delta`. At each
-iteration it traces two finite-difference probes to form the full 2-by-2 Jacobian
-`J = dG/du`, solves
-
-```text
-J du = -G,
-```
-
-and uses backtracking until the reference-sphere error decreases. The full matrix is
-important: it corrects both scale error along the requested axis and pupil-aberration
-induced cross-axis shear. The current limit is ten Newton iterations. The solver targets
-`2e-7 R_exit`; if numerical roundoff prevents another decreasing step, a result within
-`1e-6 R_exit` is still accepted. The latter is about 6 nm for a 6 mm exit-pupil radius
-and remains negligible compared with a contrast shear. Failure to trace, a singular inverse map, or failure to
-converge becomes an ordinary failed contrast partner ray with its context preserved.
-
-After convergence, the contrast residual uses the actual finite wavefront difference
-
-```text
-dW = W(u) - W(p),
-```
-
-not a rescaled version of the OPD from the original guessed ray. This distinction matters
-because `W(p + delta) - W(p)` is nonlinear for a finite shear.
-
-This is more faithful to the reduced exit-pupil coordinate used by the Hopkins OTF than
-`calibrateContrastFrequency(true)`, but it is also more expensive because each partner
-can require several trial traces. The two options are mutually exclusive. A failed or
-unavailable inverse map is reported as a failed contrast ray, preserving the fixed merit
-layout and the existing failure diagnostics.
-
-This first implementation retains Gaussian quadrature for the reference rays in the
-entrance pupil and the existing entrance-pupil overlap construction. It corrects the
-partner separation, but it does not remap the quadrature nodes or integration weights
-into a uniform exit-pupil quadrature. It is therefore an important correction rather
-than a complete exit-pupil OTF integral, and should be compared against independently
-calculated MTF before becoming the default.
-
-#### Regression evidence
-
-The tests compare the maximum two-dimensional error of both sagittal and tangential
-pairs over several pupil azimuths at 40 cycles/mm:
-
-| Lens and field | Rigid entrance shift | Block calibration | Direct aiming |
-| --- | ---: | ---: | ---: |
-| Nikkor Z 14-30 mm at 57.68 degrees | 0.69209 mm | not measured | 0.00000119 mm |
-| US 3,549,241 Example 5 at 45 degrees | 0.63498 mm | 0.09335 mm | 0.00000129 mm |
-
-The second case shows the distinction clearly. Block calibration removes about 85 percent
-of the maximum error, so it is useful, but its residual is still about 72,000 times the
-direct-aiming residual. These tests validate the ray-pair coordinate construction; they
-do not claim that the resulting optimized MTF must improve. On the Leica APO 75/2 the
-final independently measured MTF difference was small and mixed, which is consistent
-with the remaining quadrature approximation and with optimization finding a nearby
-design basin.
-
-### Per-sample frequency measurement
-
-This measurement is also available on its own, as a diagnostic that changes no residual.
-It is an analysis-level option rather than a builder one, since it does not affect
-optimization:
-
-```java
-new ContrastOptions(frequency).measure_frequency(true)
-```
-
-That populates `ContrastAnalysisResult.Shear` for every sample with the reference ray's
-exit-pupil coordinate, the shear each partner produced there, and both realized
-frequencies. Neither option costs an extra ray; both quantities come from rays the samples
-already trace.
-
-The currently reported `sagittalFrequency` and `tangentialFrequency` use image-ray
-direction differences, not the reduced exit-pupil separation used by direct aiming.
-They remain useful diagnostics, but are not an independent validation of the aimed
-Hopkins frequency coordinate.
-
-## The pupil the merit sees
-
-Every residual is evaluated over a pupil, and which pupil that is depends on the
-vignetting mode, on whether the factors are held fixed, and on whether rays are also
-rejected by the physical surface apertures. All three are configurable.
-
-### Vignetting mode
-
-```java
-.vignetting(VigType.SetPupil)   // the default
-```
-
-`SetPupil` resizes the pupil so the axial marginal ray meets the stop edge, then measures
-all four vignetting factors with real rays. `SetVig` measures the same factors without the
-resize and agrees closely, within 0.005 of pupil half-width and three to four MTF decimals
-on both test lenses.
-
-`Paraxial` is cheaper and behaves differently in a way that matters. It sets only the `y`
-factors, because a paraxial ray is meridional and can say nothing about the sagittal
-pupil, so `x` comes out unvignetted at every field. The pupil is then an ellipse even on
-axis, where sagittal and tangential MTF must be equal by rotational symmetry: measured
-0.148 apart at 40 cycles/mm on the Leica 75/2, and 0.010 on the Otus. Optimizing under it
-means the sagittal pupil is a superset of the real one and the tangential pupil a subset,
-roughly 19 percent short of the real tangential aperture at full field.
-
-### Freezing the factors
-
-Apertures are never optimization variables, but vignetting is not therefore constant: it
-is where rays land on those fixed apertures. On the Leica 75/2, 28 of 29 variables move a
-vignetting factor within a single Jacobian step. The drift is smooth, so it does not
-corrupt the finite-difference Jacobian, but it does mean the solver differentiates the
-design and the pupil together — and a more heavily vignetted lens has less aberration and
-better MTF. Shrinking the pupil is therefore a way to improve the merit that costs nothing
-in the merit and real light in the lens.
-
-```java
-.freezeVignetting()
-```
-
-This measures the factors once from a reference build and holds them for the run, so every
-iteration is compared on the same pupil. The cost is staleness: the factors describe the
-design at capture, and the further a solve travels the more the assumed pupil diverges
-from the real one. Call `Analysis.discard_frozen_vignetting()` between solver restarts to
-re-measure.
-
-With `SetPupil` the captured pupil value is held as well, since factors measured at one
-working f-number do not describe another. That pins `fod.fno`, which makes a `GoalParax`
-on `Fno` inert in that combination.
-
-### Physical aperture checking
-
-```java
-.checkSpotApertures(false)
-```
-
-Whether Gaussian-quadrature spot rays are additionally rejected when they cross a physical
-surface aperture. On by default. Grid and hexapolar sampling always check, so this setting
-applies to the Gaussian-quadrature path only.
-
-Contrast sampling is the other way round: it never checks by default, because its samples
-already occupy the common vignetted-pupil overlap and turning temporary clipping into a
-discontinuous failure would hurt the optimizer. `ContrastOptions.check_apertures(true)`
-overrides that for validation.
-
-Frozen factors together with `checkSpotApertures(false)` gives a pupil that is entirely
-factor-defined and fixed for the run, which is close to the conventional arrangement in
-commercial optimizers. The trade-off is that nothing then catches factors which are wrong
-or have gone stale: rays that the real lens blocks still contribute, so the merit can
-optimize light the lens does not pass.
-
-### Investigation: updating vignetting during optimization
-
-[Optimize the Apertures, Not the Vignetting Factors](https://www.linkedin.com/pulse/optimize-apertures-vignetting-factors-javier-ruiz-uw0yf/)
-argues that a sparsely sampled optimization merit should evaluate the vignetted pupil.
-Vignetting factors remap normalized pupil coordinates into an ellipse fitted to the
-surviving pupil. This is a sampling aid rather than a change to the optical system: with
-a sufficiently dense pupil grid, an analysis should converge to the same result without
-the remapping.
-
-For Gaussian/Forbes quadrature the remapping is particularly important. Sampling the
-complete entrance pupil directly can leave many nodes outside a cat's-eye-shaped
-transmitted pupil. Discarding those rays biases the quadrature and can make the merit
-change merely because the set of surviving samples changed. Vignetting factors allow a
-small, fixed-size sample set to represent the transmitted pupil much more accurately.
-They improve RMS convergence much more readily than a worst-ray quantity such as maximum
-geometric spot radius, which still requires adequate sampling near the pupil boundary.
-
-The article recommends recalculating the factors as the design evolves, rather than
-necessarily freezing them at the start. That differs from Beam42's current optional
-`freezeVignetting()` strategy. Freezing is reasonable for a local refinement in which the
-prescription and its clipping change little, and it prevents the optimizer from improving
-the merit simply by reducing the transmitted pupil. Its weakness is that the assumed
-pupil becomes stale when the design moves substantially. This is especially relevant to
-global optimization and to any future support for varying clear-aperture semi-diameters.
-
-The physical variables should be the surface clear-aperture semi-diameters, not the
-vignetting factors themselves. Factors are only an elliptical approximation to the
-surviving pupil, and arbitrary optimized factors need not correspond to any realizable
-set of apertures. If apertures become variables, relative illumination or throughput also
-needs a constraint so that the optimizer cannot obtain better image quality merely by
-discarding more of the pupil.
-
-Vignetting remapping and physical aperture checking are separate operations:
-
-- vignetting factors move sparse pupil samples into an approximation of the transmitted
-  pupil;
-- aperture checking verifies that each remapped ray actually passes every physical
-  aperture, since the fitted ellipse is not the exact cat's-eye boundary.
-
-The desired end state may therefore be to apply current vignetting factors and also check
-physical apertures during optimization. A failed ray must not simply be omitted from an
-RMS or contrast calculation: doing so changes the population being optimized and can
-reward additional clipping.
-
-This needs investigation before changing the default. In particular, compare the
-following policies on local and large-displacement optimizations:
-
-1. factors measured and frozen at the starting prescription;
-2. factors recalculated for every merit-function evaluation;
-3. the same two policies with physical aperture checking enabled;
-4. dense, non-remapped analysis of each final prescription as the reference result.
-
-Record merit continuity, failed-ray counts, independently measured spot RMS and MTF,
-relative illumination, and the drift between frozen factors and factors recalculated for
-the final prescription. This should establish whether dynamic factors give a more
-accurate merit without introducing finite-difference noise or allowing uncontrolled
-throughput loss.
-
-## Preserving the starting lens design
-
-Contrast optimization has a broad, smooth capture range and can substantially rearrange
-a lens when many prescription parameters are free. Optical performance goals alone do
-not preserve element shape, air gaps or mechanical layout. `OptimizationBuilder`
-therefore provides optional soft constraints that anchor varied parameters to their
-starting values.
-
-```java
-.applyCurvatureConstraints()
-.applyThicknessConstraints()
-.applyEdgeThicknessConstraints()
-```
-
-These methods add constraints only for the corresponding parameters that are actually
-varied. They pair naturally with `varyAllCurvatures()` and `varyAllThicknesses()`,
-but work equally with explicit surface lists.
-
-Both take an optional weight. The no-argument form uses
-`OptimizationBuilder.NOMINAL_CONSTRAINT_WEIGHT`, which is normally what you want: because
-the residuals are fractions of each starting value, the per-parameter scaling is already
-handled, and the weight sets only the global trade between optical performance and
-preserving the layout.
-
-Each constraint reports the parameter itself against a target of its starting value, in
-the same shape as `GoalParax`. A curvature constraint returns the surface curvature `1/r`
-against a target of `1/r0`; a thickness constraint returns `t` against a target of `t0`.
-Curvature is used rather than radius because a large radius change near a flat surface
-can represent a very small optical change.
-
-The solver forms `(value - target) * sqrt(weight)`, and what these constraints resist is
-a *fractional* change rather than an absolute one. That normalization is folded into the
-weight, since
-
-```text
-(v/v0 - 1) * sqrt(w) = (v - v0) * sqrt(w / v0^2)
-```
-
-so the stored weight is the configured weight divided by the square of the starting
-value, and a parameter's squared-merit contribution is
-
-```text
-weight * fractional_change^2
-```
-
-as it would be for an explicit fractional residual. One practical consequence: the weight
-held on a constraint is not the number passed to the builder. It is larger for small
-parameters and smaller for large ones, which is exactly what makes a 0.1mm air gap and a
-39mm back focus resist the same proportional change equally. `Constraint` exposes
-`fractional_deviation()` for reporting the proportional change directly.
-
-`ConstraintThickness`, `ConstraintEdgeThickness` and `ConstraintCurvature` are named for
-what they express, but they are implemented as penalty residuals in the least-squares
-merit rather than as hard bounds: they are soft constraints, not feasibility limits. A
-parameter is always free to move, it simply costs merit to do so. Increasing the weight
-keeps the design closer to its original form; decreasing it gives the optimizer more
-freedom. Nothing prevents a sufficiently strong optical gradient from pushing a parameter
-a long way regardless of weight.
-
-Since none of these imposes an absolute bound, final prescriptions still need mechanical
-checks for extreme curvatures and clearance.
-
-### Edge separation
-
-`ConstraintThickness` holds axial centre thickness, which is not the same as keeping two
-surfaces apart. The separation at height `h` is
-
-```text
-gap(h) = t + sag_next(h) - sag_this(h)
-```
-
-so curvature can bend two surfaces through each other while the axial gap sits untouched
-at its starting value. That is how a solve with thickness constraints already in place
-produced overlapping first and second surfaces on the Leica 75/2.
-
-`applyEdgeThicknessConstraints()` anchors the quantity that actually goes negative,
-measured by default at the smaller of the two bounding semi-diameters — the outermost
-height at which both surfaces exist. It complements the axial constraint rather than
-replacing it, and both are worth having whenever curvatures and thicknesses are varied
-together.
-
-On the Leica the two quantities are only loosely related, which is why one cannot stand in
-for the other:
-
-```text
-surf |  axial t  |  edge gap  | edge/axial
-   2 |    8.0000 |     0.9694 |      0.121
-   9 |    1.5000 |     0.3052 |      0.203
-   1 |    0.1000 |     4.7926 |     47.926
-```
-
-The tightest real clearance in that lens is 0.305mm at surface 9, where the axial
-constraint is anchored to 1.5mm. A fractional move the axial constraint treats as small is
-most of the actual clearance.
-
-Gaps whose starting edge separation is not positive and finite are skipped: a fractional
-constraint cannot be formed around zero, and a design that already starts with coincident
-or crossed surfaces has nothing useful to anchor to.
-
-### Choosing the weight
-
-Because a contrast merit can contain thousands of sample residuals but only a few dozen
-parameter-preservation residuals, compare their aggregate sum-of-squares contributions
-when choosing weights. The nominal weight is a useful starting point, but is not
-automatically equal in influence to the complete optical merit.
-
-This matters more than it first appears, because the optical merit grows with field count
-while the constraint count does not. Moving a setup from 4 fields to 11 took one contrast
-block from 5184 residuals to 14256 — a factor of 2.75 — against an unchanged 29
-constraints, so the nominal weight no longer held the line it was tuned to hold and the
-layout collapsed. If you add fields, scale the constraint weight with them.
-
-Raising the weight does tighten the design. On a fifteen-element f/2 with every air space
-free, the worst thickness excursion fell from 39% to 11% to 3% at weights of 1, 10 and
-100. The useful range is narrow, though: past the nominal weight the optical cost outruns
-the benefit, and the constraints begin to dominate the Jacobian and stall the solver.
-
-A single global weight is usually enough precisely because the residuals are fractional,
-so the per-parameter scaling is already handled. When one particular surface or space
-does need holding harder than the rest, construct the constraint directly rather than
-raising the global weight:
-
-```java
-.additionalGoals(analysis -> new ConstraintThickness(analysis, 7, 10.0))
-```
-
-The factory receives the same `Analysis` the setup owns, and the constraint still reads
-its starting value before any solving, so it anchors to the original prescription.
-
-## Per-ray RMS spot optimization
-
-`GoalSpotRMS` exposes one aggregate spot-radius value per field. Although suitable for
-measurement, differentiating a single square-rooted aggregate gives the solver much less
-information than exposing the signed ray deviations that make up the same RMS value.
-
-Enable the granular form with one field weight per configured field:
-
-```java
-.gaussianQuadratureSampling(6, 12)
-.spotDeviationGoals(new double[] {1.0, 1.0, 1.0, 1.0})
-```
-
-Separate X and Y field weights are also supported:
-
-```java
-.spotDeviationGoals(xWeights, yWeights)
-```
-
-Note that the array is *weights*, not targets: every residual aims at zero, so these
-goals minimize spot size rather than steer it to a value. This is the one difference in
-argument meaning from the neighbouring `spotRmsGoals(targets)` and
-`spotMaxRadiusGoals(targets)`.
-
-The sampling pattern is Gaussian quadrature. For every field, wavelength and pupil
-sample, the builder creates two `GoalSpotDeviation` residuals. If `(dx, dy)` is the ray
-intercept relative to the reference-wavelength centroid and `w_p` is its quadrature
-weight, their values in microns are
-
-```text
-r_x = 1000 sqrt(w_p) dx
-r_y = 1000 sqrt(w_p) dy
-```
-
-The merit function additionally applies the square roots of the field/orientation and
-wavelength weights. Consequently, minimizing the sum of the individual squared
-residuals is mathematically equivalent to minimizing the corresponding weighted RMS
-spot radius, while retaining the sign and direction of every ray error for the Jacobian.
-
-`gaussianQuadratureSampling` configures the common ordinary spot pattern used by
-per-ray spot goals, aggregate Gaussian spot analysis and geometric MTF. The historical
-default remains 14 rings by 20 spokes; 6 by 12 gives 72 pupil rays and 144 residuals per
-field and wavelength when a smaller optimization merit is wanted. Contrast retains a
-separate `contrastSampling` setting because it integrates over the overlap of sheared
-pupils rather than the ordinary spot pupil.
-
-For a concentric annular entrance pupil, pass its normalized inner radius as a third
-argument, for example `gaussianQuadratureSampling(6, 12, 0.50)`. See
-[`GAUSSIAN_QUADRATURE.md`](GAUSSIAN_QUADRATURE.md) for the formula, vignetting
-weighting, spoke-count guidance, and the exact scope relative to the reference paper.
-Sampling must remain fixed throughout an optimization; failed rays therefore retain
-their sample positions and report an invalid goal instead of being removed and shifting
-the remaining goal indices.
-
-Spot deviation goals cannot be combined with aggregate `spotRmsGoals`, maximum-radius spot
-goals, or explicitly requested hexapolar sampling in the same builder configuration.
-Maximum radius is inherently controlled by the worst sampled ray rather than a
-Gaussian-weighted RMS distribution and remains a separate hexapolar use case.
-
-### Suggested comparison measurements
-
-When comparing contrast optimization across prescriptions, record:
-
-- initial and final contrast merit;
-- initial and final independently calculated Gaussian-quadrature MTF;
-- initial and final spot RMS;
-- RMS `deltaW` for every field, frequency, and orientation;
-- the number of invalid contrast samples;
-- runtime and solver evaluation counts.
-
-The per-group RMS `deltaW` is particularly useful for identifying when the contrast
-goal is acting as a faithful MTF refiner and when it has moved outside its reliable
-small-phase operating range.
-
-
-# Useful links
-* https://www.linkedin.com/pulse/optimize-apertures-vignetting-factors-javier-ruiz-uw0yf/
+## Implementation notes
+
+- `OptimizationTrial.read(text, n, useGlassTypes)` reads `[trial n]` into an
+  `OptimizationBuilder` for the prescription in the same text, built with the trial's
+  `weighted` and `d-line-only`. `OptimizationBuilder.toTrial(n)` writes a builder back.
+  Both are ported to C++ like-for-like.
+- Each line is one builder call, with the same values:
+
+  | Trial | Builder |
+  |---|---|
+  | `description`, `outdir` | `description`, `outdir` |
+  | `configuration` | `scenario` |
+  | `fields`, `frequencies`, `weighted`, `d-line-only` | `fields`, `mtfFrequencies`, `weighted`, `dLineOnly` |
+  | `vignetting`, `frozen`, `check-spot-apertures` | `vignetting`, `freezeVignetting`, `checkSpotApertures` |
+  | `vary curvatures`, `vary thicknesses` | `varyAllCurvatures`/`varyAllCurvaturesExcept`/`varyCurvatures`, and the same for thicknesses |
+  | `vary aspherics existing` | `varyExistingAspherics` |
+  | `vary aspherics <surface> K <index>[:<scale>] ...` | `varyConic`, `varyAsphericCoefficient` |
+  | `constrain ...` | `applyCurvatureConstraints`, `applyThicknessConstraints`, `applyEdgeThicknessConstraints` |
+  | `goal contrast ...` | `contrastGoals`, `contrastBalanceGoals`, `contrastSampling`, `calibrateContrastFrequency`, `aimContrastAtExitPupil`, `centerContrastResiduals` |
+  | `goal mtf ...` | `mtfGoals` |
+  | `goal spot-rms`, `goal spot-max-radius`, `goal spot-deviation` | `spotRmsGoals`, `spotMaxRadiusGoals`, `spotDeviationGoals` |
+  | `goal spot sampling gaussian`, `goal spot sampling hexapolar` | `gaussianQuadratureSampling`, `hexapolarSampling` |
+  | `goal ray-aberrations` | `rayAberrationGoals` |
+  | `goal paraxial` | `paraxialGoal`, with the `ParaxHelper` id of the quantity |
+
+- `additionalVariables` and `additionalGoals` take code rather than values, so a builder
+  that uses them cannot be written as a trial; `toTrial` says so rather than dropping them.
+- `OptimizationTrial.readPipeline(text, n)` reads `[pipeline n]` into an
+  `OptimizationPipeline`, or returns null when the number names a trial;
+  `OptimizationPipeline.toPipeline` writes it back. LensTool2 runs the stages in order,
+  handing each the previous stage's prescription with the pipeline and its trials appended,
+  so a stage reads its own trial from the text exactly as a single run does.
+- The optimized prescription is `Prescription.to_opt_bench_str` followed by
+  `OptimizationBuilder.toTrial`.
+- Tests: each example trial is read into a builder and the setup it builds compared with
+  the example program's, variable by variable and goal by goal - before and after a round
+  trip through `toTrial`. The same trial files drive the C++ tests.

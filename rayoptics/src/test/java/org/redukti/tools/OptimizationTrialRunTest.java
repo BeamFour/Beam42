@@ -122,4 +122,60 @@ class OptimizationTrialRunTest {
         variable.read_from_prescription();
         assertEquals(prescription._surfaces[25]._thickness, variable.get_unscaled_value());
     }
+
+    /** A zoom of two configurations, 0 and 1, whose surface 8 varies between them. */
+    private static final String ZOOM = "Examples/jfotoptix/canon-rf70-200mm-f2.8LZ/US20250155694_Example01P.txt";
+
+    /** One configuration at a time: the tele stage starts from the wide stage's result. */
+    private static final String PIPELINE = """
+
+            [trial 5]
+            description       Wide end
+            configuration     0
+            fields            0
+            frequencies       20
+            vary thicknesses  8
+            goal paraxial     bfl 40
+
+            [trial 6]
+            description       Tele end
+            configuration     1
+            fields            0
+            frequencies       20
+            vary thicknesses  8
+            goal paraxial     bfl 40
+
+            [pipeline 7]
+            description       Wide, then tele
+            outdir            trials/zoom
+            trials            5 6
+            """;
+
+    @Test
+    void runsAPipelineStageByStage(@TempDir Path dir) throws Exception {
+        Path spec = dir.resolve("zoom.txt");
+        Files.writeString(spec, Files.readString(Path.of(ExampleFinder.geoPathToExample(ZOOM))) + PIPELINE);
+        Args arguments = Args.parseArguments(new String[]{"--specfile", spec.toString(), "--optimize", "7"});
+
+        String optimized = LensTool2.runOptimizationTrial(Files.readString(spec), arguments);
+
+        // One result, in the pipeline's own directory, and the rest of the run uses it.
+        Path output = dir.resolve("trials").resolve("zoom").resolve("zoom-pipeline7.txt");
+        assertTrue(Files.exists(output));
+        assertEquals(output.toAbsolutePath(), Path.of(arguments.specfile).toAbsolutePath());
+        assertEquals(optimized, Files.readString(output));
+
+        // Each stage moved its own configuration's column, so both changed.
+        var prescription = prescription(optimized);
+        assertNotEquals(8.46, prescription._surfaces[8]._thickness_by_scenario[0]);
+        assertNotEquals(13.14, prescription._surfaces[8]._thickness_by_scenario[1]);
+
+        // The result carries the pipeline and both its trials, so it can run again as it stands.
+        var again = OptimizationTrial.readPipeline(optimized, 7);
+        assertArrayEquals(new int[]{5, 6}, again.trials());
+        assertEquals("trials/zoom", again.outdir());
+        for (int stage : again.trials())
+            assertEquals(8, ((VarThickness) OptimizationTrial.read(optimized, stage, true)
+                    .build().variables()[0])._surface_id);
+    }
 }

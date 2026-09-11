@@ -65,8 +65,8 @@ public final class Args {
      */
     public String optimize_goal = "contrast";
     /**
-     * Number of the [trial n] section to run before reporting, from --optimize n. Null
-     * when no trial was asked for.
+     * Number of the [trial n] or [pipeline n] section to run before reporting, from
+     * --optimize n. Null when none was asked for.
      */
     public Integer optimize_trial = null;
     public boolean force = false;
@@ -231,7 +231,7 @@ public final class Args {
             // reported below
         }
         throw new IllegalArgumentException(
-                "--optimize takes the number of a [trial n] section, found '" + value + "'");
+                "--optimize takes the number of a [trial n] or [pipeline n] section, found '" + value + "'");
     }
 
     /** Accepts contrast or mtf, rejecting anything else rather than defaulting. */

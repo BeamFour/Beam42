@@ -1479,13 +1479,8 @@ public final class OptimizationBuilder {
         return sb.toString();
     }
 
-    /** One line of a trial: the keyword padded to a column, then its values. */
     private static void line(StringBuilder sb, String key, String values) {
-        sb.append(key);
-        int padding = Math.max(1, 22 - key.length());
-        for (int i = 0; i < padding; i++)
-            sb.append(' ');
-        sb.append(values).append('\n');
+        OptimizationTrial.line(sb, key, values);
     }
 
     private static String allExcept(int[] exclusions) {

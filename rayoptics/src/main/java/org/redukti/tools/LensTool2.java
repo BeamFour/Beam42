@@ -4,6 +4,7 @@ import org.redukti.exporters.ZemaxExporter;
 import org.redukti.importers.obench.ObenchFetcher;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.mathlib.M;
+import org.redukti.optim.OptimizationPipeline;
 import org.redukti.optim.OptimizationTrial;
 import org.redukti.optim.Var;
 import org.redukti.plotter.GeoMTFByFieldPlot;
@@ -384,19 +385,63 @@ public class LensTool2 {
     }
 
     /**
-     * Runs the [trial n] section of the prescription, writes the optimized prescription as
-     * {@code <name>-trial<n>.txt}, and points the rest of the run at that file, so the
-     * report describes the optimized lens.
+     * Runs the [trial n] or [pipeline n] section of the prescription - trials and pipelines
+     * share one numbering - writes the optimized prescription, and points the rest of the run
+     * at that file, so the report describes the optimized lens.
+     * <p>A pipeline runs its trials in order, each starting from the design the one before it
+     * produced, and writes one result at the end.
      * <p>The file, and so the report, goes to the --outdir given on the command line; failing
-     * that to the trial's own outdir, relative to the specfile; failing that next to the
-     * specfile.
+     * that to the trial's or pipeline's own outdir, relative to the specfile; failing that
+     * next to the specfile.
      *
      * @return the optimized prescription text
      */
     public static String runOptimizationTrial(String specText, Args arguments) throws Exception {
         int number = arguments.optimize_trial;
-        var builder = OptimizationTrial.read(specText, number, arguments.use_glass_types);
-        var prescription = builder.prescription();
+        var pipeline = OptimizationTrial.readPipeline(specText, number);
+        String optimized;
+        String outdir;
+        String suffix;
+        if (pipeline == null) {
+            var builder = OptimizationTrial.read(specText, number, arguments.use_glass_types);
+            solveTrial(builder, number);
+            // The prescription as Beam42 writes it, then the trial as the builder writes it, so
+            // the result can be reported on or the trial run again: surface positions are the
+            // same in both.
+            optimized = builder.prescription().to_opt_bench_str(new StringBuilder())
+                    .append('\n').append(builder.toTrial(number)).toString();
+            outdir = builder.outdir();
+            suffix = "-trial" + number + ".txt";
+        }
+        else {
+            System.out.println("Pipeline " + number
+                    + (pipeline.description() != null ? ": " + pipeline.description() : "")
+                    + ": trials " + pipeline.trialsText());
+            String text = specText;
+            for (int stage : pipeline.trials()) {
+                var builder = OptimizationTrial.read(text, stage, arguments.use_glass_types);
+                solveTrial(builder, stage);
+                text = carriedForward(builder.prescription(), pipeline, text, arguments.use_glass_types);
+            }
+            optimized = text;
+            outdir = pipeline.outdir();
+            suffix = "-pipeline" + number + ".txt";
+        }
+        Path specDirectory = Path.of(arguments.specfile).toAbsolutePath().getParent();
+        Path directory = arguments.outdir != null ? Path.of(arguments.outdir)
+                : outdir != null ? specDirectory.resolve(outdir)
+                : specDirectory;
+        Files.createDirectories(directory);
+        Path output = directory.resolve(
+                Helper.getOutputPathChangeExt(arguments.specfile, suffix).getFileName());
+        Files.writeString(output, optimized);
+        System.out.println("Wrote " + output);
+        arguments.specfile = output.toString();
+        return optimized;
+    }
+
+    /** Solves one trial, reporting what it varied and what that did to the merit. */
+    private static void solveTrial(org.redukti.optim.OptimizationBuilder builder, int number) {
         var setup = builder.build();
         var meritFunction = setup.meritFunction(false);
         Var[] variables = setup.variables();
@@ -417,21 +462,20 @@ public class LensTool2 {
         for (int i = 0; i < variables.length; i++)
             System.out.println("  " + OptimizationTrial.describe(variables[i]) + ": " + start[i]
                     + " -> " + variables[i].get_unscaled_value());
-        // The prescription as Beam42 writes it, then the trial as the builder writes it, so the
-        // result can be reported on or the trial run again: surface positions are the same.
-        String optimized = prescription.to_opt_bench_str(new StringBuilder())
-                .append('\n').append(builder.toTrial(number)).toString();
-        Path specDirectory = Path.of(arguments.specfile).toAbsolutePath().getParent();
-        Path directory = arguments.outdir != null ? Path.of(arguments.outdir)
-                : builder.outdir() != null ? specDirectory.resolve(builder.outdir())
-                : specDirectory;
-        Files.createDirectories(directory);
-        Path output = directory.resolve(
-                Helper.getOutputPathChangeExt(arguments.specfile, "-trial" + number + ".txt").getFileName());
-        Files.writeString(output, optimized);
-        System.out.println("Wrote " + output);
-        arguments.specfile = output.toString();
-        return optimized;
+    }
+
+    /**
+     * What a pipeline hands to its next stage, and writes at the end: the design as it now
+     * stands, the pipeline, and every trial the pipeline names - so the next stage can read
+     * its own trial from it, and the result can run the pipeline again as it stands.
+     */
+    private static String carriedForward(Prescription prescription, OptimizationPipeline pipeline,
+                                         String text, boolean useGlassTypes) throws Exception {
+        var sb = prescription.to_opt_bench_str(new StringBuilder());
+        sb.append('\n').append(pipeline.toPipeline());
+        for (int trial : pipeline.distinctTrials())
+            sb.append('\n').append(OptimizationTrial.read(text, trial, useGlassTypes).toTrial(trial));
+        return sb.toString();
     }
 
     private static String suffixed_name(String baseName, String suffix, String ext) {
@@ -467,7 +511,8 @@ public class LensTool2 {
             System.err.println("         --index-line e when the prescription quotes the refractive index at the e line rather than the d line");
             System.err.println("       --optimize varies the back focus on a prime, or the other variable airspaces on a zoom, at the central field");
             System.err.println("       --optimize-goal defaults to contrast; mtf uses the geometric MTF directly, which stalls more easily");
-            System.err.println("       --optimize trial runs the specfile's [trial n] section, writes the result as <specfile>-trial<n>.txt and reports on it");
+            System.err.println("       --optimize n runs the specfile's [trial n] section, writes the result as <specfile>-trial<n>.txt and reports on it");
+            System.err.println("         a [pipeline n] section runs its trials in order, each starting from the last result, and writes <specfile>-pipeline<n>.txt");
             System.err.println("       --mtf takes spatial frequencies in cycles/mm and defaults to 10,30,50, which is what the reports under Examples/ use");
             System.err.println("       --real-ray-aiming aims the chief ray by tracing a real ray at the entrance pupil, --paraxial-ray-aiming uses paraxial aiming; real is the default");
             System.err.println("       --patent fetches the prescription from the PhotonsToPhotos Optical Bench, e.g. --patent JP1993-034592 --example 2 --outdir ef14mm");

@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.redukti.optim.SetupAssertions.assertSameSetup;
 
 /**
- * The trials in Documentation/OPTIMIZER_SPEC.md build exactly the setups the example
+ * The trials in Documentation/OPTIMIZER.md build exactly the setups the example
  * programs build in code - the same variables and goals, in the same order, and the same
  * analysis settings - and still do after being written out by the builder and read back.
  */

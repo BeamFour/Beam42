@@ -15,7 +15,90 @@ writes a builder out as a trial. The values in a trial are the values the builde
 code - surfaces are its zero-based positions, aspheric coefficients its coefficient
 indices, MTF targets percentages - so a setup reads the same in either form.
 
-For what the goals measure and how to choose weights, see [OPTIMIZER.md](OPTIMIZER.md).
+[OPTIMIZER.md](OPTIMIZER.md) goes further into what the goals measure and how to weigh
+them against each other.
+
+## What a trial says
+
+A trial has three parts, and the sections below follow them:
+
+- **variables**, the parameters the solver may change: radii, thicknesses and aspheric
+  terms;
+- **goals**, what it aims at;
+- **constraints**, what holds the starting design together while it does.
+
+Each goal contributes one or more *residuals*, each the miss between what the design
+gives and what the goal asks for: `value − target`. The solver, Levenberg-Marquardt,
+minimizes the sum of the squares of all of them, with a goal's weight multiplying its
+squared residual, so weight 4 counts a miss like two of weight 1. What the run prints as
+the merit is the root mean square of the weighted residuals, before and after.
+
+Two things follow from that. A goal that yields many residuals - contrast or spot
+deviation, one per sampled ray - lets the solver see through to what a change is doing:
+it differentiates every residual against every variable, so it learns that moving a
+surface helps these rays and hurts those, and can trade the two off. Aggregate the same
+information into one number, an RMS spot radius say, and that cancellation has already
+happened before the solver sees it; all it can tell is whether the total got better or
+worse. And a block of thousands of residuals outweighs a handful of others unless the
+weights say otherwise, so weights are best compared between blocks, not chosen one goal
+at a time.
+
+A ray that misses a surface, or an analysis that fails, makes a goal report a huge value
+instead, which the solver reads as a rejected step rather than a direction to move in.
+
+### The goals
+
+| Goal | What each residual measures | Target |
+|---|---|---|
+| `goal contrast` | The wavefront difference between a pupil sample and a sheared copy of itself, per field, wavelength, sample and direction. A smooth, well behaved stand-in for MTF at that frequency. | 0 |
+| `goal contrast balance` | The difference between the sagittal and tangential contrast blocks at a field: one residual that holds the two meridians level. | 0 |
+| `goal mtf` | Geometric MTF at a frequency, field and direction, from the spot diagram. One residual each. | your percentage |
+| `goal spot-rms` | RMS spot radius at a field, in microns. One residual per field. | your radius, 0 to minimize |
+| `goal spot-max-radius` | The largest ray miss at a field, in microns. Needs hexapolar sampling, which samples the rim. | your radius |
+| `goal spot-deviation` | The signed X or Y miss of each sampled ray, in microns: the RMS spot broken into its parts, so the solver sees which rays are wrong and in which direction. | 0 |
+| `goal ray-aberrations` | Transverse aberration at each point of the classical sagittal and tangential ray fans. | 0 |
+| `goal paraxial` | A first-order quantity: focal length, back focus, f-number, pupil positions and the rest. | your value |
+
+Every run also anchors the effective focal length and the f-number to the prescription's
+values at weight 1, so a solve cannot quietly rescale the lens. A `goal paraxial efl` or
+`fno` line replaces that anchor.
+
+Which to use: contrast is the refinement tool, and works best on a design that is already
+reasonably corrected, since it assumes small phase differences; the geometric MTF goals
+measure the same thing more directly but their merit surface is rough at the scale the
+solver steps, so a solve driven by them stalls more easily; the spot goals suit a design
+that is still far out. [OPTIMIZER.md](OPTIMIZER.md) covers what contrast samples mean,
+how many residuals each choice produces, and how to choose between them.
+
+### The constraints
+
+An optical merit function has no opinion about mechanical layout: left alone the solver
+will collapse air spaces and drive elements through one another. Each constraint holds a
+varied parameter near where it started, as a cost rather than a bound - the parameter may
+still move, it just has to earn it.
+
+| Constraint | Holds |
+|---|---|
+| `constrain thicknesses` | Each varied thickness, at its centre. |
+| `constrain edges` | The edge separation of every gap a varied parameter can move, measured at the smaller of the two surfaces' semi-diameters. Complements the one above: two surfaces can keep their centre thickness and still cross further out. |
+| `constrain curvatures` | Each varied surface's curvature - not its radius, which runs away to infinity on a near-flat surface. |
+
+These residuals are *fractional*: the weight is divided by the square of the starting
+value, so a 1% change costs the same on a 0.1mm air gap as on a 39mm back focus, and one
+weight is sensible across a whole prescription. A constraint never reports the huge value
+described above: it exists to steer the solve, not to end it.
+
+The first-order specification is held the same way, by the paraxial goals: the automatic
+focal length and f-number anchors, and any `goal paraxial` line of your own - a back
+focus, say. They hold the design to its basic specs while the optical goals work on it,
+so they are constraints in everything but name, and the format calls them goals only
+because that is how they are built.
+
+They differ from the three above in a way worth knowing. Their residual is the plain
+difference from the target, not a fraction of it, so at the same weight a quantity of
+larger magnitude is held proportionally tighter: a 1% drift is a residual of 0.5 on a
+50mm focal length, but only 0.02 on f/2. Raise the weight on the f-number, or on any
+small quantity, if it moves more than you want.
 
 ## Running a trial
 
@@ -164,12 +247,15 @@ constrain thicknesses   1.0
 constrain edges         1.0
 ```
 
-Each holds the varied parameters near their starting values: curvatures, centre
-thicknesses, and the edge separation of every gap a varied parameter can move. The
-number is the weight, and may be left out; it defaults to 1.0, the builder's nominal
-weight. See "Preserving the starting lens design" in [OPTIMIZER.md](OPTIMIZER.md).
+What each one holds is described in [The constraints](#the-constraints) above. The number
+is the weight, and may be left out; it defaults to 1.0, the builder's nominal weight. See
+"Preserving the starting lens design" in [OPTIMIZER.md](OPTIMIZER.md) for how the weight
+behaves as it is raised.
 
 ## Goals
+
+What each goal measures is described in [The goals](#the-goals) above; this section is
+the syntax.
 
 Every goal line starts with `goal` and the goal type. Per-field rows take exactly one
 value per entry in `fields`, in the same order. Weights left out default to 1.

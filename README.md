@@ -68,6 +68,7 @@ holds generated reports for many more lenses.
 ## Resources
 
 * [LensTool2 command line tool](Documentation/LENSTOOL2.md) - options, input format and generated outputs.
+* [Optimizer](Documentation/OPTIMIZER.md) - what an optimization run aims at, and how to describe one in the prescription file.
 * [Glass catalogs](Documentation/GLASS_CATALOGS.md) - every glass Beam42 knows about.
 * [Introduction to BeamFour (YouTube)](https://youtu.be/-buXsCqEnq8)
 * [r/LensPatents](https://www.reddit.com/r/LensPatents/) - a related Reddit forum on lens patents and designs.

@@ -24,9 +24,8 @@ LensTool2 then:
    and `d-line-only` settings, and runs the solver;
 3. prints the trial's description, the merit function before and after, the solver
    status, and the final value of every variable;
-4. writes `lens-trial2.txt`, a copy of the input with the varied values replaced (see
-   [The optimized prescription](#the-optimized-prescription)), to the trial's output
-   directory;
+4. writes the optimized prescription, `lens-trial2.txt`, to the trial's output directory
+   (see [The optimized prescription](#the-optimized-prescription));
 5. produces the usual report from the optimized prescription in the same directory, as
    if LensTool2 had been run on `lens-trial2.txt`.
 
@@ -67,19 +66,23 @@ frequencies   10 30 50
 
 ## Referring to surfaces
 
-Surfaces are named the way the prescription names them:
+A surface is numbered by its position in `[lens data]`, counting from 0, as
+`OptimizationBuilder` numbers surfaces: the first row is surface 0, and every row counts,
+the aperture stop included. A thickness is numbered by the surface it follows, so
+thickness 25 is the gap after surface 25 - the back focus, when that is the last row.
 
-- by the number in the first column of `[lens data]`, such as `3` or `17`;
-- for thicknesses, also by the distance names in `[variable distances]`, such as
-  `d10` or `Bf`. A name refers to the surface whose thickness column holds it.
+The ids in the first column of `[lens data]` are not used, nor are the distance names in
+`[variable distances]`. So on a lens whose rows are labelled 1, 2, ..., 16, 16AS, 17, 18,
+surface 16 is the stop, and surface 18 the last. The `prescription.txt` LensTool2 writes
+numbers surfaces from 1, so its surface *n* is a trial's surface *n* − 1.
 
 A surface list takes one of three forms:
 
 | Form | Meaning |
 |---|---|
 | `all` | For curvatures, every surface except the aperture stop, field stops and flat (`Infinity`) surfaces. For thicknesses, every surface whose thickness in the configuration is not zero. |
-| `all except 8 11 25` | The same set without the listed surfaces. |
-| `3 5 6 13` | Exactly these surfaces. A flat surface listed here is varied, and so becomes curved. |
+| `all except 7 10 24` | The same set without the listed surfaces. |
+| `2 4 5 12` | Exactly these surfaces. A flat surface listed here is varied, and so becomes curved. |
 
 ## Settings
 
@@ -101,15 +104,15 @@ example programs do.
 ## Variables
 
 ```ini
-vary curvatures   all except 8 11 25
-vary thicknesses  d8 d15 d20
+vary curvatures   all except 7 10 24
+vary thicknesses  7 14 19
 vary aspherics    existing
-vary aspherics    1  K  A4:1e6  A6  A8  A10
+vary aspherics    0  K  A4:1e6  A6  A8  A10
 ```
 
 - `vary curvatures <list>` varies the radii of the listed surfaces.
-- `vary thicknesses <list>` varies thicknesses. On a zoom, a variable distance is varied
-  for the trial's configuration only.
+- `vary thicknesses <list>` varies thicknesses. On a zoom, a thickness that differs
+  between configurations is varied for the trial's configuration only.
 - `vary aspherics existing` makes a variable of every non-zero conic constant and
   aspheric coefficient already in the prescription. A sphere stays a sphere, and an
   asphere gains no orders it did not have.
@@ -265,20 +268,24 @@ goal replaces that target rather than adding a second one.
 ## The optimized prescription
 
 The optimized prescription is written to `<prescription>-trial<n>.txt` in the trial's
-output directory (see [Running a trial](#running-a-trial)), replacing any earlier one from
-the same trial. It is a copy of the input with only the varied values changed:
+output directory (see [Running a trial](#running-a-trial)), replacing any earlier one
+from the same trial. It is the optimized lens as Beam42 writes a prescription - the same
+format as the `prescription.txt` in a LensTool2 report - followed by the trial that was
+run, so the file can be reported on, or the trial run again, as it stands.
 
-- a radius, in its surface's `[lens data]` row;
-- a thickness, in its `[lens data]` row, or for a named distance in the configuration's
-  column of `[variable distances]`;
-- a conic constant or coefficient, in the surface's `[aspherical data]` row, which is
-  extended or created when terms were added.
+Being Beam42's own format, it holds what Beam42 reads and nothing else, whatever the input
+carried:
 
-Values are written in the shortest form that reads back as the same number, which the
-Java and C++ versions produce identically. Everything else is copied unchanged,
-including the trials, so the optimized file can be reported on or optimized again;
-running trial 1 on `lens-trial1.txt` writes `lens-trial1-trial1.txt`. Summary rows such
-as `Total Length` in `[variable distances]` are not recalculated.
+- surfaces are labelled 1, 2, 3, ... in order;
+- a zoom keeps only its configured scenarios, renumbered from 0 in the same order, so a
+  trial's `configuration` still means the same zoom position;
+- thicknesses that do not differ between configurations are written as numbers;
+- data derived from the design - total length, principal points, element and group
+  focal lengths - and anything else Beam42 does not use is left out, since it would no
+  longer describe the optimized lens.
+
+Surface positions are unchanged by this, so the trial carried over still refers to the
+same surfaces. Other trials in the input are not carried over.
 
 ## Examples
 
@@ -317,8 +324,8 @@ description       MTF targets, selected curvatures and the back focus
 fields            0 0.3 0.7 1.0
 frequencies       10 20 40
 
-vary curvatures   all except 8 11 25
-vary thicknesses  Bf
+vary curvatures   all except 7 10 24
+vary thicknesses  25
 vary aspherics    existing
 
 goal mtf   10 sag   93 93 94 93
@@ -339,7 +346,7 @@ fields            0 0.3 0.7 1.0
 frequencies       10 30 50
 
 vary curvatures   all
-vary aspherics    1  K  A4:1e6  A6:1e9  A8:1e11  A10:1e14
+vary aspherics    0  K  A4:1e6  A6:1e9  A8:1e11  A10:1e14
 
 constrain curvatures
 
@@ -361,7 +368,7 @@ d-line-only           no
 vignetting            set-vig frozen
 check-spot-apertures  no
 
-vary thicknesses      d8 d15 d20
+vary thicknesses      7 14 19
 
 goal contrast         10 30 50
 goal contrast         balance  all except 0 0.9 1.0   weight 1.0
@@ -370,10 +377,10 @@ goal contrast         sampling 6 12
 
 ## Implementation notes
 
-- A trial reader in `org.redukti.optim` turns one numbered section into a configured
-  `OptimizationBuilder`, and is ported to C++ like-for-like. It resolves surface names
-  to the builder's zero-based indices through each surface's id, and expands
-  `all except` itself using the builder's own `all` rules.
+- `OptimizationTrial` in `org.redukti.optim` turns one numbered section into a
+  configured `OptimizationBuilder`, and is ported to C++ like-for-like. Surface numbers
+  pass straight through as the builder's zero-based indices; `all except` uses the
+  builder's own `all` rules.
 - Keywords map onto existing builder calls:
 
   | Trial | Builder |
@@ -381,21 +388,19 @@ goal contrast         sampling 6 12
   | `configuration` | `scenario` |
   | `fields`, `frequencies`, `weighted`, `d-line-only` | `fields`, `mtfFrequencies`, `weighted`, `dLineOnly` |
   | `vignetting`, `frozen`, `check-spot-apertures` | `vignetting`, `freezeVignetting`, `checkSpotApertures` |
-  | `vary curvatures`, `vary thicknesses` | `varyAllCurvatures`/`varyCurvatures`, `varyAllThicknesses`/`varyThicknesses` |
-  | `vary aspherics existing` | `varyExistingAspherics` |
+  | `vary curvatures`, `vary thicknesses` | `varyAllCurvatures`/`varyAllCurvaturesExcept`/`varyCurvatures`, and the same for thicknesses |
+  | `vary aspherics existing` | `varyExistingAspherics`, or `varyExistingAsphericsExcept` when some surfaces have explicit rows |
   | `vary aspherics <surface> <terms>` | `additionalVariables` with `VarAsphK`/`VarAsphCoeff`, after extending the surface's coefficients |
   | `constrain ...` | `applyCurvatureConstraints`, `applyThicknessConstraints`, `applyEdgeThicknessConstraints` |
   | `goal contrast ...` | `contrastGoals`, `contrastBalanceGoals`, `contrastSampling`, `calibrateContrastFrequency`, `aimContrastAtExitPupil`, `centerContrastResiduals` |
   | `goal mtf ...` | `mtfGoals` |
   | `goal spot-...`, `goal spot sampling` | `spotRmsGoals`, `spotMaxRadiusGoals`, `gaussianQuadratureSampling`, `hexapolarSampling` |
   | `goal ray-aberrations` | `rayAberrationGoals` |
-  | `goal paraxial` | `additionalGoals` with `GoalParax` |
+  | `goal paraxial` | `focalLengthGoal`, `fNumberGoal`, or `additionalGoals` with `GoalParax` |
 
-- One builder change is needed: the automatic focal length and f-number anchors need
-  settable targets, so that a trial's `efl` or `fno` goal can replace them.
-- The builder's per-ray `spotDeviationGoals` are deliberately not exposed.
-- The optimized prescription is written by rewriting the input text line by line, the
-  way `GlassFinder.enrich` does for `--update-specfile`.
+- The builder's per-ray `spotDeviationGoals` are not exposed yet.
+- The optimized prescription is `Prescription.to_opt_bench_str` followed by the trial's
+  section text (`OptimizationTrial.optimizedPrescription`).
 - Tests: each example trial is parsed into a setup and compared with the setup built by
   the example program, variable by variable and goal by goal. The same trial files drive
   the C++ tests.

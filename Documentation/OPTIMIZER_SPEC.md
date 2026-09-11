@@ -9,6 +9,12 @@ package, and LensTool2 runs it, in both the Java and C++ versions.
 A prescription file can hold any number of trials, numbered `[trial 1]`, `[trial 2]` and
 so on, so the different setups tried on a lens sit next to the lens they belong to.
 
+A trial is an `OptimizationBuilder` written as text, and goes both ways:
+`OptimizationTrial.read` reads a trial into a builder, and `OptimizationBuilder.toTrial`
+writes a builder out as a trial. The values in a trial are the values the builder takes in
+code - surfaces are its zero-based positions, aspheric coefficients its coefficient
+indices, MTF targets percentages - so a setup reads the same in either form.
+
 For what the goals measure and how to choose weights, see [OPTIMIZER.md](OPTIMIZER.md).
 
 ## Running a trial
@@ -107,7 +113,7 @@ example programs do.
 vary curvatures   all except 7 10 24
 vary thicknesses  7 14 19
 vary aspherics    existing
-vary aspherics    0  K  A4:1e6  A6  A8  A10
+vary aspherics    0  K  1:1e6  2  3  4
 ```
 
 - `vary curvatures <list>` varies the radii of the listed surfaces.
@@ -122,23 +128,31 @@ vary aspherics    0  K  A4:1e6  A6  A8  A10
 
 ### Aspheric terms
 
-Terms are `K`, the conic constant, and `A<n>`, the coefficient of r<sup>n</sup>,
-numbered as in the prescription's `[aspherical data]`: `A4`, `A6`, ... for an even
-asphere, and `A3`, `A4`, ... for an odd one. `A2` is only available when the prescription
-declares even aspheres with an A2 term. A surface with no aspherical data becomes an
-asphere of the type the prescription declares, which is even unless it says otherwise.
+Terms are `K`, the conic constant, and coefficient indices, the index into the surface's
+coefficient array that `VarAsphCoeff` and `varyAsphericCoefficient` take:
+
+| Asphere | Index *i* is the coefficient of | So |
+|---|---|---|
+| even | r<sup>2(*i*+1)</sup> | 1 is A4, 2 is A6, 3 is A8, ... |
+| even with A2 | r<sup>2(*i*+1)</sup> | 0 is A2, 1 is A4, ... |
+| odd | r<sup>*i*+1</sup> | 2 is A3, 3 is A4, ... |
+
+An index the surface's type does not have - 0 on an even asphere without A2, 0 or 1 on
+an odd one - is an error. A spherical surface becomes an asphere of the type the
+prescription already uses, which is even when it has no aspheres.
 
 Each coefficient variable carries a scale, so that the solver works with values of order
-one. Give it after a colon, as in `A6:1e9`. Without one:
+one: the variable is the coefficient times the scale. Give it after a colon, as in
+`2:1e9`. Without one:
 
 - an existing non-zero coefficient uses 10<sup>−floor(log10 |value|)</sup>, as
   `vary aspherics existing` does;
 - a coefficient starting at zero uses 10<sup>round(log10 h<sup>n</sup>)</sup>, where h
-  is half the surface's diameter from `[lens data]`. One unit of the scaled variable
-  then moves the sag at the rim by about one lens unit. On the Noct-Nikkor's front
-  surface this gives 1e6, 1e8, 1e11 and 1e14 for A4 to A10, against the hand-chosen
-  1e6, 1e9, 1e11 and 1e14 in `NoctNikkor58mm`. A surface with no diameter needs
-  explicit scales.
+  is half the surface's diameter from `[lens data]` and n the power of r. One unit of the
+  scaled variable then moves the sag at the rim by about one lens unit. On the
+  Noct-Nikkor's front surface this gives 1e6, 1e8, 1e11 and 1e14 for coefficients 1 to 4,
+  against the hand-chosen 1e6, 1e9, 1e11 and 1e14 in `NoctNikkor58mm`. A surface with no
+  diameter needs explicit scales.
 
 `K` is used unscaled and takes no scale.
 
@@ -217,10 +231,15 @@ goal spot sampling    gaussian 6 12
 | `goal spot-rms <targets>` | Target RMS spot radius per field, in microns. | |
 | `goal spot-max-radius <targets>` | Target maximum spot radius per field, in microns. | |
 | `goal spot-rms\|spot-max-radius weights <weights>` | Weights for those targets. | 1 |
+| `goal spot-deviation <weights>` | Minimize RMS spot size through each ray's signed X and Y deviation, with one weight per field. | |
+| `goal spot-deviation x\|y <weights>` | Separate X and Y weights; both rows are needed. | |
 | `goal spot sampling gaussian <rings> <spokes> [<inner radius>]` | Gaussian-quadrature spot pattern, optionally annular. | `gaussian 14 20` |
-| `goal spot sampling hexapolar <rays>` | Hexapolar spot pattern. | |
+| `goal spot sampling hexapolar <rays>` | Use the hexapolar spot pattern. | |
 
-`spot-max-radius` switches the spot pattern to hexapolar.
+`spot-max-radius` switches the spot pattern to hexapolar. `spot-deviation` needs the
+Gaussian-quadrature pattern, and cannot be combined with `spot-rms`. The two sampling
+lines are separate settings and may both be given: the Gaussian-quadrature rings and
+spokes are kept even when hexapolar sampling is chosen.
 
 ### Ray aberrations
 
@@ -271,7 +290,12 @@ The optimized prescription is written to `<prescription>-trial<n>.txt` in the tr
 output directory (see [Running a trial](#running-a-trial)), replacing any earlier one
 from the same trial. It is the optimized lens as Beam42 writes a prescription - the same
 format as the `prescription.txt` in a LensTool2 report - followed by the trial that was
-run, so the file can be reported on, or the trial run again, as it stands.
+run, as the builder writes it, so the file can be reported on, or the trial run again, as
+it stands.
+
+The trial is written back in the builder's own form: settings at their defaults are left
+out, shorthand such as `0 to 1 step 0.1` is written out, and comments and blank lines are
+not kept.
 
 Being Beam42's own format, it holds what Beam42 reads and nothing else, whatever the input
 carried:
@@ -346,7 +370,7 @@ fields            0 0.3 0.7 1.0
 frequencies       10 30 50
 
 vary curvatures   all
-vary aspherics    0  K  A4:1e6  A6:1e9  A8:1e11  A10:1e14
+vary aspherics    0  K  1:1e6  2:1e9  3:1e11  4:1e14
 
 constrain curvatures
 
@@ -377,30 +401,33 @@ goal contrast         sampling 6 12
 
 ## Implementation notes
 
-- `OptimizationTrial` in `org.redukti.optim` turns one numbered section into a
-  configured `OptimizationBuilder`, and is ported to C++ like-for-like. Surface numbers
-  pass straight through as the builder's zero-based indices; `all except` uses the
-  builder's own `all` rules.
-- Keywords map onto existing builder calls:
+- `OptimizationTrial.read(text, n, useGlassTypes)` reads `[trial n]` into an
+  `OptimizationBuilder` for the prescription in the same text, built with the trial's
+  `weighted` and `d-line-only`. `OptimizationBuilder.toTrial(n)` writes a builder back.
+  Both are ported to C++ like-for-like.
+- Each line is one builder call, with the same values:
 
   | Trial | Builder |
   |---|---|
+  | `description`, `outdir` | `description`, `outdir` |
   | `configuration` | `scenario` |
   | `fields`, `frequencies`, `weighted`, `d-line-only` | `fields`, `mtfFrequencies`, `weighted`, `dLineOnly` |
   | `vignetting`, `frozen`, `check-spot-apertures` | `vignetting`, `freezeVignetting`, `checkSpotApertures` |
   | `vary curvatures`, `vary thicknesses` | `varyAllCurvatures`/`varyAllCurvaturesExcept`/`varyCurvatures`, and the same for thicknesses |
-  | `vary aspherics existing` | `varyExistingAspherics`, or `varyExistingAsphericsExcept` when some surfaces have explicit rows |
-  | `vary aspherics <surface> <terms>` | `additionalVariables` with `VarAsphK`/`VarAsphCoeff`, after extending the surface's coefficients |
+  | `vary aspherics existing` | `varyExistingAspherics` |
+  | `vary aspherics <surface> K <index>[:<scale>] ...` | `varyConic`, `varyAsphericCoefficient` |
   | `constrain ...` | `applyCurvatureConstraints`, `applyThicknessConstraints`, `applyEdgeThicknessConstraints` |
   | `goal contrast ...` | `contrastGoals`, `contrastBalanceGoals`, `contrastSampling`, `calibrateContrastFrequency`, `aimContrastAtExitPupil`, `centerContrastResiduals` |
   | `goal mtf ...` | `mtfGoals` |
-  | `goal spot-...`, `goal spot sampling` | `spotRmsGoals`, `spotMaxRadiusGoals`, `gaussianQuadratureSampling`, `hexapolarSampling` |
+  | `goal spot-rms`, `goal spot-max-radius`, `goal spot-deviation` | `spotRmsGoals`, `spotMaxRadiusGoals`, `spotDeviationGoals` |
+  | `goal spot sampling gaussian`, `goal spot sampling hexapolar` | `gaussianQuadratureSampling`, `hexapolarSampling` |
   | `goal ray-aberrations` | `rayAberrationGoals` |
-  | `goal paraxial` | `focalLengthGoal`, `fNumberGoal`, or `additionalGoals` with `GoalParax` |
+  | `goal paraxial` | `paraxialGoal`, with the `ParaxHelper` id of the quantity |
 
-- The builder's per-ray `spotDeviationGoals` are not exposed yet.
-- The optimized prescription is `Prescription.to_opt_bench_str` followed by the trial's
-  section text (`OptimizationTrial.optimizedPrescription`).
-- Tests: each example trial is parsed into a setup and compared with the setup built by
-  the example program, variable by variable and goal by goal. The same trial files drive
-  the C++ tests.
+- `additionalVariables` and `additionalGoals` take code rather than values, so a builder
+  that uses them cannot be written as a trial; `toTrial` says so rather than dropping them.
+- The optimized prescription is `Prescription.to_opt_bench_str` followed by
+  `OptimizationBuilder.toTrial`.
+- Tests: each example trial is read into a builder and the setup it builds compared with
+  the example program's, variable by variable and goal by goal - before and after a round
+  trip through `toTrial`. The same trial files drive the C++ tests.

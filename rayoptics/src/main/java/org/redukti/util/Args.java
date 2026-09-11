@@ -64,6 +64,11 @@ public final class Args {
      * solver steps, so a solve driven by it stalls in a local minimum.
      */
     public String optimize_goal = "contrast";
+    /**
+     * Number of the [trial n] section to run before reporting, from --optimize n. Null
+     * when no trial was asked for.
+     */
+    public Integer optimize_trial = null;
     public boolean force = false;
     /**
      * Vignetting calculation applied once the model is built. Defaults to the
@@ -160,7 +165,14 @@ public final class Args {
                 arguments.update_specfile = true;
             }
             else if (arg1.equals("--optimize")) {
-                arguments.optimize = true;
+                // Followed by a trial number it runs that [trial n]; on its own it is the
+                // routine airspace optimization.
+                if (arg2 != null && !arg2.startsWith("--")) {
+                    arguments.optimize_trial = parse_trial_number(arg2);
+                    i++;
+                }
+                else
+                    arguments.optimize = true;
             }
             else if (arg1.equals("--optimize-goal")) {
                 arguments.optimize_goal = parse_optimize_goal(arg2);
@@ -206,6 +218,20 @@ public final class Args {
             return normalized;
         throw new IllegalArgumentException(
                 "Unrecognized --index-line '" + value + "', expected one of: d, e");
+    }
+
+    /** Accepts the number of a [trial n] section. */
+    public static int parse_trial_number(String value) {
+        try {
+            int number = Integer.parseInt(value.trim());
+            if (number >= 0)
+                return number;
+        }
+        catch (NumberFormatException e) {
+            // reported below
+        }
+        throw new IllegalArgumentException(
+                "--optimize takes the number of a [trial n] section, found '" + value + "'");
     }
 
     /** Accepts contrast or mtf, rejecting anything else rather than defaulting. */

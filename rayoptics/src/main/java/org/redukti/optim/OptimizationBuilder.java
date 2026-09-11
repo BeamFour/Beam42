@@ -97,6 +97,13 @@ public final class OptimizationBuilder {
     private final List<GoalFactory> additionalGoalFactories = new ArrayList<>();
     private SpotGoals spotRmsGoals;
     private SpotGoals spotMaxRadiusGoals;
+    private int[] curvatureExclusions = new int[0];
+    private int[] thicknessExclusions = new int[0];
+    private int[] asphericExclusions = new int[0];
+    private Double focalLengthTarget;
+    private double focalLengthWeight = 1.0;
+    private Double fNumberTarget;
+    private double fNumberWeight = 1.0;
 
     private OptimizationBuilder(Prescription prescription) {
         if (prescription == null)
@@ -302,6 +309,7 @@ public final class OptimizationBuilder {
     public OptimizationBuilder varyCurvatures(int... surfaces) {
         this.curvatureSurfaces = copy(surfaces);
         this.allCurvatureSurfaces = false;
+        this.curvatureExclusions = new int[0];
         return this;
     }
 
@@ -310,13 +318,24 @@ public final class OptimizationBuilder {
      * whose radius is zero (and therefore intentionally flat) are excluded.
      */
     public OptimizationBuilder varyAllCurvatures() {
+        return varyAllCurvaturesExcept();
+    }
+
+    /**
+     * Vary every surface {@link #varyAllCurvatures()} would, apart from the listed ones.
+     * Saves spelling out a long list when only a few surfaces are to stay as they are.
+     */
+    public OptimizationBuilder varyAllCurvaturesExcept(int... surfaces) {
+        this.curvatureSurfaces = new int[0];
         this.allCurvatureSurfaces = true;
+        this.curvatureExclusions = copy(surfaces);
         return this;
     }
 
     public OptimizationBuilder varyThicknesses(int... surfaces) {
         this.thicknessSurfaces = copy(surfaces);
         this.allThicknessSurfaces = false;
+        this.thicknessExclusions = new int[0];
         return this;
     }
 
@@ -329,7 +348,14 @@ public final class OptimizationBuilder {
      * layout, the solver will collapse gaps and drive elements through one another.
      */
     public OptimizationBuilder varyAllThicknesses() {
+        return varyAllThicknessesExcept();
+    }
+
+    /** Vary every thickness {@link #varyAllThicknesses()} would, apart from the listed surfaces'. */
+    public OptimizationBuilder varyAllThicknessesExcept(int... surfaces) {
+        this.thicknessSurfaces = new int[0];
         this.allThicknessSurfaces = true;
+        this.thicknessExclusions = copy(surfaces);
         return this;
     }
 
@@ -390,6 +416,18 @@ public final class OptimizationBuilder {
 
     public OptimizationBuilder varyExistingAspherics(boolean include) {
         this.includeExistingAspherics = include;
+        this.asphericExclusions = new int[0];
+        return this;
+    }
+
+    /**
+     * Vary the existing aspheric terms of every surface apart from the listed ones. Lets
+     * a caller take over particular surfaces through {@link #additionalVariables(Var...)}
+     * - to add orders, or to choose scaling - without their terms being varied twice.
+     */
+    public OptimizationBuilder varyExistingAsphericsExcept(int... surfaces) {
+        this.includeExistingAspherics = true;
+        this.asphericExclusions = copy(surfaces);
         return this;
     }
 
@@ -568,6 +606,34 @@ public final class OptimizationBuilder {
                 throw new IllegalArgumentException("additional goal factories must not contain null");
             additionalGoalFactories.add(factory);
         }
+        return this;
+    }
+
+    /**
+     * Target and weight for the effective focal length goal every setup carries. Without
+     * this the target is the prescription's focal length for the scenario, at weight 1.
+     */
+    public OptimizationBuilder focalLengthGoal(double target, double weight) {
+        if (!Double.isFinite(target) || target <= 0.0)
+            throw new IllegalArgumentException("focal length target must be finite and positive");
+        if (!Double.isFinite(weight) || weight < 0.0)
+            throw new IllegalArgumentException("focal length weight must be finite and non-negative");
+        this.focalLengthTarget = target;
+        this.focalLengthWeight = weight;
+        return this;
+    }
+
+    /**
+     * Target and weight for the f-number goal every setup carries. Without this the
+     * target is the prescription's f-number for the scenario, at weight 1.
+     */
+    public OptimizationBuilder fNumberGoal(double target, double weight) {
+        if (!Double.isFinite(target) || target <= 0.0)
+            throw new IllegalArgumentException("f-number target must be finite and positive");
+        if (!Double.isFinite(weight) || weight < 0.0)
+            throw new IllegalArgumentException("f-number weight must be finite and non-negative");
+        this.fNumberTarget = target;
+        this.fNumberWeight = weight;
         return this;
     }
 
@@ -765,7 +831,8 @@ public final class OptimizationBuilder {
             for (int surface = 0; surface < prescription._surfaces.length; surface++) {
                 var definition = prescription._surfaces[surface];
                 if (!definition.is_aperture_stop() && !definition.is_field_stop()
-                        && definition._radius != 0.0)
+                        && definition._radius != 0.0
+                        && !contains(curvatureExclusions, surface))
                     result.add(new VarRadius(prescription, surface));
             }
         } else {
@@ -776,7 +843,7 @@ public final class OptimizationBuilder {
             for (int surface = 0; surface < prescription._surfaces.length; surface++) {
                 // A zero thickness is a coincident surface, not a space to open up, and
                 // it gives the fractional ConstraintThickness no base to work from.
-                if (thicknessOf(surface) != 0.0)
+                if (thicknessOf(surface) != 0.0 && !contains(thicknessExclusions, surface))
                     result.add(new VarThickness(prescription, surface, scenario));
             }
         } else {
@@ -785,6 +852,8 @@ public final class OptimizationBuilder {
         }
         if (includeExistingAspherics) {
             for (int surfaceId = 0; surfaceId < prescription._surfaces.length; surfaceId++) {
+                if (contains(asphericExclusions, surfaceId))
+                    continue;
                 var surface = prescription._surfaces[surfaceId];
                 if (surface._k != 0.0)
                     result.add(new VarAsphK(prescription, surfaceId));
@@ -895,10 +964,12 @@ public final class OptimizationBuilder {
                         spotMaxRadiusGoals.targets[field], spotMaxRadiusGoals.weights[field]));
         }
 
-        // Anchor first-order properties to the requested prescription values.
+        // Anchor first-order properties to the requested prescription values, unless the
+        // caller has set targets of its own.
         result.add(new GoalParax(analysis, ParaxHelper.Effective_focal_length,
-                focalLengthOf(), 1.0));
-        result.add(new GoalParax(analysis, ParaxHelper.Fno, fNumberOf(), 1.0));
+                focalLengthTarget != null ? focalLengthTarget : focalLengthOf(), focalLengthWeight));
+        result.add(new GoalParax(analysis, ParaxHelper.Fno,
+                fNumberTarget != null ? fNumberTarget : fNumberOf(), fNumberWeight));
 
         if (addRayAberrationGoals) {
             for (int field = 1; field <= fields.length; field++) {
@@ -985,6 +1056,9 @@ public final class OptimizationBuilder {
             spotMaxRadiusGoals.validate(fields.length, "spot maximum radius");
         validateSurfaces(curvatureSurfaces, "curvature");
         validateSurfaces(thicknessSurfaces, "thickness");
+        validateSurfaces(curvatureExclusions, "excluded curvature");
+        validateSurfaces(thicknessExclusions, "excluded thickness");
+        validateSurfaces(asphericExclusions, "excluded aspheric");
         if (addRayAberrationGoals && dLineOnly
                 && Arrays.stream(prescription._wvls).noneMatch(w -> sameWavelength(w, Glass.d)))
             throw new IllegalArgumentException("d-line optimization requires the prescription to contain the d-line wavelength");
@@ -1008,6 +1082,13 @@ public final class OptimizationBuilder {
 
     private static boolean sameWavelength(double a, double b) {
         return Math.abs(a - b) < 1.0e-3;
+    }
+
+    private static boolean contains(int[] values, int value) {
+        for (int v : values)
+            if (v == value)
+                return true;
+        return false;
     }
 
     private static double[] copy(double[] values) {

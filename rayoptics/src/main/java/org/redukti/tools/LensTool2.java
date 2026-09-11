@@ -4,6 +4,9 @@ import org.redukti.exporters.ZemaxExporter;
 import org.redukti.importers.obench.ObenchFetcher;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.mathlib.M;
+import org.redukti.optim.OptimizationTrial;
+import org.redukti.optim.OptimizedPrescriptionWriter;
+import org.redukti.optim.Var;
 import org.redukti.plotter.GeoMTFByFieldPlot;
 import org.redukti.plotter.GeoMTFPlot;
 import org.redukti.plotter.RayAberrationPlot;
@@ -70,15 +73,16 @@ public class LensTool2 {
     }
 
     /**
-     * Loads the prescription, optionally running the glass type matcher over it
+     * Reads the prescription text, optionally running the glass type matcher over it
      * first. The matched prescription is used for this run only; it replaces the
      * input file just when --update-specfile asks for that.
      */
-    private static OpticalBenchDataImporter.LensSpecifications loadSpecs(Args arguments) throws Exception {
-        if (!arguments.assign_glass_types)
-            return getSpecsFromFile(arguments.specfile);
+    private static String loadSpecText(Args arguments) throws Exception {
         Path specpath = Path.of(arguments.specfile);
-        var result = GlassFinder.enrich(Files.readString(specpath), arguments.force,
+        String text = Files.readString(specpath);
+        if (!arguments.assign_glass_types)
+            return text;
+        var result = GlassFinder.enrich(text, arguments.force,
                 arguments.index_line_value());
         System.out.printf("Assigned %d glass types; %d ambiguous; %d unmatched%n",
                 result.selected(), result.ambiguous(), result.unmatched());
@@ -88,9 +92,7 @@ public class LensTool2 {
             Files.writeString(specpath, result.text());
             System.out.println("Updated " + specpath);
         }
-        var specs = new OpticalBenchDataImporter.LensSpecifications();
-        specs.parse_buffer(result.text());
-        return specs;
+        return result.text();
     }
     public static Prescription createPrescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types, boolean d_line) {
         return Prescription.build_prescription(specs, use_glass_types, false, d_line);
@@ -382,6 +384,57 @@ public class LensTool2 {
         }
     }
 
+    /**
+     * Runs the [trial n] section of the prescription, writes the optimized prescription as
+     * {@code <name>-trial<n>.txt}, and points the rest of the run at that file, so the
+     * report describes the optimized lens.
+     * <p>The file, and so the report, goes to the --outdir given on the command line; failing
+     * that to the trial's own outdir, relative to the specfile; failing that next to the
+     * specfile.
+     *
+     * @return the optimized prescription text
+     */
+    public static String runOptimizationTrial(String specText, Args arguments) throws Exception {
+        int number = arguments.optimize_trial;
+        var trial = OptimizationTrial.parse(specText, number);
+        var specs = new OpticalBenchDataImporter.LensSpecifications();
+        specs.parse_buffer(specText);
+        var prescription = createPrescription(specs, arguments.use_glass_types,
+                trial.weighted(), trial.dLineOnly());
+        var setup = trial.builder(prescription).build();
+        var meritFunction = setup.meritFunction(false);
+        Var[] variables = setup.variables();
+        double[] start = new double[variables.length];
+        for (int i = 0; i < variables.length; i++) {
+            variables[i].read_from_prescription();
+            start[i] = variables[i].get_unscaled_value();
+        }
+        System.out.println("Trial " + number
+                + (trial.description() != null ? ": " + trial.description() : ""));
+        System.out.println(variables.length + " variables, " + setup.goals().length + " goals");
+        setup.analysis().compute();
+        double before = meritFunction.getRMS();
+        int status = meritFunction.getSolver().solve();
+        double after = meritFunction.getRMS();
+        System.out.printf("Status %d, merit %.6g -> %.6g%s%n", status, before, after,
+                after < before ? "" : " (no improvement)");
+        for (int i = 0; i < variables.length; i++)
+            System.out.println("  " + trial.describe(variables[i]) + ": " + start[i]
+                    + " -> " + variables[i].get_unscaled_value());
+        String optimized = OptimizedPrescriptionWriter.write(specText, prescription, variables);
+        Path specDirectory = Path.of(arguments.specfile).toAbsolutePath().getParent();
+        Path directory = arguments.outdir != null ? Path.of(arguments.outdir)
+                : trial.outdir() != null ? specDirectory.resolve(trial.outdir())
+                : specDirectory;
+        Files.createDirectories(directory);
+        Path output = directory.resolve(
+                Helper.getOutputPathChangeExt(arguments.specfile, "-trial" + number + ".txt").getFileName());
+        Files.writeString(output, optimized);
+        System.out.println("Wrote " + output);
+        arguments.specfile = output.toString();
+        return optimized;
+    }
+
     private static String suffixed_name(String baseName, String suffix, String ext) {
         return baseName + suffix + ext;
     }
@@ -409,12 +462,13 @@ public class LensTool2 {
             System.err.println("       [--output-ray-aberration-plots] [--output-wavelength-mtfs] [--auto-size-spot-diagrams] \\");
             System.err.println("       [--use-spot-pattern " + Args.spot_pattern_names() + "] [--spot-grid-size count] [--vig-type " + Args.vig_type_names() + "] \\");
             System.err.println("       [--real-ray-aiming|--paraxial-ray-aiming] [--mtf freq,freq,...] \\");
-            System.err.println("       [--assign-glass-types [--index-line d|e] [--force] [--update-specfile]] [--optimize [--optimize-goal contrast|mtf]]");
+            System.err.println("       [--assign-glass-types [--index-line d|e] [--force] [--update-specfile]] [--optimize [--optimize-goal contrast|mtf] | --optimize trial]");
             System.err.println("       --assign-glass-types matches each surface's nd/vd to a catalog glass for this run;");
             System.err.println("         --force re-matches surfaces that already name a glass, --update-specfile writes the result back to the specfile");
             System.err.println("         --index-line e when the prescription quotes the refractive index at the e line rather than the d line");
             System.err.println("       --optimize varies the back focus on a prime, or the other variable airspaces on a zoom, at the central field");
             System.err.println("       --optimize-goal defaults to contrast; mtf uses the geometric MTF directly, which stalls more easily");
+            System.err.println("       --optimize trial runs the specfile's [trial n] section, writes the result as <specfile>-trial<n>.txt and reports on it");
             System.err.println("       --mtf takes spatial frequencies in cycles/mm and defaults to 10,30,50, which is what the reports under Examples/ use");
             System.err.println("       --real-ray-aiming aims the chief ray by tracing a real ray at the entrance pupil, --paraxial-ray-aiming uses paraxial aiming; real is the default");
             System.err.println("       --patent fetches the prescription from the PhotonsToPhotos Optical Bench, e.g. --patent JP1993-034592 --example 2 --outdir ef14mm");
@@ -435,7 +489,11 @@ public class LensTool2 {
             // Real ray aiming is what makes very wide angle lenses trace correctly,
             // so it stays on unless the caller asks for paraxial aiming.
             boolean realRayAiming = arguments.real_ray_aiming == null || arguments.real_ray_aiming;
-            OpticalBenchDataImporter.LensSpecifications specs = loadSpecs(arguments);
+            String specText = loadSpecText(arguments);
+            if (arguments.optimize_trial != null)
+                specText = runOptimizationTrial(specText, arguments);
+            var specs = new OpticalBenchDataImporter.LensSpecifications();
+            specs.parse_buffer(specText);
             var prescription = createPrescription(specs,arguments.use_glass_types,arguments.only_d_line);
             if (arguments.optimize)
                 runDefaultOptimizations(prescription, arguments, vigType);

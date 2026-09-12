@@ -1,10 +1,16 @@
-# Optimizer
+# Optimizer Design Notes
 
-## Goal Contrast
+# Contrast Optimization
 
 Contrast optimization uses pupil wavefront differences as a fast, smooth proxy for
 MTF. It is intended primarily as a refinement method: it works best when the starting
 prescription is already reasonably corrected and the phase differences are small.
+
+The implementation is based on the description in following paper:
+
+E. Elliott, K. Moore, C. Normanshire, S. Gay, J. Aiona, and M. G. Nicholson, "Contrast optimization: a faster and
+better technique for optimizing on MTF," in *International Optical Design Conference 2017*, Proc. SPIE 10590,
+1059014 (2017), [doi:10.1117/12.2292761](https://doi.org/10.1117/12.2292761)
 
 ### What a sample means
 
@@ -145,93 +151,6 @@ improvement.
 Centring is off by default because it changes every contrast residual and therefore every
 committed regression value.
 
-### Controlling astigmatism
-
-The contrast merit minimizes `sum(sagittal^2) + sum(tangential^2)`. At a fixed total that
-barely discriminates how astigmatism is split between the two meridians, and a designer
-discriminates sharply. On the Leica 75/2 a solve produced this at 50 cycles/mm:
-
-```text
-field    0.0    0.2    0.4    0.6    0.7    0.8    0.9    1.0
-sag     .447   .407   .453   .295   .177   .156   .288   .565
-tan     .447   .413   .531   .657   .706   .725   .627   .539
-sum     .894   .820   .984   .952   .883   .881   .915  1.104
-```
-
-The sum stays within 15 percent of itself across the whole field while the difference goes
-from zero to 0.57. The lens is not worse in that zone, it is lopsided there, and nothing in
-the merit had an opinion about that.
-
-`GoalContrastBalance` supplies the opinion. Its value is the difference between what the
-two orientations contribute to the merit,
-
-```text
-sum_wavelengths w (
-    w_sagittal sum_samples r_sagittal^2
-  - w_tangential sum_samples r_tangential^2
-)
-```
-
-against a target of zero, positive when sagittal is the worse meridian. Defining it on the
-residuals rather than on raw wavefront differences means it follows whatever those already
-account for, including residual centring, frequency calibration, wavelength weights and
-the configured sagittal/tangential field weights. Its value is smooth and quadratic, with
-no modulus and no square root. Since the least-squares solver squares every goal value,
-its final merit contribution is quartic in the wavefront differences.
-
-The weights in that expression are exactly the weights used by the ordinary contrast
-goals. If a field gives sagittal contrast weight 2 and tangential weight 0.5, balance is
-reached when those *weighted merit contributions* are equal, not when the two unweighted
-residual energies are equal. A zero orientation weight removes that orientation from both
-the ordinary contrast block and the balance comparison. This keeps the balance goal from
-quietly imposing a different sagittal/tangential weighting policy from the contrast merit
-it accompanies.
-
-Enable it per field, since the outermost field usually wants leniency:
-
-```java
-.contrastBalanceGoals(new boolean[] {false, true, true, true, false})
-.contrastBalanceGoals(fields, 0.05)
-```
-
-One flag per configured field, in field order; false adds no explicit balance constraint at
-that field. The ordinary contrast residuals still constrain the two meridians independently.
-The goal applies to every configured contrast frequency, so it adds one residual per enabled
-field per frequency.
-
-**Leave it off on axis.** At field zero the two meridians are identical by rotational
-symmetry, so there is nothing to balance and the value reduces to
-
-```text
-(w_sagittal - w_tangential) * S
-```
-
-where `S` is the axial residual energy. With equal orientation weights that is exactly
-zero and the goal is inert. With unequal weights it is not: it silently becomes a second
-axial contrast goal of strength `w_sagittal - w_tangential`, which is normally a number
-that fell out of a field taper rather than a decision about axial emphasis. Measured on the
-Leica 75/2 with weights 8 and 4 on axis, it contributed 50.3 of a 802.6 merit — 6.3 percent,
-none of it balance.
-
-It also behaves unlike the contrast goals it is shadowing. `S` is already a sum of squares,
-so this residual is quadratic where the per-sample residuals are linear: it pushes hardest
-while axial aberration is large and fades quadratically as the design improves. If axial
-emphasis is what is wanted, raise the field-zero entries in the sagittal and tangential
-weight arrays instead. Those act through the ordinary residuals, scale predictably, and do
-not evaporate on convergence.
-
-**Set the weight from a measurement, not from the default.** A balance residual is a
-difference of sums of squares, so it is large exactly where a per-sample contrast residual
-is small. On the Leica starting design at 10/30/50 cycles/mm over 11 fields, the balance
-block at weight 1.0 came to 43.6 against the contrast block's 52.6 — 83 percent of the
-optical merit, from 33 residuals against 14256. `NOMINAL_BALANCE_WEIGHT` is 0.1, which puts
-it near 8 percent there, but nothing in this goal adapts to the design the way the
-fractional design-preservation constraints do.
-
-Be clear about what this is. Residual centring corrects an error in the merit; this does
-not. It tells the optimizer a design preference it has no way to infer — that astigmatism
-should be shared between the meridians rather than dumped on one of them.
-
 ### Operating range and limitation
 
 The proxy is most faithful in the small-phase regime:
@@ -248,30 +167,6 @@ On a poorly corrected starting prescription, the phase differences may span or w
 through one or more cycles. In that regime, the squared wavefront differences no longer
 uniquely determine MTF and can improve while independently measured MTF gets worse.
 Contrast merit should therefore be validated against a separate spot/MTF analysis.
-
-### Comparison with Gaussian-quadrature MTF goals
-
-A Gaussian-quadrature geometric MTF goal traces pupil rays to image-plane intercepts,
-constructs a spot distribution, and estimates MTF from that distribution:
-
-```text
-pupil ray -> image intercept -> spot distribution -> estimated MTF
-```
-
-Contrast optimization instead compares pairs of wavefront samples separated by the
-frequency-dependent pupil shear:
-
-```text
-paired pupil rays -> OPD difference -> least-squares residual
-```
-
-A contrast sample is therefore associated with one spatial frequency. A spot sample,
-by contrast, can contribute to every MTF frequency calculated from the same spot
-distribution.
-
-Contrast goals are normally much smoother and cheaper to evaluate, but they are a
-surrogate. Gaussian-quadrature MTF provides the more direct result and is useful both as
-an alternative optimization goal and as an independent validation measurement.
 
 ### Exit-pupil frequency calibration
 
@@ -757,7 +652,118 @@ raising the global weight:
 The factory receives the same `Analysis` the setup owns, and the constraint still reads
 its starting value before any solving, so it anchors to the original prescription.
 
-## Per-ray RMS spot optimization
+### Controlling astigmatism
+
+The contrast merit minimizes `sum(sagittal^2) + sum(tangential^2)`. At a fixed total that
+barely discriminates how astigmatism is split between the two meridians, and a designer
+discriminates sharply. On the Leica 75/2 a solve produced this at 50 cycles/mm:
+
+```text
+field    0.0    0.2    0.4    0.6    0.7    0.8    0.9    1.0
+sag     .447   .407   .453   .295   .177   .156   .288   .565
+tan     .447   .413   .531   .657   .706   .725   .627   .539
+sum     .894   .820   .984   .952   .883   .881   .915  1.104
+```
+
+The sum stays within 15 percent of itself across the whole field while the difference goes
+from zero to 0.57. The lens is not worse in that zone, it is lopsided there, and nothing in
+the merit had an opinion about that.
+
+`GoalContrastBalance` supplies the opinion. Its value is the difference between what the
+two orientations contribute to the merit,
+
+```text
+sum_wavelengths w (
+    w_sagittal sum_samples r_sagittal^2
+  - w_tangential sum_samples r_tangential^2
+)
+```
+
+against a target of zero, positive when sagittal is the worse meridian. Defining it on the
+residuals rather than on raw wavefront differences means it follows whatever those already
+account for, including residual centring, frequency calibration, wavelength weights and
+the configured sagittal/tangential field weights. Its value is smooth and quadratic, with
+no modulus and no square root. Since the least-squares solver squares every goal value,
+its final merit contribution is quartic in the wavefront differences.
+
+The weights in that expression are exactly the weights used by the ordinary contrast
+goals. If a field gives sagittal contrast weight 2 and tangential weight 0.5, balance is
+reached when those *weighted merit contributions* are equal, not when the two unweighted
+residual energies are equal. A zero orientation weight removes that orientation from both
+the ordinary contrast block and the balance comparison. This keeps the balance goal from
+quietly imposing a different sagittal/tangential weighting policy from the contrast merit
+it accompanies.
+
+Enable it per field, since the outermost field usually wants leniency:
+
+```java
+.contrastBalanceGoals(new boolean[] {false, true, true, true, false})
+.contrastBalanceGoals(fields, 0.05)
+```
+
+One flag per configured field, in field order; false adds no explicit balance constraint at
+that field. The ordinary contrast residuals still constrain the two meridians independently.
+The goal applies to every configured contrast frequency, so it adds one residual per enabled
+field per frequency.
+
+**Leave it off on axis.** At field zero the two meridians are identical by rotational
+symmetry, so there is nothing to balance and the value reduces to
+
+```text
+(w_sagittal - w_tangential) * S
+```
+
+where `S` is the axial residual energy. With equal orientation weights that is exactly
+zero and the goal is inert. With unequal weights it is not: it silently becomes a second
+axial contrast goal of strength `w_sagittal - w_tangential`, which is normally a number
+that fell out of a field taper rather than a decision about axial emphasis. Measured on the
+Leica 75/2 with weights 8 and 4 on axis, it contributed 50.3 of a 802.6 merit — 6.3 percent,
+none of it balance.
+
+It also behaves unlike the contrast goals it is shadowing. `S` is already a sum of squares,
+so this residual is quadratic where the per-sample residuals are linear: it pushes hardest
+while axial aberration is large and fades quadratically as the design improves. If axial
+emphasis is what is wanted, raise the field-zero entries in the sagittal and tangential
+weight arrays instead. Those act through the ordinary residuals, scale predictably, and do
+not evaporate on convergence.
+
+**Set the weight from a measurement, not from the default.** A balance residual is a
+difference of sums of squares, so it is large exactly where a per-sample contrast residual
+is small. On the Leica starting design at 10/30/50 cycles/mm over 11 fields, the balance
+block at weight 1.0 came to 43.6 against the contrast block's 52.6 — 83 percent of the
+optical merit, from 33 residuals against 14256. `NOMINAL_BALANCE_WEIGHT` is 0.1, which puts
+it near 8 percent there, but nothing in this goal adapts to the design the way the
+fractional design-preservation constraints do.
+
+Be clear about what this is. Residual centring corrects an error in the merit; this does
+not. It tells the optimizer a design preference it has no way to infer — that astigmatism
+should be shared between the meridians rather than dumped on one of them.
+
+### Contrast Optimization versus Gaussian-quadrature MTF goals
+
+A Gaussian-quadrature geometric MTF goal traces pupil rays to image-plane intercepts,
+constructs a spot distribution, and estimates MTF from that distribution:
+
+```text
+pupil ray -> image intercept -> spot distribution -> estimated MTF
+```
+
+Contrast optimization instead compares pairs of wavefront samples separated by the
+frequency-dependent pupil shear:
+
+```text
+paired pupil rays -> OPD difference -> least-squares residual
+```
+
+A contrast sample is therefore associated with one spatial frequency. A spot sample,
+by contrast, can contribute to every MTF frequency calculated from the same spot
+distribution.
+
+Contrast goals are normally much smoother and cheaper to evaluate, but they are a
+surrogate. Gaussian-quadrature MTF provides the more direct result and is useful both as
+an alternative optimization goal and as an independent validation measurement.
+
+# Per-ray RMS spot optimization
 
 `GoalSpotRMS` exposes one aggregate spot-radius value per field. Although suitable for
 measurement, differentiating a single square-rooted aggregate gives the solver much less

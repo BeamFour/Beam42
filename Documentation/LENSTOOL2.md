@@ -260,6 +260,8 @@ and the defaults are what the committed examples use.
 | `--auto-size-spot-diagrams` | off | Scale each spot diagram to its own spot size. By default all spot diagrams share a fixed 600 unit radius so that fields stay visually comparable. |
 | `--mtf <f1,f2,...>` | `10,30,50` | Spatial frequencies in cycles/mm for the MTF by field plots. Every report under `Examples/` uses the default, so change it only when comparing against a manufacturer's own choice of frequencies. |
 | `--output-wavelength-mtfs` | off | Additionally emit a per wavelength monochromatic MTF plot for each field. |
+| `--output-pupil-maps` | off | Additionally measure and draw which part of each field's pupil the lens passes, and which surface blocks the rest. See below. |
+| `--pupil-map-samples <n>` | 121 | Samples per axis in a pupil map. Only consulted with `--output-pupil-maps`. Minimum 2. |
 | `--output-ray-aberration-plots` | off | Additionally emit transverse ray aberration **and** wavefront (OPD) fan plots, tangential and sagittal, for each field. |
 | `--assign-glass-types` | off | Match each surface's nd and vd to a catalog glass before analysing, so the model uses the full dispersion curve instead of a two number approximation. Applies to this run only. |
 | `--index-line <d\|e>` | `d` | Which line the prescription's refractive index column is quoted at, for `--assign-glass-types`. See below. |
@@ -270,8 +272,8 @@ and the defaults are what the committed examples use.
 | `--optimize-goal <contrast\|mtf>` | `contrast` | Objective for `--optimize`. |
 | `--real-ray-aiming` / `--paraxial-ray-aiming` | real | Chief ray aiming algorithm. Real aiming traces an actual ray at the entrance pupil; paraxial aiming is faster but does not hold up on very wide angle lenses. Applies to the analysis model, not the layout diagrams. |
 
-Invalid values for `--mtf`, `--vig-type`, `--use-spot-pattern` and
-`--spot-grid-size` are rejected with an error rather than silently falling back
+Invalid values for `--mtf`, `--vig-type`, `--use-spot-pattern`,
+`--spot-grid-size` and `--pupil-map-samples` are rejected with an error rather than silently falling back
 to the default, since each of them changes the numbers that come out.
 
 ### Vignetting types
@@ -307,6 +309,42 @@ geometric MTF derived from them, so it changes every spot and MTF number.
 paper it follows. `hex` is the historical default and is what the committed
 reports under `Examples/` use.
 
+### Pupil maps
+
+`--output-pupil-maps` measures, rather than assumes, which part of each field's
+pupil the lens passes. A dense grid of raw pupil coordinates is traced with the
+physical apertures checked and the vignetting factors **not** applied, so the
+rays that survive map out the bundle the lens really transmits. Each map draws
+that region, colours the rest by the surface that blocks it, and overlays the
+nominal pupil and the region the vignetting factors describe.
+
+It answers a question the other outputs cannot: whether the four measured
+factors put the sampled region where the light actually is. On a normal lens
+they shrink the pupil and the two agree closely. On a wide angle lens the
+factors are negative - `scale = 1 - factor`, so they *expand* the pupil - and
+the bundle off axis reaches well outside the nominal pupil, which is why
+sampling confined to the unit circle flatters those lenses.
+
+`pupil-report<suffix>.txt` carries the numbers for every field:
+
+```text
+field  vig scales x-,x+,y-,y+       passed |x|,|y|   nominal pupil   piecewise sampled/covered   ellipse sampled/covered
+ 0.80   1.300  1.300  1.120  1.084    1.296  1.097           100%               98% 98%             98% 98%
+ 1.00   1.418  1.418  0.654  1.049    1.413  1.032            86%               90% 100%             90% 99%
+```
+
+* **vig scales** - the factors as the tracer applies them, `1 - factor`.
+* **passed |x|,|y|** - how far the traced bundle actually reaches.
+* **nominal pupil** - how much of the unit circle the lens passes.
+* **sampled / covered** - for each candidate mapping of the factors, the share of
+  the mapped region the lens passes (rays not wasted on blocked light) and the
+  share of the bundle the region reaches (light not missed). `piecewise` is what
+  the tracer uses; `ellipse` is the single translated ellipse through the same
+  four measured extremes, described in [OPTIMIZER.md](OPTIMIZER.md).
+
+`--pupil-map-samples` sets the grid resolution per axis, 121 by default. The cost
+is its square, so raise it only for a close look at a boundary.
+
 ## Output files
 
 `<suffix>` is empty for a single configuration lens, or `-0`, `-1`, ... for a
@@ -329,6 +367,10 @@ spec with multiple configurations (a zoom, for instance).
 | `mtf<suffix>.svg` / `.csv` | yes | Geometric MTF by field, equal weighted across wavelengths.                                          |
 | `mtf-w<suffix>.svg` / `.csv` | yes | Geometric MTF by field, weighted across wavelengths.                                                |
 | `mtf-fld<i>-<wavelength><suffix>.svg` | `--output-wavelength-mtfs` | Monochromatic MTF per field and wavelength. Not included in the README.                             |
+| `pupil<suffix>.svg` | `--output-pupil-maps` | Measured pupil map, axial field. Not included in the README. |
+| `pupil-semi-skew<suffix>.svg` | `--output-pupil-maps` | Measured pupil map, 0.7 field. Not included in the README. |
+| `pupil-skew<suffix>.svg` | `--output-pupil-maps` | Measured pupil map, full field. Not included in the README. |
+| `pupil-report<suffix>.txt` | `--output-pupil-maps` | Per field: the vignetting scales, how far the bundle reaches, and how well each candidate mapping describes it. |
 | `rayabbr-fld<i>-{tan,sag}<suffix>.svg` | `--output-ray-aberration-plots` | Transverse ray aberration fans. Not included in the README.                               |
 | `opdabbr-fld<i>-{tan,sag}<suffix>.svg` | `--output-ray-aberration-plots` | Wavefront (OPD) fans. Not included in the README.                                         |
 

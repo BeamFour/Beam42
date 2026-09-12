@@ -1,5 +1,6 @@
 package org.redukti.util;
 
+import org.redukti.rayoptics.analysis.PupilMapAnalysis;
 import org.redukti.rayoptics.analysis.SpotOptions;
 import org.redukti.spec.VigType;
 
@@ -74,8 +75,20 @@ public final class Args {
      * Vignetting calculation applied once the model is built. Defaults to the
      * value every tool in this module already hard-codes, so wiring an existing
      * tool up to this field is a no-op.
+     * <p>In LensTool2 this settles the models the ANALYSIS outputs are computed from - the
+     * spot diagrams, the MTF, the ray aberration fans and the vignetting and paraxial
+     * dumps. The layout diagrams and the routine optimization set their own; see
+     * {@code LensTool2.LAYOUT_VIG_TYPE} and {@code LensTool2.OPTIMIZATION_VIG_TYPE}.
      */
     public VigType vig_type = VigType.SetPupil;
+    /**
+     * Write the measured pupil maps beside the other reports: which part of each field's
+     * pupil the lens passes, and which surface blocks the rest. See
+     * {@link org.redukti.rayoptics.analysis.PupilMapAnalysis}.
+     */
+    public boolean output_pupil_maps = false;
+    /** Samples per axis in a pupil map; the cost is the square of this. */
+    public int pupil_map_samples = PupilMapAnalysis.DEFAULT_NUM_SAMPLES;
     /**
      * Selects the chief ray aiming algorithm. TRUE aims with a real ray trace
      * at the entrance pupil (what the model calls a wide angle system), FALSE
@@ -149,6 +162,13 @@ public final class Args {
             }
             else if (arg1.equals("--spot-grid-size")) {
                 arguments.spot_grid_size = parse_positive_int(arg1, arg2);
+                i++;
+            }
+            else if (arg1.equals("--output-pupil-maps")) {
+                arguments.output_pupil_maps = true;
+            }
+            else if (arg1.equals("--pupil-map-samples")) {
+                arguments.pupil_map_samples = parse_positive_int(arg1, arg2);
                 i++;
             }
             else if (arg1.equals("--auto-size-spot-diagrams")) {

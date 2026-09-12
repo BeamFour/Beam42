@@ -9,6 +9,7 @@ import org.redukti.optim.OptimizationTrial;
 import org.redukti.optim.Var;
 import org.redukti.plotter.GeoMTFByFieldPlot;
 import org.redukti.plotter.GeoMTFPlot;
+import org.redukti.plotter.PupilMapPlot;
 import org.redukti.plotter.RayAberrationPlot;
 import org.redukti.plotter.SpotDiagram;
 import org.redukti.rayoptics.analysis.*;
@@ -32,6 +33,25 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class LensTool2 {
+
+    /**
+     * Vignetting for the LAYOUT diagrams, whatever the analysis uses.
+     *
+     * <p>A layout draws the rim rays of each bundle, so it needs the factors that say where
+     * the bundle actually ends: without them the drawn rays are the nominal pupil's, which
+     * on a wide angle lens is not the bundle the apertures pass. This is why the layout has
+     * always set its own vignetting rather than following --vig-type.
+     */
+    private static final VigType LAYOUT_VIG_TYPE = VigType.SetPupil;
+
+    /**
+     * Vignetting for the routine airspace optimization (--optimize), which is not the
+     * analysis setting: a merit function wants a ray set that keeps its sensitivity to the
+     * variables rather than one that measures the lens exactly, and the vignetted bundle
+     * gives that for fewer rays. A [trial n] states its own, defaulting the same way
+     * through OptimizationBuilder.
+     */
+    private static final VigType OPTIMIZATION_VIG_TYPE = VigType.SetPupil;
 
     public static OpticalBenchDataImporter.LensSpecifications getSpecsFromFile(String specfile) throws Exception {
         OpticalBenchDataImporter.LensSpecifications specs = new OpticalBenchDataImporter.LensSpecifications();
@@ -299,6 +319,33 @@ public class LensTool2 {
         }
     }
 
+    /**
+     * Writes the measured pupil maps: which part of each field's pupil the lens passes,
+     * which surface blocks the rest, and how well the vignetting factors describe it.
+     *
+     * <p>Named like the spot diagrams, and for the same three fields, so a map sits beside
+     * the spot it explains. The report covers every field.
+     */
+    private static void generatePupilMaps(OpticalModel opm, Args arguments, String filename_suffix) throws Exception {
+        var maps = PupilMapAnalysis.eval(opm, arguments.pupil_map_samples, null);
+        Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile,
+                suffixed_name("pupil-report", filename_suffix, ".txt"), arguments.outdir), maps.toString());
+        for (var map : maps.maps) {
+            String filename = null;
+            if (map.fld.y == 0.0)
+                filename = suffixed_name("pupil", filename_suffix, ".svg");
+            else if (map.fld.y == 0.7)
+                filename = suffixed_name("pupil-semi-skew", filename_suffix, ".svg");
+            else if (map.fld.y == 1.0)
+                filename = suffixed_name("pupil-skew", filename_suffix, ".svg");
+            if (filename == null)
+                continue;
+            Helper.createOutputFile(
+                    Helper.getOutputFileWithPath(arguments.specfile, filename, arguments.outdir),
+                    new PupilMapPlot(map).plot());
+        }
+    }
+
     private static SpotOptions spotOptions(Args arguments) {
         SpotOptions options = new SpotOptions();
         if (arguments.spot_pattern == SpotOptions.PATTERN_GAUSS_QUADRATURE)
@@ -328,7 +375,7 @@ public class LensTool2 {
     public static void doLayoutDiagrams(Prescription prescription,Args arguments, int config, String filename_suffix) throws Exception {
         // First we use rayoptics to get ray starts
         // For very wide angle lenses, blindly spraying rays doesn't work very well
-        var opm = createLayoutSystem(prescription,config,VigType.SetPupil,true);
+        var opm = createLayoutSystem(prescription,config,LAYOUT_VIG_TYPE,true);
         Layout2D layout = new Layout2D();
         Path output = Helper.getOutputFileWithPath(arguments.specfile,suffixed_name("layout-fan",filename_suffix,".svg"),arguments.outdir);
         String fan = layout.renderSvg(opm, 1000, 500,
@@ -513,6 +560,10 @@ public class LensTool2 {
             System.err.println("       --optimize-goal defaults to contrast; mtf uses the geometric MTF directly, which stalls more easily");
             System.err.println("       --optimize n runs the specfile's [trial n] section, writes the result as <specfile>-trial<n>.txt and reports on it");
             System.err.println("         a [pipeline n] section runs its trials in order, each starting from the last result, and writes <specfile>-pipeline<n>.txt");
+            System.err.println("       --vig-type settles the models the analysis outputs are computed from; the layouts and --optimize set their own");
+            System.err.println("       --output-pupil-maps writes pupil[-semi-skew|-skew].svg and pupil-report.txt: the part of each field's pupil the lens passes,");
+            System.err.println("         the surface that blocks the rest, and how well the vignetting factors describe it; --pupil-map-samples sets the grid, default "
+                    + PupilMapAnalysis.DEFAULT_NUM_SAMPLES);
             System.err.println("       --mtf takes spatial frequencies in cycles/mm and defaults to 10,30,50, which is what the reports under Examples/ use");
             System.err.println("       --real-ray-aiming aims the chief ray by tracing a real ray at the entrance pupil, --paraxial-ray-aiming uses paraxial aiming; real is the default");
             System.err.println("       --patent fetches the prescription from the PhotonsToPhotos Optical Bench, e.g. --patent JP1993-034592 --example 2 --outdir ef14mm");
@@ -529,7 +580,9 @@ public class LensTool2 {
         try {
             long startTime = System.nanoTime();
             final double[] fields = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
-            VigType vigType = arguments.vig_type;
+            // --vig-type settles the models the analysis outputs are computed from; the
+            // layouts and the routine optimization set their own.
+            VigType analysisVigType = arguments.vig_type;
             // Real ray aiming is what makes very wide angle lenses trace correctly,
             // so it stays on unless the caller asks for paraxial aiming.
             boolean realRayAiming = arguments.real_ray_aiming == null || arguments.real_ray_aiming;
@@ -540,7 +593,7 @@ public class LensTool2 {
             specs.parse_buffer(specText);
             var prescription = createPrescription(specs,arguments.use_glass_types,arguments.only_d_line);
             if (arguments.optimize)
-                runDefaultOptimizations(prescription, arguments, vigType);
+                runDefaultOptimizations(prescription, arguments, OPTIMIZATION_VIG_TYPE);
             String prescription_output = prescription.to_opt_bench_str(new StringBuilder()).toString();
             Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile, "prescription.txt", arguments.outdir), prescription_output);
             ZemaxExporter zemaxExporter = new ZemaxExporter();
@@ -551,7 +604,7 @@ public class LensTool2 {
                 if (prescription.get_num_configurations() > 0)
                     addConfigLabelToREADME(SB,prescription._configuration_names[config]);
                 var scenario_filesuffix = prescription.get_num_configurations() > 0 ? ("-"+config) : "";
-                var opm = createSystem(prescription, true, vigType, realRayAiming, fields, config);
+                var opm = createSystem(prescription, true, analysisVigType, realRayAiming, fields, config);
                 var sm = opm.seq_model;
                 var osp = opm.optical_spec;
                 var fod = opm.optical_spec.parax_data.fod;
@@ -571,6 +624,8 @@ public class LensTool2 {
                 //System.out.println(Trace.list_ray(buf,Trace.trace_ray(opm, Vector2.vector2_0,osp.fov.fields[4],sm.central_wavelength(),new TraceOptions()).pkg,null,null).toString());
 
                 var spotAnalysis = generateSpotDiagrams(opm, arguments, !arguments.auto_size_spots, scenario_filesuffix);
+                if (arguments.output_pupil_maps)
+                    generatePupilMaps(opm, arguments, scenario_filesuffix);
                 addLayoutsToREADME(SB,scenario_filesuffix);
                 addSpotDiagramsToREADME(SB,scenario_filesuffix);
                 addFodToREADME(SB,fod);
@@ -580,7 +635,7 @@ public class LensTool2 {
                 if (arguments.do_ray_aberrations)
                     generateRayAberrationPlots(opm, arguments, scenario_filesuffix);
                 // Generate MTF with weighted average across wavelengths
-                opm = createSystem(prescriptionForWeightedMTF, true, vigType, realRayAiming, fields, config);
+                opm = createSystem(prescriptionForWeightedMTF, true, analysisVigType, realRayAiming, fields, config);
                 generateMTFs(opm, arguments, fields, prescriptionForWeightedMTF.get_wvl_wts(), "mtf-w", scenario_filesuffix);
             }
             createREADME(SB,

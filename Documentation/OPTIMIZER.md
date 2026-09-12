@@ -51,16 +51,16 @@ instead, which the solver reads as a step to reject rather than a direction to m
 
 ### The goals
 
-| Goal | What each residual measures                                                                                                                              | Target                           | Aggregate |
-|---|----------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|-----------|
-| `goal contrast` | Increase contrast at a specific MTF frequency.                                                                                                              | 0                                | No        |
-| `goal contrast balance` | Reduces the difference between the sagittal and tangential contrast at a field: aims to reduce astigmatism. Only available with contrast goals.          | 0                                | Yes       |
-| `goal mtf` | Geometric MTF at a frequency, field and direction.                                                                                                       | your percentage, 100 to maximize | Yes       |
-| `goal spot-rms` | RMS spot radius at a field, in microns.                                                                                                                  | your radius, 0 to minimize       | Yes       |
-| `goal spot-max-radius` | The largest ray miss at a field, in microns. Needs hexapolar sampling, which samples the rim.                                                            | your radius                      | Yes       |
+| Goal | What each residual measures                                                                                                                                 | Target                           | Aggregate |
+|---|-------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|-----------|
+| `goal contrast` | Increases contrast at a specific MTF frequency. Measures loss of contrast hence target is 0 loss.                                                | 0                                | No        |
+| `goal contrast balance` | Reduces the difference between the sagittal and tangential contrast at a field: aims to reduce astigmatism. Only available with contrast goals.             | 0                                | Yes       |
+| `goal mtf` | Geometric MTF at a frequency, field and direction.                                                                                                          | your percentage, 100 to maximize | Yes       |
+| `goal spot-rms` | RMS spot radius at a field, in microns.                                                                                                                     | your radius, 0 to minimize       | Yes       |
+| `goal spot-max-radius` | The largest ray miss at a field, in microns. Needs hexapolar sampling, which samples the rim.                                                               | your radius                      | Yes       |
 | `goal spot-deviation` | The signed X or Y miss of each sampled ray, in microns: the RMS spot broken into its parts, so the solver sees which rays are wrong and in which direction. | 0                                | No        |
-| `goal ray-aberrations` | Transverse aberration at each point of the classical sagittal and tangential ray fans.                                                                   | 0                                | No        |
-| `goal paraxial` | A first-order quantity: focal length, back focus, f-number, pupil positions and the rest.                                                                | your value                       | Yes       |
+| `goal ray-aberrations` | Transverse aberration at each point of the classical sagittal and tangential ray fans.                                                                      | 0                                | No        |
+| `goal paraxial` | A first-order quantity: focal length, back focus, f-number, pupil positions and the rest.                                                                   | your value                       | Yes       |
 
 The goals are classified as aggregate or not. An aggregate goal targets a metric at field/wavelength level that is affected by the 
 design as a whole, the optimizer cannot see the effect of each individual ray trace. The non-aggregate goals allow the optimizer

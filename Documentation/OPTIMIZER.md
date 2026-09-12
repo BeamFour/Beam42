@@ -1,4 +1,17 @@
-# Optimizer Configuration
+# Beam42 Optimizer
+
+The Optimizer is Beam42 is not suitable for designing lenses from scratch as it
+lacks global optimization, and other features necessary. Its main use case is to fine
+tune existing designs. It has also been used successfully in reverse engineering attempts
+where glass types are known and initial estimates of curvatures and distances is 
+possible.
+
+There is no UI for the optimizer. There are two ways it can be used:
+
+* There is a Builder class in the library that can be used to construct the configuration
+  and then execute it.
+* You can add configurations in the LensTool2 input prescriptions. This is covered in
+  the rest of this document.
 
 Beam42 prescription files can include optimizer configurations alongside the lens specification. 
 Each [trial n] section defines an optimization run for one lens configuration (scenario). 
@@ -18,15 +31,6 @@ package, and LensTool2 runs it, in both the Java and C++ versions.
 A prescription file can hold any number of trials, numbered `[trial 1]`, `[trial 2]` and
 so on, so the different setups tried on a lens sit next to the lens they belong to.
 
-A trial is an `OptimizationBuilder` written as text, and goes both ways:
-`OptimizationTrial.read` reads a trial into a builder, and `OptimizationBuilder.toTrial`
-writes a builder out as a trial. The values in a trial are the values the builder takes in
-code - surfaces are its zero-based positions, aspheric coefficients its coefficient
-indices, MTF targets percentages - so a setup reads the same in either form.
-
-[OPTIMIZER_NOTES.md](OPTIMIZER_NOTES.md) goes further into what the goals measure and how to weigh
-them against each other.
-
 ## What a trial says
 
 A trial has three parts, and the sections below follow them:
@@ -42,47 +46,45 @@ minimizes the sum of the squares of all of them, with a goal's weight multiplyin
 squared residual, so weight 4 counts a miss like two of weight 1. What the run prints as
 the merit is the root mean square of the weighted residuals, before and after.
 
-Two things follow from that. A goal that yields many residuals - contrast or spot
-deviation, one per sampled ray - lets the solver see through to what a change is doing:
-it differentiates every residual against every variable, so it learns that moving a
-surface helps these rays and hurts those, and can trade the two off. Aggregate the same
-information into one number, an RMS spot radius say, and that cancellation has already
-happened before the solver sees it; all it can tell is whether the total got better or
-worse. And a block of thousands of residuals outweighs a handful of others unless the
-weights say otherwise, so weights are best compared between blocks, not chosen one goal
-at a time.
-
-A ray that misses a surface, or an analysis that fails, makes a goal report a huge value
-instead, which the solver reads as a rejected step rather than a direction to move in.
-
 ### The goals
 
-| Goal | What each residual measures | Target |
-|---|---|---|
-| `goal contrast` | The wavefront difference between a pupil sample and a sheared copy of itself, per field, wavelength, sample and direction. A smooth, well behaved stand-in for MTF at that frequency. | 0 |
-| `goal contrast balance` | The difference between the sagittal and tangential contrast blocks at a field: one residual that holds the two meridians level. | 0 |
-| `goal mtf` | Geometric MTF at a frequency, field and direction, from the spot diagram. One residual each. | your percentage |
-| `goal spot-rms` | RMS spot radius at a field, in microns. One residual per field. | your radius, 0 to minimize |
-| `goal spot-max-radius` | The largest ray miss at a field, in microns. Needs hexapolar sampling, which samples the rim. | your radius |
-| `goal spot-deviation` | The signed X or Y miss of each sampled ray, in microns: the RMS spot broken into its parts, so the solver sees which rays are wrong and in which direction. | 0 |
-| `goal ray-aberrations` | Transverse aberration at each point of the classical sagittal and tangential ray fans. | 0 |
-| `goal paraxial` | A first-order quantity: focal length, back focus, f-number, pupil positions and the rest. | your value |
+| Goal | What each residual measures                                                                                                                              | Target                           | Aggregate |
+|---|----------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|-----------|
+| `goal contrast` | Increase contrast at specfic MTF frequency.                                                                                                              | 0                                | No        |
+| `goal contrast balance` | Reduces the difference between the sagittal and tangential contrast at a field: aims to reduce astigmatism. Only available with contrast goals.          | 0                                | Yes       |
+| `goal mtf` | Geometric MTF at a frequency, field and direction.                                                                                                       | your percentage, 100 to maximize | Yes       |
+| `goal spot-rms` | RMS spot radius at a field, in microns.                                                                                                                  | your radius, 0 to minimize       | Yes       |
+| `goal spot-max-radius` | The largest ray miss at a field, in microns. Needs hexapolar sampling, which samples the rim.                                                            | your radius                      | Yes       |
+| `goal spot-deviation` | The signed X or Y miss of each sampled ray, in microns: the RMS spot broken into its parts, so the solver sees which rays are wrong and in which direction. | 0                                | No        |
+| `goal ray-aberrations` | Transverse aberration at each point of the classical sagittal and tangential ray fans.                                                                   | 0                                | No        |
+| `goal paraxial` | A first-order quantity: focal length, back focus, f-number, pupil positions and the rest.                                                                | your value                       | Yes       |
 
-Every run also anchors the effective focal length and the f-number to the prescription's
+The goals are classified as aggregate or not. An aggregate goal targets a metric at field/wavelength level that is affected by the 
+design as a whole, the optimizer cannot see the effect of each individual ray trace. The non-aggregate goals allow the optimizer
+to see through the impact of each ray trace.
+
+The non-aggregate goals, particularly contrast and spot deviations, can cause the optimizer to significantly alter
+a design. This is particularly true if the design is relatively simple or heavily aberrated. You must always enable
+constraints on curvatures and gaps, as well as on paraxial values, if you want to design to be refinement of the
+original.
+
+Every run anchors the effective focal length and the f-number to the prescription's
 values at weight 1, so a solve cannot quietly rescale the lens. A `goal paraxial efl` or
 `fno` line replaces that anchor.
 
-Which to use: contrast is the refinement tool, and works best on a design that is already
-reasonably corrected, since it assumes small phase differences; the geometric MTF goals
-measure the same thing more directly but their merit surface is rough at the scale the
-solver steps, so a solve driven by them stalls more easily; the spot goals suit a design
-that is still far out. [OPTIMIZER_NOTES.md](OPTIMIZER_NOTES.md) covers what contrast samples mean,
-how many residuals each choice produces, and how to choose between them.
+The contrast goals produce the best MTF results, but may not work well with older aberrated
+designs. The spot size goals are less effective in improving MTF because a spot size is not necessarily
+correlated to MTF. The Geometric MTF goals are useful when you want to reproduce an MTF curve
+rather than achieve the best MTF. But the Geometric MTF goals work at an aggregate level and may not 
+be as effective.
+
+You will need to play with weights to influence the outcome. Often it requires repeated trial and error
+to come up with a configuration that gives good results.
 
 ### The constraints
 
-An optical merit function has no opinion about mechanical layout: left alone the solver
-will collapse air spaces and drive elements through one another. Each constraint holds a
+An optical merit function has no opinion about mechanical layout: left alone depending on the configuration, 
+the solver will collapse air spaces and drive elements through one another. Each constraint holds a
 varied parameter near where it started, as a cost rather than a bound - the parameter may
 still move, it just has to earn it.
 
@@ -577,3 +579,6 @@ goal contrast         sampling 6 12
 - Tests: each example trial is read into a builder and the setup it builds compared with
   the example program's, variable by variable and goal by goal - before and after a round
   trip through `toTrial`. The same trial files drive the C++ tests.
+
+[OPTIMIZER_NOTES.md](OPTIMIZER_NOTES.md) goes further into what the goals measure and how to weigh
+them against each other.

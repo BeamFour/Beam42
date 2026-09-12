@@ -1,4 +1,13 @@
-# Optimization Trials
+# Optimizer Configuration
+
+Beam42 prescription files can include optimizer configurations alongside the lens specification. 
+Each [trial n] section defines an optimization run for one lens configuration (scenario). 
+An optional [pipeline n] section runs several trials in sequence, each starting from the previous 
+trial’s result. Pipelines are particularly useful for zoom lenses, where trials can alternate 
+between configurations that share the same optical surfaces, or for combining coarse 
+and fine optimization stages.
+
+## Optimization Trials
 
 An optimization trial is a section in a prescription file that describes an optimizer
 run. It says which fields and frequencies are evaluated, what the solver may change,
@@ -129,41 +138,6 @@ so a number claimed by both is an error, as is one the file does not define.
 `--optimize` without a number keeps its existing meaning, the routine air-space
 optimization controlled by `--optimize-goal`.
 
-## Pipelines
-
-A pipeline runs trials one after another, each starting from the design the one before it
-produced:
-
-```ini
-[pipeline 5]
-description   Zoom: wide, then tele, twice over
-outdir        trials/zoom
-trials        1 2 1 2
-```
-
-`lenstool2 --specfile lens.txt --optimize 5` then runs trial 1, trial 2, trial 1 again and
-trial 2 again, and writes `lens-pipeline5.txt`.
-
-A zoom is what it was made for. Only one configuration is optimized at a time, so the wide
-end is optimized first and the tele end starts from that result. The two configurations
-share every radius and glass thickness, so the second stage partly undoes the first, which
-is why the stages are usually written to alternate until the design settles. Nothing about
-it is specific to zooms: a coarse stage followed by a fine one, or spot goals followed by
-contrast, chain the same way.
-
-| Line | Meaning | Default |
-|---|---|---|
-| `trials` | The trials to run, in order. A trial may appear more than once. | required |
-| `description` | Free text, shown when the pipeline runs. | none |
-| `outdir` | Where the result goes; the stages' own `outdir` lines are not used, since a pipeline writes one result. | the prescription's directory |
-
-- Each stage reads its trial afresh, so a stage's `configuration`, `weighted` and
-  `d-line-only` are its own.
-- A pipeline runs trials, not other pipelines.
-- Only the final design is written. The file carries the prescription, the pipeline, and
-  every trial the pipeline names, so it can run the pipeline again as it stands - which is
-  how you take another two passes at a zoom that has not settled.
-
 ## Layout
 
 ```ini
@@ -207,7 +181,11 @@ A surface list takes one of three forms:
 |---|---|
 | `all` | For curvatures, every surface except the aperture stop, field stops and flat (`Infinity`) surfaces. For thicknesses, every surface whose thickness in the configuration is not zero. |
 | `all except 7 10 24` | The same set without the listed surfaces. |
-| `2 4 5 12` | Exactly these surfaces. A flat surface listed here is varied, and so becomes curved. |
+| `2 4 5 12` | Exactly these surfaces, including flat surfaces if explicitly listed. |
+
+An explicitly listed flat surface cannot be combined with `constrain curvatures`:
+the fractional constraint needs a finite, non-zero starting curvature. Remove the
+flat surface from the list or omit the curvature constraint for that trial.
 
 ## Settings
 
@@ -218,13 +196,16 @@ A surface list takes one of three forms:
 | `configuration` | Configuration to optimize, counting from 0. Only matters for a zoom. | `0` |
 | `fields` | Relative field heights between 0 and 1, the first being 0. `0 to 1 step 0.1` is shorthand for eleven evenly spaced fields. | required |
 | `frequencies` | Frequencies, in cycles/mm, at which the MTF is measured. | required |
-| `weighted` | `yes` uses the prescription's wavelength weights; `no` weighs every wavelength equally. | `yes` |
-| `d-line-only` | Restrict ray-aberration goals to the d line. | `no` |
+| `weighted` | `yes` selects the five d, C, e, F and g lines with built-in weights; `no` selects the three d, F and C lines with equal weights. | `yes` |
+| `d-line-only` | Use only the d line for all goals in the trial, overriding the wavelength set selected by `weighted`. | `no` |
 | `vignetting` | A `--vig-type` name (`none`, `paraxial`, `set-vig`, `set-pupil`, ...), optionally followed by `frozen` to measure it once and hold it for the run. | `set-pupil` |
 | `check-spot-apertures` | Whether Gaussian-quadrature spot rays are stopped by surface apertures. | `yes` |
 
-`weighted` and `d-line-only` also shape the prescription used for the run, as the
-example programs do.
+These settings build the prescription used for the run, as the example programs do.
+With `weighted yes`, the weights for d, C, e, F and g are respectively 1.0, 0.475,
+0.98, 0.49 and 0.15. With `weighted no`, d, F and C each have weight 1.0.
+With `d-line-only yes`, the d line alone has weight 1.0. These are built-in choices;
+the trial does not read wavelength weights from the prescription file.
 
 ## Variables
 
@@ -370,7 +351,8 @@ goal ray-aberrations  yes
 ```
 
 `yes` adds the ten-sample sagittal and tangential ray fans for every field and
-wavelength, restricted to the d line by `d-line-only`. The default is `no`.
+wavelength. `d-line-only` restricts these and all other goals in the trial to the d
+line. The default for `goal ray-aberrations` is `no`.
 
 ### Paraxial
 
@@ -405,6 +387,41 @@ goal replaces that target rather than adding a second one.
 | `red` | Reduction ratio |
 | `power` | Optical power |
 | `opt-inv` | Optical invariant |
+
+## Pipelines
+
+A pipeline runs trials one after another, each starting from the design the one before it
+produced:
+
+```ini
+[pipeline 5]
+description   Zoom: wide, then tele, twice over
+outdir        trials/zoom
+trials        1 2 1 2
+```
+
+`lenstool2 --specfile lens.txt --optimize 5` then runs trial 1, trial 2, trial 1 again and
+trial 2 again, and writes `lens-pipeline5.txt`.
+
+A zoom is what it was made for. Only one configuration is optimized at a time, so the wide
+end is optimized first and the tele end starts from that result. The two configurations
+share every radius and glass thickness, so the second stage partly undoes the first, which
+is why the stages are usually written to alternate until the design settles. Nothing about
+it is specific to zooms: a coarse stage followed by a fine one, or spot goals followed by
+contrast, chain the same way.
+
+| Line | Meaning | Default |
+|---|---|---|
+| `trials` | The trials to run, in order. A trial may appear more than once. | required |
+| `description` | Free text, shown when the pipeline runs. | none |
+| `outdir` | Where the result goes; the stages' own `outdir` lines are not used, since a pipeline writes one result. | the prescription's directory |
+
+- Each stage reads its trial afresh, so a stage's `configuration`, `weighted` and
+  `d-line-only` are its own.
+- A pipeline runs trials, not other pipelines.
+- Only the final design is written. The file carries the prescription, the pipeline, and
+  every trial the pipeline names, so it can run the pipeline again as it stands - which is
+  how you take another two passes at a zoom that has not settled.
 
 ## The optimized prescription
 

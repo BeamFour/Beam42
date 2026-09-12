@@ -62,6 +62,23 @@ class OptimizationTrialTest {
     }
 
     @Test
+    void rejectsFractionalCurvatureConstraintsOnFlatSurfaces() throws Exception {
+        for (String settings : new String[]{
+                "vary curvatures 3\nconstrain curvatures\n",
+                "constrain curvatures\nvary curvatures 3\n"}) {
+            String text = withTrials(SUMMICRON, "[trial 1]\n" + MTF_FIVE_FIELDS + settings);
+            int constraintLine = Arrays.asList(text.split("\\r?\\n")).indexOf("constrain curvatures") + 1;
+            var error = assertThrows(OptimizationTrial.TrialException.class, () -> read(text));
+            assertTrue(error.getMessage().contains("line " + constraintLine + ":"), error.getMessage());
+            assertTrue(error.getMessage().contains("flat surface 3"), error.getMessage());
+        }
+        // Listing a flat surface without a fractional constraint remains supported.
+        var variables = read(withTrials(SUMMICRON,
+                "[trial 1]\n" + MTF_FIVE_FIELDS + "vary curvatures 3\n")).build().variables();
+        assertEquals(List.of("surface 3 radius"), names(variables));
+    }
+
+    @Test
     void ignoresTheIdsInTheFile() throws Exception {
         // Position 6 is the stop, although the row with id 6 is an ordinary surface.
         assertRejected(FD300, "[trial 1]\n" + MTF_FIVE_FIELDS + "vary curvatures 6\n", "surface 6 is a stop");

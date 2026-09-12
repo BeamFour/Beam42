@@ -323,6 +323,7 @@ public final class OptimizationTrial {
         private final List<AsphericRow> asphericRows = new ArrayList<>();
 
         private Double curvatureConstraint;
+        private int curvatureConstraintLine;
         private Double thicknessConstraint;
         private Double edgeConstraint;
 
@@ -597,6 +598,7 @@ public final class OptimizationTrial {
                 case "curvatures" -> {
                     once(line, "constrain curvatures");
                     curvatureConstraint = weight;
+                    curvatureConstraintLine = line;
                 }
                 case "thicknesses" -> {
                     once(line, "constrain thicknesses");
@@ -915,6 +917,14 @@ public final class OptimizationTrial {
 
         /** A builder for the prescription, set up as the trial says. */
         OptimizationBuilder apply(Prescription prescription) {
+            if (curvatureConstraint != null && curvatures != null
+                    && curvatures.kind() == SelectionKind.LIST) {
+                for (int surface : curvatures.surfaces())
+                    if (prescription._surfaces[surface]._radius == 0.0)
+                        throw error(curvatureConstraintLine, "cannot constrain curvature of flat surface "
+                                + surface + "; a fractional curvature constraint needs a non-zero starting curvature"
+                                + "; remove this surface from 'vary curvatures' or omit 'constrain curvatures'");
+            }
             if (prescription._surfaces.length != radii.size())
                 throw new IllegalArgumentException("the prescription has " + prescription._surfaces.length
                         + " surfaces but the trial's [lens data] has " + radii.size()

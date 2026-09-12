@@ -78,6 +78,39 @@ class PupilMapAnalysisTest {
     }
 
     @Test
+    void expandsToMeasureTheBundleWithClearedFactors() throws Exception {
+        var opm = model();
+        int n = PupilMapAnalysis.DEFAULT_NUM_SAMPLES;
+        var reference = PupilMapAnalysis.eval(opm, n, new int[]{10}).maps.get(0);
+        long passed = reference.samples.stream().filter(s -> s.passed()).count();
+        long nominalPassed = reference.samples.stream()
+                .filter(s -> s.passed() && s.x() * s.x() + s.y() * s.y() <= 1.0).count();
+        double expectedCoverage = (double) nominalPassed / passed;
+
+        var fld = opm.optical_spec.fov.fields[10];
+        fld.clear_vignetting();
+        double initialReach = PupilMapAnalysis.reach_for(fld);
+        var map = PupilMapAnalysis.eval(opm, n, new int[]{10}).maps.get(0);
+
+        assertTrue(map.reach > initialReach);
+        assertTrue(map.passed_x > 1.3, "transmitted light outside the initial square is measured");
+        assertEquals(reference.passed_x, map.passed_x, 2 * map.reach / (n - 1));
+        assertEquals(expectedCoverage, map.piecewise_quality.covered(), 0.01);
+        assertEquals(expectedCoverage, map.ellipse_quality.covered(), 0.01);
+        assertEquals(n * n, map.samples.size());
+        for (int k = 0; k < n; k++) {
+            assertFalse(map.sample(0, k).passed());
+            assertFalse(map.sample(n - 1, k).passed());
+            assertFalse(map.sample(k, 0).passed());
+            assertFalse(map.sample(k, n - 1).passed());
+        }
+        assertEquals(0.0, fld.vlx);
+        assertEquals(0.0, fld.vux);
+        assertEquals(0.0, fld.vly);
+        assertEquals(0.0, fld.vuy);
+    }
+
+    @Test
     void plotsTheMap() throws Exception {
         var opm = model();
         var map = PupilMapAnalysis.eval(opm, SAMPLES, new int[]{10}).maps.get(0);

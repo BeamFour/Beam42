@@ -133,12 +133,19 @@ public class PupilMapAnalysis {
     /** Default samples per axis: enough to place a boundary to about 1% of the pupil radius. */
     public static final int DEFAULT_NUM_SAMPLES = 121;
 
+    private static final int MAX_REACH_EXPANSIONS = 8;
+
     public static PupilMapResult eval(OpticalModel opm) {
         return eval(opm, DEFAULT_NUM_SAMPLES, null);
     }
 
     /**
      * Maps the pupil of each requested field.
+     * The square grows by 50% while any sampled boundary ray passes. The sample
+     * count stays fixed, so expanding the square increases the grid spacing.
+     *
+     * @throws IllegalStateException if passing boundary rays remain after eight
+     *                               expansions; no truncated map is returned
      *
      * @param num_samples samples per axis across the sampled square
      * @param fields      indices into the field spec, or null for every field
@@ -162,23 +169,52 @@ public class PupilMapAnalysis {
                 continue;
             Field fld = osp.fov.fields[fi];
             double reach = reach_for(fld);
-            var samples = new ArrayList<Sample>(num_samples * num_samples);
-            for (int i = 0; i < num_samples; i++) {
-                for (int j = 0; j < num_samples; j++) {
-                    double x = -reach + 2 * reach * i / (num_samples - 1.0);
-                    double y = -reach + 2 * reach * j / (num_samples - 1.0);
-                    var ray = Trace.trace_safe(opm, new Vector2(x, y), fld, wvl, options);
-                    boolean passed = ray.pkg != null && ray.err == null;
-                    int blocked_by = ray.err instanceof TraceRayBlockedException ? ray.err.surf : -1;
-                    samples.add(new Sample(x, y, passed, blocked_by));
+            // The factors are the hypothesis being checked, so cleared or underestimated
+            // factors can make this initial square smaller than the transmitted bundle.
+            // Passing boundary rays signal that we must expand: otherwise the map would
+            // miss usable pupil area and overstate the mapping's coverage of the bundle.
+            for (int expansion = 0; ; expansion++) {
+                var samples = sample_grid(opm, fld, wvl, options, reach, num_samples);
+                boolean boundaryPassed = false;
+                for (int k = 0; k < num_samples; k++) {
+                    if (samples.get(k).passed()
+                            || samples.get((num_samples - 1) * num_samples + k).passed()
+                            || samples.get(k * num_samples).passed()
+                            || samples.get(k * num_samples + num_samples - 1).passed()) {
+                        boundaryPassed = true;
+                        break;
+                    }
                 }
+                if (!boundaryPassed) {
+                    result.maps.add(new PupilMapForField(fi, fld, reach, num_samples, samples));
+                    break;
+                }
+                if (expansion == MAX_REACH_EXPANSIONS)
+                    throw new IllegalStateException("Pupil map for field " + fi
+                            + " still has passing boundary rays at reach " + reach);
+                reach *= 1.5;
             }
-            result.maps.add(new PupilMapForField(fi, fld, reach, num_samples, samples));
         }
         return result;
     }
 
-    /** Far enough out to hold the whole vignetted region, with a margin to see its edge. */
+    private static List<Sample> sample_grid(OpticalModel opm, Field fld, double wvl,
+                                           TraceOptions options, double reach, int num_samples) {
+        var samples = new ArrayList<Sample>(num_samples * num_samples);
+        for (int i = 0; i < num_samples; i++) {
+            for (int j = 0; j < num_samples; j++) {
+                double x = -reach + 2 * reach * i / (num_samples - 1.0);
+                double y = -reach + 2 * reach * j / (num_samples - 1.0);
+                var ray = Trace.trace_safe(opm, new Vector2(x, y), fld, wvl, options);
+                boolean passed = ray.pkg != null && ray.err == null;
+                int blocked_by = ray.err instanceof TraceRayBlockedException ? ray.err.surf : -1;
+                samples.add(new Sample(x, y, passed, blocked_by));
+            }
+        }
+        return samples;
+    }
+
+    /** Initial reach enclosing the candidate mappings; tracing may require a larger square. */
     public static double reach_for(Field fld) {
         double widest = Math.max(
                 Math.max(scale(fld.vlx), scale(fld.vux)),

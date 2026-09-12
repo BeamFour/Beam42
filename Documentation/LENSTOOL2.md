@@ -254,7 +254,7 @@ and the defaults are what the committed examples use.
 | `--outdir <dir>` | alongside the spec file | Directory for generated output. **Required** with `--patent`. See the note on the Zemax file below. |
 | `--only-d-line` | off | Build the prescription and Zemax export for the d line alone instead of the full wavelength set. |
 | `--dont-use-glass-types` | off (glass types used) | Ignore named glass types in the spec and use the tabulated index/dispersion instead. Useful when a catalogue glass is unavailable or suspect. |
-| `--vig-type <type>` | `set-pupil` | Aperture and vignetting calculation run once the model is built. See below. Accepts either the enum spelling (`SetPupil`) or kebab case (`set-pupil`), case insensitive. |
+| `--vig-type <type>` | `set-pupil` | Aperture and vignetting calculation run once the model is built, for the models the **analysis** outputs are computed from. See below. Accepts either the enum spelling (`SetPupil`) or kebab case (`set-pupil`), case insensitive. |
 | `--use-spot-pattern <pattern>` | `hex` | Pupil sampling pattern for spot diagrams and MTF. One of `hex` (hexapolar), `grid`, or `gaussian` (also accepted as `gq`). See below. |
 | `--spot-grid-size <n>` | 64 | Samples per dimension for the rectangular grid. Only consulted when `--use-spot-pattern grid` is in effect; ignored for the other patterns. Minimum 2. |
 | `--auto-size-spot-diagrams` | off | Scale each spot diagram to its own spot size. By default all spot diagrams share a fixed 600 unit radius so that fields stay visually comparable. |
@@ -282,6 +282,15 @@ These differ in which way the calculation runs. `set-pupil` derives the pupil
 from the authored stop, so it changes the f/# and leaves the apertures alone.
 `set-stop-aperture` and `set-fnum` go the other way: they hold the f/# and size
 the stop to satisfy it.
+
+`--vig-type` settles the spot diagrams, the MTF, the ray aberration fans and the
+vignetting and paraxial dumps. Two other users of vignetting set their own and
+are not affected by it: the layout diagrams always use `set-pupil`, since a
+layout draws each bundle's rim rays and needs to know where the bundle ends, and
+`--optimize` does too, because a merit function wants a ray set that keeps its
+sensitivity to the variables rather than one that measures the lens exactly. A
+`[trial n]` states its own with a `vignetting` line; see
+[OPTIMIZER.md](OPTIMIZER.md).
 
 | Value | What it does | When to use it |
 | --- | --- | --- |

@@ -28,3 +28,45 @@ Bf	39.38
 [patent info]
 [report data]
 lens name	Leica APO 75mm F2 Walter Mandler
+[trial 1]
+description           Contrast
+fields                0 to 1 step 0.1
+frequencies           10 20 40
+weighted              no
+vignetting            set-vig frozen
+check-spot-apertures  no
+vary curvatures       all
+vary thicknesses      all
+constrain thicknesses	5.0
+constrain edges
+constrain curvatures
+goal contrast   10 20 40
+goal contrast   sag  8 8 8 8 8 8 4 2 1 0.5 0.1
+goal contrast   tan  4 4 4 4 4 4 1 1 0.5 0.1 0.1
+goal contrast   balance  all except 1.0 weight 4
+goal contrast   sampling 6 12
+goal contrast         calibrate no
+goal contrast         exit-pupil-aiming no
+goal contrast         centering no
+goal ray-aberrations  no
+outdir                try1
+[trial 2]
+configuration         0
+#fields                0 to 1 step 0.1
+fields                0 0.3 0.7 1.0
+frequencies           10 20 40
+weighted              no
+d-line-only           no
+vignetting            set-vig frozen
+check-spot-apertures  no
+vary curvatures       all
+vary thicknesses      all
+constrain curvatures  	1.0
+constrain edges			128.0
+constrain thicknesses 	64.0
+goal spot-deviation   1 1 1 1
+#goal spot-deviation    1 1 1 1 1 1 1 1 1 1 1
+goal spot sampling    gaussian 6 12
+goal ray-aberrations  no
+goal paraxial         bfl 39.38
+outdir                try2

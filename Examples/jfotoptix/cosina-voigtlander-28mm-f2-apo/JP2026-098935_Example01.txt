@@ -59,3 +59,18 @@ originY	416.75
 ppmm	18.793
 [notes]
 Bill: Something wrong between s6 and s10. Magnification measured.
+[trial 1]
+description         Cosina Voigtlander APO-Lanthar 28mm F2.0
+fields              0.0 0.3 0.7 1.0
+frequencies         10 30 50
+vignetting          set-pupil
+vary aspherics      existing
+vary curvatures     all
+vary thicknesses    all
+weighted            no
+constrain           curvatures
+constrain           thicknesses
+goal contrast       sampling 6 12
+goal contrast       10 30 50
+goal contrast       calibrate yes
+outdir				try1

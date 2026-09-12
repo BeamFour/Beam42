@@ -60,7 +60,7 @@ Running with no arguments prints a usage summary.
 
 The input is the tab delimited format used by the
 [PhotonsToPhotos Optical Bench](https://www.photonstophotos.net/GeneralTopics/Lenses/OpticalBench/OpticalBenchHub.htm),
-with two extensions added by Beam42. Sections are introduced by a name in square
+with several extensions added by Beam42. Sections are introduced by a name in square
 brackets, and lines beginning with `#` are comments.
 
 | Section | Origin | Purpose |
@@ -72,6 +72,12 @@ brackets, and lines beginning with `#` are comments.
 | `[aspherical data]` | Optical Bench | Aspheric coefficients. |
 | `[patent info]` | **Beam42 extension** | Provenance for the report header. |
 | `[report data]` | **Beam42 extension** | Report title and, importantly, which configurations to process. |
+| `[trial n]` | **Beam42 extension** | An optimization run described in the file: what may vary, what it aims at, and what holds the design together. Read only when `--optimize n` asks for it. |
+| `[pipeline n]` | **Beam42 extension** | Trials run in order, each starting from the result of the one before. |
+
+A section the reader does not know is skipped, which is what lets the optimizer's
+`[trial n]` and `[pipeline n]` sections sit in the same file as the lens they belong to.
+Both are described in [OPTIMIZER.md](OPTIMIZER.md).
 
 ### `[constants]` and aspheric types
 
@@ -260,6 +266,7 @@ and the defaults are what the committed examples use.
 | `--force` | off | With `--assign-glass-types`, re-match surfaces that already name a recognised glass. |
 | `--update-specfile` | off | With `--assign-glass-types`, also write the matched prescription back over the input file. Refused on its own. |
 | `--optimize` | off | Run the routine airspace optimization before reporting: the back focus on a prime, the other variable airspaces on a zoom. See below. |
+| `--optimize <n>` | off | Run the spec file's `[trial n]` or `[pipeline n]` section instead, and report on its result. See [OPTIMIZER.md](OPTIMIZER.md). |
 | `--optimize-goal <contrast\|mtf>` | `contrast` | Objective for `--optimize`. |
 | `--real-ray-aiming` / `--paraxial-ray-aiming` | real | Chief ray aiming algorithm. Real aiming traces an actual ray at the entrance pupil; paraxial aiming is faster but does not hold up on very wide angle lenses. Applies to the analysis model, not the layout diagrams. |
 
@@ -372,6 +379,13 @@ so an optimized airspace cannot quietly turn the lens into a different one.
 **On the objective.** Both goals target the central field at the `--mtf`
 frequencies. `contrast` is the default, as it is the more effective option.
 Use `--optimize-goal mtf` only if you want to check that out.
+
+`--optimize` **with a number** is a different thing: it runs an optimization the
+prescription itself describes - a `[trial n]` section, or a `[pipeline n]` that runs
+several trials in order, each starting from the last result. There you choose the
+variables, the goals and the constraints. The optimized prescription is written as
+`<specfile>-trial<n>.txt` or `<specfile>-pipeline<n>.txt`, and the report is built from
+it. See [OPTIMIZER.md](OPTIMIZER.md).
 
 ### `prescription.txt` round trips
 

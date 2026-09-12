@@ -1,6 +1,10 @@
 # Optimizer Design Notes
+These are the design and implementation notes for the optimizer: what each goal measures,
+why it behaves as it does, and what was measured along the way. For using the optimizer -
+the trial and pipeline sections of a prescription, and what each setting does - see
+[OPTIMIZER.md](OPTIMIZER.md).
 
-# Contrast Optimization
+## Contrast Optimization
 
 Contrast optimization uses pupil wavefront differences as a fast, smooth proxy for
 MTF. It is intended primarily as a refinement method: it works best when the starting
@@ -395,133 +399,197 @@ direction differences, not the reduced exit-pupil separation used by direct aimi
 They remain useful diagnostics, but are not an independent validation of the aimed
 Hopkins frequency coordinate.
 
-## The pupil the merit sees
+### Controlling astigmatism
 
-Every residual is evaluated over a pupil, and which pupil that is depends on the
-vignetting mode, on whether the factors are held fixed, and on whether rays are also
-rejected by the physical surface apertures. All three are configurable.
+The contrast merit minimizes `sum(sagittal^2) + sum(tangential^2)`. At a fixed total that
+barely discriminates how astigmatism is split between the two meridians, and a designer
+discriminates sharply. On the Leica 75/2 a solve produced this at 50 cycles/mm:
 
-### Vignetting mode
-
-```java
-.vignetting(VigType.SetPupil)   // the default
+```text
+field    0.0    0.2    0.4    0.6    0.7    0.8    0.9    1.0
+sag     .447   .407   .453   .295   .177   .156   .288   .565
+tan     .447   .413   .531   .657   .706   .725   .627   .539
+sum     .894   .820   .984   .952   .883   .881   .915  1.104
 ```
 
-`SetPupil` resizes the pupil so the axial marginal ray meets the stop edge, then measures
-all four vignetting factors with real rays. `SetVig` measures the same factors without the
-resize and agrees closely, within 0.005 of pupil half-width and three to four MTF decimals
-on both test lenses.
+The sum stays within 15 percent of itself across the whole field while the difference goes
+from zero to 0.57. The lens is not worse in that zone, it is lopsided there, and nothing in
+the merit had an opinion about that.
 
-`Paraxial` is cheaper and behaves differently in a way that matters. It sets only the `y`
-factors, because a paraxial ray is meridional and can say nothing about the sagittal
-pupil, so `x` comes out unvignetted at every field. The pupil is then an ellipse even on
-axis, where sagittal and tangential MTF must be equal by rotational symmetry: measured
-0.148 apart at 40 cycles/mm on the Leica 75/2, and 0.010 on the Otus. Optimizing under it
-means the sagittal pupil is a superset of the real one and the tangential pupil a subset,
-roughly 19 percent short of the real tangential aperture at full field.
+`GoalContrastBalance` supplies the opinion. Its value is the difference between what the
+two orientations contribute to the merit,
 
-### Freezing the factors
-
-Apertures are never optimization variables, but vignetting is not therefore constant: it
-is where rays land on those fixed apertures. On the Leica 75/2, 28 of 29 variables move a
-vignetting factor within a single Jacobian step. The drift is smooth, so it does not
-corrupt the finite-difference Jacobian, but it does mean the solver differentiates the
-design and the pupil together — and a more heavily vignetted lens has less aberration and
-better MTF. Shrinking the pupil is therefore a way to improve the merit that costs nothing
-in the merit and real light in the lens.
-
-```java
-.freezeVignetting()
+```text
+sum_wavelengths w (
+    w_sagittal sum_samples r_sagittal^2
+  - w_tangential sum_samples r_tangential^2
+)
 ```
 
-This measures the factors once from a reference build and holds them for the run, so every
-iteration is compared on the same pupil. The cost is staleness: the factors describe the
-design at capture, and the further a solve travels the more the assumed pupil diverges
-from the real one. Call `Analysis.discard_frozen_vignetting()` between solver restarts to
-re-measure.
+against a target of zero, positive when sagittal is the worse meridian. Defining it on the
+residuals rather than on raw wavefront differences means it follows whatever those already
+account for, including residual centring, frequency calibration, wavelength weights and
+the configured sagittal/tangential field weights. Its value is smooth and quadratic, with
+no modulus and no square root. Since the least-squares solver squares every goal value,
+its final merit contribution is quartic in the wavefront differences.
 
-With `SetPupil` the captured pupil value is held as well, since factors measured at one
-working f-number do not describe another. That pins `fod.fno`, which makes a `GoalParax`
-on `Fno` inert in that combination.
+The weights in that expression are exactly the weights used by the ordinary contrast
+goals. If a field gives sagittal contrast weight 2 and tangential weight 0.5, balance is
+reached when those *weighted merit contributions* are equal, not when the two unweighted
+residual energies are equal. A zero orientation weight removes that orientation from both
+the ordinary contrast block and the balance comparison. This keeps the balance goal from
+quietly imposing a different sagittal/tangential weighting policy from the contrast merit
+it accompanies.
 
-### Physical aperture checking
+Enable it per field, since the outermost field usually wants leniency:
 
 ```java
-.checkSpotApertures(false)
+.contrastBalanceGoals(new boolean[] {false, true, true, true, false})
+.contrastBalanceGoals(fields, 0.05)
 ```
 
-Whether Gaussian-quadrature spot rays are additionally rejected when they cross a physical
-surface aperture. On by default. Grid and hexapolar sampling always check, so this setting
-applies to the Gaussian-quadrature path only.
+One flag per configured field, in field order; false adds no explicit balance constraint at
+that field. The ordinary contrast residuals still constrain the two meridians independently.
+The goal applies to every configured contrast frequency, so it adds one residual per enabled
+field per frequency.
 
-Contrast sampling is the other way round: it never checks by default, because its samples
-already occupy the common vignetted-pupil overlap and turning temporary clipping into a
-discontinuous failure would hurt the optimizer. `ContrastOptions.check_apertures(true)`
-overrides that for validation.
+**Leave it off on axis.** At field zero the two meridians are identical by rotational
+symmetry, so there is nothing to balance and the value reduces to
 
-Frozen factors together with `checkSpotApertures(false)` gives a pupil that is entirely
-factor-defined and fixed for the run, which is close to the conventional arrangement in
-commercial optimizers. The trade-off is that nothing then catches factors which are wrong
-or have gone stale: rays that the real lens blocks still contribute, so the merit can
-optimize light the lens does not pass.
+```text
+(w_sagittal - w_tangential) * S
+```
 
-### Investigation: updating vignetting during optimization
+where `S` is the axial residual energy. With equal orientation weights that is exactly
+zero and the goal is inert. With unequal weights it is not: it silently becomes a second
+axial contrast goal of strength `w_sagittal - w_tangential`, which is normally a number
+that fell out of a field taper rather than a decision about axial emphasis. Measured on the
+Leica 75/2 with weights 8 and 4 on axis, it contributed 50.3 of a 802.6 merit — 6.3 percent,
+none of it balance.
 
-[Optimize the Apertures, Not the Vignetting Factors](https://www.linkedin.com/pulse/optimize-apertures-vignetting-factors-javier-ruiz-uw0yf/)
-argues that a sparsely sampled optimization merit should evaluate the vignetted pupil.
-Vignetting factors remap normalized pupil coordinates into an ellipse fitted to the
-surviving pupil. This is a sampling aid rather than a change to the optical system: with
-a sufficiently dense pupil grid, an analysis should converge to the same result without
-the remapping.
+It also behaves unlike the contrast goals it is shadowing. `S` is already a sum of squares,
+so this residual is quadratic where the per-sample residuals are linear: it pushes hardest
+while axial aberration is large and fades quadratically as the design improves. If axial
+emphasis is what is wanted, raise the field-zero entries in the sagittal and tangential
+weight arrays instead. Those act through the ordinary residuals, scale predictably, and do
+not evaporate on convergence.
 
-For Gaussian/Forbes quadrature the remapping is particularly important. Sampling the
-complete entrance pupil directly can leave many nodes outside a cat's-eye-shaped
-transmitted pupil. Discarding those rays biases the quadrature and can make the merit
-change merely because the set of surviving samples changed. Vignetting factors allow a
-small, fixed-size sample set to represent the transmitted pupil much more accurately.
-They improve RMS convergence much more readily than a worst-ray quantity such as maximum
-geometric spot radius, which still requires adequate sampling near the pupil boundary.
+**Set the weight from a measurement, not from the default.** A balance residual is a
+difference of sums of squares, so it is large exactly where a per-sample contrast residual
+is small. On the Leica starting design at 10/30/50 cycles/mm over 11 fields, the balance
+block at weight 1.0 came to 43.6 against the contrast block's 52.6 — 83 percent of the
+optical merit, from 33 residuals against 14256. `NOMINAL_BALANCE_WEIGHT` is 0.1, which puts
+it near 8 percent there, but nothing in this goal adapts to the design the way the
+fractional design-preservation constraints do.
 
-The article recommends recalculating the factors as the design evolves, rather than
-necessarily freezing them at the start. That differs from Beam42's current optional
-`freezeVignetting()` strategy. Freezing is reasonable for a local refinement in which the
-prescription and its clipping change little, and it prevents the optimizer from improving
-the merit simply by reducing the transmitted pupil. Its weakness is that the assumed
-pupil becomes stale when the design moves substantially. This is especially relevant to
-global optimization and to any future support for varying clear-aperture semi-diameters.
+Be clear about what this is. Residual centring corrects an error in the merit; this does
+not. It tells the optimizer a design preference it has no way to infer — that astigmatism
+should be shared between the meridians rather than dumped on one of them.
 
-The physical variables should be the surface clear-aperture semi-diameters, not the
-vignetting factors themselves. Factors are only an elliptical approximation to the
-surviving pupil, and arbitrary optimized factors need not correspond to any realizable
-set of apertures. If apertures become variables, relative illumination or throughput also
-needs a constraint so that the optimizer cannot obtain better image quality merely by
-discarding more of the pupil.
+## Spot goals
 
-Vignetting remapping and physical aperture checking are separate operations:
+### Per-ray RMS spot optimization
 
-- vignetting factors move sparse pupil samples into an approximation of the transmitted
-  pupil;
-- aperture checking verifies that each remapped ray actually passes every physical
-  aperture, since the fitted ellipse is not the exact cat's-eye boundary.
+`GoalSpotRMS` exposes one aggregate spot-radius value per field. Although suitable for
+measurement, differentiating a single square-rooted aggregate gives the solver much less
+information than exposing the signed ray deviations that make up the same RMS value.
 
-The desired end state may therefore be to apply current vignetting factors and also check
-physical apertures during optimization. A failed ray must not simply be omitted from an
-RMS or contrast calculation: doing so changes the population being optimized and can
-reward additional clipping.
+Enable the granular form with one field weight per configured field:
 
-This needs investigation before changing the default. In particular, compare the
-following policies on local and large-displacement optimizations:
+```java
+.gaussianQuadratureSampling(6, 12)
+.spotDeviationGoals(new double[] {1.0, 1.0, 1.0, 1.0})
+```
 
-1. factors measured and frozen at the starting prescription;
-2. factors recalculated for every merit-function evaluation;
-3. the same two policies with physical aperture checking enabled;
-4. dense, non-remapped analysis of each final prescription as the reference result.
+Separate X and Y field weights are also supported:
 
-Record merit continuity, failed-ray counts, independently measured spot RMS and MTF,
-relative illumination, and the drift between frozen factors and factors recalculated for
-the final prescription. This should establish whether dynamic factors give a more
-accurate merit without introducing finite-difference noise or allowing uncontrolled
-throughput loss.
+```java
+.spotDeviationGoals(xWeights, yWeights)
+```
+
+Note that the array is *weights*, not targets: every residual aims at zero, so these
+goals minimize spot size rather than steer it to a value. This is the one difference in
+argument meaning from the neighbouring `spotRmsGoals(targets)` and
+`spotMaxRadiusGoals(targets)`.
+
+The sampling pattern is Gaussian quadrature. For every field, wavelength and pupil
+sample, the builder creates two `GoalSpotDeviation` residuals. If `(dx, dy)` is the ray
+intercept relative to the reference-wavelength centroid and `w_p` is its quadrature
+weight, their values in microns are
+
+```text
+r_x = 1000 sqrt(w_p) dx
+r_y = 1000 sqrt(w_p) dy
+```
+
+The merit function additionally applies the square roots of the field/orientation and
+wavelength weights. Consequently, minimizing the sum of the individual squared
+residuals is mathematically equivalent to minimizing the corresponding weighted RMS
+spot radius, while retaining the sign and direction of every ray error for the Jacobian.
+
+`gaussianQuadratureSampling` configures the common ordinary spot pattern used by
+per-ray spot goals, aggregate Gaussian spot analysis and geometric MTF. The historical
+default remains 14 rings by 20 spokes; 6 by 12 gives 72 pupil rays and 144 residuals per
+field and wavelength when a smaller optimization merit is wanted. Contrast retains a
+separate `contrastSampling` setting because it integrates over the overlap of sheared
+pupils rather than the ordinary spot pupil.
+
+For a concentric annular entrance pupil, pass its normalized inner radius as a third
+argument, for example `gaussianQuadratureSampling(6, 12, 0.50)`. See
+[`GAUSSIAN_QUADRATURE.md`](GAUSSIAN_QUADRATURE.md) for the formula, vignetting
+weighting, spoke-count guidance, and the exact scope relative to the reference paper.
+Sampling must remain fixed throughout an optimization; failed rays therefore retain
+their sample positions and report an invalid goal instead of being removed and shifting
+the remaining goal indices.
+
+Spot deviation goals cannot be combined with aggregate `spotRmsGoals`, maximum-radius spot
+goals, or explicitly requested hexapolar sampling in the same builder configuration.
+Maximum radius is inherently controlled by the worst sampled ray rather than a
+Gaussian-weighted RMS distribution and remains a separate hexapolar use case.
+
+### Suggested comparison measurements
+
+When comparing contrast optimization across prescriptions, record:
+
+- initial and final contrast merit;
+- initial and final independently calculated Gaussian-quadrature MTF;
+- initial and final spot RMS;
+- RMS `deltaW` for every field, frequency, and orientation;
+- the number of invalid contrast samples;
+- runtime and solver evaluation counts.
+
+The per-group RMS `deltaW` is particularly useful for identifying when the contrast
+goal is acting as a faithful MTF refiner and when it has moved outside its reliable
+small-phase operating range.
+
+## Goals not yet covered here
+
+The geometric MTF, ray aberration and paraxial goals have no notes yet. What they measure,
+and how they are written in a trial, is in [OPTIMIZER.md](OPTIMIZER.md).
+
+## Contrast versus geometric MTF goals
+
+A Gaussian-quadrature geometric MTF goal traces pupil rays to image-plane intercepts,
+constructs a spot distribution, and estimates MTF from that distribution:
+
+```text
+pupil ray -> image intercept -> spot distribution -> estimated MTF
+```
+
+Contrast optimization instead compares pairs of wavefront samples separated by the
+frequency-dependent pupil shear:
+
+```text
+paired pupil rays -> OPD difference -> least-squares residual
+```
+
+A contrast sample is therefore associated with one spatial frequency. A spot sample,
+by contrast, can contribute to every MTF frequency calculated from the same spot
+distribution.
+
+Contrast goals are normally much smoother and cheaper to evaluate, but they are a
+surrogate. Gaussian-quadrature MTF provides the more direct result and is useful both as
+an alternative optimization goal and as an independent validation measurement.
 
 ## Preserving the starting lens design
 
@@ -652,191 +720,133 @@ raising the global weight:
 The factory receives the same `Analysis` the setup owns, and the constraint still reads
 its starting value before any solving, so it anchors to the original prescription.
 
-### Controlling astigmatism
+## The pupil the merit sees
 
-The contrast merit minimizes `sum(sagittal^2) + sum(tangential^2)`. At a fixed total that
-barely discriminates how astigmatism is split between the two meridians, and a designer
-discriminates sharply. On the Leica 75/2 a solve produced this at 50 cycles/mm:
+Every residual is evaluated over a pupil, and which pupil that is depends on the
+vignetting mode, on whether the factors are held fixed, and on whether rays are also
+rejected by the physical surface apertures. All three are configurable.
 
-```text
-field    0.0    0.2    0.4    0.6    0.7    0.8    0.9    1.0
-sag     .447   .407   .453   .295   .177   .156   .288   .565
-tan     .447   .413   .531   .657   .706   .725   .627   .539
-sum     .894   .820   .984   .952   .883   .881   .915  1.104
-```
-
-The sum stays within 15 percent of itself across the whole field while the difference goes
-from zero to 0.57. The lens is not worse in that zone, it is lopsided there, and nothing in
-the merit had an opinion about that.
-
-`GoalContrastBalance` supplies the opinion. Its value is the difference between what the
-two orientations contribute to the merit,
-
-```text
-sum_wavelengths w (
-    w_sagittal sum_samples r_sagittal^2
-  - w_tangential sum_samples r_tangential^2
-)
-```
-
-against a target of zero, positive when sagittal is the worse meridian. Defining it on the
-residuals rather than on raw wavefront differences means it follows whatever those already
-account for, including residual centring, frequency calibration, wavelength weights and
-the configured sagittal/tangential field weights. Its value is smooth and quadratic, with
-no modulus and no square root. Since the least-squares solver squares every goal value,
-its final merit contribution is quartic in the wavefront differences.
-
-The weights in that expression are exactly the weights used by the ordinary contrast
-goals. If a field gives sagittal contrast weight 2 and tangential weight 0.5, balance is
-reached when those *weighted merit contributions* are equal, not when the two unweighted
-residual energies are equal. A zero orientation weight removes that orientation from both
-the ordinary contrast block and the balance comparison. This keeps the balance goal from
-quietly imposing a different sagittal/tangential weighting policy from the contrast merit
-it accompanies.
-
-Enable it per field, since the outermost field usually wants leniency:
+### Vignetting mode
 
 ```java
-.contrastBalanceGoals(new boolean[] {false, true, true, true, false})
-.contrastBalanceGoals(fields, 0.05)
+.vignetting(VigType.SetPupil)   // the default
 ```
 
-One flag per configured field, in field order; false adds no explicit balance constraint at
-that field. The ordinary contrast residuals still constrain the two meridians independently.
-The goal applies to every configured contrast frequency, so it adds one residual per enabled
-field per frequency.
+`SetPupil` resizes the pupil so the axial marginal ray meets the stop edge, then measures
+all four vignetting factors with real rays. `SetVig` measures the same factors without the
+resize and agrees closely, within 0.005 of pupil half-width and three to four MTF decimals
+on both test lenses.
 
-**Leave it off on axis.** At field zero the two meridians are identical by rotational
-symmetry, so there is nothing to balance and the value reduces to
+`Paraxial` is cheaper and behaves differently in a way that matters. It sets only the `y`
+factors, because a paraxial ray is meridional and can say nothing about the sagittal
+pupil, so `x` comes out unvignetted at every field. The pupil is then an ellipse even on
+axis, where sagittal and tangential MTF must be equal by rotational symmetry: measured
+0.148 apart at 40 cycles/mm on the Leica 75/2, and 0.010 on the Otus. Optimizing under it
+means the sagittal pupil is a superset of the real one and the tangential pupil a subset,
+roughly 19 percent short of the real tangential aperture at full field.
 
-```text
-(w_sagittal - w_tangential) * S
-```
+### Freezing the factors
 
-where `S` is the axial residual energy. With equal orientation weights that is exactly
-zero and the goal is inert. With unequal weights it is not: it silently becomes a second
-axial contrast goal of strength `w_sagittal - w_tangential`, which is normally a number
-that fell out of a field taper rather than a decision about axial emphasis. Measured on the
-Leica 75/2 with weights 8 and 4 on axis, it contributed 50.3 of a 802.6 merit — 6.3 percent,
-none of it balance.
-
-It also behaves unlike the contrast goals it is shadowing. `S` is already a sum of squares,
-so this residual is quadratic where the per-sample residuals are linear: it pushes hardest
-while axial aberration is large and fades quadratically as the design improves. If axial
-emphasis is what is wanted, raise the field-zero entries in the sagittal and tangential
-weight arrays instead. Those act through the ordinary residuals, scale predictably, and do
-not evaporate on convergence.
-
-**Set the weight from a measurement, not from the default.** A balance residual is a
-difference of sums of squares, so it is large exactly where a per-sample contrast residual
-is small. On the Leica starting design at 10/30/50 cycles/mm over 11 fields, the balance
-block at weight 1.0 came to 43.6 against the contrast block's 52.6 — 83 percent of the
-optical merit, from 33 residuals against 14256. `NOMINAL_BALANCE_WEIGHT` is 0.1, which puts
-it near 8 percent there, but nothing in this goal adapts to the design the way the
-fractional design-preservation constraints do.
-
-Be clear about what this is. Residual centring corrects an error in the merit; this does
-not. It tells the optimizer a design preference it has no way to infer — that astigmatism
-should be shared between the meridians rather than dumped on one of them.
-
-### Contrast Optimization versus Gaussian-quadrature MTF goals
-
-A Gaussian-quadrature geometric MTF goal traces pupil rays to image-plane intercepts,
-constructs a spot distribution, and estimates MTF from that distribution:
-
-```text
-pupil ray -> image intercept -> spot distribution -> estimated MTF
-```
-
-Contrast optimization instead compares pairs of wavefront samples separated by the
-frequency-dependent pupil shear:
-
-```text
-paired pupil rays -> OPD difference -> least-squares residual
-```
-
-A contrast sample is therefore associated with one spatial frequency. A spot sample,
-by contrast, can contribute to every MTF frequency calculated from the same spot
-distribution.
-
-Contrast goals are normally much smoother and cheaper to evaluate, but they are a
-surrogate. Gaussian-quadrature MTF provides the more direct result and is useful both as
-an alternative optimization goal and as an independent validation measurement.
-
-# Per-ray RMS spot optimization
-
-`GoalSpotRMS` exposes one aggregate spot-radius value per field. Although suitable for
-measurement, differentiating a single square-rooted aggregate gives the solver much less
-information than exposing the signed ray deviations that make up the same RMS value.
-
-Enable the granular form with one field weight per configured field:
+Apertures are never optimization variables, but vignetting is not therefore constant: it
+is where rays land on those fixed apertures. On the Leica 75/2, 28 of 29 variables move a
+vignetting factor within a single Jacobian step. The drift is smooth, so it does not
+corrupt the finite-difference Jacobian, but it does mean the solver differentiates the
+design and the pupil together — and a more heavily vignetted lens has less aberration and
+better MTF. Shrinking the pupil is therefore a way to improve the merit that costs nothing
+in the merit and real light in the lens.
 
 ```java
-.gaussianQuadratureSampling(6, 12)
-.spotDeviationGoals(new double[] {1.0, 1.0, 1.0, 1.0})
+.freezeVignetting()
 ```
 
-Separate X and Y field weights are also supported:
+This measures the factors once from a reference build and holds them for the run, so every
+iteration is compared on the same pupil. The cost is staleness: the factors describe the
+design at capture, and the further a solve travels the more the assumed pupil diverges
+from the real one. Call `Analysis.discard_frozen_vignetting()` between solver restarts to
+re-measure.
+
+With `SetPupil` the captured pupil value is held as well, since factors measured at one
+working f-number do not describe another. That pins `fod.fno`, which makes a `GoalParax`
+on `Fno` inert in that combination.
+
+### Physical aperture checking
 
 ```java
-.spotDeviationGoals(xWeights, yWeights)
+.checkSpotApertures(false)
 ```
 
-Note that the array is *weights*, not targets: every residual aims at zero, so these
-goals minimize spot size rather than steer it to a value. This is the one difference in
-argument meaning from the neighbouring `spotRmsGoals(targets)` and
-`spotMaxRadiusGoals(targets)`.
+Whether Gaussian-quadrature spot rays are additionally rejected when they cross a physical
+surface aperture. On by default. Grid and hexapolar sampling always check, so this setting
+applies to the Gaussian-quadrature path only.
 
-The sampling pattern is Gaussian quadrature. For every field, wavelength and pupil
-sample, the builder creates two `GoalSpotDeviation` residuals. If `(dx, dy)` is the ray
-intercept relative to the reference-wavelength centroid and `w_p` is its quadrature
-weight, their values in microns are
+Contrast sampling is the other way round: it never checks by default, because its samples
+already occupy the common vignetted-pupil overlap and turning temporary clipping into a
+discontinuous failure would hurt the optimizer. `ContrastOptions.check_apertures(true)`
+overrides that for validation.
 
-```text
-r_x = 1000 sqrt(w_p) dx
-r_y = 1000 sqrt(w_p) dy
-```
+Frozen factors together with `checkSpotApertures(false)` gives a pupil that is entirely
+factor-defined and fixed for the run, which is close to the conventional arrangement in
+commercial optimizers. The trade-off is that nothing then catches factors which are wrong
+or have gone stale: rays that the real lens blocks still contribute, so the merit can
+optimize light the lens does not pass.
 
-The merit function additionally applies the square roots of the field/orientation and
-wavelength weights. Consequently, minimizing the sum of the individual squared
-residuals is mathematically equivalent to minimizing the corresponding weighted RMS
-spot radius, while retaining the sign and direction of every ray error for the Jacobian.
+### Investigation: updating vignetting during optimization
 
-`gaussianQuadratureSampling` configures the common ordinary spot pattern used by
-per-ray spot goals, aggregate Gaussian spot analysis and geometric MTF. The historical
-default remains 14 rings by 20 spokes; 6 by 12 gives 72 pupil rays and 144 residuals per
-field and wavelength when a smaller optimization merit is wanted. Contrast retains a
-separate `contrastSampling` setting because it integrates over the overlap of sheared
-pupils rather than the ordinary spot pupil.
+[Optimize the Apertures, Not the Vignetting Factors](https://www.linkedin.com/pulse/optimize-apertures-vignetting-factors-javier-ruiz-uw0yf/)
+argues that a sparsely sampled optimization merit should evaluate the vignetted pupil.
+Vignetting factors remap normalized pupil coordinates into an ellipse fitted to the
+surviving pupil. This is a sampling aid rather than a change to the optical system: with
+a sufficiently dense pupil grid, an analysis should converge to the same result without
+the remapping.
 
-For a concentric annular entrance pupil, pass its normalized inner radius as a third
-argument, for example `gaussianQuadratureSampling(6, 12, 0.50)`. See
-[`GAUSSIAN_QUADRATURE.md`](GAUSSIAN_QUADRATURE.md) for the formula, vignetting
-weighting, spoke-count guidance, and the exact scope relative to the reference paper.
-Sampling must remain fixed throughout an optimization; failed rays therefore retain
-their sample positions and report an invalid goal instead of being removed and shifting
-the remaining goal indices.
+For Gaussian/Forbes quadrature the remapping is particularly important. Sampling the
+complete entrance pupil directly can leave many nodes outside a cat's-eye-shaped
+transmitted pupil. Discarding those rays biases the quadrature and can make the merit
+change merely because the set of surviving samples changed. Vignetting factors allow a
+small, fixed-size sample set to represent the transmitted pupil much more accurately.
+They improve RMS convergence much more readily than a worst-ray quantity such as maximum
+geometric spot radius, which still requires adequate sampling near the pupil boundary.
 
-Spot deviation goals cannot be combined with aggregate `spotRmsGoals`, maximum-radius spot
-goals, or explicitly requested hexapolar sampling in the same builder configuration.
-Maximum radius is inherently controlled by the worst sampled ray rather than a
-Gaussian-weighted RMS distribution and remains a separate hexapolar use case.
+The article recommends recalculating the factors as the design evolves, rather than
+necessarily freezing them at the start. That differs from Beam42's current optional
+`freezeVignetting()` strategy. Freezing is reasonable for a local refinement in which the
+prescription and its clipping change little, and it prevents the optimizer from improving
+the merit simply by reducing the transmitted pupil. Its weakness is that the assumed
+pupil becomes stale when the design moves substantially. This is especially relevant to
+global optimization and to any future support for varying clear-aperture semi-diameters.
 
-### Suggested comparison measurements
+The physical variables should be the surface clear-aperture semi-diameters, not the
+vignetting factors themselves. Factors are only an elliptical approximation to the
+surviving pupil, and arbitrary optimized factors need not correspond to any realizable
+set of apertures. If apertures become variables, relative illumination or throughput also
+needs a constraint so that the optimizer cannot obtain better image quality merely by
+discarding more of the pupil.
 
-When comparing contrast optimization across prescriptions, record:
+Vignetting remapping and physical aperture checking are separate operations:
 
-- initial and final contrast merit;
-- initial and final independently calculated Gaussian-quadrature MTF;
-- initial and final spot RMS;
-- RMS `deltaW` for every field, frequency, and orientation;
-- the number of invalid contrast samples;
-- runtime and solver evaluation counts.
+- vignetting factors move sparse pupil samples into an approximation of the transmitted
+  pupil;
+- aperture checking verifies that each remapped ray actually passes every physical
+  aperture, since the fitted ellipse is not the exact cat's-eye boundary.
 
-The per-group RMS `deltaW` is particularly useful for identifying when the contrast
-goal is acting as a faithful MTF refiner and when it has moved outside its reliable
-small-phase operating range.
+The desired end state may therefore be to apply current vignetting factors and also check
+physical apertures during optimization. A failed ray must not simply be omitted from an
+RMS or contrast calculation: doing so changes the population being optimized and can
+reward additional clipping.
 
+This needs investigation before changing the default. In particular, compare the
+following policies on local and large-displacement optimizations:
 
-# Useful links
+1. factors measured and frozen at the starting prescription;
+2. factors recalculated for every merit-function evaluation;
+3. the same two policies with physical aperture checking enabled;
+4. dense, non-remapped analysis of each final prescription as the reference result.
+
+Record merit continuity, failed-ray counts, independently measured spot RMS and MTF,
+relative illumination, and the drift between frozen factors and factors recalculated for
+the final prescription. This should establish whether dynamic factors give a more
+accurate merit without introducing finite-difference noise or allowing uncontrolled
+throughput loss.
+
+## Useful links
 * https://www.linkedin.com/pulse/optimize-apertures-vignetting-factors-javier-ruiz-uw0yf/

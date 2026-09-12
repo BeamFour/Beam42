@@ -1,9 +1,9 @@
 # Beam42 Optimizer
 
-The Optimizer is Beam42 is not suitable for designing lenses from scratch as it
+The Optimizer in Beam42 is not suitable for designing lenses from scratch as it
 lacks global optimization, and other features necessary. Its main use case is to fine
 tune existing designs. It has also been used successfully in reverse engineering attempts
-where glass types are known and initial estimates of curvatures and distances is 
+where glass types are known and initial estimates of curvatures and distances are 
 possible.
 
 There is no UI for the optimizer. There are two ways it can be used:
@@ -46,11 +46,14 @@ minimizes the sum of the squares of all of them, with a goal's weight multiplyin
 squared residual, so weight 4 counts a miss like two of weight 1. What the run prints as
 the merit is the root mean square of the weighted residuals, before and after.
 
+A ray that misses a surface, or an analysis that fails, makes a goal report a huge value
+instead, which the solver reads as a step to reject rather than a direction to move in.
+
 ### The goals
 
 | Goal | What each residual measures                                                                                                                              | Target                           | Aggregate |
 |---|----------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|-----------|
-| `goal contrast` | Increase contrast at specfic MTF frequency.                                                                                                              | 0                                | No        |
+| `goal contrast` | Increase contrast at a specific MTF frequency.                                                                                                              | 0                                | No        |
 | `goal contrast balance` | Reduces the difference between the sagittal and tangential contrast at a field: aims to reduce astigmatism. Only available with contrast goals.          | 0                                | Yes       |
 | `goal mtf` | Geometric MTF at a frequency, field and direction.                                                                                                       | your percentage, 100 to maximize | Yes       |
 | `goal spot-rms` | RMS spot radius at a field, in microns.                                                                                                                  | your radius, 0 to minimize       | Yes       |
@@ -65,7 +68,7 @@ to see through the impact of each ray trace.
 
 The non-aggregate goals, particularly contrast and spot deviations, can cause the optimizer to significantly alter
 a design. This is particularly true if the design is relatively simple or heavily aberrated. You must always enable
-constraints on curvatures and gaps, as well as on paraxial values, if you want to design to be refinement of the
+constraints on curvatures and gaps, as well as on paraxial values, if you want the design to be a refinement of the
 original.
 
 Every run anchors the effective focal length and the f-number to the prescription's
@@ -83,7 +86,7 @@ to come up with a configuration that gives good results.
 
 ### The constraints
 
-An optical merit function has no opinion about mechanical layout: left alone depending on the configuration, 
+An optical merit function has no opinion about mechanical layout: left alone, and depending on what it may vary, 
 the solver will collapse air spaces and drive elements through one another. Each constraint holds a
 varied parameter near where it started, as a cost rather than a bound - the parameter may
 still move, it just has to earn it.

@@ -437,9 +437,15 @@ format as the `prescription.txt` in a LensTool2 report - followed by the trial t
 run, as the builder writes it, so the file can be reported on, or the trial run again, as
 it stands.
 
-The trial is written back in the builder's own form: settings at their defaults are left
-out, shorthand such as `0 to 1 step 0.1` is written out, and comments and blank lines are
-not kept.
+The trial is written back in the builder's own form: shorthand such as `0 to 1 step 0.1`
+is written out, and comments and blank lines are not kept.
+
+Every setting the trial's goals consult is written out, its default included - the
+contrast settings when it has contrast goals, the spot sampling when a goal needs the spot
+analysis, and the wavelengths, vignetting and configuration always. A saved trial therefore
+keeps its meaning if a default later changes. Settings nothing in the trial consults are
+left out, as are weight rows of 1, since "an omitted weight is 1" is part of the format
+rather than a default that could drift.
 
 Being Beam42's own format, it holds what Beam42 reads and nothing else, whatever the input
 carried:

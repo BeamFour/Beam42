@@ -1367,8 +1367,10 @@ public final class OptimizationBuilder {
 
     /**
      * This setup as a {@code [trial number]} section of a prescription file, which
-     * {@link OptimizationTrial#read} reads back into an equivalent builder. Settings at
-     * their defaults are left out. Variables and goals given as code, through
+     * {@link OptimizationTrial#read} reads back into an equivalent builder. Every setting
+     * the trial's goals consult is written, its default included, so that a later change to a
+     * default cannot change what a saved trial means; a setting nothing in the trial consults
+     * is left out. Weights left out are 1, which is part of the format rather than a default. Variables and goals given as code, through
      * {@link #additionalVariables(Var...)} or {@link #additionalGoals(GoalFactory...)}, have
      * no written form, so a builder that uses them cannot be written.
      */
@@ -1382,20 +1384,16 @@ public final class OptimizationBuilder {
             line(sb, "description", description);
         if (outdir != null)
             line(sb, "outdir", outdir);
-        if (scenario != 0)
-            line(sb, "configuration", Integer.toString(scenario));
+        line(sb, "configuration", Integer.toString(scenario));
         if (fields != null)
             line(sb, "fields", OptimizationTrial.format(fields));
         if (mtfFrequencies != null)
             line(sb, "frequencies", OptimizationTrial.format(mtfFrequencies));
-        if (!weighted)
-            line(sb, "weighted", "no");
-        if (dLineOnly)
-            line(sb, "d-line-only", "yes");
-        if (vigType != VigType.SetPupil || freezeVignetting)
-            line(sb, "vignetting", OptimizationTrial.kebab(vigType.name()) + (freezeVignetting ? " frozen" : ""));
-        if (!checkSpotApertures)
-            line(sb, "check-spot-apertures", "no");
+        line(sb, "weighted", yesNo(weighted));
+        line(sb, "d-line-only", yesNo(dLineOnly));
+        line(sb, "vignetting", OptimizationTrial.kebab(vigType.name()) + (freezeVignetting ? " frozen" : ""));
+        if (!checkSpotApertures || (tracesSpots() && !hexapolarPattern()))
+            line(sb, "check-spot-apertures", yesNo(checkSpotApertures));
 
         if (allCurvatureSurfaces)
             line(sb, "vary curvatures", allExcept(curvatureExclusions));
@@ -1429,14 +1427,10 @@ public final class OptimizationBuilder {
             if (contrastBalanceFields != null)
                 line(sb, "goal contrast", "balance " + balance() + " weight "
                         + OptimizationTrial.format(contrastBalanceWeight));
-            if (contrastRings != DEFAULT_CONTRAST_RINGS || contrastSpokes != DEFAULT_CONTRAST_SPOKES)
-                line(sb, "goal contrast", "sampling " + contrastRings + " " + contrastSpokes);
-            if (calibrateContrastFrequency)
-                line(sb, "goal contrast", "calibrate yes");
-            if (aimContrastAtExitPupil)
-                line(sb, "goal contrast", "exit-pupil-aiming yes");
-            if (centerContrastResiduals)
-                line(sb, "goal contrast", "centering yes");
+            line(sb, "goal contrast", "sampling " + contrastRings + " " + contrastSpokes);
+            line(sb, "goal contrast", "calibrate " + yesNo(calibrateContrastFrequency));
+            line(sb, "goal contrast", "exit-pupil-aiming " + yesNo(aimContrastAtExitPupil));
+            line(sb, "goal contrast", "centering " + yesNo(centerContrastResiduals));
         }
         for (MtfGoals goal : mtfGoals) {
             line(sb, "goal mtf", goal.frequency + " sag " + OptimizationTrial.format(goal.sagittal));
@@ -1464,14 +1458,14 @@ public final class OptimizationBuilder {
         }
         if (gaussianQuadratureRings != DEFAULT_GAUSSIAN_QUADRATURE_RINGS
                 || gaussianQuadratureSpokes != DEFAULT_GAUSSIAN_QUADRATURE_SPOKES
-                || gaussianQuadratureInnerRadius != 0.0)
+                || gaussianQuadratureInnerRadius != 0.0
+                || (tracesSpots() && !hexapolarPattern()))
             line(sb, "goal spot sampling", "gaussian " + gaussianQuadratureRings + " " + gaussianQuadratureSpokes
                     + (gaussianQuadratureInnerRadius != 0.0
                     ? " " + OptimizationTrial.format(gaussianQuadratureInnerRadius) : ""));
-        if (useHexapolarSpotPattern)
+        if (hexapolarPattern())
             line(sb, "goal spot sampling", "hexapolar " + hexapolarSpotRays);
-        if (addRayAberrationGoals)
-            line(sb, "goal ray-aberrations", "yes");
+        line(sb, "goal ray-aberrations", yesNo(addRayAberrationGoals));
         for (ParaxialGoal goal : paraxialGoals)
             line(sb, "goal paraxial", OptimizationTrial.paraxialName(goal.paraxId()) + " "
                     + OptimizationTrial.format(goal.target())
@@ -1533,6 +1527,21 @@ public final class OptimizationBuilder {
         line(sb, key, OptimizationTrial.format(goals.targets));
         if (!allOnes(goals.weights))
             line(sb, key, "weights " + OptimizationTrial.format(goals.weights));
+    }
+
+    private static String yesNo(boolean value) {
+        return value ? "yes" : "no";
+    }
+
+    /** Whether any goal needs the spot analysis, and so the spot sampling settings. */
+    private boolean tracesSpots() {
+        return spotRmsGoals != null || spotMaxRadiusGoals != null || addSpotDeviationGoals
+                || !mtfGoals.isEmpty();
+    }
+
+    /** The spot pattern in effect: a maximum-radius goal asks for hexapolar whatever else is set. */
+    private boolean hexapolarPattern() {
+        return useHexapolarSpotPattern || spotMaxRadiusGoals != null;
     }
 
     private static boolean allOnes(double[] values) {

@@ -156,6 +156,7 @@ class OptimizationTrialTest {
             [trial 1]
             description           Everything a trial can say
             outdir                trials/one
+            configuration         0
             fields                0 0.25 0.5 0.75 1
             frequencies           10 20
             weighted              no
@@ -175,6 +176,8 @@ class OptimizationTrialTest {
             goal contrast         balance all except 0.25 weight 0.4
             goal contrast         sampling 4 8
             goal contrast         calibrate yes
+            goal contrast         exit-pupil-aiming no
+            goal contrast         centering no
             goal mtf              10 sag 90 85 80 70 60
             goal mtf              10 tan 90 85 80 70 60
             goal mtf              10 tan weights 1 1 2 2 4
@@ -248,13 +251,19 @@ class OptimizationTrialTest {
         String written = builder.toTrial(7);
         assertEquals("""
                 [trial 7]
+                configuration         0
                 fields                0 0.5 1
                 frequencies           10
+                weighted              yes
+                d-line-only           no
+                vignetting            set-pupil
+                check-spot-apertures  yes
                 vary thicknesses      10 4
                 vary aspherics        0 1:100000
                 goal spot-deviation   x 1 2 3
                 goal spot-deviation   y 1 1 1
                 goal spot sampling    gaussian 3 6
+                goal ray-aberrations  no
                 goal paraxial         bfl 37.3
                 """, written);
         var reread = OptimizationTrial.read(lens + written, 7, true);

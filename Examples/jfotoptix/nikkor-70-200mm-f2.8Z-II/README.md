@@ -43,8 +43,8 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 33 | -65.3298 | d33 | 37.44 |  |  |  |
 | 34 | -34.6941 | 1.4 | 36.76 | 1.58335 | 59.55 |  |
 | 35 | -123.343 | 29.75 | 38.48 |  |  |  |
-| 36 | 0.0 | 1.6 | 45.82 | 1.5168 | 64.13 | Hikari | J-BK7A |
-| 37 | 0.0 | 0.174 | 45.82 |  |  |  |
+| 36 | CG | 1.6 | 45.82 | 1.5168 | 64.13 | Hikari | J-BK7A |
+| 37 | CG | 0.174 | 45.82 |  |  |  |
 ## Aspherical Data
 | ID  | Type | k   | P1 | P2 | P3 | P4 | P5 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -182,4 +182,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./WO2026-172598_Example01P.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-08-20
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-09-13

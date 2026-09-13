@@ -801,12 +801,10 @@ public final class OptimizationBuilder {
                     "optimization requires at least as many goals as variables: "
                             + goals.size() + " goals for " + variables.size() + " variables"
                             + "; add optical goals or enable rayAberrationGoals()");
-        analysis.vignetting(configuration.vigType)
-                .freezing_vignetting(configuration.freezeVignetting)
-                .checking_spot_apertures(configuration.checkSpotApertures);
-        configureSpotPattern(analysis, goals);
-        configureContrastAnalysis(analysis, goals);
-        configureRequiredAnalyses(analysis, goals);
+        boolean customMaximumRadius = !additionalGoalFactories.isEmpty()
+                && goals.stream().anyMatch(GoalSpotMaxRadius.class::isInstance);
+        var effective = configuration.effectiveAnalysis(customMaximumRadius);
+        configuration.configureAnalysis(analysis, effective, !additionalGoalFactories.isEmpty());
         return new OptimizationSetup(analysis, variables.toArray(new Var[0]), goals.toArray(new Goal[0]));
     }
 
@@ -843,47 +841,6 @@ public final class OptimizationBuilder {
             gaps.add(surface);
         }
         return gaps;
-    }
-
-    private void configureContrastAnalysis(Analysis analysis, List<Goal> goals) {
-        if (configuration.contrastGoals.isEmpty()) return;
-        if (configuration.calibrateContrastFrequency && configuration.aimContrastAtExitPupil)
-            throw new IllegalArgumentException(
-                    "Contrast frequency calibration and exit-pupil aiming are mutually exclusive");
-        int[] frequencies = configuration.contrastGoals.stream().mapToInt(goal -> goal.frequency).toArray();
-        analysis.using_contrast_analysis(frequencies, configuration.contrastRings, configuration.contrastSpokes);
-        analysis.calibrating_contrast_frequency(configuration.calibrateContrastFrequency);
-        analysis.aiming_contrast_at_exit_pupil(configuration.aimContrastAtExitPupil);
-        analysis.centering_contrast_residuals(configuration.centerContrastResiduals);
-    }
-
-    private void configureRequiredAnalyses(Analysis analysis, List<Goal> goals) {
-        // Additional goal factories are conservatively assumed to require all analyses.
-        if (additionalGoalFactories.isEmpty()) {
-            boolean spots = goals.stream().anyMatch(goal ->
-                    goal instanceof GoalSpotRMS || goal instanceof GoalSpotDeviation
-                            || goal instanceof GoalSpotMaxRadius || goal instanceof GoalGeoMTF);
-            boolean mtf = goals.stream().anyMatch(GoalGeoMTF.class::isInstance);
-            boolean rayAberrations = goals.stream().anyMatch(goal ->
-                    goal instanceof GoalRayAberration || goal instanceof GoalMTFProxy);
-            analysis.required_analyses(spots, rayAberrations, mtf);
-        }
-    }
-
-    private void configureSpotPattern(Analysis analysis, List<Goal> goals) {
-        boolean hasSpotMaxRadiusGoal = goals.stream().anyMatch(GoalSpotMaxRadius.class::isInstance);
-        if (configuration.addSpotDeviationGoals) {
-            analysis.using_gauss_quadrature_pattern(
-                            configuration.gaussianQuadratureRings, configuration.gaussianQuadratureSpokes,
-                            configuration.gaussianQuadratureInnerRadius)
-                    .retaining_failed_spot_rays(true);
-        }
-        else if (configuration.useHexapolarSpotPattern || hasSpotMaxRadiusGoal)
-            analysis.using_hexapolar_pattern(configuration.hexapolarSpotRays);
-        else
-            analysis.using_gauss_quadrature_pattern(
-                    configuration.gaussianQuadratureRings, configuration.gaussianQuadratureSpokes,
-                    configuration.gaussianQuadratureInnerRadius);
     }
 
     private List<Var> buildVariables() {

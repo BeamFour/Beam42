@@ -127,6 +127,7 @@ final class OptimizationConfiguration {
     }
 
     String toTrial(int number) {
+        var effective = effectiveAnalysis(false);
         var sb = new StringBuilder();
         sb.append("[trial ").append(number).append("]\n");
         if (description != null)
@@ -141,7 +142,7 @@ final class OptimizationConfiguration {
         line(sb, "weighted", yesNo(weighted));
         line(sb, "d-line-only", yesNo(dLineOnly));
         line(sb, "vignetting", OptimizationTrial.kebab(vigType.name()) + (freezeVignetting ? " frozen" : ""));
-        if (!checkSpotApertures || (tracesSpots() && !hexapolarPattern()))
+        if (!checkSpotApertures || (effective.spots() && !effective.hexapolar()))
             line(sb, "check-spot-apertures", yesNo(checkSpotApertures));
 
         if (allCurvatureSurfaces)
@@ -208,11 +209,11 @@ final class OptimizationConfiguration {
         if (gaussianQuadratureRings != DEFAULT_GAUSSIAN_QUADRATURE_RINGS
                 || gaussianQuadratureSpokes != DEFAULT_GAUSSIAN_QUADRATURE_SPOKES
                 || gaussianQuadratureInnerRadius != 0.0
-                || (tracesSpots() && !hexapolarPattern()))
+                || (effective.spots() && !effective.hexapolar()))
             line(sb, "goal spot sampling", "gaussian " + gaussianQuadratureRings + " " + gaussianQuadratureSpokes
                     + (gaussianQuadratureInnerRadius != 0.0
                     ? " " + OptimizationTrial.format(gaussianQuadratureInnerRadius) : ""));
-        if (hexapolarPattern())
+        if (effective.hexapolar())
             line(sb, "goal spot sampling", "hexapolar " + hexapolarSpotRays);
         line(sb, "goal ray-aberrations", yesNo(addRayAberrationGoals));
         for (ParaxialGoal goal : paraxialGoals)
@@ -282,15 +283,48 @@ final class OptimizationConfiguration {
         return value ? "yes" : "no";
     }
 
-    /** Whether any goal needs the spot analysis, and so the spot sampling settings. */
-    private boolean tracesSpots() {
-        return spotRmsGoals != null || spotMaxRadiusGoals != null || addSpotDeviationGoals
-                || !mtfGoals.isEmpty();
+    /**
+     * Resolve the decisions shared by setup construction and canonical writing.
+     * A custom maximum-radius goal also requests hexapolar sampling, but per-ray
+     * deviation goals retain Gaussian sampling so their residual count stays fixed.
+     * Custom goals have no written form, so the writer passes false.
+     */
+    EffectiveAnalysis effectiveAnalysis(boolean customMaximumRadius) {
+        boolean mtf = !mtfGoals.isEmpty();
+        boolean spots = spotRmsGoals != null || spotMaxRadiusGoals != null || addSpotDeviationGoals || mtf;
+        boolean hexapolar = !addSpotDeviationGoals
+                && (useHexapolarSpotPattern || spotMaxRadiusGoals != null || customMaximumRadius);
+        return new EffectiveAnalysis(spots, addRayAberrationGoals, mtf, hexapolar, addSpotDeviationGoals);
     }
 
-    /** The spot pattern in effect: a maximum-radius goal asks for hexapolar whatever else is set. */
-    private boolean hexapolarPattern() {
-        return useHexapolarSpotPattern || spotMaxRadiusGoals != null;
+    record EffectiveAnalysis(boolean spots, boolean rayAberrations, boolean mtf,
+                             boolean hexapolar, boolean retainFailedRays) {}
+
+    void configureAnalysis(Analysis analysis, EffectiveAnalysis effective, boolean customGoals) {
+        analysis.vignetting(vigType)
+                .freezing_vignetting(freezeVignetting)
+                .checking_spot_apertures(checkSpotApertures);
+        if (effective.hexapolar())
+            analysis.using_hexapolar_pattern(hexapolarSpotRays);
+        else
+            analysis.using_gauss_quadrature_pattern(
+                    gaussianQuadratureRings, gaussianQuadratureSpokes, gaussianQuadratureInnerRadius);
+        if (effective.retainFailedRays())
+            analysis.retaining_failed_spot_rays(true);
+        if (!contrastGoals.isEmpty()) {
+            if (calibrateContrastFrequency && aimContrastAtExitPupil)
+                throw new IllegalArgumentException(
+                        "Contrast frequency calibration and exit-pupil aiming are mutually exclusive");
+            int[] frequencies = contrastGoals.stream().mapToInt(goal -> goal.frequency).toArray();
+            analysis.using_contrast_analysis(frequencies, contrastRings, contrastSpokes);
+            analysis.calibrating_contrast_frequency(calibrateContrastFrequency);
+            analysis.aiming_contrast_at_exit_pupil(aimContrastAtExitPupil);
+            analysis.centering_contrast_residuals(centerContrastResiduals);
+        }
+        // Unknown factories may need any analysis. Keep the Analysis defaults (or
+        // the factory's explicit choices) instead of disabling work based on built-in goals.
+        if (!customGoals)
+            analysis.required_analyses(effective.spots(), effective.rayAberrations(), effective.mtf());
     }
 
     private static boolean allOnes(double[] values) {

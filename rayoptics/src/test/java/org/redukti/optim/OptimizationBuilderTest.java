@@ -548,6 +548,35 @@ class OptimizationBuilderTest {
                 .analysis();
 
         assertEquals(SpotOptions.PATTERN_HEXAPOLAR, analysis._spot_pattern);
+        assertTrue(analysis._compute_spots);
+        assertTrue(analysis._compute_ray_aberrations);
+        assertTrue(analysis._compute_mtf);
+    }
+
+    @Test
+    void customFactoryCanKeepItsExplicitAnalysisRequirements() {
+        var analysis = OptimizationBuilder.builder(prescription())
+                .fields(0.0).mtfFrequencies(10)
+                .additionalGoals(a -> {
+                    a.required_analyses(true, false, false);
+                    return new GoalSpotMaxRadius(a, 1, 20.0, 1.0);
+                }).build().analysis();
+        assertTrue(analysis._compute_spots);
+        assertFalse(analysis._compute_ray_aberrations);
+        assertFalse(analysis._compute_mtf);
+        assertEquals(SpotOptions.PATTERN_HEXAPOLAR, analysis._spot_pattern);
+    }
+
+    @Test
+    void perRayDeviationKeepsGaussianSamplingWithACustomMaximumRadiusGoal() {
+        var analysis = OptimizationBuilder.builder(prescription())
+                .fields(0.0).mtfFrequencies(10)
+                .spotDeviationGoals(1.0).gaussianQuadratureSampling(3, 6)
+                .additionalGoals(a -> new GoalSpotMaxRadius(a, 1, 20.0, 1.0))
+                .build().analysis();
+        assertEquals(SpotOptions.PATTERN_GAUSS_QUADRATURE, analysis._spot_pattern);
+        assertEquals(3, analysis._num_rings);
+        assertEquals(6, analysis._num_spokes);
     }
 
     @Test

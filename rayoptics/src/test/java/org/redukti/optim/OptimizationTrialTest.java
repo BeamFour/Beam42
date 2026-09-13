@@ -86,6 +86,41 @@ class OptimizationTrialTest {
     }
 
     @Test
+    void effectiveAnalysesAndSamplingSurviveRoundTrip() throws Exception {
+        record Case(String goals, boolean spots, boolean rays, boolean mtf, boolean hexapolar) {}
+        var cases = List.of(
+                new Case("", false, false, false, false),
+                new Case("goal spot-rms 10\n", true, false, false, false),
+                new Case("goal spot-max-radius 10\n", true, false, false, true),
+                new Case("goal spot-deviation 1\n", true, false, false, false),
+                new Case("goal mtf 20 sag 50\ngoal mtf 20 tan 50\n", true, false, true, false),
+                new Case("goal ray-aberrations yes\n", false, true, false, false),
+                new Case("goal contrast 20\n", false, false, false, false),
+                new Case("goal spot sampling hexapolar 32\n", false, false, false, true));
+        for (var c : cases) {
+            String text = withTrials(SUMMICRON, "[trial 1]\nfields 0\nfrequencies 20\n" + c.goals());
+            var builder = read(text);
+            var setup = builder.build();
+            var analysis = setup.analysis();
+            assertEquals(c.spots(), analysis._compute_spots, c.goals());
+            assertEquals(c.rays(), analysis._compute_ray_aberrations, c.goals());
+            assertEquals(c.mtf(), analysis._compute_mtf, c.goals());
+            assertEquals(c.hexapolar()
+                            ? org.redukti.rayoptics.analysis.SpotOptions.PATTERN_HEXAPOLAR
+                            : org.redukti.rayoptics.analysis.SpotOptions.PATTERN_GAUSS_QUADRATURE,
+                    analysis._spot_pattern, c.goals());
+            String written = builder.toTrial(1);
+            assertEquals(written, OptimizationTrial.parse(text, 1).toTrial());
+            String normalized = written.replaceAll("\\s+", " ");
+            assertEquals(c.hexapolar(), normalized.contains("sampling hexapolar"), c.goals());
+            assertEquals(c.spots() && !c.hexapolar(), normalized.contains("sampling gaussian"), c.goals());
+            var restored = read(withTrials(SUMMICRON, written));
+            assertEquals(written, restored.toTrial(1));
+            assertSameSetup(setup, restored.build());
+        }
+    }
+
+    @Test
     void numbersSurfacesByPosition() throws Exception {
         String text = withTrials(SUMMICRON, "[trial 1]\n" + MTF_FIVE_FIELDS + """
                 vary curvatures   all except 2 6

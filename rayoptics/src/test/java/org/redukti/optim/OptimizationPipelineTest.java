@@ -92,6 +92,43 @@ class OptimizationPipelineTest {
     }
 
     @Test
+    void bothEntryPointsValidateTheSameHeaders() throws Exception {
+        String[] invalid = {
+                "[trial 1]\n",
+                "[pipeline 7]\ntrials 1\n[pipeline 7]\n",
+                "[pipeline 1]\ntrials 2\n",
+                "[ trial nope ]\n",
+                "[ pipeline nope ]\n",
+                "[trial 99999999999999999999]\n",
+                "[pipeline 99999999999999999999]\n"
+        };
+        for (String extra : invalid) {
+            String text = withSections(TRIALS + "\n" + extra);
+            var trialError = assertThrows(OptimizationTrial.TrialException.class,
+                    () -> OptimizationTrial.parse(text, 1));
+            var pipelineError = assertThrows(OptimizationTrial.TrialException.class,
+                    () -> OptimizationTrial.readPipeline(text, 1));
+            assertEquals(trialError.getMessage(), pipelineError.getMessage());
+            assertTrue(trialError.getMessage().contains("line"), trialError.getMessage());
+        }
+    }
+
+    @Test
+    void mixedHeadersAndUnrelatedSectionsRoundTrip() throws Exception {
+        String text = withSections(TRIALS.replace("[trial 1]", "[ TrIaL 1 ]")
+                + "\n[unrelated]\nignored value\n[ PiPeLiNe 7 ]\ntrials 1 2 1\n")
+                .replace("\n", "\r\n");
+        var definition = OptimizationTrial.parse(text, 1);
+        var builder = definition.createBuilder(text, true);
+        String trial = definition.toTrial(builder.prescription());
+        var pipeline = OptimizationTrial.readPipeline(text, 7);
+        String written = withSections(trial + "\n[trial 2]\nfields 0\nfrequencies 20\n"
+                + pipeline.toPipeline());
+        assertEquals(trial, OptimizationTrial.parse(written, 1).toTrial(builder.prescription()));
+        assertEquals(pipeline.toPipeline(), OptimizationTrial.readPipeline(written, 7).toPipeline());
+    }
+
+    @Test
     void reportsProblemsWithTheirLine() throws Exception {
         String text = withSections(TRIALS + "\n[pipeline 7]\ntrials 1\nbogus 2\n");
         int line = java.util.List.of(text.split("\n", -1)).indexOf("bogus 2") + 1;

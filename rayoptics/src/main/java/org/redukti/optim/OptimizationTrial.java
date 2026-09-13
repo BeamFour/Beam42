@@ -119,43 +119,63 @@ public final class OptimizationTrial {
      *                        the pipeline has a problem
      */
     public static OptimizationPipeline readPipeline(String text, int number) {
-        String[] lines = text.split("\\r?\\n", -1);
-        Map<Integer, Integer> trials = new TreeMap<>();
-        Map<Integer, Integer> pipelines = new TreeMap<>();
-        int start = -1;
-        for (int i = 0; i < lines.length; i++) {
-            String trimmed = lines[i].trim();
-            if (!trimmed.startsWith("["))
-                continue;
-            Matcher trial = TRIAL_HEADER.matcher(trimmed);
-            if (trial.matches()) {
-                trials.put(Integer.parseInt(trial.group(1)), i + 1);
-                continue;
-            }
-            Matcher pipeline = PIPELINE_HEADER.matcher(trimmed);
-            if (pipeline.matches()) {
-                int found = Integer.parseInt(pipeline.group(1));
-                Integer earlier = pipelines.put(found, i + 1);
-                if (earlier != null)
-                    throw new TrialException("[pipeline " + found + "] is defined twice, at lines "
-                            + earlier + " and " + (i + 1));
-                if (found == number)
-                    start = i;
-            }
-        }
-        for (int both : pipelines.keySet())
-            if (trials.containsKey(both))
-                throw new TrialException("the number " + both + " is used by both [trial " + both
-                        + "] at line " + trials.get(both) + " and [pipeline " + both + "] at line "
-                        + pipelines.get(both) + "; trials and pipelines share one numbering");
-        if (start < 0) {
+        var index = new SectionIndex(text);
+        var trials = index.trials;
+        var pipelines = index.pipelines;
+        Integer start = pipelines.get(number);
+        if (start == null) {
             if (trials.containsKey(number))
                 return null;
             throw new TrialException("there is no [trial " + number + "] or [pipeline " + number
                     + "] in this prescription; it defines " + defined("trial", trials) + " and "
                     + defined("pipeline", pipelines));
         }
-        return readPipeline(lines, start, number, trials.keySet(), pipelines.keySet());
+        return readPipeline(index.lines, start - 1, number, trials.keySet(), pipelines.keySet());
+    }
+
+    /** Shared header validation. Map values are one-based source lines for diagnostics. */
+    private static final class SectionIndex {
+        final String[] lines;
+        final Map<Integer, Integer> trials = new TreeMap<>();
+        final Map<Integer, Integer> pipelines = new TreeMap<>();
+
+        SectionIndex(String text) {
+            lines = text.split("\\r?\\n", -1);
+            for (int i = 0; i < lines.length; i++) {
+                String header = lines[i].trim();
+                if (!header.startsWith("["))
+                    continue;
+                index(header, i + 1, "trial", TRIAL_HEADER, trials);
+                index(header, i + 1, "pipeline", PIPELINE_HEADER, pipelines);
+            }
+            for (int both : pipelines.keySet())
+                if (trials.containsKey(both))
+                    throw new TrialException("the number " + both + " is used by both [trial " + both
+                            + "] at line " + trials.get(both) + " and [pipeline " + both + "] at line "
+                            + pipelines.get(both) + "; trials and pipelines share one numbering");
+        }
+
+        private void index(String header, int line, String kind, Pattern pattern,
+                           Map<Integer, Integer> sections) {
+            Matcher matcher = pattern.matcher(header);
+            if (!matcher.matches()) {
+                if (lower(header.substring(1).stripLeading()).startsWith(kind))
+                    throw new TrialException("line " + line + ": expected [" + kind
+                            + " <number>], found " + header);
+                return;
+            }
+            int number;
+            try {
+                number = Integer.parseInt(matcher.group(1));
+            } catch (NumberFormatException e) {
+                throw new TrialException("line " + line + ": " + kind + " number is out of range: "
+                        + matcher.group(1));
+            }
+            Integer earlier = sections.put(number, line);
+            if (earlier != null)
+                throw new TrialException("[" + kind + " " + number + "] is defined twice, at lines "
+                        + earlier + " and " + line);
+        }
     }
 
     private static String defined(String what, Map<Integer, Integer> numbers) {
@@ -398,7 +418,8 @@ public final class OptimizationTrial {
         }
 
         static Reader parse(String text, int number) {
-            String[] lines = text.split("\\r?\\n", -1);
+            var index = new SectionIndex(text);
+            String[] lines = index.lines;
 
             // The lens data as the prescription reader sees it.
             List<String> radii = new ArrayList<>();
@@ -415,31 +436,7 @@ public final class OptimizationTrial {
                     radii.add(words[1]);
             }
 
-            // Find the trial's lines.
-            Map<Integer, Integer> headers = new TreeMap<>();
-            List<Integer> trialLines = new ArrayList<>();
-            boolean inTrial = false;
-            for (int i = 0; i < lines.length; i++) {
-                String trimmed = lines[i].trim();
-                if (trimmed.startsWith("[")) {
-                    inTrial = false;
-                    Matcher matcher = TRIAL_HEADER.matcher(trimmed);
-                    if (matcher.matches()) {
-                        int found = Integer.parseInt(matcher.group(1));
-                        Integer earlier = headers.put(found, i + 1);
-                        if (earlier != null)
-                            throw new TrialException("[trial " + found + "] is defined twice, at lines "
-                                    + earlier + " and " + (i + 1));
-                        inTrial = found == number;
-                    }
-                    else if (trimmed.toLowerCase(Locale.ROOT).startsWith("[trial"))
-                        throw new TrialException("line " + (i + 1) + ": expected [trial <number>], found "
-                                + trimmed);
-                    continue;
-                }
-                if (inTrial)
-                    trialLines.add(i);
-            }
+            var headers = index.trials;
             if (!headers.containsKey(number))
                 throw new TrialException("there is no [trial " + number + "] in this prescription; "
                         + (headers.isEmpty() ? "it defines no trials"
@@ -447,7 +444,8 @@ public final class OptimizationTrial {
                         + String.join(", ", headers.keySet().stream().map(String::valueOf).toList())));
 
             var reader = new Reader(number, radii);
-            for (int i : trialLines)
+            // The stored one-based header line is the zero-based first body line.
+            for (int i = headers.get(number); i < lines.length && !lines[i].trim().startsWith("["); i++)
                 reader.read(i + 1, lines[i]);
             reader.finish();
             return reader;

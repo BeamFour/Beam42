@@ -57,7 +57,7 @@ instead, which the solver reads as a step to reject rather than a direction to m
 | `goal contrast balance` | Reduces the difference between the sagittal and tangential contrast at a field: aims to reduce astigmatism. Only available with contrast goals.             | 0                                | Yes       |
 | `goal mtf` | Geometric MTF at a frequency, field and direction.                                                                                                          | your percentage, 100 to maximize | Yes       |
 | `goal spot-rms` | RMS spot radius at a field, in microns.                                                                                                                     | your radius, 0 to minimize       | Yes       |
-| `goal spot-max-radius` | The largest ray miss at a field, in microns. Needs hexapolar sampling, which samples the rim.                                                               | your radius                      | Yes       |
+| `goal spot-max-radius` | The largest sampled ray miss at a field, in microns. The current builder forces hexapolar sampling, including the rim.                                                               | your radius                      | Yes       |
 | `goal spot-deviation` | The signed X or Y miss of each sampled ray, in microns: the RMS spot broken into its parts, so the solver sees which rays are wrong and in which direction. | 0                                | No        |
 | `goal ray-aberrations` | Transverse aberration at each point of the classical sagittal and tangential ray fans.                                                                      | 0                                | No        |
 | `goal paraxial` | A first-order quantity: focal length, back focus, f-number, pupil positions and the rest.                                                                   | your value                       | Yes       |
@@ -282,6 +282,30 @@ the syntax.
 Every goal line starts with `goal` and the goal type. Per-field rows take exactly one
 value per entry in `fields`, in the same order. Weights left out default to 1.
 
+### Supported sampling patterns
+
+The following patterns are available for optimization trials. GQ means Gaussian quadrature.
+
+| Goal | Supported sampling | Default or selection |
+|---|---|---|
+| `spot-rms` | GQ or hexapolar | GQ by default. |
+| `spot-max-radius` | Hexapolar | Selects hexapolar for all spot and geometric-MTF goals in the stage. |
+| `spot-deviation` | GQ | GQ only. |
+| `mtf` | GQ or hexapolar | Uses the stage's spot pattern; GQ by default. |
+| `contrast` | Separate GQ-based contrast sampling | Set with `goal contrast sampling`; default `6 12`. |
+| `contrast balance` | The contrast goal's samples | Requires contrast goals. |
+| `ray-aberrations` | Sagittal and tangential ray fans | Ten samples per fan. |
+| `paraxial` and layout constraints | No spot sampling | Spot-pattern settings do not apply. |
+
+There is one spot pattern per stage, shared by all spot and geometric-MTF goals.
+Grid sampling is not available for optimization trials. Contrast sampling is independent:
+a stage can use hexapolar spots and GQ-based contrast samples simultaneously. Sampling
+settings do not enable goals themselves.
+
+`check-spot-apertures` applies only to GQ spots. Hexapolar spots always check physical
+apertures. Contrast does not check physical apertures by default; the trial spot setting
+does not change this. The optional GQ spot inner radius does not configure contrast sampling.
+
 ### Contrast
 
 ```ini
@@ -300,10 +324,17 @@ goal contrast   sampling 6 12
 | `goal contrast tan <weights>` | Tangential weight per field, for every contrast frequency. | 1 |
 | `goal contrast <frequency> sag\|tan <weights>` | Weights for one frequency, overriding the rows above. | |
 | `goal contrast balance <fields> [weight <w>]` | Hold sagittal and tangential contrast in balance. `<fields>` is `all`, `all except <field values>`, or one `yes`/`no` per field. | weight 0.1 |
-| `goal contrast sampling <rings> <spokes>` | Pupil sampling for contrast. | `6 12` |
+| `goal contrast sampling <rings> <spokes>` | Separate GQ-derived contrast pattern; at least 1 ring and 3 spokes. | `6 12` |
 | `goal contrast calibrate yes\|no` | Correct the pupil shift so each sample realises the requested frequency. | `no` |
 | `goal contrast exit-pupil-aiming yes\|no` | Aim the sheared rays on the exit pupil. Cannot be combined with `calibrate`. | `no` |
 | `goal contrast centering yes\|no` | Subtract the constant part of each contrast block. | `no` |
+
+Contrast begins with `rings × spokes` weighted GQ points for each field, wavelength,
+and frequency. Each point has a reference ray and two displaced partners. The pattern
+is mapped and contracted to keep the triplets in the common vignetted-pupil overlap;
+weights are adjusted and normalized. This is not the ordinary spot pattern. There is
+currently no contrast pattern selector for grid or hexapolar. The builder/trial default
+is `6 12`; direct `ContrastOptions` defaults to `3 6`.
 
 In `balance`, fields are named by their value in `fields`, so nothing has to be
 counted. The weight's scale is unlike the contrast weights'; see "Controlling
@@ -341,13 +372,28 @@ goal spot sampling    gaussian 6 12
 | `goal spot-rms\|spot-max-radius weights <weights>` | Weights for those targets. | 1 |
 | `goal spot-deviation <weights>` | Minimize RMS spot size through each ray's signed X and Y deviation, with one weight per field. | |
 | `goal spot-deviation x\|y <weights>` | Separate X and Y weights; both rows are needed. | |
-| `goal spot sampling gaussian <rings> <spokes> [<inner radius>]` | Gaussian-quadrature spot pattern, optionally annular. | `gaussian 14 20` |
-| `goal spot sampling hexapolar <rays>` | Use the hexapolar spot pattern. | |
+| `goal spot sampling gaussian <rings> <spokes> [<inner radius>]` | Gaussian-quadrature spot pattern: rings >= 1, spokes >= 3, inner radius in [0, 1). | `gaussian 14 20` |
+| `goal spot sampling hexapolar <rings>` | Use hexapolar sampling; integer >= 1. Despite the Java parameter name `numRays`, this is a ring count, not a total ray count. | 64 rings when selected |
 
-`spot-max-radius` switches the spot pattern to hexapolar. `spot-deviation` needs the
-Gaussian-quadrature pattern, and cannot be combined with `spot-rms`. The two sampling
-lines are separate settings and may both be given: the Gaussian-quadrature rings and
-spokes are kept even when hexapolar sampling is chosen.
+`spot-max-radius` switches the shared spot pattern to hexapolar, even when a Gaussian
+sampling line is present. This is a builder policy intended to include pupil-rim rays.
+The metric is still the maximum over sampled rays, not a guaranteed continuous maximum.
+
+`spot-deviation` currently requires GQ and cannot be combined with explicit hexapolar
+sampling, `spot-max-radius`, or `spot-rms`. The sampling conflicts are rejected during
+trial parsing with a source line; the `spot-rms` conflict is rejected when building the
+setup. Separate X/Y deviation-weight rows follow the same restrictions.
+
+Both Gaussian and hexapolar sampling lines may be given when there are no
+`spot-deviation` goals. They store separate settings, not two simultaneous patterns:
+hexapolar takes precedence regardless of line order. Its count is a number of rings;
+the generated point count is approximately `1 + 3*rings*(rings + 1)`, before tracing
+failures. GQ uses `rings * spokes` samples.
+
+Canonical writing preserves configured hexapolar intent, even for an invalid Java
+builder, so writing cannot silently turn an incompatible configuration into a valid
+one. Valid trial and pipeline configurations remain round-trippable. There is no
+`goal spot sampling grid` syntax today.
 
 ### Ray aberrations
 

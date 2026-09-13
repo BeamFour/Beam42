@@ -222,8 +222,8 @@ public final class OptimizationBuilder {
     }
 
     public OptimizationBuilder contrastSampling(int rings, int spokes) {
-        if (rings < 1 || spokes < 1)
-            throw new IllegalArgumentException("contrast rings and spokes must be at least 1");
+        if (rings < 1 || spokes < 3)
+            throw new IllegalArgumentException("contrast sampling requires at least 1 ring and 3 spokes");
         configuration.contrastRings = rings;
         configuration.contrastSpokes = spokes;
         return this;

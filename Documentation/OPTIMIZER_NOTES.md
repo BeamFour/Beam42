@@ -4,6 +4,9 @@ why it behaves as it does, and what was measured along the way. For using the op
 the trial and pipeline sections of a prescription, and what each setting does - see
 [OPTIMIZER.md](OPTIMIZER.md).
 
+The current sampling support matrix is in that user guide. Implementation gaps and
+proposed changes are recorded in [Sampling limitations and follow-up work](#sampling-limitations-and-follow-up-work) below.
+
 ## Contrast Optimization
 
 Contrast optimization uses pupil wavefront differences as a fast, smooth proxy for
@@ -1039,3 +1042,123 @@ throughput loss.
 
 ## Useful links
 * https://www.linkedin.com/pulse/optimize-apertures-vignetting-factors-javier-ruiz-uw0yf/
+
+## Sampling limitations and follow-up work
+
+Audit date: 2026-09-13. User-facing pattern choices are documented in
+[OPTIMIZER.md](OPTIMIZER.md#supported-sampling-patterns).
+
+### 1. Grid exists below the optimizer, but not in its execution path
+
+**Current limitation:** `SpotOptions` and `SpotAnalysis.eval()` support grid, hexapolar,
+and GQ. `OptimizationBuilder` and trial syntax expose only GQ and hexapolar.
+`Analysis.compute()` treats any non-GQ pattern as hexapolar, so assigning
+`PATTERN_GRID` directly silently selects the wrong pattern.
+
+**Possible resolution:** add explicit pattern dispatch in `Analysis`, a builder grid
+setting, parser/writer support, and tests that verify generated coordinates rather than
+only the pattern flag. Reject unknown patterns instead of falling back to hexapolar.
+Grid support in the analysis library alone must not be advertised as optimizer support.
+
+### 2. Per-ray spot deviation assumes the GQ sample layout
+
+**Current limitation:** the builder allocates `rings * spokes` samples for every field
+and wavelength. `GoalSpotDeviation` reads a fixed sample index and multiplies the
+deviation by the square root of its sample weight. The goal's formula itself does not
+require Gaussian nodes, but the surrounding code currently does.
+
+Only the GQ branch of `SpotAnalysis` forwards the option to preserve failed rays.
+Grid and hexapolar spot wrappers pass `append_if_none=false`, so failures remove
+samples and can change subsequent indices during a solve. Simply removing the
+builder/parser restriction would produce incorrect residual correspondence.
+
+**Possible resolution:** introduce a common weighted sample set containing coordinates,
+stable indices and count. Construct residuals from that set and preserve a validity slot
+for every ray in every tracing path. Normalize integration weights consistently so that
+changing the number of grid/hexapolar rays does not arbitrarily rescale the merit.
+Test failure/recovery of individual rays, residual count stability, and agreement between
+the sum of squared deviations and the intended weighted RMS metric.
+
+The prohibition on combining aggregate RMS with per-ray deviations is a separate
+builder policy; it should be evaluated separately from pattern support.
+
+### 3. Maximum-radius goals force a sampling preference
+
+**Current limitation:** a built-in maximum-radius goal forces hexapolar sampling for
+every spot and geometric-MTF goal in the stage. The metric itself just takes the maximum
+sampled image-plane radius and can operate on other patterns. Ordinary GQ radial nodes
+are interior, so they do not explicitly test the pupil rim.
+
+**Possible resolution:** make rim coverage a goal requirement or a documented default,
+rather than silently overriding explicit pattern selection. Options include a separate
+boundary sample set or a pattern with boundary nodes. Test convergence of the maximum
+with both radial and angular refinement; sampling the rim alone does not prove that the
+largest image-plane miss occurs there.
+
+Custom goal factories are a distinct escape hatch: a custom maximum-radius goal requests
+hexapolar unless built-in deviation goals keep GQ for residual stability. Custom factories
+cannot be written as trials, and this behavior is not evidence of general trial support.
+
+### 4. Contrast sampling is coupled to GQ generation
+
+**Current limitation:** `Trace.generate_contrast_quadrature()` starts with weighted GQ
+points. It maps them into the vignetted pupil, positions them about the overlap centre,
+and contracts the whole pattern until each reference and both displaced partners fit.
+Weights include the vignetting Jacobian and are normalized. `GoalContrast` and balance
+goals consume these results; ordinary spot-pattern settings have no effect on them.
+
+**Possible resolution:** separate the base weighted sampler from the shear/overlap
+transformation. Other patterns would need appropriate weights, stable counts and partner
+validity, not just different point coordinates. GQ can remain the efficient default for
+integration without being a universal requirement of the contrast objective.
+
+**Separate numerical question:** increasing sample count refines the contracted region,
+not necessarily the complete common overlap. Compare the current contrast proxy against
+integration over the full overlap before claiming that a denser or different pattern
+removes this approximation. Preserve frequency calibration, exit-pupil aiming and
+centering behavior in such comparisons.
+
+### 5. Sampling parameter names obscure computational cost
+
+**Current limitation:** `hexapolarSampling(int numRays)`, `SpotOptions.num_rays()` and
+historical documentation call the hexapolar setting a ray count. It reaches
+`TraceRingsDef.num_rings`; the point count grows approximately as
+`1 + 3*n*(n + 1)`. The default 64 therefore means thousands of rays, not 64 rays.
+GQ's count is `rings * spokes`.
+
+**Possible resolution:** introduce a clearly named ring-count API while retaining an
+alias for existing callers. Keep the numeric meaning of saved trials unchanged; silently
+reinterpreting existing values as total rays would violate round-trip compatibility.
+
+### 6. Aperture and annulus settings are not uniform across samplers
+
+**Current limitation:** GQ spot tracing honors `check-spot-apertures`; hexapolar and
+lower-level grid tracing force physical-aperture checking. GQ spot inner radius applies
+only to that spot sampler. Contrast uses separate options, defaults to no physical-aperture
+checking, and does not inherit the spot annulus.
+
+**Possible resolution:** explicitly describe each sampler's domain and clipping policy.
+Any unification needs regression tests for vignetting, obscurations, failed rays and
+weight normalization. Do not assume that choosing the same pattern name makes the
+sampled pupil or merit identical.
+
+### Corrected configuration defects
+
+- **Invalid configuration silently repaired on writing:** the shared effective-pattern
+  decision suppressed configured hexapolar sampling when spot-deviation was present.
+  The writer now preserves configured intent; parsing rejects deviation with hexapolar
+  or maximum-radius goals and reports the conflicting line. Regression tests cover
+  writing an invalid Java builder and both input orders, including X/Y deviation rows.
+- **Contrast accepted too few spokes:** the builder, reader and `ContrastOptions`
+  accepted one or two spokes although the shared GQ generator requires at least three.
+  These entry points now reject those values before tracing. One ring and three spokes
+  are the structural minimum, not a convergence recommendation.
+
+### Evidence and scope
+
+The audit follows `OptimizationConfiguration`, `OptimizationBuilder`,
+`OptimizationTrial`, `Analysis`, `SpotAnalysis`, `SpotIntercepts`, `ContrastAnalysis`,
+and the sampling routines in `Trace`. Configuration tests cover pattern selection,
+round-trip stability, unsupported syntax and numerical bounds. Existing tracing and
+optimization tests cover representative lenses; this audit does not establish optical
+convergence for every lens or implement the proposed pattern extensions.

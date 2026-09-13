@@ -526,6 +526,37 @@ class OptimizationTrialTest {
     }
 
     @Test
+    void trialSamplingMatchesTheAvailableTracerPatterns() throws Exception {
+        String prefix = "[trial 1]\nfields 0\nfrequencies 20\n";
+        String lens = withTrials(SUMMICRON, "");
+        for (int spokes : new int[]{1, 2}) {
+            String text = lens + prefix + "goal contrast 20\ngoal contrast sampling 1 " + spokes;
+            var error = assertThrows(OptimizationTrial.TrialException.class,
+                    () -> OptimizationTrial.parse(text, 1));
+            assertTrue(error.getMessage().contains("line " + text.split("\n", -1).length + ":"));
+            assertThrows(IllegalArgumentException.class,
+                    () -> OptimizationBuilder.builder(prescription(lens, true, false)).contrastSampling(1, spokes));
+            assertThrows(IllegalArgumentException.class,
+                    () -> new org.redukti.rayoptics.analysis.ContrastOptions(20).num_spokes(spokes));
+        }
+        assertThrows(OptimizationTrial.TrialException.class,
+                () -> OptimizationTrial.parse(lens + prefix + "goal spot sampling grid 9\n", 1));
+        // Independent spot and contrast settings are valid together, at the lower bound.
+        String text = lens + prefix + "goal spot-rms 10\ngoal spot sampling hexapolar 2\n"
+                + "goal contrast 20\ngoal contrast sampling 1 3\n";
+        var builder = read(text);
+        var setup = builder.build();
+        setup.analysis().compute();
+        assertNotNull(setup.analysis()._spots);
+        assertEquals(3, setup.analysis()._contrasts[0].fields.get(0).wavelengths().get(0).samples().size());
+        assertEquals(org.redukti.rayoptics.analysis.SpotOptions.PATTERN_HEXAPOLAR,
+                setup.analysis()._spot_pattern);
+        var restored = read(lens + builder.toTrial(1));
+        assertSameSetup(builder.build(), restored.build());
+        assertEquals(builder.toTrial(1), restored.toTrial(1));
+    }
+
+    @Test
     void rejectsMistakes() throws Exception {
         assertRejected("[trial 1]\nfields 0\nfields 0\n", "'fields' is given more than once");
         assertRejected("[trial 1]\nfields 0\n", "'frequencies' is required");

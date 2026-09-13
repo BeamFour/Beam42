@@ -33,7 +33,7 @@ public class ContrastOptions {
     }
 
     public ContrastOptions num_spokes(Integer value) {
-        if (value != null && value < 1) throw new IllegalArgumentException("Number of spokes must be at least 1");
+        if (value != null && value < 3) throw new IllegalArgumentException("Number of spokes must be at least 3");
         numSpokes = value;
         return this;
     }

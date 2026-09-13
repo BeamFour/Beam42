@@ -733,6 +733,8 @@ public final class OptimizationTrial {
                     once(line, "goal contrast sampling");
                     count(line, w, 5, "goal contrast sampling <rings> <spokes>");
                     contrastSampling = new int[]{positiveInt(line, w[3], "rings"), positiveInt(line, w[4], "spokes")};
+                    if (contrastSampling[1] < 3)
+                        throw error(line, "contrast sampling requires at least 1 ring and 3 spokes");
                     contrastSettingsLine = line;
                 }
                 case "calibrate" -> {

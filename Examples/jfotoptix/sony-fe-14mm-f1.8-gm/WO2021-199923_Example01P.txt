@@ -65,3 +65,5 @@ originY	185.95
 ppmm	3.915
 [notes]
 Bill: Patent supplies all diameters. Measured d0 and Magnification. Not perfect.
+Dibyendu
+options --optimize --assign-glass-types --index-line e

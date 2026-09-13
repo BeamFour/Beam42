@@ -128,6 +128,10 @@ final class OptimizationConfiguration {
 
     String toTrial(int number) {
         var effective = effectiveAnalysis(false);
+        // Preserve configured intent, even when the combination is invalid. Using
+        // execution's Gaussian override here would silently repair a rejected setup
+        // into a different, valid one when its trial is read back.
+        boolean configuredHexapolar = useHexapolarSpotPattern || spotMaxRadiusGoals != null;
         var sb = new StringBuilder();
         sb.append("[trial ").append(number).append("]\n");
         if (description != null)
@@ -142,7 +146,7 @@ final class OptimizationConfiguration {
         line(sb, "weighted", yesNo(weighted));
         line(sb, "d-line-only", yesNo(dLineOnly));
         line(sb, "vignetting", OptimizationTrial.kebab(vigType.name()) + (freezeVignetting ? " frozen" : ""));
-        if (!checkSpotApertures || (effective.spots() && !effective.hexapolar()))
+        if (!checkSpotApertures || (effective.spots() && !configuredHexapolar))
             line(sb, "check-spot-apertures", yesNo(checkSpotApertures));
 
         if (allCurvatureSurfaces)
@@ -209,11 +213,11 @@ final class OptimizationConfiguration {
         if (gaussianQuadratureRings != DEFAULT_GAUSSIAN_QUADRATURE_RINGS
                 || gaussianQuadratureSpokes != DEFAULT_GAUSSIAN_QUADRATURE_SPOKES
                 || gaussianQuadratureInnerRadius != 0.0
-                || (effective.spots() && !effective.hexapolar()))
+                || (effective.spots() && !configuredHexapolar))
             line(sb, "goal spot sampling", "gaussian " + gaussianQuadratureRings + " " + gaussianQuadratureSpokes
                     + (gaussianQuadratureInnerRadius != 0.0
                     ? " " + OptimizationTrial.format(gaussianQuadratureInnerRadius) : ""));
-        if (effective.hexapolar())
+        if (configuredHexapolar)
             line(sb, "goal spot sampling", "hexapolar " + hexapolarSpotRays);
         line(sb, "goal ray-aberrations", yesNo(addRayAberrationGoals));
         for (ParaxialGoal goal : paraxialGoals)

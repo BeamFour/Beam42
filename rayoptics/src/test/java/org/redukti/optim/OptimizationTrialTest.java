@@ -496,6 +496,36 @@ class OptimizationTrialTest {
     }
 
     @Test
+    void writingAnInvalidBuilderPreservesItsHexapolarSetting() throws Exception {
+        String lens = withTrials(SUMMICRON, "");
+        var builder = OptimizationBuilder.builder(prescription(lens, true, false))
+                .fields(0.0).mtfFrequencies(20).spotDeviationGoals(1).hexapolarSampling(32);
+        assertThrows(IllegalArgumentException.class, builder::build);
+        String written = builder.toTrial(1);
+        assertTrue(written.replaceAll("\\s+", " ").contains("goal spot sampling hexapolar 32"), written);
+        assertThrows(OptimizationTrial.TrialException.class,
+                () -> OptimizationTrial.parse(lens + "\n" + written, 1));
+    }
+
+    @Test
+    void incompatibleSpotSamplingReportsTheConflictingLineInEitherOrder() throws Exception {
+        for (String deviation : List.of("goal spot-deviation 1",
+                "goal spot-deviation x 1\ngoal spot-deviation y 1")) {
+            for (String conflict : List.of("goal spot sampling hexapolar 32", "goal spot-max-radius 10")) {
+                for (boolean reverse : List.of(false, true)) {
+                    String rows = reverse ? conflict + "\n" + deviation : deviation + "\n" + conflict;
+                    String text = withTrials(SUMMICRON, "[trial 1]\nfields 0\nfrequencies 20\n" + rows);
+                    int line = text.split("\n", -1).length;
+                    var error = assertThrows(OptimizationTrial.TrialException.class,
+                            () -> OptimizationTrial.parse(text, 1));
+                    assertEquals("trial 1, line " + line
+                            + ": spot deviation goals require Gaussian-quadrature spot sampling", error.getMessage());
+                }
+            }
+        }
+    }
+
+    @Test
     void rejectsMistakes() throws Exception {
         assertRejected("[trial 1]\nfields 0\nfields 0\n", "'fields' is given more than once");
         assertRejected("[trial 1]\nfields 0\n", "'frequencies' is required");

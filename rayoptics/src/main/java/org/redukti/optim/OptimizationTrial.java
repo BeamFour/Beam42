@@ -415,6 +415,7 @@ public final class OptimizationTrial {
         private int[] gaussianSampling;
         private double gaussianInnerRadius;
         private Integer hexapolarRays;
+        private int hexapolarLine;
 
         private boolean rayAberrations;
         private final List<ParaxialGoal> paraxialGoals = new ArrayList<>();
@@ -809,6 +810,7 @@ public final class OptimizationTrial {
                     once(line, "goal spot sampling hexapolar");
                     count(line, w, 5, "goal spot sampling hexapolar <rays>");
                     hexapolarRays = positiveInt(line, w[4], "rays");
+                    hexapolarLine = line;
                 }
                 default -> throw error(line, "unknown spot sampling '" + w[3] + "'; expected gaussian or hexapolar");
             }
@@ -902,6 +904,14 @@ public final class OptimizationTrial {
                         "give spot deviation weights either as one row or as x and y rows, not both");
             if ((spotDeviationX == null) != (spotDeviationY == null))
                 throw error(firstLine(spotDeviationX, spotDeviationY), "spot deviation needs both an x and a y row");
+            if ((spotDeviation != null || spotDeviationX != null)
+                    && (hexapolarRays != null || spotMaxRadius != null)) {
+                int line = Math.max(hexapolarLine, spotMaxRadius != null ? spotMaxRadius.line() : 0);
+                for (PerField row : new PerField[]{spotDeviation, spotDeviationX, spotDeviationY})
+                    if (row != null)
+                        line = Math.max(line, row.line());
+                throw error(line, "spot deviation goals require Gaussian-quadrature spot sampling");
+            }
         }
 
         private void checkContrastFrequency(int frequency, int line) {

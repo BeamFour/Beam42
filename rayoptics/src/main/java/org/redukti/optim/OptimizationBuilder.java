@@ -54,71 +54,22 @@ public final class OptimizationBuilder {
 
     private static final int RAY_FAN_SAMPLES = 10;
 
-    private static final int DEFAULT_HEXAPOLAR_RAYS = 64;
-    private static final int DEFAULT_GAUSSIAN_QUADRATURE_RINGS = 14;
-    private static final int DEFAULT_GAUSSIAN_QUADRATURE_SPOKES = 20;
-    private static final int DEFAULT_CONTRAST_RINGS = 6;
-    private static final int DEFAULT_CONTRAST_SPOKES = 12;
-
     private final Prescription prescription;
-    private double[] fields;
-    private int[] mtfFrequencies;
-    private int[] curvatureSurfaces = new int[0];
-    private boolean allCurvatureSurfaces;
-    private int[] thicknessSurfaces = new int[0];
-    private boolean allThicknessSurfaces;
-    private boolean includeExistingAspherics;
-    private boolean weighted = true;
-    private boolean dLineOnly;
-    private boolean addRayAberrationGoals;
-    private boolean useHexapolarSpotPattern;
-    private int hexapolarSpotRays = DEFAULT_HEXAPOLAR_RAYS;
-    private int gaussianQuadratureRings = DEFAULT_GAUSSIAN_QUADRATURE_RINGS;
-    private int gaussianQuadratureSpokes = DEFAULT_GAUSSIAN_QUADRATURE_SPOKES;
-    private double gaussianQuadratureInnerRadius = 0.0;
-    private boolean checkSpotApertures = true;
-    private double[] spotDeviationXWeights;
-    private double[] spotDeviationYWeights;
-    private boolean addSpotDeviationGoals;
-    // 3x6 is enough to measure a fixed design but not to optimize against: the
-    // solver drives the 18 sampled points further than the wavefront between
-    // them, so the merit reads better than the lens is. 6x12 is converged - 8x16
-    // reproduces it - and 12 spokes samples the x and y axes alike, so sagittal
-    // and tangential residuals stay comparable.
-    private int contrastRings = DEFAULT_CONTRAST_RINGS;
-    private int contrastSpokes = DEFAULT_CONTRAST_SPOKES;
-    private boolean calibrateContrastFrequency = false;
-    private boolean aimContrastAtExitPupil = false;
-    private boolean centerContrastResiduals = false;
-    private boolean[] contrastBalanceFields;
-    private double contrastBalanceWeight = NOMINAL_BALANCE_WEIGHT;
-    private int scenario = 0;
-    private VigType vigType = VigType.SetPupil;
-    private boolean freezeVignetting = false;
-    private Double thicknessConstraintWeight;
-    private Double edgeThicknessConstraintWeight;
-    private Double curvatureConstraintWeight;
-    private final List<MtfGoals> mtfGoals = new ArrayList<>();
-    private final List<ContrastGoals> contrastGoals = new ArrayList<>();
+    private final OptimizationConfiguration configuration;
     private final List<Var> additionalVariables = new ArrayList<>();
     private final List<GoalFactory> additionalGoalFactories = new ArrayList<>();
-    private SpotGoals spotRmsGoals;
-    private SpotGoals spotMaxRadiusGoals;
-    private int[] curvatureExclusions = new int[0];
-    private int[] thicknessExclusions = new int[0];
-    /** Aspheric terms varied explicitly, in the order given. */
-    private final List<AsphericTerm> asphericTerms = new ArrayList<>();
-    /** First-order goals, in the order given; efl and fno replace the automatic ones. */
-    private final List<ParaxialGoal> paraxialGoals = new ArrayList<>();
-    private String description;
-    private String outdir;
 
     private OptimizationBuilder(Prescription prescription) {
+        this(prescription, new OptimizationConfiguration());
+    }
+
+    OptimizationBuilder(Prescription prescription, OptimizationConfiguration configuration) {
         if (prescription == null)
             throw new IllegalArgumentException("prescription must not be null");
         if (prescription._surfaces == null)
             throw new IllegalArgumentException("prescription must be built before optimization");
         this.prescription = prescription;
+        this.configuration = configuration.copy();
     }
 
     public static OptimizationBuilder builder(Prescription prescription) {
@@ -132,12 +83,12 @@ public final class OptimizationBuilder {
 
     /** Free text describing the setup: written into a trial, and shown when it runs. */
     public OptimizationBuilder description(String description) {
-        this.description = description;
+        configuration.description = description;
         return this;
     }
 
     public String description() {
-        return description;
+        return configuration.description;
     }
 
     /**
@@ -145,12 +96,12 @@ public final class OptimizationBuilder {
      * prescription's file unless absolute. Only a trial uses it.
      */
     public OptimizationBuilder outdir(String outdir) {
-        this.outdir = outdir;
+        configuration.outdir = outdir;
         return this;
     }
 
     public String outdir() {
-        return outdir;
+        return configuration.outdir;
     }
 
     // ------------------------------------------------------------------
@@ -158,24 +109,24 @@ public final class OptimizationBuilder {
     // ------------------------------------------------------------------
 
     public OptimizationBuilder fields(double... fields) {
-        this.fields = copy(fields);
+        configuration.fields = copy(fields);
         return this;
     }
 
     public OptimizationBuilder mtfFrequencies(int... frequencies) {
-        this.mtfFrequencies = copy(frequencies);
+        configuration.mtfFrequencies = copy(frequencies);
         return this;
     }
 
     /** Use the prescription's wavelength weights; false assigns every wavelength weight 1.0. */
     public OptimizationBuilder weighted(boolean weighted) {
-        this.weighted = weighted;
+        configuration.weighted = weighted;
         return this;
     }
 
     /** Restrict enabled ray-aberration goals to the Fraunhofer d-line. */
     public OptimizationBuilder dLineOnly(boolean dLineOnly) {
-        this.dLineOnly = dLineOnly;
+        configuration.dLineOnly = dLineOnly;
         return this;
     }
 
@@ -196,7 +147,7 @@ public final class OptimizationBuilder {
     public OptimizationBuilder scenario(int scenario) {
         if (scenario < 0)
             throw new IllegalArgumentException("scenario must be non-negative, got " + scenario);
-        this.scenario = scenario;
+        configuration.scenario = scenario;
         return this;
     }
 
@@ -206,7 +157,7 @@ public final class OptimizationBuilder {
      * unvignetted and breaks on-axis rotational symmetry.
      */
     public OptimizationBuilder vignetting(VigType vigType) {
-        this.vigType = vigType == null ? VigType.None : vigType;
+        configuration.vigType = vigType == null ? VigType.None : vigType;
         return this;
     }
 
@@ -220,7 +171,7 @@ public final class OptimizationBuilder {
     }
 
     public OptimizationBuilder freezeVignetting(boolean freeze) {
-        this.freezeVignetting = freeze;
+        configuration.freezeVignetting = freeze;
         return this;
     }
 
@@ -235,15 +186,7 @@ public final class OptimizationBuilder {
     /** Configure Gaussian quadrature for a concentric annular pupil. */
     public OptimizationBuilder gaussianQuadratureSampling(
             int rings, int spokes, double innerPupilRadius) {
-        if (rings < 1 || spokes < 3)
-            throw new IllegalArgumentException(
-                    "Gaussian quadrature requires at least 1 ring and 3 spokes");
-        if (!Double.isFinite(innerPupilRadius)
-                || innerPupilRadius < 0.0 || innerPupilRadius >= 1.0)
-            throw new IllegalArgumentException("Inner pupil radius must be finite and in [0, 1)");
-        this.gaussianQuadratureRings = rings;
-        this.gaussianQuadratureSpokes = spokes;
-        this.gaussianQuadratureInnerRadius = innerPupilRadius;
+        configuration.gaussianSampling(rings, spokes, innerPupilRadius);
         return this;
     }
 
@@ -254,7 +197,7 @@ public final class OptimizationBuilder {
      * Grid and hexapolar sampling always retain physical aperture checking.
      */
     public OptimizationBuilder checkSpotApertures(boolean check) {
-        this.checkSpotApertures = check;
+        configuration.checkSpotApertures = check;
         return this;
     }
 
@@ -273,16 +216,16 @@ public final class OptimizationBuilder {
     public OptimizationBuilder hexapolarSampling(int numRays) {
         if (numRays < 1)
             throw new IllegalArgumentException("hexapolar spot rays must be at least 1");
-        this.useHexapolarSpotPattern = true;
-        this.hexapolarSpotRays = numRays;
+        configuration.useHexapolarSpotPattern = true;
+        configuration.hexapolarSpotRays = numRays;
         return this;
     }
 
     public OptimizationBuilder contrastSampling(int rings, int spokes) {
         if (rings < 1 || spokes < 1)
             throw new IllegalArgumentException("contrast rings and spokes must be at least 1");
-        contrastRings = rings;
-        contrastSpokes = spokes;
+        configuration.contrastRings = rings;
+        configuration.contrastSpokes = spokes;
         return this;
     }
 
@@ -299,7 +242,7 @@ public final class OptimizationBuilder {
      * <p>Off by default because it changes every contrast residual.
      */
     public OptimizationBuilder calibrateContrastFrequency(boolean value) {
-        calibrateContrastFrequency = value;
+        configuration.calibrateContrastFrequency = value;
         return this;
     }
 
@@ -316,7 +259,7 @@ public final class OptimizationBuilder {
     }
 
     public OptimizationBuilder aimContrastAtExitPupil(boolean value) {
-        aimContrastAtExitPupil = value;
+        configuration.aimContrastAtExitPupil = value;
         return this;
     }
 
@@ -334,7 +277,7 @@ public final class OptimizationBuilder {
      * {@link ContrastAnalysis#center_residuals(ContrastAnalysisResult, int)}.
      */
     public OptimizationBuilder centerContrastResiduals(boolean value) {
-        centerContrastResiduals = value;
+        configuration.centerContrastResiduals = value;
         return this;
     }
 
@@ -343,9 +286,9 @@ public final class OptimizationBuilder {
     // ------------------------------------------------------------------
 
     public OptimizationBuilder varyCurvatures(int... surfaces) {
-        this.curvatureSurfaces = copy(surfaces);
-        this.allCurvatureSurfaces = false;
-        this.curvatureExclusions = new int[0];
+        configuration.curvatureSurfaces = copy(surfaces);
+        configuration.allCurvatureSurfaces = false;
+        configuration.curvatureExclusions = new int[0];
         return this;
     }
 
@@ -362,16 +305,16 @@ public final class OptimizationBuilder {
      * Saves spelling out a long list when only a few surfaces are to stay as they are.
      */
     public OptimizationBuilder varyAllCurvaturesExcept(int... surfaces) {
-        this.curvatureSurfaces = new int[0];
-        this.allCurvatureSurfaces = true;
-        this.curvatureExclusions = copy(surfaces);
+        configuration.curvatureSurfaces = new int[0];
+        configuration.allCurvatureSurfaces = true;
+        configuration.curvatureExclusions = copy(surfaces);
         return this;
     }
 
     public OptimizationBuilder varyThicknesses(int... surfaces) {
-        this.thicknessSurfaces = copy(surfaces);
-        this.allThicknessSurfaces = false;
-        this.thicknessExclusions = new int[0];
+        configuration.thicknessSurfaces = copy(surfaces);
+        configuration.allThicknessSurfaces = false;
+        configuration.thicknessExclusions = new int[0];
         return this;
     }
 
@@ -389,9 +332,9 @@ public final class OptimizationBuilder {
 
     /** Vary every thickness {@link #varyAllThicknesses()} would, apart from the listed surfaces'. */
     public OptimizationBuilder varyAllThicknessesExcept(int... surfaces) {
-        this.thicknessSurfaces = new int[0];
-        this.allThicknessSurfaces = true;
-        this.thicknessExclusions = copy(surfaces);
+        configuration.thicknessSurfaces = new int[0];
+        configuration.allThicknessSurfaces = true;
+        configuration.thicknessExclusions = copy(surfaces);
         return this;
     }
 
@@ -399,21 +342,21 @@ public final class OptimizationBuilder {
     private double thicknessOf(int surface) {
         var definition = prescription._surfaces[surface];
         return definition._thickness_by_scenario != null
-                ? definition._thickness_by_scenario[scenario]
+                ? definition._thickness_by_scenario[configuration.scenario]
                 : definition._thickness;
     }
 
     /** Effective focal length this scenario is anchored to. */
     private double focalLengthOf() {
         return prescription._focal_length_by_scenario != null
-                ? prescription._focal_length_by_scenario[scenario]
+                ? prescription._focal_length_by_scenario[configuration.scenario]
                 : prescription._focal_length;
     }
 
     /** F-number this scenario is anchored to. */
     private double fNumberOf() {
         return prescription._f_number_by_scenario != null
-                ? prescription._f_number_by_scenario[scenario]
+                ? prescription._f_number_by_scenario[configuration.scenario]
                 : prescription._fno;
     }
 
@@ -422,10 +365,10 @@ public final class OptimizationBuilder {
      * as an array index failure from somewhere inside the solve.
      */
     private void validateScenario() {
-        if (scenario == 0) return;
+        if (configuration.scenario == 0) return;
         int available = scenarioCount();
-        if (scenario >= available)
-            throw new IllegalArgumentException("scenario " + scenario
+        if (configuration.scenario >= available)
+            throw new IllegalArgumentException("scenario " + configuration.scenario
                     + " requested but the prescription defines " + available
                     + (available == 1 ? " (it is not multi-configuration)" : ""));
     }
@@ -451,7 +394,7 @@ public final class OptimizationBuilder {
     }
 
     public OptimizationBuilder varyExistingAspherics(boolean include) {
-        this.includeExistingAspherics = include;
+        configuration.includeExistingAspherics = include;
         return this;
     }
 
@@ -493,7 +436,7 @@ public final class OptimizationBuilder {
         var definition = prescription._surfaces[surface];
         if (definition.is_aperture_stop() || definition.is_field_stop())
             throw new IllegalArgumentException("surface " + surface + " is a stop; it cannot be aspheric");
-        for (AsphericTerm term : asphericTerms)
+        for (AsphericTerm term : configuration.asphericTerms)
             if (term.surface() == surface && term.index() == index)
                 throw new IllegalArgumentException((index < 0 ? "the conic constant"
                         : "coefficient " + index) + " of surface " + surface + " is varied twice");
@@ -503,7 +446,7 @@ public final class OptimizationBuilder {
                 throw new IllegalArgumentException("surface " + surface + " has no diameter to derive a scale for coefficient "
                         + index + " from; give the coefficient a scale");
         }
-        asphericTerms.add(new AsphericTerm(surface, index, scale));
+        configuration.asphericTerms.add(new AsphericTerm(surface, index, scale));
         return this;
     }
 
@@ -546,7 +489,7 @@ public final class OptimizationBuilder {
     }
 
     private boolean hasExplicitAsphericTerms(int surface) {
-        for (AsphericTerm term : asphericTerms)
+        for (AsphericTerm term : configuration.asphericTerms)
             if (term.surface() == surface)
                 return true;
         return false;
@@ -598,14 +541,14 @@ public final class OptimizationBuilder {
     public OptimizationBuilder mtfGoals(MtfGoals... goals) {
         if (goals == null)
             throw new IllegalArgumentException("MTF goals must not be null");
-        this.mtfGoals.addAll(Arrays.asList(goals));
+        configuration.mtfGoals.addAll(Arrays.asList(goals));
         return this;
     }
 
     public OptimizationBuilder contrastGoals(ContrastGoals... goals) {
         if (goals == null)
             throw new IllegalArgumentException("contrast goals must not be null");
-        this.contrastGoals.addAll(Arrays.asList(goals));
+        configuration.contrastGoals.addAll(Arrays.asList(goals));
         return this;
     }
 
@@ -648,8 +591,8 @@ public final class OptimizationBuilder {
         if (!Double.isFinite(weight) || weight < 0.0)
             throw new IllegalArgumentException(
                     "contrast balance weight must be finite and non-negative");
-        this.contrastBalanceFields = fields.clone();
-        this.contrastBalanceWeight = weight;
+        configuration.contrastBalanceFields = fields.clone();
+        configuration.contrastBalanceWeight = weight;
         return this;
     }
 
@@ -663,7 +606,7 @@ public final class OptimizationBuilder {
     }
 
     public OptimizationBuilder spotRmsGoals(double[] targets, double[] weights) {
-        this.spotRmsGoals = new SpotGoals(targets, weights);
+        configuration.spotRmsGoals = new SpotGoals(targets, weights);
         return this;
     }
 
@@ -677,17 +620,17 @@ public final class OptimizationBuilder {
      * weight per field is applied to every wavelength, sample and orientation.
      */
     public OptimizationBuilder spotDeviationGoals(double... fieldWeights) {
-        this.addSpotDeviationGoals = true;
-        this.spotDeviationXWeights = copy(fieldWeights);
-        this.spotDeviationYWeights = copy(fieldWeights);
+        configuration.addSpotDeviationGoals = true;
+        configuration.spotDeviationXWeights = copy(fieldWeights);
+        configuration.spotDeviationYWeights = copy(fieldWeights);
         return this;
     }
 
     /** Assign separate per-field weights to the signed X and Y spot deviations. */
     public OptimizationBuilder spotDeviationGoals(double[] xWeights, double[] yWeights) {
-        this.addSpotDeviationGoals = true;
-        this.spotDeviationXWeights = copy(xWeights);
-        this.spotDeviationYWeights = copy(yWeights);
+        configuration.addSpotDeviationGoals = true;
+        configuration.spotDeviationXWeights = copy(xWeights);
+        configuration.spotDeviationYWeights = copy(yWeights);
         return this;
     }
 
@@ -696,7 +639,7 @@ public final class OptimizationBuilder {
     }
 
     public OptimizationBuilder spotMaxRadiusGoals(double[] targets, double[] weights) {
-        this.spotMaxRadiusGoals = new SpotGoals(targets, weights);
+        configuration.spotMaxRadiusGoals = new SpotGoals(targets, weights);
         return this;
     }
 
@@ -711,7 +654,7 @@ public final class OptimizationBuilder {
     }
 
     public OptimizationBuilder rayAberrationGoals(boolean enabled) {
-        this.addRayAberrationGoals = enabled;
+        configuration.addRayAberrationGoals = enabled;
         return this;
     }
 
@@ -748,10 +691,10 @@ public final class OptimizationBuilder {
             throw new IllegalArgumentException("paraxial target must be finite");
         if (!Double.isFinite(weight) || weight < 0.0)
             throw new IllegalArgumentException("paraxial weight must be finite and non-negative");
-        for (ParaxialGoal goal : paraxialGoals)
+        for (ParaxialGoal goal : configuration.paraxialGoals)
             if (goal.paraxId() == paraxId)
                 throw new IllegalArgumentException("there is already a goal for " + ParaxHelper.Names[paraxId]);
-        paraxialGoals.add(new ParaxialGoal(paraxId, target, weight));
+        configuration.paraxialGoals.add(new ParaxialGoal(paraxId, target, weight));
         return this;
     }
 
@@ -780,7 +723,7 @@ public final class OptimizationBuilder {
     public OptimizationBuilder applyThicknessConstraints(double weight) {
         if (!Double.isFinite(weight) || weight < 0.0)
             throw new IllegalArgumentException("thickness constraint weight must be finite and non-negative");
-        this.thicknessConstraintWeight = weight;
+        configuration.thicknessConstraintWeight = weight;
         return this;
     }
 
@@ -815,7 +758,7 @@ public final class OptimizationBuilder {
     public OptimizationBuilder applyEdgeThicknessConstraints(double weight) {
         if (!Double.isFinite(weight) || weight < 0.0)
             throw new IllegalArgumentException("edge thickness constraint weight must be finite and non-negative");
-        this.edgeThicknessConstraintWeight = weight;
+        configuration.edgeThicknessConstraintWeight = weight;
         return this;
     }
 
@@ -840,7 +783,7 @@ public final class OptimizationBuilder {
     public OptimizationBuilder applyCurvatureConstraints(double weight) {
         if (!Double.isFinite(weight) || weight < 0.0)
             throw new IllegalArgumentException("curvature constraint weight must be finite and non-negative");
-        this.curvatureConstraintWeight = weight;
+        configuration.curvatureConstraintWeight = weight;
         return this;
     }
 
@@ -850,7 +793,7 @@ public final class OptimizationBuilder {
 
     public OptimizationSetup build() {
         validate();
-        Analysis analysis = new Analysis(prescription, copy(fields), copy(mtfFrequencies), scenario);
+        Analysis analysis = new Analysis(prescription, copy(configuration.fields), copy(configuration.mtfFrequencies), configuration.scenario);
         List<Var> variables = buildVariables();
         List<Goal> goals = buildGoals(analysis, variables);
         if (goals.size() < variables.size())
@@ -858,9 +801,9 @@ public final class OptimizationBuilder {
                     "optimization requires at least as many goals as variables: "
                             + goals.size() + " goals for " + variables.size() + " variables"
                             + "; add optical goals or enable rayAberrationGoals()");
-        analysis.vignetting(vigType)
-                .freezing_vignetting(freezeVignetting)
-                .checking_spot_apertures(checkSpotApertures);
+        analysis.vignetting(configuration.vigType)
+                .freezing_vignetting(configuration.freezeVignetting)
+                .checking_spot_apertures(configuration.checkSpotApertures);
         configureSpotPattern(analysis, goals);
         configureContrastAnalysis(analysis, goals);
         configureRequiredAnalyses(analysis, goals);
@@ -903,15 +846,15 @@ public final class OptimizationBuilder {
     }
 
     private void configureContrastAnalysis(Analysis analysis, List<Goal> goals) {
-        if (contrastGoals.isEmpty()) return;
-        if (calibrateContrastFrequency && aimContrastAtExitPupil)
+        if (configuration.contrastGoals.isEmpty()) return;
+        if (configuration.calibrateContrastFrequency && configuration.aimContrastAtExitPupil)
             throw new IllegalArgumentException(
                     "Contrast frequency calibration and exit-pupil aiming are mutually exclusive");
-        int[] frequencies = contrastGoals.stream().mapToInt(goal -> goal.frequency).toArray();
-        analysis.using_contrast_analysis(frequencies, contrastRings, contrastSpokes);
-        analysis.calibrating_contrast_frequency(calibrateContrastFrequency);
-        analysis.aiming_contrast_at_exit_pupil(aimContrastAtExitPupil);
-        analysis.centering_contrast_residuals(centerContrastResiduals);
+        int[] frequencies = configuration.contrastGoals.stream().mapToInt(goal -> goal.frequency).toArray();
+        analysis.using_contrast_analysis(frequencies, configuration.contrastRings, configuration.contrastSpokes);
+        analysis.calibrating_contrast_frequency(configuration.calibrateContrastFrequency);
+        analysis.aiming_contrast_at_exit_pupil(configuration.aimContrastAtExitPupil);
+        analysis.centering_contrast_residuals(configuration.centerContrastResiduals);
     }
 
     private void configureRequiredAnalyses(Analysis analysis, List<Goal> goals) {
@@ -929,46 +872,46 @@ public final class OptimizationBuilder {
 
     private void configureSpotPattern(Analysis analysis, List<Goal> goals) {
         boolean hasSpotMaxRadiusGoal = goals.stream().anyMatch(GoalSpotMaxRadius.class::isInstance);
-        if (addSpotDeviationGoals) {
+        if (configuration.addSpotDeviationGoals) {
             analysis.using_gauss_quadrature_pattern(
-                            gaussianQuadratureRings, gaussianQuadratureSpokes,
-                            gaussianQuadratureInnerRadius)
+                            configuration.gaussianQuadratureRings, configuration.gaussianQuadratureSpokes,
+                            configuration.gaussianQuadratureInnerRadius)
                     .retaining_failed_spot_rays(true);
         }
-        else if (useHexapolarSpotPattern || hasSpotMaxRadiusGoal)
-            analysis.using_hexapolar_pattern(hexapolarSpotRays);
+        else if (configuration.useHexapolarSpotPattern || hasSpotMaxRadiusGoal)
+            analysis.using_hexapolar_pattern(configuration.hexapolarSpotRays);
         else
             analysis.using_gauss_quadrature_pattern(
-                    gaussianQuadratureRings, gaussianQuadratureSpokes,
-                    gaussianQuadratureInnerRadius);
+                    configuration.gaussianQuadratureRings, configuration.gaussianQuadratureSpokes,
+                    configuration.gaussianQuadratureInnerRadius);
     }
 
     private List<Var> buildVariables() {
         List<Var> result = new ArrayList<>();
-        if (allCurvatureSurfaces) {
+        if (configuration.allCurvatureSurfaces) {
             for (int surface = 0; surface < prescription._surfaces.length; surface++) {
                 var definition = prescription._surfaces[surface];
                 if (!definition.is_aperture_stop() && !definition.is_field_stop()
                         && definition._radius != 0.0
-                        && !contains(curvatureExclusions, surface))
+                        && !contains(configuration.curvatureExclusions, surface))
                     result.add(new VarRadius(prescription, surface));
             }
         } else {
-            for (int surface : curvatureSurfaces)
+            for (int surface : configuration.curvatureSurfaces)
                 result.add(new VarRadius(prescription, surface));
         }
-        if (allThicknessSurfaces) {
+        if (configuration.allThicknessSurfaces) {
             for (int surface = 0; surface < prescription._surfaces.length; surface++) {
                 // A zero thickness is a coincident surface, not a space to open up, and
                 // it gives the fractional ConstraintThickness no base to work from.
-                if (thicknessOf(surface) != 0.0 && !contains(thicknessExclusions, surface))
-                    result.add(new VarThickness(prescription, surface, scenario));
+                if (thicknessOf(surface) != 0.0 && !contains(configuration.thicknessExclusions, surface))
+                    result.add(new VarThickness(prescription, surface, configuration.scenario));
             }
         } else {
-            for (int surface : thicknessSurfaces)
-                result.add(new VarThickness(prescription, surface, scenario));
+            for (int surface : configuration.thicknessSurfaces)
+                result.add(new VarThickness(prescription, surface, configuration.scenario));
         }
-        if (includeExistingAspherics) {
+        if (configuration.includeExistingAspherics) {
             for (int surfaceId = 0; surfaceId < prescription._surfaces.length; surfaceId++) {
                 if (hasExplicitAsphericTerms(surfaceId))
                     continue;
@@ -997,7 +940,7 @@ public final class OptimizationBuilder {
      */
     private List<Var> explicitAsphericVariables() {
         List<Var> result = new ArrayList<>();
-        for (AsphericTerm term : asphericTerms) {
+        for (AsphericTerm term : configuration.asphericTerms) {
             var surface = prescription._surfaces[term.surface()];
             if (!surface.is_aspheric())
                 surface._asph_type = asphereTypeOf(term.surface());
@@ -1028,26 +971,26 @@ public final class OptimizationBuilder {
         // Anchor the varied parameters to where they started. Built from the variable
         // list so the goals attach to exactly what is free to move, and built here while
         // the prescription still holds its original values.
-        if (thicknessConstraintWeight != null) {
+        if (configuration.thicknessConstraintWeight != null) {
             for (Var variable : variables)
                 if (variable instanceof VarThickness thickness)
                     result.add(new ConstraintThickness(analysis, thickness._surface_id,
-                            thicknessConstraintWeight));
+                            configuration.thicknessConstraintWeight));
         }
-        if (edgeThicknessConstraintWeight != null) {
+        if (configuration.edgeThicknessConstraintWeight != null) {
             for (int gap : edgeAffectedGaps(variables))
                 if (ConstraintEdgeThickness.is_constrainable(analysis, gap))
                     result.add(new ConstraintEdgeThickness(analysis, gap,
-                            edgeThicknessConstraintWeight));
+                            configuration.edgeThicknessConstraintWeight));
         }
-        if (curvatureConstraintWeight != null) {
+        if (configuration.curvatureConstraintWeight != null) {
             for (Var variable : variables)
                 if (variable instanceof VarRadius radius)
                     result.add(new ConstraintCurvature(analysis, radius._surface_id,
-                            curvatureConstraintWeight));
+                            configuration.curvatureConstraintWeight));
         }
-        for (MtfGoals curve : mtfGoals) {
-            for (int field = 0; field < fields.length; field++) {
+        for (MtfGoals curve : configuration.mtfGoals) {
+            for (int field = 0; field < configuration.fields.length; field++) {
                 result.add(new GoalGeoMTF(analysis, field + 1, Orientation.SAGITTAL, curve.frequency,
                         curve.sagittal[field] / 100.0, curve.sagittalWeights[field]));
                 result.add(new GoalGeoMTF(analysis, field + 1, Orientation.TANGENTIAL, curve.frequency,
@@ -1055,12 +998,12 @@ public final class OptimizationBuilder {
             }
         }
 
-        int contrastSamples = contrastRings * contrastSpokes;
-        for (int contrast_index = 0; contrast_index < contrastGoals.size(); contrast_index++) {
-            ContrastGoals curve = contrastGoals.get(contrast_index);
-            for (int field = 0; field < fields.length; field++) {
+        int contrastSamples = configuration.contrastRings * configuration.contrastSpokes;
+        for (int contrast_index = 0; contrast_index < configuration.contrastGoals.size(); contrast_index++) {
+            ContrastGoals curve = configuration.contrastGoals.get(contrast_index);
+            for (int field = 0; field < configuration.fields.length; field++) {
                 for (int wavelength = 0; wavelength < prescription._wvls.length; wavelength++) {
-                    double wavelengthWeight = weighted ? prescription._wts[wavelength] : 1.0;
+                    double wavelengthWeight = configuration.weighted ? prescription._wts[wavelength] : 1.0;
                     for (int sample = 0; sample < contrastSamples; sample++) {
                         result.add(new GoalContrast(analysis, contrast_index, curve.frequency, field + 1,
                                 wavelength, sample, Orientation.SAGITTAL,
@@ -1073,47 +1016,47 @@ public final class OptimizationBuilder {
             }
         }
 
-        if (contrastBalanceFields != null) {
+        if (configuration.contrastBalanceFields != null) {
             double[] wavelengthWeights = new double[prescription._wvls.length];
             for (int w = 0; w < wavelengthWeights.length; w++)
-                wavelengthWeights[w] = weighted ? prescription._wts[w] : 1.0;
-            for (int contrast_index = 0; contrast_index < contrastGoals.size(); contrast_index++) {
-                ContrastGoals curve = contrastGoals.get(contrast_index);
-                for (int field = 0; field < fields.length; field++) {
-                    if (!contrastBalanceFields[field]) continue;
+                wavelengthWeights[w] = configuration.weighted ? prescription._wts[w] : 1.0;
+            for (int contrast_index = 0; contrast_index < configuration.contrastGoals.size(); contrast_index++) {
+                ContrastGoals curve = configuration.contrastGoals.get(contrast_index);
+                for (int field = 0; field < configuration.fields.length; field++) {
+                    if (!configuration.contrastBalanceFields[field]) continue;
                     result.add(new GoalContrastBalance(analysis, contrast_index, curve.frequency,
                             field + 1, wavelengthWeights,
                             curve.sagittalWeights[field], curve.tangentialWeights[field],
-                            contrastBalanceWeight));
+                            configuration.contrastBalanceWeight));
                 }
             }
         }
 
-        if (spotRmsGoals != null) {
-            for (int field = 0; field < fields.length; field++)
+        if (configuration.spotRmsGoals != null) {
+            for (int field = 0; field < configuration.fields.length; field++)
                 result.add(new GoalSpotRMS(analysis, field + 1,
-                        spotRmsGoals.targets[field], spotRmsGoals.weights[field]));
+                        configuration.spotRmsGoals.targets[field], configuration.spotRmsGoals.weights[field]));
         }
-        if (addSpotDeviationGoals) {
-            int samples = gaussianQuadratureRings * gaussianQuadratureSpokes;
-            for (int field = 0; field < fields.length; field++) {
+        if (configuration.addSpotDeviationGoals) {
+            int samples = configuration.gaussianQuadratureRings * configuration.gaussianQuadratureSpokes;
+            for (int field = 0; field < configuration.fields.length; field++) {
                 for (int wavelength = 0; wavelength < prescription._wvls.length; wavelength++) {
-                    double wavelengthWeight = weighted ? prescription._wts[wavelength] : 1.0;
+                    double wavelengthWeight = configuration.weighted ? prescription._wts[wavelength] : 1.0;
                     for (int sample = 0; sample < samples; sample++) {
                         result.add(new GoalSpotDeviation(analysis, field + 1, wavelength,
                                 sample, Orientation.X,
-                                wavelengthWeight * spotDeviationXWeights[field]));
+                                wavelengthWeight * configuration.spotDeviationXWeights[field]));
                         result.add(new GoalSpotDeviation(analysis, field + 1, wavelength,
                                 sample, Orientation.Y,
-                                wavelengthWeight * spotDeviationYWeights[field]));
+                                wavelengthWeight * configuration.spotDeviationYWeights[field]));
                     }
                 }
             }
         }
-        if (spotMaxRadiusGoals != null) {
-            for (int field = 0; field < fields.length; field++)
+        if (configuration.spotMaxRadiusGoals != null) {
+            for (int field = 0; field < configuration.fields.length; field++)
                 result.add(new GoalSpotMaxRadius(analysis, field + 1,
-                        spotMaxRadiusGoals.targets[field], spotMaxRadiusGoals.weights[field]));
+                        configuration.spotMaxRadiusGoals.targets[field], configuration.spotMaxRadiusGoals.weights[field]));
         }
 
         // Anchor first-order properties to the requested prescription values, unless the
@@ -1121,13 +1064,13 @@ public final class OptimizationBuilder {
         result.add(anchor(analysis, ParaxHelper.Effective_focal_length, focalLengthOf()));
         result.add(anchor(analysis, ParaxHelper.Fno, fNumberOf()));
 
-        if (addRayAberrationGoals) {
-            for (int field = 1; field <= fields.length; field++) {
+        if (configuration.addRayAberrationGoals) {
+            for (int field = 1; field <= configuration.fields.length; field++) {
                 for (int orientation = Orientation.SAGITTAL; orientation <= Orientation.TANGENTIAL; orientation++) {
                     for (int wavelength = 0; wavelength < prescription._wvls.length; wavelength++) {
-                        if (dLineOnly && !sameWavelength(prescription._wvls[wavelength], Glass.d))
+                        if (configuration.dLineOnly && !sameWavelength(prescription._wvls[wavelength], Glass.d))
                             continue;
-                        double weight = weighted ? prescription._wts[wavelength] : 1.0;
+                        double weight = configuration.weighted ? prescription._wts[wavelength] : 1.0;
                         for (int sample = 0; sample < RAY_FAN_SAMPLES; sample++)
                             result.add(new GoalRayAberration(analysis, field, orientation, sample,
                                     prescription._wvls[wavelength], 0.0, weight));
@@ -1135,7 +1078,7 @@ public final class OptimizationBuilder {
                 }
             }
         }
-        for (ParaxialGoal goal : paraxialGoals)
+        for (ParaxialGoal goal : configuration.paraxialGoals)
             if (goal.paraxId() != ParaxHelper.Effective_focal_length && goal.paraxId() != ParaxHelper.Fno)
                 result.add(new GoalParax(analysis, goal.paraxId(), goal.target(), goal.weight()));
         for (GoalFactory factory : additionalGoalFactories) {
@@ -1150,68 +1093,68 @@ public final class OptimizationBuilder {
     }
 
     private void validate() {
-        if (fields == null || fields.length == 0)
+        if (configuration.fields == null || configuration.fields.length == 0)
             throw new IllegalArgumentException("at least one field is required");
         validateScenario();
-        if (contrastBalanceFields != null) {
-            if (contrastBalanceFields.length != fields.length)
+        if (configuration.contrastBalanceFields != null) {
+            if (configuration.contrastBalanceFields.length != configuration.fields.length)
                 throw new IllegalArgumentException(
-                        "contrast balance needs one flag per field: " + fields.length
-                                + " fields but " + contrastBalanceFields.length + " flags");
-            if (contrastGoals.isEmpty())
+                        "contrast balance needs one flag per field: " + configuration.fields.length
+                                + " fields but " + configuration.contrastBalanceFields.length + " flags");
+            if (configuration.contrastGoals.isEmpty())
                 throw new IllegalArgumentException(
                         "contrast balance goals require contrast goals to balance");
         }
-        for (double field : fields)
+        for (double field : configuration.fields)
             if (!Double.isFinite(field) || field < 0.0 || field > 1.0)
                 throw new IllegalArgumentException("fields must be finite values between 0 and 1");
-        if (fields[0] != 0.0)
+        if (configuration.fields[0] != 0.0)
             throw new IllegalArgumentException("the first field must be 0.0");
 
-        if (mtfFrequencies == null || mtfFrequencies.length == 0)
+        if (configuration.mtfFrequencies == null || configuration.mtfFrequencies.length == 0)
             throw new IllegalArgumentException("at least one MTF frequency is required");
         Set<Integer> frequencies = new HashSet<>();
-        for (int frequency : mtfFrequencies) {
+        for (int frequency : configuration.mtfFrequencies) {
             if (frequency <= 0 || !frequencies.add(frequency))
                 throw new IllegalArgumentException("MTF frequencies must be positive and unique");
         }
         Set<Integer> goalFrequencies = new HashSet<>();
-        for (MtfGoals curve : mtfGoals) {
+        for (MtfGoals curve : configuration.mtfGoals) {
             if (!frequencies.contains(curve.frequency))
                 throw new IllegalArgumentException("MTF goal frequency was not requested for measurement: " + curve.frequency);
             if (!goalFrequencies.add(curve.frequency))
                 throw new IllegalArgumentException("duplicate MTF goal frequency: " + curve.frequency);
-            curve.validate(fields.length);
+            curve.validate(configuration.fields.length);
         }
         Set<Integer> contrastFrequencies = new HashSet<>();
-        for (ContrastGoals curve : contrastGoals) {
+        for (ContrastGoals curve : configuration.contrastGoals) {
             if (curve == null)
                 throw new IllegalArgumentException("contrast goals must not contain null");
             if (curve.frequency <= 0 || !contrastFrequencies.add(curve.frequency))
                 throw new IllegalArgumentException("contrast frequencies must be positive and unique");
-            curve.validate(fields.length);
+            curve.validate(configuration.fields.length);
         }
-        if (spotRmsGoals != null)
-            spotRmsGoals.validate(fields.length, "spot RMS");
-        if (addSpotDeviationGoals) {
-            MtfGoals.validateWeights(spotDeviationXWeights, fields.length,
+        if (configuration.spotRmsGoals != null)
+            configuration.spotRmsGoals.validate(configuration.fields.length, "spot RMS");
+        if (configuration.addSpotDeviationGoals) {
+            MtfGoals.validateWeights(configuration.spotDeviationXWeights, configuration.fields.length,
                     "spot deviation X weights");
-            MtfGoals.validateWeights(spotDeviationYWeights, fields.length,
+            MtfGoals.validateWeights(configuration.spotDeviationYWeights, configuration.fields.length,
                     "spot deviation Y weights");
-            if (spotRmsGoals != null)
+            if (configuration.spotRmsGoals != null)
                 throw new IllegalArgumentException(
                         "aggregate spot RMS goals and per-ray spot deviation goals cannot both be enabled");
-            if (spotMaxRadiusGoals != null || useHexapolarSpotPattern)
+            if (configuration.spotMaxRadiusGoals != null || configuration.useHexapolarSpotPattern)
                 throw new IllegalArgumentException(
                         "spot deviation goals require Gaussian-quadrature spot sampling");
         }
-        if (spotMaxRadiusGoals != null)
-            spotMaxRadiusGoals.validate(fields.length, "spot maximum radius");
-        validateSurfaces(curvatureSurfaces, "curvature");
-        validateSurfaces(thicknessSurfaces, "thickness");
-        validateSurfaces(curvatureExclusions, "excluded curvature");
-        validateSurfaces(thicknessExclusions, "excluded thickness");
-        if (addRayAberrationGoals && dLineOnly
+        if (configuration.spotMaxRadiusGoals != null)
+            configuration.spotMaxRadiusGoals.validate(configuration.fields.length, "spot maximum radius");
+        validateSurfaces(configuration.curvatureSurfaces, "curvature");
+        validateSurfaces(configuration.thicknessSurfaces, "thickness");
+        validateSurfaces(configuration.curvatureExclusions, "excluded curvature");
+        validateSurfaces(configuration.thicknessExclusions, "excluded thickness");
+        if (configuration.addRayAberrationGoals && configuration.dLineOnly
                 && Arrays.stream(prescription._wvls).noneMatch(w -> sameWavelength(w, Glass.d)))
             throw new IllegalArgumentException("d-line optimization requires the prescription to contain the d-line wavelength");
     }
@@ -1238,7 +1181,7 @@ public final class OptimizationBuilder {
 
     /** A first-order goal: the given target and weight, or the prescription's value at weight 1. */
     private GoalParax anchor(Analysis analysis, int paraxId, double prescribed) {
-        for (ParaxialGoal goal : paraxialGoals)
+        for (ParaxialGoal goal : configuration.paraxialGoals)
             if (goal.paraxId() == paraxId)
                 return new GoalParax(analysis, paraxId, goal.target(), goal.weight());
         return new GoalParax(analysis, paraxId, prescribed, 1.0);
@@ -1260,11 +1203,11 @@ public final class OptimizationBuilder {
     }
 
     public static final class MtfGoals {
-        private final int frequency;
-        private final double[] sagittal;
-        private final double[] tangential;
-        private final double[] sagittalWeights;
-        private final double[] tangentialWeights;
+        final int frequency;
+        final double[] sagittal;
+        final double[] tangential;
+        final double[] sagittalWeights;
+        final double[] tangentialWeights;
 
         private MtfGoals(int frequency, double[] sagittal, double[] tangential,
                          double[] sagittalWeights, double[] tangentialWeights) {
@@ -1308,9 +1251,9 @@ public final class OptimizationBuilder {
     }
 
     public static final class ContrastGoals {
-        private final int frequency;
-        private final double[] sagittalWeights;
-        private final double[] tangentialWeights;
+        final int frequency;
+        final double[] sagittalWeights;
+        final double[] tangentialWeights;
 
         private ContrastGoals(int frequency, double[] sagittalWeights, double[] tangentialWeights) {
             this.frequency = frequency;
@@ -1324,11 +1267,11 @@ public final class OptimizationBuilder {
         }
     }
 
-    private static final class SpotGoals {
-        private final double[] targets;
-        private final double[] weights;
+    static final class SpotGoals {
+        final double[] targets;
+        final double[] weights;
 
-        private SpotGoals(double[] targets, double[] weights) {
+        SpotGoals(double[] targets, double[] weights) {
             this.targets = copy(targets);
             this.weights = weights == null ? unitWeights(targets) : copy(weights);
         }
@@ -1356,10 +1299,10 @@ public final class OptimizationBuilder {
     }
 
     /** An explicitly varied aspheric term: the conic constant when index is -1, else _coeffs[index]. */
-    private record AsphericTerm(int surface, int index, Double scale) {}
+    record AsphericTerm(int surface, int index, Double scale) {}
 
     /** A first-order goal on a {@link ParaxHelper} quantity. */
-    private record ParaxialGoal(int paraxId, double target, double weight) {}
+    record ParaxialGoal(int paraxId, double target, double weight) {}
 
     // ------------------------------------------------------------------
     // Writing - the setup as a [trial n] section
@@ -1378,179 +1321,7 @@ public final class OptimizationBuilder {
         if (!additionalVariables.isEmpty() || !additionalGoalFactories.isEmpty())
             throw new IllegalStateException(
                     "variables and goals added as code have no written form, so this setup cannot be written as a trial");
-        var sb = new StringBuilder();
-        sb.append("[trial ").append(number).append("]\n");
-        if (description != null)
-            line(sb, "description", description);
-        if (outdir != null)
-            line(sb, "outdir", outdir);
-        line(sb, "configuration", Integer.toString(scenario));
-        if (fields != null)
-            line(sb, "fields", OptimizationTrial.format(fields));
-        if (mtfFrequencies != null)
-            line(sb, "frequencies", OptimizationTrial.format(mtfFrequencies));
-        line(sb, "weighted", yesNo(weighted));
-        line(sb, "d-line-only", yesNo(dLineOnly));
-        line(sb, "vignetting", OptimizationTrial.kebab(vigType.name()) + (freezeVignetting ? " frozen" : ""));
-        if (!checkSpotApertures || (tracesSpots() && !hexapolarPattern()))
-            line(sb, "check-spot-apertures", yesNo(checkSpotApertures));
-
-        if (allCurvatureSurfaces)
-            line(sb, "vary curvatures", allExcept(curvatureExclusions));
-        else if (curvatureSurfaces.length > 0)
-            line(sb, "vary curvatures", OptimizationTrial.format(curvatureSurfaces));
-        if (allThicknessSurfaces)
-            line(sb, "vary thicknesses", allExcept(thicknessExclusions));
-        else if (thicknessSurfaces.length > 0)
-            line(sb, "vary thicknesses", OptimizationTrial.format(thicknessSurfaces));
-        if (includeExistingAspherics)
-            line(sb, "vary aspherics", "existing");
-        Map<Integer, List<String>> terms = new LinkedHashMap<>();
-        for (AsphericTerm term : asphericTerms)
-            terms.computeIfAbsent(term.surface(), s -> new ArrayList<>()).add(term.index() < 0 ? "K"
-                    : term.index() + (term.scale() != null ? ":" + OptimizationTrial.format(term.scale()) : ""));
-        for (var entry : terms.entrySet())
-            line(sb, "vary aspherics", entry.getKey() + " " + String.join(" ", entry.getValue()));
-
-        if (curvatureConstraintWeight != null)
-            line(sb, "constrain curvatures", OptimizationTrial.format(curvatureConstraintWeight));
-        if (thicknessConstraintWeight != null)
-            line(sb, "constrain thicknesses", OptimizationTrial.format(thicknessConstraintWeight));
-        if (edgeThicknessConstraintWeight != null)
-            line(sb, "constrain edges", OptimizationTrial.format(edgeThicknessConstraintWeight));
-
-        if (!contrastGoals.isEmpty()) {
-            line(sb, "goal contrast", OptimizationTrial.format(
-                    contrastGoals.stream().mapToInt(goal -> goal.frequency).toArray()));
-            contrastWeights(sb, true);
-            contrastWeights(sb, false);
-            if (contrastBalanceFields != null)
-                line(sb, "goal contrast", "balance " + balance() + " weight "
-                        + OptimizationTrial.format(contrastBalanceWeight));
-            line(sb, "goal contrast", "sampling " + contrastRings + " " + contrastSpokes);
-            line(sb, "goal contrast", "calibrate " + yesNo(calibrateContrastFrequency));
-            line(sb, "goal contrast", "exit-pupil-aiming " + yesNo(aimContrastAtExitPupil));
-            line(sb, "goal contrast", "centering " + yesNo(centerContrastResiduals));
-        }
-        for (MtfGoals goal : mtfGoals) {
-            line(sb, "goal mtf", goal.frequency + " sag " + OptimizationTrial.format(goal.sagittal));
-            line(sb, "goal mtf", goal.frequency + " tan " + OptimizationTrial.format(goal.tangential));
-            if (Arrays.equals(goal.sagittalWeights, goal.tangentialWeights)) {
-                if (!allOnes(goal.sagittalWeights))
-                    line(sb, "goal mtf", goal.frequency + " weights " + OptimizationTrial.format(goal.sagittalWeights));
-            }
-            else {
-                if (!allOnes(goal.sagittalWeights))
-                    line(sb, "goal mtf", goal.frequency + " sag weights " + OptimizationTrial.format(goal.sagittalWeights));
-                if (!allOnes(goal.tangentialWeights))
-                    line(sb, "goal mtf", goal.frequency + " tan weights " + OptimizationTrial.format(goal.tangentialWeights));
-            }
-        }
-        spotGoals(sb, "goal spot-rms", spotRmsGoals);
-        spotGoals(sb, "goal spot-max-radius", spotMaxRadiusGoals);
-        if (addSpotDeviationGoals) {
-            if (Arrays.equals(spotDeviationXWeights, spotDeviationYWeights))
-                line(sb, "goal spot-deviation", OptimizationTrial.format(spotDeviationXWeights));
-            else {
-                line(sb, "goal spot-deviation", "x " + OptimizationTrial.format(spotDeviationXWeights));
-                line(sb, "goal spot-deviation", "y " + OptimizationTrial.format(spotDeviationYWeights));
-            }
-        }
-        if (gaussianQuadratureRings != DEFAULT_GAUSSIAN_QUADRATURE_RINGS
-                || gaussianQuadratureSpokes != DEFAULT_GAUSSIAN_QUADRATURE_SPOKES
-                || gaussianQuadratureInnerRadius != 0.0
-                || (tracesSpots() && !hexapolarPattern()))
-            line(sb, "goal spot sampling", "gaussian " + gaussianQuadratureRings + " " + gaussianQuadratureSpokes
-                    + (gaussianQuadratureInnerRadius != 0.0
-                    ? " " + OptimizationTrial.format(gaussianQuadratureInnerRadius) : ""));
-        if (hexapolarPattern())
-            line(sb, "goal spot sampling", "hexapolar " + hexapolarSpotRays);
-        line(sb, "goal ray-aberrations", yesNo(addRayAberrationGoals));
-        for (ParaxialGoal goal : paraxialGoals)
-            line(sb, "goal paraxial", OptimizationTrial.paraxialName(goal.paraxId()) + " "
-                    + OptimizationTrial.format(goal.target())
-                    + (goal.weight() != 1.0 ? " weight " + OptimizationTrial.format(goal.weight()) : ""));
-        return sb.toString();
-    }
-
-    private static void line(StringBuilder sb, String key, String values) {
-        OptimizationTrial.line(sb, key, values);
-    }
-
-    private static String allExcept(int[] exclusions) {
-        return exclusions.length == 0 ? "all" : "all except " + OptimizationTrial.format(exclusions);
-    }
-
-    /** Contrast weights: one row when every frequency shares them, else a row per frequency. */
-    private void contrastWeights(StringBuilder sb, boolean sagittal) {
-        String direction = sagittal ? "sag" : "tan";
-        double[] first = sagittal ? contrastGoals.get(0).sagittalWeights : contrastGoals.get(0).tangentialWeights;
-        boolean shared = contrastGoals.stream().allMatch(goal ->
-                Arrays.equals(sagittal ? goal.sagittalWeights : goal.tangentialWeights, first));
-        if (shared) {
-            if (!allOnes(first))
-                line(sb, "goal contrast", direction + " " + OptimizationTrial.format(first));
-            return;
-        }
-        for (ContrastGoals goal : contrastGoals) {
-            double[] weights = sagittal ? goal.sagittalWeights : goal.tangentialWeights;
-            if (!allOnes(weights))
-                line(sb, "goal contrast", goal.frequency + " " + direction + " " + OptimizationTrial.format(weights));
-        }
-    }
-
-    /** The balanced fields: all, all except the listed field values, or yes/no for each. */
-    private String balance() {
-        boolean all = true, none = true;
-        for (boolean flag : contrastBalanceFields) {
-            all &= flag;
-            none &= !flag;
-        }
-        if (all)
-            return "all";
-        if (none || fields == null || fields.length != contrastBalanceFields.length) {
-            List<String> flags = new ArrayList<>();
-            for (boolean flag : contrastBalanceFields)
-                flags.add(flag ? "yes" : "no");
-            return String.join(" ", flags);
-        }
-        List<String> except = new ArrayList<>();
-        for (int i = 0; i < fields.length; i++)
-            if (!contrastBalanceFields[i])
-                except.add(OptimizationTrial.format(fields[i]));
-        return "all except " + String.join(" ", except);
-    }
-
-    private static void spotGoals(StringBuilder sb, String key, SpotGoals goals) {
-        if (goals == null)
-            return;
-        line(sb, key, OptimizationTrial.format(goals.targets));
-        if (!allOnes(goals.weights))
-            line(sb, key, "weights " + OptimizationTrial.format(goals.weights));
-    }
-
-    private static String yesNo(boolean value) {
-        return value ? "yes" : "no";
-    }
-
-    /** Whether any goal needs the spot analysis, and so the spot sampling settings. */
-    private boolean tracesSpots() {
-        return spotRmsGoals != null || spotMaxRadiusGoals != null || addSpotDeviationGoals
-                || !mtfGoals.isEmpty();
-    }
-
-    /** The spot pattern in effect: a maximum-radius goal asks for hexapolar whatever else is set. */
-    private boolean hexapolarPattern() {
-        return useHexapolarSpotPattern || spotMaxRadiusGoals != null;
-    }
-
-    private static boolean allOnes(double[] values) {
-        if (values == null)
-            return true;
-        for (double value : values)
-            if (value != 1.0)
-                return false;
-        return true;
+        return configuration.toTrial(number);
     }
 
     @FunctionalInterface

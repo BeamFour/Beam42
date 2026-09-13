@@ -55,6 +55,7 @@ class OptimizationTrialTest {
         var definition = OptimizationTrial.parse(text, 1);
         var first = definition.createBuilder(text, true);
         String canonical = definition.toTrial(first.prescription());
+        assertEquals(canonical, definition.toTrial());
         assertEquals(first.toTrial(1), canonical);
         assertEquals(1, definition.number());
         assertTrue(canonical.contains("weighted"));
@@ -76,7 +77,12 @@ class OptimizationTrialTest {
         assertSameSetup(next.build(), reread.createBuilder(design, true).build());
         // Changing one returned builder must not change the reusable definition.
         next.fields(0.0);
+        next.contrastGoals(OptimizationBuilder.contrast(30, new double[]{1.0}));
+        next.varyCurvatures(0);
+        next.contrastBalanceGoals(new boolean[]{true});
         assertEquals(canonical, definition.toTrial(first.prescription()));
+        assertEquals(canonical, definition.toTrial());
+        assertEquals(canonical, definition.createBuilder(design, true).toTrial(1));
     }
 
     @Test
@@ -261,6 +267,11 @@ class OptimizationTrialTest {
                 """;
         var builder = read(withTrials(SUMMICRON, loose));
         assertEquals(EVERYTHING, builder.toTrial(1));
+        // Parsing and canonical writing need no prescription or solver construction.
+        var definition = OptimizationTrial.parse(withTrials(SUMMICRON, loose), 1);
+        assertEquals(EVERYTHING, definition.toTrial());
+        assertEquals(EVERYTHING, OptimizationTrial.parse(
+                withTrials(SUMMICRON, definition.toTrial()), 1).toTrial());
 
         // Reading what was written gives the same setup, and writes the same text again.
         var again = read(withTrials(SUMMICRON, EVERYTHING));

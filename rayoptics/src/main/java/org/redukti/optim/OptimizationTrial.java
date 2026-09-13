@@ -78,14 +78,17 @@ public final class OptimizationTrial {
     }
 
     /**
-     * Parsed trial settings, reusable across pipeline stages. The private reader is never
-     * modified after parsing; each application creates a fresh builder and stage state.
+     * Parsed trial settings, reusable across pipeline stages. Canonical configuration is
+     * resolved once; the private reader retains source locations for surface-dependent
+     * diagnostics. Each application creates a fresh builder and stage state.
      */
     public static final class TrialDefinition {
         private final Reader settings;
+        private final OptimizationConfiguration configuration;
 
         private TrialDefinition(Reader settings) {
             this.settings = settings;
+            this.configuration = settings.configuration();
         }
 
         public int number() {
@@ -97,17 +100,21 @@ public final class OptimizationTrial {
             var specs = new OpticalBenchDataImporter.LensSpecifications();
             specs.parse_buffer(prescriptionText);
             var prescription = Prescription.build_prescription(
-                    specs, useGlassTypes, settings.weighted, settings.dLineOnly);
-            return settings.apply(prescription);
+                    specs, useGlassTypes, configuration.weighted, configuration.dLineOnly);
+            return settings.apply(prescription, configuration);
         }
 
         /**
-         * Write canonical trial text, including the effective defaults, using the existing
-         * builder writer. The prescription supplies surface context for validation; it is
-         * neither rebuilt nor optimized. No solver variables or goals are constructed.
+         * Write canonical trial text, including effective defaults, without constructing
+         * a prescription, builder or solver. Surface-dependent checks run when creating a stage.
          */
+        public String toTrial() {
+            return configuration.toTrial(number());
+        }
+
+        /** Compatibility overload that also performs prescription-dependent validation. */
         public String toTrial(Prescription prescription) {
-            return settings.apply(prescription).toTrial(number());
+            return settings.apply(prescription, configuration).toTrial(number());
         }
     }
 
@@ -948,8 +955,12 @@ public final class OptimizationTrial {
             return flags;
         }
 
-        /** A builder for the prescription, set up as the trial says. */
-        OptimizationBuilder apply(Prescription prescription) {
+        /** Apply prescription-dependent checks at each stage, retaining source diagnostics. */
+        OptimizationBuilder apply(Prescription prescription, OptimizationConfiguration configuration) {
+            if (prescription._surfaces.length != radii.size())
+                throw new IllegalArgumentException("the prescription has " + prescription._surfaces.length
+                        + " surfaces but the trial's [lens data] has " + radii.size()
+                        + "; build the prescription from the same text as the trial");
             if (curvatureConstraint != null && curvatures != null
                     && curvatures.kind() == SelectionKind.LIST) {
                 for (int surface : curvatures.surfaces())
@@ -958,41 +969,11 @@ public final class OptimizationTrial {
                                 + surface + "; a fractional curvature constraint needs a non-zero starting curvature"
                                 + "; remove this surface from 'vary curvatures' or omit 'constrain curvatures'");
             }
-            if (prescription._surfaces.length != radii.size())
-                throw new IllegalArgumentException("the prescription has " + prescription._surfaces.length
-                        + " surfaces but the trial's [lens data] has " + radii.size()
-                        + "; build the prescription from the same text as the trial");
-            var builder = OptimizationBuilder.builder(prescription)
-                    .description(description)
-                    .outdir(outdir)
-                    .fields(fields)
-                    .mtfFrequencies(frequencies)
-                    .scenario(configuration)
-                    .weighted(weighted)
-                    .dLineOnly(dLineOnly);
-            if (vignetting != null)
-                builder.vignetting(vignetting);
-            if (freezeVignetting)
-                builder.freezeVignetting();
-            if (checkSpotApertures != null)
-                builder.checkSpotApertures(checkSpotApertures);
-
-            if (curvatures != null) {
-                switch (curvatures.kind()) {
-                    case ALL -> builder.varyAllCurvatures();
-                    case ALL_EXCEPT -> builder.varyAllCurvaturesExcept(curvatures.surfaces());
-                    case LIST -> builder.varyCurvatures(curvatures.surfaces());
-                }
-            }
-            if (thicknesses != null) {
-                switch (thicknesses.kind()) {
-                    case ALL -> builder.varyAllThicknesses();
-                    case ALL_EXCEPT -> builder.varyAllThicknessesExcept(thicknesses.surfaces());
-                    case LIST -> builder.varyThicknesses(thicknesses.surfaces());
-                }
-            }
-            if (existingAspherics)
-                builder.varyExistingAspherics();
+            // Add explicit terms through the public API to keep its prescription-dependent
+            // validation (asphere kind and coefficient scaling) and source-line errors.
+            var stage = configuration.copy();
+            stage.asphericTerms.clear();
+            var builder = new OptimizationBuilder(prescription, stage);
             for (AsphericRow row : asphericRows) {
                 for (Term term : row.terms()) {
                     try {
@@ -1009,61 +990,85 @@ public final class OptimizationTrial {
                 }
             }
 
-            if (curvatureConstraint != null)
-                builder.applyCurvatureConstraints(curvatureConstraint);
-            if (thicknessConstraint != null)
-                builder.applyThicknessConstraints(thicknessConstraint);
-            if (edgeConstraint != null)
-                builder.applyEdgeThicknessConstraints(edgeConstraint);
+            return builder;
+        }
 
-            if (contrastFrequencies != null) {
-                var goals = new OptimizationBuilder.ContrastGoals[contrastFrequencies.length];
-                for (int i = 0; i < contrastFrequencies.length; i++) {
-                    int frequency = contrastFrequencies[i];
-                    goals[i] = OptimizationBuilder.contrast(frequency,
-                            weightsFor(contrastSagittalFor.get(frequency), contrastSagittal),
-                            weightsFor(contrastTangentialFor.get(frequency), contrastTangential));
-                }
-                builder.contrastGoals(goals);
-                if (contrastSampling != null)
-                    builder.contrastSampling(contrastSampling[0], contrastSampling[1]);
-                if (calibrateContrast != null)
-                    builder.calibrateContrastFrequency(calibrateContrast);
-                if (exitPupilAiming != null)
-                    builder.aimContrastAtExitPupil(exitPupilAiming);
-                if (centerContrast != null)
-                    builder.centerContrastResiduals(centerContrast);
-                if (balanceFields != null)
-                    builder.contrastBalanceGoals(balanceFlags(), balanceWeight);
+        /** Resolve shorthand and omitted values once into the same settings the builder uses. */
+        OptimizationConfiguration configuration() {
+            var c = new OptimizationConfiguration();
+            c.description = description;
+            c.outdir = outdir;
+            c.fields = fields.clone();
+            c.mtfFrequencies = frequencies.clone();
+            c.scenario = configuration;
+            c.weighted = weighted;
+            c.dLineOnly = dLineOnly;
+            if (vignetting != null) c.vigType = vignetting;
+            c.freezeVignetting = freezeVignetting;
+            if (checkSpotApertures != null) c.checkSpotApertures = checkSpotApertures;
+            if (curvatures != null) {
+                c.allCurvatureSurfaces = curvatures.kind() != SelectionKind.LIST;
+                if (curvatures.kind() == SelectionKind.LIST) c.curvatureSurfaces = curvatures.surfaces().clone();
+                if (curvatures.kind() == SelectionKind.ALL_EXCEPT) c.curvatureExclusions = curvatures.surfaces().clone();
             }
-
+            if (thicknesses != null) {
+                c.allThicknessSurfaces = thicknesses.kind() != SelectionKind.LIST;
+                if (thicknesses.kind() == SelectionKind.LIST) c.thicknessSurfaces = thicknesses.surfaces().clone();
+                if (thicknesses.kind() == SelectionKind.ALL_EXCEPT) c.thicknessExclusions = thicknesses.surfaces().clone();
+            }
+            c.includeExistingAspherics = existingAspherics;
+            for (AsphericRow row : asphericRows)
+                for (Term term : row.terms())
+                    c.asphericTerms.add(new OptimizationBuilder.AsphericTerm(row.surface(), term.index(), term.scale()));
+            c.curvatureConstraintWeight = curvatureConstraint;
+            c.thicknessConstraintWeight = thicknessConstraint;
+            c.edgeThicknessConstraintWeight = edgeConstraint;
+            if (contrastFrequencies != null) {
+                for (int frequency : contrastFrequencies)
+                    c.contrastGoals.add(OptimizationBuilder.contrast(frequency,
+                            weightsFor(contrastSagittalFor.get(frequency), contrastSagittal),
+                            weightsFor(contrastTangentialFor.get(frequency), contrastTangential)));
+                if (contrastSampling != null) {
+                    c.contrastRings = contrastSampling[0];
+                    c.contrastSpokes = contrastSampling[1];
+                }
+                if (calibrateContrast != null) c.calibrateContrastFrequency = calibrateContrast;
+                if (exitPupilAiming != null) c.aimContrastAtExitPupil = exitPupilAiming;
+                if (centerContrast != null) c.centerContrastResiduals = centerContrast;
+                if (balanceFields != null) {
+                    c.contrastBalanceFields = balanceFlags();
+                    c.contrastBalanceWeight = balanceWeight;
+                }
+            }
             for (var entry : mtf.entrySet()) {
                 MtfRows rows = entry.getValue();
                 double[] both = rows.weights != null ? rows.weights.values() : null;
-                builder.mtfGoals(OptimizationBuilder.mtf(entry.getKey(),
+                c.mtfGoals.add(OptimizationBuilder.mtf(entry.getKey(),
                         rows.sagittal.values(), rows.tangential.values(),
                         rows.sagittalWeights != null ? rows.sagittalWeights.values() : both,
                         rows.tangentialWeights != null ? rows.tangentialWeights.values() : both));
             }
-
             if (spotRms != null)
-                builder.spotRmsGoals(spotRms.values(), spotRmsWeights != null ? spotRmsWeights.values() : null);
+                c.spotRmsGoals = new OptimizationBuilder.SpotGoals(
+                        spotRms.values(), spotRmsWeights != null ? spotRmsWeights.values() : null);
             if (spotMaxRadius != null)
-                builder.spotMaxRadiusGoals(spotMaxRadius.values(),
-                        spotMaxRadiusWeights != null ? spotMaxRadiusWeights.values() : null);
-            if (spotDeviation != null)
-                builder.spotDeviationGoals(spotDeviation.values());
-            else if (spotDeviationX != null)
-                builder.spotDeviationGoals(spotDeviationX.values(), spotDeviationY.values());
+                c.spotMaxRadiusGoals = new OptimizationBuilder.SpotGoals(
+                        spotMaxRadius.values(), spotMaxRadiusWeights != null ? spotMaxRadiusWeights.values() : null);
+            if (spotDeviation != null || spotDeviationX != null) {
+                c.addSpotDeviationGoals = true;
+                c.spotDeviationXWeights = (spotDeviation != null ? spotDeviation : spotDeviationX).values().clone();
+                c.spotDeviationYWeights = (spotDeviation != null ? spotDeviation : spotDeviationY).values().clone();
+            }
             if (gaussianSampling != null)
-                builder.gaussianQuadratureSampling(gaussianSampling[0], gaussianSampling[1], gaussianInnerRadius);
-            if (hexapolarRays != null)
-                builder.hexapolarSampling(hexapolarRays);
-            if (rayAberrations)
-                builder.rayAberrationGoals();
+                c.gaussianSampling(gaussianSampling[0], gaussianSampling[1], gaussianInnerRadius);
+            if (hexapolarRays != null) {
+                c.useHexapolarSpotPattern = true;
+                c.hexapolarSpotRays = hexapolarRays;
+            }
+            c.addRayAberrationGoals = rayAberrations;
             for (ParaxialGoal goal : paraxialGoals)
-                builder.paraxialGoal(goal.id(), goal.target(), goal.weight());
-            return builder;
+                c.paraxialGoals.add(new OptimizationBuilder.ParaxialGoal(goal.id(), goal.target(), goal.weight()));
+            return c;
         }
 
         private double[] weightsFor(PerField specific, PerField general) {

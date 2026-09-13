@@ -539,7 +539,7 @@ public class LensTool2 {
         var sb = prescription.to_opt_bench_str(new StringBuilder());
         sb.append('\n').append(pipeline.toPipeline());
         for (var trial : trials.values())
-            sb.append('\n').append(trial.toTrial(prescription));
+            sb.append('\n').append(trial.toTrial());
         return sb.toString();
     }
 

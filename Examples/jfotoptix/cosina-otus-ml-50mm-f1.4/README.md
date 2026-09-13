@@ -71,7 +71,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | img_ht | 21.413
 | obj_ang | 23.12
 | obj_na | 0
-| img_na | -0.333|
+| img_na | -0.353|
 ## Spot Analysis
 | Field | Spot Mean Radius | Spot Max Radius |
 | ---   | ---              | ---             |
@@ -100,4 +100,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./JP2026-105585_Example01-optimized.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-08-12
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-09-13

@@ -464,6 +464,38 @@ class OptimizationTrialTest {
     }
 
     @Test
+    void sharedDomainRulesRejectBothEntryPointsWithSourceContext() throws Exception {
+        record Invalid(String rows, String offendingRow,
+                       java.util.function.Consumer<OptimizationBuilder> configure) {}
+        var invalid = List.of(
+                new Invalid("goal spot-rms -1\n", "goal spot-rms -1",
+                        b -> b.spotRmsGoals(new double[]{-1})),
+                new Invalid("goal spot-deviation -1\n", "goal spot-deviation -1",
+                        b -> b.spotDeviationGoals(-1)),
+                new Invalid("goal spot-rms 1 2\n", "goal spot-rms 1 2",
+                        b -> b.spotRmsGoals(new double[]{1, 2})),
+                new Invalid("goal mtf 20 sag 101\ngoal mtf 20 tan 50\n", "goal mtf 20 sag 101",
+                        b -> b.mtfGoals(OptimizationBuilder.mtf(20, new double[]{101}, new double[]{50}))),
+                new Invalid("goal mtf 30 sag 50\ngoal mtf 30 tan 50\n", "goal mtf 30 sag 50",
+                        b -> b.mtfGoals(OptimizationBuilder.mtf(30, new double[]{50}, new double[]{50}))),
+                new Invalid("goal contrast 20 20\n", "goal contrast 20 20",
+                        b -> b.contrastGoals(OptimizationBuilder.contrast(20, new double[]{1}),
+                                OptimizationBuilder.contrast(20, new double[]{1}))));
+        String lens = withTrials(SUMMICRON, "");
+        for (var c : invalid) {
+            var builder = OptimizationBuilder.builder(prescription(lens, true, false))
+                    .fields(0.0).mtfFrequencies(20);
+            c.configure().accept(builder);
+            assertThrows(IllegalArgumentException.class, builder::build, c.rows());
+            String text = lens + "\n[trial 1]\nfields 0\nfrequencies 20\n" + c.rows();
+            var error = assertThrows(OptimizationTrial.TrialException.class,
+                    () -> OptimizationTrial.parse(text, 1), c.rows());
+            int line = List.of(text.split("\n", -1)).indexOf(c.offendingRow()) + 1;
+            assertTrue(error.getMessage().startsWith("trial 1, line " + line + ":"), error.getMessage());
+        }
+    }
+
+    @Test
     void rejectsMistakes() throws Exception {
         assertRejected("[trial 1]\nfields 0\nfields 0\n", "'fields' is given more than once");
         assertRejected("[trial 1]\nfields 0\n", "'frequencies' is required");

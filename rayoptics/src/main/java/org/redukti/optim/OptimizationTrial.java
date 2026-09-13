@@ -869,14 +869,13 @@ public final class OptimizationTrial {
                 MtfRows rows = entry.getValue();
                 if (rows.sagittal == null || rows.tangential == null)
                     throw error(rows.line, "MTF goals at " + frequency + " need both a sag and a tan row of targets");
-                if (Arrays.stream(frequencies).noneMatch(f -> f == frequency))
-                    throw error(rows.line, "MTF goal frequency " + frequency + " is not one of 'frequencies'");
+                OptimizationValidation.frequency(frequency, frequencies,
+                        () -> error(rows.line, "MTF goal frequency " + frequency + " is not one of 'frequencies'"));
                 checkPerField(rows.sagittal, "targets");
                 checkPerField(rows.tangential, "targets");
                 for (PerField targets : new PerField[]{rows.sagittal, rows.tangential})
-                    for (double target : targets.values())
-                        if (target < 0.0 || target > 100.0)
-                            throw error(targets.line(), "MTF targets are percentages, between 0 and 100");
+                    OptimizationValidation.range(targets.values(), 100.0,
+                            () -> error(targets.line(), "MTF targets are percentages, between 0 and 100"));
                 checkPerField(rows.weights, "weights");
                 checkPerField(rows.sagittalWeights, "weights");
                 checkPerField(rows.tangentialWeights, "weights");
@@ -886,6 +885,10 @@ public final class OptimizationTrial {
             checkPerField(spotRmsWeights, "weights");
             checkPerField(spotMaxRadius, "targets");
             checkPerField(spotMaxRadiusWeights, "weights");
+            for (PerField targets : new PerField[]{spotRms, spotMaxRadius})
+                if (targets != null)
+                    OptimizationValidation.range(targets.values(), Double.POSITIVE_INFINITY,
+                            () -> error(targets.line(), "spot targets must be finite and non-negative"));
             if (spotRmsWeights != null && spotRms == null)
                 throw error(spotRmsWeights.line(), "spot-rms weights need a 'goal spot-rms <targets>' line");
             if (spotMaxRadiusWeights != null && spotMaxRadius == null)
@@ -902,20 +905,19 @@ public final class OptimizationTrial {
         }
 
         private void checkContrastFrequency(int frequency, int line) {
-            if (Arrays.stream(contrastFrequencies).noneMatch(f -> f == frequency))
-                throw error(line, "contrast frequency " + frequency + " is not one of the 'goal contrast' frequencies");
+            OptimizationValidation.frequency(frequency, contrastFrequencies,
+                    () -> error(line, "contrast frequency " + frequency + " is not one of the 'goal contrast' frequencies"));
         }
 
         private void checkPerField(PerField values, String what) {
             if (values == null)
                 return;
-            if (values.values().length != fields.length)
-                throw error(values.line(), "expected " + fields.length + " " + what + ", one per field, but found "
-                        + values.values().length);
+            OptimizationValidation.fieldCount(values.values(), fields.length,
+                    () -> error(values.line(), "expected " + fields.length + " " + what + ", one per field, but found "
+                            + values.values().length));
             if (what.equals("weights"))
-                for (double value : values.values())
-                    if (value < 0.0)
-                        throw error(values.line(), "weights must not be negative");
+                OptimizationValidation.range(values.values(), Double.POSITIVE_INFINITY,
+                        () -> error(values.line(), "weights must not be negative"));
         }
 
         private static int firstLine(PerField... values) {
@@ -1179,8 +1181,9 @@ public final class OptimizationTrial {
             Set<Integer> unique = new HashSet<>();
             for (int i = from; i < w.length; i++) {
                 values[i - from] = positiveInt(line, w[i], what.replaceAll("s$", ""));
-                if (!unique.add(values[i - from]))
-                    throw error(line, w[i] + " is listed twice");
+                String token = w[i];
+                OptimizationValidation.positiveUnique(values[i - from], unique,
+                        () -> error(line, token + " is listed twice"));
             }
             return values;
         }
@@ -1206,9 +1209,8 @@ public final class OptimizationTrial {
                 for (int i = 1; i < w.length; i++)
                     values[i - 1] = number(line, w[i], "field");
             }
-            for (double value : values)
-                if (value < 0.0 || value > 1.0)
-                    throw error(line, "fields are relative heights, between 0 and 1");
+            OptimizationValidation.range(values, 1.0,
+                    () -> error(line, "fields are relative heights, between 0 and 1"));
             if (values.length == 0 || values[0] != 0.0)
                 throw error(line, "the first field must be 0");
             return values;

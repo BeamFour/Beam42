@@ -1062,9 +1062,8 @@ public final class OptimizationBuilder {
                 throw new IllegalArgumentException(
                         "contrast balance goals require contrast goals to balance");
         }
-        for (double field : configuration.fields)
-            if (!Double.isFinite(field) || field < 0.0 || field > 1.0)
-                throw new IllegalArgumentException("fields must be finite values between 0 and 1");
+        OptimizationValidation.range(configuration.fields, 1.0,
+                () -> new IllegalArgumentException("fields must be finite values between 0 and 1"));
         if (configuration.fields[0] != 0.0)
             throw new IllegalArgumentException("the first field must be 0.0");
 
@@ -1072,13 +1071,13 @@ public final class OptimizationBuilder {
             throw new IllegalArgumentException("at least one MTF frequency is required");
         Set<Integer> frequencies = new HashSet<>();
         for (int frequency : configuration.mtfFrequencies) {
-            if (frequency <= 0 || !frequencies.add(frequency))
-                throw new IllegalArgumentException("MTF frequencies must be positive and unique");
+            OptimizationValidation.positiveUnique(frequency, frequencies,
+                    () -> new IllegalArgumentException("MTF frequencies must be positive and unique"));
         }
         Set<Integer> goalFrequencies = new HashSet<>();
         for (MtfGoals curve : configuration.mtfGoals) {
-            if (!frequencies.contains(curve.frequency))
-                throw new IllegalArgumentException("MTF goal frequency was not requested for measurement: " + curve.frequency);
+            OptimizationValidation.frequency(curve.frequency, configuration.mtfFrequencies,
+                    () -> new IllegalArgumentException("MTF goal frequency was not requested for measurement: " + curve.frequency));
             if (!goalFrequencies.add(curve.frequency))
                 throw new IllegalArgumentException("duplicate MTF goal frequency: " + curve.frequency);
             curve.validate(configuration.fields.length);
@@ -1087,8 +1086,8 @@ public final class OptimizationBuilder {
         for (ContrastGoals curve : configuration.contrastGoals) {
             if (curve == null)
                 throw new IllegalArgumentException("contrast goals must not contain null");
-            if (curve.frequency <= 0 || !contrastFrequencies.add(curve.frequency))
-                throw new IllegalArgumentException("contrast frequencies must be positive and unique");
+            OptimizationValidation.positiveUnique(curve.frequency, contrastFrequencies,
+                    () -> new IllegalArgumentException("contrast frequencies must be positive and unique"));
             curve.validate(configuration.fields.length);
         }
         if (configuration.spotRmsGoals != null)
@@ -1191,19 +1190,17 @@ public final class OptimizationBuilder {
         }
 
         private static void validateTargets(double[] values, int count, String name) {
-            if (values == null || values.length != count)
-                throw new IllegalArgumentException(name + " must contain one value per field");
-            for (double value : values)
-                if (!Double.isFinite(value) || value < 0.0 || value > 100.0)
-                    throw new IllegalArgumentException(name + " must be percentages between 0 and 100");
+            OptimizationValidation.fieldCount(values, count,
+                    () -> new IllegalArgumentException(name + " must contain one value per field"));
+            OptimizationValidation.range(values, 100.0,
+                    () -> new IllegalArgumentException(name + " must be percentages between 0 and 100"));
         }
 
         private static void validateWeights(double[] values, int count, String name) {
-            if (values == null || values.length != count)
-                throw new IllegalArgumentException(name + " must contain one value per field");
-            for (double value : values)
-                if (!Double.isFinite(value) || value < 0.0)
-                    throw new IllegalArgumentException(name + " must be finite and non-negative");
+            OptimizationValidation.fieldCount(values, count,
+                    () -> new IllegalArgumentException(name + " must contain one value per field"));
+            OptimizationValidation.range(values, Double.POSITIVE_INFINITY,
+                    () -> new IllegalArgumentException(name + " must be finite and non-negative"));
         }
     }
 
@@ -1234,16 +1231,14 @@ public final class OptimizationBuilder {
         }
 
         private void validate(int fieldCount, String name) {
-            if (targets == null || targets.length != fieldCount)
-                throw new IllegalArgumentException(name + " targets must contain one value per field");
-            if (weights == null || weights.length != fieldCount)
-                throw new IllegalArgumentException(name + " weights must contain one value per field");
-            for (double target : targets)
-                if (!Double.isFinite(target) || target < 0.0)
-                    throw new IllegalArgumentException(name + " targets must be finite and non-negative");
-            for (double weight : weights)
-                if (!Double.isFinite(weight) || weight < 0.0)
-                    throw new IllegalArgumentException(name + " weights must be finite and non-negative");
+            OptimizationValidation.fieldCount(targets, fieldCount,
+                    () -> new IllegalArgumentException(name + " targets must contain one value per field"));
+            OptimizationValidation.fieldCount(weights, fieldCount,
+                    () -> new IllegalArgumentException(name + " weights must contain one value per field"));
+            OptimizationValidation.range(targets, Double.POSITIVE_INFINITY,
+                    () -> new IllegalArgumentException(name + " targets must be finite and non-negative"));
+            OptimizationValidation.range(weights, Double.POSITIVE_INFINITY,
+                    () -> new IllegalArgumentException(name + " weights must be finite and non-negative"));
         }
 
         private static double[] unitWeights(double[] targets) {

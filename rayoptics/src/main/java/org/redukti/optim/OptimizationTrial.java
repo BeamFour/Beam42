@@ -69,11 +69,46 @@ public final class OptimizationTrial {
      * @throws TrialException if the file has no such trial, or the trial has a problem
      */
     public static OptimizationBuilder read(String text, int number, boolean useGlassTypes) throws Exception {
-        Reader reader = Reader.parse(text, number);
-        var specs = new OpticalBenchDataImporter.LensSpecifications();
-        specs.parse_buffer(text);
-        var prescription = Prescription.build_prescription(specs, useGlassTypes, reader.weighted, reader.dLineOnly);
-        return reader.apply(prescription);
+        return parse(text, number).createBuilder(text, useGlassTypes);
+    }
+
+    /** Parse a reusable definition without importing glass or constructing a prescription. */
+    public static TrialDefinition parse(String text, int number) {
+        return new TrialDefinition(Reader.parse(text, number));
+    }
+
+    /**
+     * Parsed trial settings, reusable across pipeline stages. The private reader is never
+     * modified after parsing; each application creates a fresh builder and stage state.
+     */
+    public static final class TrialDefinition {
+        private final Reader settings;
+
+        private TrialDefinition(Reader settings) {
+            this.settings = settings;
+        }
+
+        public int number() {
+            return settings.number;
+        }
+
+        /** Build the current design using this trial's wavelength settings. */
+        public OptimizationBuilder createBuilder(String prescriptionText, boolean useGlassTypes) throws Exception {
+            var specs = new OpticalBenchDataImporter.LensSpecifications();
+            specs.parse_buffer(prescriptionText);
+            var prescription = Prescription.build_prescription(
+                    specs, useGlassTypes, settings.weighted, settings.dLineOnly);
+            return settings.apply(prescription);
+        }
+
+        /**
+         * Write canonical trial text, including the effective defaults, using the existing
+         * builder writer. The prescription supplies surface context for validation; it is
+         * neither rebuilt nor optimized. No solver variables or goals are constructed.
+         */
+        public String toTrial(Prescription prescription) {
+            return settings.apply(prescription).toTrial(number());
+        }
     }
 
     /**

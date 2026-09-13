@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -478,10 +479,13 @@ public class LensTool2 {
                     + (pipeline.description() != null ? ": " + pipeline.description() : "")
                     + ": trials " + pipeline.trialsText());
             String text = specText;
+            var trials = new LinkedHashMap<Integer, OptimizationTrial.TrialDefinition>();
+            for (int trial : pipeline.distinctTrials())
+                trials.put(trial, OptimizationTrial.parse(specText, trial));
             for (int stage : pipeline.trials()) {
-                var builder = OptimizationTrial.read(text, stage, arguments.use_glass_types);
+                var builder = trials.get(stage).createBuilder(text, arguments.use_glass_types);
                 solveTrial(builder, stage);
-                text = carriedForward(builder.prescription(), pipeline, text, arguments.use_glass_types);
+                text = carriedForward(builder.prescription(), pipeline, trials);
             }
             optimized = text;
             outdir = pipeline.outdir();
@@ -526,15 +530,16 @@ public class LensTool2 {
 
     /**
      * What a pipeline hands to its next stage, and writes at the end: the design as it now
-     * stands, the pipeline, and every trial the pipeline names - so the next stage can read
-     * its own trial from it, and the result can run the pipeline again as it stands.
+     * stands, the pipeline, and every trial the pipeline names. Stage prescriptions still
+     * round-trip through text, but trial definitions are parsed only once and reused.
+     * The result can run the pipeline again as it stands.
      */
     private static String carriedForward(Prescription prescription, OptimizationPipeline pipeline,
-                                         String text, boolean useGlassTypes) throws Exception {
+                                         Map<Integer, OptimizationTrial.TrialDefinition> trials) {
         var sb = prescription.to_opt_bench_str(new StringBuilder());
         sb.append('\n').append(pipeline.toPipeline());
-        for (int trial : pipeline.distinctTrials())
-            sb.append('\n').append(OptimizationTrial.read(text, trial, useGlassTypes).toTrial(trial));
+        for (var trial : trials.values())
+            sb.append('\n').append(trial.toTrial(prescription));
         return sb.toString();
     }
 

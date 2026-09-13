@@ -154,7 +154,8 @@ class OptimizationTrialRunTest {
     @Test
     void runsAPipelineStageByStage(@TempDir Path dir) throws Exception {
         Path spec = dir.resolve("zoom.txt");
-        Files.writeString(spec, Files.readString(Path.of(ExampleFinder.geoPathToExample(ZOOM))) + PIPELINE);
+        Files.writeString(spec, Files.readString(Path.of(ExampleFinder.geoPathToExample(ZOOM)))
+                + PIPELINE.replace("trials            5 6", "trials            5 6 5"));
         Args arguments = Args.parseArguments(new String[]{"--specfile", spec.toString(), "--optimize", "7"});
 
         String optimized = LensTool2.runOptimizationTrial(Files.readString(spec), arguments);
@@ -172,10 +173,17 @@ class OptimizationTrialRunTest {
 
         // The result carries the pipeline and both its trials, so it can run again as it stands.
         var again = OptimizationTrial.readPipeline(optimized, 7);
-        assertArrayEquals(new int[]{5, 6}, again.trials());
+        assertArrayEquals(new int[]{5, 6, 5}, again.trials());
+        assertEquals(again.toPipeline(), OptimizationTrial.readPipeline(
+                optimized + "\n", 7).toPipeline());
         assertEquals("trials/zoom", again.outdir());
         for (int stage : again.trials())
             assertEquals(8, ((VarThickness) OptimizationTrial.read(optimized, stage, true)
                     .build().variables()[0])._surface_id);
+        for (int stage : again.distinctTrials()) {
+            var original = OptimizationTrial.parse(Files.readString(spec), stage);
+            var restored = OptimizationTrial.parse(optimized, stage);
+            assertEquals(original.toTrial(prescription), restored.toTrial(prescription));
+        }
     }
 }

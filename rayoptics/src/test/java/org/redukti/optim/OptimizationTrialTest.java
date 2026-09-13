@@ -49,6 +49,37 @@ class OptimizationTrialTest {
             """;
 
     @Test
+    void reusesParsedDefinitionAndRoundTripsItsSettings() throws Exception {
+        String text = withTrials(SUMMICRON, "[trial 1]\n" + MTF_FIVE_FIELDS
+                + "vary thicknesses 10\nweighted no\nd-line-only yes\n");
+        var definition = OptimizationTrial.parse(text, 1);
+        var first = definition.createBuilder(text, true);
+        String canonical = definition.toTrial(first.prescription());
+        assertEquals(first.toTrial(1), canonical);
+        assertEquals(1, definition.number());
+        assertTrue(canonical.contains("weighted"));
+        assertSameSetup(read(text).build(), first.build());
+
+        // A stage hands on its changed design, without needing to carry trial text
+        // for the already-parsed definition to construct a fresh stage.
+        first.prescription()._surfaces[10]._thickness += 0.25;
+        String design = first.prescription().to_opt_bench_str(new StringBuilder()).toString();
+        var next = definition.createBuilder(design, true);
+        assertNotSame(first.prescription(), next.prescription());
+        assertEquals(first.prescription()._surfaces[10]._thickness,
+                next.prescription()._surfaces[10]._thickness, 1e-8);
+        assertEquals(canonical, definition.toTrial(next.prescription()));
+        assertArrayEquals(first.prescription()._wvls, next.prescription()._wvls);
+
+        var reread = OptimizationTrial.parse(design + "\n" + canonical, 1);
+        assertEquals(canonical, reread.toTrial(next.prescription()));
+        assertSameSetup(next.build(), reread.createBuilder(design, true).build());
+        // Changing one returned builder must not change the reusable definition.
+        next.fields(0.0);
+        assertEquals(canonical, definition.toTrial(first.prescription()));
+    }
+
+    @Test
     void numbersSurfacesByPosition() throws Exception {
         String text = withTrials(SUMMICRON, "[trial 1]\n" + MTF_FIVE_FIELDS + """
                 vary curvatures   all except 2 6

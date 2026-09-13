@@ -44,8 +44,8 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 34 | 55.0218 | 6.3943 | 31.46 |  |  |  |
 | 35 | -36.614 | 1.0 | 31.46 | 1.497 | 81.61 | Hoya | FCD1 |
 | 36 | -116.6815 | 29.351 | 33.98 |  |  |  |
-| 37 | 0.0 | 2.5 | 45.44 | 1.5168 | 64.2 |  |
-| 38 | 0.0 | 1.0 | 45.44 |  |  |  |
+| 37 | CG | 2.5 | 45.44 | 1.5168 | 64.2 |  |
+| 38 | CG | 1.0 | 45.44 |  |  |  |
 ## Aspherical Data
 | ID  | Type | k   | P1 | P2 | P3 | P4 | P5 | P6 | P7 | P8 | P9 | P10 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -184,4 +184,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./US20250093627_Example01P.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-09-04
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-09-13

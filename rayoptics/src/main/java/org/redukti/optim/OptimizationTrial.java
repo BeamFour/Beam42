@@ -799,7 +799,7 @@ public final class OptimizationTrial {
 
         private void spotSampling(int line, String[] w) {
             if (w.length < 4 || !lower(w[2]).equals("sampling"))
-                throw error(line, "expected 'goal spot sampling gaussian <rings> <spokes> [<inner radius>]' or 'goal spot sampling hexapolar <rays>'");
+                throw error(line, "expected 'goal spot sampling gaussian <rings> <spokes> [<inner radius>]' or 'goal spot sampling hexapolar <rings>'");
             switch (lower(w[3])) {
                 case "gaussian" -> {
                     once(line, "goal spot sampling gaussian");
@@ -810,8 +810,8 @@ public final class OptimizationTrial {
                 }
                 case "hexapolar" -> {
                     once(line, "goal spot sampling hexapolar");
-                    count(line, w, 5, "goal spot sampling hexapolar <rays>");
-                    hexapolarRays = positiveInt(line, w[4], "rays");
+                    count(line, w, 5, "goal spot sampling hexapolar <rings>");
+                    hexapolarRays = positiveInt(line, w[4], "rings");
                     hexapolarLine = line;
                 }
                 default -> throw error(line, "unknown spot sampling '" + w[3] + "'; expected gaussian or hexapolar");

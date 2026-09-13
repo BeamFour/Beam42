@@ -1129,6 +1129,9 @@ GQ's count is `rings * spokes`.
 **Possible resolution:** introduce a clearly named ring-count API while retaining an
 alias for existing callers. Keep the numeric meaning of saved trials unchanged; silently
 reinterpreting existing values as total rays would violate round-trip compatibility.
+The trial syntax needs no change: `goal spot sampling hexapolar <n>` names neither rays
+nor rings, and its parser and builder error messages already say rings. Only the Java
+method, parameter and field names (`numRays`, `num_rays`, `hexapolarSpotRays`) still say rays.
 
 ### 6. Aperture and annulus settings are not uniform across samplers
 

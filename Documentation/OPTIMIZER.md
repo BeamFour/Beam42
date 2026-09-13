@@ -289,7 +289,7 @@ The following patterns are available for optimization trials. GQ means Gaussian 
 | Goal | Supported sampling | Default or selection |
 |---|---|---|
 | `spot-rms` | GQ or hexapolar | GQ by default. |
-| `spot-max-radius` | Hexapolar | Selects hexapolar for all spot and geometric-MTF goals in the stage. |
+| `spot-max-radius` | Hexapolar | Selects hexapolar for all spot and geometric-MTF goals in the stage, even when a `gaussian` sampling line is given. |
 | `spot-deviation` | GQ | GQ only. |
 | `mtf` | GQ or hexapolar | Uses the stage's spot pattern; GQ by default. |
 | `contrast` | Separate GQ-based contrast sampling | Set with `goal contrast sampling`; default `6 12`. |
@@ -329,7 +329,7 @@ goal contrast   sampling 6 12
 | `goal contrast exit-pupil-aiming yes\|no` | Aim the sheared rays on the exit pupil. Cannot be combined with `calibrate`. | `no` |
 | `goal contrast centering yes\|no` | Subtract the constant part of each contrast block. | `no` |
 
-Contrast begins with `rings × spokes` weighted GQ points for each field, wavelength,
+Contrast begins with `rings Ã— spokes` weighted GQ points for each field, wavelength,
 and frequency. Each point has a reference ray and two displaced partners. The pattern
 is mapped and contracted to keep the triplets in the common vignetted-pupil overlap;
 weights are adjusted and normalized. This is not the ordinary spot pattern. There is
@@ -388,12 +388,8 @@ Both Gaussian and hexapolar sampling lines may be given when there are no
 `spot-deviation` goals. They store separate settings, not two simultaneous patterns:
 hexapolar takes precedence regardless of line order. Its count is a number of rings;
 the generated point count is approximately `1 + 3*rings*(rings + 1)`, before tracing
-failures. GQ uses `rings * spokes` samples.
-
-Canonical writing preserves configured hexapolar intent, even for an invalid Java
-builder, so writing cannot silently turn an incompatible configuration into a valid
-one. Valid trial and pipeline configurations remain round-trippable. There is no
-`goal spot sampling grid` syntax today.
+failures. The default of 64 rings is therefore about 12,500 rays per field and
+wavelength, against 280 for the default `gaussian 14 20`. GQ uses `rings * spokes` samples.
 
 ### Ray aberrations
 

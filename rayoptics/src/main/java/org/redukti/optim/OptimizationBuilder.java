@@ -215,7 +215,7 @@ public final class OptimizationBuilder {
      */
     public OptimizationBuilder hexapolarSampling(int numRays) {
         if (numRays < 1)
-            throw new IllegalArgumentException("hexapolar spot rays must be at least 1");
+            throw new IllegalArgumentException("hexapolar spot rings must be at least 1");
         configuration.useHexapolarSpotPattern = true;
         configuration.hexapolarSpotRays = numRays;
         return this;

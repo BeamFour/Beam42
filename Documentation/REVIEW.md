@@ -1462,6 +1462,72 @@ This is the same decomposition `GoalContrast` performs for MTF, applied to spot 
 it makes a direct spot merit competitive with the contrast merit on conditioning rather
 than only on cost.
 
+#### Spot deviations outweigh the constraints by orders of magnitude
+
+A spot deviation residual is a ray miss in microns; a constraint residual is a fractional
+change times √weight, so at weight 128 a 10% change costs 1.28 in the sum of squares.
+Weights chosen against a contrast merit therefore do not hold a design against a spot
+deviation merit. Measured on the Leica R Apo 75/2 (`specs-original.txt`, trial 2: fields
+0/0.3/0.7/1.0, three unweighted wavelengths, Gaussian quadrature 6×12, `set-vig frozen`,
+every curvature and thickness varied, 29 variables, `constrain curvatures 1`,
+`constrain edges 128`, `constrain thicknesses 64`, `goal paraxial bfl 39.38`). Both results
+are rescored with spot weights of 1 and the constraints anchored to the starting design:
+
+| | start | spot weights 1 | spot weights 0.0033 |
+| --- | --- | --- | --- |
+| spot deviation sum of squares (µm², 1,728 residuals) | 15,025 | 566 | 1,352 |
+| thickness / edge / curvature constraint sum of squares | 0 | 18.7 / 37.9 / 1.24 | 1.11 / 0.78 / 0.12 |
+| largest thickness change | — | 29% (surface 8) | 9% (surface 4) |
+| largest curvature change | — | 99% (surface 11) | 20% (surface 3) |
+| efl (anchor 74.68) | 74.75 | 72.64 | 74.21 |
+| bfl (target 39.38) | 39.37 | 35.77 | 39.12 |
+
+At spot weights of 1 the solver paid about 75 in penalties — 58 for constraints, 17 for
+efl and bfl, which are absolute millimetres at weight 1 — to take 14,459 off the spot
+block. Curvature, at weight 1, was the cheapest parameter and moved furthest. Scaling the
+spot weights by 1/300 brings the starting spot block to about 50, the size of the contrast
+block on the same lens (the `NOMINAL_BALANCE_WEIGHT` measurement, taken at 10/30/50 cyc/mm
+over 11 fields rather than this field set). The layout then holds; the spot improvement
+drops from 27× to 11×.
+
+The same scale problem appears when the two goal types are mixed. On the Noct-Nikkor 58/1.2
+(version5 trial 3) contrast was weighted at fields 0 and 0.3 and spot deviations at 0.0033
+at fields 0.7 and 1.0, the other fields at weight zero. At the start the two outer spot
+fields were 316 of the 342 merit (92%) — an f/1.2 lens has 95,800 µm² of spot there against
+the Leica's 15,025 over all four fields — so the solve was mostly a spot solve. Zero weights
+behaved: nothing failed at the zeroed fields, and at unit weight they improved too
+(contrast at 0.7 from 81.1 to 3.88 and at 1.0 from 173 to 5.12; spot at 0 from 2,433 to
+1,017 µm² and at 0.3 from 7,144 to 796). Thicknesses stayed within 4%, curvature changed up
+to 56% (surface 8, `constrain curvatures 1`), efl 58.00 to 57.73. Zero weights do not skip
+computation: 3,456 of the 6,952 goals carried zero weight.
+
+The two goal types measure the same thing on different scales. For a small shear, the
+wavefront difference a contrast sample takes is the wavefront slope times the shear; the
+slope is the transverse ray error divided by λ/NA, and the shear at ν cyc/mm is νλ/NA, so
+to first order ΔW in waves ≈ ν (cyc/mm) × ε (mm). Both blocks are normalised to a pupil
+average, so summed over this trial's 10/20/40 cyc/mm the contrast block at unit weight
+should be Σν²·10⁻⁶ = 0.0021 times the spot deviation block in µm², field by field. Trial 3
+computes both at every field whatever their weights, so it measures the ratio directly:
+
+| field | 0 | 0.3 | 0.7 | 1.0 |
+| --- | --- | --- | --- | --- |
+| contrast / spot deviation, start | 0.0019 | 0.0030 | 0.0030 | 0.0025 |
+| contrast / spot deviation, result | 0.0021 | 0.0020 | 0.0018 | 0.0017 |
+
+Within 0.8–1.4× of the prediction at every field, and within 0.8–1.0× once corrected. So a
+spot deviation residual scaled by ν/1000 is, to that accuracy, the contrast residual the
+same ray produces at ν: a scale fixed by physics rather than by the design a trial starts
+from. It also reframes trial 3's imbalance. Scaled this way the two outer spot fields start
+at 95,800 × 0.0021 ≈ 201, against 254 for contrast at those fields — the 92% share was
+mostly those fields being genuinely worse, not a mismatch of units.
+
+Not varied: one solve per configuration, one lens per question; the constraint weights
+were not swept; 0.0033 is a proportion taken from the block sizes, not a tuned value; MTF
+of the results was not compared. The open question is whether spot deviation residuals
+should be normalised in the builder — for instance by the starting RMS spot, as
+constraints are by their starting values — so one set of constraint weights means the same
+for every goal type.
+
 ### A tolerant Jacobian
 
 `buildJacobian` ([LMDerMeritFunction.java:116](../optimr2/src/main/java/org/redukti/optim/LMDerMeritFunction.java:116))

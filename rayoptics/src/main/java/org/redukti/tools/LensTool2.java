@@ -327,9 +327,22 @@ public class LensTool2 {
      * the spot it explains. The report covers every field.
      */
     private static void generatePupilMaps(OpticalModel opm, Args arguments, String filename_suffix) throws Exception {
-        var maps = PupilMapAnalysis.eval(opm, arguments.pupil_map_samples, null);
+        // A field at a time, so one field whose bundle cannot be bounded costs only its own
+        // map: the pupil maps are a diagnostic, and must not take the rest of the report down.
+        var maps = new PupilMapAnalysis.PupilMapResult();
+        var unmapped = new StringBuilder();
+        for (int fi = 0; fi < opm.optical_spec.fov.fields.length; fi++) {
+            try {
+                maps.maps.addAll(PupilMapAnalysis.eval(opm, arguments.pupil_map_samples, new int[]{fi}).maps);
+            }
+            catch (IllegalStateException e) {
+                System.err.println("No pupil map: " + e.getMessage());
+                unmapped.append("not mapped: ").append(e.getMessage()).append('\n');
+            }
+        }
         Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile,
-                suffixed_name("pupil-report", filename_suffix, ".txt"), arguments.outdir), maps.toString());
+                suffixed_name("pupil-report", filename_suffix, ".txt"), arguments.outdir),
+                maps.toString() + unmapped);
         for (var map : maps.maps) {
             String filename = null;
             if (map.fld.y == 0.0)

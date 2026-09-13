@@ -251,10 +251,13 @@ public class LensTool2 {
 
 
     private static SpotAnalysisResult generateSpotDiagrams(OpticalModel opm,Args arguments,boolean standardSize, String filename_suffix) throws Exception {
+        // The diagrams always use the same sampling; the user's choice of
+        // pattern only affects the reported numbers.
+        var diagramAnalysis = SpotAnalysis.eval(opm, spotDiagramOptions());
         var spotAnalysis = SpotAnalysis.eval(opm, spotOptions(arguments));
         Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile,suffixed_name("spot-report",filename_suffix,".txt"),arguments.outdir), spotAnalysis.toString());
-        for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
-            var spotFld = spotAnalysis.spot_results.get(i);
+        for (int i = 0; i < diagramAnalysis.spot_results.size(); i++) {
+            var spotFld = diagramAnalysis.spot_results.get(i);
             String filename = null;
             if (spotFld.fld.y == 0.0)
                 filename = suffixed_name("spot", filename_suffix, ".svg");
@@ -360,13 +363,29 @@ public class LensTool2 {
         }
     }
 
+    // Sampling defaults, should be defaulted via Args preferably
+    private static final int HEXAPOLAR_NUM_RINGS = 64;
+    private static final int GAUSS_QUADRATURE_NUM_RINGS = 14;
+    private static final int GAUSS_QUADRATURE_NUM_SPOKES = 20;
+
+    /** Spot diagrams are always drawn from hexapolar sampling of 21 rings, regardless of --use-spot-pattern. */
+    private static SpotOptions spotDiagramOptions() {
+        // We limit this to 21 to avoid creating huge svg files
+        return new SpotOptions().use_hexapolar().num_rings(21);
+    }
+
+    /** Sampling for the spot report and MTFs, as selected by --use-spot-pattern. */
     private static SpotOptions spotOptions(Args arguments) {
+        // TODO allow user to set the values for GQ and Hexapolar
+        // The defaults should really come from Args
         SpotOptions options = new SpotOptions();
         if (arguments.spot_pattern == SpotOptions.PATTERN_GAUSS_QUADRATURE)
-            return options.use_gaussian_quadrature();
+            return options.use_gaussian_quadrature()
+                    .num_rings(GAUSS_QUADRATURE_NUM_RINGS)
+                    .num_spokes(GAUSS_QUADRATURE_NUM_SPOKES);
         if (arguments.spot_pattern == SpotOptions.PATTERN_GRID)
             return options.use_grid().num_rays(arguments.spot_grid_size);
-        return options.use_hexapolar();
+        return options.use_hexapolar().num_rings(HEXAPOLAR_NUM_RINGS);
     }
 
     private static OpticalModel createLayoutSystem(

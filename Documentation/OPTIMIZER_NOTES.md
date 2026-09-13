@@ -562,10 +562,199 @@ The per-group RMS `deltaW` is particularly useful for identifying when the contr
 goal is acting as a faithful MTF refiner and when it has moved outside its reliable
 small-phase operating range.
 
-## Goals not yet covered here
+## Goal scaling and importance weights
 
-The geometric MTF, ray aberration and paraxial goals have no notes yet. What they measure,
-and how they are written in a trial, is in [OPTIMIZER.md](OPTIMIZER.md).
+### Issue and current behaviour
+
+This is a design review of the current `rayoptics` optimizer, not an implemented
+change. The proposals and syntax below are illustrative; existing prescriptions retain
+their current meaning.
+
+A useful merit function lets the designer specify both what constitutes a significant
+error and how important that error is relative to others. Currently a goal weight often
+has to express both. A small weight need not mean that an optical property is unimportant:
+it may merely compensate for the units in which its error is measured.
+
+`LMDerMeritFunction` takes the square root of `Goal._weight` and forms
+
+```text
+r_i = sqrt(w_i) (value_i - target_i)
+M   = sum_i r_i^2 = sum_i w_i (value_i - target_i)^2
+```
+
+Thus the supplied weight multiplies the squared error, not the residual amplitude.
+Changing a length residual from millimetres to microns increases its squared contribution
+by one million unless the weight compensates. Some goals already contain quadrature
+weights or normalization, so `value_i` is not always a raw physical measurement.
+
+Two prescriptions expose the problem:
+
+- [Nikkor version 5, trial 3](../Examples/jfotoptix/nikkor-58mm-f1.2/version5/Noct-Nikkor-58mmf1.2.txt)
+  uses `goal spot-deviation 0 0 0 2.5e-5` alongside contrast goals. Its comment explicitly
+  describes scaling spot deviation for 5/mm.
+- [Leica APO 75/2, trial 2](../Examples/jfotoptix/leica-r-apo-75mm-f2-mandler/specs-original.txt)
+  uses unit spot-deviation weights, with edge and thickness constraint weights of 128
+  and 64. These numbers combine layout preference with compensation for spot merit scale.
+  They do not by themselves establish how strongly those constraints ought to act.
+
+### Review of all current goal families
+
+The following inventory follows the goal classes, `OptimizationBuilder`, and the analysis
+values they consume. Length units are normally millimetres; the spot classes explicitly
+multiply system lengths by 1000 and thereby assume millimetres when reporting microns.
+
+| Goal | Current value/error convention | Scaling issue and possible reference scale |
+| --- | --- | --- |
+| `GoalSpotDeviation` | Signed X/Y deviation about the reference-wavelength centroid, converted to microns and multiplied by `sqrt(pupil weight)`; target zero. Builder adds wavelength and field/orientation weights. | Divide by a fixed reference spot radius in microns; retain the signed per-ray residuals. |
+| `GoalSpotRMS` | Aggregate RMS radius in microns minus the requested radius. | Reference radius error in microns. A nonzero target is an equality goal: a smaller radius can also incur error. |
+| `GoalSpotMaxRadius` | Maximum sampled radius in microns minus the requested radius. | Reference radius error in microns. Scaling does not remove the change of controlling ray or turn the target into an upper bound. |
+| `GoalRayAberration` | Signed transverse fan displacement in system length units; generated goals target zero. | Reference transverse error in those units. Unlike spot deviation, it has no micron conversion or Gaussian pupil weight. |
+| `GoalGeoMTF` | MTF fraction minus target fraction; builder converts percentage targets by dividing by 100. | A meaningful MTF error, e.g. 0.05 for five percentage points. Dimensionless values still need an error scale. |
+| `GoalMTFProxy` | `sin(pi * frequency * transverse_aberration)`, with reciprocal-length frequency. | Already dimensionless and frequency-scaled, but its characteristic error and sample aggregation still need a convention. Scaling cannot remove the proxy's periodicity. |
+| `GoalContrast` | Wavefront difference in waves, optionally centred, multiplied by `sqrt(pupil weight)`; target zero. | Fixed reference wavefront difference in waves. This is a contrast proxy, not an MTF-fraction error. |
+| `GoalContrastBalance` | Difference of weighted sagittal and tangential contrast energies, including wavelength and orientation weights; target zero. | Its value is quadratic in wavefront differences and its squared merit is quartic. It needs an energy scale and an explicit policy for embedded weights. |
+| `GoalParax` | Raw first-order value minus target. Depending on the selected quantity this is a length, inverse length, angle in degrees, or a dimensionless quantity. | A scale per physical quantity or per goal. EFL and f-number anchors currently default to weight 1 despite having different units and acceptable deviations. |
+| `ConstraintThickness` | Axial thickness relative to its starting value. | Already normalized: stored weight is caller weight divided by starting thickness squared. Expose this scale separately if adopting a common model. |
+| `ConstraintEdgeThickness` | Edge separation relative to its starting value. | Same hidden fractional normalization; small initial gaps imply strong resistance to a given absolute change. |
+| `ConstraintCurvature` | Curvature relative to starting curvature. | Same normalization in inverse-length units. Near-zero starting curvature raises the same question of relative versus absolute tolerance. |
+
+The three layout constraints are soft anchors, not feasibility bounds. Their base class
+requires a finite, nonzero starting value. A general normalization scheme must not apply
+their existing `1/base^2` factor a second time.
+
+### Separate error scale from importance
+
+The recommended general model is
+
+```text
+r_i = sqrt(a_i) e_i / s_i
+M   = sum_i a_i (e_i / s_i)^2
+```
+
+Here `e_i` is the error in its documented physical units, `s_i` is a fixed positive
+reference error in the same units, and `a_i` is a dimensionless importance weight.
+An error of one reference scale contributes `a_i` for a scalar goal. For sampled goals,
+retain the integration weights separately: `r_i = sqrt(a_i q_i) e_i / s_i`.
+The scale applies to the physical error, not to a single quadrature-weighted sample's
+apparent magnitude. This makes it independent of the number of pupil samples.
+
+A reference scale does not define a dead band, an acceptable upper bound, or a nonzero
+target. Spot deviation still aims at zero. Likewise, dividing an MTF equality residual
+by a tolerance does not make it a minimum-MTF constraint. Those are separate choices
+about the shape of the objective.
+
+For the Nikkor example, a reference radius of 200 microns and importance 1 gives exactly
+the existing spot contribution:
+
+```text
+1 / 200^2 = 2.5e-5
+
+# Proposed syntax only; not currently accepted by the parser:
+goal spot-deviation scale 200
+goal spot-deviation       0 0 0 1
+```
+
+The reciprocal of 5 cycles/mm is 0.2 mm, or 200 microns. This explains the existing
+numeric scaling, but does not establish equivalence to contrast optimization at 5/mm:
+contrast also depends on pupil shear, wavefront structure and its own residual convention.
+The value 200 is an exact translation of that trial, not a recommended universal blur size.
+
+For a layout anchor, `s = abs(start)` reproduces the current fractional merit. A designer
+could instead specify a fraction of the start, or an absolute tolerance. If both are
+supported, an explicit rule such as `s = max(absolute_floor, fraction * abs(start))`
+handles near-zero starts without inventing an arbitrary denominator. Choosing this rule
+would change the design preference and should be opt-in.
+
+### Aggregation is a separate source of scale
+
+Ordinary Gaussian pupil weights sum to one. Increasing the pupil sample count therefore
+refines a pupil average rather than simply multiplying spot merit by the ray count.
+Do not divide that merit by the sample count again. Contrast also carries its own pupil
+quadrature weights; preserve its overlap integration convention.
+
+Other axes are currently accumulated. The builder supplies wavelength weights directly
+(or 1 per wavelength in unweighted mode), and sums fields, orientations and frequencies.
+Adding wavelengths or fields can therefore strengthen optical goals against scalar
+paraxial anchors and layout penalties. Ray-fan goals have no analogous Gaussian sample
+normalization. Conversely, aggregate RMS and MTF values already perform averaging within
+their analysis. Equal numeric goal weights do not imply equal family contributions.
+
+There are two reasonable policies: retain a sum where each added requirement carries
+additional importance, or define a weighted average where extra samples refine the same
+requirement. A future design should specify this per axis and family, with separate
+family importance and within-family distribution weights if needed. Normalizing all
+field weights automatically would silently change existing prescriptions and could
+erase an intentional increase in total importance.
+
+`LMDerMeritFunction.rms()` reports `sqrt(sum(r_i^2) / number_of_goals)`. This is useful
+within a fixed residual layout, but is not a physically comparable score across layouts:
+adding quadrature residuals or zero-weight entries can change the denominator without
+the corresponding change in optical quality. The solver's sum of squares and diagnostic
+family averages should be distinguished.
+
+### Special case: contrast balance
+
+Let `E_s` and `E_t` denote the current weighted contrast energies. The balance contribution
+is `b * (E_s - E_t)^2`. If ordinary wavefront-difference residuals are divided by a common
+scale `s`, their energies are divided by `s^2`; a balance computed from those normalized
+energies is consequently divided by `s^4` in the final merit. Applying a generic
+amplitude scale to balance without accounting for this would give inconsistent results.
+
+Two options merit consideration: retain the existing weighted-energy difference with an
+explicit energy scale, or define balance from normalized contrast energies. For either,
+decide whether balance should continue to mean equal *weighted contributions* or equal
+physical sagittal/tangential errors. Currently changing an orientation weight changes
+both ordinary contrast importance and the balance goal itself. That coupling should be
+documented or deliberately redesigned, not accidentally removed by normalization.
+
+A relative difference such as `(E_s - E_t) / (E_s + E_t + epsilon)` is another option,
+but changes the objective and becomes sensitive to the denominator near a well-corrected
+design. It is not simply a unit conversion or a necessary part of this proposal.
+
+### Alternatives and tradeoffs
+
+| Approach | Benefit | Limitation |
+| --- | --- | --- |
+| Change spot residuals to millimetres | Small implementation change. | Moves the arbitrary unit scale; changes existing mixed merits and leaves every other family unresolved. |
+| Fixed documented family defaults | Easier initial prescriptions. | No universal spot, MTF or paraxial tolerance fits all designs; allow explicit overrides and preserve legacy mode. |
+| Explicit physical reference errors | Readable, stable tradeoffs; works for zero targets. | Requires the designer to choose meaningful scales. Recommended foundation. |
+| Divide by target magnitude | Convenient for nonzero anchors. | Fails at zero targets and confuses target size with acceptable error; poor general rule. |
+| Freeze scales measured from the initial design | Can start families at comparable magnitudes. | Starting-design dependent; initially small or zero errors require floors, and a bad initial error may receive too little importance. Best as a diagnostic suggestion. |
+| Recompute scales during optimization | Keeps numbers superficially comparable. | Changes the objective as the design moves and can cancel improvement; not recommended for a fixed least-squares merit. |
+| Scale Jacobian columns or variables | Can improve numerical conditioning. | Addresses parameter step sizes, not physical tradeoffs among residuals. Keep separate from goal normalization. |
+
+### Potential implementation and validation
+
+Prefer a common goal-level representation of target, physical scale and importance,
+while preserving physical `value()` reporting. A builder-only conversion to
+`effective_weight = importance / scale^2` is mathematically sufficient for simple goals,
+but repeats today's hidden normalization unless the original scale and importance are
+also retained and reported. Sample weights and contrast balance require explicit handling.
+
+An incremental implementation could start with spot deviation, then cover all families
+under the same contract. Omitted scales should preserve existing behaviour, including
+the fractional constraints. For a legacy simple goal, exact migration requires
+`new_importance = old_weight * new_scale^2`, with unchanged sampling and aggregation.
+Constraint migration should use the original caller importance and `abs(start)` scale;
+balance migration must additionally account for any changed embedded energy weights.
+
+Residual evaluation, Jacobian construction and reported merit must use the same scaling.
+Scales must be finite and strictly positive, importance finite and nonnegative. Invalid
+analysis values must retain failure semantics rather than becoming acceptable because
+of a large scale or zero importance. Existing finite layout-penalty behaviour also needs
+to be preserved deliberately.
+
+Useful diagnostics would report each family's physical error, reference scale,
+dimensionless error, importance, total squared contribution and fraction of total merit,
+along with field/wavelength/frequency aggregation and invalid-sample counts. This would
+show whether a large weight expresses a real preference or compensates for a convention.
+
+Before adopting new defaults, validate exact legacy-merit and Jacobian equivalence,
+consistent unit conversion, zero-target goals, fractional constraints, balance's quartic
+scaling, and the chosen sampling/aggregation policies. Compare the two cited trials using
+identical physical objectives first; assess changed defaults separately using spot/MTF
+and layout measurements. No optimization runs or new default values are established by
+this review.
 
 ## Contrast versus geometric MTF goals
 

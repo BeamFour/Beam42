@@ -447,7 +447,7 @@ public class VigCalc {
                 }
                 else {
                     var r_target = Lists.get(sm.ifcs,indx).edge_pt_target(start_dir);
-                    // If we missed the first surface, use bisection to bracket
+                    // If we missed a surface, use bisection to bracket
                     // the edge. Use the result to start the newton iteration to
                     // quickly find the edge.
                     if (ray_error instanceof TraceMissedSurfaceException) {

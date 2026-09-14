@@ -450,8 +450,7 @@ public class VigCalc {
                     // If we missed the first surface, use bisection to bracket
                     // the edge. Use the result to start the newton iteration to
                     // quickly find the edge.
-                    if (ray_error instanceof TraceMissedSurfaceException missedSurfaceException &&
-                        missedSurfaceException.surf == 1) {
+                    if (ray_error instanceof TraceMissedSurfaceException) {
                         var edge = Wideangle.find_edge(new Fn_r_pupil_coordinate(opm,indx,xy,fld,wvl,r_target.v(xy)),0.0,rel_p1.v(xy),null);
                         rel_p1 = rel_p1.set(xy,edge.z_enp);
                     }

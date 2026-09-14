@@ -69,7 +69,8 @@ to see through the impact of each ray trace.
 The non-aggregate goals, particularly contrast and spot deviations, can cause the optimizer to significantly alter
 a design. This is particularly true if the design is relatively simple or heavily aberrated. You must always enable
 constraints on curvatures and gaps, as well as on paraxial values, if you want the design to be a refinement of the
-original.
+original. Spot deviations at weight 1 also work on a far larger scale than the constraints; see
+[Choosing spot-deviation weights](#choosing-spot-deviation-weights).
 
 Every run anchors the effective focal length and the f-number to the prescription's
 values at weight 1, so a solve cannot quietly rescale the lens. A `goal paraxial efl` or
@@ -370,7 +371,7 @@ goal spot sampling    gaussian 6 12
 | `goal spot-rms <targets>` | Target RMS spot radius per field, in microns. | |
 | `goal spot-max-radius <targets>` | Target maximum spot radius per field, in microns. | |
 | `goal spot-rms\|spot-max-radius weights <weights>` | Weights for those targets. | 1 |
-| `goal spot-deviation <weights>` | Minimize RMS spot size through each ray's signed X and Y deviation, with one weight per field. | |
+| `goal spot-deviation <weights>` | Minimize RMS spot size through each ray's signed X and Y deviation, with one weight per field. The weights are normally far below 1; see [Choosing spot-deviation weights](#choosing-spot-deviation-weights). | |
 | `goal spot-deviation x\|y <weights>` | Separate X and Y weights; both rows are needed. | |
 | `goal spot sampling gaussian <rings> <spokes> [<inner radius>]` | Gaussian-quadrature spot pattern: rings >= 1, spokes >= 3, inner radius in [0, 1). | `gaussian 14 20` |
 | `goal spot sampling hexapolar <rings>` | Use hexapolar sampling; integer >= 1. Despite the Java parameter name `numRays`, this is a ring count, not a total ray count. | 64 rings when selected |
@@ -390,6 +391,71 @@ hexapolar takes precedence regardless of line order. Its count is a number of ri
 the generated point count is approximately `1 + 3*rings*(rings + 1)`, before tracing
 failures. The default of 64 rings is therefore about 12,500 rays per field and
 wavelength, against 280 for the default `gaussian 14 20`. GQ uses `rings * spokes` samples.
+
+#### Choosing spot-deviation weights
+
+Each spot deviation residual is a ray miss in microns, and the weight multiplies its
+square. Nothing else in a trial is measured on that scale. Constraints are fractional
+changes, paraxial goals are plain differences in millimetres or f-number, and contrast
+residuals are in waves. So at weight 1 the spot deviations outweigh everything else by
+orders of magnitude, and the solver buys a smaller spot by reshaping the lens.
+
+Large constraint weights do not stop this. On the Leica R Apo 75/2 (`specs-original.txt`,
+trial 2), spot weights of 1 with `constrain edges 128` and `constrain thicknesses 64` still
+let one thickness change by 29% and one curvature by 99%. The back focus ended 3.6mm short
+of its target. See
+[REVIEW.md](REVIEW.md#spot-deviations-outweigh-the-constraints-by-orders-of-magnitude).
+
+Instead of starting from 1, choose a spatial frequency ν in cycles/mm and set
+
+```text
+weight = (ν / 1000)²
+```
+
+| ν (cycles/mm) | 5 | 10 | 20 | 30 | 40 | 50 |
+|---|---|---|---|---|---|---|
+| weight | 2.5e-5 | 1e-4 | 4e-4 | 9e-4 | 1.6e-3 | 2.5e-3 |
+
+To first order, the wavefront difference a contrast sample measures at ν cycles/mm is ν
+times the ray's transverse miss in millimetres. At this weight, therefore, a field's spot
+deviations cost about as much as `goal contrast` at ν with `sag` and `tan` weights of 1 at
+that field. The `x` weights stand for `sag`, and the `y` weights for `tan`.
+
+The two goals are summed over fields and wavelengths in the same way, so this holds for
+any `fields` and either `weighted` setting. On the Noct-Nikkor 58/1.2 the two agreed
+within 0.8–1.4× at every field.
+
+In practice:
+
+- **Constraint weights carry over.** Weights that hold a design under a contrast goal at ν
+  also hold it under spot deviations weighted for ν. Weights tuned against spot weights of
+  1 do not transfer to anything else.
+- **Field importance multiplies in.** `goal spot-deviation 0 0 1e-4 2e-4` asks for spot at
+  10 cycles/mm at field 0.7, and at twice that importance at 1.0, like contrast weights of
+  1 and 2.
+- **Frequencies add.** To stand in for contrast at 10, 20 and 40 cycles/mm, use
+  1e-4 + 4e-4 + 1.6e-3 = 2.1e-3.
+- **Mixing with contrast, the frequency sets the balance.** In a trial with both, it says
+  how much the spot goal counts beside the contrast goals. For example,
+  `goal spot-deviation 0 0 0 2.5e-5` next to contrast at 10, 20 and 40 cycles/mm weighs
+  field 1.0 as a contrast goal at 5 cycles/mm would.
+
+Which ν to use is a design decision. A lower frequency gives the spot goal less say
+against the constraints and the paraxial goals. The frequencies you would give a contrast
+goal on the same lens give it as much say as contrast.
+
+Keep in mind:
+
+- **It is a starting point.** The relation is first order and has been measured on one
+  lens. It is closest on a well-corrected design, where the wavefront is smooth across the
+  shear. Adjust from there as with any other weight.
+- **The weight is not a blur size or a tolerance.** Every residual still aims at zero; the
+  weight only sets how much it counts.
+- **Lens data must be in millimetres.** The goal converts system units to microns by
+  multiplying by 1000.
+- **A zero weight still traces the field.** It only removes the field from the merit.
+- **Only `spot-deviation` has been worked out.** `spot-rms` and `spot-max-radius` are also
+  in microns, but this rule has not been derived for them.
 
 ### Ray aberrations
 

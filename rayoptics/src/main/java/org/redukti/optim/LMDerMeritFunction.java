@@ -4,8 +4,13 @@ import org.redukti.mathlib.M;
 import org.redukti.mathlib.MinPack;
 
 import java.util.Arrays;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class LMDerMeritFunction implements MinPack.Lmder_Function {
+
+    private static final Logger logger = Logger.getLogger(LMDerMeritFunction.class.getName());
 
     /**
      * Residual reported for a goal that cannot be evaluated (a killed ray,
@@ -20,6 +25,10 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
     private Var[] vars;
     private Goal[] functions;
     private boolean use_native;
+    /** Every analysis.compute(), including Jacobian probes that lmder does not count. */
+    private int evaluations;
+    private int iterations;
+    private final long started = System.nanoTime();
 
     public LMDerMeritFunction(Analysis analysis, Var[] vars, Goal[] functions, boolean use_native) {
         this.analysis = analysis;
@@ -56,7 +65,10 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
         // called every nprint iterations with iflag=0, so that the
         // function may perform special operations, such as printing
         // residuals.
-        if (iflag == 0) return 0;
+        if (iflag == 0) {
+            reportProgress(m, fvec);
+            return 0;
+        }
         if (iflag != 2) {
             computeResiduals(x, fvec);
         } else {
@@ -76,6 +88,7 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
      */
     private void computeResiduals(double[] x, double[] fvec) {
         boolean okay = true;
+        evaluations++;
         try {
             for (int i = 0; i < x.length; i++) {
                 vars[i].set_scaled_value(x[i]);
@@ -112,9 +125,24 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
         // called every nprint iterations with iflag=0, so that the
         // function may perform special operations, such as printing
         // residuals.
-        if (iflag == 0) return 0;
+        if (iflag == 0) {
+            reportProgress(m, fvec);
+            return 0;
+        }
         computeResiduals(x, fvec);
         return 0;
+    }
+
+    /** One line per lmder iteration, so a long solve can be told apart from a stuck one. */
+    private void reportProgress(int m, double[] fvec) {
+        iterations++;
+        if (!logger.isLoggable(Level.CONFIG))
+            return;
+        double sos = 0.0;
+        for (int i = 0; i < m; i++)
+            sos += fvec[i] * fvec[i];
+        logger.config(String.format(Locale.ROOT, "lmder: iter=%d evaluations=%d merit=%.9g elapsed=%.1f s",
+                iterations, evaluations, Math.sqrt(sos / m), (System.nanoTime() - started) / 1e9));
     }
 
     public boolean buildJacobian(double[] x, double[] fjac, int ldfjac) {
@@ -195,6 +223,7 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
 
     /** Evaluate raw goal values at {@code x + delta}; invalid goals are stored as NaN. */
     private boolean evaluate(double[] x, double[] delta, double[] values) {
+        evaluations++;
         try {
             for (int i = 0; i < delta.length; i++) {
                 vars[i].set_scaled_value(x[i] + delta[i]);

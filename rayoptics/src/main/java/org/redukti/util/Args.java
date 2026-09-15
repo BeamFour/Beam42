@@ -93,6 +93,10 @@ public final class Args {
      * {@link org.redukti.rayoptics.analysis.PupilMapAnalysis}.
      */
     public boolean output_pupil_maps = false;
+    /** Log the optimizer's progress to the console, one line per iteration. */
+    public boolean verbose = false;
+    /** Log everything, including the ray-optics info messages and debug traces. */
+    public boolean debug = false;
     /** Samples per axis in a pupil map; the cost is the square of this. */
     public int pupil_map_samples = PupilMapAnalysis.DEFAULT_NUM_SAMPLES;
     /**
@@ -172,6 +176,12 @@ public final class Args {
             }
             else if (arg1.equals("--output-pupil-maps")) {
                 arguments.output_pupil_maps = true;
+            }
+            else if (arg1.equals("--verbose")) {
+                arguments.verbose = true;
+            }
+            else if (arg1.equals("--debug")) {
+                arguments.debug = true;
             }
             else if (arg1.equals("--pupil-map-samples")) {
                 arguments.pupil_map_samples = parse_positive_int(arg1, arg2);

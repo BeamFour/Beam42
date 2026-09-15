@@ -18,6 +18,8 @@ import org.redukti.rayoptics.util.Pair;
 import org.redukti.rayoptics.util.ZDir;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Manager class for a sequential optical model
@@ -62,6 +64,8 @@ import java.util.*;
  * cur_surface (int): insertion index for next interface
  */
 public class SequentialModel {
+
+    private static final Logger logger = Logger.getLogger(SequentialModel.class.getName());
 
     public OpticalModel opt_model;
     public List<Interface> ifcs = new ArrayList<>();
@@ -468,6 +472,8 @@ public class SequentialModel {
 
         if (surfs.length == 1) {
             var idx = surfs[0];
+            if (logger.isLoggable(Level.FINE))
+                logger.fine("scale_factor=" + scale_factor + ", idx=" + idx);
             ifcs.get(idx).apply_scale_factor(scale_factor);
             if (idx < gaps.size())
                 gaps.get(idx).apply_scale_factor(scale_factor);
@@ -475,11 +481,18 @@ public class SequentialModel {
         else if (surfs.length == 2) {
             var idx1 = surfs[0];
             var idx2 = surfs[1];
+            if (logger.isLoggable(Level.FINE))
+                logger.fine("scale_factor=" + scale_factor + ", idx1=" + idx1 + ", idx2=" + idx2);
             for (int i = idx1; i < idx2+1; i++) {
                 try {
                     ifcs.get(i).apply_scale_factor(scale_factor);
-                    if (i < idx2)
+                    if (logger.isLoggable(Level.FINE))
+                        logger.fine(i + ": ifc");
+                    if (i < idx2) {
                         gaps.get(i).apply_scale_factor(scale_factor);
+                        if (logger.isLoggable(Level.FINE))
+                            logger.fine(i + ": gap");
+                    }
                 }
                 catch (IndexOutOfBoundsException e) {
                     break;

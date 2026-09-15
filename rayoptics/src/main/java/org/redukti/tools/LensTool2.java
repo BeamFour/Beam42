@@ -32,6 +32,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class LensTool2 {
 
@@ -566,8 +569,41 @@ public class LensTool2 {
         return baseName + suffix + ext;
     }
 
+    /** Held so the level set on it survives: the JDK keeps loggers only weakly. */
+    private static Logger configuredLogger;
+
+    /**
+     * Sends the loggers to the console, one bare message per line, so warnings read as they
+     * did when they were printed directly. Without --verbose or --debug only warnings show,
+     * as they do with Python's logging defaults upstream.
+     *
+     * <p>--verbose is scoped to the optimizer. The ray-optics info messages fire on every
+     * chief ray aim, so inside an optimization they outnumber the progress lines thousands to
+     * one; they come with --debug, or selectively through a java.util.logging.config.file,
+     * which still applies here - only the format is defaulted.
+     */
+    private static void configureLogging(Args arguments) {
+        if (System.getProperty("java.util.logging.SimpleFormatter.format") == null)
+            System.setProperty("java.util.logging.SimpleFormatter.format", "%5$s%6$s%n");
+        Level level;
+        if (arguments.debug) {
+            configuredLogger = Logger.getLogger("org.redukti");
+            level = Level.FINE;
+        }
+        else if (arguments.verbose) {
+            configuredLogger = Logger.getLogger("org.redukti.optim");
+            level = Level.CONFIG;
+        }
+        else
+            return;
+        configuredLogger.setLevel(level);
+        for (Handler handler : Logger.getLogger("").getHandlers())
+            handler.setLevel(level);
+    }
+
     public static void main(String[] args) throws Exception {
         Args arguments = Args.parseArguments(args);
+        configureLogging(arguments);
         if (arguments.patent != null && arguments.specfile != null) {
             System.err.println("Use either --specfile or --patent, not both");
             System.exit(1);
@@ -585,7 +621,7 @@ public class LensTool2 {
         }
         if (arguments.specfile == null && arguments.patent == null) {
             System.err.println("Usage: (--specfile inputfile [--outdir dir] | --patent number --example n --outdir dir) \\");
-            System.err.println("       [--only-d-line] [--dont-use-glass-types] \\");
+            System.err.println("       [--only-d-line] [--dont-use-glass-types] [--verbose|--debug] \\");
             System.err.println("       [--output-ray-aberration-plots] [--output-wavelength-mtfs] [--auto-size-spot-diagrams] \\");
             System.err.println("       [--use-spot-pattern " + Args.spot_pattern_names() + "] [--spot-grid-size count] [--vig-type " + Args.vig_type_names() + "] \\");
             System.err.println("       [--real-ray-aiming|--paraxial-ray-aiming] [--mtf freq,freq,...] \\");
@@ -607,6 +643,8 @@ public class LensTool2 {
             System.err.println("       --patent fetches the prescription from the PhotonsToPhotos Optical Bench, e.g. --patent JP1993-034592 --example 2 --outdir ef14mm");
             System.err.println("         --outdir is required with --patent: a fetched lens has no local file to take its location from");
             System.err.println("       Output files are created alongside the specfile unless --outdir is given");
+            System.err.println("       --verbose logs the optimizer's progress, one line per iteration;");
+            System.err.println("         --debug logs everything, including ray-optics' info and debug traces, which are voluminous during an optimization");
             System.exit(1);
         }
         if (!resolveSpecfile(arguments))

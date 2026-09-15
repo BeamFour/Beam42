@@ -17,6 +17,8 @@ import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.Pair;
 import org.redukti.rayoptics.util.Triple;
 
+import java.util.logging.Logger;
+
 /**
  * The OpticalSpecs class holds the optical usage definition of the model.
  * Aperture, field of view, wavelength, and focal position are all aspects of
@@ -28,6 +30,8 @@ import org.redukti.rayoptics.util.Triple;
  * first order properties.
  */
 public class OpticalSpecs {
+
+    private static final Logger logger = Logger.getLogger(OpticalSpecs.class.getName());
 
     public static boolean do_aiming_default = true;
 
@@ -91,7 +95,9 @@ public class OpticalSpecs {
                         }
                     }
                     catch (Exception e) {
-                        System.err.println("OpticalSpecs aim_chief_ray failure at field " + i);
+                        var msg = "OpticalSpecs aim_chief_ray failure at field " + i;
+                        logger.config(msg);
+                        System.err.println(msg);
                     }
                 }
             }

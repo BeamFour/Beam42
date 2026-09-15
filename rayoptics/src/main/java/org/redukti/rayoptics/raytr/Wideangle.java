@@ -14,9 +14,14 @@ import org.redukti.rayoptics.specs.ImageKey;
 import org.redukti.rayoptics.util.Lists;
 import org.redukti.rayoptics.util.Pair;
 
+import java.util.Locale;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Wideangle {
+
+    private static final Logger logger = Logger.getLogger(Wideangle.class.getName());
 
     /**
      * Trace a ray thru the center of the entrance pupil at z_enp.
@@ -52,8 +57,8 @@ public class Wideangle {
         catch (TraceException ray_error) {
             //print(f'  ray_error: "{type(ray_error).__name__}", '
             //              f'{ray_error.surf=}')
-            //logger.debug(f'   ray_error: "{type(ray_error).__name__}", '
-            //f'{ray_error.surf=}')
+            if (logger.isLoggable(Level.FINE))
+                logger.fine("   ray_error: \"" + ray_error.getClass().getSimpleName() + "\", ray_error.surf=" + ray_error.surf);
             ray_pkg = ray_error.ray_pkg;
             rr = new RayResult(ray_pkg,ray_error);
             // FIXME should below be null?
@@ -145,6 +150,9 @@ public class Wideangle {
         var coord = osp.obj_coords(fld);
         var pt0 = coord.pt;
         var dir0 = coord.dir;
+        if (logger.isLoggable(Level.CONFIG))
+            logger.config(String.format(Locale.ROOT, "%s, %s %s:   obj dir sine=%8.4f",
+                    fov.key.imageKey, fov.key.valueKey, fld.yv(), dir0.y));
 
         // If there is aim_info, try it and return if good.
         if (fld.z_enp != null) {
@@ -164,7 +172,8 @@ public class Wideangle {
             var coord_rr = enp_z_coordinate(z_enp_0,sm,stop_idx,dir0,fod.obj_dist,wvl);
             var final_coord = coord_rr.stop_coord;
             var rr = coord_rr.rr;
-            //logger.info(f"  axial chief {z_enp_0=:8.4f}  {rr.err is None}")
+            if (logger.isLoggable(Level.CONFIG))
+                logger.config(String.format(Locale.ROOT, "  axial chief z_enp_0=%8.4f  %s", z_enp_0, rr.err == null));
             return new RayResultWithZEnp(z_enp_0,rr);
         }
         ZEnpStopHt start_z = null;
@@ -187,8 +196,8 @@ public class Wideangle {
             var final_coord = coord_rr.stop_coord;
             if (rr.err == null) {
                 var ht_at_stop = final_coord.y;
-                //            logger.debug(f"  ray passed at z_enp={z_enp:10.5f},  "
-                //                         f"{ht_at_stop=:7.3f}")
+                if (logger.isLoggable(Level.FINE))
+                    logger.fine(String.format(Locale.ROOT, "  ray passed at z_enp=%10.5f,  ht_at_stop=%7.3f", z_enp, ht_at_stop));
                 successes++;
                 if (start_z == null)
                     start_z = new ZEnpStopHt(z_enp, ht_at_stop);
@@ -205,7 +214,7 @@ public class Wideangle {
                         if (Objects.equals(direction,"first")) {
                             // first time through, reverse direction and start on
                             // the other side of z_enp_0.
-                            //logger.debug("  --> reverse search direction")
+                            logger.fine("  --> reverse search direction");
                             del_z = -del_z;
                             z_enp = z_enp_0;
                             direction = "reverse";
@@ -217,13 +226,15 @@ public class Wideangle {
                 }
             }
             else {
-                // logger.debug(f"  ray failed at z_enp={z_enp:10.5f}, "
-                //                         f"{type(rr.err).__name__} at surf {rr.err.surf}")
+                if (logger.isLoggable(Level.FINE))
+                    logger.fine(String.format(Locale.ROOT, "  ray failed at z_enp=%10.5f, %s at surf %d",
+                            z_enp, rr.err.getClass().getSimpleName(), rr.err.surf));
                 if (rr.err instanceof TraceMissedSurfaceException) {
                     // if the first surface was missed, then exit
                     if (rr.err.surf == 1) {
-                        //logger.debug(f"Num 1st surf misses {first_surf_misses}: "
-                        //                                 +msg1)
+                        if (logger.isLoggable(Level.FINE))
+                            logger.fine(String.format(Locale.ROOT, "Num 1st surf misses %d: trial %d   z_enp=%8.4f",
+                                    first_surf_misses, trial, z_enp));
                         del_z = -del_z;
                         z_enp = z_enp_0;
                         first_surf_misses++;
@@ -232,7 +243,7 @@ public class Wideangle {
                 // if the first surface was missed, then exit
                 if (start_z != null) {
                     if (Objects.equals(direction,"first")) {
-                        // logger.debug("  --> reverse search direction")
+                        logger.fine("  --> reverse search direction");
                         del_z = -del_z;
                         z_enp = z_enp_0;
                         direction = "reverse";
@@ -260,6 +271,8 @@ public class Wideangle {
         var ht_at_stop_a = start_z.ht_at_stop;
         var z_enp_b = end_z.z_enp;
         var ht_at_stop_b = end_z.ht_at_stop;
+        if (logger.isLoggable(Level.FINE))
+            logger.fine(String.format(Locale.ROOT, "  start_z=%10.5f  end_z=%10.5f", z_enp_a, z_enp_b));
 
         Double a = null, b = null;
         // If start and end are equal, then only one ray was successful.
@@ -280,6 +293,8 @@ public class Wideangle {
                         start_z = new ZEnpStopHt(z_enp,ht_at_stop);
                     end_z = new ZEnpStopHt(z_enp,ht_at_stop);
                 }
+                if (logger.isLoggable(Level.FINE))
+                    logger.fine(String.format(Locale.ROOT, "  sample point z_enp=%8.4f  ray passed: %s", z_enp, rr.err == null));
             }
             if (start_z == null || end_z == null)
                 return new RayResultWithZEnp(null, rr);
@@ -316,8 +331,9 @@ public class Wideangle {
                     6);
             var z_enp_edge_b = edge_b.z_enp;
             var ht_at_stop_edg_b = edge_b.ht_at_stop;
-            //logger.debug(f"  edge_b found at at z_enp={z_enp_edge_b:10.5f},  "
-            //                     f"{ht_at_stop_edg_b=:7.3f}")
+            if (logger.isLoggable(Level.FINE))
+                logger.fine(String.format(Locale.ROOT, "  edge_b found at at z_enp=%10.5f,  ht_at_stop_edg_b=%7.3f",
+                        z_enp_edge_b, ht_at_stop_edg_b));
             if (ht_at_stop_edg_b * ht_at_stop_b < 0) {
                 start_z = new ZEnpStopHt(z_enp_b, ht_at_stop_b);
                 end_z = new ZEnpStopHt(z_enp_edge_b, ht_at_stop_edg_b);
@@ -333,8 +349,9 @@ public class Wideangle {
                         6);
                 var z_enp_edge_a = edge_a.z_enp;
                 var ht_at_stop_edg_a = edge_a.ht_at_stop;
-                // logger.debug(f"  edge_a found at at z_enp={z_enp_edge_a:10.5f},  "
-                //                         f"{ht_at_stop_edg_a=:7.3f}")
+                if (logger.isLoggable(Level.FINE))
+                    logger.fine(String.format(Locale.ROOT, "  edge_a found at at z_enp=%10.5f,  ht_at_stop_edg_a=%7.3f",
+                            z_enp_edge_a, ht_at_stop_edg_a));
                 if (ht_at_stop_edg_a * ht_at_stop_a < 0) {
                     // found an interval containing a crossover point
                     start_z = new ZEnpStopHt(z_enp_a, ht_at_stop_a);
@@ -345,15 +362,15 @@ public class Wideangle {
                 else {
                     //  there is no ray that passes thru the center of the stop
                     //                # surface.
-                    System.err.println(String.format("chief ray trace failed at field %3.1f",fld.yv()));
+                    logger.warning(String.format(Locale.ROOT, "chief ray trace failed at field %3.1f", fld.yv()));
                     var z_enp_cntr = z_enp_edge_a + (z_enp_edge_b - z_enp_edge_a)/2;
                     var coord_rr = enp_z_coordinate(z_enp_cntr,sm,stop_idx,dir0,fod.obj_dist,wvl);
                     var final_coord = coord_rr.stop_coord;
                     rr = coord_rr.rr;
                     var ht_at_stop = final_coord.y;
-                    // logger.debug(f"  fld: {fld.yv:3.1f}:   {z_enp_edge_a=:8.4f}  "
-                    //                    f"{z_enp_edge_b=:8.4f}  {z_enp_cntr=:8.4f}  "
-                    //                    f"{ht_at_stop=:10.2e}")
+                    if (logger.isLoggable(Level.FINE))
+                        logger.fine(String.format(Locale.ROOT, "  fld: %3.1f:   z_enp_edge_a=%8.4f  z_enp_edge_b=%8.4f  z_enp_cntr=%8.4f  ht_at_stop=%10.2e",
+                                fld.yv(), z_enp_edge_a, z_enp_edge_b, z_enp_cntr, ht_at_stop));
                     return new RayResultWithZEnp(z_enp_b, rr);
                 }
             }
@@ -368,11 +385,11 @@ public class Wideangle {
                                           (end_z.ht_at_stop - start_z.ht_at_stop)) * start_z.ht_at_stop;
         }
 
-        //    logger.debug(f"  trials: {trial},   {successes=}")
-        //    logger.debug(f"  z_enp: start_z={a:10.5f} z_estimate={z_estimate:10.5f}  "
-        //                 f"end_z={b:10.5f}")
-        //    logger.debug(f"  ht_at_stop: start_z={start_z[1]:10.5f} "
-        //                 f"end_z={end_z[1]:10.5f}")
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine(String.format(Locale.ROOT, "  trials: %d,   successes=%d", trial, successes));
+            logger.fine(String.format(Locale.ROOT, "  z_enp: start_z=%10.5f z_estimate=%10.5f  end_z=%10.5f", a, z_estimate, b));
+            logger.fine(String.format(Locale.ROOT, "  ht_at_stop: start_z=%10.5f end_z=%10.5f", start_z.ht_at_stop, end_z.ht_at_stop));
+        }
 
         Pair<Vector3,RayResult> result;
         try {
@@ -387,7 +404,8 @@ public class Wideangle {
         z_enp = start_coord.z;
         var final_coord = Lists.get(rr.pkg.ray,stop_idx).p;
         var ht_at_stop = final_coord.y;
-        //logger.info(f"fld: {fld.yv:3.1f}:   {z_enp=:8.4f}  {ht_at_stop=:10.2e}")
+        if (logger.isLoggable(Level.CONFIG))
+            logger.config(String.format(Locale.ROOT, "fld: %3.1f:   z_enp=%8.4f  ht_at_stop=%10.2e", fld.yv(), z_enp, ht_at_stop));
         return new RayResultWithZEnp(z_enp,rr);
     }
 
@@ -478,11 +496,15 @@ public class Wideangle {
         double y_target = 0.;
         Vector3 start_coords = null;
         boolean converged = false;
+        // what the solver log messages report: upstream's scipy results carry these
+        String method = "secant";
+        int iterations = 0;
         if (stop_idx != null) {
             // do 1D iteration if field and target points are zero in x
             var fn = new Eval_Z_Enp_Function(sm,stop_idx,dir0,obj_dist,wvl,y_target);
             try {
                 var result = SecantSolver.find_root(fn,z_enp,50,1.48e-8);
+                iterations = result.iterations;
                 z_enp = result.root;
                 converged = result.converged;
                 rr = fn.rr;
@@ -492,6 +514,8 @@ public class Wideangle {
                 start_coords = new Vector3(0.,0.,z_enp);
             }
             catch (TraceException ray_err) {
+                if (logger.isLoggable(Level.FINE))
+                    logger.fine("trace error: " + ray_err.surf);
                 // the objective records the ray result on every evaluation;
                 // hold on to the last one so the caller still has ray data.
                 rr = fn.rr;
@@ -499,12 +523,13 @@ public class Wideangle {
                 start_coords = new Vector3(0.,0.,z_enp);
             }
             if (!converged) {
-                //                logger.debug(f'  {results.method} converged: '
-                //                             f'{results.converged},  # fct evals='
-                //                             f'{results.function_calls}  msg: "{results.flag}" '
-                //                             f'{z_enp=:9.4f}')
+                if (logger.isLoggable(Level.FINE))
+                    logger.fine(String.format(Locale.ROOT, "  %s converged: %s,  iterations=%d  z_enp=%9.4f",
+                            method, converged, iterations, z_enp));
                 try {
+                    method = "brentq";
                     var result = BrentSolver.find_root(start_z, end_z, fn);
+                    iterations = result.iterations;
                     if (result.converged) {
                         z_enp = result.root;
                         converged = true;
@@ -524,8 +549,8 @@ public class Wideangle {
         }
         else
             start_coords = new Vector3(0., 0., fod.enp_dist);
-        //    logger.debug(f'  {results.method} converged: {results.converged},  '
-        //                 f'# fct evals={results.function_calls}  msg: "{results.flag}"')
+        if (logger.isLoggable(Level.FINE))
+            logger.fine(String.format(Locale.ROOT, "  %s converged: %s,  iterations=%d", method, converged, iterations));
         return new Pair<>(start_coords,rr);
     }
 
@@ -575,6 +600,9 @@ public class Wideangle {
         var coord = osp.obj_coords(fld);
         var pt0 = coord.pt;
         var dir0 = coord.dir;
+        if (logger.isLoggable(Level.CONFIG))
+            logger.config(String.format(Locale.ROOT, "%s, %s %s:   obj dir sine=%8.4f",
+                    osp.fov.key.imageKey, osp.fov.key.valueKey, fld.yv(), dir0.y));
 
         if (fld.z_enp != null) {
             var z_enp = fld.z_enp;
@@ -587,6 +615,8 @@ public class Wideangle {
         var z_enp_0 = fod.enp_dist;
         if (dir0.z == 1.0) { // axial chief ray
             var coord_rr = enp_z_coordinate(z_enp_0,sm,stop_idx,dir0,fod.obj_dist,wvl);
+            if (logger.isLoggable(Level.FINE))
+                logger.fine(String.format(Locale.ROOT, "  axial chief z_enp_0=%8.4f  %s", z_enp_0, coord_rr.rr.err == null));
             return new RayResultWithZEnp(z_enp_0,coord_rr.rr);
         }
 
@@ -604,14 +634,23 @@ public class Wideangle {
             var coord_rr = enp_z_coordinate(z_enp,sm,stop_idx,dir0,fod.obj_dist,wvl);
             rr = coord_rr.rr;
             if (rr.err == null) {
+                if (logger.isLoggable(Level.FINE))
+                    logger.fine(String.format(Locale.ROOT, "  ray passed at z_enp=%10.5f,  final_coord[1]=%7.3f",
+                            z_enp, coord_rr.stop_coord.y));
                 successes++;
                 if (start_z == null)
                     start_z = z_enp;
                 end_z = z_enp;
             }
             else {
+                if (logger.isLoggable(Level.FINE))
+                    logger.fine(String.format(Locale.ROOT, "  ray failed at z_enp=%10.5f, %s at surf %d",
+                            z_enp, rr.err.getClass().getSimpleName(), rr.err.surf));
                 if (rr.err instanceof TraceMissedSurfaceException) {
                     if (rr.err.surf == 1) {
+                        if (logger.isLoggable(Level.FINE))
+                            logger.fine(String.format(Locale.ROOT, "Num 1st surf misses %d: trial %d   z_enp=%8.4f",
+                                    first_surf_misses, trial, z_enp));
                         del_z = -del_z;
                         z_enp = z_enp_0;
                         first_surf_misses++;
@@ -623,6 +662,11 @@ public class Wideangle {
             }
             z_enp += del_z;
             trial += 1;
+        }
+
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine(String.format(Locale.ROOT, "  trials: %d,   successes=%d", trial, successes));
+            logger.fine(String.format(Locale.ROOT, "  start_z=%10.5f  end_z=%10.5f", start_z, end_z));
         }
 
         // If start and end are equal, then only one ray was successful.
@@ -641,20 +685,31 @@ public class Wideangle {
                         start_z = z_enp;
                     end_z = z_enp;
                 }
+                if (logger.isLoggable(Level.FINE))
+                    logger.fine(String.format(Locale.ROOT, "  sample point z_enp=%8.4f  ray passed: %s", z_enp, rr.err == null));
             }
         }
         // Now that candidate z_enps have been identified that trace without
         // ray failures, iterate to find the ray thru the stop center
         double[] starting_pts = {start_z, (start_z + end_z)/2.0, end_z};
+        if (logger.isLoggable(Level.FINE))
+            logger.fine(String.format(Locale.ROOT, "  start_z=%10.5f  end_z=%10.5f", start_z, end_z));
         for (var init_z: starting_pts) {
             var result = find_z_enp(opm,stop_idx,init_z,fld,wvl);
             rr = result.rr;
             z_enp = result.z_enp;
-            if (rr.err == null)
+            if (rr.err == null) {
+                if (logger.isLoggable(Level.FINE))
+                    logger.fine(String.format(Locale.ROOT, "  iter start %8.4f,  z_enp %8.4f", init_z, z_enp));
                 break;
+            }
         }
+        // upstream also logs the solver's convergence here; find_z_enp does not
+        // return the solver result, so there is nothing to report it from
         var final_coord = Lists.get(rr.pkg.ray,stop_idx).p;
         var y_ht = final_coord.y;
+        if (logger.isLoggable(Level.CONFIG))
+            logger.config(String.format(Locale.ROOT, "fld: %3.1f:   z_enp=%8.4f  ht_at_stop=%10.2e", fld.yv(), z_enp, y_ht));
         return new RayResultWithZEnp(z_enp,rr);
     }
 
@@ -698,6 +753,8 @@ public class Wideangle {
                 z_enp = result.root;
             }
             catch (TraceException ray_err) {
+                if (logger.isLoggable(Level.FINE))
+                    logger.fine("   trace error: " + ray_err.surf);
                 z_enp = z_enp_0;
                 // Preserve the caller's estimate rather than replacing it with zero.
             }

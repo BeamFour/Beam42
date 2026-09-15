@@ -15,8 +15,12 @@ import org.redukti.rayoptics.specs.FieldSpec;
 import org.redukti.rayoptics.util.Lists;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Trace {
+
+    private static final Logger logger = Logger.getLogger(Trace.class.getName());
 
     /**
      * Trace a single ray via pupil, field and wavelength specs.
@@ -264,6 +268,8 @@ public class Trace {
                 rr.pkg = pkg;
                 rr.err = null;
             } catch (TraceException ray_error) {
+                if (logger.isLoggable(Level.FINE))
+                    logger.fine("ray_error: \"" + ray_error.getClass().getSimpleName() + "\", ray_error.surf=" + ray_error.surf);
                 pkg = ray_error.ray_pkg;
                 rr.pkg = ray_error.ray_pkg;
                 rr.err = ray_error;
@@ -1152,6 +1158,8 @@ public class Trace {
                 rr.pkg = pkg;
                 rr.err = null;
             } catch (TraceException ray_error) {
+                if (logger.isLoggable(Level.FINE))
+                    logger.fine("ray_error: \"" + ray_error.getClass().getSimpleName() + "\", ray_error.surf=" + ray_error.surf);
                 pkg = ray_error.ray_pkg;
                 rr.pkg = ray_error.ray_pkg;
                 rr.err = ray_error;

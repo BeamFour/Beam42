@@ -263,6 +263,8 @@ and the defaults are what the committed examples use.
 | `--output-pupil-maps` | off | Additionally measure and draw which part of each field's pupil the lens passes, and which surface blocks the rest. See below. |
 | `--pupil-map-samples <n>` | 121 | Samples per axis in a pupil map. Only consulted with `--output-pupil-maps`. Minimum 2. |
 | `--output-ray-aberration-plots` | off | Additionally emit transverse ray aberration **and** wavefront (OPD) fan plots, tangential and sagittal, for each field. |
+| `--verbose` | off | Log the optimizer's progress to stderr, one line per iteration: merit, evaluations so far, elapsed time. Warnings are always shown. |
+| `--debug` | off | Log everything, including the ray-optics info messages (each field's vignetting and real entrance pupil) and debug traces (the vignetting, pupil and wide angle searches). These fire on every chief ray aim, so during an optimization they run to thousands of lines per iteration. For a subset, pass a standard `-Djava.util.logging.config.file` instead. |
 | `--assign-glass-types` | off | Match each surface's refractive index and Abbe number to a catalog glass before analysing, so the model uses the full dispersion curve instead of a two number approximation. Applies to this run only. |
 | `--index-line <d\|e>` | `d` | Line the refractive index column is quoted at, for `--assign-glass-types`. See below. |
 | `--abbe-line <d\|e>` | `d` | Line the Abbe number column is quoted at. Independent of `--index-line`. |

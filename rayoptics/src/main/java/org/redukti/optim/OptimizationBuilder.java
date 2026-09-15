@@ -805,7 +805,8 @@ public final class OptimizationBuilder {
                 && goals.stream().anyMatch(GoalSpotMaxRadius.class::isInstance);
         var effective = configuration.effectiveAnalysis(customMaximumRadius);
         configuration.configureAnalysis(analysis, effective, !additionalGoalFactories.isEmpty());
-        return new OptimizationSetup(analysis, variables.toArray(new Var[0]), goals.toArray(new Goal[0]));
+        return new OptimizationSetup(analysis, variables.toArray(new Var[0]), goals.toArray(new Goal[0]),
+                configuration.solverTolerances);
     }
 
     /**
@@ -1285,11 +1286,14 @@ public final class OptimizationBuilder {
         private final Analysis analysis;
         private final Var[] variables;
         private final Goal[] goals;
+        private final SolverTolerances tolerances;
 
-        private OptimizationSetup(Analysis analysis, Var[] variables, Goal[] goals) {
+        private OptimizationSetup(Analysis analysis, Var[] variables, Goal[] goals,
+                                  SolverTolerances tolerances) {
             this.analysis = analysis;
             this.variables = variables;
             this.goals = goals;
+            this.tolerances = tolerances;
         }
 
         public Analysis analysis() { return analysis; }
@@ -1297,7 +1301,7 @@ public final class OptimizationBuilder {
         public Goal[] goals() { return Arrays.copyOf(goals, goals.length); }
 
         public LMDerMeritFunction meritFunction(boolean useNative) {
-            return new LMDerMeritFunction(analysis, variables, goals, useNative);
+            return new LMDerMeritFunction(analysis, variables, goals, useNative, tolerances);
         }
     }
 }

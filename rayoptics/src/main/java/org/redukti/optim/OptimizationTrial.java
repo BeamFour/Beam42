@@ -368,6 +368,10 @@ public final class OptimizationTrial {
         private final List<String> radii;
         private final Set<String> seen = new HashSet<>();
 
+        private Double solverFtol;
+        private Double solverXtol;
+        private Double solverGtol;
+        private Integer solverMaxEvaluations;
         private String description;
         private String outdir;
         private int configuration = 0;
@@ -518,10 +522,40 @@ public final class OptimizationTrial {
                         freezeVignetting = true;
                     }
                 }
+                case "solver" -> solver(line, w);
                 case "vary" -> vary(line, w);
                 case "constrain" -> constrain(line, w);
                 case "goal" -> goal(line, w);
                 default -> throw error(line, "unknown keyword '" + w[0] + "'");
+            }
+        }
+
+        /**
+         * The lmder stopping tolerances. Left alone, the solver keeps its own
+         * defaults; see the note in LMDerSolver on why xtol is off by default.
+         */
+        private void solver(int line, String[] w) {
+            if (w.length != 3)
+                throw error(line, "expected 'solver ftol|xtol|gtol|max-evaluations <value>'");
+            switch (lower(w[1])) {
+                case "ftol" -> {
+                    once(line, "solver ftol");
+                    solverFtol = nonNegative(line, w[2], "ftol");
+                }
+                case "xtol" -> {
+                    once(line, "solver xtol");
+                    solverXtol = nonNegative(line, w[2], "xtol");
+                }
+                case "gtol" -> {
+                    once(line, "solver gtol");
+                    solverGtol = nonNegative(line, w[2], "gtol");
+                }
+                case "max-evaluations" -> {
+                    once(line, "solver max-evaluations");
+                    solverMaxEvaluations = positiveInt(line, w[2], "max-evaluations");
+                }
+                default -> throw error(line, "unknown solver setting '" + w[1]
+                        + "'; expected ftol, xtol, gtol or max-evaluations");
             }
         }
 
@@ -1019,6 +1053,12 @@ public final class OptimizationTrial {
             c.dLineOnly = dLineOnly;
             if (vignetting != null) c.vigType = vignetting;
             c.freezeVignetting = freezeVignetting;
+            c.solverTolerances = new SolverTolerances(
+                    solverFtol != null ? solverFtol : SolverTolerances.DEFAULT_FTOL,
+                    solverXtol != null ? solverXtol : SolverTolerances.DEFAULT_XTOL,
+                    solverGtol != null ? solverGtol : SolverTolerances.DEFAULT_GTOL,
+                    solverMaxEvaluations != null ? solverMaxEvaluations
+                            : SolverTolerances.FROM_VARIABLE_COUNT);
             if (checkSpotApertures != null) c.checkSpotApertures = checkSpotApertures;
             if (curvatures != null) {
                 c.allCurvatureSurfaces = curvatures.kind() != SelectionKind.LIST;

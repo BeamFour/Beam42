@@ -25,12 +25,20 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
     private Var[] vars;
     private Goal[] functions;
     private boolean use_native;
+    /** Solver tolerances handed to the solver this builds; see SolverTolerances. */
+    private final SolverTolerances tolerances;
     /** Every analysis.compute(), including Jacobian probes that lmder does not count. */
     private int evaluations;
     private int iterations;
     private final long started = System.nanoTime();
 
     public LMDerMeritFunction(Analysis analysis, Var[] vars, Goal[] functions, boolean use_native) {
+        this(analysis, vars, functions, use_native, SolverTolerances.DEFAULTS);
+    }
+
+    public LMDerMeritFunction(Analysis analysis, Var[] vars, Goal[] functions, boolean use_native,
+                              SolverTolerances tolerances) {
+        this.tolerances = tolerances;
         this.analysis = analysis;
         this.vars = vars;
         this.functions = functions;
@@ -286,7 +294,7 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
 
     public Solver getSolver() {
         validateInputs();
-        return new LMDerSolver(analysis, vars, functions, use_native);
+        return new LMDerSolver(analysis, vars, functions, use_native, tolerances);
     }
 
     @Override

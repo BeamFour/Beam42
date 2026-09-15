@@ -206,12 +206,39 @@ flat surface from the list or omit the curvature constraint for that trial.
 | `d-line-only` | Use only the d line for all goals in the trial, overriding the wavelength set selected by `weighted`. | `no` |
 | `vignetting` | A `--vig-type` name (`none`, `paraxial`, `set-vig`, `set-pupil`, ...), optionally followed by `frozen` to measure it once and hold it for the run. | `set-pupil` |
 | `check-spot-apertures` | Whether Gaussian-quadrature spot rays are stopped by surface apertures. | `yes` |
+| `solver ftol\|xtol\|gtol <value>` | One of the solver's stopping tolerances, for this trial only. See below. | the solver's own |
+| `solver max-evaluations <n>` | Trial steps the solver may take before it gives up. See below. | `100 * (variables + 1)` |
 
 These settings build the prescription used for the run, as the example programs do.
 With `weighted yes`, the weights for d, C, e, F and g are respectively 1.0, 0.475,
 0.98, 0.49 and 0.15. With `weighted no`, d, F and C each have weight 1.0.
 With `d-line-only yes`, the d line alone has weight 1.0. These are built-in choices;
 the trial does not read wavelength weights from the prescription file.
+
+### Solver tolerances
+
+`solver` overrides one of the stopping tests in lmder, the least-squares solver, for
+this trial. Anything not named keeps its default, so a trial that says nothing about
+the solver runs as every trial did before these settings existed.
+
+```
+solver ftol             1.0E-8
+solver xtol             1.0E-5
+solver gtol             0
+solver max-evaluations  500
+```
+
+| Setting | Stops the solve when | Default |
+|---|---|---|
+| `ftol` | the sum of squares improves by less than this, relatively | the square root of the machine epsilon, about `1.49E-8` |
+| `xtol` | the variables stop moving: one iteration changes the varied curvatures, thicknesses and aspheric terms by less than this, relative to their own size. It measures the step in the design, not in the merit | `0`, which never stops it: ray-trace noise makes late steps tiny |
+| `gtol` | the gradient is this flat | the square root of the machine epsilon |
+| `max-evaluations` | the solver has taken this many trial steps | `100 * (variables + 1)` |
+
+`max-evaluations` is the `maxfev` of lmder, and it counts trial steps only. The
+Jacobian probes around them, two per variable per iteration, are not counted, so a
+solve costs far more evaluations of the merit than this number suggests. Run with
+`--verbose` to see the tolerances in use and one line per iteration.
 
 ## Variables
 

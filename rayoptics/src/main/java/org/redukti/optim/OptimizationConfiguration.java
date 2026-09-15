@@ -51,6 +51,8 @@ final class OptimizationConfiguration {
     int scenario = 0;
     VigType vigType = VigType.SetPupil;
     boolean freezeVignetting = false;
+    /** Solver tolerances a trial set; null fields keep the LMDerSolver defaults. */
+    SolverTolerances solverTolerances = SolverTolerances.DEFAULTS;
     Double thicknessConstraintWeight;
     Double edgeThicknessConstraintWeight;
     Double curvatureConstraintWeight;
@@ -110,6 +112,7 @@ final class OptimizationConfiguration {
         result.scenario = scenario;
         result.vigType = vigType;
         result.freezeVignetting = freezeVignetting;
+        result.solverTolerances = solverTolerances;
         result.thicknessConstraintWeight = thicknessConstraintWeight;
         result.edgeThicknessConstraintWeight = edgeThicknessConstraintWeight;
         result.curvatureConstraintWeight = curvatureConstraintWeight;
@@ -148,6 +151,16 @@ final class OptimizationConfiguration {
         line(sb, "vignetting", OptimizationTrial.kebab(vigType.name()) + (freezeVignetting ? " frozen" : ""));
         if (!checkSpotApertures || (effective.spots() && !configuredHexapolar))
             line(sb, "check-spot-apertures", yesNo(checkSpotApertures));
+        // Only what this trial changed: the values came from the same constants, so
+        // an untouched trial compares equal and writes nothing.
+        if (solverTolerances.ftol() != SolverTolerances.DEFAULT_FTOL)
+            line(sb, "solver ftol", OptimizationTrial.format(solverTolerances.ftol()));
+        if (solverTolerances.xtol() != SolverTolerances.DEFAULT_XTOL)
+            line(sb, "solver xtol", OptimizationTrial.format(solverTolerances.xtol()));
+        if (solverTolerances.gtol() != SolverTolerances.DEFAULT_GTOL)
+            line(sb, "solver gtol", OptimizationTrial.format(solverTolerances.gtol()));
+        if (solverTolerances.maxEvaluations() != SolverTolerances.FROM_VARIABLE_COUNT)
+            line(sb, "solver max-evaluations", Integer.toString(solverTolerances.maxEvaluations()));
 
         if (allCurvatureSurfaces)
             line(sb, "vary curvatures", allExcept(curvatureExclusions));

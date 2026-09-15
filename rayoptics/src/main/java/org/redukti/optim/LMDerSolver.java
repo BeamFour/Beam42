@@ -3,20 +3,34 @@ package org.redukti.optim;
 import org.redukti.mathlib.MinPack;
 
 import java.util.Arrays;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class LMDerSolver implements Solver {
+
+    private static final Logger logger = Logger.getLogger(LMDerSolver.class.getName());
+
     private Analysis analysis;
     /** number of vars in lmder parlance */
     private Var[] vars;
     /** number of functions in lmder parlance */
     private Goal[] functions;
     private boolean use_native = false;
+    /** What a trial asked for; a null field keeps the default chosen below. */
+    private final SolverTolerances tolerances;
 
     public LMDerSolver(Analysis analysis, Var[] vars, Goal[] functions, boolean use_native) {
+        this(analysis, vars, functions, use_native, SolverTolerances.DEFAULTS);
+    }
+
+    public LMDerSolver(Analysis analysis, Var[] vars, Goal[] functions, boolean use_native,
+                       SolverTolerances tolerances) {
         this.analysis = analysis;
         this.vars = vars;
         this.functions = functions;
         this.use_native = use_native;
+        this.tolerances = tolerances;
     }
 
     @Override
@@ -50,10 +64,16 @@ public class LMDerSolver implements Solver {
             double[] fvec = new double[m];      // Results of goals
             double[] fjac = new double[m * n];    // Space for jacobian
             int ldfjac = m;
-            double ftol = Math.sqrt(MinPack.dpmpar(1));
-            double xtol = 0.;      // don't stop on step size; ray-trace noise makes late steps tiny
-            double gtol = 1.0e-12; // stop when the gradient is genuinely flat
-            int maxfev = (n + 1) * 100;
+            // The defaults live in SolverTolerances; a trial's 'solver' settings
+            // replace them there, so this only reads what it was given.
+            double ftol = tolerances.ftol();
+            double xtol = tolerances.xtol();
+            double gtol = tolerances.gtol();
+            int maxfev = tolerances.maxEvaluations(n);
+            if (logger.isLoggable(Level.CONFIG))
+                logger.config(String.format(Locale.ROOT,
+                        "lmder: n=%d m=%d ftol=%g xtol=%g gtol=%g maxfev=%d",
+                        n, m, ftol, xtol, gtol, maxfev));
             int mode = 1; // 1=scale internally 2=scale using diag
             double factor = 100;
             int nprint = 1;

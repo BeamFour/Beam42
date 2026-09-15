@@ -121,6 +121,33 @@ class OptimizationTrialTest {
     }
 
     @Test
+    void solverTolerancesRoundTripAndAreAbsentUntilAskedFor() throws Exception {
+        String settings = """
+                solver ftol            1.0E-6
+                solver xtol            1.0E-5
+                solver gtol            0
+                solver max-evaluations 250
+                """;
+        var builder = read(withTrials(SUMMICRON, "[trial 1]\n" + MTF_FIVE_FIELDS + settings));
+        String written = builder.toTrial(1);
+        String normalized = written.replaceAll("\\s+", " ");
+        assertTrue(normalized.contains("solver ftol 1.0E-6"), written);
+        assertTrue(normalized.contains("solver xtol 1.0E-5"), written);
+        assertTrue(normalized.contains("solver gtol 0"), written);
+        assertTrue(normalized.contains("solver max-evaluations 250"), written);
+        assertEquals(written, read(withTrials(SUMMICRON, written)).toTrial(1));
+
+        // A trial that says nothing about the solver writes nothing back, so the
+        // solver keeps the defaults it has always used.
+        String silent = read(withTrials(SUMMICRON, "[trial 1]\n" + MTF_FIVE_FIELDS)).toTrial(1);
+        assertFalse(silent.contains("solver "), silent);
+
+        var error = assertThrows(OptimizationTrial.TrialException.class, () -> read(withTrials(
+                SUMMICRON, "[trial 1]\n" + MTF_FIVE_FIELDS + "solver wibble 1\n")));
+        assertTrue(error.getMessage().contains("unknown solver setting 'wibble'"), error.getMessage());
+    }
+
+    @Test
     void numbersSurfacesByPosition() throws Exception {
         String text = withTrials(SUMMICRON, "[trial 1]\n" + MTF_FIVE_FIELDS + """
                 vary curvatures   all except 2 6

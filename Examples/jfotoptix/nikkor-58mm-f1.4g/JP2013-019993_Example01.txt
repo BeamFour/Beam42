@@ -160,3 +160,19 @@ goal mtf   30 tan       55 55 55 50 50 38 23
 goal spot sampling    gaussian 6 12
 goal ray-aberrations  no
 outdir                try7
+[trial 8]
+description       MTF targets
+fields            0 0.1 0.2 0.4 0.6 0.8 1.0
+frequencies       10 30
+weighted		  no
+check-spot-apertures  yes
+vary curvatures   all
+vary aspherics    existing
+#                       0  .1 .2 .4 .6 .8 1.
+goal mtf   10 sag       80 80 82 83 75 70 48
+goal mtf   10 tan       80 80 82 82 80 80 68
+goal mtf   30 sag       55 55 55 50 50 40 28
+goal mtf   30 tan       55 55 55 50 50 40 26
+goal spot sampling    gaussian 6 12
+goal ray-aberrations  no
+outdir                try8

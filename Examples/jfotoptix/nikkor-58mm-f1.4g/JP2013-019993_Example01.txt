@@ -85,6 +85,7 @@ description       MTF targets
 fields            0 0.2 0.4 0.6 0.8 1.0
 frequencies       10 30
 weighted		  yes
+check-spot-apertures  yes
 vary curvatures   all
 vary aspherics    existing
 goal spot-rms           10 10 20 30 45 50
@@ -99,4 +100,63 @@ outdir                try3
 #lmder: iter=171 evaluations=10043 merit=3.83810265 elapsed=730.5 s
 #lmder: info=1 nfev=183 njev=170 (each njev costs 2n=56 evaluations via central differences)
 #Status 1, merit 4.74923 -> 3.83810
-
+[trial 4]
+description       MTF targets
+fields            0 0.1 0.2 0.4 0.6 0.8 1.0
+frequencies       10 30
+weighted		  yes
+check-spot-apertures  yes
+vary curvatures   all
+vary aspherics    existing
+goal mtf   10 sag       85 85 85 83 86 70 48
+goal mtf   10 tan       85 85 85 82 82 80 68
+goal mtf   30 sag       58 58 56 50 50 35 28
+goal mtf   30 tan       58 58 56 50 50 34 23
+goal spot sampling    gaussian 6 12
+goal ray-aberrations  no
+outdir                try4
+[trial 5]
+description       MTF targets
+fields            0 0.1 0.2 0.4 0.6 0.8 1.0
+frequencies       10 30
+weighted		  yes
+check-spot-apertures  yes
+vary curvatures   all
+vary aspherics    existing
+goal mtf   10 sag       80 80 82 83 75 70 48
+goal mtf   10 tan       80 80 82 82 80 80 68
+goal mtf   30 sag       55 55 55 50 50 35 28
+goal mtf   30 tan       55 55 55 50 50 34 23
+goal spot sampling    gaussian 6 12
+goal ray-aberrations  no
+outdir                try5
+[trial 6]
+description       MTF targets
+fields            0 0.1 0.2 0.4 0.6 0.8 1.0
+frequencies       10 30
+weighted		  no
+check-spot-apertures  yes
+vary curvatures   all
+vary aspherics    existing
+goal mtf   10 sag       80 80 82 83 75 70 48
+goal mtf   10 tan       80 80 82 82 80 80 68
+goal mtf   30 sag       55 55 55 50 50 35 28
+goal mtf   30 tan       55 55 55 50 50 34 23
+goal spot sampling    gaussian 6 12
+goal ray-aberrations  no
+outdir                try6
+[trial 7]
+description       MTF targets
+fields            0 0.1 0.2 0.4 0.6 0.8 1.0
+frequencies       10 30
+weighted		  no
+check-spot-apertures  yes
+vary curvatures   all
+vary aspherics    existing
+goal mtf   10 sag       80 80 82 83 75 70 48
+goal mtf   10 tan       80 80 82 82 80 80 68
+goal mtf   30 sag       55 55 55 50 50 40 28
+goal mtf   30 tan       55 55 55 50 50 38 23
+goal spot sampling    gaussian 6 12
+goal ray-aberrations  no
+outdir                try7

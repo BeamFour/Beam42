@@ -41,3 +41,62 @@ ppmm	25.65635982
 originX	71							
 originY	857							
 [notes]
+[trial 1]
+description         AF-S NIKKOR 58mm f/1.4G ED
+fields              0.0 0.3 0.7 1.0
+frequencies         10 30
+vignetting          set-vig frozen
+vary aspherics      existing
+vary curvatures     all
+#vary thicknesses   all
+weighted            yes
+constrain           curvatures
+constrain 			edges
+#constrain          thicknesses
+goal contrast       sampling 6 12
+goal contrast       10 30
+goal contrast   	balance all weight 1
+#goal contrast      calibrate yes
+outdir				try1
+[trial 2]
+description           Contrast
+fields                0 to 1 step 0.1
+frequencies           10 30
+weighted              no
+vignetting            set-vig frozen
+check-spot-apertures  no
+vary curvatures       all
+#vary thicknesses      all
+#constrain thicknesses	5.0
+constrain edges
+constrain curvatures
+goal contrast   10 30
+goal contrast   sag  4 4 4 4 4 4 4 2 2 0.5 0.1
+goal contrast   tan  4 4 4 4 4 4 1 1 0.5 0.1 0.1
+goal contrast   balance  all weight 8
+goal contrast   sampling 6 12
+goal contrast         calibrate no
+goal contrast         exit-pupil-aiming no
+goal contrast         centering no
+goal ray-aberrations  no
+outdir                try2
+[trial 3]
+description       MTF targets
+fields            0 0.2 0.4 0.6 0.8 1.0
+frequencies       10 30
+weighted		  yes
+vary curvatures   all
+vary aspherics    existing
+goal spot-rms           10 10 20 30 45 50
+goal spot-rms weights   1  1  1  1  1  1
+goal mtf   10 sag       85 85 83 86 70 48
+goal mtf   10 tan       85 85 82 82 80 68
+goal mtf   30 sag       58 56 50 50 35 28
+goal mtf   30 tan       58 56 50 50 34 23
+goal spot sampling    gaussian 6 12
+goal ray-aberrations  no
+outdir                try3
+#lmder: iter=171 evaluations=10043 merit=3.83810265 elapsed=730.5 s
+#lmder: info=1 nfev=183 njev=170 (each njev costs 2n=56 evaluations via central differences)
+#Status 1, merit 4.74923 -> 3.83810
+

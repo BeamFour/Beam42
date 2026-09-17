@@ -38,3 +38,14 @@ Bf	14.3308
 [notes]
 Based on Glass selection and Aspherics contributed by reddit user Arimaiciai
 https://www.reddit.com/r/LensPatents/comments/1q0q090/leica_aposummicronm_35_f2_asph_us12181644b2_2018/
+[patent info]
+country	US
+number	US12181644B2
+example	EX 1
+year applied	2018
+inventors	    Stefan Roth,Kathrin Keller
+current assignee	Leica Camera AG
+original assignee	Leica Camera AG
+link	https://patents.google.com/patent/US12181644B2/en
+[report data]
+lens name	Leica APO-Summicron-M 35mm f/2 Asph

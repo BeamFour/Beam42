@@ -28,3 +28,14 @@ Bf	83.26
 10	344.637	6.06	1.5927	30.0	35.4	S-FTM16
 11	-47.997	Bf		30.0
 [notes]
+[patent info]
+country	JP
+number	JP S47-008749
+example	EX 2
+year applied	1968
+inventors	Michimi Suwa
+current assignee	Canon Inc
+original assignee	Canon Inc
+link	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S47-008749/12/en
+[report data]
+lens name	Canon FL-F 300mm f5.6

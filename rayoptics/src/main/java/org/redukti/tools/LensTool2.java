@@ -242,12 +242,16 @@ public class LensTool2 {
         sb.append("* To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average\n");
     }
 
-    public static void createREADME(StringBuilder sb, String specFile, Path output_file) throws Exception {
+    public static void createREADME(StringBuilder sb, String specFile, Prescription prescription, Path output_file) throws Exception {
         String filename = Helper.getFilename(specFile);
         String zmxFilename = Helper.replaceExtension(filename, ".zmx");
         sb.append("## Resources\n");
         sb.append("* [OpticalBench Compatible Data File, tab delimited](./prescription.txt)\n");
         sb.append("* [Zemax file](./" + zmxFilename + ")\n\n");
+        // A lens folder usually holds several prescriptions, so record which one this
+        // report came from and how finished it is. Just the name: the file sits in the
+        // same folder as this README.
+        sb.append("Generated from `" + filename + "`, status **" + prescription.get_status() + "**\n\n");
         sb.append("Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on " + LocalDate.now() + "\n");
         Helper.createOutputFile(output_file,sb.toString());
     }
@@ -722,6 +726,7 @@ public class LensTool2 {
             }
             createREADME(SB,
                     arguments.specfile,
+                    prescription,
                     Helper.getOutputFileWithPath(arguments.specfile, "README.md", arguments.outdir));
             long finishTime = System.nanoTime();
             System.out.println("Finished in " + TimeUnit.NANOSECONDS.toSeconds(finishTime-startTime) + " secs");

@@ -146,6 +146,30 @@ present or even tracked does not mean it is finished.
   `git status --short -- <file>` is empty before pinning a test to a lens.
 * Prefer lenses that existing tests already use.
 
+### Which prescription is the real one
+
+A lens folder often holds many prescription variants — trials, revisions, dead ends — so do
+not assume the obvious-looking name is the current one. Establish it, in this order:
+
+1. **The `status` field in the prescription**, under `[report data]`: `TODO`, `Candidate` or
+   `Accepted`, absent meaning `TODO`. Only an `Accepted` prescription is signed off. See
+   [Documentation/LENSTOOL2.md](Documentation/LENSTOOL2.md).
+2. **The generated `README.md`**, which names the prescription it came from and its status,
+   just above the generation date:
+
+   ```
+   Generated from `Otus55.txt`, status **Accepted**
+   ```
+
+3. **Older folders predate both**, and their READMEs carry neither line. There, the
+   Resources section links the Zemax file generated alongside the report —
+   `* [Zemax file](./leica-noctilux-50mm-f1-11a.zmx)` — and the prescription is that name
+   with a `.txt` extension: in that folder, one of 14 candidates. This is a proxy, not a
+   sign-off; it says which file made the report, not that anyone blessed it.
+4. Whichever route you took, check the file is committed and unmodified, as above.
+
+If these disagree, or the README is itself uncommitted, ask rather than guessing.
+
 ## Where the documentation lives
 
 | Document | Covers |

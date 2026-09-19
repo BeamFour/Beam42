@@ -66,11 +66,26 @@ public class Prescription {
     @Deprecated
     public double _var_angle_of_view = 0.0;
 
+    /** Work in progress - not to be relied upon. This is the assumed status when
+     * a prescription does not say. */
+    public static final String STATUS_TODO = "TODO";
+    /** Complete enough to look at, but not signed off. */
+    public static final String STATUS_CANDIDATE = "Candidate";
+    /** Signed off. This is the version a report or a test should be based on. */
+    public static final String STATUS_ACCEPTED = "Accepted";
+
+    private static final String[] VALID_STATUSES = { STATUS_TODO, STATUS_CANDIDATE, STATUS_ACCEPTED };
+
     /** Following are optional values for information only, used to generate
      * lens report.
      */
     public String _title;
     public String _lens_name;
+    /** How far along this prescription is - one of TODO, Candidate or Accepted.
+     * A lens folder often holds several prescriptions and this says which of them
+     * is the finished one. Empty means not stated, which is read as TODO.
+     */
+    public String _status = "";
     public String _patent_country = "";
     public String _patent_number;
     public String _patent_example = "";
@@ -330,6 +345,7 @@ public class Prescription {
         if (report_data.count() > 0) {
             // new style
             lensName = report_data.get_value("lens name");
+            prescription.set_status(report_data.get_value("status"));
         }
         if (lensName == null) {
             // old style - to be removed
@@ -545,6 +561,30 @@ public class Prescription {
         }
         return false;
     }
+    /** The status of this prescription, defaulting to TODO when the file does not say. */
+    public String get_status() {
+        return _status == null || _status.isEmpty() ? STATUS_TODO : _status;
+    }
+
+    /** Accepts any case, and stores the canonical spelling, so that a status cannot be
+     * missed because of how it was typed. An unrecognized value is an error rather than a
+     * silent TODO, as the whole point of the field is to be relied upon.
+     */
+    public void set_status(String status) {
+        if (status == null || status.isEmpty()) {
+            _status = "";
+            return;
+        }
+        for (var valid : VALID_STATUSES) {
+            if (valid.equalsIgnoreCase(status.trim())) {
+                _status = valid;
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Unknown status '" + status + "'; expected one of "
+                + String.join(", ", VALID_STATUSES));
+    }
+
     private void add_patent_section(StringBuilder sb) {
         sb.append("[patent info]\n");
         if (_patent_country != null && !_patent_country.isEmpty())
@@ -568,6 +608,8 @@ public class Prescription {
         sb.append("[report data]\n");
         if (_lens_name != null && !_lens_name.isEmpty())
             sb.append("lens name\t").append(_lens_name).append("\n");
+        if (_status != null && !_status.isEmpty())
+            sb.append("status\t").append(_status).append("\n");
         if (_configurations != null) {
             sb.append("scenarios");
             // we change scenarios to be ours

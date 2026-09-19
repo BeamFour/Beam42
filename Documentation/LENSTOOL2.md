@@ -209,8 +209,39 @@ row under `[descriptive data]` is still read, but `[patent info]` supersedes it.
 | Key | Effect |
 | --- | --- |
 | `lens name` | Display name used as the report heading. |
+| `status` | How far along this prescription is: `TODO`, `Candidate` or `Accepted`. Absent means `TODO`. |
 | `scenarios` | **Selects which configurations are processed.** A list of zero based column indices into the multi valued rows of `[variable distances]`. |
 | `names` | A label for each selected configuration, in the same order. |
+
+### `status`
+
+A lens folder usually accumulates several prescriptions — trials, revisions and
+dead ends — and nothing in the file used to say which of them was finished.
+`status` is that marker:
+
+| Value | Meaning |
+| --- | --- |
+| `TODO` | Work in progress, not to be relied upon. The assumed status when the file does not say. |
+| `Candidate` | Complete enough to look at, but not signed off. |
+| `Accepted` | Signed off. This is the version a report or a test should be based on. |
+
+The value is case insensitive and stored in its canonical spelling, so `accepted`
+and `Accepted` are the same. Anything else is an error rather than a silent
+`TODO`, since the point of the field is to be relied upon:
+
+```
+Failed due to: Unknown status 'Acepted'; expected one of TODO, Candidate, Accepted
+```
+
+Every generated `README.md` records the prescription it came from and that
+prescription's status, just above the generation date:
+
+```
+Generated from `Otus55.txt`, status **Accepted**
+```
+
+Only the file name appears, never a path, because the prescription sits in the
+same folder as the README.
 
 This is how a zoom is handled. `[variable distances]` carries one column per
 focal length, and `scenarios` picks the ones to report on:

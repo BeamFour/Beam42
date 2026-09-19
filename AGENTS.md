@@ -86,6 +86,12 @@ and are not committed. They are local reading material only.
   category unless they are ports.
 * If a file's provenance is unclear, ask rather than guessing: ray-optics is BSD-3-Clause
   and BeamFour is GPL-2.0, so a wrong header is a licensing error, not a cosmetic one.
+* **Check licence compatibility before porting anything in.** The project is GPL v3 or
+  later, so incoming code must be under a licence compatible with that: the permissive
+  licences (BSD, MIT, Apache 2.0) and GPL v3 or "v2 or later" are fine, while **GPL v2
+  only** is not — that incompatibility is precisely why `beam42` is segregated. Establish
+  the licence of the source project *before* writing the port, not after, and say what it
+  is. If it is unclear or unstated, stop and ask.
 * Licence texts live in the repository root, except the one that applies to a single
   module. A file's short header points at the applicable one:
   * `LICENSE-GPL-3.0.txt` — the overall licence (GPL v3 or later), and the licence of the
@@ -101,6 +107,20 @@ and are not committed. They are local reading material only.
     project's.
 * The same set, minus GPL v2 and plus `LICENSE-ryu.txt`, is in rayoptics-cpp; keep the two
   in step when attributions change on either side.
+
+## 5. No new dependencies
+
+The project deliberately carries almost no external dependencies. JUnit, at test scope, is
+the only one; the runtime code depends on nothing beyond the JDK, and that is intentional.
+
+* **Do not add an external dependency unless you are specifically asked to.** This holds
+  even when the library is small, popular, well maintained, or would save real work — that
+  trade has been considered and declined, so proposing it is fine but adding it is not.
+* Where a capability genuinely is needed, the preferred route is to **port** a
+  well-established implementation into the project rather than depend on it. MINPACK (the
+  Levenberg-Marquardt solver) and fftpack are both here that way. A port is subject to the
+  licence-compatibility check and the attribution rules in section 4.
+* Failing that, write it against the JDK, or do without.
 
 ## Building and testing
 

@@ -4,6 +4,17 @@ Guidance for AI coding agents working in this repository. Read this before makin
 Most substantive documentation already exists — see [Where the documentation lives](#where-the-documentation-lives)
 — so this file covers only the rules that are easy to violate without being told.
 
+## 0. Never commit
+
+Leave every change in the working tree. The author reviews each change manually and commits
+it himself — that review is the quality gate, and a commit made for him bypasses it.
+
+* Do not run `git commit`, and do not stage, amend, rebase, revert, push, or create
+  branches or tags unless you are explicitly asked to in that instance.
+* Read-only git — `status`, `diff`, `log`, `show` — is always fine and is often the right
+  way to check what you have touched.
+* When you finish, describe what you changed and which files it touched, and leave it there.
+
 ## What this repository is
 
 Beam42 combines two independently-originated components:
@@ -75,8 +86,21 @@ and are not committed. They are local reading material only.
   category unless they are ports.
 * If a file's provenance is unclear, ask rather than guessing: ray-optics is BSD-3-Clause
   and BeamFour is GPL-2.0, so a wrong header is a licensing error, not a cosmetic one.
-* Licence texts live in the repository root (`LICENSE.txt`, `LICENSE-ray-optics.txt`,
-  `LICENSE-Minpack.txt`).
+* Licence texts live in the repository root, except the one that applies to a single
+  module. A file's short header points at the applicable one:
+  * `LICENSE-GPL-3.0.txt` — the overall licence (GPL v3 or later), and the licence of the
+    Goptical-derived code: `org.redukti.data`, `org.redukti.render`,
+    `OpticalBenchDataImporter`, and `Quaternion`, `Transform3`, `Triangle2`, `Vector2Pair`,
+    `Vector3Pair`, `ArrayIndex2D`.
+  * `LICENSE-ray-optics.txt` — BSD 3-Clause, for the ray-optics port.
+  * `LICENSE-Minpack.txt` — for the MINPACK-derived solver.
+  * `beam42/LICENSE.txt` — GNU GPL v2, for the `beam42` module only, and kept inside the
+    module rather than at the root for that reason. BeamFour is a standalone
+    product kept here for convenience; neither module depends on the other, so it can be
+    removed by anyone for whom GPL-2.0 is a problem. Do not treat its licence as the
+    project's.
+* The same set, minus GPL v2 and plus `LICENSE-ryu.txt`, is in rayoptics-cpp; keep the two
+  in step when attributions change on either side.
 
 ## Building and testing
 

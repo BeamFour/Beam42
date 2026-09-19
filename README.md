@@ -138,11 +138,28 @@ Here are some other projects that I have not personally tried out
 
 ## License
 
-Beam42 as a whole is distributed under the [GNU General Public License, version 2](LICENSE.txt).
+The project includes code derived from several open-source projects. See the individual license notices in the source
+code and the LICENSE files:
 
-The two components have different upstream origins:
+* [LICENSE-GPL-3.0.txt](LICENSE-GPL-3.0.txt) - the overall license, and the license of the code derived from
+  [Goptical](https://www.gnu.org/software/goptical/): the `org.redukti.data` and `org.redukti.render` packages,
+  `OpticalBenchDataImporter`, and `Quaternion`, `Transform3`, `Triangle2`, `Vector2Pair`, `Vector3Pair` and
+  `ArrayIndex2D` in `org.redukti.mathlib` / `org.redukti.util`.
+* [LICENSE-ray-optics.txt](LICENSE-ray-optics.txt) - BSD 3-Clause, for the code derived from Michael Hayford's
+  [ray-optics](https://github.com/mjhoptics/ray-optics), by way of
+  [rayoptics4j](https://github.com/BeamFour/rayoptics4j).
+* [LICENSE-Minpack.txt](LICENSE-Minpack.txt) - for the code derived from MINPACK.
+* [beam42/LICENSE.txt](beam42/LICENSE.txt) - GNU GPL v2, for the `beam42` module only; see below.
 
-* The `beam42` module derives from [BeamFour](https://github.com/StellarSoftwareBerkeley/BeamFour), which is GPL-2.0.
-  This is what makes the combined work GPL-2.0.
-* The `rayoptics` module derives from [ray-optics](https://github.com/mjhoptics/ray-optics) and
-  [rayoptics4j](https://github.com/BeamFour/rayoptics4j), both of which are BSD-3-Clause.
+The overall license is GNU GPL v3 or later.
+
+### The `beam42` module is the exception
+
+The `beam42` module derives from [BeamFour](https://github.com/StellarSoftwareBerkeley/BeamFour), which is GPL-2.0,
+and it is kept under that license.
+
+BeamFour is a standalone product and is kept in this repository for convenience rather than because the rest of the
+project depends on it: the `rayoptics` module does not use it, and generates BeamFour input files rather than calling
+into it. If the GPL-2.0 licensing of this module is a concern, the `beam42` directory can be removed — delete it along
+with its `<module>` entry in the root `pom.xml`. Neither module depends on the other, so the remainder still builds and
+runs.

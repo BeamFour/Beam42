@@ -396,8 +396,11 @@ class OptimizationBuilderTest {
                 .findFirst().orElseThrow();
 
         // On axis the two meridians are identical by rotational symmetry, so a balance
-        // goal there is satisfied however aberrated the lens is.
-        assertEquals(0.0, onAxis.value(), 1.0e-12);
+        // goal there is satisfied however aberrated the lens is. Exactly zero in
+        // principle: the vignetting factors on axis are bit-identical across both
+        // meridians. What is left is round-off in the sampled contrast itself, so this
+        // gets the same tolerance as the off-axis comparison below.
+        assertEquals(0.0, onAxis.value(), 1.0e-9);
 
         double sagittal = blockSumOfSquares(setup, Orientation.SAGITTAL, 1);
         double tangential = blockSumOfSquares(setup, Orientation.TANGENTIAL, 1);

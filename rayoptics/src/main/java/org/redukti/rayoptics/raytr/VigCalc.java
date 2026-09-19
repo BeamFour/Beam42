@@ -635,9 +635,39 @@ public class VigCalc {
         Vector2 start_coord = Vector2.vector2_0;
         double start_r = 0;
         if (indx != null) {
-            var objective_fn = new R_Pupil_Coordinate(opt_model,indx,xy,fld,wvl,r_target);
             try {
-                start_r = SecantSolver.find_root(objective_fn, start_r0, 50, 1e-6).root;
+                // set `x1` so that search goes inward from the edge.
+                var eps = 1e-4;
+                var p1 = start_r0 * (1 - eps);
+                // Deviation from upstream. At start_r0 == 0 the inward step is
+                // degenerate - p1 lands on start_r0 - and scipy's newton, like
+                // SecantSolver, rejects x1 == x0. Upstream shares this defect
+                // but does not reach it; Beam43 does, because bisection now
+                // runs for every surface (not just the first) and find_edge
+                // brackets from 0.0, so rel_p1[xy] can arrive here as exactly
+                // zero. Passing null falls back to the offset scipy would have
+                // chosen itself, which is what this call did before the inward
+                // step was introduced.
+                if (p1 == start_r0) {
+                    // Deviation from upstream. The relative step above takes the
+                    // second point inward, toward zero, because perturbing a ray
+                    // outward from near the edge can make it miss the surface -
+                    // that is what this fix is for. At start_r0 == 0 the step is
+                    // degenerate: p1 lands on start_r0, and scipy's newton, like
+                    // SecantSolver, rejects x1 == x0. Upstream shares this but
+                    // does not reach it; Beam43 does, because bisection now runs
+                    // for every surface rather than only the first, and
+                    // find_edge brackets from 0.0, so rel_p1[xy] can arrive here
+                    // as exactly zero.
+                    //
+                    // Use an absolute step instead. At the pupil centre there is
+                    // no inward direction, and no miss to avoid either - the
+                    // centre is the furthest point from any edge - so the sign
+                    // is arbitrary and only the offset matters.
+                    p1 = start_r0 - eps;
+                }
+                var objective_fn = new R_Pupil_Coordinate(opt_model,indx,xy,fld,wvl,r_target);
+                start_r = SecantSolver.find_root(objective_fn, start_r0, p1, 50, 1e-6).root;
             }
             catch (TraceException rt_err) {
                 if (logger.isLoggable(Level.FINE))

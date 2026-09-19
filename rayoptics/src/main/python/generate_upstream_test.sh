@@ -34,7 +34,7 @@ esac
 # Modules the exporter needs. Java silently ignores classpath entries that do
 # not exist, so these are checked rather than assumed.
 cp=""
-for module in tools rayoptics mathlib render beam42; do
+for module in rayoptics beam42; do
     classes="$repo_root/$module/target/classes"
     if [ ! -d "$classes" ]; then
         echo "Missing $classes - run 'mvn compile' first" >&2

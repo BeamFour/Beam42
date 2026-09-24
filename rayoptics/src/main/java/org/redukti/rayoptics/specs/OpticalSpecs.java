@@ -259,11 +259,11 @@ public class OpticalSpecs {
                 }
                 else {
                     var aim_pt = fld.aim_info;
-                    var obj2enp_dist = -(fod.obj_dist + z_enp);
+                    var obj2enp_dist = fod.obj_dist + z_enp;
                     pt1 = new Vector3(eprad*pupil[0]+aim_pt[0],
-                                    eprad*pupil[1]+aim_pt[1],
-                                    fod.obj_dist+z_enp);
-                    pt0 = new Vector3(d0.x/d0.z,d0.y/d0.z, 0.0).times(obj2enp_dist);
+                                      eprad*pupil[1]+aim_pt[1],
+                                      obj2enp_dist);
+                    pt0 = new Vector3(d0.x/d0.z,d0.y/d0.z, 0.0).times(-obj2enp_dist);
                 }
             }
             dir0 = pt1.minus(pt0).normalize();

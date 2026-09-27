@@ -95,11 +95,13 @@ and are not committed. They are local reading material only.
 * Licence texts live in the repository root, except the one that applies to a single
   module. A file's short header points at the applicable one:
   * `LICENSE-GPL-3.0.txt` — the overall licence (GPL v3 or later), and the licence of the
-    Goptical-derived code: `org.redukti.data`, `org.redukti.render`,
-    `OpticalBenchDataImporter`, and `Quaternion`, `Transform3`, `Triangle2`, `Vector2Pair`,
-    `Vector3Pair`, `ArrayIndex2D`.
+    Goptical-derived code: `org.redukti.data`, `org.redukti.render`, and `Quaternion`,
+    `Transform3`, `Vector2Pair`, `Vector3Pair` in `org.redukti.mathlib`.
+    `OpticalBenchDataImporter` and `ArrayIndex2D` were previously (incorrectly) attributed
+    here; neither is derived from Goptical.
   * `LICENSE-ray-optics.txt` — BSD 3-Clause, for the ray-optics port.
   * `LICENSE-Minpack.txt` — for the MINPACK-derived solver.
+  * `LICENSE-jfftpack.txt` — for the jfftpack-derived FFT code.
   * `beam42/LICENSE.txt` — GNU GPL v2, for the `beam42` module only, and kept inside the
     module rather than at the root for that reason. BeamFour is a standalone
     product kept here for convenience; neither module depends on the other, so it can be

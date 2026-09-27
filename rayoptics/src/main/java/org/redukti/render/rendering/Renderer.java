@@ -239,11 +239,6 @@ public abstract class Renderer {
         draw_polygon (p, rgb, filled, true);
     }
 
-    public void draw_triangle (Triangle2 t, boolean filled, Rgb rgb)
-    {
-        draw_polygon (t.as_array(), rgb, filled, true);
-    }
-
     public void draw_box (Vector2Pair c, Rgb rgb)
     {
         draw_segment (new Vector2(c.v0.x (), c.v0.y ()), new Vector2(c.v1.x (), c.v0.y ()), rgb);

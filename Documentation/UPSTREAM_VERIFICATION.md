@@ -12,9 +12,10 @@ Paths are written as variables so nothing here is tied to one machine:
 | `$VENV` | the Python virtualenv, deliberately outside both checkouts |
 | `$PYTHON` | `$VENV/Scripts/python.exe` on Windows, `$VENV/bin/python` elsewhere — the name the scripts read |
 
-This file is currently gitignored through the `*.local.md` rule, which it earned when it
-held hard-coded paths. Nothing machine-specific is left, so it can be committed under a
-plain name whenever that is wanted.
+There are two documents. This one is the background: why the comparison exists, what it has
+established, and the traps. `rayoptics/src/main/python/README.md` is the command reference
+for the three scripts, with per-script options and the assertion breakdown of a generated
+test. Start here, then go there to run something.
 
 ## Why
 
@@ -131,19 +132,92 @@ stops when `|p - p1| < 1e-6` and upstream's `newton` does the same, so the root 
 pinned to about 1e-6 and two correct implementations can land either side of it. Measured
 residual on the Otus outer-field vignetting factors is 6.7e-8, well inside that.
 
-That is why the generated tests use 1e-6 for vignetting and aiming rather than the 1e-12
-used for analytic quantities: it is the tolerance the search itself converges to, not an
-arbitrary loosening. Tightening it would produce failures unrelated to correctness.
+That is why the generated tests split their tolerances by kind, and none of the three is an
+arbitrary loosening:
+
+| quantity | tolerance | why |
+| --- | --- | --- |
+| analytic | 1e-12 relative | in practice they agree bit for bit |
+| vignetting, aiming | 1e-6 | the tolerance the vignetting search itself converges to; measured residual ~7e-8 |
+| ray data | 1e-6 | downstream of two iterated solves, so no more exact than the ray it starts from |
+
+Ray data cannot beat its starting ray, which comes from `iterate_ray` for the chief ray aim
+point and `calc_vignetted_ray` for the vignetting factors. The residual propagates linearly
+rather than amplifying: on the Otus outer field `vuy` differs by 6.7e-8 relative, giving
+3.4e-8 on the pupil coordinate, which over a 17.5 mm entrance pupil radius is 5.9e-7 mm of
+ray height — against a largest observed difference of 5.7e-7. `op_delta` agrees to a few
+times 1e-9. All of it stays six orders tighter than any real kernel defect would produce.
+
+If you are tempted to tighten these: tracing with `apply_vignetting=False` does *not* buy
+precision, because the aim point is still iterated, and it costs coverage — unscaled
+marginal rays at the outer fields get blocked and drop out of the comparison entirely.
 
 One genuine difference remains: `find_z_enp_on_interval` passes an absolute tolerance of
 1.48e-8 where upstream passes `rtol=1e-7` to `newton`. In practice the wide angle `z_enp`
 values agree far inside 1e-6.
 
+**Upstream's `apply_vignetting` mutates its argument; Beam43's does not.** Upstream does
+`vig_pupil = pupil[:]`, which for a numpy array is a view rather than a copy, so it scales
+the caller's array in place. `trace_ray_fan` records the pupil *after* tracing and therefore
+captures the vignetted coordinate; Beam43 copies, so its `fan_x` keeps the nominal value.
+
+The rays traced are identical either way — only the recorded abscissa differs — but it looks
+alarming when it surfaces:
+
+```
+fan.0.0.0.0.pupil ==> expected: <-1.0003278333220664> but was: <-1.0>
+```
+
+which is `-1 x (1 - vlx)`. `dump_reference.py` records the nominal fan abscissa, accumulated
+the way both sides step it, so the pupil assertion still guards index alignment without
+depending on the quirk. Beam43's copying behaviour is the sane one and should stay; just do
+not expect a caller's pupil array to come back modified.
+
 **Stamp the upstream git SHA into any fixture.** Upstream moves under the port — that is
 how the `obj_na` and euler defects arose — and a regenerated fixture should be a visible
 diff rather than a silent one.
 
-## Running the diff
+## Regenerating the regression tests
+
+This is the workflow that actually gets used. `generate_upstream_test.sh` emits the Python
+model, runs it under upstream to capture reference values, and writes a JUnit test with
+those values inlined, into `org.redukti.rayoptics.upstream`. See the scripts' README for
+what each generated method asserts and at what tolerance.
+
+```
+export PYTHON=$VENV/Scripts/python.exe
+cd $BEAM43 && mvn compile
+
+FLAGS="--only-d-line --dont-use-glass-types --vig-type set-vig"
+./rayoptics/src/main/python/generate_upstream_test.sh \
+    Examples/jfotoptix/sigma-14-24mm-f2.8-art/JP2018-189733_Example01P.txt --scenario 0 $FLAGS
+./rayoptics/src/main/python/generate_upstream_test.sh \
+    Examples/jfotoptix/cosina-otus-ml-50mm-f1.4/JP2026-105585_Example01.txt $FLAGS
+./rayoptics/src/main/python/generate_upstream_test.sh \
+    Examples/jfotoptix/nikkor-58mm-z-f0.95/nikkor-z-58mmf0.95_ex1.txt $FLAGS
+./rayoptics/src/main/python/generate_upstream_test.sh \
+    Examples/jfotoptix/leica-r-summicron-50mm-f2/US004123144_Example08P.txt $FLAGS
+./rayoptics/src/main/python/generate_upstream_test.sh \
+    Examples/jfotoptix/canon-ef50mm-f1.0L/US004717245_Example02P.txt $FLAGS
+```
+
+Those five lenses are chosen to cover the three aspheric coefficient conventions, a plain
+double Gauss, and — the Sigma — a wide-angle model that exercises `find_real_enp_rev1`.
+
+**Regenerate all five, not only the ones whose assertions failed.** Any change touching
+vignetting moves the reference values by ~1e-7, and the tests that still pass are merely
+inside tolerance rather than unaffected. Leaving them puts the fixtures on two different
+upstream commits, and the next sync produces a confusing partial diff.
+
+`generate_upstream_test.sh` builds its classpath from a hard-coded module list. That list
+has gone stale once already, when the modules consolidated — if it aborts with
+`Missing .../target/classes`, check it against `<modules>` in `pom.xml`.
+
+Other tests carry values that move with the same changes but are not regenerated by this
+script: `ZeissOtusML50mmTest` (see the memory note on harvesting its goldens in one run),
+and occasionally a tolerance or a rounded digit in `OptimizationBuilderTest` and `MtfTest`.
+
+## Running the obench structural diff
 
 `RayOpticsExporter` emits Python and Java model builders from one `ModelSpec` over a shared
 `Prescription`, so field list, spectral region, wide-angle aiming and vignetting are single

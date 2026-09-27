@@ -80,30 +80,14 @@ and OPD is compared in waves on both sides.
 angle model. Vignetting depends on it too, but only at solver tolerance, so without this a
 regression in the wide angle search could slip through.
 
-Tolerances are split by kind, and none of them is an arbitrary loosening.
-
-Analytic quantities use 1e-12 relative; in practice they agree bit for bit.
-
-Vignetting and aiming use 1e-6, the tolerance the vignetting search itself converges to:
-`iterate_pupil_ray` and upstream's `newton` both stop at `|p - p1| < 1e-6`, so two correct
-implementations can land either side of a root pinned only that far. Measured residual is
-around 7e-8.
-
-Ray data also uses 1e-6, because it is downstream of *two* iterated solves — `iterate_ray`
-for the chief ray aim point and `calc_vignetted_ray` for the vignetting factors — and can be
-no more exact than the starting ray it is traced from. The residual propagates linearly
-rather than amplifying: on the Otus outer field `vuy` differs by 6.7e-8 relative, giving
-3.4e-8 on the pupil coordinate, which over a 17.5mm entrance pupil radius is 5.9e-7mm of ray
-height, against a largest observed difference of 5.7e-7. `op_delta` agrees to a few times
-1e-9. All of it remains six orders tighter than any real kernel defect would produce.
-
-Worth knowing if you are tempted to tighten these: tracing with `apply_vignetting=False` does
-*not* buy precision, because the aim point is still iterated, and it costs coverage — unscaled
-marginal rays at the outer fields get blocked and drop out of the comparison.
+Tolerances are split by kind — 1e-12 relative for analytic quantities, 1e-6 for vignetting,
+aiming and ray data. None of the three is an arbitrary loosening; the reasoning, and why
+tightening them produces failures unrelated to correctness, is under **Traps** in
+[../../../../Documentation/UPSTREAM_VERIFICATION.md](../../../../Documentation/UPSTREAM_VERIFICATION.md).
 
 Add a new lens by running the script and committing the result. Pick lenses that exercise
-something distinct — the current four cover the three aspheric coefficient conventions plus
-a plain double Gauss, and one of them is wide angle.
+something distinct — the current five cover the three aspheric coefficient conventions, a
+plain double Gauss, and a wide angle model.
 
 ## `dump_reference.py`
 
@@ -137,50 +121,17 @@ slows it down.
 
 ## Things that will bite you
 
-**obench validates the sequential model, not the optical spec.** It deliberately differs: it
-keys fields as `('image', 'real height')` where the exporter emits `('object', 'angle')`, and
-hardcodes `WvlSpec([('F', .5), ('d', 1.), ('C', .5)], ref_wl=1)` rather than reading the
-prescription. It never runs vignetting, and supports features the port does not — diffractive
-elements, `ObjectGlass`, `Magnification` switching to a finite conjugate. Comparing *traced*
-results against an obench-built model folds those choices into the answer. Compare structure.
+These live in
+[../../../../Documentation/UPSTREAM_VERIFICATION.md](../../../../Documentation/UPSTREAM_VERIFICATION.md),
+under **Traps**, so there is one copy to keep current. Read them before trusting a
+comparison — several read as port defects when they are artifacts of the source data or of
+upstream's own conventions:
 
-**obench only ever reads scenario 0.** Its `read_float` resolves a variable-distance name as
-`var_dists[s][0]`, the first value, so no other zoom configuration can be checked this way.
-
-**Trailing zero coefficients are noise.** `read_float('')` returns `0.`, so an aspheric data
-line ending in a tab picks up a phantom coefficient — a real case in the wild has two
-surfaces with a trailing tab and one without, which reads as a 9-versus-8 mismatch. It is
-numerically inert, since both implementations stop at `max_nonzero_coef`. `obench_diff.py`
-trims trailing zeros before comparing for this reason.
-
-**Some files break obench's glass lookup.** Where the lens data puts a second glass name in
-the maker column rather than a catalog, obench passes it to `create_glass` and raises
-`GlassCatalogNotFoundError`; the Beam43 importer looks it up, misses, and falls back to
-nd/vd. Use `--no-glass`, which blanks the name and maker columns so obench takes the numeric
-path.
-
-**Use `--only-d-line` for anything wavelength-dependent.** Upstream turns a numeric `nd, vd`
-pair into `opticalglass.modelglass.ModelGlass`, a Buchdahl fit, while `Glass` uses a GNU
-Optical fit. They agree only at d, where both return `nd` by construction. Away from the
-reference wavelength, any difference is the dispersion model rather than the code under test.
-
-**Upstream's `apply_vignetting` mutates its argument; Beam43's does not.** Upstream does
-`vig_pupil = pupil[:]`, which for a numpy array is a view rather than a copy, so it scales
-the caller's array in place. `trace_ray_fan` records the pupil *after* tracing and therefore
-captures the vignetted coordinate; Beam43 copies, so its `fan_x` keeps the nominal value.
-
-The rays traced are identical either way — only the recorded abscissa differs — but it looks
-alarming when it surfaces:
-
-```
-fan.0.0.0.0.pupil ==> expected: <-1.0003278333220664> but was: <-1.0>
-```
-
-which is `-1 x (1 - vlx)`. `dump_reference.py` records the nominal fan abscissa, accumulated
-the way both sides step it, so the pupil assertion still guards index alignment without
-depending on the quirk. Beam43's copying behaviour is the sane one and should stay; just do
-not expect a caller's pupil array to come back modified.
-
-**Record which upstream a fixture came from.** Upstream moves under the port — that is how
-the `obj_na` and euler-convention defects arose — so a regenerated fixture should be a
-visible diff rather than a silent one.
+- obench validates the sequential model, not the optical spec
+- obench only ever reads scenario 0, so zoom configurations cannot be checked this way
+- trailing zero coefficients from a stray tab in the source file
+- lens data that puts a second glass name in the maker column, breaking obench's lookup
+- the two dispersion models, which agree only at the d line
+- tolerances on solver-dependent quantities, and why they are what they are
+- `apply_vignetting` mutating its argument upstream but not here
+- recording which upstream commit a fixture came from

@@ -1,3 +1,4 @@
+// Ported from Minpack Copyright Notice (1999) University of Chicago.
 package org.redukti.mathlib;
 
 public class MinPack {

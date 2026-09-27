@@ -1,7 +1,6 @@
-/*
-The software is ported from Goptical, hence is licensed under the GPL.
-Copyright (c) 2021 Dibyendu Majumdar
-*/
+// This code is part of Beam42 project (https://github.com/BeamFour/Beam42)
+// Copyright 2025-2026 by Dibyendu Majumdar
+// License GPL v3
 package org.redukti.importers.obench;
 
 import org.redukti.rayoptics.seq.Glass;

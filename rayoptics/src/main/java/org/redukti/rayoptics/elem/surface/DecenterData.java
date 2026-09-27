@@ -2,11 +2,9 @@
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
 package org.redukti.rayoptics.elem.surface;
-
 import org.redukti.mathlib.Matrix3;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.math.Tfm3d;
-import org.redukti.rayoptics.util.Pair;
 
 import java.util.Objects;
 

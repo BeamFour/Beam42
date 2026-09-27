@@ -33,9 +33,7 @@ The project has two fairly independent components:
     * Set goals targeting MTF, ray aberrations or spot sizes.
     * Constrain by paraxial parameters.
     * Constrain curvatures and thicknesses to avoid altering the design drastically.
-    * Constrain the difference between tangential and sagittal MTF to reduce astigmatism.
     * Weights can be set to influence the outcome.
-    * The optimization functions are available as Java API calls. There is no UI for this.
     * The underlying solver is the MINPACK Levenberg-Marquardt solver; constraints are implemented by assigning weights.
 
 ### BeamFour
@@ -142,14 +140,18 @@ The project includes code derived from several open-source projects. See the ind
 code and the LICENSE files:
 
 * [LICENSE-GPL-3.0.txt](LICENSE-GPL-3.0.txt) - the overall license, and the license of the code derived from
-  [Goptical](https://www.gnu.org/software/goptical/): the `org.redukti.data` and `org.redukti.render` packages,
-  `OpticalBenchDataImporter`, and `Quaternion`, `Transform3`, `Triangle2`, `Vector2Pair`, `Vector3Pair` and
-  `ArrayIndex2D` in `org.redukti.mathlib` / `org.redukti.util`.
+  [Goptical](https://www.gnu.org/software/goptical/): mainly the `org.redukti.data` and `org.redukti.render`
+  packages, plus `Quaternion`, `Transform3`, `Triangle2`, `Vector2Pair` and `Vector3Pair` in `org.redukti.mathlib`.
 * [LICENSE-ray-optics.txt](LICENSE-ray-optics.txt) - BSD 3-Clause, for the code derived from Michael Hayford's
   [ray-optics](https://github.com/mjhoptics/ray-optics), by way of
   [rayoptics4j](https://github.com/BeamFour/rayoptics4j).
 * [LICENSE-Minpack.txt](LICENSE-Minpack.txt) - for the code derived from MINPACK.
+* [LICENSE-jfftpack.txt](LICENSE-jfftpack.txt) - for the code derived from jfftpack.
 * [beam42/LICENSE.txt](beam42/LICENSE.txt) - GNU GPL v2, for the `beam42` module only; see below.
+
+Each source file carries its own notice identifying which of the above it falls under. Files that are not derived
+from any external project - original Beam42 code - are marked with a `This code is part of Beam42 project` header
+and are licensed under GPL v3 or later, same as the overall project.
 
 The overall license is GNU GPL v3 or later.
 

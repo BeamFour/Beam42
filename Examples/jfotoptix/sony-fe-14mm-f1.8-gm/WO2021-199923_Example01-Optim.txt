@@ -1,0 +1,80 @@
+[descriptive data]
+title	WO 2021/199923 Example 1 (Sony FE 14mm F1.8 GM)
+[constants]
+[variable distances]
+Focal Length	14.42	undefined
+Angle of View	113.42	undefined
+F-Number	1.85	undefined
+Image Height	43.33	43.33
+Total Length	114.70	114.70
+Magnification	0	-0.0934
+S	Infinity	250
+d0	Infinity	133.85
+d14	6.35	4.66
+d25	4.78	6.47
+Bf(p)	undefined	undefined
+Bf	15.449273931124184	15.44
+[lens data]
+1	32.125	1.87	1.58547	52.78	59.5	BACD12	Hoya
+2	15.036	11.07		38.73	
+3	36.239	1.50	1.73234	36.82	54.7	TAC8	Hoya
+4	17.755	11.66		29.47	
+5	-57.581	1.50	1.59489	27.14	68.6	FCD505	Hoya
+6	31.581	0.00		24.93	
+7	30.073	7.90	1.69416	24.92	31.2	FD8	Hoya
+8	-54.912	2.58		23.19	
+9	-27.601	1.20	1.91048	20.98	31.3	TAFD25	Hoya
+10	19.770	6.00	1.77660	20.36	29.7	NBFD29	Hoya
+11	-114.412	0.60		20.30	
+12	36.344	8.00	1.77173	22.73	49.2	M-TAF101	Hoya
+13	-47.160	5.71		23.71	
+14	AS	d14		23.33	
+15	24.591	6.96	1.43810	22.85	95.1	FCD100	Hoya
+16	-34.569	0.20		22.04	
+17	106.589	5.92	1.49845	21.96	81.6	FCD1	Hoya
+18	-17.865	1.20	1.86252	21.81	25.2	NBFD25	Hoya
+19	55.538	0.75		23.16	
+20	32.194	6.10	1.93323	24.97	20.9	E-FDS1	Hoya
+21	-46.433	0.20		24.93	
+22	-123.478	0.90	1.86252	24.11	25.2	NBFD25	Hoya
+23	41.916	2.81		23.40	
+24	-500.000	1.40	1.85639	23.43	40.1	M-TAFD305	Hoya
+25	298.710	d25		23.98	
+26	-418.530	2.10	1.62228	29.30	63.9	PCD40	Hoya
+27	-83.351	Bf		29.92	
+[aspherical data]
+1	32.125	0	-3.2157E-07	-8.9102E-09	7.2086E-12	-4.2574E-15	-2.1368E-19
+2	15.036	-0.594	5.9716E-06	-2.5549E-09	-4.9560E-11	8.1327E-14	-3.5142E-16
+12	36.344	0	-6.7796E-06	-1.9157E-08	9.9948E-11	-9.2684E-13	2.2031E-15
+13	-47.160	0	2.4694E-06	-2.2906E-08	1.2660E-10	-9.1880E-13	1.9071E-15
+24	-500.000	0	-7.4318E-05	2.5730E-07	3.0021E-09	-2.8311E-11	6.5427E-14
+25	298.710	0	-3.0668E-05	3.5429E-07	2.3165E-09	-2.1595E-11	4.6042E-14
+[group data]
+G1	1	211.81
+_AS	14	Infinity
+_G2	15	42.34
+[figure]
+source	Data/WO2021-199923_Figure01.png
+originX	91.80
+originY	526.10
+ppmm	11.924
+[figure]
+source	Data/WO2021-199923_Figure01P.png
+originX	46.58
+originY	185.95
+ppmm	3.915
+[notes]
+Bill: Patent supplies all diameters. Measured d0 and Magnification. Not perfect.
+Dibyendu
+options --optimize --assign-glass-types --index-line e
+[patent info]
+country	EU
+number	WO2021199923
+example	1
+year applied	2021
+inventors	YAMADA TAKUMU,MATSUOKA ORA
+current assignee	Sony Group Corp
+original assignee	Sony Group Corp
+link	https://patents.google.com/patent/WO2021199923A1/en
+[report data]
+lens name	Sony FE 14mm F1.8 GM

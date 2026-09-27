@@ -56,3 +56,4 @@ original assignee	Sony Group Corp
 link	https://patents.google.com/patent/WO2021199923A1/en
 [report data]
 lens name	Sony FE 14mm F1.8 GM
+status	Accepted

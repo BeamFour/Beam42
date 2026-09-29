@@ -483,6 +483,24 @@ Keep in mind:
 - **A zero weight still traces the field.** It only removes the field from the merit.
 - **Only `spot-deviation` has been worked out.** `spot-rms` and `spot-max-radius` are also
   in microns, but this rule has not been derived for them.
+- **It equates cost in the merit, not the MTF you end up with.** See below.
+
+The frequency sets what a spot deviation *costs* against the other goals. It does not make
+the two goals ask for the same thing, and a solve driven by spot deviations at ν will not
+generally land where contrast at ν would have taken it.
+
+The two agree only in the limit the relation was derived in: while the aberration is small,
+the contrast block and the spot block are the same sum of squares to first order, which is
+why the measured ratio came out close. Away from it they measure different things. A spot
+deviation residual weighs every ray by the square of its miss, so a faint halo of rays far
+from the centre dominates the merit. MTF at a given frequency loses roughly the share of the
+energy in that halo, however far out it sits, and depends on how the rest of the light is
+distributed in the core. A spot goal can therefore spend the design's freedom pulling in
+flare that MTF hardly notices, while leaving a core that contrast would have tightened.
+
+So use the spot goals when a compact spot is what you want, and contrast or `goal mtf` when
+MTF is. Where a trial mixes them, the frequency scale is what stops the spot deviations from
+swamping the contrast goals; it does not make them redundant.
 
 ### Ray aberrations
 

@@ -635,9 +635,12 @@ public class VigCalc {
         Vector2 start_coord = Vector2.vector2_0;
         double start_r = 0;
         if (indx != null) {
-            var objective_fn = new R_Pupil_Coordinate(opt_model,indx,xy,fld,wvl,r_target);
             try {
-                start_r = SecantSolver.find_root(objective_fn, start_r0, 50, 1e-6).root;
+                // set `x1` so that search goes inward from the edge.
+                var eps = 1e-4;
+                var p1 = start_r0 * (1 - eps);
+                var objective_fn = new R_Pupil_Coordinate(opt_model,indx,xy,fld,wvl,r_target);
+                start_r = SecantSolver.find_root(objective_fn, start_r0, p1, 50, 1e-6).root;
             }
             catch (TraceException rt_err) {
                 if (logger.isLoggable(Level.FINE))

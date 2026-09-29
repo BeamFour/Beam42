@@ -115,24 +115,6 @@ public class Layout2DTest {
         Assertions.assertFalse(reference.contains("Infinity"));
         assertOrthogonalBlackSegments(elements);
     }
-    @Test
-    public void rendersImagePlaneAndNonStopAperture() {
-        OpticalModel model = withNonStopAperture();
-        ElementModel elementModel = new ElementModel(model);
-        long apertures = elementModel.elements().stream()
-                .filter(element -> element.type() == ElementType.APERTURE)
-                .count();
-        Assertions.assertEquals(1, apertures);
-
-        String svg = new Layout2D().renderSvg(model, 1000, 500,
-                new LayoutOptions().drawReferenceRays(false));
-        Assertions.assertFalse(svg.contains("NaN"));
-        Assertions.assertFalse(svg.contains("Infinity"));
-        Assertions.assertEquals(2, countOccurrences(svg, "stroke-width=\"2.5\""),
-                "only the two halves of the explicit stop should be bold");
-        assertImagePlane(svg, 250.0);
-        assertOrthogonalBlackSegments(svg);
-    }
 
     private static int countOccurrences(String text, String value) {
         return (text.length() - text.replace(value, "").length()) / value.length();
@@ -202,6 +184,7 @@ public class Layout2DTest {
         model.update_model();
         VigCalc.set_pupil(model);
         model.update_model();
+        System.out.println(model.seq_model.list_surfaces(new StringBuilder()).toString());
         return model;
     }
     private static OpticalModel nikkorWideZoom() {

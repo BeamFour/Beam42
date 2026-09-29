@@ -68,8 +68,9 @@ holds generated reports for many more lenses.
 * [LensTool2 command line tool](Documentation/LENSTOOL2.md) - options, input format and generated outputs.
 * [Optimizer](Documentation/OPTIMIZER.md) - what an optimization run aims at, and how to describe one in the prescription file.
 * [Glass catalogs](Documentation/GLASS_CATALOGS.md) - every glass Beam42 knows about.
-* [Introduction to BeamFour (YouTube)](https://youtu.be/-buXsCqEnq8)
+* [rayoptics-cpp](https://github.com/BeamFour/rayoptics-cpp) - a faithful C++ port of the Java RayOptics module, maintained using LLMs.
 * [r/LensPatents](https://www.reddit.com/r/LensPatents/) - a related Reddit forum on lens patents and designs.
+* [Introduction to BeamFour (YouTube)](https://youtu.be/-buXsCqEnq8)
   
 ### Literature
 

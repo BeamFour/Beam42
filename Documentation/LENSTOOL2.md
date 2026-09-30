@@ -66,7 +66,7 @@ brackets, and lines beginning with `#` are comments.
 | Section | Origin | Purpose |
 | --- | --- | --- |
 | `[descriptive data]` | Optical Bench | `title`, and other free form descriptive fields. |
-| `[constants]` | Optical Bench | Selects how `[aspherical data]` coefficients are interpreted: `ODD`, `EVEN A2`, or default `EVEN`. See below. |
+| `[constants]` | Optical Bench | Selects how `[aspherical data]` coefficients are interpreted: `RADIAL`, `EVEN A2`, or default `EVEN`. See below. |
 | `[variable distances]` | Optical Bench | System values and named airspaces. Three rows are mandatory, see below. Each row may carry **several values**, one per configuration. |
 | `[lens data]` | Optical Bench, **extended** | The surface table. Beam42 adds glass and catalog name columns, see below. |
 | `[aspherical data]` | Optical Bench | Aspheric coefficients. |
@@ -86,12 +86,16 @@ The importer uses two constants to choose the coefficient convention for
 
 | Constant present | Aspheric type |
 | --- | --- |
-| `AsphericalOddCount` | `ODD` |
-| `AsphericalA2` (without `AsphericalOddCount`) | `EVEN A2` |
+| Positive `AsphericalOddCount` | `RADIAL` (radial, both odd and even powers) |
+| `AsphericalA2` (without a positive `AsphericalOddCount`) | `EVEN A2` |
 | Neither | `EVEN` |
 
-These are presence checks: the value of `AsphericalOddCount` is not used as a
-count, and it takes precedence if both constants are present. Put `[constants]`
+`AsphericalOddCount` is a non-negative integer counting odd powers starting at
+A3. Coefficients are ordered by increasing power, including the declared odd
+powers interleaved with even powers, then continuing with even powers only:
+count 1 means A3, A4, A6, A8, ...; count 2 means A3, A4, A5, A6, A8, ... .
+A zero count selects an even format. A positive count takes precedence over
+`AsphericalA2` if both constants are present. Put `[constants]`
 before `[aspherical data]`, because the importer selects the type as it reads
 each aspheric row. For example:
 
@@ -102,7 +106,8 @@ AsphericalOddCount	1
 
 Omitting or choosing the wrong constant changes the interpretation of the
 coefficients and therefore the surface shape. The generated `prescription.txt`
-recreates the applicable aspheric constant; other constants are discarded.
+preserves the odd count (increasing it if newly added odd terms require it);
+other constants are discarded.
 
 See [Aspheric coefficient ordering in the outputs](#aspheric-coefficient-ordering-in-the-outputs)
 for how README and Zemax coefficient lists differ from this input convention.
@@ -426,20 +431,29 @@ The Zemax file and the generated README's **Aspherical Data** table include the
 full coefficient array, with zeros in unused leading positions. Optical Bench
 input and the generated `prescription.txt` omit those positions:
 
-| Type | Optical Bench / `prescription.txt` coefficient sequence | Zemax parameters / README `P1`, `P2`, ... |
+| Type | Optical Bench / `prescription.txt` coefficient sequence | Full coefficients / README `P1`, `P2`, ... |
 | --- | --- | --- |
 | `EVEN` | `a, b, ...` | `0, a, b, ...` |
 | `EVEN A2` | `a, b, ...` | `a, b, ...` |
-| `ODD` | `a, b, ...` | `0, 0, a, b, ...` |
+| `RADIAL`, count 1 | `A3, A4, A6, A8, ...` | `0, 0, A3, A4, 0, A6, 0, A8, ...` |
+| `RADIAL`, count 2 | `A3, A4, A5, A6, A8, ...` | `0, 0, A3, A4, A5, A6, 0, A8, ...` |
 
 Here `a` and `b` stand for the first two supplied polynomial coefficients,
 after the radius and conic constant in an Optical Bench aspheric row. The
-leading zeros are restored on import and omitted again when writing
+leading zeros and missing odd powers are restored on import and omitted again when writing
 `prescription.txt`; they do not represent a change to the surface. Do not copy
 the full README or Zemax sequence into `[aspherical data]` without removing the
-unused leading positions for the selected type. The README labels both even
+unused positions for the selected type and odd count. The README labels both even
 variants as `EVEN`, and also pads shorter rows with trailing zeros to align the
 table columns.
+
+Zemax export uses `XOSPHERE` for `RADIAL` surfaces. `XDAT 1` holds the
+number of radial terms, `XDAT 2` is the normalization radius (1), and
+`XDAT 3` onward contain A1, A2, A3, ... including every zero slot. `CONI`
+is the conic constant, unchanged. Even surfaces retain `EVENASPH` and
+their `PARM` coefficient records. Zemax's term count is not Optical Bench's
+odd count: A3 through A20 contain nine odd powers, so `AsphericalOddCount 9`
+corresponds to 20 radial slots after inserting zeros for A1 and A2.
 
 ### Routine optimization
 

@@ -133,8 +133,8 @@ public class ZemaxExporter {
                 sb.append("  STOP\n");
             }
             if (s.is_aspheric()) {
-                if (s.is_odd_asphere())
-                    sb.append("  TYPE ODDASPHE\n");
+                if (s.is_radial_asphere())
+                    sb.append("  TYPE XOSPHERE\n");
                 else
                     sb.append("  TYPE EVENASPH\n");
             }
@@ -145,16 +145,26 @@ public class ZemaxExporter {
             sb.append("  MIRR 2 0\n");
             if (s.is_aspheric()) {
                 double[] aspherics = s.get_aspheric_coeffs();
-                for (int a = 1; a <= aspherics.length; a++) {
-                    sb.append("  PARM ").append(a).append(" ");
-                    sb.append(aspherics[a-1]).append("\n");
+                if (s.is_radial_asphere()) {
+                    int count = aspherics == null ? 0 : aspherics.length;
+                    if (count > 240)
+                        throw new IllegalArgumentException("XOSPHERE supports at most 240 radial terms");
+                    // Extra Data: term count, normalization radius, then A1, A2, ... .
+                    // A unit normalization radius preserves our dimensional coefficients.
+                    sb.append("  XDAT 1 ").append(count).append("\n");
+                    sb.append("  XDAT 2 1.0\n");
+                    for (int a = 0; a < count; a++)
+                        sb.append("  XDAT ").append(a + 3).append(" ").append(aspherics[a]).append("\n");
+                } else {
+                    for (int a = 1; a <= aspherics.length; a++) {
+                        sb.append("  PARM ").append(a).append(" ");
+                        sb.append(aspherics[a-1]).append("\n");
+                    }
                 }
             }
             sb.append("  DISZ ").append(thickness).append("\n");
             if (s.is_aspheric()) {
-                // For Odd aspheres we have to supply ec, for Even aspheres cc
-                double k = s.is_odd_asphere() ? s.get_cc()+1 : s.get_cc();
-                sb.append("  CONI ").append(k).append("\n");
+                sb.append("  CONI ").append(s.get_cc()).append("\n");
             }
             if (s.get_refractive_index() != 0.0) {
                 sb.append("  GLAS ");

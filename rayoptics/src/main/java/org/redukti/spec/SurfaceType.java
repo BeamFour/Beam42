@@ -9,7 +9,7 @@ public class SurfaceType {
 
     public final static int ASPH_EVEN = 1;
     public final static int ASPH_EVEN_A2 = 2;
-    public final static int ASPH_ODD = 3;
+    public final static int ASPH_RADIAL = 3;
 
     public String _id;
     public double _radius;
@@ -33,7 +33,8 @@ public class SurfaceType {
     /**
      * Coefficients are stored in  a normalized way
      * For Even polynomials, first coefficient is 0, as this is the A2 term
-     * For Odd polynomials first 2 coefficients are 0.
+     * For radial polynomials, index i is A(i+1): the first 2 coefficients
+     * are 0 and omitted odd powers are also represented by zeros.
      * But in OpticalBench the data is output so that
      * these values are skipped
      */
@@ -113,8 +114,8 @@ public class SurfaceType {
     public boolean is_aspheric() {
         return _asph_type != 0;
     }
-    public boolean is_odd_asphere() {
-        return is_aspheric() && _asph_type == ASPH_ODD;
+    public boolean is_radial_asphere() {
+        return is_aspheric() && _asph_type == ASPH_RADIAL;
     }
     public boolean is_even_a2_asphere() {
         return is_aspheric() && _asph_type == ASPH_EVEN_A2;
@@ -165,16 +166,48 @@ public class SurfaceType {
         return sb;
     }
     public StringBuilder aspherics_to_opt_bench_str(StringBuilder sb) {
+        return aspherics_to_opt_bench_str(sb, required_odd_count());
+    }
+
+    /** Minimum Optical Bench odd count needed to retain this surface's nonzero terms. */
+    public int required_odd_count() {
+        if (!is_radial_asphere())
+            return 0;
+        int count = 1;
+        if (_coeffs != null) {
+            for (int i = 2; i < _coeffs.length; i += 2) {
+                if (_coeffs[i] != 0.0)
+                    count = i / 2;
+            }
+        }
+        return count;
+    }
+
+    public StringBuilder aspherics_to_opt_bench_str(StringBuilder sb, int odd_count) {
         if (_k == 0 && (_coeffs == null || _coeffs.length == 0))
             return sb;
         sb.append(_id).append("\t");
         sb.append(_radius).append("\t");
         sb.append(_k).append("\t");
+        if (odd_count > 0) {
+            if (!is_radial_asphere() && _coeffs != null && _coeffs.length > 0 && _coeffs[0] != 0.0)
+                throw new IllegalArgumentException("Optical Bench odd format cannot represent an A2 term");
+            int max_power = _coeffs == null ? 2 : (is_radial_asphere() ? _coeffs.length : 2 * _coeffs.length);
+            for (int power = 3; power <= max_power; power++) {
+                if (power % 2 != 0 && (power - 1) / 2 > odd_count)
+                    continue;
+                double value = is_radial_asphere() ? _coeffs[power - 1]
+                        : (power % 2 == 0 ? _coeffs[power / 2 - 1] : 0.0);
+                sb.append(value).append("\t");
+            }
+            sb.append("\n");
+            return sb;
+        }
         int i = 0;
         // Skip the unused params for optical bench format
         if (_asph_type == ASPH_EVEN)
             i = 1;
-        else if (_asph_type == ASPH_ODD)
+        else if (_asph_type == ASPH_RADIAL)
             i = 2;
         for (; i < _coeffs.length; i++) {
             sb.append(_coeffs[i]).append("\t");
@@ -202,8 +235,8 @@ public class SurfaceType {
             case ASPH_EVEN_A2: {
                 return "EVEN";
             }
-            case ASPH_ODD: {
-                return "ODD";
+            case ASPH_RADIAL: {
+                return "RADIAL";
             }
         }
         return "";

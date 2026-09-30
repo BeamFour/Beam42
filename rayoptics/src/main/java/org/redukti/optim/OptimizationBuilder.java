@@ -413,7 +413,7 @@ public final class OptimizationBuilder {
 
     /**
      * Vary one aspheric coefficient, {@code _coeffs[index]} of the surface: on an even
-     * asphere the coefficient of r^(2(index+1)), so index 1 is A4; on an odd asphere the
+     * asphere the coefficient of r^(2(index+1)), so index 1 is A4; on a radial asphere the
      * coefficient of r^(index+1), so index 2 is A3. A spherical surface becomes an asphere of
      * the type the prescription already uses, even when it has none, and a coefficient the
      * surface does not have starts at zero.
@@ -458,8 +458,8 @@ public final class OptimizationBuilder {
         var definition = prescription._surfaces[surface];
         if (definition.is_aspheric())
             return definition._asph_type;
-        if (prescription.has_odd_aspheric())
-            return SurfaceType.ASPH_ODD;
+        if (prescription.has_radial_aspheric())
+            return SurfaceType.ASPH_RADIAL;
         if (prescription.has_even_a2_aspheric())
             return SurfaceType.ASPH_EVEN_A2;
         return SurfaceType.ASPH_EVEN;
@@ -468,11 +468,11 @@ public final class OptimizationBuilder {
     /** The power of r a coefficient multiplies, rejecting an index the asphere type does not have. */
     private static int powerOf(int asphereType, int index) {
         switch (asphereType) {
-            case SurfaceType.ASPH_ODD -> {
+            case SurfaceType.ASPH_RADIAL -> {
                 if (index >= 2)
                     return index + 1;
                 throw new IllegalArgumentException("coefficient " + index
-                        + " is not a term of an odd asphere, whose terms start at index 2, the A3 term");
+                        + " is not a term of a radial asphere, whose terms start at index 2, the A3 term");
             }
             case SurfaceType.ASPH_EVEN_A2 -> {
                 return 2 * (index + 1);

@@ -46,7 +46,7 @@ public class RayOpticsExporter {
     }
 
     void generate_aspherics(OpticalBenchDataImporter.AsphericalData asphere, StringBuilder fp) {
-        if (asphere.get_asphere_type() != OpticalBenchDataImporter.AsphereType.Odd)
+        if (asphere.get_asphere_type() != OpticalBenchDataImporter.AsphereType.Radial)
             fp.append("sm.ifcs[sm.cur_surface].profile = EvenPolynomial(r=").append(asphere.get_r()).append(", cc=").append(asphere.get_cc()).append(",\n");
         else
             fp.append("sm.ifcs[sm.cur_surface].profile = RadialPolynomial(r=").append(asphere.get_r()).append(", cc=").append(asphere.get_cc()).append(",\n");

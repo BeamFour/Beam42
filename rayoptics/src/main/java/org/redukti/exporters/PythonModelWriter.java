@@ -87,7 +87,7 @@ public class PythonModelWriter {
         else if (op instanceof ModelSpec.SetProfile o) {
             SurfaceType s = o.surface();
             sb.append("sm.ifcs[sm.cur_surface].profile = ")
-              .append(s.is_odd_asphere() ? "RadialPolynomial" : "EvenPolynomial")
+              .append(s.is_radial_asphere() ? "RadialPolynomial" : "EvenPolynomial")
               .append("(r=").append(num(s.get_radius_of_curvature()))
               .append(", cc=").append(num(s.get_cc()))
               .append(", coefs=").append(list(s.get_aspheric_coeffs())).append(")\n");

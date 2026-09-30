@@ -117,7 +117,7 @@ public class JavaModelWriter {
         else if (op instanceof ModelSpec.SetProfile o) {
             SurfaceType s = o.surface();
             sb.append("        sm.ifcs.get(sm.cur_surface).profile = new ")
-              .append(s.is_odd_asphere() ? "RadialPolynomial" : "EvenPolynomial")
+              .append(s.is_radial_asphere() ? "RadialPolynomial" : "EvenPolynomial")
               .append("().r(").append(num(s.get_radius_of_curvature()))
               .append(").cc(").append(num(s.get_cc()))
               .append(").coefs(").append(array(s.get_aspheric_coeffs())).append(");\n");

@@ -255,6 +255,11 @@ vary aspherics    0  K  1:1e6  2  3  4
 - `vary aspherics existing` makes a variable of every non-zero conic constant and
   aspheric coefficient already in the prescription. A sphere stays a sphere, and an
   asphere gains no orders it did not have.
+  Here "existing" means nonzero when the optimization setup is built, not merely
+  present as a column in the input. Both explicitly supplied zeros and zeros inserted
+  for omitted powers stay fixed. The variable list remains fixed during that solve,
+  even if a coefficient reaches zero. A later pipeline stage builds a fresh list
+  from the preceding stage's result.
 - `vary aspherics <surface> <terms>` varies the named terms of one surface, adding any
   it does not have yet, starting from zero. An explicit row for a surface takes
   precedence over `existing` for that surface.
@@ -268,10 +273,19 @@ coefficient array that `VarAsphCoeff` and `varyAsphericCoefficient` take:
 |---|---|---|
 | even | r<sup>2(*i*+1)</sup> | 1 is A4, 2 is A6, 3 is A8, ... |
 | even with A2 | r<sup>2(*i*+1)</sup> | 0 is A2, 1 is A4, ... |
-| odd | r<sup>*i*+1</sup> | 2 is A3, 3 is A4, ... |
+| radial (`RADIAL`, both odd and even powers) | r<sup>*i*+1</sup> | 2 is A3, 3 is A4, 5 is A6, ... |
+
+These are normalized array indices, not column numbers in Optical Bench's compact
+aspheric row. For `AsphericalOddCount = 1` and supplied A3, A4, A6, A8, A10, A12,
+the indices are **2, 3, 5, 7, 9, 11**. `vary aspherics existing` varies those
+coefficients if nonzero, plus a nonzero conic constant. An explicit index 4 instead
+requests A5, even though that power was omitted from the input. If it becomes
+nonzero, prescription export increases the odd count to preserve it. An explicit
+row replaces the entire `existing` selection for that surface, including its conic
+constant; include `K` in that row if it should also vary.
 
 An index the surface's type does not have - 0 on an even asphere without A2, 0 or 1 on
-an odd one - is an error. A spherical surface becomes an asphere of the type the
+a radial one - is an error. A spherical surface becomes an asphere of the type the
 prescription already uses, which is even when it has no aspheres.
 
 Each coefficient variable carries a scale, so that the solver works with values of order

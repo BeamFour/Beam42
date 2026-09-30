@@ -113,7 +113,7 @@ public class OpticalBenchDataImporter {
     public enum AsphereType {
         Even,
         EvenA2,
-        Odd
+        Radial
     }
 
     public static final class AsphericalData {
@@ -142,21 +142,36 @@ public class OpticalBenchDataImporter {
             return _asphere_type;
         }
 
-        public boolean is_odd_asphere() {
-            return _asphere_type == AsphereType.Odd;
+        public boolean is_radial_asphere() {
+            return _asphere_type == AsphereType.Radial;
         }
 
         public double[] get_coeffs() {
+            if (is_radial_asphere()) {
+                int count = _data.size() - 2;
+                int length = count == 0 ? 2 : radial_power(count - 1);
+                double[] coeffs = new double[length];
+                for (int i = 0; i < count; i++)
+                    coeffs[radial_power(i) - 1] = data(i + 2);
+                return coeffs;
+            }
             int a = 0;
-            if (get_asphere_type() == OpticalBenchDataImporter.AsphereType.Odd)
-                a = 2;
-            else if (get_asphere_type() == OpticalBenchDataImporter.AsphereType.Even)
+            if (get_asphere_type() == OpticalBenchDataImporter.AsphereType.Even)
                 a = 1;
             double[] coeffs = new double[_data.size()-2+a];
             for (int i = 2; i < _data.size(); i++, a++) {
                 coeffs[a] = data(i);
             }
             return coeffs;
+        }
+
+        // A3, A4, ... through the declared odd terms, then even powers only.
+        private int radial_power(int index) {
+            return index / 2 < _odd_count ? index + 3 : 2 * (index - _odd_count) + 4;
+        }
+
+        public int get_odd_count() {
+            return _odd_count;
         }
 
         public double get_cc() {
@@ -167,6 +182,7 @@ public class OpticalBenchDataImporter {
         }
 
         private AsphereType _asphere_type;
+        private int _odd_count;
         private int _surface_number;
         private List<Double> _data;
     }
@@ -445,8 +461,9 @@ public class OpticalBenchDataImporter {
                     }
                     break;
                     case ASPHERICAL_DATA: {
-                        if (has_constant("AsphericalOddCount"))
-                            asphere_type = AsphereType.Odd;
+                        int odd_count = get_aspherical_odd_count();
+                        if (odd_count > 0)
+                            asphere_type = AsphereType.Radial;
                         else if (has_constant("AsphericalA2"))
                             asphere_type = AsphereType.EvenA2;
                         else
@@ -454,6 +471,7 @@ public class OpticalBenchDataImporter {
                         String optBenchID = words[0];
                         int id = surfaceIdMap.get(optBenchID);
                         AsphericalData aspherical_data = new AsphericalData(asphere_type,id);
+                        aspherical_data._odd_count = odd_count;
                         for (int i = 1; i < words.length; i++) {
                             aspherical_data.add_data(parseDouble(words[i]));
                         }
@@ -487,6 +505,16 @@ public class OpticalBenchDataImporter {
 
         public boolean has_constant(String c) {
             return constants_.find_variable(c) != null;
+        }
+
+        public int get_aspherical_odd_count() {
+            Variable value = constants_.find_variable("AsphericalOddCount");
+            if (value == null)
+                return 0;
+            int count = value.num_scenarios() == 1 ? value.get_value_as_integer(0, -1) : -1;
+            if (count < 0)
+                throw new IllegalArgumentException("AsphericalOddCount must be a non-negative integer");
+            return count;
         }
 
         public double get_image_height() {

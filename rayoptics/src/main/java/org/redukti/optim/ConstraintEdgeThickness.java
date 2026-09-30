@@ -115,7 +115,7 @@ public class ConstraintEdgeThickness extends Constraint {
         double radius = surface.get_radius_of_curvature();
         if (!surface.is_aspheric())
             return new Spherical(radius == 0.0 ? 0.0 : 1.0 / radius);
-        if (surface.is_odd_asphere())
+        if (surface.is_radial_asphere())
             return new RadialPolynomial().r(radius).cc(surface.get_cc())
                     .coefs(surface.get_aspheric_coeffs());
         return new EvenPolynomial().r(radius).cc(surface.get_cc())

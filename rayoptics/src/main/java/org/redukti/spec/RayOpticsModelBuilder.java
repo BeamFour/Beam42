@@ -119,7 +119,7 @@ public class RayOpticsModelBuilder {
                     .max_aperture(ap_radius));
         }
         if (s.is_aspheric()) {
-            if (s.is_odd_asphere())
+            if (s.is_radial_asphere())
                 sm.ifcs.get(sm.cur_surface).profile = new RadialPolynomial().r(s.get_radius_of_curvature()).cc(s.get_cc()).coefs(s.get_aspheric_coeffs());
             else
                 sm.ifcs.get(sm.cur_surface).profile = new EvenPolynomial().r(s.get_radius_of_curvature()).cc(s.get_cc()).coefs(s.get_aspheric_coeffs());

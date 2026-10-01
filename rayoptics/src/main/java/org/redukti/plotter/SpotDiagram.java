@@ -22,26 +22,26 @@ public class SpotDiagram {
 
     /**
      * Supply a radius for the plt - if not supplied this is set to
-     * 1000 * computed max_radius.
+     * the computed maximum radius in micrometres. Supplied radii are also in micrometres.
      * Example value is 600. that covers most lenses, past and present
      * but modern lenses tend to have much smaller spot diagrams.
      */
     public String plot(Double radius) {
         RendererSvg r = new RendererSvg(640,640, Rgb.rgb_black);
         if (radius == null)
-            radius = result.max_radius*1000;
+            radius = result.get_max_radius();
         r.set_window(new Vector2Pair(new Vector2(-radius, -radius), new Vector2(radius, radius)), true);
         var axes = new PlotAxes();
         axes.set_show_axes (false, PlotAxes.AxisMask.XY);
         axes.set_label ("Sagittal distance", PlotAxes.AxisMask.X);
         axes.set_label ("Tangential distance", PlotAxes.AxisMask.Y);
-        axes.set_unit ("m", true, true, -3, PlotAxes.AxisMask.XY);
+        axes.set_unit ("m", true, true, -6, PlotAxes.AxisMask.XY);
         axes.set_tics_count (3, PlotAxes.AxisMask.XY);
         var plotRenderer = new PlotRenderer();
         plotRenderer.draw_axes_2d (r, axes);
         for (var intercepts: result.intercepts) {
             for (int i = 0; i < intercepts.x.length; i++) {
-                r.draw_point (new Vector2(intercepts.x[i]*1000, intercepts.y[i]*1000), Colors.get_wavelen_color(intercepts.wvl), Renderer.PointStyle.PointStyleDot);
+                r.draw_point (new Vector2(intercepts.x[i]*result.system_units_to_micrometres, intercepts.y[i]*result.system_units_to_micrometres), Colors.get_wavelen_color(intercepts.wvl), Renderer.PointStyle.PointStyleDot);
             }
         }
         return r.write(new StringBuilder()).toString();

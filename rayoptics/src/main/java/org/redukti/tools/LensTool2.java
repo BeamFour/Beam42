@@ -172,7 +172,7 @@ public class LensTool2 {
     }
 
     public static StringBuilder spotResultsMarkdownTable(SpotAnalysisResult spotAnalysisResult, StringBuilder sb) {
-        sb.append("| Field | Spot Mean Radius | Spot Max Radius |\n");
+        sb.append("| Field | Spot Mean Radius (µm) | Spot Max Radius (µm) |\n");
         sb.append("| ---   | ---              | ---             |\n");
         for (var result: spotAnalysisResult.spot_results) {
             sb.append(" | ").append(result.fld)

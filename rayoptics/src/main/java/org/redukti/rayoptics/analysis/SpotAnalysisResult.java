@@ -28,8 +28,22 @@ public class SpotAnalysisResult {
         public List<SpotIntercepts> intercepts = new ArrayList<>();
         public double max_radius;
         public double mean_radius;
+        /** Conversion captured with the intercepts, which remain in model units. */
+        public final double system_units_to_micrometres;
 
         public SpotResultsForField(Field fld, List<TraceGridByWvl> trace_results, double ref_wvl, boolean use_centroid) {
+            if (fld.fov == null) {
+                // Standalone fields historically use millimetres.
+                system_units_to_micrometres = 1000.0;
+            } else {
+                var model = fld.fov.optical_spec.opt_model;
+                String units = model.system_spec.dimensions;
+                if (!("m".equalsIgnoreCase(units) || "cm".equalsIgnoreCase(units)
+                        || "mm".equalsIgnoreCase(units) || "in".equalsIgnoreCase(units)
+                        || "ft".equalsIgnoreCase(units)))
+                    throw new IllegalArgumentException("Unsupported spot model units: " + units);
+                system_units_to_micrometres = 1.0 / model.nm_to_sys_units(1000.0);
+            }
             this.fld = new FieldSnapshot(fld);
             this.image_pt = fld.ref_sphere.image_pt;
             this.trace_results = trace_results;
@@ -75,11 +89,11 @@ public class SpotAnalysisResult {
         }
 
         public double get_max_radius() {
-            return max_radius * 1000;
+            return max_radius * system_units_to_micrometres;
         }
 
         public double get_mean_radius() {
-            return mean_radius * 1000;
+            return mean_radius * system_units_to_micrometres;
         }
 
         /**

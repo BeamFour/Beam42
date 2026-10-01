@@ -17,6 +17,51 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class WeightedSpotAnalysisTest {
 
     @Test
+    void reportsAndPlotsPhysicalSpotSizesInMicrometresForEverySupportedUnit() {
+        String[] units = {"m", "cm", "mm", "in", "ft", "MM"};
+        double[] factors = {1e6, 1e4, 1e3, 25400.0, 304800.0, 1e3};
+        String referencePlot = null;
+        for (int i = 0; i < units.length; i++) {
+            var model = new org.redukti.rayoptics.optical.OpticalModel();
+            model.system_spec.dimensions = units[i];
+            var field = model.optical_spec.fov.fields[0];
+            field.ref_sphere = new ReferenceSphere(Vector3.ZERO, Vector3.ZERO, 1.0, null);
+            var trace = new TraceGridByWvl(550.0, List.of(
+                    new GridItem(new Vector2(3.0 / factors[i], 4.0 / factors[i]), null)));
+            var result = new SpotAnalysisResult.SpotResultsForField(field, List.of(trace), 550.0, false);
+            assertEquals(5.0, result.get_mean_radius(), 1e-12, units[i]);
+            assertEquals(5.0, result.get_max_radius(), 1e-12, units[i]);
+            assertEquals(5.0 / factors[i], result.max_radius, 1e-15, units[i]);
+
+            var analysis = new org.redukti.optim.Analysis(null, new double[]{0.0}, new int[0]);
+            analysis._spots = new SpotAnalysisResult.SpotResultsForField[]{result};
+            var x = new org.redukti.optim.GoalSpotDeviation(analysis, 1, 0, 0,
+                    org.redukti.rayoptics.util.Orientation.X, 1.0);
+            var y = new org.redukti.optim.GoalSpotDeviation(analysis, 1, 0, 0,
+                    org.redukti.rayoptics.util.Orientation.Y, 1.0);
+            assertEquals(5.0, Math.hypot(x.value(), y.value()), 1e-12, units[i]);
+            String plot = new org.redukti.plotter.SpotDiagram(result).plot(null);
+            if (referencePlot == null) referencePlot = plot;
+            else assertEquals(referencePlot, plot, units[i]);
+            assertTrue(org.redukti.tools.LensTool2.spotResultsMarkdownTable(
+                    new SpotAnalysisResult(false), new StringBuilder()).toString().contains("(µm)"));
+
+            // Existing results retain the units of their stored intercepts.
+            model.system_spec.dimensions = "ft";
+            assertEquals(5.0, result.get_mean_radius(), 1e-12, units[i]);
+        }
+    }
+
+    @Test
+    void rejectsUnsupportedModelUnits() {
+        var model = new org.redukti.rayoptics.optical.OpticalModel();
+        model.system_spec.dimensions = "unknown";
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new SpotAnalysisResult.SpotResultsForField(
+                        model.optical_spec.fov.fields[0], List.of(), 550.0, false));
+    }
+
+    @Test
     void resultsRetainMetadataAndInterceptsAfterInputsChange() {
         var field = new Field(null);
         field.y = 0.7;

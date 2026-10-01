@@ -40,7 +40,7 @@ public class GoalSpotDeviation extends Goal {
                 ? intercepts.x[_sample_index] : intercepts.y[_sample_index];
         // SpotAnalysis stores system units (normally mm); public spot radii and
         // optimization targets use microns.
-        return 1000.0 * Math.sqrt(intercepts.weights[_sample_index]) * deviation;
+        return field.system_units_to_micrometres * Math.sqrt(intercepts.weights[_sample_index]) * deviation;
     }
 
     @Override

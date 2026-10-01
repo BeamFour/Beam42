@@ -12,7 +12,7 @@ Magnification	0	0	0
 d0	Infinity	Infinity	Infinity
 d11	29.2621	15.3732	2.3000
 d17	8.4844	9.0291	9.7754
-Bf	38.80	44.5092	53.0211
+Bf	38.7893	44.5092	53.0211
 Aperture Diameter	17.266	18.870	21.377
 [lens data]
 1	103.2579	3.9000	1.69350	77.78	53.18	M-LAC130
@@ -78,3 +78,4 @@ link	https://patents.google.com/patent/JP2018189733A/en
 lens name	Sigma 14-24mm F2.8 DG HSM Art
 scenarios	0	2
 names	14mm f2.8	24mm f2.8
+status	Accepted

@@ -13,7 +13,7 @@ d0	Infinity	Infinity	Infinity
 d10	17.4502	9.3308	3.1517
 d13	8.4183	10.2009	9.5800
 d18	9.1955	5.5627	2.6650
-Bf	21.47	27.2429	35.07
+Bf	21.4678	27.2429	35.0723
 Aperture Diameter	17.193	19.521	22.957
 [lens data]
 1	85.4412	3.2000	1.69350	67.09	53.18	M-LAC130
@@ -83,3 +83,4 @@ link	https://patents.google.com/patent/JP2020042221A/en
 lens name	Sigma 14-24mm F2.8 DG DN A
 scenarios	0	2
 names	14mm f2.8	24mm f2.8
+status	Accepted

@@ -17,8 +17,8 @@ na obj        3.950e-10
 n obj             1.000
 img_dist          35.08
 img_ht            21.18
-exp_dist         -23.80
+exp_dist         -23.81
 exp_radius        10.05
-na img          -0.1682
+na img          -0.1706
 n img             1.000
 optical invariant        3.614

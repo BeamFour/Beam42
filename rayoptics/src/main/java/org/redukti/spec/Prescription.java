@@ -308,9 +308,11 @@ public class Prescription {
      * @param use_glass_types If true will use glass types if glass names are provided
      * @param wvls Wavelengths to use
      * @param wts Wavelength weights - mainly used for Spot diagrams and MTFs
-     * @param default_scenario Default scenario - use 0 if input has no scenarios
+     * @param default_configuration Configuration that supplies the default values; see
+     *                              {@link #scenario_of_configuration} for how it is resolved
      */
-    public static Prescription build_prescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types, double[] wvls, double[] wts, int default_scenario) {
+    public static Prescription build_prescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types, double[] wvls, double[] wts, int default_configuration) {
+        int default_scenario = scenario_of_configuration(specs, default_configuration);
         // We use default values variables that can change in a multi-configuration setup.
         // The defaults are useful as they are the ones that are manipulated during optimization
         var prescription = new Prescription(
@@ -403,11 +405,46 @@ public class Prescription {
         }
     }
 
-    private Prescription add_configurations(OpticalBenchDataImporter.LensSpecifications specs) {
+    /**
+     * The report's {@code scenarios} list, or null when the report selects no
+     * configurations. The list only counts when it is non-empty and every entry has
+     * a name.
+     */
+    private static OpticalBenchDataImporter.Variable configured_scenarios(OpticalBenchDataImporter.LensSpecifications specs) {
         var configurations = specs.get_report_data().find_variable("scenarios");
         var configuration_names = specs.get_report_data().find_variable("names");
         if (configurations != null && configurations.num_values() > 0 &&
-            configuration_names != null && configuration_names.num_values() == configurations.num_values()) {
+            configuration_names != null && configuration_names.num_values() == configurations.num_values())
+            return configurations;
+        return null;
+    }
+
+    /**
+     * Resolve a configuration index to the OpticalBench scenario it selects.
+     * <p>
+     * When the report selects configurations, configuration {@code i} is the scenario
+     * named by the {@code i}th entry of {@code scenarios}. Otherwise there is no
+     * indirection, and the configuration index is the scenario itself.
+     *
+     * @throws IllegalArgumentException if the index is negative, or beyond the
+     *                                  configurations the report selects
+     */
+    public static int scenario_of_configuration(OpticalBenchDataImporter.LensSpecifications specs, int configuration) {
+        if (configuration < 0)
+            throw new IllegalArgumentException("configuration must be non-negative, got " + configuration);
+        var configurations = configured_scenarios(specs);
+        if (configurations == null)
+            return configuration;
+        if (configuration >= configurations.num_values())
+            throw new IllegalArgumentException("configuration " + configuration
+                    + " requested but the prescription selects " + configurations.num_values());
+        return configurations.get_value_as_integer(configuration, 0);
+    }
+
+    private Prescription add_configurations(OpticalBenchDataImporter.LensSpecifications specs) {
+        var configurations = configured_scenarios(specs);
+        if (configurations != null) {
+            var configuration_names = specs.get_report_data().find_variable("names");
             _configurations = new int[configurations.num_values()];
             _configuration_names = new String[configuration_names.num_values()];
             for (int i = 0; i < configurations.num_values(); i++) {

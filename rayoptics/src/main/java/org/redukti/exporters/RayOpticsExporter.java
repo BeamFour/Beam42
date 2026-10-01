@@ -252,7 +252,10 @@ public class RayOpticsExporter {
         if (arguments.legacy_notebook) {
             var specs = new OpticalBenchDataImporter.LensSpecifications();
             specs.parse_file(arguments.specfile);
-            output = new RayOpticsExporter().generate(specs, arguments.scenario, arguments.use_glass_types);
+            // --scenario names a configuration, as it does for the comparable model,
+            // but this path reads the OpticalBench scenarios directly
+            int scenario = Prescription.scenario_of_configuration(specs, arguments.scenario);
+            output = new RayOpticsExporter().generate(specs, scenario, arguments.use_glass_types);
         }
         else {
             output = generate_comparable(arguments);

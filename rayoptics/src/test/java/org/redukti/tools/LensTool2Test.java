@@ -3,6 +3,8 @@ package org.redukti.tools;
 import org.junit.jupiter.api.Test;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.rayoptics.seq.Glass;
+import org.redukti.spec.Prescription;
+import org.redukti.spec.VigType;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,6 +25,52 @@ class LensTool2Test {
             scenarios	0	1
             names	Wide	Long
             """;
+
+    @Test
+    void firstSelectedScenarioSuppliesDefaultGeometryAndOpticalSpecs() throws Exception {
+        for (String report : new String[]{"scenarios\t1\nnames\tLong",
+                "scenarios\t1\t0\nnames\tLong\tWide"}) {
+            String input = INPUT.replace("scenarios\t0\t1\nnames\tWide\tLong", report);
+            assertNotEquals(INPUT, input, "fixture no longer contains the report being replaced");
+            var specs = new OpticalBenchDataImporter.LensSpecifications();
+            specs.parse_buffer(input);
+            var prescription = LensTool2.createPrescription(specs, true, false);
+            assertEquals(60.0, prescription._focal_length);
+            assertEquals(5.0, prescription._fno);
+            assertEquals(35.0, prescription._angle_of_view_in_degrees);
+            assertEquals(55.0, prescription.get_surfaces()[1]._thickness);
+            assertEquals(55.0, prescription.get_surfaces()[1].get_thickness_by_scenario(0));
+            var model = LensTool2.createSystem(prescription, true, VigType.None,
+                    false, new double[]{0.0, 1.0}, 0);
+            assertEquals(5.0, model.optical_spec.pupil.value);
+            assertEquals(17.5, model.optical_spec.fov.value);
+            var weighted = LensTool2.createWeightedPrescription(prescription, false);
+            assertEquals(60.0, weighted._focal_length);
+            assertEquals(5.0, weighted._fno);
+            assertEquals(35.0, weighted._angle_of_view_in_degrees);
+        }
+    }
+
+    @Test
+    void configurationIndexResolvesThroughSelectedScenarios() throws Exception {
+        var reordered = new OpticalBenchDataImporter.LensSpecifications();
+        reordered.parse_buffer(INPUT.replace("scenarios\t0\t1\nnames\tWide\tLong",
+                "scenarios\t1\t0\nnames\tLong\tWide"));
+        assertEquals(1, Prescription.scenario_of_configuration(reordered, 0));
+        assertEquals(0, Prescription.scenario_of_configuration(reordered, 1));
+        assertThrows(IllegalArgumentException.class,
+                () -> Prescription.scenario_of_configuration(reordered, 2));
+        assertThrows(IllegalArgumentException.class,
+                () -> Prescription.scenario_of_configuration(reordered, -1));
+        assertThrows(IllegalArgumentException.class,
+                () -> Prescription.build_prescription(reordered, true, new double[]{587.5618},
+                        new double[]{1.0}, 2));
+
+        // Without selected configurations the index is the scenario itself
+        var unconfigured = new OpticalBenchDataImporter.LensSpecifications();
+        unconfigured.parse_buffer(INPUT.replace("scenarios\t0\t1\nnames\tWide\tLong\n", ""));
+        assertEquals(1, Prescription.scenario_of_configuration(unconfigured, 1));
+    }
 
     @Test
     void reportsAndWeightedSpectrumKeepFinalAirspaces() throws Exception {

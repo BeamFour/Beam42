@@ -58,3 +58,16 @@ originY	80.74
 ppmm	1.846
 [notes]
 Bill: d0 measured.
+[patent info]
+country	JP
+number	JP-S62-108218
+example	3
+year applied	1985
+inventors	Yoshinari Hamanishi
+current assignee	Nikon Corp
+original assignee	Nippon Kogaku KK
+link	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S62-108218/11/en
+[report data]
+lens name	AF Zoom-Nikkor 24-85mm f/2.8-4D IF
+scenarios	0	2
+names	24mm f2.8	85mm f4.0

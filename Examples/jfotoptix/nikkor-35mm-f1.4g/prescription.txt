@@ -42,3 +42,4 @@ original assignee	Nikon Corp
 link	https://patents.google.com/patent/US7663816B2/en
 [report data]
 lens name	AFS Nikkor 35mm F1.4G
+status	Candidate

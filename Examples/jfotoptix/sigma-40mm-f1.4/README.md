@@ -43,10 +43,8 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 28| EVEN | 0.0 | 0.0 | -2.73662E-6 | 3.07519E-9 | 3.90515E-11 | -1.94154E-14 |
 | 29| EVEN | 0.0 | 0.0 | 3.26804E-6 | 3.98767E-9 | 3.58258E-11 | 0  |
 ## Layouts
-![Layout Only](./layoutonly.svg)
-![Layout Field 0.0](./layout.svg)
-![Layout Field 0.7](./layout-semi-skew.svg)
-![Layout Field 1.0](./layout-skew.svg)
+![Layout Elements](./layoutonly.svg)
+![Layout](./layout.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew.svg)
@@ -75,21 +73,21 @@ Note that where glass types are shown the refractive index and abbe number is as
 | img_ht | 21.847
 | obj_ang | 27.935
 | obj_na | 0
-| img_na | -0.326|
+| img_na | -0.345|
 ## Spot Analysis
-| Field | Spot Mean Radius | Spot Max Radius |
+| Field | Spot Mean Radius (µm) | Spot Max Radius (µm) |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 4.243 | 7.173|
- | Field(x=0.0, y=0.1) | 4.412 | 15.688|
- | Field(x=0.0, y=0.2) | 5.396 | 19.904|
- | Field(x=0.0, y=0.3) | 5.391 | 20.512|
- | Field(x=0.0, y=0.4) | 5.1 | 22.444|
- | Field(x=0.0, y=0.5) | 5.35 | 27.785|
- | Field(x=0.0, y=0.6) | 5.822 | 42.269|
- | Field(x=0.0, y=0.7) | 6.239 | 33.337|
- | Field(x=0.0, y=0.8) | 6.335 | 39.849|
- | Field(x=0.0, y=0.9) | 7.173 | 56.509|
- | Field(x=0.0, y=1.0) | 8.553 | 42.261|
+ | Field(x=0.0, y=0.0) | 4.159 | 7.168|
+ | Field(x=0.0, y=0.1) | 4.382 | 15.545|
+ | Field(x=0.0, y=0.2) | 4.974 | 20.135|
+ | Field(x=0.0, y=0.3) | 5.063 | 20.546|
+ | Field(x=0.0, y=0.4) | 5.152 | 23.035|
+ | Field(x=0.0, y=0.5) | 5.442 | 27.983|
+ | Field(x=0.0, y=0.6) | 5.92 | 42.635|
+ | Field(x=0.0, y=0.7) | 6.337 | 57.57|
+ | Field(x=0.0, y=0.8) | 6.686 | 62.567|
+ | Field(x=0.0, y=0.9) | 7.356 | 65.713|
+ | Field(x=0.0, y=1.0) | 8.444 | 45.026|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10=red,30=blue,50=black cycles/mm
@@ -104,4 +102,6 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./Sigma-40mmf1.4.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-07-07
+Generated from `Sigma-40mmf1.4.txt`, status **TODO**
+
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-10-02

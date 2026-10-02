@@ -19,6 +19,6 @@ img_dist          39.00
 img_ht            21.85
 exp_dist         -45.64
 exp_radius        29.18
-na img          -0.3259
+na img          -0.3448
 n img             1.000
 optical invariant        7.532

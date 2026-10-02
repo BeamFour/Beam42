@@ -75,3 +75,4 @@ originY	406.89
 ppmm	8.652
 [notes]
 Bill: Measured Magnification.
+Dibyendu: --vig-type set-fnum

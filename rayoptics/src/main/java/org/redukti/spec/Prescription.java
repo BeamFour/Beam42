@@ -369,6 +369,13 @@ public class Prescription {
         prescription.add_configurations(specs);
         List<OpticalBenchDataImporter.LensSurface> surfaces = specs.get_surfaces();
         for (int i = 0; i < surfaces.size(); i++) {
+            if (prescription._configurations != null) {
+                // Below is just for validation checks
+                for (int scenario : prescription._configurations) {
+                    surfaces.get(i).get_thickness(scenario);
+                    surfaces.get(i).get_diameter(scenario);
+                }
+            }
             prescription.import_surface(surfaces.get(i),default_scenario,use_glass_types);
             if (prescription._configurations != null) {
                 prescription.add_configuration_data(surfaces.get(i));

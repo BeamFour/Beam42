@@ -134,6 +134,60 @@ public class LensTool2 {
         return new RayOpticsModelBuilder(prescription).build_optical_model(fov_angle,fields,false,vig_type,use_wideangle_aiming,config);
     }
 
+    /** Save analysis apertures without changing the prescription used to compute the analyses. */
+    static Prescription prescriptionWithAnalysisApertures(Prescription prescription,
+                                                          OpticalModel[] models, VigType vigType) throws Exception {
+        var specs = new OpticalBenchDataImporter.LensSpecifications();
+        specs.parse_buffer(prescription.to_opt_bench_str(new StringBuilder()).toString());
+        var result = createPrescription(specs, true, prescription._wvls, prescription._wts);
+        if (vigType != VigType.SetStopAperture && vigType != VigType.SetApertures
+                && vigType != VigType.SetFnum)
+            return result;
+        var surfaces = result.get_surfaces();
+        // Glass apertures are shared across configurations; the stop may vary.
+        double[] sharedDiameters = new double[surfaces.length];
+        for (var surface : surfaces) {
+            if (surface.is_aperture_stop() && result.get_num_configurations() > 0
+                    && surface._diameter_by_scenario == null) {
+                surface._diameter_by_scenario = new double[models.length];
+                java.util.Arrays.fill(surface._diameter_by_scenario, surface._diameter);
+            }
+        }
+        for (int config = 0; config < models.length; config++) {
+            var targets = new ArrayList<Integer>();
+            for (int i = 0; i < surfaces.length; i++) {
+                if (vigType != VigType.SetStopAperture || surfaces[i].is_aperture_stop())
+                    targets.add(i);
+            }
+            result.update_apertures_from(models[config], config, null, targets,
+                    Prescription.APERTURE_DECIMALS);
+            for (int i : targets) {
+                if (!surfaces[i].is_aperture_stop())
+                    sharedDiameters[i] = Math.max(sharedDiameters[i], surfaces[i]._diameter);
+            }
+        }
+        if (vigType != VigType.SetStopAperture) {
+            for (int i = 0; i < surfaces.length; i++) {
+                if (!surfaces[i].is_aperture_stop())
+                    surfaces[i]._diameter = sharedDiameters[i];
+            }
+        }
+        return result;
+    }
+
+    /** Record the source filename without its local filesystem path. */
+    static String prescriptionOutput(Prescription prescription, String specFile) {
+        var sb = prescription.to_opt_bench_str(new StringBuilder());
+        sb.append("\n[notes]\n");
+        sb.append("source prescription\t").append(escapeNote(Helper.getFilename(specFile))).append('\n');
+        return sb.toString();
+    }
+
+    private static String escapeNote(String value) {
+        return value.replace("\\", "\\\\").replace("\t", "\\t")
+                .replace("\r", "\\r").replace("\n", "\\n");
+    }
+
     public static void outputSpotAnalysis(SpotAnalysisResult.SpotResultsForField result, Path output_file, Double radius) throws Exception {
         if (output_file != null) {
             Helper.createOutputFile(output_file, new SpotDiagram(result).plot(radius));
@@ -677,7 +731,14 @@ public class LensTool2 {
             var prescription = createPrescription(specs,arguments.use_glass_types,arguments.only_d_line);
             if (arguments.optimize)
                 runDefaultOptimizations(prescription, arguments, OPTIMIZATION_VIG_TYPE);
-            String prescription_output = prescription.to_opt_bench_str(new StringBuilder()).toString();
+            // The vignetting can alter the prescription (aperture diameters)
+            // So we want to capture the changed values
+            var analysisModels = new OpticalModel[Math.max(prescription.get_num_configurations(), 1)];
+            for (int config = 0; config < analysisModels.length; config++)
+                analysisModels[config] = createSystem(prescription, true, analysisVigType,
+                        realRayAiming, fields, config);
+            var outputPrescription = prescriptionWithAnalysisApertures(prescription, analysisModels, analysisVigType);
+            String prescription_output = prescriptionOutput(outputPrescription, arguments.specfile);
             Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile, "prescription.txt", arguments.outdir), prescription_output);
             ZemaxExporter zemaxExporter = new ZemaxExporter();
             // Named from the specfile but placed like every other output, so that
@@ -686,14 +747,14 @@ public class LensTool2 {
             String zmxName = Helper.replaceExtension(Helper.getFilename(arguments.specfile), ".zmx");
             Helper.createOutputFile(
                     Helper.getOutputFileWithPath(arguments.specfile, zmxName, arguments.outdir),
-                    zemaxExporter.generate(prescription, arguments.only_d_line));
-            StringBuilder SB = startREADME(prescription);
+                    zemaxExporter.generate(outputPrescription, arguments.only_d_line));
+            StringBuilder SB = startREADME(outputPrescription);
             var prescriptionForWeightedMTF = createWeightedPrescription(prescription, arguments.only_d_line);
             for (int config = 0; config < Math.max(prescription.get_num_configurations(),1); config++) {
                 if (prescription.get_num_configurations() > 0)
                     addConfigLabelToREADME(SB,prescription._configuration_names[config]);
                 var scenario_filesuffix = prescription.get_num_configurations() > 0 ? ("-"+config) : "";
-                var opm = createSystem(prescription, true, analysisVigType, realRayAiming, fields, config);
+                var opm = analysisModels[config];
                 var sm = opm.seq_model;
                 var osp = opm.optical_spec;
                 var fod = opm.optical_spec.parax_data.fod;
@@ -702,7 +763,7 @@ public class LensTool2 {
                 System.out.println(osp.list_str(new StringBuilder()).toString());
                 Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile, suffixed_name("vig", scenario_filesuffix, ".txt"), arguments.outdir), osp.list_str(new StringBuilder()).toString());
                 Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile, suffixed_name("paraxial", scenario_filesuffix, ".txt"), arguments.outdir), fod.toString());
-                doLayoutDiagrams(prescription, arguments, config, scenario_filesuffix);
+                doLayoutDiagrams(outputPrescription, arguments, config, scenario_filesuffix);
 
 //            StringBuilder buf = new StringBuilder();
 //            for (int i = 0; i < fields.length; i++) {
@@ -729,7 +790,7 @@ public class LensTool2 {
             }
             createREADME(SB,
                     arguments.specfile,
-                    prescription,
+                    outputPrescription,
                     Helper.getOutputFileWithPath(arguments.specfile, "README.md", arguments.outdir));
             long finishTime = System.nanoTime();
             System.out.println("Finished in " + TimeUnit.NANOSECONDS.toSeconds(finishTime-startTime) + " secs");

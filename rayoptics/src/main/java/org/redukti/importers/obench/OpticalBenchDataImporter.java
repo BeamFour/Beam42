@@ -101,6 +101,23 @@ public class OpticalBenchDataImporter {
                 return 0.0;
             }
         }
+
+        /** Numeric value of a referenced variable; zero is valid, missing data is not. */
+        public double require_value_as_double(int scenario) {
+            if (scenario < 0 || scenario >= _values.size())
+                throw new IllegalArgumentException("Variable '" + _name
+                        + "' has no value for scenario " + scenario);
+            String value = _values.get(scenario);
+            try {
+                double result = Double.parseDouble(value);
+                if (Double.isNaN(result))
+                    throw new NumberFormatException();
+                return result;
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Variable '" + _name + "' specifies '"
+                        + value + "' for scenario " + scenario + "; expected a numeric value");
+            }
+        }
         public int get_value_as_integer(int scenario, int defaultValue) {
             String s = get_value(scenario);
             return parseInteger(s,defaultValue);
@@ -228,6 +245,8 @@ public class OpticalBenchDataImporter {
         }
 
         public double get_thickness(int scenario) {
+            if (_thickness_variable != null)
+                return _thickness_variable.require_value_as_double(scenario);
             if (scenario < _thickness_by_scenario.size())
                 return _thickness_by_scenario.get(scenario);
             else {
@@ -241,6 +260,8 @@ public class OpticalBenchDataImporter {
         }
 
         public double get_diameter(int scenario) {
+            if (_diameter_variable != null)
+                return _diameter_variable.require_value_as_double(scenario);
             if (scenario < _diameter_by_scenario.size())
                 return _diameter_by_scenario.get(scenario);
             else {
@@ -306,6 +327,8 @@ public class OpticalBenchDataImporter {
         }
 
         private int _id;
+        private Variable _thickness_variable;
+        private Variable _diameter_variable;
         private SurfaceType _surface_type;
         private double _radius;
         private List<Double> _thickness_by_scenario = new ArrayList<>();
@@ -569,17 +592,18 @@ public class OpticalBenchDataImporter {
                 surface_builder.add_thickness(0.0);
                 return;
             }
-            if (Character.isAlphabetic(value.charAt(0))) {
+            if (Character.isAlphabetic(value.charAt(0)) && !value.equals("Infinity")) {
                 Variable var = find_variable(value);
                 if (var != null) {
+                    surface_builder._thickness_variable = var;
                     for (int i = 0; i < var.num_scenarios(); i++) {
                         String s = var.get_value(i);
                         double d = parseDouble(s);
                         surface_builder.add_thickness(d);
                     }
                 } else {
-                    //fprintf (stderr, "Variable %s was not found\n", value);
-                    surface_builder.add_thickness(0.0);
+                    throw new IllegalArgumentException("Referenced variable '" + value
+                            + "' was not found in [variable distances]");
                 }
             } else {
                 surface_builder.add_thickness(parseDouble(value));
@@ -595,6 +619,7 @@ public class OpticalBenchDataImporter {
             else {
                 Variable var = find_variable("Aperture Diameter");
                 if (var != null) {
+                    surface_builder._diameter_variable = var;
                     for (int i = 0; i < var.num_scenarios(); i++) {
                         String s = var.get_value(i);
                         double d = parseDouble(s);

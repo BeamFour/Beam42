@@ -69,6 +69,7 @@ brackets. Lines beginning with `#` are treated as comments.
 | `[variable distances]` | Optical Bench | System values and named airspaces. Three rows are mandatory, see below. Each row may carry **several values**, one per configuration. |
 | `[lens data]` | Optical Bench, **extended** | The surface table. Beam42 accepts glass and catalog name columns, see below.                                                          |
 | `[aspherical data]` | Optical Bench | Aspheric coefficients.                                                                                                                |
+| `[notes]` | **Beam42 extension** | Source prescription filename recorded in the generated prescription. Informational only. |
 | `[patent info]` | **Beam42 extension** | Provenance for the patent report.                                                                                                     |
 | `[report data]` | **Beam42 extension** | Report title and, importantly, which configurations to process.                                                                       |
 | `[trial n]` | **Beam42 extension** | An optimization run described in the file. See [OPTIMIZER.md](OPTIMIZER.md) for details.                                                      |
@@ -141,7 +142,7 @@ LensTool2 treats the following as optional:
 | --- |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
 | `Image Height` | Sets the image circle diameter. Only the **first** value is read, so it does not vary per configuration.                                                                  | Defaults to 43.2 mm, i.e. 35 mm format.                                                       |
 | `Aperture Diameter` | Overrides the diameter given on the aperture stop (`AS`) row in `[lens data]`, one value per configuration. This allows a zoom to vary its stop diameter by focal length. | The diameter defined on the aperture stop (`AS`) row in `[lens data]` is used.                |
-| Named airspaces (`Bf`, `d12`, `d20`, ...) | Any row whose name appears in a thickness column of `[lens data]`, supplying one thickness per configuration.                                                             | A thickness naming a variable that does not exist defaults to **0.0**, with no warning. FIXME |
+| Named airspaces (`Bf`, `d12`, `d20`, ...) | Any row whose name appears in a thickness column of `[lens data]`, supplying one thickness per configuration. Zero is a valid thickness. | An undefined variable, or a missing, empty or non-numeric value for a selected scenario, is an error. |
 
 ### `[lens data]` glass columns
 
@@ -519,14 +520,26 @@ it. See [OPTIMIZER.md](OPTIMIZER.md).
 `prescription.txt` contains the data and configurations used for the report;
 unused input data is discarded.
 
+When `--vig-type` resizes apertures (`set-stop-aperture`, `set-apertures` or
+`set-fnum`), the generated prescription, Zemax export and README surface table
+include the resulting diameters, rounded to four decimal places. Stop diameters
+are saved per configuration. Other surfaces have shared apertures, so their
+saved diameter is the largest required across the selected configurations.
+Sizing uses the final geometry after any optimization; it does not change the
+optimizer's vignetting or freezing settings.
+
 It can be fed straight back in. For a run using the default analysis options:
 
 ```bash
 java -jar rayoptics/target/lenstool.jar --specfile prescription.txt --outdir rerun
 ```
 
-The prescription does not save command line analysis settings FIXME. To reproduce a
-non-default run, supply the same `--mtf`, `--only-d-line`, `--vig-type`, ray aiming,
+The generated `[notes]` section records the source filename in a
+`source prescription<tab>filename` row, matching the README's `Generated from`
+line, without its local filesystem path. Command line arguments are not saved.
+These notes are informational: LensTool2 does not apply them when reading the
+prescription. To reproduce a non-default run, supply
+the same `--mtf`, `--only-d-line`, `--vig-type`, ray aiming,
 spot sampling, diagram sizing and optional plot flags again. For example:
 
 ```bash
@@ -536,7 +549,10 @@ java -jar rayoptics/target/lenstool.jar --specfile prescription.txt --outdir rer
 Optimized airspaces and assigned glasses are already saved in the prescription;
 do not repeat `--optimize` or glass assignment to reproduce that geometry.
 With matching analysis settings, the regenerated outputs should reproduce the
-same numerical results. Two output details can still vary:
+same numerical results when apertures have not been resized. After resizing,
+rounding and shared aperture sizes can affect a subsequent analysis or sizing
+pass. Use `--vig-type set-vig` to measure vignetting from the saved apertures
+without resizing them again. Two output details can still vary:
 
 * The report footer carries the generation date, `Report / Zemax file generated
   using Beam42 on <date>`.

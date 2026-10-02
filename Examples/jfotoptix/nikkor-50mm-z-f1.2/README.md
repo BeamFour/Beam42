@@ -2,48 +2,48 @@
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
-|EU | WO 2021/241230 | EX 1 | 2021 | Hiroki Harada | Nikon Corp  | [link](https://patents.google.com/patent/WO2021241230A1/en) |
+|EU | WO 2021/241230 | EX 1 | 2021 | Hiroki Harada | Nikon Corp | [link](https://patents.google.com/patent/WO2021241230A1/en) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
 | ID  | Radius | Thickness | Diameter | nd  | vd  | Glass Make | Glass |
 | --- | ---    | ---       | ---      | --- | --- | ---        | ---   |
-| 1 | 280.6827 | 2.65 | 62.72 | 1.64 | 60.19 | Hikari | J-LAK01 |
-| 2 | 46.02198 | 3.54 | 56.7 |  |  |  |
-| 3 | 50.87481 | 4.19 | 56.64 | 1.94594 | 17.98 | Hoya | FDS18 |
-| 4 | 62.23366 | 16.51 | 55.16 |  |  |  |
-| 5 | -43.98849 | 3.2 | 55.16 | 1.55298 | 55.07 | Hikari | J-KZFH4 |
-| 6 | -158.30791 | 4.05 | 57.82 |  |  |  |
-| 7 | -82.01412 | 6.7 | 59.68 | 1.59349 | 67.0 | Hikari | J-PSKH4 |
-| 8 | -52.72274 | 0.1 | 59.68 |  |  |  |
+| 1 | 280.6827 | 2.65 | 61.3982 | 1.64 | 60.19 | Hikari | J-LAK01 |
+| 2 | 46.02198 | 3.54 | 55.4211 |  |  |  |
+| 3 | 50.87481 | 4.19 | 55.2952 | 1.94594 | 17.98 | Hoya | FDS18 |
+| 4 | 62.23366 | 16.51 | 53.938 |  |  |  |
+| 5 | -43.98849 | 3.2 | 53.5133 | 1.55298 | 55.07 | Hikari | J-KZFH4 |
+| 6 | -158.30791 | 4.05 | 56.7495 |  |  |  |
+| 7 | -82.01412 | 6.7 | 57.2121 | 1.59349 | 67.0 | Hikari | J-PSKH4 |
+| 8 | -52.72274 | 0.1 | 58.6067 |  |  |  |
 | 9 | FS | 0.0 | 58.56 |  |  |  |
-| 10 | 113.04472 | 10.81 | 62.66 | 1.59349 | 67.0 | Hikari | J-PSKH4 |
-| 11 | -113.04472 | 0.2 | 62.66 |  |  |  |
-| 12 | 75.49059 | 6.54 | 61.16 | 1.59349 | 67.0 | Hikari | J-PSKH4 |
-| 13 | 275.33026 | 0.2 | 60.1 |  |  |  |
-| 14 | 48.85546 | 10.35 | 56.36 | 1.59349 | 67.0 | Hikari | J-PSKH4 |
-| 15 | 571.46325 | 0.68 | 54.12 |  |  |  |
-| 16 | 290.13527 | 6.04 | 52.94 | 1.59319 | 67.9 | Hikari | J-PSKH1 |
-| 17 | -109.11 | 2.16 | 51.04 | 1.738 | 32.26 | Hikari | J-KZFH9 |
-| 18 | 40.04126 | 7.79 | 43.22 |  |  |  |
-| 19 | AS | 19.164 | 40.849 |  |  |  |
-| 20 | -37.07012 | 1.7 | 37.42 | 1.72047 | 34.7 | Schott | N-KZFS8 |
-| 21 | -95.03209 | 0.2 | 38.12 |  |  |  |
-| 22 | 58.85968 | 6.2 | 39.08 | 1.59319 | 67.9 | Hikari | J-PSKH1 |
-| 23 | 0.0 | 2.0 | 39.08 |  |  |  |
+| 10 | 113.04472 | 10.81 | 60.8352 | 1.59349 | 67.0 | Hikari | J-PSKH4 |
+| 11 | -113.04472 | 0.2 | 61.105 |  |  |  |
+| 12 | 75.49059 | 6.54 | 59.4501 | 1.59349 | 67.0 | Hikari | J-PSKH4 |
+| 13 | 275.33026 | 0.2 | 58.6273 |  |  |  |
+| 14 | 48.85546 | 10.35 | 54.8865 | 1.59349 | 67.0 | Hikari | J-PSKH4 |
+| 15 | 571.46325 | 0.68 | 52.8298 |  |  |  |
+| 16 | 290.13527 | 6.04 | 51.1625 | 1.59319 | 67.9 | Hikari | J-PSKH1 |
+| 17 | -109.11 | 2.16 | 49.3791 | 1.738 | 32.26 | Hikari | J-KZFH9 |
+| 18 | 40.04126 | 7.79 | 41.6017 |  |  |  |
+| 19 | AS | 19.164 | 40.8399 |  |  |  |
+| 20 | -37.07012 | 1.7 | 36.392 | 1.72047 | 34.7 | Schott | N-KZFS8 |
+| 21 | -95.03209 | 0.2 | 37.7351 |  |  |  |
+| 22 | 58.85968 | 6.2 | 38.8871 | 1.59319 | 67.9 | Hikari | J-PSKH1 |
+| 23 | 0.0 | 2.0 | 38.5144 |  |  |  |
 | 24 | 391.6081 | 6.46 | 38.08 | 1.59349 | 67.0 | Hikari | J-PSKH4 |
 | 25 | -165.0 | 2.6 | 38.08 |  |  |  |
-| 26 | 71.0 | 4.0 | 39.18 | 1.7645 | 49.1 | Ohara | L-LAH91 |
-| 27 | -430.72555 | 1.9 | 39.18 |  |  |  |
-| 28 | 137.78125 | 3.1 | 40.08 | 1.618 | 63.34 | Hikari | J-PSK02 |
-| 29 | 795.36428 | 0.1 | 40.08 |  |  |  |
-| 30 | 87.92389 | 5.7 | 39.92 | 1.90265 | 35.77 | Hikari | J-LASFH9A |
-| 31 | -127.68 | 1.8 | 39.58 | 1.61266 | 44.46 | Hikari | J-KZFH1 |
-| 32 | 40.89766 | 7.76 | 37.28 |  |  |  |
-| 33 | -64.58764 | 1.8 | 37.28 | 1.5168 | 64.13 | Hikari | J-BK7A |
-| 34 | 423.87378 | 10.755 | 38.86 |  |  |  |
-| 35 | CG | 1.6 | 44.56 | 1.5168 | 64.13 | Hikari | J-BK7A |
-| 36 | CG | 0.702 | 44.56 |  |  |  |
+| 26 | 71.0 | 4.0 | 38.9446 | 1.7645 | 49.1 | Ohara | L-LAH91 |
+| 27 | -430.72555 | 1.9 | 39.143 |  |  |  |
+| 28 | 137.78125 | 3.1 | 39.4009 | 1.618 | 63.34 | Hikari | J-PSK02 |
+| 29 | 795.36428 | 0.1 | 39.27 |  |  |  |
+| 30 | 87.92389 | 5.7 | 39.1064 | 1.90265 | 35.77 | Hikari | J-LASFH9A |
+| 31 | -127.68 | 1.8 | 38.5846 | 1.61266 | 44.46 | Hikari | J-KZFH1 |
+| 32 | 40.89766 | 7.76 | 35.8918 |  |  |  |
+| 33 | -64.58764 | 1.8 | 35.8896 | 1.5168 | 64.13 | Hikari | J-BK7A |
+| 34 | 423.87378 | 10.755 | 37.2869 |  |  |  |
+| 35 | CG | 1.6 | 42.1185 | 1.5168 | 64.13 | Hikari | J-BK7A |
+| 36 | CG | 0.702 | 42.6038 |  |  |  |
 ## Aspherical Data
 | ID  | Type | k   | P1 | P2 | P3 | P4 | P5 | P6 | P7 | P8 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -62,7 +62,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ---       | ---   |
 | effective_focal_length |51.281
 | back_focal_length | 0.753
-| optical_invariant | 8.765
+| optical_invariant | 8.763
 | object_distance | 1.0E10
 | image_distance | 0.753
 | power | 0.02
@@ -71,9 +71,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ffl_F | 9.918
 | fno | 1.23
 | enp_dist_P | 50.619
-| enp_radius | 20.85
+| enp_radius | 20.846
 | exp_dist_P' | -63.806
-| exp_radius | 26.269
+| exp_radius | 26.264
 | m | -0
 | red | -1.9500518046394414E8
 | n_obj | 1
@@ -85,8 +85,8 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius (µm) | Spot Max Radius (µm) |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 5.814 | 11.638|
- | Field(x=0.0, y=0.1) | 6.157 | 23.666|
+ | Field(x=0.0, y=0.0) | 5.811 | 11.638|
+ | Field(x=0.0, y=0.1) | 6.154 | 23.565|
  | Field(x=0.0, y=0.2) | 6.706 | 28.391|
  | Field(x=0.0, y=0.3) | 7.117 | 33.168|
  | Field(x=0.0, y=0.4) | 7.838 | 37.042|
@@ -95,7 +95,7 @@ Note that where glass types are shown the refractive index and abbe number is as
  | Field(x=0.0, y=0.7) | 10.722 | 46.43|
  | Field(x=0.0, y=0.8) | 12.318 | 53.735|
  | Field(x=0.0, y=0.9) | 14.715 | 76.334|
- | Field(x=0.0, y=1.0) | 19.181 | 119.861|
+ | Field(x=0.0, y=1.0) | 16.462 | 121.146|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10=red,30=blue,50=black cycles/mm
@@ -110,6 +110,6 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./Nikkor-Z-50mm-f1.2.zmx)
 
-Generated from `Nikkor-Z-50mm-f1.2.txt`, status **TODO**
+Generated from `Nikkor-Z-50mm-f1.2.txt`, status **Accepted**
 
 Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-10-02

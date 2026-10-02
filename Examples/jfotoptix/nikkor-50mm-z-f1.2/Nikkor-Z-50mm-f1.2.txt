@@ -1,8 +1,5 @@
 [descriptive data]
 title	WO 2021/241230 Example 1 (Nikon Nikkor Z 50mm f/1.2 S)
-#patent	country	number	example	year	inventors	org	link
-patent	EU	WO 2021/241230	EX 1	2021	Hiroki Harada	Nikon Corp 	https://patents.google.com/patent/WO2021241230A1/en
-lens name	NIKKOR Z 50mm f/1.2 S
 [constants]
 [variable distances]
 Focal Length	51.29	undefined
@@ -68,3 +65,17 @@ ppmm	4.219
 Bill:
 6	-52.72274	-3.000		54.64	
 9	FS	3.100		57.18	
+Dibyendu:
+--vig-type set-fnum
+[patent info]
+country	EU
+number	WO 2021/241230
+example	EX 1
+year applied	2021
+inventors	Hiroki Harada
+current assignee	Nikon Corp
+original assignee	Nikon Corp
+link	https://patents.google.com/patent/WO2021241230A1/en
+[report data]
+lens name	NIKKOR Z 50mm f/1.2 S
+status	Accepted

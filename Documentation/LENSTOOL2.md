@@ -35,13 +35,13 @@ prescription is downloaded from the Optical Bench into a directory you specify:
 java -jar rayoptics/target/lenstool.jar --patent JP1993-034592 --example 2 --outdir ef14mm
 ```
 
-The example number is padded to two digits to match the convention used by OpticalBench, thus `2` is converted to `02`. 
+The example number is padded to two digits to match the convention used by Optical Bench, thus `2` is converted to `02`. 
 Examples that carry a suffix are passed through unchanged, therefore 
 `--example 08P` looks for a spec with that suffix.
 
-The Patent numbers must be specified in the format used by OpticalBench.
+The patent numbers must be specified in the format used by Optical Bench.
 
-If the OpticalBench has no matching patent/example then the tool emits an error message such as:
+If the Optical Bench has no matching patent/example then the tool emits an error message such as:
 
 ```
 Patent / example not found on the Optical Bench: JP1993-034592 example 47
@@ -102,9 +102,11 @@ AsphericalOddCount	1
 ```
 
 Omitting or choosing the wrong constant changes the interpretation of the
-coefficients and therefore the surface shape. The generated `prescription.txt`
-preserves `AsphericalOddCount` and `AsphericalA2` if present;
-other constants are discarded.
+coefficients and therefore the surface shape. When writing `prescription.txt` the tool 
+regenerates the aspheric constants rather than preserving both as supplied. 
+It can increase `AsphericalOddCount` when added terms require it; a zero count is 
+omitted, and `AsphericalA2` is emitted only when applicable without a positive 
+odd count. Other constants are discarded.
 
 `[constants]` must appear before `[aspherical data]`.
 
@@ -113,10 +115,13 @@ for how README and Zemax coefficient lists differ from this input convention.
 
 ### `[variable distances]`
 
-Each row is a name followed by one value per configuration / scenario. Three of these are
-**mandatory** for LensTool2.
-Furthermore, if multiple configurations are present in `scenarios` (see `[report data]` below) then each
-must have a corresponding value. It is an error if the required value is missing or `undefined`.
+Each row is a name followed by one value per configuration / scenario. The first value after 
+the variable name is given scenario number 0, and rest are numbered sequentially.
+
+Three of the variables are **mandatory** for LensTool2.
+
+If multiple configurations are present in `scenarios` (see `[report data]` below) then each
+must have a corresponding value. It is an error if the required value is missing, `undefined` or non-positive.
 
 | Row | Meaning |
 | --- | --- |
@@ -128,9 +133,9 @@ must have a corresponding value. It is an error if the required value is missing
 Failed due to: The prescription does not specify 'Angle of View'; add it to the
 [variable distances] section as the full angle of view in degrees
 ```
-If the OpticalBench spec file omits some values above, you must manually edit the file.
+If the Optical Bench spec file omits values required by LensTool2, you must manually edit the file.
 
-LensTool2 treats following as optional:
+LensTool2 treats the following as optional:
 
 | Row | If present                                                                                                                                                                | If absent                                                                                     |
 | --- |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
@@ -209,9 +214,10 @@ link	https://patents.google.com/patent/US20150146085A1/en
 A patent can often have multiple configurations, typically for different object distances, such as object at infinity or
 at close distance. Or different focal lengths for a zoom.
 
-The OpticalBench input file implicitly defines scenarios in `[variable distances]` section.
-Each available scenario is given a value, the number of values must all be the same for all
-variables, however some values may be empty or `undefined`.
+The Optical Bench input file implicitly defines scenarios in `[variable distances]` section.
+Each available scenario is given a value. Some values may be empty or `undefined` or missing.
+The three mandatory variables need valid values only for the selected scenarios. `Image Height` always uses 
+its first value.
 
 Example:
 
@@ -252,7 +258,9 @@ The `names` row provides the ability to set a name for each scenario - this is t
 manufacturer specified lens parameters, not the actual focal lengths in the spec file.
 
 `LensTool2` produces a complete set of outputs per configuration in `[report data]`. The
-generated file names are suffixed `-0`, `-1` and so on, and the README links to them. 
+generated file names are suffixed with the configuration's position (ordinal) number, independent
+of the scenario number. The first set is suffixed with `-0`, the next with `-1` and so on, 
+and the README links to them (some outputs are optional and are not linked to the README). 
 
 Important:
 
@@ -287,7 +295,8 @@ Generated from `Otus55.txt`, status **Accepted**
 
 ## Options
 
-`--specfile` is the only required option. Everything else has a default.
+Either `--specfile` or `--patent` with `--example` and `--outdir` is required. 
+Everything else has a default.
 
 | Option | Default | Effect                                                                                                                                                                                                                                                                                                                                                         |
 | --- | --- |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

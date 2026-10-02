@@ -56,6 +56,7 @@ original assignee	Nikon Corp
 link	https://patents.google.com/patent/US12025779B2/en
 [report data]
 lens name	Nikkor Z 58mm f/0.95 Noct
+status	Accepted
 
 [notes]
 source prescription	nikkor-z-58mmf0.95_ex1.txt

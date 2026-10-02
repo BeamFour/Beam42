@@ -30,15 +30,13 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 20 | 74.043 | 4.602 | 47.2 | 1.55963 | 61.17 | Ohara | BAL50 |
 | 21 | 499.996 | 38.65 | 47.2 |  |  |  |
 ## Aspherical Data
-| ID  | k   | P1  | P2  | P3  | P3 | P5 | P6 | P7 | P8 | P9 | P10 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 5 | -1.0 | 0.0 | 4.638E-7 | 1.284E-9 | -1.638E-12 | 1.636E-15 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
-| 15 | -1.0 | 0.0 | 2.39E-7 | 2.218E-9 | -3.207E-12 | 1.925E-15 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
+| ID  | Type | k   | P1 | P2 | P3 | P4 | P5 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 5| EVEN | -1.0 | 0.0 | 4.638E-7 | 1.284E-9 | -1.638E-12 | 1.636E-15 |
+| 15| EVEN | -1.0 | 0.0 | 2.39E-7 | 2.218E-9 | -3.207E-12 | 1.925E-15 |
 ## Layouts
-![Layout Only](./layoutonly.svg)
-![Layout Field 0.0](./layout.svg)
-![Layout Field 0.7](./layout-semi-skew.svg)
-![Layout Field 1.0](./layout-skew.svg)
+![Layout Elements](./layoutonly.svg)
+![Layout](./layout.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew.svg)
@@ -48,7 +46,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ---       | ---   |
 | effective_focal_length |51.992
 | back_focal_length | 38.707
-| optical_invariant | 10.821
+| optical_invariant | 10.823
 | object_distance | 1.0E10
 | image_distance | 38.707
 | power | 0.019
@@ -57,9 +55,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ffl_F | 27.543
 | fno | 1
 | enp_dist_P | 36.309
-| enp_radius | 25.996
+| enp_radius | 26
 | exp_dist_P' | -269.606
-| exp_radius | 154.185
+| exp_radius | 154.206
 | m | -0
 | red | -1.923364232511164E8
 | n_obj | 1
@@ -67,31 +65,35 @@ Note that where glass types are shown the refractive index and abbe number is as
 | img_ht | 21.642
 | obj_ang | 22.6
 | obj_na | 0
-| img_na | -0.447|
+| img_na | -0.5|
 ## Spot Analysis
-| Field | Spot Mean Radius | Spot Max Radius |
+| Field | Spot Mean Radius (µm) | Spot Max Radius (µm) |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 19.066 | 46.334|
- | Field(x=0.0, y=0.1) | 24.803 | 110.338|
- | Field(x=0.0, y=0.2) | 26.634 | 108.116|
- | Field(x=0.0, y=0.3) | 28.083 | 115.461|
- | Field(x=0.0, y=0.4) | 29.499 | 131.941|
- | Field(x=0.0, y=0.5) | 30.164 | 138.772|
- | Field(x=0.0, y=0.6) | 32.411 | 154.195|
- | Field(x=0.0, y=0.7) | 39.329 | 188.183|
- | Field(x=0.0, y=0.8) | 47.492 | 187.648|
- | Field(x=0.0, y=0.9) | 52.119 | 168.981|
- | Field(x=0.0, y=1.0) | 49.189 | 131.983|
+ | Field(x=0.0, y=0.0) | 20.083 | 59.783|
+ | Field(x=0.0, y=0.1) | 24.576 | 100.412|
+ | Field(x=0.0, y=0.2) | 29.001 | 125.573|
+ | Field(x=0.0, y=0.3) | 29.31 | 135.116|
+ | Field(x=0.0, y=0.4) | 29.726 | 146.823|
+ | Field(x=0.0, y=0.5) | 30.464 | 153.163|
+ | Field(x=0.0, y=0.6) | 32.679 | 172.341|
+ | Field(x=0.0, y=0.7) | 38.292 | 189.076|
+ | Field(x=0.0, y=0.8) | 45.413 | 188.203|
+ | Field(x=0.0, y=0.9) | 50.528 | 169.56|
+ | Field(x=0.0, y=1.0) | 48.103 | 132.279|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d), 486.1327(F), 656.2725(C) were calculated across 10 fields, and then averaged
 ## Polychromatic Geometric MTF (Weighted)
 ![Polychromatic Geometrical MTF Weighted](./mtf-w.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
 * To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
-* [OpticalBench Compatible Data File, tab delimited](./US004717245_Example02a.txt)
+* [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./US004717245_Example02a.zmx)
+
+Generated from `US004717245_Example02a.txt`, status **TODO**
+
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-10-02

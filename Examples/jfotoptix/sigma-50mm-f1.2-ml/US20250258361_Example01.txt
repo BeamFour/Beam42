@@ -1,8 +1,5 @@
 [descriptive data]
 title	US 2025/0258361 Example 1
-#patent	country	number	example	year	inventors	org	link
-patent	US	US 2025/0258361	EX 1	2024	UEDA HIROAKI	Sigma Corp 	https://worldwide.espacenet.com/patent/search?q=pn%3DUS2025258361A1
-lens name	Sigma 50mm f1.2 DG DN ART
 [constants]
 [variable distances]
 Focal Length	48.27	44.69
@@ -76,3 +73,15 @@ ppmm	8.652
 [notes]
 Bill: Measured Magnification.
 Dibyendu: --vig-type set-fnum
+[patent info]
+country	US
+number	US 2025/0258361
+example	EX 1
+year applied	2024
+inventors	UEDA HIROAKI
+current assignee	Sigma Corp
+original assignee	Sigma Corp
+link	https://worldwide.espacenet.com/patent/search?q=pn%3DUS2025258361A1
+[report data]
+lens name	Sigma 50mm f1.2 DG DN ART
+status	Accepted

@@ -54,11 +54,12 @@ number	US 2025/0258361
 example	EX 1
 year applied	2024
 inventors	UEDA HIROAKI
-current assignee	Sigma Corp 
-original assignee	Sigma Corp 
+current assignee	Sigma Corp
+original assignee	Sigma Corp
 link	https://worldwide.espacenet.com/patent/search?q=pn%3DUS2025258361A1
 [report data]
 lens name	Sigma 50mm f1.2 DG DN ART
+status	Accepted
 
 [notes]
 source prescription	US20250258361_Example01.txt

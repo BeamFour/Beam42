@@ -2,7 +2,7 @@
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
-|US | US 2025/0258361 | EX 1 | 2024 | UEDA HIROAKI | Sigma Corp  | [link](https://worldwide.espacenet.com/patent/search?q=pn%3DUS2025258361A1) |
+|US | US 2025/0258361 | EX 1 | 2024 | UEDA HIROAKI | Sigma Corp | [link](https://worldwide.espacenet.com/patent/search?q=pn%3DUS2025258361A1) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -107,6 +107,6 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./US20250258361_Example01.zmx)
 
-Generated from `US20250258361_Example01.txt`, status **TODO**
+Generated from `US20250258361_Example01.txt`, status **Accepted**
 
 Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-10-02

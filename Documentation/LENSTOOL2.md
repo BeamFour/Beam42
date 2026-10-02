@@ -444,19 +444,27 @@ spec with multiple configurations (a zoom, for instance).
 ### Aspheric coefficient ordering in the outputs
 
 The Zemax file and the generated README's **Aspherical Data** table include the
-full coefficient array, with zeros in unused leading positions. Optical Bench
-input and the generated `prescription.txt` omit those positions:
+full coefficient array. For `EVEN` surfaces, the array contains only even
+powers, starting with a zero for A2; `EVEN A2` supplies A2 directly. For
+`RADIAL` surfaces, the array contains every power starting at A1, with zeros
+for A1, A2 and any odd powers not included by `AsphericalOddCount`. Optical
+Bench input and the generated `prescription.txt` omit these zero placeholders,
+as shown below.
+
+`An` is the coefficient multiplying radius to power n. README labels `P1`,
+`P2`, ... identify array positions: for even surfaces they correspond to A2,
+A4, A6, ...; for radial surfaces they correspond to A1, A2, A3, ... . The
+polynomial coefficients follow the radius and conic constant in an Optical
+Bench aspheric row:
 
 | Type | Optical Bench / `prescription.txt` coefficient sequence | Full coefficients / README `P1`, `P2`, ... |
 | --- | --- |--------------------------------------------|
-| `EVEN` | `a, b, ...` | `0, a, b, ...` representing `A2, A4, A6, ...` |
-| `EVEN A2` | `a, b, ...` | `a, b, ...` representing `A2, A4, A6, ...` |
+| `EVEN` | `A4, A6, ...` | `0, A4, A6, ...` (the first slot is A2) |
+| `EVEN A2` | `A2, A4, A6, ...` | `A2, A4, A6, ...` |
 | `RADIAL`, count 1 | `A3, A4, A6, A8, ...` | `0, 0, A3, A4, 0, A6, 0, A8, ...`          |
 | `RADIAL`, count 2 | `A3, A4, A5, A6, A8, ...` | `0, 0, A3, A4, A5, A6, 0, A8, ...`         |
 
-Here `a` and `b` stand for the first two supplied polynomial coefficients,
-after the radius and conic constant in an Optical Bench aspheric row. The
-leading zeros and missing odd powers are restored on import and omitted again when writing
+These zero placeholders are restored on import and omitted again when writing
 `prescription.txt`; they do not represent a change to the surface. Do not copy
 the full README or Zemax sequence into `[aspherical data]` without removing the
 unused positions for the selected type and odd count. The README labels both even
@@ -468,8 +476,9 @@ number of radial terms, `XDAT 2` is the normalization radius (1), and
 `XDAT 3` onward contain A1, A2, A3, ... including every zero slot. `CONI`
 is the conic constant, unchanged. Even surfaces retain `EVENASPH` and
 their `PARM` coefficient records. Zemax's term count is not Optical Bench's
-odd count: A3 through A20 contain nine odd powers, so `AsphericalOddCount 9`
-corresponds to 20 radial slots after inserting zeros for A1 and A2.
+odd count. For a coefficient sequence ending at A20, `AsphericalOddCount 9`
+includes the nine odd powers A3 through A19. Zemax stores 20 radial slots,
+including zeros for A1 and A2.
 
 ### Routine optimization
 

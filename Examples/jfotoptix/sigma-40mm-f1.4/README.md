@@ -102,6 +102,6 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./Sigma-40mmf1.4.zmx)
 
-Generated from `Sigma-40mmf1.4.txt`, status **TODO**
+Generated from `Sigma-40mmf1.4.txt`, status **Accepted**
 
 Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-10-02

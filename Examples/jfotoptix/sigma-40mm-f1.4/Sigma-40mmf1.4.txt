@@ -67,5 +67,6 @@ original assignee	Sigma Corp
 link	https://patents.google.com/patent/JP2020012952A/en
 [report data]
 lens name	Sigma 40mm f1.4 DG ART
+status	Accepted
 [notes]
 --vig-type set-fnum

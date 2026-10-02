@@ -2578,12 +2578,6 @@
 <use x="319.992" y="317.906" xlink:href="#dot"  stroke="#00ebff" />
 <use x="320.003" y="317.882" xlink:href="#dot"  stroke="#00ebff" />
 <use x="320" y="317.731" xlink:href="#dot"  stroke="#ff0000" />
-<use x="320" y="311.704" xlink:href="#dot"  stroke="#ff0000" />
-<use x="319.991" y="311.722" xlink:href="#dot"  stroke="#ff0000" />
-<use x="319.997" y="311.776" xlink:href="#dot"  stroke="#ff0000" />
-<use x="320.031" y="311.867" xlink:href="#dot"  stroke="#ff0000" />
-<use x="320.107" y="311.995" xlink:href="#dot"  stroke="#ff0000" />
-<use x="320.239" y="312.163" xlink:href="#dot"  stroke="#ff0000" />
 <use x="320.438" y="312.372" xlink:href="#dot"  stroke="#ff0000" />
 <use x="320.717" y="312.622" xlink:href="#dot"  stroke="#ff0000" />
 <use x="321.083" y="312.916" xlink:href="#dot"  stroke="#ff0000" />
@@ -2637,13 +2631,6 @@
 <use x="318.917" y="312.916" xlink:href="#dot"  stroke="#ff0000" />
 <use x="319.283" y="312.622" xlink:href="#dot"  stroke="#ff0000" />
 <use x="319.562" y="312.372" xlink:href="#dot"  stroke="#ff0000" />
-<use x="319.761" y="312.163" xlink:href="#dot"  stroke="#ff0000" />
-<use x="319.893" y="311.995" xlink:href="#dot"  stroke="#ff0000" />
-<use x="319.969" y="311.867" xlink:href="#dot"  stroke="#ff0000" />
-<use x="320.003" y="311.776" xlink:href="#dot"  stroke="#ff0000" />
-<use x="320.009" y="311.722" xlink:href="#dot"  stroke="#ff0000" />
-<use x="320" y="312.284" xlink:href="#dot"  stroke="#ff0000" />
-<use x="319.992" y="312.299" xlink:href="#dot"  stroke="#ff0000" />
 <use x="319.999" y="312.344" xlink:href="#dot"  stroke="#ff0000" />
 <use x="320.037" y="312.42" xlink:href="#dot"  stroke="#ff0000" />
 <use x="320.119" y="312.527" xlink:href="#dot"  stroke="#ff0000" />
@@ -2723,7 +2710,6 @@
 <use x="319.881" y="312.527" xlink:href="#dot"  stroke="#ff0000" />
 <use x="319.963" y="312.42" xlink:href="#dot"  stroke="#ff0000" />
 <use x="320.001" y="312.344" xlink:href="#dot"  stroke="#ff0000" />
-<use x="320.008" y="312.299" xlink:href="#dot"  stroke="#ff0000" />
 <use x="320" y="312.867" xlink:href="#dot"  stroke="#ff0000" />
 <use x="319.989" y="312.88" xlink:href="#dot"  stroke="#ff0000" />
 <use x="319.995" y="312.916" xlink:href="#dot"  stroke="#ff0000" />

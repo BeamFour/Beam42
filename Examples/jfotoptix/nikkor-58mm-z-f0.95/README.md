@@ -36,8 +36,8 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 26 | 55.281 | 9.11 | 38.5 | 1.883 | 40.69 | Hikari | J-LASF08A |
 | 27 | -144.041 | 3.0 | 38.0 | 1.76684 | 46.78 | Hikari | J-LASFH2 |
 | 28 | 52.858 | 14.5 | 38.0 |  |  |  |
-| 29 | 0.0 | 1.6 | 43.4 | 1.5168 | 64.13 | Hikari | J-BK7A |
-| 30 | 0.0 | 1.0 | 43.4 |  |  |  |
+| 29 | CG | 1.6 | 43.4 | 1.5168 | 64.13 | Hikari | J-BK7A |
+| 30 | CG | 1.0 | 43.4 |  |  |  |
 ## Aspherical Data
 | ID  | Type | k   | P1 | P2 | P3 | P4 | P5 | P6 | P7 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -45,10 +45,8 @@ Note that where glass types are shown the refractive index and abbe number is as
 | 20| EVEN | 0.0 | 0.0 | -1.15028E-6 | -4.51771E-10 | 2.7267E-13 | -7.66812E-17 | 0.0 | 0  |
 | 28| EVEN | 0.0 | 0.0 | 3.18645E-6 | -1.14718E-8 | 7.74567E-11 | -2.24225E-13 | 3.3479E-16 | -1.7047E-19 |
 ## Layouts
-![Layout Only](./layoutonly.svg)
-![Layout Field 0.0](./layout.svg)
-![Layout Field 0.7](./layout-semi-skew.svg)
-![Layout Field 1.0](./layout-skew.svg)
+![Layout Elements](./layoutonly.svg)
+![Layout](./layout.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew.svg)
@@ -77,21 +75,21 @@ Note that where glass types are shown the refractive index and abbe number is as
 | img_ht | 21.69
 | obj_ang | 19.98
 | obj_na | 0
-| img_na | -0.453|
+| img_na | -0.508|
 ## Spot Analysis
-| Field | Spot Mean Radius | Spot Max Radius |
+| Field | Spot Mean Radius (µm) | Spot Max Radius (µm) |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 5.687 | 11.519|
- | Field(x=0.0, y=0.1) | 6.206 | 20.881|
- | Field(x=0.0, y=0.2) | 6.528 | 22.8|
- | Field(x=0.0, y=0.3) | 7.135 | 26.014|
- | Field(x=0.0, y=0.4) | 7.547 | 27.879|
- | Field(x=0.0, y=0.5) | 7.436 | 27.603|
- | Field(x=0.0, y=0.6) | 7.218 | 25.475|
- | Field(x=0.0, y=0.7) | 7.301 | 26.86|
- | Field(x=0.0, y=0.8) | 8.522 | 32.166|
- | Field(x=0.0, y=0.9) | 11.094 | 39.427|
- | Field(x=0.0, y=1.0) | 13.741 | 44.469|
+ | Field(x=0.0, y=0.0) | 5.769 | 11.764|
+ | Field(x=0.0, y=0.1) | 6.113 | 21.019|
+ | Field(x=0.0, y=0.2) | 6.438 | 22.877|
+ | Field(x=0.0, y=0.3) | 6.85 | 26.158|
+ | Field(x=0.0, y=0.4) | 7.15 | 28.038|
+ | Field(x=0.0, y=0.5) | 7.141 | 27.7|
+ | Field(x=0.0, y=0.6) | 6.977 | 25.573|
+ | Field(x=0.0, y=0.7) | 7.119 | 26.784|
+ | Field(x=0.0, y=0.8) | 8.395 | 32.821|
+ | Field(x=0.0, y=0.9) | 10.967 | 40.277|
+ | Field(x=0.0, y=1.0) | 13.548 | 44.668|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10=red,30=blue,50=black cycles/mm
@@ -106,4 +104,6 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./nikkor-z-58mmf0.95_ex1.zmx)
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-07-07
+Generated from `nikkor-z-58mmf0.95_ex1.txt`, status **TODO**
+
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-10-02

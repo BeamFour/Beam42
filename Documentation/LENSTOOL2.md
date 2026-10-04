@@ -322,7 +322,7 @@ Everything else has a default.
 | `--abbe-line <d\|e>` | `d` | Specifies how the Abbe number is quoted in the input file. Independent of `--index-line`.                                                                                                                                                                                                                                                                      |
 | `--force` | off | With `--assign-glass-types`, re-match surfaces that already name a recognised glass.                                                                                                                                                                                                                                                                           |
 | `--update-specfile` | off | With `--assign-glass-types`, also write the matched prescription back over the input file. Rejected on its own.                                                                                                                                                                                                                                                |
-| `--optimize` | off | Run the routine airspace optimization before reporting: the back focus on a prime, the other variable airspaces on a zoom. See below.                                                                                                                                                                                                                          |
+| `--optimize` | off | Run the routine airspace optimization before reporting: the back focus on a prime, or airspaces whose thickness differs across the selected configurations on a zoom. See below. |
 | `--optimize <n>` | off | Run the spec file's `[trial n]` or `[pipeline n]` section instead, and report on its result. See [OPTIMIZER.md](OPTIMIZER.md).                                                                                                                                                                                                                                 |
 | `--optimize-goal <contrast\|mtf>` | `contrast` | Objective for `--optimize`.                                                                                                                                                                                                                                                                                                                                    |
 | `--real-ray-aiming` / `--paraxial-ray-aiming` | real | Chief ray aiming algorithm. Real aiming traces an actual ray at the entrance pupil; paraxial aiming is faster but does not hold up on very wide angle lenses. Applies to the analysis model, not the layout diagrams.                                                                                                                                          |
@@ -496,9 +496,11 @@ On a **prime** ending in a cover glass the back focus is taken as the airspace
 **in front of** the cover glass, not the short gap between cover glass and
 image. `CG` rows in `[lens data]` are what makes this exact rather than a guess.
 
-A zoom is optimized one configuration at a time. As there is no support for a
-variable shared across configurations, so any airspace in `[variable distances]` 
-that has a constant **value** across configurations is left out of the optimization.
+A zoom is optimized one configuration at a time. Shared optimization variables
+are not yet supported, so airspaces whose thickness is identical across the
+selected configurations are held fixed. Selection does not depend on the
+variable's name or whether it represents back focus: a varying back-focus
+airspace is eligible.
 
 Example:
 

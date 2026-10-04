@@ -490,16 +490,27 @@ optimized design. What it varies depends on the lens:
 | Lens | Varied |
 | --- | --- |
 | Prime | The back focus airspace, located automatically. |
-| Zoom | The variable airspaces other than the back focus, one configuration at a time. |
+| Zoom | The airspaces whose thickness changes between the configurations being reported, one configuration at a time. |
 
-On a design ending in a cover glass the back focus is taken as the airspace **in
-front of** the cover glass, not the short gap between cover glass and image.
-`CG` rows in `[lens data]` are what makes this exact rather than a guess.
+On a **prime** ending in a cover glass the back focus is taken as the airspace
+**in front of** the cover glass, not the short gap between cover glass and
+image. `CG` rows in `[lens data]` are what makes this exact rather than a guess.
 
-A zoom is optimized one configuration at a time. There is no support yet for a
-variable shared across configurations, so the back focus is deliberately left
-out of the zoom case: it normally has to stay common across zoom settings, and
-nothing here can enforce that.
+A zoom is optimized one configuration at a time. As there is no support for a
+variable shared across configurations, so any airspace in `[variable distances]` 
+that has a constant **value** across configurations is left out of the optimization.
+
+Example:
+
+```
+[variable distances]
+d8	19.08	10.32	6.94	2.65	20.03	11.12	7.69	3.46	22.29	13.66	10.37	6.38
+d11	10.76	8.35	7.26	5.85	9.77	7.55	6.52	5.04	7.50	5.02	3.83	2.13
+d28	20.38	25.195	28.045	33.19	22.54	27.74	30.59	35.22	22.54	27.74	30.59	35.22
+Bf	0.97	0.97	0.97	0.97	0.97	0.97	0.97	0.97	0.97	0.97	0.97	0.97
+```
+
+The variable `Bf` will be skipped as its value is a constant across configurations.
 
 Effective focal length and f-number are anchored to the prescription throughout,
 so an optimized airspace cannot quietly turn the lens into a different one.
@@ -728,7 +739,7 @@ thickness column.
 
 This is the usual path for **zooms**, and `--optimize` does it automatically on a
 multi configuration prescription. See [Routine optimization](#routine-optimization)
-for the variables selected and the limitation on shared back focus.
+for the variables selected and the airspaces that are held fixed.
 
 ### 4. Optimize curvatures and aspherics
 

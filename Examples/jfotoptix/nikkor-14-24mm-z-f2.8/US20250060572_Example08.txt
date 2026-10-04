@@ -66,3 +66,4 @@ link	https://patents.google.com/patent/US20250060572A1/en
 lens name	Z Nikkor 14-24mm f/2.8S
 scenarios	0	1
 names	14mm f2.8	24mm f2.8
+status	Candidate

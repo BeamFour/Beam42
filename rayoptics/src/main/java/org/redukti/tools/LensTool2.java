@@ -490,8 +490,9 @@ public class LensTool2 {
 
     /**
      * Runs the routine airspace optimization. A prime gets its back focus
-     * varied; a zoom gets the other variable airspaces varied, one configuration
-     * at a time, because a variable cannot yet be shared across configurations.
+     * varied; a zoom gets the airspaces that change between zoom settings
+     * varied, one configuration at a time, because a variable cannot yet be
+     * shared across configurations.
      */
     private static void runDefaultOptimizations(Prescription prescription, Args arguments,
                                                 VigType vigType) throws Exception {
@@ -502,7 +503,7 @@ public class LensTool2 {
             int[] surfaces;
             String what;
             if (zoom) {
-                surfaces = DefaultOptimizations.findVariableThicknesses(prescription, backFocus);
+                surfaces = DefaultOptimizations.findVariableThicknesses(prescription);
                 what = "variable airspaces";
             }
             else if (backFocus >= 0) {

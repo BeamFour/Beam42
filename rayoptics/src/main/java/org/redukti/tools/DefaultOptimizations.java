@@ -23,7 +23,8 @@ import org.redukti.spec.VigType;
  * <p>Only one configuration is optimized per call. There is no support for a
  * variable shared across configurations, so a zoom is optimized one
  * configuration at a time and nothing here tries to hold the back focus common
- * between them.
+ * between them - instead the airspaces that have to stay common are left out of
+ * the solve, which {@link #findVariableThicknesses} explains.
  */
 public final class DefaultOptimizations {
 
@@ -80,27 +81,59 @@ public final class DefaultOptimizations {
     }
 
     /**
-     * The airspaces a zoom varies between configurations, excluding the back
-     * focus. These are the surfaces whose thickness came from a multi valued
-     * row of [variable distances].
+     * The airspaces a zoom varies between configurations. These are the surfaces
+     * whose thickness came from a multi valued row of [variable distances] and
+     * whose value actually differs between the configurations being reported.
+     *
+     * <p>That second half of the test is what keeps the back focus out, and it is
+     * deliberately a test on the value rather than on the position. A gap holding
+     * the same value at every zoom setting is one that has to stay common - the
+     * cover glass to sensor spacing, typically - and since a variable cannot yet
+     * be shared across configurations, varying it per configuration would hand
+     * each zoom setting its own sensor position.
+     *
+     * <p>Excluding {@link #findBackFocusSurface} instead would be wrong on a design
+     * that ends in a cover glass: there the airspace in front of the cover glass is
+     * the one that moves with the zoom, so that rule points at a genuine zoom
+     * airspace, and dropping it would leave the rear group's spacing out of the
+     * solve while admitting the fixed sensor gap behind the cover glass.
      */
-    public static int[] findVariableThicknesses(Prescription prescription, int backFocusSurface) {
+    public static int[] findVariableThicknesses(Prescription prescription) {
         SurfaceType[] surfaces = prescription.get_surfaces();
         int count = 0;
         for (int i = 0; i < surfaces.length; i++)
-            if (isVariableAirspace(surfaces[i], i, backFocusSurface))
+            if (isVariableAirspace(surfaces[i]))
                 count++;
         int[] result = new int[count];
         int n = 0;
         for (int i = 0; i < surfaces.length; i++)
-            if (isVariableAirspace(surfaces[i], i, backFocusSurface))
+            if (isVariableAirspace(surfaces[i]))
                 result[n++] = i;
         return result;
     }
 
-    private static boolean isVariableAirspace(SurfaceType surface, int index, int backFocusSurface) {
-        return index != backFocusSurface
-                && surface._thickness_by_scenario != null
+    /**
+     * True when the thickness row this surface references holds more than one distinct
+     * value across the configurations.
+     *
+     * <p>The array is indexed by configuration, not by the scenario numbering of the
+     * input: {@code Prescription} fills it from the scenarios the report's
+     * {@code scenarios} list selects, so the scenarios a patent tabulated but this
+     * report does not use are already absent and cannot make an airspace look as though
+     * it varies. A value those selected scenarios are missing is rejected while the
+     * prescription is built, so nothing here has to allow for one.
+     */
+    private static boolean variesByConfiguration(double[] thickness_by_scenario) {
+        if (thickness_by_scenario == null)
+            return false;
+        for (int i = 1; i < thickness_by_scenario.length; i++)
+            if (thickness_by_scenario[i] != thickness_by_scenario[0])
+                return true;
+        return false;
+    }
+
+    private static boolean isVariableAirspace(SurfaceType surface) {
+        return variesByConfiguration(surface._thickness_by_scenario)
                 && surface.get_refractive_index() == 0.0;
     }
 

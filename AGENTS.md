@@ -124,6 +124,42 @@ the only one; the runtime code depends on nothing beyond the JDK, and that is in
   licence-compatibility check and the attribution rules in section 4.
 * Failing that, write it against the JDK, or do without.
 
+## 6. Avoid verbose documentation
+
+The documents in Documentation should be clear and use simple straightforward
+language. Do not unnecessarily try to tell a story. Instructions to users should
+be clear and to the point. Technical explanations should be "dry" and matter of fact.
+Include explanations and examples when they help the reader use the tool or understand
+a limitation. Omit narrative and background that do not serve that purpose, especially
+in user manuals. Design documents can contain more detail and background information.
+
+Example of good doc:
+
+>A zoom is optimized one configuration at a time. Shared optimization variables
+are not yet supported, so airspaces whose thickness is identical across the
+selected configurations are held fixed. Selection does not depend on the
+variable's name or whether it represents back focus: a varying back-focus
+airspace is eligible.
+
+Example of bad doc:
+
+>A zoom is optimized one configuration at a time. There is no support yet for a
+variable shared across configurations, so an airspace that has to stay common
+across zoom settings is deliberately left out - nothing here can enforce that it
+stays common. Such an airspace is recognized by its **value**: a row of
+`[variable distances]` that holds the same number in every configuration being
+reported is fixed geometry, typically the cover glass to image gap, and is not
+varied.
+
+>Position is not what decides this, because on a zoom that models its sensor
+stack the airspace in front of the cover glass is itself one of the airspaces
+that moves with the zoom - often the strongest variable there is. Excluding the
+back focus by position would drop that one from the solve and admit the fixed
+gap behind the cover glass in its place.
+
+The second example is unnecessarily verbose and goes into explanations that
+hinder understanding rather than help.
+
 ## Building and testing
 
 Maven multi-module build (`beam42`, `rayoptics`), Java 17. `mvn` may not be on `PATH`;

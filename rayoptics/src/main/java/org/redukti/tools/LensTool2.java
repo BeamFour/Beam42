@@ -692,7 +692,7 @@ public class LensTool2 {
             System.err.println("         --force re-matches surfaces that already name a glass, --update-specfile writes the result back to the specfile");
             System.err.println("         --index-line e when the prescription quotes the refractive index at the e line rather than the d line");
             System.err.println("         --abbe-line e  when it also quotes the Abbe number as ve; Leica patents use ne with ve, ne with vd is usually an error");
-            System.err.println("       --optimize varies the back focus on a prime, or the other variable airspaces on a zoom, at the central field");
+            System.err.println("       --optimize varies the back focus on a prime, or airspaces whose thickness differs across the selected configurations on a zoom, at the central field");
             System.err.println("       --optimize-goal defaults to contrast; mtf uses the geometric MTF directly, which stalls more easily");
             System.err.println("       --optimize n runs the specfile's [trial n] section, writes the result as <specfile>-trial<n>.txt and reports on it");
             System.err.println("         a [pipeline n] section runs its trials in order, each starting from the last result, and writes <specfile>-pipeline<n>.txt");

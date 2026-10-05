@@ -110,6 +110,10 @@ Citations follow the style used by Optica (formerly OSA) journals: author(s), "t
   Open-access version: LLNL-CONF-442492,
   [UNT Digital Library](https://digital.library.unt.edu/ark:/67531/metadc865679/).
 
+* T. Steinich and V. Blahnik, "Optical design of camera optics for mobile phones," Adv. Opt. Technol. 1, 51–58 (2012),
+  [doi:10.1515/aot-2012-0002](https://doi.org/10.1515/aot-2012-0002).
+  Source of the wavelength weights used for the weighted polychromatic MTF.
+
 * E. Elliott, K. Moore, C. Normanshire, S. Gay, J. Aiona, and M. G. Nicholson, "Contrast optimization: a faster and
   better technique for optimizing on MTF," in *International Optical Design Conference 2017*, Proc. SPIE 10590,
   1059014 (2017), [doi:10.1117/12.2292761](https://doi.org/10.1117/12.2292761).

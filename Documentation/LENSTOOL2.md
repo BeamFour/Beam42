@@ -586,6 +586,24 @@ weights.
 `--only-d-line` is the one thing that changes this: it reduces **both** to the d
 line alone, which makes the two outputs identical.
 
+The `mtf-w` weights are taken from T. Steinich and V. Blahnik, "Optical design of
+camera optics for mobile phones," Adv. Opt. Technol. **1**(1–2), 51–58 (2012),
+[doi:10.1515/aot-2012-0002](https://doi.org/10.1515/aot-2012-0002), normalized
+to the d line. Wavelengths are as quoted in the paper.
+
+| Line | Wavelength | Weight | Relative |
+| --- | --- | --- | --- |
+| C | 656.28 nm | 151 | 0.475 |
+| d | 587.56 nm | 318 | 1.0 |
+| e | 546.07 nm | 312 | 0.98 |
+| F | 486.13 nm | 157 | 0.49 |
+| g | 435.84 nm | 49 | 0.15 |
+
+A polychromatic MTF depends on the weights used. Manufacturers rarely publish
+the weighting behind their MTF charts, so curves from different brands are not
+directly comparable. Beam42 applies the same weights to every lens so that its
+own results can be compared.
+
 Per wavelength MTF plots, from `--output-wavelength-mtfs`, are **cut off at 100
 cycles/mm**. The limit applies to the plotted data as well as the axis, and is
 not configurable.

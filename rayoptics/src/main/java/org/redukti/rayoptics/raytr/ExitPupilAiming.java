@@ -51,15 +51,19 @@ public final class ExitPupilAiming {
 
     /**
      * Aim a ray so its transverse coordinate on the exit-pupil reference sphere equals
-     * {@code target}. The initial entrance-pupil coordinate is normally the traditional
+     * {@code targetExitPupilCoord}. The initial entrance-pupil coordinate is normally the traditional
      * entrance-pupil displacement and is therefore already a close guess.
      */
     public static Result aim(
-            OpticalModel opticalModel, Vector2 initialPupil, Vector2 target,
-            Field field, double wavelength, TraceOptions traceOptions) {
+            OpticalModel opticalModel,
+            Vector2 initialEntrancePupilCoord,
+            Vector2 targetExitPupilCoord,
+            Field field,
+            double wavelength,
+            TraceOptions traceOptions) {
         if (field.chief_ray == null || field.ref_sphere == null
                 || M.is_kinda_big(field.ref_sphere.ref_sphere_radius)) {
-            return failed(initialPupil,
+            return failed(initialEntrancePupilCoord,
                     new ExitPupilAimException("Finite exit-pupil reference sphere required"));
         }
 
@@ -69,9 +73,9 @@ public final class ExitPupilAiming {
         // A tighter threshold stalls on trace/intersection roundoff for off-axis rays.
         double targetTolerance = Math.max(1.0e-10, pupilRadius * 2.0e-7);
         double acceptableTolerance = Math.max(targetTolerance, pupilRadius * 1.0e-6);
-        Vector2 pupil = initialPupil;
+        Vector2 pupil = initialEntrancePupilCoord;
         Evaluation current = evaluate(
-                opticalModel, pupil, target, field, wavelength, traceOptions);
+                opticalModel, pupil, targetExitPupilCoord, field, wavelength, traceOptions);
         if (current.ray.err != null) {
             return new Result(pupil, current.ray, current.coordinate, 0, Double.NaN);
         }
@@ -87,10 +91,10 @@ public final class ExitPupilAiming {
             if (iteration == MAX_ITERATIONS) break;
 
             Evaluation xProbe = evaluate(opticalModel,
-                    pupil.plus(new Vector2(ENTRANCE_STEP, 0.0)), target,
+                    pupil.plus(new Vector2(ENTRANCE_STEP, 0.0)), targetExitPupilCoord,
                     field, wavelength, traceOptions);
             Evaluation yProbe = evaluate(opticalModel,
-                    pupil.plus(new Vector2(0.0, ENTRANCE_STEP)), target,
+                    pupil.plus(new Vector2(0.0, ENTRANCE_STEP)), targetExitPupilCoord,
                     field, wavelength, traceOptions);
             if (xProbe.coordinate == null || yProbe.coordinate == null) break;
 
@@ -112,7 +116,7 @@ public final class ExitPupilAiming {
             for (int lineSearch = 0; lineSearch < 8; lineSearch++) {
                 double scale = Math.scalb(1.0, -lineSearch);
                 Vector2 trialPupil = pupil.plus(new Vector2(dx * scale, dy * scale));
-                Evaluation trial = evaluate(opticalModel, trialPupil, target,
+                Evaluation trial = evaluate(opticalModel, trialPupil, targetExitPupilCoord,
                         field, wavelength, traceOptions);
                 if (trial.coordinate != null && trial.residual.len() < error) {
                     accepted = trial;

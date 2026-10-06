@@ -723,6 +723,11 @@ public class Trace {
         return grid;
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    /// Gaussian Quadrature is a Beam42 enhancement
+    /// See Documentation/GAUSSIAN_QUADRATURE.md
+    //////////////////////////////////////////////////////////////////////////////////////////
+
     public static List<GridItem> trace_gaussian_quadrature(
             OpticalModel opt_model, TraceRingsDef grid_rng, Integer num_spokes,
             Field fld, double wvl, double foc, ImageFilter img_filter,
@@ -755,6 +760,102 @@ public class Trace {
         }
         return grid;
     }
+
+    /**
+     * Generates a Gaussian quadrature pattern over a circular or concentric
+     * annular pupil.
+     *
+     * <p>The radial coordinates are Gauss-Legendre nodes transformed from
+     * {@code [-1, 1]} to squared pupil radius
+     * {@code [min_radius^2, max_radius^2]}. Each radial node
+     * is repeated at uniformly spaced angles. The returned weights are
+     * normalized to sum to one, so they integrate a pupil average rather than
+     * the area (pi) of the unit disk.</p>
+     *
+     * <p>Based on B. J. Bauman, H. Xiao, "Gaussian Quadrature for Optical Design
+     * with Non-circular Pupils and Fields, and Broad Wavelength Ranges".</p>
+     *
+     * <p>Also see https://optics.ansys.com/hc/en-us/articles/42661826659347-How-to-use-vignetting-factors</p>
+     */
+    static List<GaussianQuadraturePoint> generate_gaussian_quadrature(
+            TraceRingsDef grid_rng, int num_rings, Integer num_spokes) {
+        if (num_rings < 1 || (num_spokes != null && num_spokes < 3)) {
+            throw new IllegalArgumentException(
+                    "The number of rings must be at least 1 and spokes must be at least 3");
+        }
+        if (!Double.isFinite(grid_rng.min_radius) || !Double.isFinite(grid_rng.max_radius)
+                || grid_rng.min_radius < 0.0 || grid_rng.max_radius <= grid_rng.min_radius) {
+            throw new IllegalArgumentException(
+                    "Pupil radii must be finite and satisfy 0 <= min_radius < max_radius");
+        }
+
+        int spokes = num_spokes == null ? 4 * (num_rings + 1) : num_spokes;
+        double[][] nodesAndWeights = gauss_legendre_nodes_and_weights(num_rings);
+        List<GaussianQuadraturePoint> points = new ArrayList<>(num_rings * spokes);
+
+        for (int angle = 1; angle <= spokes; angle++) {
+            double theta = 2.0 * Math.PI * angle / spokes;
+            double cosTheta = Math.cos(theta);
+            double sinTheta = Math.sin(theta);
+            for (int ring = 0; ring < num_rings; ring++) {
+                double radialFraction = 0.5 + 0.5 * nodesAndWeights[0][ring];
+                double innerRadiusSquared = grid_rng.min_radius * grid_rng.min_radius;
+                double outerRadiusSquared = grid_rng.max_radius * grid_rng.max_radius;
+                double radius = Math.sqrt(innerRadiusSquared
+                        + radialFraction * (outerRadiusSquared - innerRadiusSquared));
+                Vector2 pupil = new Vector2(
+                        grid_rng.cx + radius * cosTheta,
+                        grid_rng.cy + radius * sinTheta);
+                double weight = 0.5 * nodesAndWeights[1][ring] / spokes;
+                points.add(new GaussianQuadraturePoint(pupil, weight));
+            }
+        }
+        return points;
+    }
+
+    /** Computes Gauss-Legendre nodes and weights on [-1, 1]. */
+    private static double[][] gauss_legendre_nodes_and_weights(int order) {
+        double[] nodes = new double[order];
+        double[] weights = new double[order];
+        int rootsToFind = (order + 1) / 2;
+
+        for (int i = 0; i < rootsToFind; i++) {
+            double x = Math.cos(Math.PI * (i + 0.75) / (order + 0.5));
+            double derivative;
+            double delta;
+            do {
+                double p0 = 1.0;
+                double p1 = x;
+                for (int degree = 2; degree <= order; degree++) {
+                    double p2 = ((2.0 * degree - 1.0) * x * p1
+                            - (degree - 1.0) * p0) / degree;
+                    p0 = p1;
+                    p1 = p2;
+                }
+                double polynomial = p1;
+                double previousPolynomial = p0;
+                derivative = order * (x * polynomial - previousPolynomial)
+                        / (x * x - 1.0);
+                delta = polynomial / derivative;
+                x -= delta;
+            } while (Math.abs(delta) > 1.0e-15);
+
+            double weight = 2.0 / ((1.0 - x * x) * derivative * derivative);
+            nodes[i] = -x;
+            nodes[order - 1 - i] = x;
+            weights[i] = weight;
+            weights[order - 1 - i] = weight;
+        }
+        return new double[][]{nodes, weights};
+    }
+
+    record GaussianQuadraturePoint(Vector2 pupil, double weight) {}
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Contrast trace is a Beam42 enhancement.
+    /// Its main use is in optimization
+    /// See Documentation/OPTIMIZER_NOTES.md
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Trace the reference and the two displaced rays required by contrast
@@ -803,9 +904,15 @@ public class Trace {
         var points = generate_contrast_quadrature(
                 grid_rng, num_spokes, sagittal_shift, tangential_shift, fld);
         for (var point : points) {
+            // Each sample traces a reference ray and sagittal/tangential partners.
+            // The supplied shifts are normalized entrance-pupil offsets.
+            // When aim_exit_pupil is enabled, these provide initial guesses;
+            // each partner is inverse-aimed to a physical reference-sphere separation
+            // Delta = |R| lambda nu / |n_img| from the reference ray.
+            // Here lambda is in system length units and nu is image-space frequency.
             var pupil = point.pupil();
-            var sagittalPupil = pupil.plus(sagittal_shift);
-            var tangentialPupil = pupil.plus(tangential_shift);
+            var sagittalEntrancePupil = pupil.plus(sagittal_shift);
+            var tangentialEntrancePupil = pupil.plus(tangential_shift);
             var reference = trace_safe(opt_model, pupil, fld, wvl, trace_options);
             RayResult sagittal;
             RayResult tangential;
@@ -819,20 +926,20 @@ public class Trace {
                     sagittal = new RayResult(null, error);
                     tangential = new RayResult(null, error);
                 } else {
-                    var sagittalTarget = new Vector2(
+                    var sagittalExitPupilTarget = new Vector2(
                             referenceCoordinate.x + sagittal_exit_shift.x,
                             referenceCoordinate.y + sagittal_exit_shift.y);
-                    var tangentialTarget = new Vector2(
+                    var tangentialExitPupilTarget = new Vector2(
                             referenceCoordinate.x + tangential_exit_shift.x,
                             referenceCoordinate.y + tangential_exit_shift.y);
-                    sagittal = ExitPupilAiming.aim(opt_model, sagittalPupil, sagittalTarget,
+                    sagittal = ExitPupilAiming.aim(opt_model, sagittalEntrancePupil, sagittalExitPupilTarget,
                             fld, wvl, trace_options).ray();
-                    tangential = ExitPupilAiming.aim(opt_model, tangentialPupil, tangentialTarget,
+                    tangential = ExitPupilAiming.aim(opt_model, tangentialEntrancePupil, tangentialExitPupilTarget,
                             fld, wvl, trace_options).ray();
                 }
             } else {
-                sagittal = trace_safe(opt_model, sagittalPupil, fld, wvl, trace_options);
-                tangential = trace_safe(opt_model, tangentialPupil, fld, wvl, trace_options);
+                sagittal = trace_safe(opt_model, sagittalEntrancePupil, fld, wvl, trace_options);
+                tangential = trace_safe(opt_model, tangentialEntrancePupil, fld, wvl, trace_options);
             }
             samples.add(new ContrastRayTriplet(
                     pupil, reference.pkg, sagittal.pkg, tangential.pkg,
@@ -1007,119 +1114,6 @@ public class Trace {
         return points;
     }
 
-    private static List<Vector2> generate_gaussian(TraceRingsDef grid_rng, int ncircles, double max_radius) {
-        List<Vector2> points;
-        points = new ArrayList<>();
-        double cx = grid_rng.cx, cy = grid_rng.cy;  // center of ring
-        points.add(new Vector2(cx,cy));
-        double sigma = max_radius/Math.sqrt(2.0*Math.log(1+ncircles));
-        for (int icirc=1; icirc<=ncircles; icirc++)
-        {
-            double daz = 60.0 / icirc;
-            double offset = (icirc%2 == 0) ? 0.0 : 0.5*daz;
-            double p = M.square(icirc)/(ncircles + M.square(ncircles));
-            double r = sigma*Math.sqrt(2.0*Math.log(1/(1-p)));
-            for (int jaz = 0; jaz<6*icirc; jaz++)
-            {
-                double angle_deg = offset + jaz*daz;
-                double angle_rad = Math.toRadians(angle_deg);
-                double x = cx + r*Math.cos(angle_rad);
-                double y = cy + r*Math.sin(angle_rad);
-                points.add(new Vector2(x, y));
-            }
-        }
-        return points;
-    }
-
-    /**
-     * Generates a Gaussian quadrature pattern over a circular or concentric
-     * annular pupil.
-     *
-     * <p>The radial coordinates are Gauss-Legendre nodes transformed from
-     * {@code [-1, 1]} to squared pupil radius
-     * {@code [min_radius^2, max_radius^2]}. Each radial node
-     * is repeated at uniformly spaced angles. The returned weights are
-     * normalized to sum to one, so they integrate a pupil average rather than
-     * the area (pi) of the unit disk.</p>
-     *
-     * <p>Based on B. J. Bauman, H. Xiao, "Gaussian Quadrature for Optical Design
-     * with Non-circular Pupils and Fields, and Broad Wavelength Ranges".</p>
-     *
-     * <p>Also see https://optics.ansys.com/hc/en-us/articles/42661826659347-How-to-use-vignetting-factors</p>
-     */
-    static List<GaussianQuadraturePoint> generate_gaussian_quadrature(
-            TraceRingsDef grid_rng, int num_rings, Integer num_spokes) {
-        if (num_rings < 1 || (num_spokes != null && num_spokes < 3)) {
-            throw new IllegalArgumentException(
-                    "The number of rings must be at least 1 and spokes must be at least 3");
-        }
-        if (!Double.isFinite(grid_rng.min_radius) || !Double.isFinite(grid_rng.max_radius)
-                || grid_rng.min_radius < 0.0 || grid_rng.max_radius <= grid_rng.min_radius) {
-            throw new IllegalArgumentException(
-                    "Pupil radii must be finite and satisfy 0 <= min_radius < max_radius");
-        }
-
-        int spokes = num_spokes == null ? 4 * (num_rings + 1) : num_spokes;
-        double[][] nodesAndWeights = gauss_legendre_nodes_and_weights(num_rings);
-        List<GaussianQuadraturePoint> points = new ArrayList<>(num_rings * spokes);
-
-        for (int angle = 1; angle <= spokes; angle++) {
-            double theta = 2.0 * Math.PI * angle / spokes;
-            double cosTheta = Math.cos(theta);
-            double sinTheta = Math.sin(theta);
-            for (int ring = 0; ring < num_rings; ring++) {
-                double radialFraction = 0.5 + 0.5 * nodesAndWeights[0][ring];
-                double innerRadiusSquared = grid_rng.min_radius * grid_rng.min_radius;
-                double outerRadiusSquared = grid_rng.max_radius * grid_rng.max_radius;
-                double radius = Math.sqrt(innerRadiusSquared
-                        + radialFraction * (outerRadiusSquared - innerRadiusSquared));
-                Vector2 pupil = new Vector2(
-                        grid_rng.cx + radius * cosTheta,
-                        grid_rng.cy + radius * sinTheta);
-                double weight = 0.5 * nodesAndWeights[1][ring] / spokes;
-                points.add(new GaussianQuadraturePoint(pupil, weight));
-            }
-        }
-        return points;
-    }
-
-    /** Computes Gauss-Legendre nodes and weights on [-1, 1]. */
-    private static double[][] gauss_legendre_nodes_and_weights(int order) {
-        double[] nodes = new double[order];
-        double[] weights = new double[order];
-        int rootsToFind = (order + 1) / 2;
-
-        for (int i = 0; i < rootsToFind; i++) {
-            double x = Math.cos(Math.PI * (i + 0.75) / (order + 0.5));
-            double derivative;
-            double delta;
-            do {
-                double p0 = 1.0;
-                double p1 = x;
-                for (int degree = 2; degree <= order; degree++) {
-                    double p2 = ((2.0 * degree - 1.0) * x * p1
-                            - (degree - 1.0) * p0) / degree;
-                    p0 = p1;
-                    p1 = p2;
-                }
-                double polynomial = p1;
-                double previousPolynomial = p0;
-                derivative = order * (x * polynomial - previousPolynomial)
-                        / (x * x - 1.0);
-                delta = polynomial / derivative;
-                x -= delta;
-            } while (Math.abs(delta) > 1.0e-15);
-
-            double weight = 2.0 / ((1.0 - x * x) * derivative * derivative);
-            nodes[i] = -x;
-            nodes[order - 1 - i] = x;
-            weights[i] = weight;
-            weights[order - 1 - i] = weight;
-        }
-        return new double[][]{nodes, weights};
-    }
-
-    record GaussianQuadraturePoint(Vector2 pupil, double weight) {}
 
 
     static class BaseObjectiveFunctionRaw {

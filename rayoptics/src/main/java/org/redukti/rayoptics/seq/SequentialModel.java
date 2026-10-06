@@ -917,6 +917,11 @@ public class SequentialModel {
         return grids;
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    /// Gaussian Quadrature is a Beam42 enhancement
+    /// See Documentation/GAUSSIAN_QUADRATURE.md
+    //////////////////////////////////////////////////////////////////////////////////////////
+
     public List<TraceGridByWvl> trace_gaussian_quadrature(
         TraceGridCallback fct, int fi, Integer wl, int num_rings,
         Integer num_spokes, boolean append_if_none, TraceOptions trace_options) {

@@ -1,6 +1,6 @@
 # LensTool2
 
-`LensTool2` is the command line front end to Beam42's RayOptics component. It takes a
+`LensTool2` is the command line front end to Beam42's RayOptics module. It takes a
 single lens specification file and generates a full set of analysis outputs:
 layout and spot diagrams, geometric MTF plots, a paraxial report, a Zemax export
 and a `README.md` that ties them together. The reports under `Examples/` are all
@@ -475,7 +475,7 @@ table columns.
 Zemax export uses `XOSPHERE` for `RADIAL` surfaces. `XDAT 1` holds the
 number of radial terms, `XDAT 2` is the normalization radius (1), and
 `XDAT 3` onward contain A1, A2, A3, ... including every zero slot. `CONI`
-is the conic constant, unchanged. Even surfaces retain `EVENASPH` and
+is the conic constant, unchanged. Even surfaces use `EVENASPH` and
 their `PARM` coefficient records. Zemax's term count is not Optical Bench's
 odd count. For a coefficient sequence ending at A20, `AsphericalOddCount 9`
 includes the nine odd powers A3 through A19. Zemax stores 20 radial slots,
@@ -521,12 +521,9 @@ so an optimized airspace cannot quietly turn the lens into a different one.
 frequencies. `contrast` is the default, as it is the more effective option.
 Use `--optimize-goal mtf` only if you want to check that out.
 
-`--optimize` **with a number** is a different thing: it runs an optimization the
-prescription itself describes - a `[trial n]` section, or a `[pipeline n]` that runs
-several trials in order, each starting from the last result. There you choose the
-variables, the goals and the constraints. The optimized prescription is written as
-`<specfile>-trial<n>.txt` or `<specfile>-pipeline<n>.txt`, and the report is built from
-it. See [OPTIMIZER.md](OPTIMIZER.md).
+`--optimize` **with a number** triggers an optimization 
+run specified in a `[trial n]` or a `[pipeline n]` section. See [OPTIMIZER.md](OPTIMIZER.md)
+for details.
 
 ### `prescription.txt` round trips
 

@@ -86,6 +86,7 @@ Citations follow the style used by Optica (formerly OSA) journals: author(s), "t
   [doi:10.1364/JOSA.52.000672](https://doi.org/10.1364/JOSA.52.000672).
   This paper presents generalized ray tracing equations that cover not only rotationally symmetric surfaces
   (including aspherics) but also diffraction gratings. The paper allows for surfaces to have their own local axes.
+  The ray tracing in rayoptics module is based on this paper.
 
 * R. E. Hopkins and R. Hanau, "Fundamental Methods of Ray Tracing," Chap. 5 in *Military Standardization Handbook:
   Optical Design*, MIL-HDBK-141 (U.S. Defense Supply Agency, Washington, DC, 1962).
@@ -144,8 +145,8 @@ Here are some other projects that I have not personally tried out
 The project includes code derived from several open-source projects. See the individual license notices in the source
 code and the LICENSE files:
 
-* [LICENSE-GPL-3.0.txt](LICENSE-GPL-3.0.txt) - the overall license, and the license of the code derived from
-  [Goptical](https://www.gnu.org/software/goptical/): mainly the `org.redukti.data` and `org.redukti.render`
+* [LICENSE-GPL-3.0.txt](LICENSE-GPL-3.0.txt) - the overall license for everything in rayoptics module, 
+  and the license of the code derived from [Goptical](https://www.gnu.org/software/goptical/): mainly the `org.redukti.data` and `org.redukti.render`
   packages, plus `Quaternion`, `Transform3`, `Triangle2`, `Vector2Pair` and `Vector3Pair` in `org.redukti.mathlib`.
 * [LICENSE-ray-optics.txt](LICENSE-ray-optics.txt) - BSD 3-Clause, for the code derived from Michael Hayford's
   [ray-optics](https://github.com/mjhoptics/ray-optics), by way of
@@ -160,13 +161,10 @@ and are licensed under GPL v3 or later, same as the overall project.
 
 The overall license is GNU GPL v3 or later.
 
-### The `beam42` module is the exception
+### The `beam42` module LICENSE
 
 The `beam42` module derives from [BeamFour](https://github.com/StellarSoftwareBerkeley/BeamFour), which is GPL-2.0,
 and it is kept under that license.
 
-BeamFour is a standalone product and is kept in this repository for convenience rather than because the rest of the
-project depends on it: the `rayoptics` module does not use it, and generates BeamFour input files rather than calling
-into it. If the GPL-2.0 licensing of this module is a concern, the `beam42` directory can be removed — delete it along
-with its `<module>` entry in the root `pom.xml`. Neither module depends on the other, so the remainder still builds and
-runs.
+BeamFour is a standalone product. If the GPL-2.0 licensing of this module is a concern, the `beam42` directory 
+can be removed — delete it along with its `<module>` entry in the root `pom.xml`.

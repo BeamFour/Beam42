@@ -43,3 +43,95 @@ originX	6
 originY	313.5
 [notes]
 Bill: CLD wasn't specified. Production lens.
+[trial 1]
+description         AI Nikkor 28mm f/1.4D
+fields              0.0 0.3 0.7 1.0
+frequencies         10 30
+vignetting          set-vig frozen
+vary thicknesses   	1 10 16 19
+vary aspherics    	existing
+weighted            no
+#constrain          thicknesses
+goal contrast       sampling 6 12
+goal contrast       10 30
+#goal contrast   	balance all weight 1
+goal contrast   	sag  4 4 2 0.1
+goal contrast   	tan  4 4 2 0.1
+goal contrast       calibrate yes
+outdir				try1
+[trial 2]
+description         AI Nikkor 28mm f/1.4D
+fields              0.0 0.3 0.7 1.0
+frequencies         10 30
+vignetting          set-vig frozen
+vary thicknesses   	1 10 16 19
+vary curvatures     all
+vary aspherics    	existing
+constrain edges
+constrain curvatures
+weighted            no
+#constrain          thicknesses
+goal contrast       sampling 6 12
+goal contrast       10 30
+goal contrast   	balance all weight 1
+goal contrast   	sag  4 4 2 0.1
+goal contrast   	tan  4 4 2 0.1
+goal contrast       calibrate yes
+outdir				try2
+[trial 3]
+description         AI Nikkor 28mm f/1.4D
+fields              0.0 0.3 0.7 1.0
+frequencies         10 30
+vignetting          set-vig frozen
+vary thicknesses   	1 10 16 19
+vary curvatures     all
+vary aspherics    	existing
+constrain edges
+constrain curvatures
+weighted            no
+#constrain          thicknesses
+goal contrast       sampling 6 12
+goal contrast       10 30
+goal contrast   	balance all weight 8
+goal contrast   	sag  4 4 2 0.1
+goal contrast   	tan  4 4 2 0.1
+goal contrast       calibrate yes
+outdir				try3
+[trial 4]
+description         AI Nikkor 28mm f/1.4D
+fields                0 to 1 step 0.1
+frequencies         10 30
+vignetting          set-vig frozen
+vary thicknesses   	1 10 16 19
+vary curvatures     all
+vary aspherics    	existing
+constrain edges
+constrain curvatures
+weighted            no
+#constrain          thicknesses
+goal contrast       sampling 6 12
+goal contrast       10 30
+goal contrast   	balance all weight 8
+goal contrast   sag  4 4 4 4 4 4 4 2 2 0.5 0.1
+goal contrast   tan  4 4 4 4 4 4 4 2 2 0.5 0.1
+goal contrast       calibrate yes
+outdir				try4
+[trial 5]
+description         AI Nikkor 28mm f/1.4D
+fields                0 to 1 step 0.1
+frequencies         10 30
+vignetting          set-vig frozen
+vary thicknesses   	1 10 16 19
+vary curvatures     all
+vary aspherics    	existing
+constrain edges
+constrain curvatures
+weighted            yes
+#constrain          thicknesses
+goal contrast       sampling 6 12
+goal contrast       10 30
+goal contrast   	balance all weight 8
+goal contrast   sag  4 4 4 4 4 4 4 2 2 0.5 0.1
+goal contrast   tan  4 4 4 4 4 4 4 2 2 0.5 0.1
+goal contrast       calibrate yes
+outdir				try5

@@ -131,6 +131,7 @@ goal spot sampling    gaussian 6 12
 goal ray-aberrations  no
 outdir                try5
 [trial 6]
+# probably best of the lot
 description       MTF targets
 fields            0 0.1 0.2 0.4 0.6 0.8 1.0
 frequencies       10 30

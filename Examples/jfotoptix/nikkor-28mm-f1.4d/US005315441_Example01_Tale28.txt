@@ -135,3 +135,60 @@ goal contrast   sag  4 4 4 4 4 4 4 2 2 0.5 0.1
 goal contrast   tan  4 4 4 4 4 4 4 2 2 0.5 0.1
 goal contrast       calibrate yes
 outdir				try5
+[trial 6]
+description         Same as 4 but for only 30
+fields                0 to 1 step 0.1
+frequencies         30
+vignetting          set-vig frozen
+vary thicknesses   	1 10 16 19
+vary curvatures     all
+vary aspherics    	existing
+constrain edges
+constrain curvatures
+weighted            no
+#constrain          thicknesses
+goal contrast       sampling 6 12
+goal contrast       30
+goal contrast   	balance all weight 8
+goal contrast   sag  4 4 4 4 4 4 4 2 2 0.5 0.1
+goal contrast   tan  4 4 4 4 4 4 4 2 2 0.5 0.1
+goal contrast       calibrate yes
+outdir				try4b
+[trial 7]
+description         Same as 4 but for only 30, and different weights
+fields                0 to 1 step 0.1
+frequencies         30
+vignetting          set-vig frozen
+vary thicknesses   	1 10 16 19
+vary curvatures     all
+vary aspherics    	existing
+constrain edges
+constrain curvatures
+weighted            no
+#constrain          thicknesses
+goal contrast       sampling 6 12
+goal contrast       30
+goal contrast   	balance all weight 8
+goal contrast   sag  4 4 4 4 4 4 4 2 2 0.1 0.1
+goal contrast   tan  4 4 4 4 4 4 4 2 2 1.0 0.01
+goal contrast       calibrate yes
+outdir				try4c
+[trial 8]
+description         Same as 4 but for only 30, and different weights, and weighted
+fields                0 to 1 step 0.1
+frequencies         30
+vignetting          set-vig frozen
+vary thicknesses   	1 10 16 19
+vary curvatures     all
+vary aspherics    	existing
+constrain edges
+constrain curvatures
+weighted            yes
+#constrain          thicknesses
+goal contrast       sampling 6 12
+goal contrast       30
+goal contrast   	balance all weight 8
+goal contrast   sag  4 4 4 4 4 4 4 2 2 0.1 0.1
+goal contrast   tan  4 4 4 4 4 4 4 2 2 1.0 0.01
+goal contrast       calibrate yes
+outdir				try4d

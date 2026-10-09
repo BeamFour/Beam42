@@ -90,3 +90,4 @@ link	https://patents.google.com/patent/US20190018229A1/en
 lens name	Sony FE 70-200 mm F2.8 GM OSS
 scenarios	0	2
 names	70mm f2.8	200mm f2.8
+status	Accepted

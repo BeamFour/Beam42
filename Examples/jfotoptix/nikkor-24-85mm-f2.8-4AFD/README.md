@@ -85,7 +85,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | obj_na | 0
 | img_na | -0.179|
 ## Spot Analysis
-| Field | Spot Mean Radius | Spot Max Radius |
+| Field | Spot Mean Radius (µm) | Spot Max Radius (µm) |
 | ---   | ---              | ---             |
  | Field(x=0.0, y=0.0) | 5.538 | 19.518|
  | Field(x=0.0, y=0.1) | 6.872 | 36.612|
@@ -142,7 +142,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | obj_na | 0
 | img_na | -0.122|
 ## Spot Analysis
-| Field | Spot Mean Radius | Spot Max Radius |
+| Field | Spot Mean Radius (µm) | Spot Max Radius (µm) |
 | ---   | ---              | ---             |
  | Field(x=0.0, y=0.0) | 6.876 | 29.352|
  | Field(x=0.0, y=0.1) | 6.682 | 39.383|

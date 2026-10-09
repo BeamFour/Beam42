@@ -781,6 +781,7 @@ public class LensTool2 {
                 addSpotDiagramsToREADME(SB,scenario_filesuffix);
                 addFodToREADME(SB,fod);
                 addSpotReportToREADME(SB,spotAnalysis);
+                spotAnalysis = null;
                 addMTFsToREADME(SB,scenario_filesuffix,arguments.mtf_freqs);
                 generateMTFs(opm, arguments, fields, prescription.get_wvl_wts(), "mtf", scenario_filesuffix);
                 if (arguments.do_ray_aberrations)

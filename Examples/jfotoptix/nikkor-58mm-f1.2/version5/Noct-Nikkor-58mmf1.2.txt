@@ -31,8 +31,7 @@ Bf	37.78
 configuration         0
 #fields                0 to 1 step 0.1
 fields                0 0.3 0.7 1.0
-weighted              no
-d-line-only           no
+wavelengths           d F C
 vignetting            set-vig frozen
 check-spot-apertures  no
 vary curvatures       all
@@ -51,8 +50,6 @@ outdir                try2
 configuration         0
 #fields                0 to 1 step 0.1
 fields                0 0.3 0.7 1.0
-weighted              yes
-d-line-only           no
 vignetting            set-vig frozen
 check-spot-apertures  no
 vary curvatures       all

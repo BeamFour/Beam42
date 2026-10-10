@@ -48,8 +48,7 @@ description           Same as 4 but for only 30, and different weights
 outdir                try4c
 configuration         0
 fields                0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
-weighted              no
-d-line-only           no
+wavelengths           d F C
 vignetting            set-vig frozen
 vary curvatures       all
 vary thicknesses      1 10 16 19

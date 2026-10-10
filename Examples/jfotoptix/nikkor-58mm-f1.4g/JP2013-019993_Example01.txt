@@ -48,7 +48,6 @@ vignetting          set-vig frozen
 vary aspherics      existing
 vary curvatures     all
 #vary thicknesses   all
-weighted            yes
 constrain           curvatures
 constrain 			edges
 #constrain          thicknesses
@@ -60,7 +59,7 @@ outdir				try1
 [trial 2]
 description           Contrast
 fields                0 to 1 step 0.1
-weighted              no
+wavelengths           d F C
 vignetting            set-vig frozen
 check-spot-apertures  no
 vary curvatures       all
@@ -81,7 +80,6 @@ outdir                try2
 [trial 3]
 description       MTF targets
 fields            0 0.2 0.4 0.6 0.8 1.0
-weighted		  yes
 check-spot-apertures  yes
 vary curvatures   all
 vary aspherics    existing
@@ -100,7 +98,6 @@ outdir                try3
 [trial 4]
 description       MTF targets
 fields            0 0.1 0.2 0.4 0.6 0.8 1.0
-weighted		  yes
 check-spot-apertures  yes
 vary curvatures   all
 vary aspherics    existing
@@ -114,7 +111,6 @@ outdir                try4
 [trial 5]
 description       MTF targets
 fields            0 0.1 0.2 0.4 0.6 0.8 1.0
-weighted		  yes
 check-spot-apertures  yes
 vary curvatures   all
 vary aspherics    existing
@@ -129,7 +125,7 @@ outdir                try5
 # probably best of the lot
 description       MTF targets
 fields            0 0.1 0.2 0.4 0.6 0.8 1.0
-weighted		  no
+wavelengths d F C
 check-spot-apertures  yes
 vary curvatures   all
 vary aspherics    existing
@@ -143,7 +139,7 @@ outdir                try6
 [trial 7]
 description       MTF targets
 fields            0 0.1 0.2 0.4 0.6 0.8 1.0
-weighted		  no
+wavelengths d F C
 check-spot-apertures  yes
 vary curvatures   all
 vary aspherics    existing
@@ -157,7 +153,7 @@ outdir                try7
 [trial 8]
 description       MTF targets
 fields            0 0.1 0.2 0.4 0.6 0.8 1.0
-weighted		  no
+wavelengths d F C
 check-spot-apertures  yes
 vary curvatures   all
 vary aspherics    existing

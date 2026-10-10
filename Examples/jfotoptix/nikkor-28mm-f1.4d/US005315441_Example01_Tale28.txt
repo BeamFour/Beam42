@@ -49,7 +49,7 @@ fields              0.0 0.3 0.7 1.0
 vignetting          set-vig frozen
 vary thicknesses   	1 10 16 19
 vary aspherics    	existing
-weighted            no
+wavelengths         d F C
 #constrain          thicknesses
 goal contrast       sampling 6 12
 goal contrast       10 30
@@ -67,7 +67,7 @@ vary curvatures     all
 vary aspherics    	existing
 constrain edges
 constrain curvatures
-weighted            no
+wavelengths         d F C
 #constrain          thicknesses
 goal contrast       sampling 6 12
 goal contrast       10 30
@@ -85,7 +85,7 @@ vary curvatures     all
 vary aspherics    	existing
 constrain edges
 constrain curvatures
-weighted            no
+wavelengths         d F C
 #constrain          thicknesses
 goal contrast       sampling 6 12
 goal contrast       10 30
@@ -103,7 +103,7 @@ vary curvatures     all
 vary aspherics    	existing
 constrain edges
 constrain curvatures
-weighted            no
+wavelengths         d F C
 #constrain          thicknesses
 goal contrast       sampling 6 12
 goal contrast       10 30
@@ -121,7 +121,6 @@ vary curvatures     all
 vary aspherics    	existing
 constrain edges
 constrain curvatures
-weighted            yes
 #constrain          thicknesses
 goal contrast       sampling 6 12
 goal contrast       10 30
@@ -139,7 +138,7 @@ vary curvatures     all
 vary aspherics    	existing
 constrain edges
 constrain curvatures
-weighted            no
+wavelengths         d F C
 #constrain          thicknesses
 goal contrast       sampling 6 12
 goal contrast       30
@@ -157,7 +156,7 @@ vary curvatures     all
 vary aspherics    	existing
 constrain edges
 constrain curvatures
-weighted            no
+wavelengths         d F C
 #constrain          thicknesses
 goal contrast       sampling 6 12
 goal contrast       30
@@ -175,7 +174,6 @@ vary curvatures     all
 vary aspherics    	existing
 constrain edges
 constrain curvatures
-weighted            yes
 #constrain          thicknesses
 goal contrast       sampling 6 12
 goal contrast       30

@@ -44,7 +44,6 @@ originY	857
 [trial 1]
 description         AF-S NIKKOR 58mm f/1.4G ED
 fields              0.0 0.3 0.7 1.0
-frequencies         10 30
 vignetting          set-vig frozen
 vary aspherics      existing
 vary curvatures     all
@@ -61,7 +60,6 @@ outdir				try1
 [trial 2]
 description           Contrast
 fields                0 to 1 step 0.1
-frequencies           10 30
 weighted              no
 vignetting            set-vig frozen
 check-spot-apertures  no
@@ -83,7 +81,6 @@ outdir                try2
 [trial 3]
 description       MTF targets
 fields            0 0.2 0.4 0.6 0.8 1.0
-frequencies       10 30
 weighted		  yes
 check-spot-apertures  yes
 vary curvatures   all
@@ -103,7 +100,6 @@ outdir                try3
 [trial 4]
 description       MTF targets
 fields            0 0.1 0.2 0.4 0.6 0.8 1.0
-frequencies       10 30
 weighted		  yes
 check-spot-apertures  yes
 vary curvatures   all
@@ -118,7 +114,6 @@ outdir                try4
 [trial 5]
 description       MTF targets
 fields            0 0.1 0.2 0.4 0.6 0.8 1.0
-frequencies       10 30
 weighted		  yes
 check-spot-apertures  yes
 vary curvatures   all
@@ -134,7 +129,6 @@ outdir                try5
 # probably best of the lot
 description       MTF targets
 fields            0 0.1 0.2 0.4 0.6 0.8 1.0
-frequencies       10 30
 weighted		  no
 check-spot-apertures  yes
 vary curvatures   all
@@ -149,7 +143,6 @@ outdir                try6
 [trial 7]
 description       MTF targets
 fields            0 0.1 0.2 0.4 0.6 0.8 1.0
-frequencies       10 30
 weighted		  no
 check-spot-apertures  yes
 vary curvatures   all
@@ -164,7 +157,6 @@ outdir                try7
 [trial 8]
 description       MTF targets
 fields            0 0.1 0.2 0.4 0.6 0.8 1.0
-frequencies       10 30
 weighted		  no
 check-spot-apertures  yes
 vary curvatures   all

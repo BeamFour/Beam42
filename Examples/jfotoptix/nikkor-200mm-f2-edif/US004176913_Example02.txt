@@ -63,7 +63,6 @@ lens name	Ai Nikkor ED-IF 200mm F2S
 [trial 1]
 description         Nikkor 200mm f2 ED-IF adjust gaps
 fields              0.0 0.3 0.7 1.0
-frequencies         10 30 50
 vary thicknesses	3 5 8 10 12 15 16 18
 weighted            no
 goal contrast       sampling 6 12

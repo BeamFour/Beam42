@@ -31,7 +31,6 @@ Bf	37.78
 configuration         0
 #fields                0 to 1 step 0.1
 fields                0 0.3 0.7 1.0
-frequencies           10 20 40
 weighted              no
 d-line-only           no
 vignetting            set-vig frozen
@@ -52,7 +51,6 @@ outdir                try2
 configuration         0
 #fields                0 to 1 step 0.1
 fields                0 0.3 0.7 1.0
-frequencies           10 20 40
 weighted              yes
 d-line-only           no
 vignetting            set-vig frozen
@@ -74,7 +72,6 @@ goal contrast   20 sag  4 2 1 0
 goal contrast   20 tan  4 2 1 0
 goal contrast   40 sag  8 4 1 0
 goal contrast   40 tan  8 4 1 0
-#goal contrast   balance  all except 1.0 weight 4
 goal contrast   sampling 6 12
 goal contrast         calibrate no
 goal contrast         exit-pupil-aiming no

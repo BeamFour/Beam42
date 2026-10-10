@@ -62,7 +62,6 @@ Bill: Something wrong between s6 and s10. Magnification measured.
 [trial 1]
 description         Cosina Voigtlander APO-Lanthar 28mm F2.0
 fields              0.0 0.3 0.7 1.0
-frequencies         10 30 50
 vignetting          set-pupil
 vary aspherics      existing
 vary curvatures     all

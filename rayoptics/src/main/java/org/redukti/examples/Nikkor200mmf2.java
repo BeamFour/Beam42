@@ -21,8 +21,6 @@ public class Nikkor200mmf2 {
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
                 .varyThicknesses(3,5,8,10,12,15,16,18)
-                .weighted(weighted)
-                .dLineOnly(dLineOnly)
                 .contrastSampling(6, 12)
                 .contrastGoals(
                         contrast(10, fieldWeights),

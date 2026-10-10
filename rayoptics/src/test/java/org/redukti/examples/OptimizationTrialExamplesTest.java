@@ -49,7 +49,7 @@ class OptimizationTrialExamplesTest {
                 [trial 1]
                 description           Contrast, every parameter free
                 fields                0 to 1 step 0.1
-                weighted              no
+                wavelengths           d F C
                 vignetting            set-vig frozen
                 check-spot-apertures  no
 
@@ -121,8 +121,7 @@ class OptimizationTrialExamplesTest {
                 description           Moving groups at the wide end
                 configuration         0
                 fields                0 to 1 step 0.1
-                weighted              no
-                d-line-only           no
+                wavelengths           d F C
                 vignetting            set-vig frozen
                 check-spot-apertures  no
 

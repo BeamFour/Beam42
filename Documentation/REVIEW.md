@@ -1196,11 +1196,10 @@ assumed to carry to other designs; direct aiming has no such dependence.
 
 ## Smaller items
 
-- **`dLineOnly` is ignored for contrast goals.** *Still open.*
-  [OptimizationBuilder.java:544](../optimr2/src/main/java/org/redukti/optim/OptimizationBuilder.java:544)
-  loops all `prescription._wvls` unconditionally, while the ray-aberration loop honours
-  the flag. Consistent in the `ZeissOtusML50mm` path only because the prescription itself
-  is restricted upstream.
+- ~~**`dLineOnly` is ignored for contrast goals.**~~ **Fixed** by removing the flag.
+  `weighted` and `d-line-only` became one `wavelengths` line, which builds the
+  prescription, so every goal sees exactly the wavelengths it names and no flag can
+  disagree with them. Restricting goals to the d line is now `wavelengths d`.
 
 - ~~**There is no way to build a contrast-only merit.**~~ **Fixed.** Ray-aberration fans
   are opt-in now: `buildGoals` adds them only for `rayAberrationGoals()`, and a merit
@@ -1377,8 +1376,8 @@ measurement and defects that need a fix, because they want different kinds of ef
    once that A/B is done, since it regenerates every golden value.
 9. **Validate frequency against the cutoff** (§5) at configuration time rather than on the
    first trace.
-10. **`dLineOnly` is ignored for contrast goals**, or document that it deliberately does
-    not apply to them.
+10. ~~**`dLineOnly` is ignored for contrast goals**~~ - the flag is gone; see the
+    smaller items above.
 11. **Two vignetting conventions coexist.** `ZemaxExporter` writes all-zero vignetting
     factors and relies on real apertures; `trace_contrast` sets `check_apertures = false`
     and relies entirely on the vignetting map. A design compared across the two is not

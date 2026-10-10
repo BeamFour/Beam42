@@ -34,8 +34,6 @@ public class Pentax80200mmf28 {
                 //.applyCurvatureConstraints()
                 //.applyThicknessConstraints()
                 //.applyEdgeThicknessConstraints()
-                .weighted(false)
-                .dLineOnly(false)
                 .contrastSampling(6, 12)
                 .calibrateContrastFrequency(false)
                 .centerContrastResiduals(false)

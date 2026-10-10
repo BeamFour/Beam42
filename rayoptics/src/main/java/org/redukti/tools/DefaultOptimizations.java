@@ -144,7 +144,7 @@ public final class DefaultOptimizations {
      */
     public static Result optimizeThicknesses(Prescription prescription, int[] surfaces,
                                              int[] mtfFrequencies, int configuration,
-                                             VigType vigType, boolean dLineOnly,
+                                             VigType vigType,
                                              Objective objective) throws Exception {
         if (surfaces.length == 0)
             throw new IllegalArgumentException("no surfaces to optimize");
@@ -153,7 +153,6 @@ public final class DefaultOptimizations {
                 .mtfFrequencies(mtfFrequencies)
                 .scenario(configuration)
                 .vignetting(vigType)
-                .dLineOnly(dLineOnly)
                 .varyThicknesses(surfaces)
                 .applyThicknessConstraints();
         // Goals at the central field, both meridians, driving contrast up.

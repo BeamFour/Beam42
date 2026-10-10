@@ -33,8 +33,6 @@ public class GenericContrastOpt {
                 .applyCurvatureConstraints()
                 .applyThicknessConstraints()
                 .applyEdgeThicknessConstraints()
-                .weighted(false)
-                .dLineOnly(dLineOnly)
                 .contrastSampling(6, 12)
                 .calibrateContrastFrequency(false)
                 .centerContrastResiduals(false)

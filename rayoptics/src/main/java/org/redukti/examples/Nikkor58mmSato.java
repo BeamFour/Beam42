@@ -35,8 +35,6 @@ public class Nikkor58mmSato {
                 .applyCurvatureConstraints()
                 .applyThicknessConstraints()
                 .applyEdgeThicknessConstraints()
-                .weighted(false)
-                .dLineOnly(dLineOnly)
                 .contrastSampling(6, 12)
                 .calibrateContrastFrequency(false)
                 .vignetting(VigType.SetVig)

@@ -27,8 +27,6 @@ public class ZeissOtusML50mmv2 {
                         3, 5, 6, 13, 16)
                 .varyThicknesses(25)
                 .varyExistingAspherics()
-                .weighted(weighted)
-                .dLineOnly(dLineOnly)
                 .mtfGoals(
                         mtf(10,
                                 new double[]{93, 93, 94, 93},

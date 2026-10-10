@@ -21,8 +21,6 @@ public class GenericMtfOpt {
                 .fields(0.0, 0.3, 0.7, 1.0)
                 .mtfFrequencies(10, 30, 50)
                 .varyAllCurvatures()
-                .weighted(weighted)
-                .dLineOnly(dLineOnly)
                 .rayAberrationGoals()
                 .mtfGoals(
                         mtf(10,

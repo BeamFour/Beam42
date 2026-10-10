@@ -28,8 +28,6 @@ class ZeissOtusML50mmTest {
                         11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23)
                 .varyThicknesses(25)
                 .varyExistingAspherics()
-                .weighted(false)
-                .dLineOnly(false)
                 .rayAberrationGoals()
                 // A single goal frequency, like the contrast test - but at 40,
                 // not 20. This is NOT the saving the contrast test got: MTF
@@ -87,8 +85,6 @@ class ZeissOtusML50mmTest {
                         11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23)
                 .varyThicknesses(25)
                 .varyExistingAspherics()
-                .weighted(false)
-                .dLineOnly(false)
                 // Ray fans are opt-in now; they were unconditional when these values
                 // were generated, so keep them to preserve the merit.
                 .rayAberrationGoals()

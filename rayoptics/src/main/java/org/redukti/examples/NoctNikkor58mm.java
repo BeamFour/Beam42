@@ -30,8 +30,6 @@ public class NoctNikkor58mm {
                         new VarAsphCoeff(prescription,0,2,1E9),
                         new VarAsphCoeff(prescription,0,3,1E11),
                         new VarAsphCoeff(prescription,0,4,1E14))
-                .weighted(weighted)
-                .dLineOnly(dLineOnly)
                 .applyCurvatureConstraints()
                 .gaussianQuadratureSampling(3, 6)
                 .spotDeviationGoals(fieldWeights)
@@ -52,8 +50,6 @@ public class NoctNikkor58mm {
                         new VarAsphCoeff(prescription,0,2,1E9),
                         new VarAsphCoeff(prescription,0,3,1E11),
                         new VarAsphCoeff(prescription,0,4,1E14))
-                .weighted(weighted)
-                .dLineOnly(dLineOnly)
                 .applyCurvatureConstraints()
                 .spotRmsGoals(new double[]{15, 30, 50, 70},
                               fieldWeights)
@@ -76,8 +72,6 @@ public class NoctNikkor58mm {
                         new VarAsphCoeff(prescription,0,2,1E9),
                         new VarAsphCoeff(prescription,0,3,1E11),
                         new VarAsphCoeff(prescription,0,4,1E14))
-                .weighted(weighted)
-                .dLineOnly(dLineOnly)
                 .applyCurvatureConstraints()
                 .mtfGoals(
                         mtf(10,
@@ -114,8 +108,6 @@ public class NoctNikkor58mm {
                         new VarAsphCoeff(prescription,0,2,1E9),
                         new VarAsphCoeff(prescription,0,3,1E11),
                         new VarAsphCoeff(prescription,0,4,1E14))
-                .weighted(false)
-                .dLineOnly(dLineOnly)
                 .applyCurvatureConstraints()
                 .applyEdgeThicknessConstraints()
                 .applyThicknessConstraints()
@@ -149,8 +141,6 @@ public class NoctNikkor58mm {
                         new VarAsphCoeff(prescription,0,2,1E9),
                         new VarAsphCoeff(prescription,0,3,1E11),
                         new VarAsphCoeff(prescription,0,4,1E14))
-                .weighted(false)
-                .dLineOnly(dLineOnly)
                 .applyCurvatureConstraints()
                 .applyEdgeThicknessConstraints()
                 .applyThicknessConstraints()
@@ -179,8 +169,6 @@ public class NoctNikkor58mm {
                         new VarAsphCoeff(prescription,0,2,1E9),
                         new VarAsphCoeff(prescription,0,3,1E11),
                         new VarAsphCoeff(prescription,0,4,1E14))
-                .weighted(weighted)
-                .dLineOnly(dLineOnly)
                 .rayAberrationGoals()
                 .applyCurvatureConstraints()
                 .paraxialGoal(ParaxHelper.Back_focal_length, 37.78)

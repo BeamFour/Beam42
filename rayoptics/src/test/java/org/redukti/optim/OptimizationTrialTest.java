@@ -50,14 +50,14 @@ class OptimizationTrialTest {
     @Test
     void reusesParsedDefinitionAndRoundTripsItsSettings() throws Exception {
         String text = withTrials(SUMMICRON, "[trial 1]\n" + MTF_FIVE_FIELDS
-                + "vary thicknesses 10\nweighted no\nd-line-only yes\n");
+                + "vary thicknesses 10\nwavelengths d\n");
         var definition = OptimizationTrial.parse(text, 1);
         var first = definition.createBuilder(text, true);
         String canonical = definition.toTrial(first.prescription());
         assertEquals(canonical, definition.toTrial());
         assertEquals(first.toTrial(1), canonical);
         assertEquals(1, definition.number());
-        assertTrue(canonical.contains("weighted"));
+        assertTrue(canonical.contains("wavelengths           d\n"), canonical);
         assertSameSetup(read(text).build(), first.build());
 
         // A stage hands on its changed design, without needing to carry trial text
@@ -254,8 +254,7 @@ class OptimizationTrialTest {
             outdir                trials/one
             configuration         0
             fields                0 0.25 0.5 0.75 1
-            weighted              no
-            d-line-only           yes
+            wavelengths           d C e F g  weights standard
             vignetting            set-vig frozen
             check-spot-apertures  no
             vary curvatures       all except 2 6
@@ -296,8 +295,6 @@ class OptimizationTrialTest {
                 description   Everything a trial can say   # a comment is not kept
                 outdir  trials/one
                 fields 0 to 1 step 0.25
-                weighted no
-                d-line-only yes
                 vignetting set-vig frozen
                 check-spot-apertures no
                 vary curvatures all except 2 6
@@ -351,8 +348,7 @@ class OptimizationTrialTest {
                 [trial 7]
                 configuration         0
                 fields                0 0.5 1
-                weighted              yes
-                d-line-only           no
+                wavelengths           d C e F g  weights standard
                 vignetting            set-pupil
                 check-spot-apertures  yes
                 vary thicknesses      10 4

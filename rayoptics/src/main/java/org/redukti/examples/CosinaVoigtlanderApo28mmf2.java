@@ -31,8 +31,6 @@ public class CosinaVoigtlanderApo28mmf2 {
                 // collapses air spaces and pushes elements through the stop.
                 .applyCurvatureConstraints()
                 .applyThicknessConstraints()
-                .weighted(weighted)
-                .dLineOnly(dLineOnly)
                 .contrastSampling(6, 12)
                 .calibrateContrastFrequency(true)
                 .contrastGoals(

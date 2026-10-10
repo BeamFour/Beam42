@@ -101,9 +101,12 @@ public class Prescription {
     public String _patent_link = "";
 
     public Prescription(double focal_length, double fno, double angle_of_view_degrees, double diameter_image_circle, boolean d_line_only) {
-        this(focal_length,fno,angle_of_view_degrees,diameter_image_circle,
-            d_line_only ? new double[] {587.5618} : new double[] {587.5618, 486.1327, 656.2725},
-            d_line_only ? new double[] {1.0} : new double[] {1.0, 1.0, 1.0});
+        this(focal_length, fno, angle_of_view_degrees, diameter_image_circle,
+            d_line_only ? WavelengthSet.dLine() : WavelengthSet.standardTriColor());
+    }
+    public Prescription(double focal_length, double fno, double angle_of_view_degrees, double diameter_image_circle, WavelengthSet wavelengths) {
+        this(focal_length, fno, angle_of_view_degrees, diameter_image_circle,
+            wavelengths.wavelengths(), wavelengths.weights());
     }
     public Prescription(double focal_length, double fno, double angle_of_view_degrees, double diameter_image_circle, double[] wvls, double[] wts) {
         this._focal_length = focal_length;
@@ -229,7 +232,7 @@ public class Prescription {
         return build_prescription(specs,true, false, true);
     }
     public static Prescription build_prescription_e_line(OpticalBenchDataImporter.LensSpecifications specs) {
-        return build_prescription(specs,true, new double[] {546.074}, new double[] {1.0},0);
+        return build_prescription(specs, true, WavelengthSet.eLine());
     }
     public static Prescription build_prescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types) {
         return build_prescription(specs, use_glass_types,false,false);
@@ -238,28 +241,17 @@ public class Prescription {
         return build_prescription(specs, use_glass_types, wvls, wts,0);
     }
 
-    public final static double WT_d = 1.0;
-    public final static double WT_C = 0.475;
-    public final static double WT_e = 0.98;
-    public final static double WT_F = 0.49;
-    public final static double WT_g = 0.15;
+    /** Build with a chosen set of wavelengths and their weights. */
+    public static Prescription build_prescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types, WavelengthSet wavelengths) {
+        return build_prescription(specs, use_glass_types, wavelengths.wavelengths(), wavelengths.weights(), 0);
+    }
 
+    /** The three sets {@link WavelengthSet} defines, selected the way the old trials did. */
     public static Prescription build_prescription(OpticalBenchDataImporter.LensSpecifications specs, boolean use_glass_types, boolean weighted, boolean d_line) {
-        double[] wvls;
-        double[] wts;
-        if (d_line) {
-            wvls = new double[] { Glass.d };
-            wts = new double[] {1.0};
-        }
-        else if (weighted) {
-            wvls = new double[]{Glass.d, Glass.C, Glass.e, Glass.F, Glass.g};
-            wts = new double[]{WT_d, WT_C, WT_e, WT_F, WT_g};
-        }
-        else {
-            wvls = new double[]{Glass.d, Glass.F, Glass.C};
-            wts = new double[]{1.0, 1.0, 1.0};
-        }
-        return build_prescription(specs,use_glass_types,wvls,wts,0);
+        WavelengthSet wavelengths = d_line ? WavelengthSet.dLine()
+                : weighted ? WavelengthSet.standardFiveColor()
+                : WavelengthSet.standardTriColor();
+        return build_prescription(specs, use_glass_types, wavelengths);
     }
     /** Names of the [variable distances] entries a prescription cannot be built without */
     private final static String FOCAL_LENGTH = "Focal Length";

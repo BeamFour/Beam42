@@ -675,8 +675,8 @@ refines a pupil average rather than simply multiplying spot merit by the ray cou
 Do not divide that merit by the sample count again. Contrast also carries its own pupil
 quadrature weights; preserve its overlap integration convention.
 
-Other axes are currently accumulated. The builder supplies wavelength weights directly
-(or 1 per wavelength in unweighted mode), and sums fields, orientations and frequencies.
+Other axes are currently accumulated. The builder supplies the wavelength set's weights
+directly, and sums fields, orientations and frequencies.
 Adding wavelengths or fields can therefore strengthen optical goals against scalar
 paraxial anchors and layout penalties. Ray-fan goals have no analogous Gaussian sample
 normalization. Conversely, aggregate RMS and MTF values already perform averaging within

@@ -27,8 +27,6 @@ public class ZeissOtusML50mm {
                         11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23)
                 .varyThicknesses(25)
                 .varyExistingAspherics()
-                .weighted(weighted)
-                .dLineOnly(dLineOnly)
                 .rayAberrationGoals()
                 .mtfGoals(
                         mtf(10,
@@ -53,8 +51,6 @@ public class ZeissOtusML50mm {
                         11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23)
                 .varyThicknesses(25)
                 .varyExistingAspherics()
-                .weighted(weighted)
-                .dLineOnly(dLineOnly)
                 // Retain the historical Otus merit explicitly. Ray fans are
                 // optional in OptimizationBuilder because dense contrast goals
                 // do not generally need them.

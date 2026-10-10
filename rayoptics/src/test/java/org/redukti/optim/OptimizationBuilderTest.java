@@ -7,6 +7,7 @@ import org.redukti.rayoptics.seq.Glass;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.VigType;
 import org.redukti.spec.SurfaceType;
+import org.redukti.spec.WavelengthSet;
 
 import java.util.Arrays;
 
@@ -20,10 +21,20 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 class OptimizationBuilderTest {
 
+    /** The same lens evaluated at the d line alone. */
+    private static Prescription dLinePrescription() {
+        return lens(new Prescription(50.0, 1.4, 40.0, 43.28,
+                new double[]{Glass.d}, new double[]{1.0}));
+    }
+
     private static Prescription prescription() {
-        return new Prescription(50.0, 1.4, 40.0, 43.28,
+        return lens(new Prescription(50.0, 1.4, 40.0, 43.28,
                 new double[]{Glass.d, Glass.F, Glass.C},
-                new double[]{1.0, 0.5, 0.25})
+                new double[]{1.0, 0.5, 0.25}));
+    }
+
+    private static Prescription lens(Prescription prescription) {
+        return prescription
                 .surf(50.0, 5.0, 30.0, 1.5, 50.0)
                 .asph(SurfaceType.ASPH_EVEN, -0.5,
                         new double[]{0.0, 2.5e-6, 0.0, -4.0e-10})
@@ -78,13 +89,15 @@ class OptimizationBuilderTest {
         assertArrayEquals(new double[]{0.25, 0.5, 1.0}, rayWeights);
     }
 
+    /**
+     * The wavelength set is the prescription's: a d-line prescription produces d-line
+     * goals, and there is no separate switch that could disagree with it.
+     */
     @Test
-    void supportsDLineOnlyAndUnweightedGoals() {
-        var setup = OptimizationBuilder.builder(prescription())
+    void goalsCoverExactlyThePrescriptionsWavelengths() {
+        var setup = OptimizationBuilder.builder(dLinePrescription())
                 .fields(0.0, 1.0)
                 .mtfFrequencies(10)
-                .weighted(false)
-                .dLineOnly(true)
                 .rayAberrationGoals()
                 .build();
 
@@ -96,6 +109,20 @@ class OptimizationBuilderTest {
                     assertEquals(Glass.d, goal._wvl);
                     assertEquals(1.0, goal._weight);
                 });
+    }
+
+    /** Requesting other wavelengths than the prescription carries is a mistake, not a mode. */
+    @Test
+    void rejectsAWavelengthSetThePrescriptionWasNotBuiltFor() {
+        var error = assertThrows(IllegalArgumentException.class, () ->
+                OptimizationBuilder.builder(prescription())
+                        .fields(0.0)
+                        .mtfFrequencies(10)
+                        .wavelengths(WavelengthSet.dLine())
+                        .rayAberrationGoals()
+                        .build());
+        assertTrue(error.getMessage().contains("build the prescription from the same wavelength set"),
+                error.getMessage());
     }
 
     @Test
@@ -168,7 +195,6 @@ class OptimizationBuilderTest {
         var setup = OptimizationBuilder.builder(prescription)
                 .fields(0.0)
                 .mtfFrequencies(10)
-                .dLineOnly(true)
                 .additionalVariables(customVariable)
                 .additionalGoals(analysis -> new GoalSpotRMS(analysis, 1, 7.5, 4.0))
                 .build();
@@ -380,9 +406,6 @@ class OptimizationBuilderTest {
         var setup = OptimizationBuilder.builder(prescription())
                 .fields(0.0, 1.0)
                 .mtfFrequencies(10)
-                // Unweighted so the goal's wavelength pooling and the sum below coincide;
-                // weighted pooling is covered separately.
-                .weighted(false)
                 .contrastSampling(2, 4)
                 .contrastGoals(OptimizationBuilder.contrast(10, new double[]{1, 1}))
                 .contrastBalanceGoals(new boolean[]{true, true})
@@ -402,14 +425,13 @@ class OptimizationBuilderTest {
         // gets the same tolerance as the off-axis comparison below.
         assertEquals(0.0, onAxis.value(), 1.0e-9);
 
-        double sagittal = blockSumOfSquares(setup, Orientation.SAGITTAL, 1);
-        double tangential = blockSumOfSquares(setup, Orientation.TANGENTIAL, 1);
+        double difference = weightedDifference(setup, 1, 1.0, 1.0);
         GoalContrastBalance offAxis = Arrays.stream(setup.goals())
                 .filter(GoalContrastBalance.class::isInstance)
                 .map(GoalContrastBalance.class::cast)
                 .filter(goal -> goal._field == 1)
                 .findFirst().orElseThrow();
-        assertEquals(sagittal - tangential, offAxis.value(), 1.0e-9,
+        assertEquals(difference, offAxis.value(), 1.0e-9,
                 "balance must equal the difference the two meridians contribute to the merit");
     }
 
@@ -423,7 +445,6 @@ class OptimizationBuilderTest {
         var setup = OptimizationBuilder.builder(prescription())
                 .fields(0.0, 1.0)
                 .mtfFrequencies(10)
-                .weighted(true)   // prescription weights are 1.0, 0.5, 0.25
                 .contrastSampling(2, 4)
                 .contrastGoals(OptimizationBuilder.contrast(10, new double[]{1, 1}))
                 .contrastBalanceGoals(new boolean[]{false, true})
@@ -450,7 +471,6 @@ class OptimizationBuilderTest {
         var setup = OptimizationBuilder.builder(prescription())
                 .fields(0.0, 1.0)
                 .mtfFrequencies(10)
-                .weighted(false)
                 .contrastSampling(2, 4)
                 .contrastGoals(OptimizationBuilder.contrast(10,
                         new double[]{1.0, 2.5}, new double[]{1.0, 0.4}))
@@ -463,9 +483,7 @@ class OptimizationBuilderTest {
                 .map(GoalContrastBalance.class::cast)
                 .findFirst().orElseThrow();
 
-        double sagittal = blockSumOfSquares(setup, Orientation.SAGITTAL, 1);
-        double tangential = blockSumOfSquares(setup, Orientation.TANGENTIAL, 1);
-        assertEquals(2.5 * sagittal - 0.4 * tangential, balance.value(), 1.0e-9,
+        assertEquals(weightedDifference(setup, 1, 2.5, 0.4), balance.value(), 1.0e-9,
                 "balance must include the contrast merit's field/orientation weights");
     }
 
@@ -480,15 +498,21 @@ class OptimizationBuilderTest {
                 .sum();
     }
 
-    /** Sum of squares of the merit's own contrast residuals for one field and orientation. */
-    private static double blockSumOfSquares(
-            OptimizationBuilder.OptimizationSetup setup, int orientation, int field) {
-        return Arrays.stream(setup.goals())
-                .filter(GoalContrast.class::isInstance)
-                .map(GoalContrast.class::cast)
-                .filter(goal -> goal._field == field && goal._orientation == orientation)
-                .mapToDouble(goal -> goal.value() * goal.value())
-                .sum();
+    /**
+     * What the balance goal should read: each wavelength's residual energies, scaled by
+     * that wavelength's weight - the prescription's 1.0, 0.5 and 0.25 - and by the field's
+     * sagittal and tangential weights.
+     */
+    private static double weightedDifference(OptimizationBuilder.OptimizationSetup setup,
+                                             int field, double sagittalWeight, double tangentialWeight) {
+        double[] weights = {1.0, 0.5, 0.25};
+        double difference = 0.0;
+        for (int w = 0; w < weights.length; w++) {
+            double sagittal = wavelengthSumOfSquares(setup, Orientation.SAGITTAL, field, w);
+            double tangential = wavelengthSumOfSquares(setup, Orientation.TANGENTIAL, field, w);
+            difference += weights[w] * (sagittalWeight * sagittal - tangentialWeight * tangential);
+        }
+        return difference;
     }
 
     @Test
@@ -669,7 +693,6 @@ class OptimizationBuilderTest {
         var setup = OptimizationBuilder.builder(prescription())
                 .fields(0.0)
                 .mtfFrequencies(20)
-                .dLineOnly(true)
                 .contrastSampling(2, 4)
                 .contrastGoals(
                         OptimizationBuilder.contrast(10, new double[]{1.0}),
@@ -695,7 +718,6 @@ class OptimizationBuilderTest {
         var setup = OptimizationBuilder.builder(prescription())
                 .fields(0.0)
                 .mtfFrequencies(20)
-                .weighted(false)
                 .gaussianQuadratureSampling(2, 4)
                 .spotDeviationGoals(new double[]{1.0}, new double[]{1.0})
                 .build();
@@ -735,7 +757,6 @@ class OptimizationBuilderTest {
                 .fields(0.0)
                 .mtfFrequencies(20)
                 .varyCurvatures(0)
-                .weighted(false)
                 .gaussianQuadratureSampling(2, 4)
                 .spotDeviationGoals(1.0)
                 .build();

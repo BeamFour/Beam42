@@ -3,11 +3,11 @@
 // License GPL v3
 package org.redukti.optim;
 
-import org.redukti.rayoptics.seq.Glass;
 import org.redukti.rayoptics.util.Orientation;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.SurfaceType;
 import org.redukti.spec.VigType;
+import org.redukti.spec.WavelengthSet;
 
 import java.util.*;
 
@@ -73,6 +73,9 @@ public final class OptimizationBuilder {
             throw new IllegalArgumentException("prescription must be built before optimization");
         this.prescription = prescription;
         this.configuration = configuration.copy();
+        // The prescription's own set, unless a caller or a trial asked for one.
+        if (this.configuration.wavelengths == null)
+            this.configuration.wavelengths = WavelengthSet.of(prescription);
     }
 
     public static OptimizationBuilder builder(Prescription prescription) {
@@ -127,15 +130,19 @@ public final class OptimizationBuilder {
         return this;
     }
 
-    /** Use the prescription's wavelength weights; false assigns every wavelength weight 1.0. */
-    public OptimizationBuilder weighted(boolean weighted) {
-        configuration.weighted = weighted;
-        return this;
-    }
-
-    /** Restrict enabled ray-aberration goals to the Fraunhofer d-line. */
-    public OptimizationBuilder dLineOnly(boolean dLineOnly) {
-        configuration.dLineOnly = dLineOnly;
+    /**
+     * The wavelengths to evaluate, and the weight each one carries. Every per-wavelength
+     * residual's weight is its field and orientation weight times its wavelength weight,
+     * and the analyses combine wavelengths with the same weights, so this is one decision
+     * rather than two. The default is {@link WavelengthSet#standardFiveColor()}.
+     *
+     * <p>A prescription built for other wavelengths than these is a different design to
+     * the one being optimized; build it from the same set.
+     */
+    public OptimizationBuilder wavelengths(WavelengthSet wavelengths) {
+        if (wavelengths == null)
+            throw new IllegalArgumentException("a wavelength set is required");
+        configuration.wavelengths = wavelengths;
         return this;
     }
 
@@ -970,7 +977,7 @@ public final class OptimizationBuilder {
             ContrastGoals curve = configuration.contrastGoals.get(contrast_index);
             for (int field = 0; field < configuration.fields.length; field++) {
                 for (int wavelength = 0; wavelength < prescription._wvls.length; wavelength++) {
-                    double wavelengthWeight = configuration.weighted ? prescription._wts[wavelength] : 1.0;
+                    double wavelengthWeight = prescription._wts[wavelength];
                     for (int sample = 0; sample < contrastSamples; sample++) {
                         result.add(new GoalContrast(analysis, contrast_index, curve.frequency, field + 1,
                                 wavelength, sample, Orientation.SAGITTAL,
@@ -986,7 +993,7 @@ public final class OptimizationBuilder {
         if (configuration.contrastBalanceFields != null) {
             double[] wavelengthWeights = new double[prescription._wvls.length];
             for (int w = 0; w < wavelengthWeights.length; w++)
-                wavelengthWeights[w] = configuration.weighted ? prescription._wts[w] : 1.0;
+                wavelengthWeights[w] = prescription._wts[w];
             for (int contrast_index = 0; contrast_index < configuration.contrastGoals.size(); contrast_index++) {
                 ContrastGoals curve = configuration.contrastGoals.get(contrast_index);
                 for (int field = 0; field < configuration.fields.length; field++) {
@@ -1008,7 +1015,7 @@ public final class OptimizationBuilder {
             int samples = configuration.gaussianQuadratureRings * configuration.gaussianQuadratureSpokes;
             for (int field = 0; field < configuration.fields.length; field++) {
                 for (int wavelength = 0; wavelength < prescription._wvls.length; wavelength++) {
-                    double wavelengthWeight = configuration.weighted ? prescription._wts[wavelength] : 1.0;
+                    double wavelengthWeight = prescription._wts[wavelength];
                     for (int sample = 0; sample < samples; sample++) {
                         result.add(new GoalSpotDeviation(analysis, field + 1, wavelength,
                                 sample, Orientation.X,
@@ -1035,9 +1042,7 @@ public final class OptimizationBuilder {
             for (int field = 1; field <= configuration.fields.length; field++) {
                 for (int orientation = Orientation.SAGITTAL; orientation <= Orientation.TANGENTIAL; orientation++) {
                     for (int wavelength = 0; wavelength < prescription._wvls.length; wavelength++) {
-                        if (configuration.dLineOnly && !sameWavelength(prescription._wvls[wavelength], Glass.d))
-                            continue;
-                        double weight = configuration.weighted ? prescription._wts[wavelength] : 1.0;
+                        double weight = prescription._wts[wavelength];
                         for (int sample = 0; sample < RAY_FAN_SAMPLES; sample++)
                             result.add(new GoalRayAberration(analysis, field, orientation, sample,
                                     prescription._wvls[wavelength], 0.0, weight));
@@ -1121,9 +1126,28 @@ public final class OptimizationBuilder {
         validateSurfaces(configuration.thicknessSurfaces, "thickness");
         validateSurfaces(configuration.curvatureExclusions, "excluded curvature");
         validateSurfaces(configuration.thicknessExclusions, "excluded thickness");
-        if (configuration.addRayAberrationGoals && configuration.dLineOnly
-                && Arrays.stream(prescription._wvls).noneMatch(w -> sameWavelength(w, Glass.d)))
-            throw new IllegalArgumentException("d-line optimization requires the prescription to contain the d-line wavelength");
+        validateWavelengths();
+    }
+
+    /**
+     * The prescription carries the wavelengths into the optical model, and the goals take
+     * their wavelength weights from it, so a prescription built for a different set than
+     * the one configured would optimize a different design than the one requested.
+     */
+    private void validateWavelengths() {
+        double[] wavelengths = configuration.wavelengths.wavelengths();
+        double[] weights = configuration.wavelengths.weights();
+        boolean same = prescription._wvls.length == wavelengths.length;
+        for (int i = 0; same && i < wavelengths.length; i++)
+            same = sameWavelength(prescription._wvls[i], wavelengths[i])
+                    && prescription._wts[i] == weights[i];
+        if (!same)
+            throw new IllegalArgumentException(
+                    "the prescription is built for wavelengths " + Arrays.toString(prescription._wvls)
+                            + " weighted " + Arrays.toString(prescription._wts)
+                            + ", but the optimization requests " + Arrays.toString(wavelengths)
+                            + " weighted " + Arrays.toString(weights)
+                            + "; build the prescription from the same wavelength set");
     }
 
     private void validateSurfaces(int[] surfaces, String kind) {

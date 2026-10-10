@@ -5,8 +5,8 @@ package org.redukti.optim;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.spec.Prescription;
-import org.redukti.spec.SurfaceType;
 import org.redukti.spec.VigType;
+import org.redukti.spec.WavelengthSet;
 import org.redukti.util.Args;
 
 import java.math.BigDecimal;
@@ -103,7 +103,7 @@ public final class OptimizationTrial {
             var specs = new OpticalBenchDataImporter.LensSpecifications();
             specs.parse_buffer(prescriptionText);
             var prescription = Prescription.build_prescription(
-                    specs, useGlassTypes, configuration.weighted, configuration.dLineOnly);
+                    specs, useGlassTypes, configuration.wavelengths);
             return settings.apply(prescription, configuration);
         }
 
@@ -294,6 +294,19 @@ public final class OptimizationTrial {
         return String.join(" ", result);
     }
 
+    /**
+     * A wavelength set as a trial writes it: the letters, then a weights clause unless
+     * every weight is 1.0. The standard five are written as {@code weights standard}
+     * rather than as five numbers.
+     */
+    static String format(WavelengthSet wavelengths) {
+        if (wavelengths.hasStandardWeights())
+            return wavelengths.letters() + "  weights standard";
+        if (wavelengths.hasEqualWeights())
+            return wavelengths.letters();
+        return wavelengths.letters() + "  weights " + format(wavelengths.weights());
+    }
+
     static String format(int[] values) {
         List<String> result = new ArrayList<>();
         for (int value : values)
@@ -379,8 +392,7 @@ public final class OptimizationTrial {
         private String outdir;
         private int configuration = 0;
         private double[] fields;
-        private boolean weighted = true;
-        private boolean dLineOnly = false;
+        private WavelengthSet wavelengths;
         private VigType vignetting;
         private boolean freezeVignetting;
         private Boolean checkSpotApertures;
@@ -491,13 +503,9 @@ public final class OptimizationTrial {
                     once(line, "fields");
                     fields = fieldList(line, w);
                 }
-                case "weighted" -> {
-                    once(line, "weighted");
-                    weighted = yesNo(line, w, 1);
-                }
-                case "d-line-only" -> {
-                    once(line, "d-line-only");
-                    dLineOnly = yesNo(line, w, 1);
+                case "wavelengths" -> {
+                    once(line, "wavelengths");
+                    wavelengths = wavelengthSet(line, w);
                 }
                 case "check-spot-apertures" -> {
                     once(line, "check-spot-apertures");
@@ -1044,8 +1052,8 @@ public final class OptimizationTrial {
             // The MTF goal rows are the only statement of which frequencies to measure.
             c.mtfFrequencies = mtf.keySet().stream().mapToInt(Integer::intValue).sorted().toArray();
             c.scenario = configuration;
-            c.weighted = weighted;
-            c.dLineOnly = dLineOnly;
+            // A trial without the line keeps the five-line standard set.
+            c.wavelengths = wavelengths != null ? wavelengths : WavelengthSet.standardFiveColor();
             if (vignetting != null) c.vigType = vignetting;
             c.freezeVignetting = freezeVignetting;
             c.solverTolerances = new SolverTolerances(
@@ -1233,6 +1241,51 @@ public final class OptimizationTrial {
                         () -> error(line, token + " is listed twice"));
             }
             return values;
+        }
+
+        /**
+         * 'wavelengths <letters> [weights standard|<values>]'. Letters are the Fraunhofer
+         * ones and are case sensitive: C and c are different lines. Omitting the weights
+         * clause weights every wavelength 1.0; 'standard' is the five-line set's weights,
+         * which exist to avoid retyping them.
+         */
+        private WavelengthSet wavelengthSet(int line, String[] w) {
+            List<String> letters = new ArrayList<>();
+            int i = 1;
+            for (; i < w.length && !lower(w[i]).equals("weights"); i++)
+                letters.add(w[i]);
+            if (letters.isEmpty())
+                throw error(line, "expected 'wavelengths <letters> [weights standard|<values>]'");
+            double[] weights = null;
+            if (i < w.length) {
+                if (i + 1 >= w.length)
+                    throw error(line, "expected 'standard' or one weight per wavelength after 'weights'");
+                if (lower(w[i + 1]).equals("standard")) {
+                    if (w.length != i + 2)
+                        throw error(line, "'weights standard' takes no values");
+                    var standard = WavelengthSet.standardFiveColor();
+                    // Reject an unknown letter before complaining about the set.
+                    letters.forEach(letter -> {
+                        try {
+                            WavelengthSet.wavelengthOf(letter);
+                        }
+                        catch (IllegalArgumentException e) {
+                            throw error(line, e.getMessage());
+                        }
+                    });
+                    if (!String.join(" ", letters).equals(standard.letters()))
+                        throw error(line, "'weights standard' applies to the wavelengths '"
+                                + standard.letters() + "'; give the weights explicitly for any other set");
+                    return standard;
+                }
+                weights = numbers(line, w, i + 1);
+            }
+            try {
+                return WavelengthSet.ofLetters(letters, weights);
+            }
+            catch (IllegalArgumentException e) {
+                throw error(line, e.getMessage());
+            }
         }
 
         /** Field values, or 'fields a to b step s' written out with decimal steps. */

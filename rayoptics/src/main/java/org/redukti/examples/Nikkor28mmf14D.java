@@ -29,8 +29,6 @@ public class Nikkor28mmf14D {
                 .applyCurvatureConstraints()
                 .applyThicknessConstraints()
                 .applyEdgeThicknessConstraints()
-                .weighted(true)
-                .dLineOnly(dLineOnly)
                 .contrastSampling(6, 12)
                 .calibrateContrastFrequency(true)
                 .vignetting(VigType.SetVig)

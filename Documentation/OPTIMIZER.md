@@ -124,8 +124,8 @@ lenstool2 --specfile lens.txt --optimize 2
 LensTool2 then:
 
 1. reads `lens.txt` and its `[trial 2]` section;
-2. builds the prescription for the trial's configuration, using the trial's `weighted`
-   and `d-line-only` settings, and runs the solver;
+2. builds the prescription for the trial's configuration, using the trial's
+   `wavelengths` setting, and runs the solver;
 3. prints the trial's description, the merit function before and after, the solver
    status, and the final value of every variable;
 4. writes the optimized prescription, `lens-trial2.txt`, to the trial's output directory
@@ -200,18 +200,57 @@ flat surface from the list or omit the curvature constraint for that trial.
 | `outdir` | Directory for the trial's optimized prescription and report, relative to the prescription's directory unless absolute. Created if missing; a command-line `--outdir` takes precedence. | the prescription's directory |
 | `configuration` | Configuration to optimize, counting from 0. Only matters for a zoom. | `0` |
 | `fields` | Relative field heights between 0 and 1, the first being 0. `0 to 1 step 0.1` is shorthand for eleven evenly spaced fields. | required |
-| `weighted` | `yes` selects the five d, C, e, F and g lines with built-in weights; `no` selects the three d, F and C lines with equal weights. | `yes` |
-| `d-line-only` | Use only the d line for all goals in the trial, overriding the wavelength set selected by `weighted`. | `no` |
+| `wavelengths` | The wavelengths to evaluate, as Fraunhofer letters, and optionally their weights: `wavelengths <letters> [weights standard\|<values>]`. See below. | `d C e F g  weights standard` |
 | `vignetting` | A `--vig-type` name (`none`, `paraxial`, `set-vig`, `set-pupil`, ...), optionally followed by `frozen` to measure it once and hold it for the run. | `set-pupil` |
 | `check-spot-apertures` | Whether Gaussian-quadrature spot rays are stopped by surface apertures. | `yes` |
 | `solver ftol\|xtol\|gtol <value>` | One of the solver's stopping tolerances, for this trial only. See below. | the solver's own |
 | `solver max-evaluations <n>` | Trial steps the solver may take before it gives up. See below. | `100 * (variables + 1)` |
 
-These settings build the prescription used for the run, as the example programs do.
-With `weighted yes`, the weights for d, C, e, F and g are respectively 1.0, 0.475,
-0.98, 0.49 and 0.15. With `weighted no`, d, F and C each have weight 1.0.
-With `d-line-only yes`, the d line alone has weight 1.0. These are built-in choices;
-the trial does not read wavelength weights from the prescription file.
+### Wavelengths
+
+```ini
+wavelengths  d
+wavelengths  d F C
+wavelengths  d C e F g  weights standard
+```
+
+The letters are the Fraunhofer ones and are case sensitive: `C` is 656.2725 nm and `c`
+is not a line.
+
+**Use d, C, F, e, C', F' and g.** A glass taken from a catalog carries measured indices
+at exactly those seven lines, and asking it for any other wavelength fails the run with
+"Glass does not have data for wavelength ...". A surface whose glass is given as nd and
+vd instead - no glass name, a name absent from the catalogs, or `--no-glass-types` -
+has its index computed from a dispersion model, so any wavelength works there, as an
+approximation. A trial mixing the two kinds of surface is therefore limited by the
+catalog ones. Other lines the reader accepts (t, s, r, D, h, i) are for that
+nd/vd case, and for later, when more wavelength data can be loaded.
+
+Omitting the `weights` clause weights every wavelength 1.0. `weights standard` is
+1.0, 0.475, 0.98, 0.49 and 0.15 for d, C, e, F and g, which exists so the five numbers
+need not be retyped; it applies only to that set. Any other weighting is written out:
+`wavelengths d F C  weights 1 0.5 0.25`.
+
+A wavelength's weight applies to everything: the analyses combine per-wavelength
+results with it, and each per-wavelength residual's weight is its field and
+orientation weight times its wavelength weight. The line also builds the prescription
+for the run, so the wavelength set is one decision rather than two.
+
+The trial does not read wavelengths or weights from the prescription file.
+
+`weights standard` is a design weighting, taken from the MTF design data in T. Steinich
+and V. Blahnik, "Optical design of camera optics for mobile phones," Adv. Opt. Technol.
+**1**(1–2), 51–58 (2012), [doi:10.1515/aot-2012-0002](https://doi.org/10.1515/aot-2012-0002).
+An instrument that *measures* MTF weights the spectrum its own way, so the two do not
+agree. For the weighting given in the ZEISS MTF-Tester K9 data sheet, write it out:
+
+```ini
+wavelengths  d C e F g  weights 1 0.33 1.046 0.654 0.235
+```
+
+Those five are a plot in one product data sheet read off and divided by the value at d,
+so they are good to a point or two at best, and the data sheet covers the K9 service
+tester rather than the K8. `WavelengthSet.k9Tester()` is the same set in code.
 
 ### Solver tolerances
 
@@ -521,8 +560,8 @@ goal ray-aberrations  yes
 ```
 
 `yes` adds the ten-sample sagittal and tangential ray fans for every field and
-wavelength. `d-line-only` restricts these and all other goals in the trial to the d
-line. The default for `goal ray-aberrations` is `no`.
+wavelength, so `wavelengths d` is what restricts them to the d line. The default for
+`goal ray-aberrations` is `no`.
 
 ### Paraxial
 
@@ -586,8 +625,8 @@ contrast, chain the same way.
 | `description` | Free text, shown when the pipeline runs. | none |
 | `outdir` | Where the result goes; the stages' own `outdir` lines are not used, since a pipeline writes one result. | the prescription's directory |
 
-- Each stage reads its trial afresh, so a stage's `configuration`, `weighted` and
-  `d-line-only` are its own.
+- Each stage reads its trial afresh, so a stage's `configuration` and `wavelengths`
+  are its own.
 - A pipeline runs trials, not other pipelines.
 - Only the final design is written. The file carries the prescription, the pipeline, and
   every trial the pipeline names, so it can run the pipeline again as it stands - which is
@@ -638,7 +677,7 @@ The trials below reproduce setups from the `examples` package.
 [trial 1]
 description           Contrast, every parameter free
 fields                0 to 1 step 0.1
-weighted              no
+wavelengths           d F C
 vignetting            set-vig frozen
 check-spot-apertures  no
 
@@ -700,8 +739,7 @@ goal paraxial        bfl 37.78
 description           Moving groups at the wide end
 configuration         0
 fields                0 to 1 step 0.1
-weighted              no
-d-line-only           no
+wavelengths           d F C
 vignetting            set-vig frozen
 check-spot-apertures  no
 
@@ -716,7 +754,7 @@ goal contrast         sampling 6 12
 
 - `OptimizationTrial.read(text, n, useGlassTypes)` reads `[trial n]` into an
   `OptimizationBuilder` for the prescription in the same text, built with the trial's
-  `weighted` and `d-line-only`. `OptimizationBuilder.toTrial(n)` writes a builder back.
+  `wavelengths`. `OptimizationBuilder.toTrial(n)` writes a builder back.
   Both are ported to C++ like-for-like.
 - Each line is one builder call, with the same values:
 
@@ -724,7 +762,7 @@ goal contrast         sampling 6 12
   |---|---|
   | `description`, `outdir` | `description`, `outdir` |
   | `configuration` | `scenario` |
-  | `fields`, `weighted`, `d-line-only` | `fields`, `weighted`, `dLineOnly` |
+  | `fields`, `wavelengths` | `fields`, `wavelengths` |
   | `vignetting`, `frozen`, `check-spot-apertures` | `vignetting`, `freezeVignetting`, `checkSpotApertures` |
   | `vary curvatures`, `vary thicknesses` | `varyAllCurvatures`/`varyAllCurvaturesExcept`/`varyCurvatures`, and the same for thicknesses |
   | `vary aspherics existing` | `varyExistingAspherics` |

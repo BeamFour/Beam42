@@ -5,6 +5,7 @@ package org.redukti.optim;
 
 import java.util.*;
 import org.redukti.spec.VigType;
+import org.redukti.spec.WavelengthSet;
 import org.redukti.optim.OptimizationBuilder.*;
 import static org.redukti.optim.OptimizationBuilder.NOMINAL_BALANCE_WEIGHT;
 
@@ -27,8 +28,12 @@ final class OptimizationConfiguration {
     int[] thicknessSurfaces = new int[0];
     boolean allThicknessSurfaces;
     boolean includeExistingAspherics;
-    boolean weighted = true;
-    boolean dLineOnly;
+    /**
+     * The wavelengths every goal and analysis sees, and the weight each one carries. Null
+     * until a builder fills it from its prescription, which is the usual case: the set is
+     * chosen when the prescription is built. A trial sets it from its own line.
+     */
+    WavelengthSet wavelengths;
     boolean addRayAberrationGoals;
     boolean useHexapolarSpotPattern;
     int hexapolarSpotRays = DEFAULT_HEXAPOLAR_RAYS;
@@ -93,8 +98,7 @@ final class OptimizationConfiguration {
         result.thicknessSurfaces = thicknessSurfaces == null ? null : thicknessSurfaces.clone();
         result.allThicknessSurfaces = allThicknessSurfaces;
         result.includeExistingAspherics = includeExistingAspherics;
-        result.weighted = weighted;
-        result.dLineOnly = dLineOnly;
+        result.wavelengths = wavelengths;
         result.addRayAberrationGoals = addRayAberrationGoals;
         result.useHexapolarSpotPattern = useHexapolarSpotPattern;
         result.hexapolarSpotRays = hexapolarSpotRays;
@@ -147,8 +151,8 @@ final class OptimizationConfiguration {
         line(sb, "configuration", Integer.toString(scenario));
         if (fields != null)
             line(sb, "fields", OptimizationTrial.format(fields));
-        line(sb, "weighted", yesNo(weighted));
-        line(sb, "d-line-only", yesNo(dLineOnly));
+        if (wavelengths != null)
+            line(sb, "wavelengths", OptimizationTrial.format(wavelengths));
         line(sb, "vignetting", OptimizationTrial.kebab(vigType.name()) + (freezeVignetting ? " frozen" : ""));
         if (!checkSpotApertures || (effective.spots() && !configuredHexapolar))
             line(sb, "check-spot-apertures", yesNo(checkSpotApertures));

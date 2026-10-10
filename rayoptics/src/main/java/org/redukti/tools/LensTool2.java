@@ -522,7 +522,7 @@ public class LensTool2 {
                     ? DefaultOptimizations.Objective.MTF
                     : DefaultOptimizations.Objective.CONTRAST;
             var result = DefaultOptimizations.optimizeThicknesses(prescription, surfaces,
-                    arguments.mtf_freqs, config, vigType, arguments.only_d_line, objective);
+                    arguments.mtf_freqs, config, vigType, objective);
             System.out.printf("Optimized %s for configuration %d on %s: status %d, merit %.6g -> %.6g%s%n",
                     what, config, arguments.optimize_goal, result.status(), result.before(), result.after(),
                     result.improved() ? "" : " (no improvement)");

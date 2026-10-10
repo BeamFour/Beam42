@@ -181,13 +181,6 @@ entry. If the glass or catalog name is not recognised, LensTool2 falls back
 to the given index and Abbe number - there is no warning. Passing
 `--dont-use-glass-types` forces this behaviour for every surface.
 
-The two cases differ in which wavelengths they can be traced at. A catalog glass holds
-measured indices at **d, C, F, e, C', F' and g**, and asking it for any other wavelength
-fails with "Glass does not have data for wavelength ...". A glass used as index and Abbe
-number computes its index from a dispersion model, so it answers at any wavelength, as
-an approximation. Every wavelength set the optimizer offers stays within those seven
-lines; see the `wavelengths` line in [OPTIMIZER.md](OPTIMIZER.md).
-
 ### `[patent info]`
 
 This is only used to produce the generated report header and does not

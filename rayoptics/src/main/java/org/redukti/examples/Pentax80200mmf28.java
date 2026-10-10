@@ -26,7 +26,6 @@ public class Pentax80200mmf28 {
 
         return OptimizationBuilder.builder(prescription)
                 .fields(fields)
-                .mtfFrequencies(10,30,50)
                 .scenario(0)
 //                .varyExistingAspherics()
 //                .varyAllCurvatures()

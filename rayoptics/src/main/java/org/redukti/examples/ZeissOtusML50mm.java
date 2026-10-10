@@ -48,7 +48,6 @@ public class ZeissOtusML50mm {
         double[] fieldWeights = {1.0, 1.0, 1.0, 1.0};
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
-                .mtfFrequencies(10, 30, 50)
                 .varyCurvatures(
                         0, 1, 2, 3, 4, 5, 6, 8, 9,
                         11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23)

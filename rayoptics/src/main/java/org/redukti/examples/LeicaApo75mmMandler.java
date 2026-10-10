@@ -63,7 +63,6 @@ public class LeicaApo75mmMandler {
                                                              double[] fieldWeights) {
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 0.95)
-                .mtfFrequencies(10, 20, 40)
                 .varyAllCurvatures()
                 .varyAllThicknesses()
                 .weighted(weighted)
@@ -82,7 +81,6 @@ public class LeicaApo75mmMandler {
                                                                      double[] fieldWeights) {
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
-                .mtfFrequencies(10, 20, 40)
                 .varyAllCurvatures()
                 .varyAllThicknesses()
                 .weighted(weighted)
@@ -146,7 +144,6 @@ public class LeicaApo75mmMandler {
         boolean[] correctAstigmatism = {true, true, true, true, true, true, true, true, true, true, false};
         return OptimizationBuilder.builder(prescription)
                 .fields(fields)
-                .mtfFrequencies(10, 20, 40)
                 .varyAllCurvatures()
                 .varyAllThicknesses()
                 .weighted(false)
@@ -186,7 +183,6 @@ public class LeicaApo75mmMandler {
                 .varyAllThicknesses()
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)
-                .mtfFrequencies(10, 20, 40)
                 .rayAberrationGoals()
                 .applyCurvatureConstraints()
                 .applyThicknessConstraints()

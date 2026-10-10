@@ -379,7 +379,6 @@ public final class OptimizationTrial {
         private String outdir;
         private int configuration = 0;
         private double[] fields;
-        private int[] frequencies;
         private boolean weighted = true;
         private boolean dLineOnly = false;
         private VigType vignetting;
@@ -491,10 +490,6 @@ public final class OptimizationTrial {
                 case "fields" -> {
                     once(line, "fields");
                     fields = fieldList(line, w);
-                }
-                case "frequencies" -> {
-                    once(line, "frequencies");
-                    frequencies = positiveInts(line, w, 1, "frequencies");
                 }
                 case "weighted" -> {
                     once(line, "weighted");
@@ -878,8 +873,6 @@ public final class OptimizationTrial {
         private void finish() {
             if (fields == null)
                 throw new TrialException("trial " + number + ": 'fields' is required");
-            if (frequencies == null)
-                throw new TrialException("trial " + number + ": 'frequencies' is required");
 
             checkPerField(contrastSagittal, "weights");
             checkPerField(contrastTangential, "weights");
@@ -910,8 +903,6 @@ public final class OptimizationTrial {
                 MtfRows rows = entry.getValue();
                 if (rows.sagittal == null || rows.tangential == null)
                     throw error(rows.line, "MTF goals at " + frequency + " need both a sag and a tan row of targets");
-                OptimizationValidation.frequency(frequency, frequencies,
-                        () -> error(rows.line, "MTF goal frequency " + frequency + " is not one of 'frequencies'"));
                 checkPerField(rows.sagittal, "targets");
                 checkPerField(rows.tangential, "targets");
                 for (PerField targets : new PerField[]{rows.sagittal, rows.tangential})
@@ -1050,7 +1041,8 @@ public final class OptimizationTrial {
             c.description = description;
             c.outdir = outdir;
             c.fields = fields.clone();
-            c.mtfFrequencies = frequencies.clone();
+            // The MTF goal rows are the only statement of which frequencies to measure.
+            c.mtfFrequencies = mtf.keySet().stream().mapToInt(Integer::intValue).sorted().toArray();
             c.scenario = configuration;
             c.weighted = weighted;
             c.dLineOnly = dLineOnly;

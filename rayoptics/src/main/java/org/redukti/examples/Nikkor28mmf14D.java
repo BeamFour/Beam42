@@ -23,7 +23,6 @@ public class Nikkor28mmf14D {
         double[] fieldWeights = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
-                .mtfFrequencies(10, 30, 50)
                 .varyExistingAspherics()
                 .varyAllCurvatures()
                 .varyAllThicknesses()

@@ -49,7 +49,6 @@ class OptimizationTrialExamplesTest {
                 [trial 1]
                 description           Contrast, every parameter free
                 fields                0 to 1 step 0.1
-                frequencies           10 30 50
                 weighted              no
                 vignetting            set-vig frozen
                 check-spot-apertures  no
@@ -77,7 +76,6 @@ class OptimizationTrialExamplesTest {
                 [trial 1]
                 description       MTF targets, selected curvatures and the back focus
                 fields            0 0.3 0.7 1.0
-                frequencies       10 20 40
 
                 vary curvatures   all except 7 10 24
                 vary thicknesses  25
@@ -102,7 +100,6 @@ class OptimizationTrialExamplesTest {
                 [trial 1]
                 description       RMS spot size, aspherising the front surface
                 fields            0 0.3 0.7 1.0
-                frequencies       10 30 50
 
                 vary curvatures   all
                 vary aspherics    0  K  1:1e6  2:1e9  3:1e11  4:1e14
@@ -124,7 +121,6 @@ class OptimizationTrialExamplesTest {
                 description           Moving groups at the wide end
                 configuration         0
                 fields                0 to 1 step 0.1
-                frequencies           10 30 50
                 weighted              no
                 d-line-only           no
                 vignetting            set-vig frozen

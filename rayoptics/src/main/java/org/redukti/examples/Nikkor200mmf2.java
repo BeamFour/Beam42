@@ -20,7 +20,6 @@ public class Nikkor200mmf2 {
         double[] fieldWeights = {1.0, 1.0, 1.0, 1.0};
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
-                .mtfFrequencies(10, 30, 50)
                 .varyThicknesses(3,5,8,10,12,15,16,18)
                 .weighted(weighted)
                 .dLineOnly(dLineOnly)

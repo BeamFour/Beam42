@@ -23,7 +23,6 @@ public class NoctNikkor58mm {
                                                              double[] fieldWeights) {
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
-                .mtfFrequencies(10, 30, 50)
                 .varyAllCurvatures()
                 .additionalVariables(
                         new VarAsphK(prescription, 0),
@@ -46,7 +45,6 @@ public class NoctNikkor58mm {
                                                                      double[] fieldWeights) {
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
-                .mtfFrequencies(10, 30, 50)
                 .varyAllCurvatures()
                 .additionalVariables(
                         new VarAsphK(prescription, 0),
@@ -109,7 +107,6 @@ public class NoctNikkor58mm {
         boolean[] correctAstigmatism = {true, true, false, false};
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
-                .mtfFrequencies(30)
                 .varyAllCurvatures()
                 .additionalVariables(
                         new VarAsphK(prescription, 0),
@@ -145,7 +142,6 @@ public class NoctNikkor58mm {
 
         return OptimizationBuilder.builder(prescription)
                 .fields(fields)
-                .mtfFrequencies(30)
                 .varyAllCurvatures()
                 .additionalVariables(
                         new VarAsphK(prescription, 0),
@@ -176,7 +172,6 @@ public class NoctNikkor58mm {
                                                                      double[] fieldWeights) {
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
-                .mtfFrequencies(10, 30, 50)
                 .varyAllCurvatures()
                 .additionalVariables(
                         new VarAsphK(prescription, 0),

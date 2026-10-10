@@ -24,7 +24,6 @@ class OptimizationTrialRunTest {
             [trial 3]
             description   Back focus for contrast
             fields        0
-            frequencies   20
             vary thicknesses  25
             goal contrast     20
             goal contrast     sampling 3 6
@@ -33,7 +32,6 @@ class OptimizationTrialRunTest {
             description   The same, reported separately
             outdir        trials/back focus
             fields        0
-            frequencies   20
             vary thicknesses  25
             goal contrast     20
             goal contrast     sampling 3 6
@@ -133,7 +131,6 @@ class OptimizationTrialRunTest {
             description       Wide end
             configuration     0
             fields            0
-            frequencies       20
             vary thicknesses  8
             goal paraxial     bfl 40
 
@@ -141,7 +138,6 @@ class OptimizationTrialRunTest {
             description       Tele end
             configuration     1
             fields            0
-            frequencies       20
             vary thicknesses  8
             goal paraxial     bfl 40
 

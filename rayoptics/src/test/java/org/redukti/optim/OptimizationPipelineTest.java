@@ -16,12 +16,10 @@ class OptimizationPipelineTest {
     private static final String TRIALS = """
             [trial 1]
             fields        0
-            frequencies   20
             vary thicknesses 10
 
             [trial 2]
             fields        0
-            frequencies   20
             vary thicknesses 0
             """;
 
@@ -122,7 +120,7 @@ class OptimizationPipelineTest {
         var builder = definition.createBuilder(text, true);
         String trial = definition.toTrial(builder.prescription());
         var pipeline = OptimizationTrial.readPipeline(text, 7);
-        String written = withSections(trial + "\n[trial 2]\nfields 0\nfrequencies 20\n"
+        String written = withSections(trial + "\n[trial 2]\nfields 0\n"
                 + pipeline.toPipeline());
         assertEquals(trial, OptimizationTrial.parse(written, 1).toTrial(builder.prescription()));
         assertEquals(pipeline.toPipeline(), OptimizationTrial.readPipeline(written, 7).toPipeline());

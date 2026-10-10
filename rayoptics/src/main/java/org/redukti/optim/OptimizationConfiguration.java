@@ -147,8 +147,6 @@ final class OptimizationConfiguration {
         line(sb, "configuration", Integer.toString(scenario));
         if (fields != null)
             line(sb, "fields", OptimizationTrial.format(fields));
-        if (mtfFrequencies != null)
-            line(sb, "frequencies", OptimizationTrial.format(mtfFrequencies));
         line(sb, "weighted", yesNo(weighted));
         line(sb, "d-line-only", yesNo(dLineOnly));
         line(sb, "vignetting", OptimizationTrial.kebab(vigType.name()) + (freezeVignetting ? " frozen" : ""));

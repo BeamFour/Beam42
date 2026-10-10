@@ -23,7 +23,7 @@ and fine optimization stages.
 ## Optimization Trials
 
 An optimization trial is a section in a prescription file that describes an optimizer
-run. It says which fields and frequencies are evaluated, what the solver may change,
+run. It says which fields are evaluated, what the solver may change,
 what holds the starting design together, and what the run aims for. It does the job
 that otherwise needs an `OptimizationBuilder` program like the ones in the `examples`
 package, and LensTool2 runs it, in both the Java and C++ versions.
@@ -151,7 +151,6 @@ optimization controlled by `--optimize-goal`.
 description   Contrast, every parameter free
 # Anything after a # is a comment
 fields        0  0.3  0.7  1.0
-frequencies   10 30 50
 ```
 
 - A trial starts at a line `[trial <n>]` and runs to the next line that starts with `[`.
@@ -201,7 +200,6 @@ flat surface from the list or omit the curvature constraint for that trial.
 | `outdir` | Directory for the trial's optimized prescription and report, relative to the prescription's directory unless absolute. Created if missing; a command-line `--outdir` takes precedence. | the prescription's directory |
 | `configuration` | Configuration to optimize, counting from 0. Only matters for a zoom. | `0` |
 | `fields` | Relative field heights between 0 and 1, the first being 0. `0 to 1 step 0.1` is shorthand for eleven evenly spaced fields. | required |
-| `frequencies` | Frequencies, in cycles/mm, at which the MTF is measured. | required |
 | `weighted` | `yes` selects the five d, C, e, F and g lines with built-in weights; `no` selects the three d, F and C lines with equal weights. | `yes` |
 | `d-line-only` | Use only the d line for all goals in the trial, overriding the wavelength set selected by `weighted`. | `no` |
 | `vignetting` | A `--vig-type` name (`none`, `paraxial`, `set-vig`, `set-pupil`, ...), optionally followed by `frozen` to measure it once and hold it for the run. | `set-pupil` |
@@ -397,7 +395,7 @@ goal mtf   10 tan weights   1 1 2 4
 | `goal mtf <frequency> weights <weights>` | Weights per field for both directions. |
 | `goal mtf <frequency> sag\|tan weights <weights>` | Weights per field for one direction. |
 
-The frequency must be one of `frequencies`.
+The MTF is measured at the frequencies these rows name, and at no others.
 
 ### Spot
 
@@ -640,7 +638,6 @@ The trials below reproduce setups from the `examples` package.
 [trial 1]
 description           Contrast, every parameter free
 fields                0 to 1 step 0.1
-frequencies           10 30 50
 weighted              no
 vignetting            set-vig frozen
 check-spot-apertures  no
@@ -665,7 +662,6 @@ goal contrast         sampling 6 12
 [trial 1]
 description       MTF targets, selected curvatures and the back focus
 fields            0 0.3 0.7 1.0
-frequencies       10 20 40
 
 vary curvatures   all except 7 10 24
 vary thicknesses  25
@@ -686,7 +682,6 @@ goal ray-aberrations  yes
 [trial 1]
 description       RMS spot size, aspherising the front surface
 fields            0 0.3 0.7 1.0
-frequencies       10 30 50
 
 vary curvatures   all
 vary aspherics    0  K  1:1e6  2:1e9  3:1e11  4:1e14
@@ -705,7 +700,6 @@ goal paraxial        bfl 37.78
 description           Moving groups at the wide end
 configuration         0
 fields                0 to 1 step 0.1
-frequencies           10 30 50
 weighted              no
 d-line-only           no
 vignetting            set-vig frozen
@@ -730,7 +724,7 @@ goal contrast         sampling 6 12
   |---|---|
   | `description`, `outdir` | `description`, `outdir` |
   | `configuration` | `scenario` |
-  | `fields`, `frequencies`, `weighted`, `d-line-only` | `fields`, `mtfFrequencies`, `weighted`, `dLineOnly` |
+  | `fields`, `weighted`, `d-line-only` | `fields`, `weighted`, `dLineOnly` |
   | `vignetting`, `frozen`, `check-spot-apertures` | `vignetting`, `freezeVignetting`, `checkSpotApertures` |
   | `vary curvatures`, `vary thicknesses` | `varyAllCurvatures`/`varyAllCurvaturesExcept`/`varyCurvatures`, and the same for thicknesses |
   | `vary aspherics existing` | `varyExistingAspherics` |

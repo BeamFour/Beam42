@@ -116,6 +116,12 @@ public final class OptimizationBuilder {
         return this;
     }
 
+    /**
+     * Frequencies, in cycles/mm, at which the geometric MTF is measured. Optional: left
+     * unset, the MTF goals' own frequencies are used. Setting it adds frequencies that are
+     * measured without being goals, which only has an effect when some MTF goal exists,
+     * since otherwise no MTF is computed.
+     */
     public OptimizationBuilder mtfFrequencies(int... frequencies) {
         configuration.mtfFrequencies = copy(frequencies);
         return this;
@@ -1072,7 +1078,8 @@ public final class OptimizationBuilder {
             throw new IllegalArgumentException("the first field must be 0.0");
 
         if (configuration.mtfFrequencies == null || configuration.mtfFrequencies.length == 0)
-            throw new IllegalArgumentException("at least one MTF frequency is required");
+            configuration.mtfFrequencies = configuration.mtfGoals.stream()
+                    .mapToInt(curve -> curve.frequency).distinct().sorted().toArray();
         Set<Integer> frequencies = new HashSet<>();
         for (int frequency : configuration.mtfFrequencies) {
             OptimizationValidation.positiveUnique(frequency, frequencies,

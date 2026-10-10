@@ -27,7 +27,6 @@ public class Nikkor58mmSato {
 
         return OptimizationBuilder.builder(prescription)
                 .fields(fields)
-                .mtfFrequencies(10, 30, 50)
                 .varyExistingAspherics()
                 .varyAllCurvatures()
                 .varyAllThicknesses()

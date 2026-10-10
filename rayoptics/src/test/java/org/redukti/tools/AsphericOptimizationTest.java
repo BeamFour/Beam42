@@ -82,7 +82,7 @@ class AsphericOptimizationTest {
     }
 
     @Test void explicitTermsOverrideExistingAndCanIntroduceAnOmittedOddPower() throws Exception {
-        String text = LENS + "\n[trial 1]\nfields 0\nfrequencies 20\nvary aspherics existing\nvary aspherics 0 4\n"
+        String text = LENS + "\n[trial 1]\nfields 0\nvary aspherics existing\nvary aspherics 0 4\n"
                 + "goal spot-rms 1\n";
         var builder = OptimizationTrial.read(text, 1, false);
         var setup = builder.build();
@@ -106,7 +106,6 @@ class AsphericOptimizationTest {
 
                 [trial 1]
                 fields 0
-                frequencies 20
                 vary aspherics 0 5
                 goal spot-rms 1
                 goal spot sampling hexapolar 2

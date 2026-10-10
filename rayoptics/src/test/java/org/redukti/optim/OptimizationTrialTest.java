@@ -43,7 +43,6 @@ class OptimizationTrialTest {
 
     private static final String MTF_FIVE_FIELDS = """
             fields        0 to 1 step 0.25
-            frequencies   20
             goal mtf      20 sag   50 50 50 50 50
             goal mtf      20 tan   50 50 50 50 50
             """;
@@ -98,7 +97,7 @@ class OptimizationTrialTest {
                 new Case("goal contrast 20\n", false, false, false, false),
                 new Case("goal spot sampling hexapolar 32\n", false, false, false, true));
         for (var c : cases) {
-            String text = withTrials(SUMMICRON, "[trial 1]\nfields 0\nfrequencies 20\n" + c.goals());
+            String text = withTrials(SUMMICRON, "[trial 1]\nfields 0\n" + c.goals());
             var builder = read(text);
             var setup = builder.build();
             var analysis = setup.analysis();
@@ -200,7 +199,6 @@ class OptimizationTrialTest {
         var setup = read(withTrials(SUMMICRON, """
                 [trial 1]
                 fields        0 to 1 step 0.1
-                frequencies   20
                 vary thicknesses 10
                 """)).build();
         assertArrayEquals(new double[]{0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0},
@@ -212,7 +210,6 @@ class OptimizationTrialTest {
         var goals = read(withTrials(SUMMICRON, """
                 [trial 1]
                 fields        0
-                frequencies   20
                 vary thicknesses 10
                 goal paraxial efl 42 weight 2
                 goal paraxial bfl 30
@@ -257,7 +254,6 @@ class OptimizationTrialTest {
             outdir                trials/one
             configuration         0
             fields                0 0.25 0.5 0.75 1
-            frequencies           10 20
             weighted              no
             d-line-only           yes
             vignetting            set-vig frozen
@@ -300,7 +296,6 @@ class OptimizationTrialTest {
                 description   Everything a trial can say   # a comment is not kept
                 outdir  trials/one
                 fields 0 to 1 step 0.25
-                frequencies 10 20
                 weighted no
                 d-line-only yes
                 vignetting set-vig frozen
@@ -346,7 +341,6 @@ class OptimizationTrialTest {
         String lens = withTrials(SUMMICRON, "");
         var builder = OptimizationBuilder.builder(prescription(lens, true, false))
                 .fields(0.0, 0.5, 1.0)
-                .mtfFrequencies(10)
                 .varyThicknesses(10, 4)
                 .varyAsphericCoefficient(0, 1, 1e5)
                 .spotDeviationGoals(new double[]{1, 2, 3}, new double[]{1, 1, 1})
@@ -357,7 +351,6 @@ class OptimizationTrialTest {
                 [trial 7]
                 configuration         0
                 fields                0 0.5 1
-                frequencies           10
                 weighted              yes
                 d-line-only           no
                 vignetting            set-pupil
@@ -438,7 +431,6 @@ class OptimizationTrialTest {
                 [trial 1]
                 configuration     1
                 fields            0
-                frequencies       10
                 vary thicknesses  8 10
                 goal mtf          10 sag 50
                 goal mtf          10 tan 50
@@ -503,8 +495,6 @@ class OptimizationTrialTest {
                         b -> b.spotRmsGoals(new double[]{1, 2})),
                 new Invalid("goal mtf 20 sag 101\ngoal mtf 20 tan 50\n", "goal mtf 20 sag 101",
                         b -> b.mtfGoals(OptimizationBuilder.mtf(20, new double[]{101}, new double[]{50}))),
-                new Invalid("goal mtf 30 sag 50\ngoal mtf 30 tan 50\n", "goal mtf 30 sag 50",
-                        b -> b.mtfGoals(OptimizationBuilder.mtf(30, new double[]{50}, new double[]{50}))),
                 new Invalid("goal contrast 20 20\n", "goal contrast 20 20",
                         b -> b.contrastGoals(OptimizationBuilder.contrast(20, new double[]{1}),
                                 OptimizationBuilder.contrast(20, new double[]{1}))));
@@ -514,7 +504,7 @@ class OptimizationTrialTest {
                     .fields(0.0).mtfFrequencies(20);
             c.configure().accept(builder);
             assertThrows(IllegalArgumentException.class, builder::build, c.rows());
-            String text = lens + "\n[trial 1]\nfields 0\nfrequencies 20\n" + c.rows();
+            String text = lens + "\n[trial 1]\nfields 0\n" + c.rows();
             var error = assertThrows(OptimizationTrial.TrialException.class,
                     () -> OptimizationTrial.parse(text, 1), c.rows());
             int line = List.of(text.split("\n", -1)).indexOf(c.offendingRow()) + 1;
@@ -541,7 +531,7 @@ class OptimizationTrialTest {
             for (String conflict : List.of("goal spot sampling hexapolar 32", "goal spot-max-radius 10")) {
                 for (boolean reverse : List.of(false, true)) {
                     String rows = reverse ? conflict + "\n" + deviation : deviation + "\n" + conflict;
-                    String text = withTrials(SUMMICRON, "[trial 1]\nfields 0\nfrequencies 20\n" + rows);
+                    String text = withTrials(SUMMICRON, "[trial 1]\nfields 0\n" + rows);
                     int line = text.split("\n", -1).length;
                     var error = assertThrows(OptimizationTrial.TrialException.class,
                             () -> OptimizationTrial.parse(text, 1));
@@ -554,7 +544,7 @@ class OptimizationTrialTest {
 
     @Test
     void trialSamplingMatchesTheAvailableTracerPatterns() throws Exception {
-        String prefix = "[trial 1]\nfields 0\nfrequencies 20\n";
+        String prefix = "[trial 1]\nfields 0\n";
         String lens = withTrials(SUMMICRON, "");
         for (int spokes : new int[]{1, 2}) {
             String text = lens + prefix + "goal contrast 20\ngoal contrast sampling 1 " + spokes;
@@ -586,8 +576,9 @@ class OptimizationTrialTest {
     @Test
     void rejectsMistakes() throws Exception {
         assertRejected("[trial 1]\nfields 0\nfields 0\n", "'fields' is given more than once");
-        assertRejected("[trial 1]\nfields 0\n", "'frequencies' is required");
-        assertRejected("[trial 1]\nfields 0 to 1 step 0.25\nfrequencies 20\n"
+        // MTF goal rows carry their own frequency; the old 'frequencies' line is gone.
+        assertRejected("[trial 1]\nfields 0\nfrequencies 20\n", "unknown keyword 'frequencies'");
+        assertRejected("[trial 1]\nfields 0 to 1 step 0.25\n"
                         + "goal mtf 20 sag 50 50 50\ngoal mtf 20 tan 50 50 50 50 50\n",
                 "expected 5 targets, one per field, but found 3");
         assertRejected("[trial 1]\n" + MTF_FIVE_FIELDS + "vary curvatures 11\n",
@@ -600,18 +591,18 @@ class OptimizationTrialTest {
         assertRejected("[trial 1]\n" + MTF_FIVE_FIELDS + "vary aspherics 0 A4\n",
                 "expected K or a coefficient index, found 'A4'");
         assertRejected("[trial 1]\n" + MTF_FIVE_FIELDS + "vary aspherics 5 K\n", "surface 5 is a stop; it cannot be aspheric");
-        assertRejected("[trial 1]\nfields 0 0.5\nfrequencies 20\ngoal contrast sag 1 1\n",
+        assertRejected("[trial 1]\nfields 0 0.5\ngoal contrast sag 1 1\n",
                 "contrast settings need a 'goal contrast <frequencies>' line");
-        assertRejected("[trial 1]\nfields 0 0.5\nfrequencies 20\nvary thicknesses 10\ngoal contrast 20\n"
+        assertRejected("[trial 1]\nfields 0 0.5\nvary thicknesses 10\ngoal contrast 20\n"
                 + "goal contrast balance all except 0.3\n", "there is no field 0.3 in 'fields'");
-        assertRejected("[trial 1]\nfields 0 0.5\nfrequencies 20\ngoal spot-deviation 1 1\ngoal spot-deviation x 1 1\n",
+        assertRejected("[trial 1]\nfields 0 0.5\ngoal spot-deviation 1 1\ngoal spot-deviation x 1 1\n",
                 "either as one row or as x and y rows");
-        assertRejected("[trial 1]\nfields 0\nfrequencies 20\ngoal paraxial focus 3\n", "unknown paraxial quantity 'focus'");
+        assertRejected("[trial 1]\nfields 0\ngoal paraxial focus 3\n", "unknown paraxial quantity 'focus'");
     }
 
     @Test
     void namesTheTrialsAFileDefines() throws Exception {
-        String text = withTrials(SUMMICRON, "[trial 1]\nfields 0\nfrequencies 20\n[trial 4]\nfields 0\nfrequencies 20\n");
+        String text = withTrials(SUMMICRON, "[trial 1]\nfields 0\n[trial 4]\nfields 0\n");
         var e = assertThrows(OptimizationTrial.TrialException.class, () -> OptimizationTrial.read(text, 2, true));
         assertEquals("there is no [trial 2] in this prescription; it defines trials 1, 4", e.getMessage());
         // The prescription reader is unaffected by the trials.

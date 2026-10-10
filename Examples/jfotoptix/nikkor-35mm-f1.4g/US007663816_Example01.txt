@@ -57,3 +57,47 @@ link	https://patents.google.com/patent/US7663816B2/en
 [report data]
 lens name	AFS Nikkor 35mm F1.4G
 status	Candidate
+[trial 1]
+description           Contrast
+fields                0 to 1 step 0.1
+frequencies           30
+weighted              no
+vignetting            set-vig frozen
+check-spot-apertures  no
+#vary curvatures       all
+vary thicknesses      4 7 16
+#constrain thicknesses	5.0
+#constrain edges
+#constrain curvatures
+goal contrast   30
+goal contrast   sag  1 1 1 2 2 2 2 2 1 0.1 0.1
+goal contrast   tan  1 1 1 1 1 1 1 1 1 1 1
+goal contrast   balance  all weight 8
+goal contrast   sampling 6 12
+goal contrast         calibrate no
+goal contrast         exit-pupil-aiming no
+goal contrast         centering no
+goal ray-aberrations  no
+outdir                try1
+[trial 2]
+description           Contrast
+fields                0 to 1 step 0.1
+frequencies           30
+weighted              yes
+vignetting            set-vig frozen
+check-spot-apertures  no
+#vary curvatures       all
+vary thicknesses      4 7 16
+#constrain thicknesses	5.0
+#constrain edges
+#constrain curvatures
+goal contrast   30
+goal contrast   sag  1 1 2 2 2 2 2 1 .5 0.1 0.1
+goal contrast   tan  1 1 1 1 1 1 1 1 1 1 1
+goal contrast   balance  all weight 8
+goal contrast   sampling 6 12
+goal contrast         calibrate no
+goal contrast         exit-pupil-aiming no
+goal contrast         centering no
+goal ray-aberrations  no
+outdir                try2

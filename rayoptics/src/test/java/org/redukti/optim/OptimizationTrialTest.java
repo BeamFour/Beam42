@@ -5,11 +5,13 @@ import org.redukti.examples.ExampleFinder;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.SurfaceType;
+import org.redukti.spec.WavelengthSet;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.redukti.optim.SetupAssertions.assertSameSetup;
@@ -46,6 +48,42 @@ class OptimizationTrialTest {
             goal mtf      20 sag   50 50 50 50 50
             goal mtf      20 tan   50 50 50 50 50
             """;
+
+    /**
+     * A named weighting saves retyping its numbers, and is written back by name. Giving
+     * the same numbers by hand is the same set, so it canonicalizes to the name too.
+     */
+    @Test
+    void namedWavelengthWeightingsAreReadAndWrittenByName() throws Exception {
+        for (var named : List.of(
+                Map.entry("standard", WavelengthSet.standardFiveColor()),
+                Map.entry("k9", WavelengthSet.k9Tester()))) {
+            String name = named.getKey();
+            WavelengthSet expected = named.getValue();
+            String text = withTrials(SUMMICRON, "[trial 1]\n" + MTF_FIVE_FIELDS
+                    + "wavelengths " + expected.letters() + " weights " + name + "\n");
+            var builder = read(text);
+            assertEquals(expected, WavelengthSet.of(builder.prescription()));
+            assertTrue(builder.toTrial(1).contains("weights " + name + "\n"), builder.toTrial(1));
+
+            String spelledOut = withTrials(SUMMICRON, "[trial 1]\n" + MTF_FIVE_FIELDS
+                    + "wavelengths " + expected.letters()
+                    + " weights " + OptimizationTrial.format(expected.weights()) + "\n");
+            assertEquals(builder.toTrial(1), read(spelledOut).toTrial(1));
+        }
+    }
+
+    @Test
+    void namedWavelengthWeightingsApplyOnlyToTheirOwnWavelengths() throws Exception {
+        assertRejected("[trial 1]\nfields 0\nwavelengths d F C weights k9\n",
+                "'weights k9' applies to the wavelengths 'd C e F g'");
+        assertRejected("[trial 1]\nfields 0\nwavelengths d weights standard\n",
+                "'weights standard' applies to the wavelengths 'd C e F g'");
+        assertRejected("[trial 1]\nfields 0\nwavelengths d C e F g weights k9 1 1 1 1 1\n",
+                "'weights k9' takes no values");
+        assertRejected("[trial 1]\nfields 0\nwavelengths d C e F g weights\n",
+                "expected 'standard', 'k9' or one weight per wavelength after 'weights'");
+    }
 
     @Test
     void reusesParsedDefinitionAndRoundTripsItsSettings() throws Exception {

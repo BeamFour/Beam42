@@ -200,7 +200,7 @@ flat surface from the list or omit the curvature constraint for that trial.
 | `outdir` | Directory for the trial's optimized prescription and report, relative to the prescription's directory unless absolute. Created if missing; a command-line `--outdir` takes precedence. | the prescription's directory |
 | `configuration` | Configuration to optimize, counting from 0. Only matters for a zoom. | `0` |
 | `fields` | Relative field heights between 0 and 1, the first being 0. `0 to 1 step 0.1` is shorthand for eleven evenly spaced fields. | required |
-| `wavelengths` | The wavelengths to evaluate, as Fraunhofer letters, and optionally their weights: `wavelengths <letters> [weights standard\|<values>]`. See below. | `d C e F g  weights standard` |
+| `wavelengths` | The wavelengths to evaluate, as Fraunhofer letters, and optionally their weights: `wavelengths <letters> [weights standard\|k9\|<values>]`. See below. | `d C e F g  weights standard` |
 | `vignetting` | A `--vig-type` name (`none`, `paraxial`, `set-vig`, `set-pupil`, ...), optionally followed by `frozen` to measure it once and hold it for the run. | `set-pupil` |
 | `check-spot-apertures` | Whether Gaussian-quadrature spot rays are stopped by surface apertures. | `yes` |
 | `solver ftol\|xtol\|gtol <value>` | One of the solver's stopping tolerances, for this trial only. See below. | the solver's own |
@@ -212,6 +212,7 @@ flat surface from the list or omit the curvature constraint for that trial.
 wavelengths  d
 wavelengths  d F C
 wavelengths  d C e F g  weights standard
+wavelengths  d C e F g  weights k9
 ```
 
 The letters are the Fraunhofer ones and are case sensitive: `C` is 656.2725 nm and `c`
@@ -226,10 +227,17 @@ approximation. A trial mixing the two kinds of surface is therefore limited by t
 catalog ones. Other lines the reader accepts (t, s, r, D, h, i) are for that
 nd/vd case, and for later, when more wavelength data can be loaded.
 
-Omitting the `weights` clause weights every wavelength 1.0. `weights standard` is
-1.0, 0.475, 0.98, 0.49 and 0.15 for d, C, e, F and g, which exists so the five numbers
-need not be retyped; it applies only to that set. Any other weighting is written out:
-`wavelengths d F C  weights 1 0.5 0.25`.
+Omitting the `weights` clause weights every wavelength 1.0. Two weightings have names,
+so their numbers need not be retyped, and each applies only to the five lines
+`d C e F g`:
+
+| name | d | C | e | F | g |
+| --- | --- | --- | --- | --- | --- |
+| `standard` | 1.0 | 0.475 | 0.98 | 0.49 | 0.15 |
+| `k9` | 1.0 | 0.330 | 1.046 | 0.654 | 0.235 |
+
+Any other weighting is written out: `wavelengths d F C  weights 1 0.5 0.25`. Giving a
+named weighting's numbers by hand is the same set, and is written back by name.
 
 A wavelength's weight applies to everything: the analyses combine per-wavelength
 results with it, and each per-wavelength residual's weight is its field and
@@ -241,16 +249,16 @@ The trial does not read wavelengths or weights from the prescription file.
 `weights standard` is a design weighting, taken from the MTF design data in T. Steinich
 and V. Blahnik, "Optical design of camera optics for mobile phones," Adv. Opt. Technol.
 **1**(1–2), 51–58 (2012), [doi:10.1515/aot-2012-0002](https://doi.org/10.1515/aot-2012-0002).
-An instrument that *measures* MTF weights the spectrum its own way, so the two do not
-agree. For the weighting given in the ZEISS MTF-Tester K9 data sheet, write it out:
 
-```ini
-wavelengths  d C e F g  weights 1 0.33 1.046 0.654 0.235
-```
+`weights k9` is a measurement weighting: the normalized spectral weighting curve in the
+ZEISS MTF-Tester K9 data sheet, read off at the five lines and divided by the value at d.
+That curve is what the instrument's halogen lamp at 3200 K, BG 38 filter and Hamamatsu
+R446 photomultiplier come to, and it peaks near 555-560 nm, so e carries slightly more
+than d. Being a plot in one product data sheet, the weights are good to a point or two
+at best, and the data sheet covers the K9 service tester rather than the K8. Use it to
+compare against measured curves rather than to design against.
 
-Those five are a plot in one product data sheet read off and divided by the value at d,
-so they are good to a point or two at best, and the data sheet covers the K9 service
-tester rather than the K8. `WavelengthSet.k9Tester()` is the same set in code.
+In code the two are `WavelengthSet.standardFiveColor()` and `WavelengthSet.k9Tester()`.
 
 ### Solver tolerances
 

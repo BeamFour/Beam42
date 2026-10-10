@@ -11,6 +11,7 @@ import org.redukti.util.Args;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -295,13 +296,26 @@ public final class OptimizationTrial {
     }
 
     /**
+     * The weightings a trial can name instead of listing their weights, each applying to
+     * one set of wavelengths. A trial reads these and {@link #format(WavelengthSet)}
+     * writes them back, so the two stay in step.
+     */
+    static final Map<String, Supplier<WavelengthSet>> NAMED_WEIGHTS = new LinkedHashMap<>();
+
+    static {
+        NAMED_WEIGHTS.put("standard", WavelengthSet::standardFiveColor);
+        NAMED_WEIGHTS.put("k9", WavelengthSet::k9Tester);
+    }
+
+    /**
      * A wavelength set as a trial writes it: the letters, then a weights clause unless
-     * every weight is 1.0. The standard five are written as {@code weights standard}
-     * rather than as five numbers.
+     * every weight is 1.0. A weighting with a name is written by that name rather than as
+     * its numbers.
      */
     static String format(WavelengthSet wavelengths) {
-        if (wavelengths.hasStandardWeights())
-            return wavelengths.letters() + "  weights standard";
+        for (var named : NAMED_WEIGHTS.entrySet())
+            if (wavelengths.equals(named.getValue().get()))
+                return wavelengths.letters() + "  weights " + named.getKey();
         if (wavelengths.hasEqualWeights())
             return wavelengths.letters();
         return wavelengths.letters() + "  weights " + format(wavelengths.weights());
@@ -1244,10 +1258,10 @@ public final class OptimizationTrial {
         }
 
         /**
-         * 'wavelengths <letters> [weights standard|<values>]'. Letters are the Fraunhofer
-         * ones and are case sensitive: C and c are different lines. Omitting the weights
-         * clause weights every wavelength 1.0; 'standard' is the five-line set's weights,
-         * which exist to avoid retyping them.
+         * 'wavelengths <letters> [weights standard|k9|<values>]'. Letters are the
+         * Fraunhofer ones and are case sensitive: C and c are different lines. Omitting
+         * the weights clause weights every wavelength 1.0. The named weightings exist to
+         * avoid retyping five numbers, and each applies only to its own wavelengths.
          */
         private WavelengthSet wavelengthSet(int line, String[] w) {
             List<String> letters = new ArrayList<>();
@@ -1255,15 +1269,17 @@ public final class OptimizationTrial {
             for (; i < w.length && !lower(w[i]).equals("weights"); i++)
                 letters.add(w[i]);
             if (letters.isEmpty())
-                throw error(line, "expected 'wavelengths <letters> [weights standard|<values>]'");
+                throw error(line, "expected 'wavelengths <letters> [weights standard|k9|<values>]'");
             double[] weights = null;
             if (i < w.length) {
                 if (i + 1 >= w.length)
-                    throw error(line, "expected 'standard' or one weight per wavelength after 'weights'");
-                if (lower(w[i + 1]).equals("standard")) {
+                    throw error(line, "expected 'standard', 'k9' or one weight per wavelength after 'weights'");
+                var named = NAMED_WEIGHTS.get(lower(w[i + 1]));
+                if (named != null) {
+                    String name = lower(w[i + 1]);
                     if (w.length != i + 2)
-                        throw error(line, "'weights standard' takes no values");
-                    var standard = WavelengthSet.standardFiveColor();
+                        throw error(line, "'weights " + name + "' takes no values");
+                    var set = named.get();
                     // Reject an unknown letter before complaining about the set.
                     letters.forEach(letter -> {
                         try {
@@ -1273,10 +1289,10 @@ public final class OptimizationTrial {
                             throw error(line, e.getMessage());
                         }
                     });
-                    if (!String.join(" ", letters).equals(standard.letters()))
-                        throw error(line, "'weights standard' applies to the wavelengths '"
-                                + standard.letters() + "'; give the weights explicitly for any other set");
-                    return standard;
+                    if (!String.join(" ", letters).equals(set.letters()))
+                        throw error(line, "'weights " + name + "' applies to the wavelengths '"
+                                + set.letters() + "'; give the weights explicitly for any other set");
+                    return set;
                 }
                 weights = numbers(line, w, i + 1);
             }

@@ -550,6 +550,89 @@ goals, or explicitly requested hexapolar sampling in the same builder configurat
 Maximum radius is inherently controlled by the worst sampled ray rather than a
 Gaussian-weighted RMS distribution and remains a separate hexapolar use case.
 
+### Spot-deviation weight scaling
+
+Each spot deviation residual is a ray miss in microns, and the weight multiplies its
+square. Nothing else in a trial is measured on that scale. Constraints are fractional
+changes, paraxial goals are plain differences in millimetres or f-number, and contrast
+residuals are in waves. So at weight 1 the spot deviations outweigh everything else by
+orders of magnitude, and the solver buys a smaller spot by reshaping the lens.
+
+Large constraint weights do not stop this. On the Leica R Apo 75/2 (`specs-original.txt`,
+trial 2), spot weights of 1 with `constrain edges 128` and `constrain thicknesses 64` still
+let one thickness change by 29% and one curvature by 99%. The back focus ended 3.6mm short
+of its target. See
+[REVIEW.md](REVIEW.md#spot-deviations-outweigh-the-constraints-by-orders-of-magnitude).
+
+Instead of starting from 1, choose a spatial frequency ν in cycles/mm and set
+
+```text
+weight = (ν / 1000)²
+```
+
+| ν (cycles/mm) | 5 | 10 | 20 | 30 | 40 | 50 |
+|---|---|---|---|---|---|---|
+| weight | 2.5e-5 | 1e-4 | 4e-4 | 9e-4 | 1.6e-3 | 2.5e-3 |
+
+To first order, the wavefront difference a contrast sample measures at ν cycles/mm is ν
+times the ray's transverse miss in millimetres. At this weight, therefore, a field's spot
+deviations cost about as much as `goal contrast` at ν with `sag` and `tan` weights of 1 at
+that field. The `x` weights stand for `sag`, and the `y` weights for `tan`.
+
+The two goals are summed over fields and wavelengths in the same way, so this holds for
+any `fields` and wavelength weighting. On the Noct-Nikkor 58/1.2 the two agreed
+within 0.8–1.4× at every field.
+
+In practice:
+
+- **Constraint weights carry over.** Weights that hold a design under a contrast goal at ν
+  also hold it under spot deviations weighted for ν. Weights tuned against spot weights of
+  1 do not transfer to anything else.
+- **Field importance multiplies in.** `goal spot-deviation 0 0 1e-4 2e-4` asks for spot at
+  10 cycles/mm at field 0.7, and at twice that importance at 1.0, like contrast weights of
+  1 and 2.
+- **Frequencies add.** To stand in for contrast at 10, 20 and 40 cycles/mm, use
+  1e-4 + 4e-4 + 1.6e-3 = 2.1e-3.
+- **Mixing with contrast, the frequency sets the balance.** In a trial with both, it says
+  how much the spot goal counts beside the contrast goals. For example,
+  `goal spot-deviation 0 0 0 2.5e-5` next to contrast at 10, 20 and 40 cycles/mm weighs
+  field 1.0 as a contrast goal at 5 cycles/mm would.
+
+Which ν to use is a design decision. A lower frequency gives the spot goal less say
+against the constraints and the paraxial goals. The frequencies you would give a contrast
+goal on the same lens give it as much say as contrast.
+
+Keep in mind:
+
+- **It is a starting point.** The relation is first order and has been measured on one
+  lens. It is closest on a well-corrected design, where the wavefront is smooth across the
+  shear. Adjust from there as with any other weight.
+- **The weight is not a blur size or a tolerance.** Every residual still aims at zero; the
+  weight only sets how much it counts.
+- **Lens data must be in millimetres.** The goal converts system units to microns by
+  multiplying by 1000.
+- **A zero weight still traces the field.** It only removes the field from the merit.
+- **Only `spot-deviation` has been worked out.** `spot-rms` and `spot-max-radius` are also
+  in microns, but this rule has not been derived for them.
+- **It equates cost in the merit, not the MTF you end up with.** See below.
+
+The frequency sets what a spot deviation *costs* against the other goals. It does not make
+the two goals ask for the same thing, and a solve driven by spot deviations at ν will not
+generally land where contrast at ν would have taken it.
+
+The two agree only in the limit the relation was derived in: while the aberration is small,
+the contrast block and the spot block are the same sum of squares to first order, which is
+why the measured ratio came out close. Away from it they measure different things. A spot
+deviation residual weighs every ray by the square of its miss, so a faint halo of rays far
+from the centre dominates the merit. MTF at a given frequency loses roughly the share of the
+energy in that halo, however far out it sits, and depends on how the rest of the light is
+distributed in the core. A spot goal can therefore spend the design's freedom pulling in
+flare that MTF hardly notices, while leaving a core that contrast would have tightened.
+
+So use the spot goals when a compact spot is what you want, and contrast or `goal mtf` when
+MTF is. Where a trial mixes them, the frequency scale is what stops the spot deviations from
+swamping the contrast goals; it does not make them redundant.
+
 ### Suggested comparison measurements
 
 When comparing contrast optimization across prescriptions, record:

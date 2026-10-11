@@ -25,14 +25,14 @@ and fine optimization stages.
 
 An optimization trial is a section in a prescription file that describes an optimizer
 run. It says which fields to evaluate, what the solver may change,
-what constrains to apply, and what goals to aim for. 
+what constraints to apply, and what goals to aim for.
 
 A prescription file can hold any number of trials, numbered `[trial 1]`, `[trial 2]` and
 so on.
 
 ## Anatomy of a Trial
 
-A trial has three parts, and the sections below follow them:
+A trial has four parts, and the sections below follow them:
 
 - **general settings**, these define what fields to use, wavelengths and weights, vignetting,
   solver tolerances, output directory, etc.
@@ -44,11 +44,36 @@ A trial has three parts, and the sections below follow them:
 Each goal contributes one or more *residuals*, a residual is the difference between the goal's
 result and the specified target, i.e. `value − target`. The solver, Levenberg-Marquardt,
 minimizes the sum of the squares of all the residuals, with a goal's weight multiplying its
-squared residual, so weight 4 counts a miss like two of weight 1. The trail run prints as
+squared residual, so weight 4 counts a miss like two of weight 1. The trial run prints as
 the merit the root mean square of the weighted residuals, before and after.
 
 When a ray misses a surface, or an analysis fails, the goal reports a huge value
 instead; the solver reads this as a step to reject rather than a direction to move in.
+
+## Trial syntax
+
+```ini
+[trial 1]
+description   Contrast, every parameter free
+# Anything after a # is a comment
+fields        0  0.3  0.7  1.0
+```
+
+- A trial starts at a line `[trial <n>]` and runs to the next line that starts with `[`.
+  `<n>` is a whole number, unique within the file. Trials need not be in order and the
+  numbers need not be consecutive.
+- The prescription reader skips sections it does not know, so a file with trials still
+  works everywhere a prescription does.
+- Each line is a keyword followed by values. Unlike the prescription sections, which
+  must be tab separated, values here may be separated by spaces or tabs.
+- `#` starts a comment that runs to the end of the line. Blank lines are ignored.
+- Keywords and values are case insensitive, except wavelength letters. Yes/no settings
+  accept `yes`/`no`, `true`/`false` and `on`/`off`.
+- Lines may appear in any order. A setting given twice is an error.
+- Anything the reader does not understand is an error naming the line: an unknown
+  keyword, the wrong number of per-field values, a surface the prescription does not
+  have. Settings that are not given take the defaults listed below.
+
 
 ## General Settings
 
@@ -368,19 +393,9 @@ wavelength, against 280 for the default `gaussian 14 20`. GQ uses `rings * spoke
 
 #### Choosing spot-deviation weights
 
-Each spot deviation residual is a ray miss in microns, and the weight multiplies its
-square. Nothing else in a trial is measured on that scale. Constraints are fractional
-changes, paraxial goals are plain differences in millimetres or f-number, and contrast
-residuals are in waves. So at weight 1 the spot deviations outweigh everything else by
-orders of magnitude, and the solver buys a smaller spot by reshaping the lens.
-
-Large constraint weights do not stop this. On the Leica R Apo 75/2 (`specs-original.txt`,
-trial 2), spot weights of 1 with `constrain edges 128` and `constrain thicknesses 64` still
-let one thickness change by 29% and one curvature by 99%. The back focus ended 3.6mm short
-of its target. See
-[REVIEW.md](REVIEW.md#spot-deviations-outweigh-the-constraints-by-orders-of-magnitude).
-
-Instead of starting from 1, choose a spatial frequency ν in cycles/mm and set
+Spot-deviation residuals are measured in microns. At weight 1 their squared contribution
+can overwhelm the constraints and other goals. Choose a spatial frequency ν in cycles/mm
+and use this starting weight:
 
 ```text
 weight = (ν / 1000)²
@@ -390,64 +405,20 @@ weight = (ν / 1000)²
 |---|---|---|---|---|---|---|
 | weight | 2.5e-5 | 1e-4 | 4e-4 | 9e-4 | 1.6e-3 | 2.5e-3 |
 
-To first order, the wavefront difference a contrast sample measures at ν cycles/mm is ν
-times the ray's transverse miss in millimetres. At this weight, therefore, a field's spot
-deviations cost about as much as `goal contrast` at ν with `sag` and `tan` weights of 1 at
-that field. The `x` weights stand for `sag`, and the `y` weights for `tan`.
+This puts the spot goal on approximately the same merit scale as contrast at ν with
+unit sagittal and tangential weights. A lower frequency gives it less influence.
+Multiply by the desired field importance; for several frequencies, add their weights.
 
-The two goals are summed over fields and wavelengths in the same way, so this holds for
-any `fields` and either `weighted` setting. On the Noct-Nikkor 58/1.2 the two agreed
-within 0.8–1.4× at every field.
+- This is a first-order approximation, measured on one lens. Adjust the weights as needed.
+- The weight sets importance, not a blur size or tolerance; every residual targets zero.
+- Lens data must be in millimetres; the goal converts to microns by multiplying by 1000.
+- A zero weight removes a field from the merit but still traces it.
+- This rule applies only to `spot-deviation`, not `spot-rms` or `spot-max-radius`.
+- Equal merit scales do not imply equal optimized MTF. Use spot goals for compact spots
+  and contrast or `goal mtf` for MTF.
 
-In practice:
-
-- **Constraint weights carry over.** Weights that hold a design under a contrast goal at ν
-  also hold it under spot deviations weighted for ν. Weights tuned against spot weights of
-  1 do not transfer to anything else.
-- **Field importance multiplies in.** `goal spot-deviation 0 0 1e-4 2e-4` asks for spot at
-  10 cycles/mm at field 0.7, and at twice that importance at 1.0, like contrast weights of
-  1 and 2.
-- **Frequencies add.** To stand in for contrast at 10, 20 and 40 cycles/mm, use
-  1e-4 + 4e-4 + 1.6e-3 = 2.1e-3.
-- **Mixing with contrast, the frequency sets the balance.** In a trial with both, it says
-  how much the spot goal counts beside the contrast goals. For example,
-  `goal spot-deviation 0 0 0 2.5e-5` next to contrast at 10, 20 and 40 cycles/mm weighs
-  field 1.0 as a contrast goal at 5 cycles/mm would.
-
-Which ν to use is a design decision. A lower frequency gives the spot goal less say
-against the constraints and the paraxial goals. The frequencies you would give a contrast
-goal on the same lens give it as much say as contrast.
-
-Keep in mind:
-
-- **It is a starting point.** The relation is first order and has been measured on one
-  lens. It is closest on a well-corrected design, where the wavefront is smooth across the
-  shear. Adjust from there as with any other weight.
-- **The weight is not a blur size or a tolerance.** Every residual still aims at zero; the
-  weight only sets how much it counts.
-- **Lens data must be in millimetres.** The goal converts system units to microns by
-  multiplying by 1000.
-- **A zero weight still traces the field.** It only removes the field from the merit.
-- **Only `spot-deviation` has been worked out.** `spot-rms` and `spot-max-radius` are also
-  in microns, but this rule has not been derived for them.
-- **It equates cost in the merit, not the MTF you end up with.** See below.
-
-The frequency sets what a spot deviation *costs* against the other goals. It does not make
-the two goals ask for the same thing, and a solve driven by spot deviations at ν will not
-generally land where contrast at ν would have taken it.
-
-The two agree only in the limit the relation was derived in: while the aberration is small,
-the contrast block and the spot block are the same sum of squares to first order, which is
-why the measured ratio came out close. Away from it they measure different things. A spot
-deviation residual weighs every ray by the square of its miss, so a faint halo of rays far
-from the centre dominates the merit. MTF at a given frequency loses roughly the share of the
-energy in that halo, however far out it sits, and depends on how the rest of the light is
-distributed in the core. A spot goal can therefore spend the design's freedom pulling in
-flare that MTF hardly notices, while leaving a core that contrast would have tightened.
-
-So use the spot goals when a compact spot is what you want, and contrast or `goal mtf` when
-MTF is. Where a trial mixes them, the frequency scale is what stops the spot deviations from
-swamping the contrast goals; it does not make them redundant.
+See [Spot-deviation weight scaling](OPTIMIZER_NOTES.md#spot-deviation-weight-scaling)
+for the derivation, measurements and examples.
 
 ### Ray Aberration Goals
 
@@ -468,8 +439,8 @@ goal paraxial   efl  50    weight 2
 
 `goal paraxial <quantity> <target> [weight <w>]` targets a first-order quantity, with a
 weight of 1 by default. Every run already holds the effective focal length and
-f-number at the prescription's values for the configuration; a trial's `efl` or `fno`
-goal replaces that target rather than adding a second one.
+f-number at the prescription's values for the configuration, at weight 1. A trial's
+`efl` or `fno` goal replaces that target rather than adding a second one.
 
 | Quantity | Meaning |
 |---|---|
@@ -493,23 +464,19 @@ goal replaces that target rather than adding a second one.
 | `power` | Optical power |
 | `opt-inv` | Optical invariant |
 
-Every run anchors the effective focal length and the f-number to the prescription's
-values at weight 1, so a trial cannot quietly rescale the lens. You can specify a `goal paraxial efl` or
-`fno` line as your own constraint.
-
 The first-order specification is held the same way, by the paraxial goals: the automatic
 focal length and f-number anchors, and any `goal paraxial` line of your own - a back
 focus, say. They hold the design to its basic specs while the optical goals work on it,
 so they are constraints in everything but name, and the format calls them goals only
 because that is how they are built.
 
-They differ from the three above in a way worth knowing. Their residual is the plain
+Unlike curvature, thickness and edge constraints, paraxial goals use the plain
 difference from the target, not a fraction of it, so at the same weight a quantity of
 larger magnitude is held proportionally tighter: a 1% drift is a residual of 0.5 on a
 50mm focal length, but only 0.02 on f/2. Raise the weight on the f-number, or on any
 small quantity, if it moves more than you want.
 
-### The constraints
+## Constraints
 
 An optical merit function has no opinion about mechanical layout: left alone, and depending on what it may vary, 
 the solver will collapse air spaces and drive elements through one another. Constraints such as below
@@ -526,18 +493,15 @@ value, so a 1% change costs the same on a 0.1mm air gap as on a 39mm back focus,
 weight is sensible across a whole prescription.
 
 
-## Constraints
-
 ```ini
 constrain curvatures    1.0
 constrain thicknesses   1.0
 constrain edges         1.0
 ```
 
-What each one holds is described in [The constraints](#the-constraints) above. The number
-is the weight, and may be left out; it defaults to 1.0, the builder's nominal weight. See
-"Preserving the starting lens design" in [OPTIMIZER_NOTES.md](OPTIMIZER_NOTES.md) for how the weight
-behaves as it is raised.
+The number is the weight, and may be left out; it defaults to 1.0, the builder's nominal
+weight. See "Preserving the starting lens design" in
+[OPTIMIZER_NOTES.md](OPTIMIZER_NOTES.md) for how the weight behaves as it is raised.
 
 
 ## Running a trial
@@ -568,31 +532,6 @@ The number is the argument following `--optimize`, when that argument does not s
 so a number claimed by both is an error, as is one the file does not define.
 `--optimize` without a number keeps its existing meaning, the routine air-space
 optimization controlled by `--optimize-goal`.
-
-## Layout
-
-```ini
-[trial 1]
-description   Contrast, every parameter free
-# Anything after a # is a comment
-fields        0  0.3  0.7  1.0
-```
-
-- A trial starts at a line `[trial <n>]` and runs to the next line that starts with `[`.
-  `<n>` is a whole number, unique within the file. Trials need not be in order and the
-  numbers need not be consecutive.
-- The prescription reader skips sections it does not know, so a file with trials still
-  works everywhere a prescription does.
-- Each line is a keyword followed by values. Unlike the prescription sections, which
-  must be tab separated, values here may be separated by spaces or tabs.
-- `#` starts a comment that runs to the end of the line. Blank lines are ignored.
-- Keywords and values are case insensitive. Yes/no settings accept `yes`/`no`,
-  `true`/`false` and `on`/`off`.
-- Lines may appear in any order. A setting given twice is an error.
-- Anything the reader does not understand is an error naming the line: an unknown
-  keyword, the wrong number of per-field values, a surface the prescription does not
-  have. Settings that are not given take the defaults listed below.
-
 
 ## Pipelines
 

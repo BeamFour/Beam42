@@ -1,10 +1,10 @@
 # Beam42 Optimizer
 
 The Optimizer in Beam42 is not suitable for designing lenses from scratch as it
-lacks global optimization, the ability to assign glasses, and other advanced features. 
-Its main use case is to fine tune existing designs. 
+lacks global optimization, the ability to assign glasses, and other advanced features.
+Its main use case is to fine tune existing designs.
 It has also been used successfully in reverse engineering attempts
-where glass types are known and initial estimates of curvatures and distances are 
+where glass types are known and initial estimates of curvatures and distances are
 possible.
 
 There is no UI for the optimizer. There are two ways it can be used:
@@ -14,11 +14,11 @@ There is no UI for the optimizer. There are two ways it can be used:
 * You can add configurations in the LensTool2 input prescriptions. This is covered in
   the rest of this document.
 
-Beam42 prescription files can include optimizer configurations alongside the lens specification. 
-Each [trial n] section defines an optimization run for one lens configuration (scenario). 
-An optional [pipeline n] section runs several trials in sequence, each starting from the previous 
-trial’s result. Pipelines are particularly useful for zoom lenses, where trials can alternate 
-between configurations that share the same optical surfaces, or for combining coarse 
+Beam42 prescription files can include optimizer configurations alongside the lens specification.
+Each [trial n] section defines an optimization run for one lens configuration (scenario).
+An optional [pipeline n] section runs several trials in sequence, each starting from the previous
+trial’s result. Pipelines are particularly useful for zoom lenses, where trials can alternate
+between configurations that share the same optical surfaces, or for combining coarse
 and fine optimization stages.
 
 ## Optimization Trials
@@ -106,7 +106,7 @@ is not a line.
 **Use d, C, F, e, C', F' and g.** The available wavelengths are limited by the supported
 refractive indexes that are loaded into the glass catalog.
 
-Omitting the `weights` clause weights every wavelength 1.0. Two predefined weightings 
+Omitting the `weights` clause weights every wavelength 1.0. Two predefined weightings
 are available for the wavelength set `d C e F g`:
 
 | name | d | C | e | F | g |
@@ -114,7 +114,7 @@ are available for the wavelength set `d C e F g`:
 | `standard` | 1.0 | 0.475 | 0.98 | 0.49 | 0.15 |
 | `k9` | 1.0 | 0.330 | 1.046 | 0.654 | 0.235 |
 
-Any other weighting must be written out: `wavelengths d F C  weights 1 0.5 0.25`. 
+Any other weighting must be written out: `wavelengths d F C  weights 1 0.5 0.25`.
 
 A wavelength's weight applies to everything: the analyses combine per-wavelength
 results with it, and each per-wavelength residual's weight is its field and
@@ -122,43 +122,39 @@ orientation weight times its wavelength weight.
 
 The trial does not read wavelengths or weights from the prescription file.
 
-`weights standard` is taken from the MTF design data in T. Steinich
-and V. Blahnik, "Optical design of camera optics for mobile phones," Adv. Opt. Technol.
-**1**(1–2), 51–58 (2012), [doi:10.1515/aot-2012-0002](https://doi.org/10.1515/aot-2012-0002).
+Use `standard` for general design work and `k9` when comparing with measurements from
+the ZEISS MTF-Tester K9. The K9 weights are approximate readings from its published
+spectral response curve.
 
-`weights k9` is based on the spectral weighting curve in the
-ZEISS MTF-Tester K9 data sheet, read off at the five lines and divided by the value at d.
-That curve is what the instrument's halogen lamp at 3200 K, BG 38 filter and Hamamatsu
-R446 photomultiplier come to, and it peaks near 555-560 nm, so e carries slightly more
-than d. Being a plot in one product data sheet, the weights are good to a point or two
-at best.
-
-In code the two are `WavelengthSet.standardFiveColor()` and `WavelengthSet.k9Tester()`.
+See [Wavelength weighting](OPTIMIZER_NOTES.md#wavelength-weighting) for their sources.
 
 ### Solver tolerances
 
-`solver` overrides one of the stopping tests in lmder, the least-squares solver, for
-this trial. Anything not named keeps its default, so a trial that says nothing about
-the solver runs as every trial did before these settings existed.
+Leave these settings at their defaults unless you need to adjust the stopping criteria
+or allow more trial steps. Each override applies only to this trial.
 
-```
+```ini
 solver ftol             1.0E-8
 solver xtol             1.0E-5
 solver gtol             0
 solver max-evaluations  500
 ```
 
-| Setting | Stops the solve when | Default |
+| Setting | Stopping criterion | Default |
 |---|---|---|
-| `ftol` | the sum of squares improves by less than this, relatively | the square root of the machine epsilon, about `1.49E-8` |
-| `xtol` | the variables stop moving: one iteration changes the varied curvatures, thicknesses and aspheric terms by less than this, relative to their own size. It measures the step in the design, not in the merit | `0`, which never stops it: ray-trace noise makes late steps tiny |
-| `gtol` | the gradient is this flat | the square root of the machine epsilon |
-| `max-evaluations` | the solver has taken this many trial steps | `100 * (variables + 1)` |
+| `ftol` | Relative improvement in the sum of squared residuals is sufficiently small. | about `1.49E-8` |
+| `xtol` | The scaled change in the variables is sufficiently small. | `0` (disabled) |
+| `gtol` | Residuals are sufficiently close to orthogonal to every Jacobian column. | about `1.49E-8` |
+| `max-evaluations` | The trial-step budget is reached. | `100 * (variables + 1)` |
 
-`max-evaluations` is the `maxfev` of lmder, and it counts trial steps only. The
-Jacobian probes around them, two per variable per iteration, are not counted, so a
-solve costs far more evaluations of the merit than this number suggests. Run with
-`--verbose` to see the tolerances in use and one line per iteration.
+Raise `max-evaluations` if the solver reaches its budget while the merit is still
+improving. Smaller tolerances ask for stricter convergence. Keep `xtol` disabled unless
+you want small parameter steps to stop the run; ray-trace noise can make these steps tiny.
+
+The budget excludes evaluations used to estimate derivatives, so the total number of
+merit evaluations can be much larger. Run with `--verbose` to see the settings and
+iteration progress. See [Solver stopping criteria](OPTIMIZER_NOTES.md#solver-stopping-criteria)
+for implementation details.
 
 ## Variables
 
@@ -232,55 +228,47 @@ An index the surface's type does not have - 0 on an even asphere without A2, 0 o
 a radial one - is an error. A spherical surface becomes an asphere of the type the
 prescription already uses, which is even when it has no aspheres.
 
-Each coefficient variable carries a scale, so that the solver works with values of order
-one: the variable is the coefficient times the scale. Give it after a colon, as in
-`2:1e9`. Without one:
+A coefficient may have an explicit scale after a colon, for example `2:1e9`.
+The solver varies the coefficient multiplied by that scale. If omitted, the scale is
+chosen automatically from the existing coefficient or, for a zero coefficient, the
+surface diameter. A surface with no diameter needs explicit scales for zero coefficients.
 
-- an existing non-zero coefficient uses 10<sup>−floor(log10 |value|)</sup>, as
-  `vary aspherics existing` does;
-- a coefficient starting at zero uses 10<sup>round(log10 h<sup>n</sup>)</sup>, where h
-  is half the surface's diameter from `[lens data]` and n the power of r. One unit of the
-  scaled variable then moves the sag at the rim by about one lens unit. On the
-  Noct-Nikkor's front surface this gives 1e6, 1e8, 1e11 and 1e14 for coefficients 1 to 4,
-  against the hand-chosen 1e6, 1e9, 1e11 and 1e14 in `NoctNikkor58mm`. A surface with no
-  diameter needs explicit scales.
-
-`K` is used unscaled and takes no scale.
+`K` is used unscaled and takes no scale. See
+[Aspheric coefficient scaling](OPTIMIZER_NOTES.md#aspheric-coefficient-scaling)
+for the scale calculation.
 
 ## Goals
 
 Every goal line starts with `goal` and the goal type. Per-field rows take exactly one
 value per entry in `fields`, in the same order. Weights left out default to 1.
 
-| Goal | What each residual measures                                                                                                                              | Target                                      | Aggregate |
-|---|----------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------|-----------|
-| `goal contrast` | Reduces contrast loss at specified MTF frequency. Target is 0 loss.                                                                                      | 0                                           | No        |
-| `goal contrast balance` | Reduces the difference between the sagittal and tangential contrast loss at a field. Only available with contrast goals. May or may not be helpful.      | 0                                           | Yes       |
-| `goal mtf` | Geometric MTF at a frequency, field and direction.                                                                                                       | Target MTF percentage, 100 to maximize      | Yes       |
-| `goal spot-rms` | RMS spot radius at a field, in microns.                                                                                                                  | Target spot radius in microns, 0 to minimize | Yes       |
-| `goal spot-max-radius` | The largest sampled ray miss at a field, in microns. The current builder forces hexapolar sampling, including the rim.                                   | Target radius in microns                    | Yes       |
-| `goal spot-deviation` | The signed X or Y miss of each sampled ray, in microns: the RMS spot broken into its parts, so the solver sees which rays are wrong and in which direction. | 0                                           | No        |
-| `goal ray-aberrations` | Transverse aberration at each point of the classical sagittal and tangential ray fans.                                                                   | 0                                           | No        |
-| `goal paraxial` | A first-order quantity: focal length, back focus, f-number, pupil positions and the rest.                                                                | Target value                                | Yes       |
+| Goal | What each residual measures                                                                                                                              | Target                                      |
+|---|----------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------|
+| `goal contrast` | Reduces contrast loss at specified MTF frequency. Target is 0 loss.                                                                                      | 0                                           |
+| `goal contrast balance` | Reduces the difference between the sagittal and tangential contrast loss at a field. Only available with contrast goals. May or may not be helpful.      | 0                                           |
+| `goal mtf` | Geometric MTF at a frequency, field and direction.                                                                                                       | Target MTF percentage, 100 to maximize      |
+| `goal spot-rms` | RMS spot radius at a field, in microns.                                                                                                                  | Target spot radius in microns, 0 to minimize |
+| `goal spot-max-radius` | The largest sampled ray miss at a field, in microns. The current builder forces hexapolar sampling, including the rim.                                   | Target radius in microns                    |
+| `goal spot-deviation` | The signed X or Y miss of each sampled ray, in microns: the RMS spot broken into its parts, so the solver sees which rays are wrong and in which direction. | 0                                           |
+| `goal ray-aberrations` | Transverse aberration at each point of the classical sagittal and tangential ray fans.                                                                   | 0                                           |
+| `goal paraxial` | A first-order quantity: focal length, back focus, f-number, pupil positions and the rest.                                                                | Target value                                |
 
-The goals are classified as aggregate or not. An aggregate goal targets a metric at field/wavelength level that is affected by the 
-design as a whole, the optimizer cannot see the effect of each individual ray trace. The non-aggregate goals allow the optimizer
-to see through the impact of each ray trace.
+Choose goals according to the result you need:
 
-The non-aggregate goals, particularly contrast and spot deviations, can cause the optimizer to significantly alter
-a design. This is particularly true if the design is relatively simple or heavily aberrated. You must always enable
-constraints on curvatures and gaps, as well as on paraxial values, if you want the design to be a refinement of the
-original. Spot deviations at weight 1 also work on a far larger scale than the constraints; see
+- Use `contrast` to improve MTF at selected frequencies. It works best on designs with
+  relatively small aberrations.
+- Use `mtf` to fit specified geometric MTF values.
+- Use spot goals when a compact spot or a specified spot radius is the objective.
+- Use paraxial goals to preserve or target first-order quantities such as back focus.
+
+Enable curvature and gap constraints when refining an existing design. The automatic
+EFL and f-number goals preserve the basic specification; add other paraxial goals as
+needed. Adjust weights to balance optical performance against changes to the design.
+Spot-deviation weights usually need to be far below 1; see
 [Choosing spot-deviation weights](#choosing-spot-deviation-weights).
 
-The contrast goals produce the best MTF results, but may not work well with older aberrated
-designs. The spot size goals are less effective in improving MTF because a spot size is not necessarily
-correlated to MTF. The Geometric MTF goals are useful when you want to reproduce an MTF curve
-rather than achieve the best MTF. But the Geometric MTF goals work at an aggregate level and may not 
-be as effective.
-
-You will need to play with weights to influence the outcome. Often it requires repeated trial and error
-to come up with a configuration that gives good results.
+See [Goal residual granularity](OPTIMIZER_NOTES.md#goal-residual-granularity)
+for the distinction between aggregate and per-sample goals.
 
 ### Supported sampling patterns
 
@@ -478,7 +466,7 @@ small quantity, if it moves more than you want.
 
 ## Constraints
 
-An optical merit function has no opinion about mechanical layout: left alone, and depending on what it may vary, 
+An optical merit function has no opinion about mechanical layout: left alone, and depending on what it may vary,
 the solver will collapse air spaces and drive elements through one another. Constraints such as below
 try to prevent this.
 
@@ -685,44 +673,6 @@ goal contrast         10 30 50
 goal contrast         balance  all except 0 0.9 1.0   weight 1.0
 goal contrast         sampling 6 12
 ```
-
-## Implementation notes
-
-- `OptimizationTrial.read(text, n, useGlassTypes)` reads `[trial n]` into an
-  `OptimizationBuilder` for the prescription in the same text, built with the trial's
-  `wavelengths`. `OptimizationBuilder.toTrial(n)` writes a builder back.
-  Both are ported to C++ like-for-like.
-- Each line is one builder call, with the same values:
-
-  | Trial | Builder |
-  |---|---|
-  | `description`, `outdir` | `description`, `outdir` |
-  | `configuration` | `scenario` |
-  | `fields`, `wavelengths` | `fields`, `wavelengths` |
-  | `vignetting`, `frozen`, `check-spot-apertures` | `vignetting`, `freezeVignetting`, `checkSpotApertures` |
-  | `vary curvatures`, `vary thicknesses` | `varyAllCurvatures`/`varyAllCurvaturesExcept`/`varyCurvatures`, and the same for thicknesses |
-  | `vary aspherics existing` | `varyExistingAspherics` |
-  | `vary aspherics <surface> K <index>[:<scale>] ...` | `varyConic`, `varyAsphericCoefficient` |
-  | `constrain ...` | `applyCurvatureConstraints`, `applyThicknessConstraints`, `applyEdgeThicknessConstraints` |
-  | `goal contrast ...` | `contrastGoals`, `contrastBalanceGoals`, `contrastSampling`, `calibrateContrastFrequency`, `aimContrastAtExitPupil`, `centerContrastResiduals` |
-  | `goal mtf ...` | `mtfGoals` |
-  | `goal spot-rms`, `goal spot-max-radius`, `goal spot-deviation` | `spotRmsGoals`, `spotMaxRadiusGoals`, `spotDeviationGoals` |
-  | `goal spot sampling gaussian`, `goal spot sampling hexapolar` | `gaussianQuadratureSampling`, `hexapolarSampling` |
-  | `goal ray-aberrations` | `rayAberrationGoals` |
-  | `goal paraxial` | `paraxialGoal`, with the `ParaxHelper` id of the quantity |
-
-- `additionalVariables` and `additionalGoals` take code rather than values, so a builder
-  that uses them cannot be written as a trial; `toTrial` says so rather than dropping them.
-- `OptimizationTrial.readPipeline(text, n)` reads `[pipeline n]` into an
-  `OptimizationPipeline`, or returns null when the number names a trial;
-  `OptimizationPipeline.toPipeline` writes it back. LensTool2 runs the stages in order,
-  handing each the previous stage's prescription with the pipeline and its trials appended,
-  so a stage reads its own trial from the text exactly as a single run does.
-- The optimized prescription is `Prescription.to_opt_bench_str` followed by
-  `OptimizationBuilder.toTrial`.
-- Tests: each example trial is read into a builder and the setup it builds compared with
-  the example program's, variable by variable and goal by goal - before and after a round
-  trip through `toTrial`. The same trial files drive the C++ tests.
 
 [OPTIMIZER_NOTES.md](OPTIMIZER_NOTES.md) goes further into what the goals measure and how to weigh
 them against each other.

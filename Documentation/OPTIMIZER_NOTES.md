@@ -1248,3 +1248,113 @@ and the sampling routines in `Trace`. Configuration tests cover pattern selectio
 round-trip stability, unsupported syntax and numerical bounds. Existing tracing and
 optimization tests cover representative lenses; this audit does not establish optical
 convergence for every lens or implement the proposed pattern extensions.
+
+## Wavelength weighting
+
+`weights standard` is taken from the MTF design data in T. Steinich
+and V. Blahnik, "Optical design of camera optics for mobile phones," Adv. Opt. Technol.
+**1**(1–2), 51–58 (2012), [doi:10.1515/aot-2012-0002](https://doi.org/10.1515/aot-2012-0002).
+
+`weights k9` is based on the spectral weighting curve in the
+ZEISS MTF-Tester K9 data sheet, read off at the five lines and divided by the value at d.
+That curve is what the instrument's halogen lamp at 3200 K, BG 38 filter and Hamamatsu
+R446 photomultiplier come to, and it peaks near 555-560 nm, so e carries slightly more
+than d. Being a plot in one product data sheet, the weights are good to a point or two
+at best.
+
+In code the two are `WavelengthSet.standardFiveColor()` and `WavelengthSet.k9Tester()`.
+
+## Solver stopping criteria
+
+ Solver tolerances
+
+`solver` overrides one of the stopping tests in lmder, the least-squares solver, for
+this trial. Anything not named keeps its default, so a trial that says nothing about
+the solver runs as every trial did before these settings existed.
+
+```
+solver ftol             1.0E-8
+solver xtol             1.0E-5
+solver gtol             0
+solver max-evaluations  500
+```
+
+| Setting | Stops the solve when | Default |
+|---|---|---|
+| `ftol` | the sum of squares improves by less than this, relatively | the square root of the machine epsilon, about `1.49E-8` |
+| `xtol` | the variables stop moving: one iteration changes the varied curvatures, thicknesses and aspheric terms by less than this, relative to their own size. It measures the step in the design, not in the merit | `0`, which never stops it: ray-trace noise makes late steps tiny |
+| `gtol` | the gradient is this flat | the square root of the machine epsilon |
+| `max-evaluations` | the solver has taken this many trial steps | `100 * (variables + 1)` |
+
+`max-evaluations` is the `maxfev` of lmder, and it counts trial steps only. The
+Jacobian probes around them, two per variable per iteration, are not counted, so a
+solve costs far more evaluations of the merit than this number suggests. Run with
+`--verbose` to see the tolerances in use and one line per iteration.
+
+## Aspheric coefficient scaling
+
+Each coefficient variable carries a scale, so that the solver works with values of order
+one: the variable is the coefficient times the scale. Give it after a colon, as in
+`2:1e9`. Without one:
+
+- an existing non-zero coefficient uses 10<sup>−floor(log10 |value|)</sup>, as
+  `vary aspherics existing` does;
+- a coefficient starting at zero uses 10<sup>round(log10 h<sup>n</sup>)</sup>, where h
+  is half the surface's diameter from `[lens data]` and n the power of r. One unit of the
+  scaled variable then moves the sag at the rim by about one lens unit. On the
+  Noct-Nikkor's front surface this gives 1e6, 1e8, 1e11 and 1e14 for coefficients 1 to 4,
+  against the hand-chosen 1e6, 1e9, 1e11 and 1e14 in `NoctNikkor58mm`. A surface with no
+  diameter needs explicit scales.
+
+`K` is used unscaled and takes no scale.
+
+## Goal residual granularity
+
+Aggregate goals expose a summary metric to the solver: geometric MTF, RMS spot radius,
+maximum spot radius, contrast balance, or a paraxial quantity. Per-sample goals expose
+individual signed ray errors or wavefront differences. Both depend on the design as a
+whole; the distinction is the information retained in the residual vector.
+
+The Jacobian for an aggregate goal contains derivatives of the summary metric.
+Per-sample goals retain separate derivatives for each ray or wavefront difference,
+including its sign and direction. This can give the solver more information about how
+to reduce the optical error. It does not guarantee a better final design, and neither
+form preserves the starting geometry without suitable constraints.
+
+## Implementation notes
+
+- `OptimizationTrial.read(text, n, useGlassTypes)` reads `[trial n]` into an
+  `OptimizationBuilder` for the prescription in the same text, built with the trial's
+  `wavelengths`. `OptimizationBuilder.toTrial(n)` writes a builder back.
+  Both are ported to C++ like-for-like.
+- Each line is one builder call, with the same values:
+
+  | Trial | Builder |
+  |---|---|
+  | `description`, `outdir` | `description`, `outdir` |
+  | `configuration` | `scenario` |
+  | `fields`, `wavelengths` | `fields`, `wavelengths` |
+  | `vignetting`, `frozen`, `check-spot-apertures` | `vignetting`, `freezeVignetting`, `checkSpotApertures` |
+  | `vary curvatures`, `vary thicknesses` | `varyAllCurvatures`/`varyAllCurvaturesExcept`/`varyCurvatures`, and the same for thicknesses |
+  | `vary aspherics existing` | `varyExistingAspherics` |
+  | `vary aspherics <surface> K <index>[:<scale>] ...` | `varyConic`, `varyAsphericCoefficient` |
+  | `constrain ...` | `applyCurvatureConstraints`, `applyThicknessConstraints`, `applyEdgeThicknessConstraints` |
+  | `goal contrast ...` | `contrastGoals`, `contrastBalanceGoals`, `contrastSampling`, `calibrateContrastFrequency`, `aimContrastAtExitPupil`, `centerContrastResiduals` |
+  | `goal mtf ...` | `mtfGoals` |
+  | `goal spot-rms`, `goal spot-max-radius`, `goal spot-deviation` | `spotRmsGoals`, `spotMaxRadiusGoals`, `spotDeviationGoals` |
+  | `goal spot sampling gaussian`, `goal spot sampling hexapolar` | `gaussianQuadratureSampling`, `hexapolarSampling` |
+  | `goal ray-aberrations` | `rayAberrationGoals` |
+  | `goal paraxial` | `paraxialGoal`, with the `ParaxHelper` id of the quantity |
+
+- `additionalVariables` and `additionalGoals` take code rather than values, so a builder
+  that uses them cannot be written as a trial; `toTrial` says so rather than dropping them.
+- `OptimizationTrial.readPipeline(text, n)` reads `[pipeline n]` into an
+  `OptimizationPipeline`, or returns null when the number names a trial;
+  `OptimizationPipeline.toPipeline` writes it back. LensTool2 runs the stages in order,
+  handing each the previous stage's prescription with the pipeline and its trials appended,
+  so a stage reads its own trial from the text exactly as a single run does.
+- The optimized prescription is `Prescription.to_opt_bench_str` followed by
+  `OptimizationBuilder.toTrial`.
+- Tests: each example trial is read into a builder and the setup it builds compared with
+  the example program's, variable by variable and goal by goal - before and after a round
+  trip through `toTrial`. The same trial files drive the C++ tests.

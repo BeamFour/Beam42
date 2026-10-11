@@ -34,6 +34,8 @@ so on.
 
 A trial has three parts, and the sections below follow them:
 
+- **general settings**, these define what fields to use, wavelengths and weights, vignetting,
+  solver tolerances, output directory, etc.
 - **variables**, the parameters the solver may change: radii, thicknesses and aspheric
   terms;
 - **goals**, what it aims to solve for;
@@ -48,148 +50,7 @@ the merit the root mean square of the weighted residuals, before and after.
 When a ray misses a surface, or an analysis fails, the goal reports a huge value
 instead; the solver reads this as a step to reject rather than a direction to move in.
 
-### The goals
-
-| Goal | What each residual measures                                                                                                                              | Target                                      | Aggregate |
-|---|----------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------|-----------|
-| `goal contrast` | Reduces contrast loss at specified MTF frequency. Target is 0 loss.                                                                                      | 0                                           | No        |
-| `goal contrast balance` | Reduces the difference between the sagittal and tangential contrast loss at a field. Only available with contrast goals. May or may not be helpful.      | 0                                           | Yes       |
-| `goal mtf` | Geometric MTF at a frequency, field and direction.                                                                                                       | Target MTF percentage, 100 to maximize      | Yes       |
-| `goal spot-rms` | RMS spot radius at a field, in microns.                                                                                                                  | Target spot radius in microns, 0 to minimize | Yes       |
-| `goal spot-max-radius` | The largest sampled ray miss at a field, in microns. The current builder forces hexapolar sampling, including the rim.                                   | Target radius in microns                    | Yes       |
-| `goal spot-deviation` | The signed X or Y miss of each sampled ray, in microns: the RMS spot broken into its parts, so the solver sees which rays are wrong and in which direction. | 0                                           | No        |
-| `goal ray-aberrations` | Transverse aberration at each point of the classical sagittal and tangential ray fans.                                                                   | 0                                           | No        |
-| `goal paraxial` | A first-order quantity: focal length, back focus, f-number, pupil positions and the rest.                                                                | Target value                                | Yes       |
-
-The goals are classified as aggregate or not. An aggregate goal targets a metric at field/wavelength level that is affected by the 
-design as a whole, the optimizer cannot see the effect of each individual ray trace. The non-aggregate goals allow the optimizer
-to see through the impact of each ray trace.
-
-The non-aggregate goals, particularly contrast and spot deviations, can cause the optimizer to significantly alter
-a design. This is particularly true if the design is relatively simple or heavily aberrated. You must always enable
-constraints on curvatures and gaps, as well as on paraxial values, if you want the design to be a refinement of the
-original. Spot deviations at weight 1 also work on a far larger scale than the constraints; see
-[Choosing spot-deviation weights](#choosing-spot-deviation-weights).
-
-Every run anchors the effective focal length and the f-number to the prescription's
-values at weight 1, so a trial cannot quietly rescale the lens. You can specify a `goal paraxial efl` or
-`fno` line as your own constraint.
-
-The contrast goals produce the best MTF results, but may not work well with older aberrated
-designs. The spot size goals are less effective in improving MTF because a spot size is not necessarily
-correlated to MTF. The Geometric MTF goals are useful when you want to reproduce an MTF curve
-rather than achieve the best MTF. But the Geometric MTF goals work at an aggregate level and may not 
-be as effective.
-
-You will need to play with weights to influence the outcome. Often it requires repeated trial and error
-to come up with a configuration that gives good results.
-
-### The constraints
-
-An optical merit function has no opinion about mechanical layout: left alone, and depending on what it may vary, 
-the solver will collapse air spaces and drive elements through one another. Constraints such as below
-try to prevent this.
-
-| Constraint | Holds |
-|---|---|
-| `constrain thicknesses` | Each varied thickness, at its centre. |
-| `constrain edges` | The edge separation of every gap a varied parameter can move, measured at the smaller of the two surfaces' semi-diameters. Complements the one above: two surfaces can keep their centre thickness and still cross further out. |
-| `constrain curvatures` | Each varied surface's curvature - not its radius, which runs away to infinity on a near-flat surface. |
-
-These residuals are *fractional*: the weight is divided by the square of the starting
-value, so a 1% change costs the same on a 0.1mm air gap as on a 39mm back focus, and one
-weight is sensible across a whole prescription.
-
-The first-order specification is held the same way, by the paraxial goals: the automatic
-focal length and f-number anchors, and any `goal paraxial` line of your own - a back
-focus, say. They hold the design to its basic specs while the optical goals work on it,
-so they are constraints in everything but name, and the format calls them goals only
-because that is how they are built.
-
-They differ from the three above in a way worth knowing. Their residual is the plain
-difference from the target, not a fraction of it, so at the same weight a quantity of
-larger magnitude is held proportionally tighter: a 1% drift is a residual of 0.5 on a
-50mm focal length, but only 0.02 on f/2. Raise the weight on the f-number, or on any
-small quantity, if it moves more than you want.
-
-## Running a trial
-
-```bash
-lenstool2 --specfile lens.txt --optimize 2
-```
-
-LensTool2 then:
-
-1. reads `lens.txt` and its `[trial 2]` section;
-2. builds the prescription for the trial's configuration, using the trial's
-   `wavelengths` setting, and runs the solver;
-3. prints the trial's description, the merit function before and after, the solver
-   status, and the final value of every variable;
-4. writes the optimized prescription, `lens-trial2.txt`, to the trial's output directory
-   (see [The optimized prescription](#the-optimized-prescription));
-5. produces the usual report from the optimized prescription in the same directory, as
-   if LensTool2 had been run on `lens-trial2.txt`.
-
-The output directory is the `--outdir` given on the command line; without one, the
-trial's own `outdir`; without that, the directory `lens.txt` is in. Giving each trial an
-`outdir` keeps their reports apart, since report files such as `layout.svg` are not
-named after the prescription.
-
-The number is the argument following `--optimize`, when that argument does not start with
-`--`. It may name a `[trial n]` or a [pipeline](#pipelines); the two share one numbering,
-so a number claimed by both is an error, as is one the file does not define.
-`--optimize` without a number keeps its existing meaning, the routine air-space
-optimization controlled by `--optimize-goal`.
-
-## Layout
-
-```ini
-[trial 1]
-description   Contrast, every parameter free
-# Anything after a # is a comment
-fields        0  0.3  0.7  1.0
-```
-
-- A trial starts at a line `[trial <n>]` and runs to the next line that starts with `[`.
-  `<n>` is a whole number, unique within the file. Trials need not be in order and the
-  numbers need not be consecutive.
-- The prescription reader skips sections it does not know, so a file with trials still
-  works everywhere a prescription does.
-- Each line is a keyword followed by values. Unlike the prescription sections, which
-  must be tab separated, values here may be separated by spaces or tabs.
-- `#` starts a comment that runs to the end of the line. Blank lines are ignored.
-- Keywords and values are case insensitive. Yes/no settings accept `yes`/`no`,
-  `true`/`false` and `on`/`off`.
-- Lines may appear in any order. A setting given twice is an error.
-- Anything the reader does not understand is an error naming the line: an unknown
-  keyword, the wrong number of per-field values, a surface the prescription does not
-  have. Settings that are not given take the defaults listed below.
-
-## Referring to surfaces
-
-A surface is numbered by its position in `[lens data]`, counting from 0, as
-`OptimizationBuilder` numbers surfaces: the first row is surface 0, and every row counts,
-the aperture stop included. A thickness is numbered by the surface it follows, so
-thickness 25 is the gap after surface 25 - the back focus, when that is the last row.
-
-The ids in the first column of `[lens data]` are not used, nor are the distance names in
-`[variable distances]`. So on a lens whose rows are labelled 1, 2, ..., 16, 16AS, 17, 18,
-surface 16 is the stop, and surface 18 the last. The `prescription.txt` LensTool2 writes
-numbers surfaces from 1, so its surface *n* is a trial's surface *n* − 1.
-
-A surface list takes one of three forms:
-
-| Form | Meaning |
-|---|---|
-| `all` | For curvatures, every surface except the aperture stop, field stops and flat (`Infinity`) surfaces. For thicknesses, every surface whose thickness in the configuration is not zero. |
-| `all except 7 10 24` | The same set without the listed surfaces. |
-| `2 4 5 12` | Exactly these surfaces, including flat surfaces if explicitly listed. |
-
-An explicitly listed flat surface cannot be combined with `constrain curvatures`:
-the fractional constraint needs a finite, non-zero starting curvature. Remove the
-flat surface from the list or omit the curvature constraint for that trial.
-
-## Settings
+## General Settings
 
 | Keyword | Values | Default |
 |---|---|---|
@@ -205,6 +66,8 @@ flat surface from the list or omit the curvature constraint for that trial.
 
 ### Wavelengths
 
+Defines set of wavelengths and weights to use for analysis.
+
 ```ini
 wavelengths  d
 wavelengths  d F C
@@ -215,45 +78,35 @@ wavelengths  d C e F g  weights k9
 The letters are the Fraunhofer ones and are case sensitive: `C` is 656.2725 nm and `c`
 is not a line.
 
-**Use d, C, F, e, C', F' and g.** A glass taken from a catalog carries measured indices
-at exactly those seven lines, and asking it for any other wavelength fails the run with
-"Glass does not have data for wavelength ...". A surface whose glass is given as nd and
-vd instead - no glass name, a name absent from the catalogs, or `--no-glass-types` -
-has its index computed from a dispersion model, so any wavelength works there, as an
-approximation. A trial mixing the two kinds of surface is therefore limited by the
-catalog ones. Other lines the reader accepts (t, s, r, D, h, i) are for that
-nd/vd case, and for later, when more wavelength data can be loaded.
+**Use d, C, F, e, C', F' and g.** The available wavelengths are limited by the supported
+refractive indexes that are loaded into the glass catalog.
 
-Omitting the `weights` clause weights every wavelength 1.0. Two weightings have names,
-so their numbers need not be retyped, and each applies only to the five lines
-`d C e F g`:
+Omitting the `weights` clause weights every wavelength 1.0. Two predefined weightings 
+are available for the wavelength set `d C e F g`:
 
 | name | d | C | e | F | g |
 | --- | --- | --- | --- | --- | --- |
 | `standard` | 1.0 | 0.475 | 0.98 | 0.49 | 0.15 |
 | `k9` | 1.0 | 0.330 | 1.046 | 0.654 | 0.235 |
 
-Any other weighting is written out: `wavelengths d F C  weights 1 0.5 0.25`. Giving a
-named weighting's numbers by hand is the same set, and is written back by name.
+Any other weighting must be written out: `wavelengths d F C  weights 1 0.5 0.25`. 
 
 A wavelength's weight applies to everything: the analyses combine per-wavelength
 results with it, and each per-wavelength residual's weight is its field and
-orientation weight times its wavelength weight. The line also builds the prescription
-for the run, so the wavelength set is one decision rather than two.
+orientation weight times its wavelength weight.
 
 The trial does not read wavelengths or weights from the prescription file.
 
-`weights standard` is a design weighting, taken from the MTF design data in T. Steinich
+`weights standard` is taken from the MTF design data in T. Steinich
 and V. Blahnik, "Optical design of camera optics for mobile phones," Adv. Opt. Technol.
 **1**(1–2), 51–58 (2012), [doi:10.1515/aot-2012-0002](https://doi.org/10.1515/aot-2012-0002).
 
-`weights k9` is a measurement weighting: the normalized spectral weighting curve in the
+`weights k9` is based on the spectral weighting curve in the
 ZEISS MTF-Tester K9 data sheet, read off at the five lines and divided by the value at d.
 That curve is what the instrument's halogen lamp at 3200 K, BG 38 filter and Hamamatsu
 R446 photomultiplier come to, and it peaks near 555-560 nm, so e carries slightly more
 than d. Being a plot in one product data sheet, the weights are good to a point or two
-at best, and the data sheet covers the K9 service tester rather than the K8. Use it to
-compare against measured curves rather than to design against.
+at best.
 
 In code the two are `WavelengthSet.standardFiveColor()` and `WavelengthSet.k9Tester()`.
 
@@ -306,6 +159,30 @@ vary aspherics    0  K  1:1e6  2  3  4
   it does not have yet, starting from zero. An explicit row for a surface takes
   precedence over `existing` for that surface.
 
+### Referring to surfaces
+
+A surface is numbered by its position in `[lens data]`, counting from 0, as
+`OptimizationBuilder` numbers surfaces: the first row is surface 0, and every row counts,
+the aperture stop included. A thickness is numbered by the surface it follows, so
+thickness 25 is the gap after surface 25 - the back focus, when that is the last row.
+
+The ids in the first column of `[lens data]` are not used, nor are the distance names in
+`[variable distances]`. So on a lens whose rows are labelled 1, 2, ..., 16, 16AS, 17, 18,
+surface 16 is the stop, and surface 18 the last. The `prescription.txt` LensTool2 writes
+numbers surfaces from 1, so its surface *n* is a trial's surface *n* − 1.
+
+A surface list takes one of three forms:
+
+| Form | Meaning |
+|---|---|
+| `all` | For curvatures, every surface except the aperture stop, field stops and flat (`Infinity`) surfaces. For thicknesses, every surface whose thickness in the configuration is not zero. |
+| `all except 7 10 24` | The same set without the listed surfaces. |
+| `2 4 5 12` | Exactly these surfaces, including flat surfaces if explicitly listed. |
+
+An explicitly listed flat surface cannot be combined with `constrain curvatures`:
+the fractional constraint needs a finite, non-zero starting curvature. Remove the
+flat surface from the list or omit the curvature constraint for that trial.
+
 ### Aspheric terms
 
 Terms are `K`, the conic constant, and coefficient indices, the index into the surface's
@@ -345,26 +222,40 @@ one: the variable is the coefficient times the scale. Give it after a colon, as 
 
 `K` is used unscaled and takes no scale.
 
-## Constraints
-
-```ini
-constrain curvatures    1.0
-constrain thicknesses   1.0
-constrain edges         1.0
-```
-
-What each one holds is described in [The constraints](#the-constraints) above. The number
-is the weight, and may be left out; it defaults to 1.0, the builder's nominal weight. See
-"Preserving the starting lens design" in [OPTIMIZER_NOTES.md](OPTIMIZER_NOTES.md) for how the weight
-behaves as it is raised.
-
 ## Goals
-
-What each goal measures is described in [The goals](#the-goals) above; this section is
-the syntax.
 
 Every goal line starts with `goal` and the goal type. Per-field rows take exactly one
 value per entry in `fields`, in the same order. Weights left out default to 1.
+
+| Goal | What each residual measures                                                                                                                              | Target                                      | Aggregate |
+|---|----------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------|-----------|
+| `goal contrast` | Reduces contrast loss at specified MTF frequency. Target is 0 loss.                                                                                      | 0                                           | No        |
+| `goal contrast balance` | Reduces the difference between the sagittal and tangential contrast loss at a field. Only available with contrast goals. May or may not be helpful.      | 0                                           | Yes       |
+| `goal mtf` | Geometric MTF at a frequency, field and direction.                                                                                                       | Target MTF percentage, 100 to maximize      | Yes       |
+| `goal spot-rms` | RMS spot radius at a field, in microns.                                                                                                                  | Target spot radius in microns, 0 to minimize | Yes       |
+| `goal spot-max-radius` | The largest sampled ray miss at a field, in microns. The current builder forces hexapolar sampling, including the rim.                                   | Target radius in microns                    | Yes       |
+| `goal spot-deviation` | The signed X or Y miss of each sampled ray, in microns: the RMS spot broken into its parts, so the solver sees which rays are wrong and in which direction. | 0                                           | No        |
+| `goal ray-aberrations` | Transverse aberration at each point of the classical sagittal and tangential ray fans.                                                                   | 0                                           | No        |
+| `goal paraxial` | A first-order quantity: focal length, back focus, f-number, pupil positions and the rest.                                                                | Target value                                | Yes       |
+
+The goals are classified as aggregate or not. An aggregate goal targets a metric at field/wavelength level that is affected by the 
+design as a whole, the optimizer cannot see the effect of each individual ray trace. The non-aggregate goals allow the optimizer
+to see through the impact of each ray trace.
+
+The non-aggregate goals, particularly contrast and spot deviations, can cause the optimizer to significantly alter
+a design. This is particularly true if the design is relatively simple or heavily aberrated. You must always enable
+constraints on curvatures and gaps, as well as on paraxial values, if you want the design to be a refinement of the
+original. Spot deviations at weight 1 also work on a far larger scale than the constraints; see
+[Choosing spot-deviation weights](#choosing-spot-deviation-weights).
+
+The contrast goals produce the best MTF results, but may not work well with older aberrated
+designs. The spot size goals are less effective in improving MTF because a spot size is not necessarily
+correlated to MTF. The Geometric MTF goals are useful when you want to reproduce an MTF curve
+rather than achieve the best MTF. But the Geometric MTF goals work at an aggregate level and may not 
+be as effective.
+
+You will need to play with weights to influence the outcome. Often it requires repeated trial and error
+to come up with a configuration that gives good results.
 
 ### Supported sampling patterns
 
@@ -390,7 +281,7 @@ settings do not enable goals themselves.
 apertures. Contrast does not check physical apertures by default; the trial spot setting
 does not change this. The optional GQ spot inner radius does not configure contrast sampling.
 
-### Contrast
+### Contrast Goals
 
 ```ini
 goal contrast   10 30 50
@@ -424,7 +315,7 @@ In `balance`, fields are named by their value in `fields`, so nothing has to be
 counted. The weight's scale is unlike the contrast weights'; see "Controlling
 astigmatism" in [OPTIMIZER_NOTES.md](OPTIMIZER_NOTES.md).
 
-### MTF
+### MTF Goals
 
 ```ini
 goal mtf   10 sag   93 93 94 93
@@ -441,7 +332,7 @@ goal mtf   10 tan weights   1 1 2 4
 
 The MTF is measured at the frequencies these rows name, and at no others.
 
-### Spot
+### Spot Goal
 
 ```ini
 goal spot-rms         15 30 50 70
@@ -558,7 +449,7 @@ So use the spot goals when a compact spot is what you want, and contrast or `goa
 MTF is. Where a trial mixes them, the frequency scale is what stops the spot deviations from
 swamping the contrast goals; it does not make them redundant.
 
-### Ray aberrations
+### Ray Aberration Goals
 
 ```ini
 goal ray-aberrations  yes
@@ -568,7 +459,7 @@ goal ray-aberrations  yes
 wavelength, so `wavelengths d` is what restricts them to the d line. The default for
 `goal ray-aberrations` is `no`.
 
-### Paraxial
+### Paraxial Goals
 
 ```ini
 goal paraxial   bfl  39.38
@@ -601,6 +492,107 @@ goal replaces that target rather than adding a second one.
 | `red` | Reduction ratio |
 | `power` | Optical power |
 | `opt-inv` | Optical invariant |
+
+Every run anchors the effective focal length and the f-number to the prescription's
+values at weight 1, so a trial cannot quietly rescale the lens. You can specify a `goal paraxial efl` or
+`fno` line as your own constraint.
+
+The first-order specification is held the same way, by the paraxial goals: the automatic
+focal length and f-number anchors, and any `goal paraxial` line of your own - a back
+focus, say. They hold the design to its basic specs while the optical goals work on it,
+so they are constraints in everything but name, and the format calls them goals only
+because that is how they are built.
+
+They differ from the three above in a way worth knowing. Their residual is the plain
+difference from the target, not a fraction of it, so at the same weight a quantity of
+larger magnitude is held proportionally tighter: a 1% drift is a residual of 0.5 on a
+50mm focal length, but only 0.02 on f/2. Raise the weight on the f-number, or on any
+small quantity, if it moves more than you want.
+
+### The constraints
+
+An optical merit function has no opinion about mechanical layout: left alone, and depending on what it may vary, 
+the solver will collapse air spaces and drive elements through one another. Constraints such as below
+try to prevent this.
+
+| Constraint | Holds |
+|---|---|
+| `constrain thicknesses` | Each varied thickness, at its centre. |
+| `constrain edges` | The edge separation of every gap a varied parameter can move, measured at the smaller of the two surfaces' semi-diameters. Complements the one above: two surfaces can keep their centre thickness and still cross further out. |
+| `constrain curvatures` | Each varied surface's curvature - not its radius, which runs away to infinity on a near-flat surface. |
+
+These residuals are *fractional*: the weight is divided by the square of the starting
+value, so a 1% change costs the same on a 0.1mm air gap as on a 39mm back focus, and one
+weight is sensible across a whole prescription.
+
+
+## Constraints
+
+```ini
+constrain curvatures    1.0
+constrain thicknesses   1.0
+constrain edges         1.0
+```
+
+What each one holds is described in [The constraints](#the-constraints) above. The number
+is the weight, and may be left out; it defaults to 1.0, the builder's nominal weight. See
+"Preserving the starting lens design" in [OPTIMIZER_NOTES.md](OPTIMIZER_NOTES.md) for how the weight
+behaves as it is raised.
+
+
+## Running a trial
+
+```bash
+lenstool2 --specfile lens.txt --optimize 2
+```
+
+LensTool2 then:
+
+1. reads `lens.txt` and its `[trial 2]` section;
+2. builds the prescription for the trial's configuration, using the trial's
+   `wavelengths` setting, and runs the solver;
+3. prints the trial's description, the merit function before and after, the solver
+   status, and the final value of every variable;
+4. writes the optimized prescription, `lens-trial2.txt`, to the trial's output directory
+   (see [The optimized prescription](#the-optimized-prescription));
+5. produces the usual report from the optimized prescription in the same directory, as
+   if LensTool2 had been run on `lens-trial2.txt`.
+
+The output directory is the `--outdir` given on the command line; without one, the
+trial's own `outdir`; without that, the directory `lens.txt` is in. Giving each trial an
+`outdir` keeps their reports apart, since report files such as `layout.svg` are not
+named after the prescription.
+
+The number is the argument following `--optimize`, when that argument does not start with
+`--`. It may name a `[trial n]` or a [pipeline](#pipelines); the two share one numbering,
+so a number claimed by both is an error, as is one the file does not define.
+`--optimize` without a number keeps its existing meaning, the routine air-space
+optimization controlled by `--optimize-goal`.
+
+## Layout
+
+```ini
+[trial 1]
+description   Contrast, every parameter free
+# Anything after a # is a comment
+fields        0  0.3  0.7  1.0
+```
+
+- A trial starts at a line `[trial <n>]` and runs to the next line that starts with `[`.
+  `<n>` is a whole number, unique within the file. Trials need not be in order and the
+  numbers need not be consecutive.
+- The prescription reader skips sections it does not know, so a file with trials still
+  works everywhere a prescription does.
+- Each line is a keyword followed by values. Unlike the prescription sections, which
+  must be tab separated, values here may be separated by spaces or tabs.
+- `#` starts a comment that runs to the end of the line. Blank lines are ignored.
+- Keywords and values are case insensitive. Yes/no settings accept `yes`/`no`,
+  `true`/`false` and `on`/`off`.
+- Lines may appear in any order. A setting given twice is an error.
+- Anything the reader does not understand is an error naming the line: an unknown
+  keyword, the wrong number of per-field values, a surface the prescription does not
+  have. Settings that are not given take the defaults listed below.
+
 
 ## Pipelines
 

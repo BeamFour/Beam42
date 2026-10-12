@@ -42,6 +42,7 @@ original assignee	Nikon Corp
 link	https://patents.google.com/patent/JP2013019993A
 [report data]
 lens name	AF-S NIKKOR 58mm f/1.4G ED (EX 1 Reoptimized in Beam42)
+status	Candidate
 
 [notes]
 source prescription	JP2013-019993_Example01a.txt

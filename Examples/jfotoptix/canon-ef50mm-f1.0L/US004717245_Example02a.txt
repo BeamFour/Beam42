@@ -1,8 +1,5 @@
 [descriptive data]
 title	US 4,717,245 Example 2 (Canon EF50mm f/1.0L USM)
-#patent	country	number	example	year	inventors	org	link
-patent	US	US4717245	EX 2	1985	Sadatoshi Takahashi	Canon Inc	https://patents.google.com/patent/US4717245A/en
-lens name	Canon EF 50mm f/1.0L USM
 [constants]
 Scaled	52	100
 [variable distances]
@@ -51,3 +48,15 @@ The radius = 1/(2*A2)
 A2 = 0
 K = -1
 Rest of coefficients unchanged
+[patent info]
+country	US
+number	US4717245
+example	EX 2
+year applied	1985
+inventors	Sadatoshi Takahashi
+current assignee	Canon Inc
+original assignee	Canon Inc
+link	https://patents.google.com/patent/US4717245A/en
+[report data]
+lens name	Canon EF 50mm f/1.0L USM
+status	Accepted

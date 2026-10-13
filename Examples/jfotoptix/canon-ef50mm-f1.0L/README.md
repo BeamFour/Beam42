@@ -9,26 +9,26 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ID  | Radius | Thickness | Diameter | nd  | vd  | Glass Make | Glass |
 | --- | ---    | ---       | ---      | --- | --- | ---        | ---   |
 | 1 | 138.055 | 5.101 | 60.55 | 1.60311 | 60.6 | Schott | N-SK14 |
-| 2 | 652.512 | 0.099 | 60.55 |  |  |  |
-| 3 | 87.469 | 4.898 | 56.04 | 1.6968 | 55.46 | Hoya | LAC14 |
-| 4 | 271.835 | 0.151 | 56.04 |  |  |  |
+| 2 | 652.512 | 0.099 | 59.0363 |  |  |  |
+| 3 | 87.469 | 4.898 | 55.1919 | 1.6968 | 55.46 | Hoya | LAC14 |
+| 4 | 271.835 | 0.151 | 53.7705 |  |  |  |
 | 5 | 67.95325 | 3.999 | 48.93 | 1.51742 | 52.2 | Hikari | J-KF6 |
-| 6 | 40.57 | 7.8 | 46.51 | 1.883 | 40.81 | Hoya | TAFD30 |
-| 7 | 145.746 | 1.3 | 46.51 |  |  |  |
-| 8 | 568.62 | 2.699 | 44.08 | 1.51742 | 52.2 | Hikari | J-KF6 |
-| 9 | 26.655 | 8.367 | 36.63 |  |  |  |
-| 10 | AS | 10.229 | 35.333 |  |  |  |
-| 11 | -25.418 | 2.007 | 36.28 | 1.84666 | 23.78 | Hoya | FDS90 |
-| 12 | 76.965 | 13.26 | 43.84 | 1.883 | 40.81 | Hoya | TAFD30 |
-| 13 | -36.192 | 1.638 | 44.398 |  |  |  |
-| 14 | -31.273 | 2.501 | 44.398 | 1.80518 | 25.36 | Schott | N-SF6 |
-| 15 | -67.6041 | 0.151 | 49.85 |  |  |  |
-| 16 | -208.993 | 6.802 | 53.96 | 1.883 | 40.81 | Hoya | TAFD30 |
-| 17 | -51.62 | 0.099 | 53.96 |  |  |  |
-| 18 | 1947.956 | 6.599 | 54.48 | 1.883 | 40.81 | Hoya | TAFD30 |
-| 19 | -72.602 | 0.499 | 54.48 |  |  |  |
+| 6 | 40.57 | 7.8 | 44.9717 | 1.883 | 40.81 | Hoya | TAFD30 |
+| 7 | 145.746 | 1.3 | 42.9784 |  |  |  |
+| 8 | 568.62 | 2.699 | 42.8391 | 1.51742 | 52.2 | Hikari | J-KF6 |
+| 9 | 26.655 | 8.367 | 35.7651 |  |  |  |
+| 10 | AS | 10.229 | 35.3285 |  |  |  |
+| 11 | -25.418 | 2.007 | 34.308 | 1.84666 | 23.78 | Hoya | FDS90 |
+| 12 | 76.965 | 13.26 | 42.1882 | 1.883 | 40.81 | Hoya | TAFD30 |
+| 13 | -36.192 | 1.638 | 44.0658 |  |  |  |
+| 14 | -31.273 | 2.501 | 44.0649 | 1.80518 | 25.36 | Schott | N-SF6 |
+| 15 | -67.6041 | 0.151 | 49.8329 |  |  |  |
+| 16 | -208.993 | 6.802 | 52.4267 | 1.883 | 40.81 | Hoya | TAFD30 |
+| 17 | -51.62 | 0.099 | 53.0857 |  |  |  |
+| 18 | 1947.956 | 6.599 | 53.9214 | 1.883 | 40.81 | Hoya | TAFD30 |
+| 19 | -72.602 | 0.499 | 53.976 |  |  |  |
 | 20 | 74.043 | 4.602 | 47.2 | 1.55963 | 61.17 | Ohara | BAL50 |
-| 21 | 499.996 | 38.65 | 47.2 |  |  |  |
+| 21 | 499.996 | 38.65 | 47.0546 |  |  |  |
 ## Aspherical Data
 | ID  | Type | k   | P1 | P2 | P3 | P4 | P5 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -46,7 +46,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ---       | ---   |
 | effective_focal_length |51.992
 | back_focal_length | 38.707
-| optical_invariant | 10.823
+| optical_invariant | 10.821
 | object_distance | 1.0E10
 | image_distance | 38.707
 | power | 0.019
@@ -55,9 +55,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ffl_F | 27.543
 | fno | 1
 | enp_dist_P | 36.309
-| enp_radius | 26
+| enp_radius | 25.996
 | exp_dist_P' | -269.606
-| exp_radius | 154.206
+| exp_radius | 154.185
 | m | -0
 | red | -1.923364232511164E8
 | n_obj | 1
@@ -69,16 +69,16 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius (µm) | Spot Max Radius (µm) |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 20.083 | 59.783|
- | Field(x=0.0, y=0.1) | 24.576 | 100.412|
- | Field(x=0.0, y=0.2) | 29.001 | 125.573|
- | Field(x=0.0, y=0.3) | 29.31 | 135.116|
- | Field(x=0.0, y=0.4) | 29.726 | 146.823|
+ | Field(x=0.0, y=0.0) | 20.072 | 59.663|
+ | Field(x=0.0, y=0.1) | 24.412 | 100.444|
+ | Field(x=0.0, y=0.2) | 28.97 | 125.55|
+ | Field(x=0.0, y=0.3) | 29.295 | 135.062|
+ | Field(x=0.0, y=0.4) | 29.716 | 146.823|
  | Field(x=0.0, y=0.5) | 30.464 | 153.163|
  | Field(x=0.0, y=0.6) | 32.679 | 172.341|
  | Field(x=0.0, y=0.7) | 38.292 | 189.076|
  | Field(x=0.0, y=0.8) | 45.413 | 188.203|
- | Field(x=0.0, y=0.9) | 50.528 | 169.56|
+ | Field(x=0.0, y=0.9) | 50.519 | 169.56|
  | Field(x=0.0, y=1.0) | 48.103 | 132.279|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
@@ -94,6 +94,6 @@ Note that where glass types are shown the refractive index and abbe number is as
 * [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./US004717245_Example02a.zmx)
 
-Generated from `US004717245_Example02a.txt`, status **TODO**
+Generated from `US004717245_Example02a.txt`, status **Accepted**
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-10-02
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-10-13

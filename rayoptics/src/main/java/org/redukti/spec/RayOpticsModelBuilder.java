@@ -5,6 +5,8 @@ package org.redukti.spec;
 
 import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
 import org.redukti.rayoptics.elem.profiles.RadialPolynomial;
+import org.redukti.rayoptics.elem.surface.Surface;
+import org.redukti.rayoptics.layout.ElementModel;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.Trace;
 import org.redukti.rayoptics.raytr.VigCalc;
@@ -124,6 +126,10 @@ public class RayOpticsModelBuilder {
             else
                 sm.ifcs.get(sm.cur_surface).profile = new EvenPolynomial().r(s.get_radius_of_curvature()).cc(s.get_cc()).coefs(s.get_aspheric_coeffs());
         }
+        // Label field stops so the layout identifies them without relying on
+        // the surface geometry.
+        if (s.is_field_stop() && sm.ifcs.get(sm.cur_surface) instanceof Surface surface)
+            surface.label = ElementModel.FIELD_STOP_LABEL;
         if (s.is_aperture_stop()) sm.set_stop();
     }
 }

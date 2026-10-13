@@ -8,6 +8,7 @@ import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.seq.Air;
 import org.redukti.rayoptics.seq.Gap;
 import org.redukti.rayoptics.seq.InteractMode;
+import org.redukti.rayoptics.seq.Interface;
 import org.redukti.rayoptics.seq.SequentialModel;
 
 import java.util.ArrayList;
@@ -15,6 +16,9 @@ import java.util.List;
 
 /** Static physical-element view of a sequential optical model. */
 public final class ElementModel {
+    /** Surface label that marks a field stop. */
+    public static final String FIELD_STOP_LABEL = "FS";
+
     private final OpticalModel opticalModel;
     private List<Element> elements = List.of();
 
@@ -37,7 +41,7 @@ public final class ElementModel {
             }
             if (sm.stop_surface != null && sm.stop_surface == i) {
                 next.add(new Stop(i, ifc));
-            } else if (isAperture(sm, i, wvl)) {
+            } else if (isFieldStop(ifc) || isAperture(sm, i, wvl)) {
                 next.add(new Aperture(i, ifc));
             }
         }
@@ -85,9 +89,15 @@ public final class ElementModel {
         return ifc.interact_mode != InteractMode.REFLECT
                 && ifc.profile != null
                 && Math.abs(ifc.profile.cv) < 1.0e-12
-                && Math.abs(followingGap.thi) < 1.0e-12
+                && isAir(precedingGap, wavelength)
                 && isAir(followingGap, wavelength);
     }
+
+    /** Returns true for a field stop explicitly identified by the prescription builder. */
+    static boolean isFieldStop(Interface ifc) {
+        return ifc instanceof Surface surface && FIELD_STOP_LABEL.equals(surface.label);
+    }
+
     public List<Element> elements() { return elements; }
 
     public static boolean isAir(Gap gap, double wavelength) {

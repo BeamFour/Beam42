@@ -3,6 +3,7 @@ package org.redukti.rayoptics.layout;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
+import org.redukti.rayoptics.elem.surface.Surface;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.VigCalc;
 import org.redukti.rayoptics.seq.SequentialModel;
@@ -39,6 +40,51 @@ public class Layout2DTest {
         Assertions.assertThrows(UnsupportedOperationException.class,
                 () -> elements.elements().add(new AirGap(0, model.seq_model.gaps.get(0))));
     }
+
+    @Test
+    public void identifiesPlanarAirToAirAperturesRegardlessOfFollowingThickness() {
+        OpticalModel model = withNonStopAperture(1.5);
+        SequentialModel sm = model.seq_model;
+        double wavelength = sm.central_wavelength();
+        int aperture = 3;
+
+        Assertions.assertNotEquals(aperture, sm.stop_surface.intValue());
+        Assertions.assertEquals(1.5, sm.gaps.get(aperture).thi);
+        Assertions.assertTrue(ElementModel.isAperture(sm, aperture, wavelength));
+        List<Aperture> apertures = new ElementModel(model).elements().stream()
+                .filter(Aperture.class::isInstance)
+                .map(Aperture.class::cast)
+                .toList();
+        Assertions.assertEquals(1, apertures.size());
+        Assertions.assertEquals(aperture, apertures.get(0).surfaceIndex());
+    }
+
+    @Test
+    public void rejectsPlanarSurfacesBoundedByGlass() {
+        OpticalModel model = leicaSummicron();
+        SequentialModel sm = model.seq_model;
+        double wavelength = sm.central_wavelength();
+
+        // Surface 4 is a planar cemented interface, surface 10 a planar air-to-glass face.
+        Assertions.assertFalse(ElementModel.isAperture(sm, 4, wavelength));
+        Assertions.assertFalse(ElementModel.isAperture(sm, 10, wavelength));
+
+        // A planar glass-to-air face is not an aperture even with a zero following airspace.
+        sm.ifcs.get(5).profile.cv = 0.0;
+        sm.gaps.get(5).thi = 0.0;
+        Assertions.assertFalse(ElementModel.isAperture(sm, 5, wavelength));
+    }
+
+    @Test
+    public void identifiesLabelledFieldStops() {
+        OpticalModel model = leicaSummicron();
+        Surface surface = (Surface) model.seq_model.ifcs.get(5);
+
+        Assertions.assertFalse(ElementModel.isFieldStop(surface));
+        surface.label = ElementModel.FIELD_STOP_LABEL;
+        Assertions.assertTrue(ElementModel.isFieldStop(surface));
+    }
+
     @Test
     public void groupsConsecutiveGlassGapsIntoCementedElements() {
         ElementModel elements = new ElementModel(leicaSummicron());
@@ -176,15 +222,15 @@ public class Layout2DTest {
         model.update_model();
         return model;
     }
-    private static OpticalModel withNonStopAperture() {
+    private static OpticalModel withNonStopAperture(double thickness) {
         OpticalModel model = leicaSummicron();
         SequentialModel sm = model.seq_model;
-        sm.set_cur_surface(sm.get_num_surfaces() - 2);
-        sm.add_surface(new SurfaceData(0.0, 0.0).max_aperture(7.0));
+        // Inserted in the airspace behind the first element, as surface 3.
+        sm.set_cur_surface(2);
+        sm.add_surface(new SurfaceData(0.0, thickness).max_aperture(13.0));
         model.update_model();
         VigCalc.set_pupil(model);
         model.update_model();
-        System.out.println(model.seq_model.list_surfaces(new StringBuilder()).toString());
         return model;
     }
     private static OpticalModel nikkorWideZoom() {

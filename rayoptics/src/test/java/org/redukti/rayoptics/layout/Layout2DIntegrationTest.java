@@ -10,6 +10,8 @@ import org.redukti.spec.VigType;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class Layout2DIntegrationTest {
 
     static OpticalBenchDataImporter.LensSpecifications getSpecsFromFile(String specfile) throws Exception {
@@ -53,5 +55,21 @@ public class Layout2DIntegrationTest {
     public void testLeica35mmNoctilux() throws Exception {
         OpticalModel model = createFromSpecfile("../Examples/jfotoptix/leica-m-35mm-f1.2/prescription.txt");
         doLayout(model,"leica-ex1");
+    }
+
+    @Test
+    public void rendersExplicitFieldStopsWithFollowingAirspaces() throws Exception {
+        OpticalModel model = createFromSpecfile(
+                "../Examples/jfotoptix/canon-rf35mm-f1.4L/US20240302626_Example02.txt");
+        ElementModel elementModel = new ElementModel(model);
+
+        var apertures = elementModel.elements().stream()
+                .filter(Aperture.class::isInstance)
+                .map(Aperture.class::cast)
+                .toList();
+        assertEquals(2, apertures.size());
+        assertEquals(10, apertures.get(0).surfaceIndex());
+        assertEquals(19, apertures.get(1).surfaceIndex());
+        doLayout(model, "canon-rf35mm-f1.4L");
     }
 }

@@ -1,8 +1,5 @@
 [descriptive data]
 title	US 2024/0302626 Example 2
-#patent	country	number	example	year	inventors	org	link
-patent	US	US20240302626	EX 2	2023	Takashi Ode,Takahiro Hatada	Canon Inc	https://patents.google.com/patent/US20240302626A1/en
-lens name	Canon RF 35mm f1.4L
 [constants]
 [variable distances]
 Focal Length	34.0
@@ -64,3 +61,15 @@ originY	366.92
 ppmm	10.712
 [notes]
 Bill: Patent diameters including AD.
+[patent info]
+country	US
+number	US20240302626
+example	EX 2
+year applied	2023
+inventors	Takashi Ode,Takahiro Hatada
+current assignee	Canon Inc
+original assignee	Canon Inc
+link	https://patents.google.com/patent/US20240302626A1/en
+[report data]
+lens name	Canon RF 35mm f1.4L
+status	Accepted

@@ -36,3 +36,15 @@ ppmm	20.853
 [notes]
 Bill: Measured d0.
 https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S59-121015/11/en
+[patent info]
+country	JP
+number	JP1984-121015
+example	EX 1
+year applied	1982
+inventors	MATSUI YASUSHI
+current assignee	NIPPON KOGAKU KK
+original assignee	NIPPON KOGAKU KK
+link	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S59-121015/11/en
+[report data]
+lens name	Nikkor 50mm F1.4 (Prototype)
+status	Accepted

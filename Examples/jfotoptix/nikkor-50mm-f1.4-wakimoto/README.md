@@ -83,4 +83,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 
 Generated from `US003560079_Example02.txt`, status **Accepted**
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-10-04
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-10-17

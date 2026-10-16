@@ -26,9 +26,6 @@ Bf	37.21
 12	79.455	3.1	1.713	36.0	53.9	LAC8	Hoya
 13	-445.14	Bf		36.0
 [figure]
-[notes]
-Diameters based on Modern Lens Design
-Bf adjusted from 37.21 to 37.15
 [patent info]
 country	US
 number	US3560079

@@ -24,7 +24,7 @@
 </g>
 </defs>
 <polygon fill="none" stroke="#ffffff" points="66.032,573.968 66.032,66.032 573.968,66.032 573.968,573.968 " />
-<text style="font-size:12;text-align:center;text-anchor:middle;" x="320" y="629.492" fill="#ffffff">Sagittal distance (mm)</text>
+<text style="font-size:12;text-align:center;text-anchor:middle;" x="320" y="629.492" fill="#ffffff">Sagittal distance (um)</text>
 <use x="150.688" y="66.032" xlink:href="#cross"  stroke="#ffffff" />
 <use x="150.688" y="573.968" xlink:href="#cross"  stroke="#ffffff" />
 <text style="font-size:12;text-align:center;text-anchor:middle;" x="150.688" y="591.968" fill="#ffffff">-400</text>
@@ -34,7 +34,7 @@
 <use x="489.312" y="66.032" xlink:href="#cross"  stroke="#ffffff" />
 <use x="489.312" y="573.968" xlink:href="#cross"  stroke="#ffffff" />
 <text style="font-size:12;text-align:center;text-anchor:middle;" x="489.312" y="591.968" fill="#ffffff">400</text>
-<text style="font-size:12;text-align:center;text-anchor:middle;" x="16.508" y="326" transform="rotate(-90,16.508,320)" fill="#ffffff">Tangential distance (mm)</text>
+<text style="font-size:12;text-align:center;text-anchor:middle;" x="16.508" y="326" transform="rotate(-90,16.508,320)" fill="#ffffff">Tangential distance (um)</text>
 <use x="573.968" y="489.312" xlink:href="#cross"  stroke="#ffffff" />
 <use x="66.032" y="489.312" xlink:href="#cross"  stroke="#ffffff" />
 <text style="font-size:12;text-align:right;text-anchor:end;" x="60.032" y="495.312" fill="#ffffff">-400</text>
@@ -1352,7 +1352,7 @@
 <use x="398.045" y="340.276" xlink:href="#dot"  stroke="#00ebff" />
 <use x="397.383" y="345.747" xlink:href="#dot"  stroke="#00ebff" />
 <use x="396.552" y="350.897" xlink:href="#dot"  stroke="#00ebff" />
-<use x="395.541" y="355.655" xlink:href="#dot"  stroke="#00ebff" />
+<use x="395.542" y="355.655" xlink:href="#dot"  stroke="#00ebff" />
 <use x="394.327" y="359.96" xlink:href="#dot"  stroke="#00ebff" />
 <use x="392.878" y="363.759" xlink:href="#dot"  stroke="#00ebff" />
 <use x="391.166" y="367.007" xlink:href="#dot"  stroke="#00ebff" />
@@ -1402,7 +1402,7 @@
 <use x="248.834" y="367.007" xlink:href="#dot"  stroke="#00ebff" />
 <use x="247.122" y="363.759" xlink:href="#dot"  stroke="#00ebff" />
 <use x="245.673" y="359.96" xlink:href="#dot"  stroke="#00ebff" />
-<use x="244.459" y="355.655" xlink:href="#dot"  stroke="#00ebff" />
+<use x="244.458" y="355.655" xlink:href="#dot"  stroke="#00ebff" />
 <use x="243.448" y="350.897" xlink:href="#dot"  stroke="#00ebff" />
 <use x="242.617" y="345.747" xlink:href="#dot"  stroke="#00ebff" />
 <use x="241.955" y="340.276" xlink:href="#dot"  stroke="#00ebff" />
@@ -2707,7 +2707,7 @@
 <use x="316.319" y="268.225" xlink:href="#dot"  stroke="#ff0000" />
 <use x="318.185" y="268.544" xlink:href="#dot"  stroke="#ff0000" />
 <use x="320" y="280.706" xlink:href="#dot"  stroke="#ff0000" />
-<use x="321.242" y="280.62" xlink:href="#dot"  stroke="#ff0000" />
+<use x="321.242" y="280.619" xlink:href="#dot"  stroke="#ff0000" />
 <use x="322.53" y="280.363" xlink:href="#dot"  stroke="#ff0000" />
 <use x="323.909" y="279.945" xlink:href="#dot"  stroke="#ff0000" />
 <use x="325.422" y="279.384" xlink:href="#dot"  stroke="#ff0000" />
@@ -2819,7 +2819,7 @@
 <use x="314.578" y="279.384" xlink:href="#dot"  stroke="#ff0000" />
 <use x="316.091" y="279.945" xlink:href="#dot"  stroke="#ff0000" />
 <use x="317.47" y="280.363" xlink:href="#dot"  stroke="#ff0000" />
-<use x="318.758" y="280.62" xlink:href="#dot"  stroke="#ff0000" />
+<use x="318.758" y="280.619" xlink:href="#dot"  stroke="#ff0000" />
 <use x="320" y="290.277" xlink:href="#dot"  stroke="#ff0000" />
 <use x="320.766" y="290.207" xlink:href="#dot"  stroke="#ff0000" />
 <use x="321.575" y="290.001" xlink:href="#dot"  stroke="#ff0000" />

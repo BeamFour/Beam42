@@ -18,7 +18,7 @@ The project has two fairly independent components:
 * It features a number of extensions on top of the upstream project.
 * Can import lens specifications in the format supported by [PhotonsToPhotos Optical Bench](https://www.photonstophotos.net/GeneralTopics/Lenses/OpticalBench/OpticalBenchHub.htm).
 * Can export to Zemax, BEAM FOUR, MJH Ray Optics.
-* Features a command line tool that takes in the lens specification and generates the following outputs:
+* Features [a command line tool](Documentation/LENSTOOL2.md) that takes in the lens specification and generates the following outputs:
     * Spot diagrams (SVG)
     * Layout diagrams (SVG)
     * Geometric MTF by Field plots (SVG)
@@ -28,7 +28,7 @@ The project has two fairly independent components:
     * Zemax file
     * A markdown README that brings together all of the above
     * For examples see links below.
-* Features an optimizer with the following features
+* Features [an optimizer](Documentation/OPTIMIZER.md) with the following capabilities:
     * Set variables on surface properties, widths. Aspherics are supported.
     * Set goals targeting MTF, ray aberrations or spot sizes.
     * Constrain by paraxial parameters.
@@ -63,14 +63,17 @@ These are a small selection. The [Examples folder](https://github.com/BeamFour/B
 holds generated reports for many more lenses.
 
 
-## Resources
+## Beam42 Resources
 
 * [LensTool2 command line tool](Documentation/LENSTOOL2.md) - options, input format and generated outputs.
-* [Optimizer](Documentation/OPTIMIZER.md) - what an optimization run aims at, and how to describe one in the prescription file.
-* [Glass catalogs](Documentation/GLASS_CATALOGS.md) - every glass Beam42 knows about.
+* [LensTool2 Optimizer](Documentation/OPTIMIZER.md) - describes how to set up optimization runs in the prescription file.
+* [Glass catalogs](Documentation/GLASS_CATALOGS.md) - glass catalogs used by Beam42.
 * [rayoptics-cpp](https://github.com/BeamFour/rayoptics-cpp) - a faithful C++ port of the Java RayOptics module, maintained using LLMs.
 * [r/LensPatents](https://www.reddit.com/r/LensPatents/) - a related Reddit forum on lens patents and designs.
-* [Introduction to BeamFour (YouTube)](https://youtu.be/-buXsCqEnq8)
+
+## BeamFour resources
+
+* [Introduction to BeamFour (YouTube)](https://youtu.be/-buXsCqEnq8) 
   
 ### Literature
 

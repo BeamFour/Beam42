@@ -1,0 +1,40 @@
+[descriptive data]
+title	JP 1983-014810 Example 1
+[constants]
+[variable distances]
+Focal Length	350	339.679	309.687
+Angle of View	7.2	undefined	undefined
+F-Number	2.8	undefined	undefined
+Image Height	43.2	43.2	43.2
+Magnification	0	-0.11163	-0.18369
+S	Infinity	3500	2100
+d0	Infinity	3407.39	2094.015
+d6	71.827	80.322	101.763
+d9	10.535	7.441	7.000
+d9AS	6.035	2.941	2.500
+d11	32.232	21.287	7.000
+Bf(p)	undefined	undefined	undefined
+Bf	146.43	169.52	146.48
+[lens data]
+1	198.240	17.455	1.49700	125.24	81.6
+2	-562.268	1.138		125.24
+3	153.727	18.592	1.49700	117.67	81.6
+4	-647.322	4.130		117.67
+5	-454.069	8.365	1.68893	111.86	31.1
+6	391.622	d6		111.86
+7	-406.326	7.539	1.72151	66.47	29.2
+8	-99.351	4.235	1.56883	66.47	56.3
+9	358.008	d9AS		61.82
+9AS	AS	4.50		59.399
+10	-560.536	4.337	1.56883	57.88	56.5
+11	91.560	d11		57.88
+12	339.815	4.029	1.68893	55.06	31.1
+13	113.817	8.264	1.69680	55.06	55.5
+14	-178.234	Bf		55.06
+[figure]
+source	Data/JP1983-014810_Figure01.png
+originX	207.69
+originY	382.69
+ppmm	4.473
+[notes]
+Bill: Measured Magnification and d0

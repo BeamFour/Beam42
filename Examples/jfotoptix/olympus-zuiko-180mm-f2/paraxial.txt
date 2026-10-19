@@ -1,24 +1,24 @@
-efl               188.3
-f                 188.3
-f'                188.3
-ffl              -77.73
-pp1               110.5
-bfl               59.50
-ppk              -128.8
-pp sep           -81.52
-f/#               2.092
-m            -1.883e-08
-red          -5.311e+07
+efl               179.9
+f                 179.9
+f'                179.9
+ffl              -55.59
+pp1               124.3
+bfl               55.44
+ppk              -124.4
+pp sep           -91.06
+f/#               2.000
+m            -1.799e-08
+red          -5.560e+07
 obj_dist      1.000e+10
 obj_ang           6.850
-enp_dist          231.6
-enp_radius        45.01
-na obj        4.501e-09
+enp_dist          238.0
+enp_radius        44.96
+na obj        4.496e-09
 n obj             1.000
-img_dist          59.50
-img_ht            22.62
-exp_dist         -55.18
-exp_radius        27.39
-na img          -0.2325
+img_dist          55.44
+img_ht            21.61
+exp_dist         -54.69
+exp_radius        27.55
+na img          -0.2500
 n img             1.000
-optical invariant        5.407
+optical invariant        5.402

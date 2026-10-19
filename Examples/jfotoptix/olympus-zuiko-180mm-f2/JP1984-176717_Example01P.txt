@@ -10,12 +10,12 @@ Image Height	43.272	43.272	43.272
 Magnification	0	-0.03357	-0.10259
 S	Infinity	5490	1854
 d0	Infinity	5458.98	1850.66
-d8	17.586	21.654	30.114
-d10	8.244	8.622	10.152
+d8	18.2626	21.654	30.114
+d10	8.4897	8.622	10.152
 d13	39.708	35.64	25.632
-d13AS	30.708	26.64	16.632
+d13AS	29.6037	26.64	16.632
 Bf(p)	undefined	undefined	undefined
-Bf	59.59	56.63	56.63
+Bf	55.3749	56.63	56.63
 [lens data]
 1	88.299	18.59	1.49700	90.03	81.61	FCD1
 2	-549.108	0.36		90.03
@@ -47,4 +47,26 @@ originX	33.45
 originY	200.03
 ppmm	3.366
 [notes]
-Bill: d0 and Magnification measured. 
+Bill: d0 and Magnification measured.
+[patent info]
+country	JP
+number	JP,59-176717,A(1984)
+example	1
+year applied	1983
+inventors	IMAIZUMI MASAKI
+current assignee	Olympus Optical Co Ltd
+original assignee	Olympus Optical Co Ltd
+link	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-S59-176717/11/en
+[report data]
+lens name	Olympus Zuiko Auto-T 180mm F2
+status	Accepted
+[trial 1]
+description	optimize var distances
+fields                0 to 1 step 0.1
+wavelengths           d F C
+vignetting            set-vig frozen
+vary thicknesses      7 9 13 18
+goal contrast         30
+goal contrast         balance  all
+goal contrast         sampling 6 12
+outdir	              try1

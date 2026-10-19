@@ -60,3 +60,21 @@ original assignee	Olympus Optical Co Ltd
 link	https://patents.google.com/patent/US4534626A/en
 [report data]
 lens name	Olympus Zuiko 250mm f2
+status	Candidate
+[trial 1]
+description           optimize var distances
+outdir                try1
+configuration         0
+fields                0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+wavelengths           d F C
+vignetting            set-vig frozen
+vary thicknesses      7 10 13 21
+goal contrast         50
+goal contrast         sag 16 8 4 4 2 1 1 1 1 1 1
+goal contrast         tan 16 8 4 4 2 1 1 1 1 1 1
+goal contrast         balance all weight 0.1
+goal contrast         sampling 6 12
+goal contrast         calibrate no
+goal contrast         exit-pupil-aiming no
+goal contrast         centering no
+goal ray-aberrations  no

@@ -32,11 +32,15 @@ section 4.6 (Cambridge University Press, 2007).
 `GaussQ.gauss_legendre_nodes_and_weights_golub_welsch` provides an independent
 implementation using the symmetric tridiagonal Jacobi matrix. It ports the
 Legendre path of the public-domain `gaussq.f` routine distributed in Netlib's
-Golden Oldies collection. The method is described by G. H. Golub and J. H.
-Welsch, [Calculation of Gauss Quadrature
+Golden Oldies collection. The routine implements the construction by G. H.
+Golub and J. H. Welsch, [Calculation of Gauss Quadrature
 Rules](https://doi.org/10.1090/S0025-5718-69-99647-1), *Mathematics of
-Computation* **23**, 221-230 (1969). Both implementations return nodes in
-ascending order and unnormalized weights whose sum is two.
+Computation* **23**, 221-230 (1969): the quadrature nodes are the eigenvalues
+of the Jacobi matrix and each weight is the zeroth moment times the square of
+the first component of the corresponding normalized eigenvector. Netlib uses
+an EISPACK-derived implicit QL eigensolver in place of the paper's shifted QR
+procedure. Both implementations return nodes in ascending order and
+unnormalized weights whose sum is two.
 
 The paper's Figure 1 labels its innermost three-ring radius `0.3535`, but its
 equation (4) gives `0.3357`; the implementation follows the equation.

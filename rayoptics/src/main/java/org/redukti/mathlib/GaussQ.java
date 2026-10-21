@@ -8,6 +8,10 @@
  * The alternative implementation is a Java port of the Legendre, no-fixed-
  * endpoint path through gaussq.f from Netlib's "go" (Golden Oldies)
  * collection: https://netlib.org/go/gaussq.f
+ * The Jacobi-matrix construction and the calculation of weights from the first
+ * eigenvector components are the Golub-Welsch algorithm in reference 1. The
+ * Netlib routine replaces that paper's shifted QR procedure with GAUSQ2, a
+ * modified EISPACK IMTQL2 implicit QL eigensolver.
  *
  * Original gaussq.f notices:
  *

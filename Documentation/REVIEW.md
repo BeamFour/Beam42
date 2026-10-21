@@ -49,8 +49,8 @@ Line references are as of 2026-08-15.
 | [ContrastAnalysis.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysis.java) | frequency → pupil shear, wavefront-difference sampling, frequency calibration |
 | [ContrastAnalysisResult.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysisResult.java) | sample/residual container |
 | [ContrastOptions.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastOptions.java) | sampling configuration |
-| [Trace.java:755](../rayoptics/src/main/java/org/redukti/rayoptics/raytr/Trace.java:755) | `trace_contrast` — overlap region and ray triplets |
-| [SequentialModel.java:924](../rayoptics/src/main/java/org/redukti/rayoptics/seq/SequentialModel.java:924) | per-wavelength chief ray / reference sphere setup |
+| [ContrastAnalysis.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysis.java) | `trace_triplets` — overlap region and ray triplets (was `Trace.trace_contrast`) |
+| [ContrastAnalysis.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysis.java) | `trace_by_wavelength` — per-wavelength chief ray / reference sphere setup (was `SequentialModel.trace_contrast`) |
 | [GoalContrast.java](../optimcommon/src/main/java/org/redukti/optim/GoalContrast.java) | one residual per (freq, field, wavelength, sample, orientation) |
 | [Analysis.java:126](../optimcommon/src/main/java/org/redukti/optim/Analysis.java:126) | analysis driver — one `ContrastAnalysis.eval` per frequency |
 | [OptimizationBuilder.java:544](../optimr2/src/main/java/org/redukti/optim/OptimizationBuilder.java:544) | contrast goal construction |
@@ -1241,7 +1241,7 @@ assumed to carry to other designs; direct aiming has no such dependence.
 - **`traced.get(0)`** in `ContrastAnalysis.eval` assumes exactly one wavelength came
   back. True because `wavelengthIndex` is non-null, but brittle.
 
-- **`SequentialModel.trace_contrast` leaves `field.chief_ray` / `field.ref_sphere`**
+- **`ContrastAnalysis.trace_by_wavelength` leaves `field.chief_ray` / `field.ref_sphere`**
   pointing at the last wavelength's values. Contrast runs last in `Analysis.compute()`,
   so anything reading that shared state afterwards sees a contrast leftover.
 

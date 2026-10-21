@@ -10,7 +10,16 @@ public class SpotIntercepts {
     public final double wvl;
     public final double[] x;
     public final double[] y;
+    /**
+     * Normally the weights are 1.0 except for
+     * gaussian quadrature pattern
+     */
     public final double[] weights;
+    /**
+     * We need to preserve all ray results
+     * to maintain correct positions in the arrays.
+     * We mark the failed ones as not valid
+     */
     public final boolean[] valid;
 
     public SpotIntercepts(TraceGridByWvl trace_data) {

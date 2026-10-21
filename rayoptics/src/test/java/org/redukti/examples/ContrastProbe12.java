@@ -54,7 +54,7 @@ public class ContrastProbe12 {
                 var pc = Trace.setup_pupil_coords(m, fld, wvl, focus, null, null);
                 fld.chief_ray = pc.chief_ray_pkg;
                 fld.ref_sphere = pc.ref_sphere;
-                var triplets = Trace.trace_contrast(m, def, 12,
+                var triplets = ContrastAnalysis.trace_triplets(m, def, 12,
                         new Vector2(shift, 0.0), new Vector2(0.0, shift),
                         fld, wvl, new TraceOptions());
 

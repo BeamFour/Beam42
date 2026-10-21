@@ -2,7 +2,6 @@ package org.redukti.rayoptics.analysis;
 
 import org.junit.jupiter.api.Test;
 import org.redukti.mathlib.Vector2;
-import org.redukti.rayoptics.raytr.ExitPupilAiming;
 import org.redukti.rayoptics.raytr.Trace;
 import org.redukti.rayoptics.raytr.TraceOptions;
 import org.redukti.rayoptics.util.Orientation;
@@ -24,7 +23,8 @@ class ContrastAnalysisTest {
         double wavelength = model.optical_spec.wvls.wavelengths[wavelengthIndex];
         double normalizedShift = ContrastAnalysis.normalized_entry_pupil_shift(
                 model, wavelength, 40.0);
-        var traced = model.seq_model.trace_contrast(
+        var traced = ContrastAnalysis.trace_by_wavelength(
+                model,
                 (rays, field, wvl, focus) -> {
                     assertNull(rays.referenceError());
                     assertNull(rays.sagittalError());

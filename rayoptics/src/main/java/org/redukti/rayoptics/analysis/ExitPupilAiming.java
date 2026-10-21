@@ -1,13 +1,14 @@
 // This code is part of Beam42 project (https://github.com/BeamFour/Beam42)
 // Copyright 2025-2026 by Dibyendu Majumdar
 // License GPL v3
-package org.redukti.rayoptics.raytr;
+package org.redukti.rayoptics.analysis;
 
 import org.redukti.mathlib.M;
 import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.exceptions.TraceException;
 import org.redukti.rayoptics.optical.OpticalModel;
+import org.redukti.rayoptics.raytr.*;
 import org.redukti.rayoptics.specs.Field;
 
 /** Inverse entrance-to-exit-pupil mapping used by contrast tracing. */

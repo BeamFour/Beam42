@@ -33,7 +33,7 @@ public class ContrastProbe13 {
         def.num_rings = 6;
         var sag = axis == 0 ? new Vector2(applied, 0) : Vector2.vector2_0;
         var tan = axis == 0 ? Vector2.vector2_0 : new Vector2(0, applied);
-        var triplets = Trace.trace_contrast(m, def, 12, sag, tan, f, wvl, to);
+        var triplets = ContrastAnalysis.trace_triplets(m, def, 12, sag, tan, f, wvl, to);
         double sum = 0;
         int n = 0;
         for (var t : triplets) {

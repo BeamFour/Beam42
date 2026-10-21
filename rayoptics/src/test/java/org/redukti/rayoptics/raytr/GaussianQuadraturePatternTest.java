@@ -2,6 +2,7 @@ package org.redukti.rayoptics.raytr;
 
 import org.junit.jupiter.api.Test;
 import org.redukti.mathlib.Vector2;
+import org.redukti.rayoptics.analysis.ContrastAnalysis;
 import org.redukti.rayoptics.specs.Field;
 
 import java.util.List;
@@ -16,18 +17,18 @@ class GaussianQuadraturePatternTest {
     void generatesRequestedNumberOfRingsAndSpokes() {
         TraceRingsDef definition = new TraceRingsDef();
 
-        List<Trace.GaussianQuadraturePoint> points =
+        List<GaussianQuadraturePoint> points =
                 Trace.generate_gaussian_quadrature(definition, 3, 8);
 
         assertEquals(24, points.size());
-        assertEquals(1.0, points.stream().mapToDouble(Trace.GaussianQuadraturePoint::weight).sum(), 1.0e-14);
+        assertEquals(1.0, points.stream().mapToDouble(GaussianQuadraturePoint::weight).sum(), 1.0e-14);
     }
 
     @Test
     void usesOptilandDefaultSpokeCount() {
         TraceRingsDef definition = new TraceRingsDef();
 
-        List<Trace.GaussianQuadraturePoint> points =
+        List<GaussianQuadraturePoint> points =
                 Trace.generate_gaussian_quadrature(definition, 3, null);
 
         assertEquals(3 * 4 * (3 + 1), points.size());
@@ -36,7 +37,7 @@ class GaussianQuadraturePatternTest {
     @Test
     void integratesLowOrderDiskMoments() {
         TraceRingsDef definition = new TraceRingsDef();
-        List<Trace.GaussianQuadraturePoint> points =
+        List<GaussianQuadraturePoint> points =
                 Trace.generate_gaussian_quadrature(definition, 3, null);
 
         double meanX = weightedMoment(points, 1, 0);
@@ -59,7 +60,7 @@ class GaussianQuadraturePatternTest {
     void integratesLowOrderAnnularMoments() {
         TraceRingsDef definition = new TraceRingsDef();
         definition.min_radius = 0.5;
-        List<Trace.GaussianQuadraturePoint> points =
+        List<GaussianQuadraturePoint> points =
                 Trace.generate_gaussian_quadrature(definition, 3, 12);
 
         double meanR2 = points.stream().mapToDouble(point -> {
@@ -79,10 +80,10 @@ class GaussianQuadraturePatternTest {
         definition.cy = -3.0;
         definition.max_radius = 0.5;
 
-        List<Trace.GaussianQuadraturePoint> points =
+        List<GaussianQuadraturePoint> points =
                 Trace.generate_gaussian_quadrature(definition, 2, 4);
 
-        for (Trace.GaussianQuadraturePoint point : points) {
+        for (GaussianQuadraturePoint point : points) {
             double x = point.pupil().x - definition.cx;
             double y = point.pupil().y - definition.cy;
             double radius = Math.sqrt(x * x + y * y);
@@ -113,19 +114,19 @@ class GaussianQuadraturePatternTest {
         Vector2 sagittalShift = new Vector2(0.06743, 0.0);
         Vector2 tangentialShift = new Vector2(0.0, 0.06743);
 
-        List<Trace.GaussianQuadraturePoint> points =
-                Trace.generate_contrast_quadrature(
+        List<GaussianQuadraturePoint> points =
+                ContrastAnalysis.generate_quadrature(
                         definition, 6, sagittalShift, tangentialShift, field);
 
         assertEquals(18, points.size());
         assertEquals(1.0,
-                points.stream().mapToDouble(Trace.GaussianQuadraturePoint::weight).sum(),
+                points.stream().mapToDouble(GaussianQuadraturePoint::weight).sum(),
                 1.0e-14);
-        for (Trace.GaussianQuadraturePoint point : points) {
+        for (GaussianQuadraturePoint point : points) {
             Vector2 pupil = point.pupil();
-            assertTrue(Trace.inside_vignetted_pupil(pupil, field));
-            assertTrue(Trace.inside_vignetted_pupil(pupil.plus(sagittalShift), field));
-            assertTrue(Trace.inside_vignetted_pupil(pupil.plus(tangentialShift), field));
+            assertTrue(ContrastAnalysis.inside_vignetted_pupil(pupil, field));
+            assertTrue(ContrastAnalysis.inside_vignetted_pupil(pupil.plus(sagittalShift), field));
+            assertTrue(ContrastAnalysis.inside_vignetted_pupil(pupil.plus(tangentialShift), field));
         }
     }
 
@@ -142,11 +143,11 @@ class GaussianQuadraturePatternTest {
         Field field = asymmetricVignettedField();
         Vector2 tangentialShift = new Vector2(0.0, 0.06743);
 
-        List<Trace.GaussianQuadraturePoint> points =
-                Trace.generate_contrast_quadrature(
+        List<GaussianQuadraturePoint> points =
+                ContrastAnalysis.generate_quadrature(
                         definition, 6, Vector2.vector2_0, tangentialShift, field);
 
-        for (Trace.GaussianQuadraturePoint point : points) {
+        for (GaussianQuadraturePoint point : points) {
             Vector2 pupil = point.pupil();
             double reapplied = vignettedY(field, pupil.plus(tangentialShift))
                     - vignettedY(field, pupil);
@@ -169,16 +170,16 @@ class GaussianQuadraturePatternTest {
         Field field = asymmetricVignettedField();
         Vector2 tangentialShift = new Vector2(0.0, 0.06743);
 
-        List<Trace.GaussianQuadraturePoint> points =
-                Trace.generate_contrast_quadrature(
+        List<GaussianQuadraturePoint> points =
+                ContrastAnalysis.generate_quadrature(
                         definition, 6, Vector2.vector2_0, tangentialShift, field);
 
-        Trace.GaussianQuadraturePoint crossing = points.stream()
+        GaussianQuadraturePoint crossing = points.stream()
                 .filter(point -> point.pupil().y < 0.0
                         && point.pupil().y + tangentialShift.y > 0.0)
                 .findFirst()
                 .orElseThrow();
-        Trace.GaussianQuadraturePoint below = points.stream()
+        GaussianQuadraturePoint below = points.stream()
                 .filter(point -> point.pupil().y + tangentialShift.y < 0.0)
                 .findFirst()
                 .orElseThrow();
@@ -199,18 +200,18 @@ class GaussianQuadraturePatternTest {
         Field field = new Field(null);
 
         // Well inside the pupil: sampled normally.
-        Trace.generate_contrast_quadrature(definition, 6,
+        ContrastAnalysis.generate_quadrature(definition, 6,
                 new Vector2(0.5, 0.0), new Vector2(0.0, 0.5), field);
 
         // The overlap centre is still inside the pupil here, but the pattern
         // would have to collapse onto it, reporting zero wavefront difference.
         assertThrows(IllegalArgumentException.class, () ->
-                Trace.generate_contrast_quadrature(definition, 6,
+                ContrastAnalysis.generate_quadrature(definition, 6,
                         new Vector2(1.41, 0.0), new Vector2(0.0, 1.41), field));
 
         // Beyond the point where even the overlap centre is valid.
         assertThrows(IllegalArgumentException.class, () ->
-                Trace.generate_contrast_quadrature(definition, 6,
+                ContrastAnalysis.generate_quadrature(definition, 6,
                         new Vector2(1.9, 0.0), new Vector2(0.0, 1.9), field));
     }
 
@@ -221,8 +222,8 @@ class GaussianQuadraturePatternTest {
         Field field = asymmetricVignettedField();
         Vector2 shift = new Vector2(0.06743, 0.0);
 
-        List<Trace.GaussianQuadraturePoint> points =
-                Trace.generate_contrast_quadrature(
+        List<GaussianQuadraturePoint> points =
+                ContrastAnalysis.generate_quadrature(
                         definition, 6, shift, new Vector2(0.0, 0.06743), field);
 
         double closest = Double.MAX_VALUE;
@@ -248,7 +249,7 @@ class GaussianQuadraturePatternTest {
         return field;
     }
 
-    private static double weightedMoment(List<Trace.GaussianQuadraturePoint> points, int xPower, int yPower) {
+    private static double weightedMoment(List<GaussianQuadraturePoint> points, int xPower, int yPower) {
         return points.stream().mapToDouble(point -> point.weight()
                 * Math.pow(point.pupil().x, xPower)
                 * Math.pow(point.pupil().y, yPower)).sum();

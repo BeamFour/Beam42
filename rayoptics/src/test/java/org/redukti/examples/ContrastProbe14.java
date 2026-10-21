@@ -13,7 +13,7 @@ import org.redukti.spec.VigType;
  * hypothesis it was written to test.</b> Kept as the record of a ruled-out cause, and
  * because its vignetting-factor table is what led to {@link ContrastProbe15}.
  *
- * <p>The hypothesis was that {@code generate_contrast_quadrature}, which contracts the
+ * <p>The hypothesis was that {@code generate_quadrature}, which contracts the
  * whole pattern by one isotropic scalar until every sample and both of its displaced
  * partners fit, would let the tangential partner drive the contraction on a pupil much
  * shorter in y than x - starving the sagittal sampling in x, where there was room.

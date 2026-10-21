@@ -5,12 +5,12 @@ import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
 import org.redukti.rayoptics.analysis.ContrastAnalysis;
 import org.redukti.rayoptics.analysis.ContrastOptions;
-import org.redukti.rayoptics.raytr.ExitPupilAiming;
+import org.redukti.rayoptics.analysis.ExitPupilAiming;
 import org.redukti.rayoptics.raytr.VigCalc;
 import org.redukti.rayoptics.specs.FieldSpec;
 import org.redukti.rayoptics.specs.ImageKey;
 import org.redukti.rayoptics.specs.ValueKey;
-import org.redukti.rayoptics.raytr.ContrastRayTriplet;
+import org.redukti.rayoptics.analysis.ContrastRayTriplet;
 import org.redukti.rayoptics.raytr.TraceOptions;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.util.Orientation;
@@ -41,7 +41,8 @@ class US003549241Example05Test {
                 double wavelength = model.optical_spec.wvls.wavelengths[wavelengthIndex];
                 double shift = ContrastAnalysis.normalized_entry_pupil_shift(
                         model, wavelength, 20.0);
-                var traced = model.seq_model.trace_contrast(
+                var traced = ContrastAnalysis.trace_by_wavelength(
+                        model,
                         (rays, field, wvl, focus) -> rays,
                         fieldIndex, wavelengthIndex, 6, 12,
                         new Vector2(shift, 0.0), new Vector2(0.0, shift),
@@ -69,11 +70,13 @@ class US003549241Example05Test {
         Vector2 tangentialShift = new Vector2(0.0, normalizedShift);
         Field field = model.optical_spec.fov.fields[fieldIndex];
 
-        var unaimed = model.seq_model.trace_contrast(
+        var unaimed = ContrastAnalysis.trace_by_wavelength(
+                model,
                 US003549241Example05Test::exitPupilSeparations,
                 fieldIndex, wavelengthIndex, 1, 6,
                 sagittalShift, tangentialShift, 40.0, new TraceOptions(), false);
-        var aimed = model.seq_model.trace_contrast(
+        var aimed = ContrastAnalysis.trace_by_wavelength(
+                model,
                 US003549241Example05Test::exitPupilSeparations,
                 fieldIndex, wavelengthIndex, 1, 6,
                 sagittalShift, tangentialShift, 40.0, new TraceOptions(), true);
@@ -83,7 +86,8 @@ class US003549241Example05Test {
                 model, field, wavelength, normalizedShift, Orientation.X, calibrationOptions);
         double tangentialScale = ContrastAnalysis.exit_pupil_frequency_calibration(
                 model, field, wavelength, normalizedShift, Orientation.Y, calibrationOptions);
-        var calibrated = model.seq_model.trace_contrast(
+        var calibrated = ContrastAnalysis.trace_by_wavelength(
+                model,
                 US003549241Example05Test::exitPupilSeparations,
                 fieldIndex, wavelengthIndex, 1, 6,
                 sagittalShift.times(sagittalScale), tangentialShift.times(tangentialScale),

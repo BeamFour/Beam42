@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.redukti.mathlib.Vector3;
 import org.redukti.mathlib.Vector2;
 import org.redukti.rayoptics.analysis.ContrastAnalysis;
+import org.redukti.rayoptics.analysis.ContrastRayTriplet;
+import org.redukti.rayoptics.analysis.ExitPupilAiming;
 import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrderData;
@@ -182,11 +184,13 @@ public class Nikkor14mmTest {
         Vector2 sagittalShift = new Vector2(normalizedShift, 0.0);
         Vector2 tangentialShift = new Vector2(0.0, normalizedShift);
 
-        var unaimed = sm.trace_contrast(
+        var unaimed = ContrastAnalysis.trace_by_wavelength(
+                opm,
                 Nikkor14mmTest::exitPupilSeparations,
                 fieldIndex, wavelengthIndex, 1, 6,
                 sagittalShift, tangentialShift, 40.0, new TraceOptions(), false);
-        var aimed = sm.trace_contrast(
+        var aimed = ContrastAnalysis.trace_by_wavelength(
+                opm,
                 Nikkor14mmTest::exitPupilSeparations,
                 fieldIndex, wavelengthIndex, 1, 6,
                 sagittalShift, tangentialShift, 40.0, new TraceOptions(), true);

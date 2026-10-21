@@ -23,6 +23,11 @@ one, so consumers compute a pupil average rather than the unnormalized integral
 whose area is pi. This normalization does not change centroids, RMS spot radii,
 or normalized geometric MTF.
 
+The paper's Figure 1 labels its innermost three-ring radius `0.3535`, but its
+equation (4) gives `0.3357`; the implementation follows the equation.
+
+## Gauss-Legendre nodes
+
 `GaussQ.gauss_legendre_nodes_and_weights` computes the one-dimensional rule by
 evaluating the Legendre recurrence and refining its roots with Newton's method.
 This follows W. H. Press, S. A. Teukolsky, W. T. Vetterling, and B. P.
@@ -41,9 +46,6 @@ the first component of the corresponding normalized eigenvector. Netlib uses
 an EISPACK-derived implicit QL eigensolver in place of the paper's shifted QR
 procedure. Both implementations return nodes in ascending order and
 unnormalized weights whose sum is two.
-
-The paper's Figure 1 labels its innermost three-ring radius `0.3535`, but its
-equation (4) gives `0.3357`; the implementation follows the equation.
 
 ## Concentric annular pupil
 

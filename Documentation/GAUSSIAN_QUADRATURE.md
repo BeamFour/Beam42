@@ -23,6 +23,21 @@ one, so consumers compute a pupil average rather than the unnormalized integral
 whose area is pi. This normalization does not change centroids, RMS spot radii,
 or normalized geometric MTF.
 
+`GaussQ.gauss_legendre_nodes_and_weights` computes the one-dimensional rule by
+evaluating the Legendre recurrence and refining its roots with Newton's method.
+This follows W. H. Press, S. A. Teukolsky, W. T. Vetterling, and B. P.
+Flannery, *Numerical Recipes: The Art of Scientific Computing*, 3rd ed.,
+section 4.6 (Cambridge University Press, 2007).
+
+`GaussQ.gauss_legendre_nodes_and_weights_golub_welsch` provides an independent
+implementation using the symmetric tridiagonal Jacobi matrix. It ports the
+Legendre path of the public-domain `gaussq.f` routine distributed in Netlib's
+Golden Oldies collection. The method is described by G. H. Golub and J. H.
+Welsch, [Calculation of Gauss Quadrature
+Rules](https://doi.org/10.1090/S0025-5718-69-99647-1), *Mathematics of
+Computation* **23**, 221-230 (1969). Both implementations return nodes in
+ascending order and unnormalized weights whose sum is two.
+
 The paper's Figure 1 labels its innermost three-ring radius `0.3535`, but its
 equation (4) gives `0.3357`; the implementation follows the equation.
 

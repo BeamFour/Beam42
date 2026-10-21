@@ -790,7 +790,7 @@ public class Trace {
         }
 
         int spokes = num_spokes == null ? 4 * (num_rings + 1) : num_spokes;
-        double[][] nodesAndWeights = gauss_legendre_nodes_and_weights(num_rings);
+        double[][] nodesAndWeights = GaussQ.gauss_legendre_nodes_and_weights(num_rings);
         List<GaussianQuadraturePoint> points = new ArrayList<>(num_rings * spokes);
 
         for (int angle = 1; angle <= spokes; angle++) {
@@ -811,42 +811,6 @@ public class Trace {
             }
         }
         return points;
-    }
-
-    /** Computes Gauss-Legendre nodes and weights on [-1, 1]. */
-    private static double[][] gauss_legendre_nodes_and_weights(int order) {
-        double[] nodes = new double[order];
-        double[] weights = new double[order];
-        int rootsToFind = (order + 1) / 2;
-
-        for (int i = 0; i < rootsToFind; i++) {
-            double x = Math.cos(Math.PI * (i + 0.75) / (order + 0.5));
-            double derivative;
-            double delta;
-            do {
-                double p0 = 1.0;
-                double p1 = x;
-                for (int degree = 2; degree <= order; degree++) {
-                    double p2 = ((2.0 * degree - 1.0) * x * p1
-                            - (degree - 1.0) * p0) / degree;
-                    p0 = p1;
-                    p1 = p2;
-                }
-                double polynomial = p1;
-                double previousPolynomial = p0;
-                derivative = order * (x * polynomial - previousPolynomial)
-                        / (x * x - 1.0);
-                delta = polynomial / derivative;
-                x -= delta;
-            } while (Math.abs(delta) > 1.0e-15);
-
-            double weight = 2.0 / ((1.0 - x * x) * derivative * derivative);
-            nodes[i] = -x;
-            nodes[order - 1 - i] = x;
-            weights[i] = weight;
-            weights[order - 1 - i] = weight;
-        }
-        return new double[][]{nodes, weights};
     }
 
     record GaussianQuadraturePoint(Vector2 pupil, double weight) {}

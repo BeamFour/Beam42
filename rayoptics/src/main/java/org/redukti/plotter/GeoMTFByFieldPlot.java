@@ -9,7 +9,7 @@ import org.redukti.data.Interpolation;
 import org.redukti.data.Range;
 import org.redukti.mathlib.M;
 import org.redukti.mathlib.Vector3;
-import org.redukti.rayoptics.analysis.MTFResultByFreq;
+import org.redukti.analysis.MTFResultByFreq;
 import org.redukti.render.plotting.Plot;
 import org.redukti.render.plotting.PlotAxes;
 import org.redukti.render.plotting.PlotData;

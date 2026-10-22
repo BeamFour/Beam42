@@ -1,7 +1,8 @@
 package org.redukti.examples;
 
+import org.redukti.analysis.ContrastAnalysis;
+import org.redukti.analysis.ContrastOptions;
 import org.redukti.optim.Analysis;
-import org.redukti.rayoptics.analysis.*;
 
 /**
  * REVIEW.md &sect;6 — the core evidence.

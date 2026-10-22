@@ -3,6 +3,7 @@
 // License GPL v3
 package org.redukti.optim;
 
+import org.redukti.analysis.*;
 import org.redukti.rayoptics.analysis.*;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.TraceOptions;

@@ -1,8 +1,8 @@
 package org.redukti.examples;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
-import org.redukti.rayoptics.analysis.SpotAnalysis;
-import org.redukti.rayoptics.analysis.SpotOptions;
+import org.redukti.analysis.SpotAnalysis;
+import org.redukti.analysis.SpotOptions;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.RayOpticsModelBuilder;

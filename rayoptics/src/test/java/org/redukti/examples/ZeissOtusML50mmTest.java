@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.redukti.optim.OptimizationBuilder;
 import org.redukti.optim.OptimizationBuilder.OptimizationSetup;
 import org.redukti.optim.ParaxHelper;
-import org.redukti.rayoptics.analysis.SpotOptions;
-import org.redukti.rayoptics.analysis.SpotAnalysis;
+import org.redukti.analysis.SpotOptions;
+import org.redukti.analysis.SpotAnalysis;
 import org.redukti.spec.Prescription;
 
 import java.nio.file.Files;

@@ -3,6 +3,7 @@
 // License GPL v3
 package org.redukti.tools;
 
+import org.redukti.analysis.*;
 import org.redukti.exporters.ZemaxExporter;
 import org.redukti.importers.obench.ObenchFetcher;
 import org.redukti.importers.obench.OpticalBenchDataImporter;

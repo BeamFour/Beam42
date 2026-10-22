@@ -1,7 +1,7 @@
 // This code is part of Beam42 project (https://github.com/BeamFour/Beam42)
 // Copyright 2025-2026 by Dibyendu Majumdar
 // License GPL v3
-package org.redukti.rayoptics.analysis;
+package org.redukti.analysis;
 
 /**
  * Input : Traced rays through the system for a given field point and wavelength. x and y intersections with the image plane.

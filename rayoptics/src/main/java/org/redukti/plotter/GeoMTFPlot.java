@@ -8,7 +8,7 @@ import org.redukti.data.DiscreteSet;
 import org.redukti.data.Interpolation;
 import org.redukti.data.Range;
 import org.redukti.mathlib.Vector3;
-import org.redukti.rayoptics.analysis.MonochromaticGeometricMTF;
+import org.redukti.analysis.MonochromaticGeometricMTF;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.specs.FieldSnapshot;
 import org.redukti.render.plotting.Plot;

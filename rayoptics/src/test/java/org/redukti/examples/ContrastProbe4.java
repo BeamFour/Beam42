@@ -1,7 +1,8 @@
 package org.redukti.examples;
 
+import org.redukti.analysis.ContrastAnalysis;
+import org.redukti.analysis.ContrastOptions;
 import org.redukti.optim.*;
-import org.redukti.rayoptics.analysis.*;
 import org.redukti.spec.Prescription;
 
 import java.util.Arrays;

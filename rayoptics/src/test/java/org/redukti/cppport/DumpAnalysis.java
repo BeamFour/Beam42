@@ -4,11 +4,11 @@
 // See LICENSE-GPL-3.0.txt
 package org.redukti.cppport;
 
-import org.redukti.rayoptics.analysis.ContrastAnalysis;
-import org.redukti.rayoptics.analysis.ContrastOptions;
-import org.redukti.rayoptics.analysis.SpotAnalysis;
-import org.redukti.rayoptics.analysis.SpotAnalysisResult;
-import org.redukti.rayoptics.analysis.SpotOptions;
+import org.redukti.analysis.ContrastAnalysis;
+import org.redukti.analysis.ContrastOptions;
+import org.redukti.analysis.SpotAnalysis;
+import org.redukti.analysis.SpotAnalysisResult;
+import org.redukti.analysis.SpotOptions;
 import org.redukti.rayoptics.analysis.TransverseRayAberrationAnalysis;
 import org.redukti.rayoptics.analysis.WavefrontAberrationAnalysis;
 import org.redukti.rayoptics.optical.OpticalModel;

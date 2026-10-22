@@ -5,7 +5,7 @@ package org.redukti.plotter;
 
 import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector2Pair;
-import org.redukti.rayoptics.analysis.SpotAnalysisResult;
+import org.redukti.analysis.SpotAnalysisResult;
 import org.redukti.render.plotting.PlotAxes;
 import org.redukti.render.plotting.PlotRenderer;
 import org.redukti.render.rendering.Renderer;

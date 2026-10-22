@@ -1,8 +1,8 @@
 package org.redukti.examples;
 
 import org.redukti.mathlib.Vector2;
-import org.redukti.rayoptics.analysis.ContrastAnalysis;
-import org.redukti.rayoptics.analysis.ContrastOptions;
+import org.redukti.analysis.ContrastAnalysis;
+import org.redukti.analysis.ContrastOptions;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.*;
 import org.redukti.rayoptics.specs.Field;

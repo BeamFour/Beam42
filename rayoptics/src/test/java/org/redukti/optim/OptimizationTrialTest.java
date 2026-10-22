@@ -1,6 +1,8 @@
 package org.redukti.optim;
 
 import org.junit.jupiter.api.Test;
+import org.redukti.analysis.ContrastOptions;
+import org.redukti.analysis.SpotOptions;
 import org.redukti.examples.ExampleFinder;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.spec.Prescription;
@@ -143,8 +145,8 @@ class OptimizationTrialTest {
             assertEquals(c.rays(), analysis._compute_ray_aberrations, c.goals());
             assertEquals(c.mtf(), analysis._compute_mtf, c.goals());
             assertEquals(c.hexapolar()
-                            ? org.redukti.rayoptics.analysis.SpotOptions.PATTERN_HEXAPOLAR
-                            : org.redukti.rayoptics.analysis.SpotOptions.PATTERN_GAUSS_QUADRATURE,
+                            ? SpotOptions.PATTERN_HEXAPOLAR
+                            : SpotOptions.PATTERN_GAUSS_QUADRATURE,
                     analysis._spot_pattern, c.goals());
             String written = builder.toTrial(1);
             assertEquals(written, OptimizationTrial.parse(text, 1).toTrial());
@@ -588,7 +590,7 @@ class OptimizationTrialTest {
             assertThrows(IllegalArgumentException.class,
                     () -> OptimizationBuilder.builder(prescription(lens, true, false)).contrastSampling(1, spokes));
             assertThrows(IllegalArgumentException.class,
-                    () -> new org.redukti.rayoptics.analysis.ContrastOptions(20).num_spokes(spokes));
+                    () -> new ContrastOptions(20).num_spokes(spokes));
         }
         assertThrows(OptimizationTrial.TrialException.class,
                 () -> OptimizationTrial.parse(lens + prefix + "goal spot sampling grid 9\n", 1));
@@ -600,7 +602,7 @@ class OptimizationTrialTest {
         setup.analysis().compute();
         assertNotNull(setup.analysis()._spots);
         assertEquals(3, setup.analysis()._contrasts[0].fields.get(0).wavelengths().get(0).samples().size());
-        assertEquals(org.redukti.rayoptics.analysis.SpotOptions.PATTERN_HEXAPOLAR,
+        assertEquals(SpotOptions.PATTERN_HEXAPOLAR,
                 setup.analysis()._spot_pattern);
         var restored = read(lens + builder.toTrial(1));
         assertSameSetup(builder.build(), restored.build());

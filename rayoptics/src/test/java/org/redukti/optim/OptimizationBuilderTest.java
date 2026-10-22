@@ -2,7 +2,7 @@ package org.redukti.optim;
 
 import org.redukti.rayoptics.util.Orientation;
 import org.junit.jupiter.api.Test;
-import org.redukti.rayoptics.analysis.SpotOptions;
+import org.redukti.analysis.SpotOptions;
 import org.redukti.rayoptics.seq.Glass;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.VigType;

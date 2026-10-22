@@ -3,8 +3,8 @@
 // License GPL v3
 package org.redukti.util;
 
-import org.redukti.rayoptics.analysis.PupilMapAnalysis;
-import org.redukti.rayoptics.analysis.SpotOptions;
+import org.redukti.analysis.PupilMapAnalysis;
+import org.redukti.analysis.SpotOptions;
 import org.redukti.spec.VigType;
 
 public final class Args {
@@ -93,7 +93,7 @@ public final class Args {
     /**
      * Write the measured pupil maps beside the other reports: which part of each field's
      * pupil the lens passes, and which surface blocks the rest. See
-     * {@link org.redukti.rayoptics.analysis.PupilMapAnalysis}.
+     * {@link PupilMapAnalysis}.
      */
     public boolean output_pupil_maps = false;
     /** Log the optimizer's progress to the console, one line per iteration. */

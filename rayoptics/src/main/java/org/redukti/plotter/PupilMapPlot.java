@@ -5,9 +5,9 @@ package org.redukti.plotter;
 
 import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector2Pair;
-import org.redukti.rayoptics.analysis.PupilMapAnalysis;
-import org.redukti.rayoptics.analysis.PupilMapAnalysis.PupilMapForField;
-import org.redukti.rayoptics.analysis.PupilMapAnalysis.Sample;
+import org.redukti.analysis.PupilMapAnalysis;
+import org.redukti.analysis.PupilMapAnalysis.PupilMapForField;
+import org.redukti.analysis.PupilMapAnalysis.Sample;
 import org.redukti.render.rendering.Renderer;
 import org.redukti.render.rendering.RendererSvg;
 import org.redukti.render.rendering.Rgb;

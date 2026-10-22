@@ -1,6 +1,6 @@
 package org.redukti.examples;
 
-import org.redukti.rayoptics.analysis.ContrastAnalysis;
+import org.redukti.analysis.ContrastAnalysis;
 
 /**
  * REVIEW.md &sect;1 — proof that vignetting rescales the shear.

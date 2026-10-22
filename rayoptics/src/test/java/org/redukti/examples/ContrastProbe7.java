@@ -1,6 +1,7 @@
 package org.redukti.examples;
 
-import org.redukti.rayoptics.analysis.*;
+import org.redukti.analysis.ContrastAnalysis;
+import org.redukti.analysis.ContrastOptions;
 
 /**
  * INCONCLUSIVE — superseded by {@link ContrastProbe8}. Kept as a record of a dead end.

@@ -1,4 +1,4 @@
-package org.redukti.rayoptics.analysis;
+package org.redukti.analysis;
 
 import org.junit.jupiter.api.Test;
 

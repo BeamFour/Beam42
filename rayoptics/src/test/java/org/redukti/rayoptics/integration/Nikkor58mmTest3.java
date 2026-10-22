@@ -1,12 +1,6 @@
 package org.redukti.rayoptics.integration;
 
 import org.junit.jupiter.api.Test;
-import org.redukti.mathlib.Vector2Pair;
-import org.redukti.mathlib.Vector2;
-import org.redukti.mathlib.Vector3;
-import org.redukti.data.DiscreteSet;
-import org.redukti.data.Interpolation;
-import org.redukti.data.Range;
 //import org.redukti.render.plotting.Plot;
 //import org.redukti.render.plotting.PlotAxes;
 //import org.redukti.render.plotting.PlotRenderer;
@@ -14,8 +8,8 @@ import org.redukti.data.Range;
 //import org.redukti.render.rendering.Renderer;
 //import org.redukti.render.rendering.RendererSvg;
 //import org.redukti.render.rendering.Rgb;
-import org.redukti.rayoptics.analysis.SpotAnalysis;
-import org.redukti.rayoptics.analysis.SpotOptions;
+import org.redukti.analysis.SpotAnalysis;
+import org.redukti.analysis.SpotOptions;
 import org.redukti.rayoptics.analysis.TransverseRayAberrationAnalysis;
 import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
 import org.redukti.rayoptics.optical.OpticalModel;

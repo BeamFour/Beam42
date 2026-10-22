@@ -1,6 +1,6 @@
 package org.redukti.examples;
 
-import org.redukti.rayoptics.analysis.*;
+import org.redukti.analysis.ContrastAnalysisResult;
 
 import java.util.*;
 

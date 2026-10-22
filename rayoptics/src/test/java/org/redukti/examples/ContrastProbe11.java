@@ -1,6 +1,8 @@
 package org.redukti.examples;
 
-import org.redukti.rayoptics.analysis.*;
+import org.redukti.analysis.ContrastAnalysis;
+import org.redukti.analysis.ContrastAnalysisResult;
+import org.redukti.analysis.ContrastOptions;
 
 /**
  * REVIEW.md &sect;6 — the sampling constraint on a phasor-based MTF goal.

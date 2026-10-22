@@ -46,15 +46,15 @@ Line references are as of 2026-08-15.
 
 | File | Role |
 | --- | --- |
-| [ContrastAnalysis.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysis.java) | frequency → pupil shear, wavefront-difference sampling, frequency calibration |
-| [ContrastAnalysisResult.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysisResult.java) | sample/residual container |
-| [ContrastOptions.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastOptions.java) | sampling configuration |
-| [ContrastAnalysis.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysis.java) | `trace_triplets` — overlap region and ray triplets (was `Trace.trace_contrast`) |
-| [ContrastAnalysis.java](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysis.java) | `trace_by_wavelength` — per-wavelength chief ray / reference sphere setup (was `SequentialModel.trace_contrast`) |
-| [GoalContrast.java](../optimcommon/src/main/java/org/redukti/optim/GoalContrast.java) | one residual per (freq, field, wavelength, sample, orientation) |
-| [Analysis.java:126](../optimcommon/src/main/java/org/redukti/optim/Analysis.java:126) | analysis driver — one `ContrastAnalysis.eval` per frequency |
-| [OptimizationBuilder.java:544](../optimr2/src/main/java/org/redukti/optim/OptimizationBuilder.java:544) | contrast goal construction |
-| [LMDerMeritFunction.java:116](../optimr2/src/main/java/org/redukti/optim/LMDerMeritFunction.java:116) | `buildJacobian` — added after the review, see §5 and the changes section |
+| [ContrastAnalysis.java](../rayoptics/src/main/java/org/redukti/analysis/ContrastAnalysis.java) | frequency → pupil shear, wavefront-difference sampling, frequency calibration |
+| [ContrastAnalysisResult.java](../rayoptics/src/main/java/org/redukti/analysis/ContrastAnalysisResult.java) | sample/residual container |
+| [ContrastOptions.java](../rayoptics/src/main/java/org/redukti/analysis/ContrastOptions.java) | sampling configuration |
+| [ContrastAnalysis.java](../rayoptics/src/main/java/org/redukti/analysis/ContrastAnalysis.java) | `trace_triplets` — overlap region and ray triplets (was `Trace.trace_contrast`) |
+| [ContrastAnalysis.java](../rayoptics/src/main/java/org/redukti/analysis/ContrastAnalysis.java) | `trace_by_wavelength` — per-wavelength chief ray / reference sphere setup (was `SequentialModel.trace_contrast`) |
+| [GoalContrast.java](../rayoptics/src/main/java/org/redukti/optim/GoalContrast.java) | one residual per (freq, field, wavelength, sample, orientation) |
+| [Analysis.java:126](../rayoptics/src/main/java/org/redukti/optim/Analysis.java:126) | analysis driver — one `ContrastAnalysis.eval` per frequency |
+| [OptimizationBuilder.java:544](../rayoptics/src/main/java/org/redukti/optim/OptimizationBuilder.java:544) | contrast goal construction |
+| [LMDerMeritFunction.java:116](../rayoptics/src/main/java/org/redukti/optim/LMDerMeritFunction.java:116) | `buildJacobian` — added after the review, see §5 and the changes section |
 
 ## Verdict
 
@@ -85,7 +85,7 @@ covers it.
 
 - Shear `= 2·λ·F#·ν` in normalized pupil radii
   (`normalized_entry_pupil_shift`,
-  [ContrastAnalysis.java:63](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysis.java:63))
+  [ContrastAnalysis.java:63](../rayoptics/src/main/java/org/redukti/analysis/ContrastAnalysis.java:63))
   — displacement 2 at the incoherent cutoff `1/(λF#)`. `fod.fno` is the working F/#,
   so finite conjugates are handled.
 - OPD is returned in waves, so residuals are commensurate across wavelengths.
@@ -277,7 +277,7 @@ The modulus of the OTF is
 i.e. it depends on the **variance** of the phase difference, not on `⟨Φ²⟩`. A constant
 `ΔW` across the pupil is a pure image displacement (it moves the phase transfer
 function, not the modulus) and costs no MTF at all. But
-[ContrastAnalysisResult.java:20](../rayoptics/src/main/java/org/redukti/rayoptics/analysis/ContrastAnalysisResult.java:20)
+[ContrastAnalysisResult.java:20](../rayoptics/src/main/java/org/redukti/analysis/ContrastAnalysisResult.java:20)
 forms `√w · ΔW` with no mean removal, so `Σr² = ⟨Φ²⟩ = Var + mean²`.
 
 This is not negligible, and it concentrates:
@@ -326,7 +326,7 @@ Two mechanisms, the second being the one that matters:
   side decides it. Symptom: tangential up, sagittal down, merit improving, lens not.
 
 Measured on the Leica starting design, the factor by which centring effectively raises
-sagittal relative to tangential ([ContrastProbe18](../optimr2/src/test/java/org/redukti/examples/ContrastProbe18.java)):
+sagittal relative to tangential ([ContrastProbe18](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe18.java)):
 
 | field | 10 cyc/mm | 20 cyc/mm | 40 cyc/mm |
 | --- | --- | --- | --- |
@@ -1345,7 +1345,7 @@ measurement and defects that need a fix, because they want different kinds of ef
    the likely mechanism behind the overlap in item 1. `SurfaceProfile.sag(x, y)` already
    exists on `Spherical`, `EvenPolynomial` and `RadialPolynomial`, and the interfaces are
    reachable from `Analysis._opt_model.seq_model.ifcs`, so the residual is cheap to form
-   in optimcommon without touching ported code.
+   in the `optim` package without touching ported code.
 
 ### Measurements not yet made
 
@@ -1529,7 +1529,7 @@ for every goal type.
 
 ### A tolerant Jacobian
 
-`buildJacobian` ([LMDerMeritFunction.java:116](../optimr2/src/main/java/org/redukti/optim/LMDerMeritFunction.java:116))
+`buildJacobian` ([LMDerMeritFunction.java:116](../rayoptics/src/main/java/org/redukti/optim/LMDerMeritFunction.java:116))
 no longer abandons the solve the moment a probe ray fails. Per variable it retries with
 the step halved up to 8 times, and per residual it falls back to a one-sided difference
 when only one side of the central difference is usable. A failed probe restores the
@@ -1570,9 +1570,8 @@ goals, constraints, build — so a reader can tell which kind of thing a method 
 
 The duplicate sagittal/tangential constant pairs were replaced by a single
 [Orientation](../rayoptics/src/main/java/org/redukti/rayoptics/util/Orientation.java) in
-`org.redukti.rayoptics.util`, next to `ZDir`. It sits in `rayoptics` rather than
-`optimcommon` because the meridian index is a ray-optics concept, not an optimization
-one: the MTF and fan analyses, the plotting tools and the goals all encode it the same
+`org.redukti.rayoptics.util`, next to `ZDir`. It sits in the ported `rayoptics` tree rather than beside the optimizer because the
+meridian index is a ray-optics concept, not an optimization one: the MTF and fan analyses, the plotting tools and the goals all encode it the same
 way, usually spelled `xy`. Beam43-only code now uses the constants where it previously
 wrote `0`, `1` or `2` directly; the upstream-ported files (`Trace`, `SequentialModel`,
 `VigCalc`, `SpotAnalysis`) were deliberately left alone to keep future ports clean.
@@ -1583,28 +1582,28 @@ It also validates, which the goals did not: `GoalGeoMTF`, `GoalRayAberration` an
 ## How the numbers were obtained
 
 The probe programs that produced every figure in this document live in
-`optimr2/src/test/java/org/redukti/examples/`. They are not JUnit tests — each has a
+`rayoptics/src/test/java/org/redukti/examples/`. They are not JUnit tests — each has a
 `main` method — but they sit in the test source root so they compile against the
 module's classpath and can reach the package-private helpers on `ZeissOtusML50mm`.
 
 | Probe | Evidence it produced |
 | --- | --- |
-| [ContrastProbe.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe.java) | goal counts and SOS by type; per-block mean/rms/variance of ΔW (§3) |
-| [ContrastProbe2.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe2.java) | frequency-block cosines (§4); mean fraction 5.2% (§3); surrogate vs geometric MTF |
-| [ContrastProbe3.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe3.java) | sampling convergence 3×6 → 20×40 (§2); warm cost split (Verdict) |
-| [ContrastProbe4.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe4.java) | the four-way re-optimization table (§2, §4). Slowest — ~5 minutes |
-| [ContrastProbe5.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe5.java) | frequency sweep showing sample collapse outside the pupil (§5) |
-| [ContrastProbe6.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe6.java) | clear-aperture survival per field; the vignetting factors that exposed §1 |
-| [ContrastProbe7.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe7.java) | **inconclusive**, superseded by Probe8 — kept as a record of a dead end |
-| [ContrastProbe8.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe8.java) | the §1 shear table — direct proof via `Field.apply_vignetting` |
-| [ContrastProbe9.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe9.java) | §6 — reproduces the Leica mid-field drop; mean decomposition that rules out §3 |
-| [ContrastProbe10.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe10.java) | §6 core evidence — σ vs LSQ prediction vs phasor vs geometric MTF |
-| [ContrastProbe11.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe11.java) | §6 — phasor sampling convergence, 6×12 → 40×80 |
-| [ContrastProbe12.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe12.java) | §7 — realised vs requested frequency, exposing the entrance/exit pupil error |
-| [ContrastProbe13.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe13.java) | §7 — verifies `calibrate_frequency` removes the field-dependent bias |
-| [ContrastProbe14.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe14.java) | §8 — **refutes** its own hypothesis: contrast sampling coverage is 82-95% and identical in x and y, so the contraction does not starve the sagittal direction. Kept as the record of a ruled-out cause |
-| [ContrastProbe15.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe15.java) | §8 — the three-mode comparison and the on-axis symmetry violation under `Paraxial` |
-| [ContrastProbe16.java](../optimr2/src/test/java/org/redukti/examples/ContrastProbe16.java) | §8 — vignetting drift per Jacobian step, and the smoothness sweep showing it is differentiable |
+| [ContrastProbe.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe.java) | goal counts and SOS by type; per-block mean/rms/variance of ΔW (§3) |
+| [ContrastProbe2.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe2.java) | frequency-block cosines (§4); mean fraction 5.2% (§3); surrogate vs geometric MTF |
+| [ContrastProbe3.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe3.java) | sampling convergence 3×6 → 20×40 (§2); warm cost split (Verdict) |
+| [ContrastProbe4.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe4.java) | the four-way re-optimization table (§2, §4). Slowest — ~5 minutes |
+| [ContrastProbe5.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe5.java) | frequency sweep showing sample collapse outside the pupil (§5) |
+| [ContrastProbe6.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe6.java) | clear-aperture survival per field; the vignetting factors that exposed §1 |
+| [ContrastProbe7.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe7.java) | **inconclusive**, superseded by Probe8 — kept as a record of a dead end |
+| [ContrastProbe8.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe8.java) | the §1 shear table — direct proof via `Field.apply_vignetting` |
+| [ContrastProbe9.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe9.java) | §6 — reproduces the Leica mid-field drop; mean decomposition that rules out §3 |
+| [ContrastProbe10.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe10.java) | §6 core evidence — σ vs LSQ prediction vs phasor vs geometric MTF |
+| [ContrastProbe11.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe11.java) | §6 — phasor sampling convergence, 6×12 → 40×80 |
+| [ContrastProbe12.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe12.java) | §7 — realised vs requested frequency, exposing the entrance/exit pupil error |
+| [ContrastProbe13.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe13.java) | §7 — verifies `calibrate_frequency` removes the field-dependent bias |
+| [ContrastProbe14.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe14.java) | §8 — **refutes** its own hypothesis: contrast sampling coverage is 82-95% and identical in x and y, so the contraction does not starve the sagittal direction. Kept as the record of a ruled-out cause |
+| [ContrastProbe15.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe15.java) | §8 — the three-mode comparison and the on-axis symmetry violation under `Paraxial` |
+| [ContrastProbe16.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe16.java) | §8 — vignetting drift per Jacobian step, and the smoothness sweep showing it is differentiable |
 
 `ContrastProbes.java` in the same package holds the shared prescription-path lookups.
 Probes 1–8 use the Otus; 9–13 use the Leica 75/2; 14–16 run both. The Otus figures in §7
@@ -1620,8 +1619,8 @@ numbers to have moved. Probes 14–16 were written and run against the code as o
 Run one with (from the repository root, after a build):
 
 ```
-javac -cp "beam42/target/classes;mathlib/target/classes;optimcommon/target/classes;optimr2/target/classes;rayoptics/target/classes;render/target/classes;tools/target/classes" -d /tmp/probes optimr2/src/test/java/org/redukti/examples/ContrastProbe*.java
-java -cp "/tmp/probes;beam42/target/classes;mathlib/target/classes;optimcommon/target/classes;optimr2/target/classes;rayoptics/target/classes;render/target/classes;tools/target/classes" org.redukti.examples.ContrastProbe8
+javac -cp "beam42/target/classes;rayoptics/target/classes" -d /tmp/probes rayoptics/src/test/java/org/redukti/examples/ContrastProbe*.java
+java -cp "/tmp/probes;beam42/target/classes;rayoptics/target/classes" org.redukti.examples.ContrastProbe8
 ```
 
 Findings 1–5 were measured against

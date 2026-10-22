@@ -1,6 +1,12 @@
 // Copyright 2017-2025 Michael J. Hayford
 // Original software https://github.com/mjhoptics/ray-optics
 // Java version by Dibyendu Majumdar
+//
+// spot() and eval_grid() are ported - the grid is upstream's only spot option.
+// The hexapolar and Gaussian-quadrature evaluations below them, and the
+// SpotOptions-driven eval(), are part of Beam42 project
+// (https://github.com/BeamFour/Beam42), Copyright 2025-2026 by Dibyendu Majumdar,
+// License GPL v3
 package org.redukti.analysis;
 
 import org.redukti.mathlib.Vector2;
@@ -33,6 +39,12 @@ public class SpotAnalysis {
         var seq_model =  opt_model.seq_model;
         return seq_model.trace_grid(SpotAnalysis::spot,fi,wl,num_rays,false,trace_options);
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    /// Everything below is a Beam42 enhancement: the hexapolar and Gaussian-quadrature
+    /// pupil patterns, and the SpotOptions-driven entry point that chooses between them.
+    /// See Documentation/GAUSSIAN_QUADRATURE.md
+    //////////////////////////////////////////////////////////////////////////////////////////
 
     public static List<TraceGridByWvl> eval_rings(OpticalModel opt_model, int fi, Integer wl, int num_rays, TraceOptions trace_options) {
         var seq_model =  opt_model.seq_model;

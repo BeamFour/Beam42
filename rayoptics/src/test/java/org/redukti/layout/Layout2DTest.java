@@ -1,7 +1,8 @@
-package org.redukti.rayoptics.layout;
+package org.redukti.layout;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.redukti.layout.*;
 import org.redukti.rayoptics.elem.profiles.EvenPolynomial;
 import org.redukti.rayoptics.elem.surface.Surface;
 import org.redukti.rayoptics.optical.OpticalModel;

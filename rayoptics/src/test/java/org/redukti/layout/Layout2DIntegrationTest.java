@@ -1,7 +1,11 @@
-package org.redukti.rayoptics.layout;
+package org.redukti.layout;
 
 import org.junit.jupiter.api.Test;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
+import org.redukti.layout.Aperture;
+import org.redukti.layout.ElementModel;
+import org.redukti.layout.Layout2D;
+import org.redukti.layout.LayoutOptions;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.RayOpticsModelBuilder;

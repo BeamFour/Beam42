@@ -6,13 +6,10 @@ package org.redukti.exporters;
 
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.mathlib.M;
-import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
-import org.redukti.rayoptics.layout.LayoutOptions;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.*;
 import org.redukti.rayoptics.seq.Glass;
-import org.redukti.rayoptics.specs.Field;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.RayOpticsModelBuilder;
 import org.redukti.spec.SurfaceType;

@@ -10,6 +10,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ContrastReportTest {
 
     @Test
+    void orientationWeightsAndFailuresAreIndependent() {
+        var failure = new ContrastAnalysisResult.Failure("partner", "MissingRay", -1);
+        var sagittal = java.util.List.of(
+                new ContrastAnalysisResult.Sample(null, 2, 0, 0.25, true, null),
+                new ContrastAnalysisResult.Sample(null, 4, 0, 0.75, true, null));
+        var tangential = java.util.List.of(
+                new ContrastAnalysisResult.Sample(null, 0, 3, 0.6, true, null),
+                new ContrastAnalysisResult.Sample(null, 0, Double.NaN, 0.4, false, failure));
+        var block = new ContrastAnalysisResult.WavelengthResult(550, 0.1, sagittal, 0, 0, tangential);
+        assertEquals(Math.sqrt(13), ContrastReport.rms(block, Orientation.SAGITTAL), 1e-14);
+        assertEquals(3, ContrastReport.rms(block, Orientation.TANGENTIAL), 1e-14);
+        var centered = block.withOffsets(1, 2);
+        assertEquals(Math.sqrt(7), ContrastReport.rms(centered, Orientation.SAGITTAL), 1e-14);
+        assertEquals(1, ContrastReport.rms(centered, Orientation.TANGENTIAL), 1e-14);
+    }
+
+    @Test
     void tabulatesOneRowPerFrequencyWavelengthAndOrientation() {
         var model = MtfTest.buildTestModel();
         var options = new ContrastOptions(0.0).num_rings(2).num_spokes(6);

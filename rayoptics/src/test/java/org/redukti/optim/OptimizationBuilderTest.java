@@ -689,6 +689,31 @@ class OptimizationBuilderTest {
     }
 
     @Test
+    void configuresIndependentOverlapQuadratureAndRejectsExitPupilAiming() {
+        var builder = OptimizationBuilder.builder(prescription())
+                .fields(0.0).mtfFrequencies(20).contrastSampling(4, 8)
+                .contrastOverlapQuadrature(true)
+                .contrastGoals(OptimizationBuilder.contrast(20, new double[]{1.0}));
+        var setup = builder.build();
+        assertTrue(setup.analysis()._contrast_overlap_quadrature);
+        setup.analysis().compute();
+        var block = setup.analysis()._contrasts[0].fields.get(0).wavelengths().get(0);
+        assertEquals(32, block.samples().size());
+        assertEquals(32, block.tangentialSamples().size());
+        var sagittalGoal = new GoalContrast(setup.analysis(), 0, 20, 1, 0, 0, 0, 1);
+        var tangentialGoal = new GoalContrast(setup.analysis(), 0, 20, 1, 0, 0, 1, 1);
+        assertEquals(block.sagittalResidual(0), sagittalGoal.value(), 1e-14);
+        assertEquals(block.tangentialResidual(0), tangentialGoal.value(), 1e-14);
+        var old = block.tangentialSamples().get(0);
+        block.tangentialSamples().set(0, new org.redukti.analysis.ContrastAnalysisResult.Sample(
+                old.pupil(), 0, Double.NaN, old.weight(), false,
+                new org.redukti.analysis.ContrastAnalysisResult.Failure("partner", "MissingRay", -1)));
+        assertEquals(LMDerMeritFunction.BIGVAL, tangentialGoal.value());
+        assertEquals(block.sagittalResidual(0), sagittalGoal.value(), 1e-14);
+        assertThrows(IllegalArgumentException.class, () -> builder.aimContrastAtExitPupil().build());
+    }
+
+    @Test
     void computesContrastGoalsWithoutComputingSpotMtf() {
         var setup = OptimizationBuilder.builder(prescription())
                 .fields(0.0)

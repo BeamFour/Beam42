@@ -54,6 +54,7 @@ final class OptimizationConfiguration {
     boolean calibrateContrastFrequency = false;
     boolean aimContrastAtExitPupil = false;
     boolean centerContrastResiduals = false;
+    boolean contrastOverlapQuadrature = false;
     boolean[] contrastBalanceFields;
     double contrastBalanceWeight = NOMINAL_BALANCE_WEIGHT;
     int scenario = 0;
@@ -114,6 +115,7 @@ final class OptimizationConfiguration {
         result.calibrateContrastFrequency = calibrateContrastFrequency;
         result.aimContrastAtExitPupil = aimContrastAtExitPupil;
         result.centerContrastResiduals = centerContrastResiduals;
+        result.contrastOverlapQuadrature = contrastOverlapQuadrature;
         result.contrastBalanceFields = contrastBalanceFields == null ? null : contrastBalanceFields.clone();
         result.contrastBalanceWeight = contrastBalanceWeight;
         result.scenario = scenario;
@@ -203,6 +205,8 @@ final class OptimizationConfiguration {
             line(sb, "goal contrast", "calibrate " + yesNo(calibrateContrastFrequency));
             line(sb, "goal contrast", "exit-pupil-aiming " + yesNo(aimContrastAtExitPupil));
             line(sb, "goal contrast", "centering " + yesNo(centerContrastResiduals));
+            if (contrastOverlapQuadrature)
+                line(sb, "goal contrast", "overlap-quadrature yes");
         }
         for (MtfGoals goal : mtfGoals) {
             line(sb, "goal mtf", goal.frequency + " sag " + OptimizationTrial.format(goal.sagittal));
@@ -342,6 +346,9 @@ final class OptimizationConfiguration {
             analysis.calibrating_contrast_frequency(calibrateContrastFrequency);
             analysis.aiming_contrast_at_exit_pupil(aimContrastAtExitPupil);
             analysis.centering_contrast_residuals(centerContrastResiduals);
+            if (contrastOverlapQuadrature && aimContrastAtExitPupil)
+                throw new IllegalArgumentException("Entrance-pupil overlap quadrature cannot be combined with exit-pupil aiming");
+            analysis.using_contrast_overlap_quadrature(contrastOverlapQuadrature);
         }
         // Unknown factories may need any analysis. Keep the Analysis defaults (or
         // the factory's explicit choices) instead of disabling work based on built-in goals.

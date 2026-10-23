@@ -6,6 +6,7 @@ package org.redukti.analysis;
 import org.redukti.mathlib.Vector2;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.specs.FieldSnapshot;
+import org.redukti.rayoptics.util.Orientation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,8 @@ public class ContrastAnalysisResult {
      *                                for all samples in a wavelength and field adds up to 1.
      *                                The sum over valid samples may be less than 1.
      *                                See {@link ContrastAnalysis#generate_quadrature}.
+     *                                With overlap quadrature, weights are normalized
+     *                                separately over each orientation's overlap.
      */
     public record Sample(Vector2 pupil, double sagittalOpdDifference,
                          double tangentialOpdDifference, double weight, boolean valid,
@@ -52,10 +55,25 @@ public class ContrastAnalysisResult {
      * enabled, in which case they hold the <em>reference wavelength's</em> weighted mean
      * difference for this field. See
      * {@link ContrastAnalysis#center_residuals(ContrastAnalysisResult, int)}.
+     * With overlap quadrature, {@code samples} holds sagittal pairs and
+     * {@code tangentialSamples} holds tangential pairs. Only the corresponding OPD
+     * component is populated. Use {@link #samples(int)} when selecting an orientation.
      */
     public record WavelengthResult(double wavelength, double normalizedPupilShift,
                                    List<Sample> samples,
-                                   double sagittalOffset, double tangentialOffset) {
+                                   double sagittalOffset, double tangentialOffset,
+                                   List<Sample> tangentialSamples) {
+
+        public WavelengthResult(double wavelength, double normalizedPupilShift,
+                                List<Sample> samples, double sagittalOffset, double tangentialOffset) {
+            this(wavelength, normalizedPupilShift, samples, sagittalOffset, tangentialOffset, samples);
+        }
+
+        /** Each orientation has its own nodes, weights and trace validity. */
+        public List<Sample> samples(int orientation) {
+            Orientation.checked(orientation);
+            return orientation == Orientation.SAGITTAL ? samples : tangentialSamples;
+        }
 
         public WavelengthResult(double wavelength, double normalizedPupilShift,
                                 List<Sample> samples) {
@@ -64,7 +82,7 @@ public class ContrastAnalysisResult {
 
         public WavelengthResult withOffsets(double sagittal, double tangential) {
             return new WavelengthResult(wavelength, normalizedPupilShift, samples,
-                    sagittal, tangential);
+                    sagittal, tangential, tangentialSamples);
         }
 
         /**
@@ -80,7 +98,7 @@ public class ContrastAnalysisResult {
         }
 
         public double tangentialResidual(int index) {
-            var sample = samples.get(index);
+            var sample = tangentialSamples.get(index);
             return Math.sqrt(sample.weight()) * (sample.tangentialOpdDifference() - tangentialOffset);
         }
     }

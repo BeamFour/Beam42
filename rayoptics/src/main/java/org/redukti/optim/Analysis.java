@@ -40,6 +40,7 @@ public class Analysis {
     public boolean _contrast_aim_exit_pupil = false;
     /** See {@link ContrastOptions#center_residuals(boolean)}; off by default. */
     public boolean _contrast_center_residuals = false;
+    public boolean _contrast_overlap_quadrature = false;
     public boolean _compute_spots = true;
     public boolean _compute_ray_aberrations = true;
     public boolean _compute_mtf = true;
@@ -132,6 +133,11 @@ public class Analysis {
     /** See {@link ContrastOptions#center_residuals(boolean)}. */
     public Analysis centering_contrast_residuals(boolean value) {
         _contrast_center_residuals = value;
+        return this;
+    }
+
+    public Analysis using_contrast_overlap_quadrature(boolean value) {
+        _contrast_overlap_quadrature = value;
         return this;
     }
     public Analysis required_analyses(boolean spots, boolean rayAberrations, boolean mtf) {
@@ -281,7 +287,8 @@ public class Analysis {
                     .num_spokes(_contrast_num_spokes)
                     .calibrate_frequency(_contrast_calibrate_frequency)
                     .aim_exit_pupil(_contrast_aim_exit_pupil)
-                    .center_residuals(_contrast_center_residuals);
+                    .center_residuals(_contrast_center_residuals)
+                    .overlap_quadrature(_contrast_overlap_quadrature);
             _contrasts[i] = ContrastAnalysis.eval(_opt_model, options);
         }
     }

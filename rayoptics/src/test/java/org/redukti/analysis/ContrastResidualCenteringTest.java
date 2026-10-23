@@ -18,6 +18,25 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
  */
 class ContrastResidualCenteringTest {
 
+    @Test
+    void centeringUsesEachOrientationsOwnWeightsAndSamples() {
+        var sagittal = List.of(
+                new ContrastAnalysisResult.Sample(null, 1, 0, 0.25, true, null),
+                new ContrastAnalysisResult.Sample(null, 3, 0, 0.75, true, null));
+        var tangential = List.of(
+                new ContrastAnalysisResult.Sample(null, 0, 2, 0.75, true, null),
+                new ContrastAnalysisResult.Sample(null, 0, 6, 0.25, true, null));
+        var result = new ContrastAnalysisResult(30);
+        result.fields.add(new ContrastAnalysisResult.FieldResult(null, new ArrayList<>(List.of(
+                new ContrastAnalysisResult.WavelengthResult(550, 0.1, sagittal, 0, 0, tangential)))));
+        ContrastAnalysis.center_residuals(result, 0);
+        var block = result.fields.get(0).wavelengths().get(0);
+        assertEquals(2.5, block.sagittalOffset(), 1e-14);
+        assertEquals(3, block.tangentialOffset(), 1e-14);
+        assertEquals(Math.sqrt(0.75), ContrastReport.rms(block, 0), 1e-14);
+        assertEquals(Math.sqrt(3), ContrastReport.rms(block, 1), 1e-14);
+    }
+
     // Weights sum to 1, as the quadrature normalizes them, and the shape is chosen with
     // weighted mean exactly zero so the block's mean is the injected tilt and nothing
     // else. WEIGHTS and SHAPE are checked against that premise below.

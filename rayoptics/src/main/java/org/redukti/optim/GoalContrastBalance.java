@@ -113,13 +113,16 @@ public class GoalContrastBalance extends Goal {
             double sagittal = 0.0;
             double tangential = 0.0;
             for (int i = 0; i < block.samples().size(); i++) {
-                if (!block.samples().get(i).valid()) continue;
                 double rs = block.sagittalResidual(i);
                 double rt = block.tangentialResidual(i);
-                if (!Double.isFinite(rs) || !Double.isFinite(rt)) continue;
-                sagittal += rs * rs;
-                tangential += rt * rt;
-                sampled = true;
+                if (block.samples().get(i).valid() && Double.isFinite(rs)) {
+                    sagittal += rs * rs;
+                    sampled = true;
+                }
+                if (block.tangentialSamples().get(i).valid() && Double.isFinite(rt)) {
+                    tangential += rt * rt;
+                    sampled = true;
+                }
             }
             difference += _wavelength_weights[wi]
                     * (_sagittal_weight * sagittal - _tangential_weight * tangential);

@@ -313,6 +313,7 @@ goal contrast   sampling 6 12
 | `goal contrast <frequency> sag\|tan <weights>` | Weights for one frequency, overriding the rows above.                                                                                                | |
 | `goal contrast balance <fields> [weight <w>]` | Attempts to balance sagittal and tangential contrast loss. `<fields>` is `all`, `all except <field values>`, or one `yes`/`no` per field. | weight 0.1 |
 | `goal contrast sampling <rings> <spokes>` | Separate GQ-derived contrast pattern; at least 1 ring and 3 spokes.                                                                                  | `6 12` |
+| `goal contrast overlap-quadrature yes\|no` | Integrate each orientation's full entrance-pupil overlap with independent ray pairs. Cannot be combined with exit-pupil aiming. | `no` |
 | `goal contrast calibrate yes\|no` | Correct the pupil shift so each sample realises the requested frequency.                                                                             | `no` |
 | `goal contrast exit-pupil-aiming yes\|no` | Aim the sheared rays on the exit pupil. Cannot be combined with `calibrate`.                                                                         | `no` |
 | `goal contrast centering yes\|no` | Subtract the constant part of each contrast block.                                                                                                   | `no` |
@@ -323,6 +324,15 @@ is mapped and contracted to keep the triplets in the common vignetted-pupil over
 weights are adjusted and normalized. This is not the ordinary spot pattern. There is
 currently no contrast pattern selector for grid or hexapolar. The builder/trial default
 is `6 12`; direct `ContrastOptions` defaults to `3 6`.
+
+With `goal contrast overlap-quadrature yes`, each orientation instead uses
+`rings × spokes` independent pairs over its full entrance-pupil overlap. `rings`
+sets the Gaussian order along the shear; `spokes` sets the total transverse order,
+split between the two pupil halves. Weights are normalized separately per orientation.
+The circular and piecewise elliptical vignetted pupils are supported. Surface-aperture
+clipping is still controlled separately. This option cannot be combined with exit-pupil
+aiming; it does not correct nonlinear entrance-to-exit pupil mapping. It remains opt-in
+so existing optimization results can be compared with the changed integration region.
 
 In `balance`, fields are named by their value in `fields`, so nothing has to be
 counted. The weight's scale is unlike the contrast weights'; see "Controlling

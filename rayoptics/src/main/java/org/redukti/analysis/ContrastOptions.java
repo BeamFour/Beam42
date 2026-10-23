@@ -14,6 +14,7 @@ public class ContrastOptions {
     boolean calibrateFrequency = false;
     boolean aimExitPupil = false;
     boolean centerResiduals = false;
+    boolean overlapQuadrature = false;
 
     /**
      * @param spatialFrequency image-space spatial frequency in cycles per
@@ -38,12 +39,22 @@ public class ContrastOptions {
         result.calibrateFrequency = calibrateFrequency;
         result.aimExitPupil = aimExitPupil;
         result.centerResiduals = centerResiduals;
+        result.overlapQuadrature = overlapQuadrature;
         return result;
     }
 
     public ContrastOptions num_rings(int value) {
         if (value < 1) throw new IllegalArgumentException("Number of rings must be at least 1");
         numRings = value;
+        return this;
+    }
+
+    /** Integrate each orientation's complete entrance-pupil overlap with separate
+     * fixed-count ray pairs. Off by default for comparison with existing solves.
+     * Cannot be combined with exit-pupil aiming, whose overlap needs a different map.
+     */
+    public ContrastOptions overlap_quadrature(boolean value) {
+        overlapQuadrature = value;
         return this;
     }
 

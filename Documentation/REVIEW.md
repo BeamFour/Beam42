@@ -909,7 +909,8 @@ the vignetted pupil.
 
 ### Possible solutions
 
-None of these has been tried. Each changes every contrast residual, so each needs the
+At the time of the measurements none of these had been tried. Option C now has an
+opt-in entrance-pupil implementation, described below. Each changes every contrast residual, so each needs the
 Otus golden values regenerated and the change carried to the C++ port.
 
 **A. One pattern per orientation, inscribed in that orientation's overlap.** Centre the
@@ -940,7 +941,118 @@ document that the contrast measures the inscribed circle. This is the current st
 is adequate where the rim carries little aberration, as on the Sigma, and misleading
 where it carries a lot.
 
-Before choosing, measure how each candidate region changes the off-axis gap: repeat the
+### Review of the diagnosis and proposed solutions (2026-10-23)
+
+The common-region diagnosis agrees with the code: the reference ray and both partners
+must lie inside the pupil, although each orientation needs only its own two-pupil
+overlap. The on-axis direct-sum comparison above isolates this integration error.
+The numerical lens results have not been independently reproduced in this review;
+some original scratch drivers were not retained.
+
+The bias is not necessarily optimistic. Omitting complex phasors can increase or
+decrease their average modulus. Optimism is the observed result for the cases above,
+not a general bound. The finite Gaussian pattern also has its outer nodes inside
+the nominal circle, so its fitted contraction depends slightly on sampling density.
+
+For uniform pupil transmission, absolute MTF is the overlap-normalized phasor modulus
+times overlap area divided by pupil area. A phasor normalized to unit sample weight
+is therefore relative to the zero-wavefront result for the same pupil. Polychromatic
+OTFs require the wavelength-dependent overlap factors and spectral weights before
+complex summation. Earlier descriptions of the phasor as an absolute diffraction-MTF
+evaluator should be read with this qualification. Geometric MTF agreement is an
+empirical comparison, not a validation of diffraction MTF; see J. A. Díaz and
+V. N. Mahajan, "Geometrical optical transfer function: is it worth calculating?,"
+Applied Optics 56, 7998–8004 (2017), https://doi.org/10.1364/AO.56.007998.
+
+Option A improves coverage but still omits part of each overlap. It uses four rays
+per paired sample instead of three: approximately one third more traces, although
+the reference-ray count doubles. For a circular f/2 pupil at 546.074 nm and
+50 cycles/mm, the current circle covers approximately 91.5% of the true overlap;
+option A covers 96.1%. These are geometric area fractions, not MTF error bounds.
+
+Option B is useful as an independent integration reference. It requires separate
+orientation validity; a failed tangential partner must not discard a sagittal pair.
+Changing masks can make optimization discontinuous when the shear or pupil changes.
+
+Option C is preferred for the integration fix. Fixed-count quadrature mapped onto
+each overlap can vary nodes and area weights continuously without a binary mask.
+For circular pupils, midpoint polar coordinates give
+`r_max(theta) = sqrt(1 - s^2 sin(theta)^2 / 4) - s abs(cos(theta)) / 2`.
+An alternative is to integrate along slices parallel to the shear, with Gaussian
+nodes along each slice. The latter also accommodates the piecewise elliptical
+pupil defined by the existing vignetting factors.
+
+Option D has no universal correction: the omitted wavefront phase was never sampled.
+Correcting the region also does not remove the large-phase limitation of the
+least-squares residual. The 0.1–0.15 wave range is empirical, not a universal threshold.
+
+Off-axis exit-pupil aiming remains a separate problem. Its partner separation is
+corrected, but its reference nodes, integration measure and overlap are still defined
+in entrance-pupil coordinates. The FFT reference assumes linear pupil mapping too.
+Agreement on one entrance-pupil grid does not establish the physical off-axis OTF.
+
+### Implemented: independent entrance-pupil overlap quadrature
+
+Enable the new path with `ContrastOptions.overlap_quadrature(true)`,
+`OptimizationBuilder.contrastOverlapQuadrature(true)`, or the trial line
+`goal contrast overlap-quadrature yes`. The default retains the contracted pattern
+for comparison with existing solves and golden values.
+
+`PupilOverlapQuadrature` integrates each orientation's two-pupil intersection along
+slices parallel to the shear. At transverse coordinate `b sin(theta)`, a pupil slice
+is `[-a_low cos(theta), a_high cos(theta)]`. Its intersection with the shifted slice
+has width `(a_low + a_high) cos(theta) - abs(s)`. Gaussian nodes cover that interval;
+transverse Gaussian nodes cover the two half intervals up to
+`acos(abs(s)/(a_low+a_high))`. Splitting at the transverse pupil axis handles the
+vignetting scale change. Weights include the slice width and transverse Jacobian.
+
+Each orientation retains `rings × spokes` residuals, with independent reference and
+partner rays, weights and validity. Four rays replace each old three-ray triplet.
+Centering, reports, contrast goals, balance goals and initial-failure diagnostics use
+the corresponding orientation's samples. Weights sum to one over each overlap;
+`Rule.overlapFraction()` supplies the separately required diffraction factor.
+Empty overlap is rejected. No binary boundary mask is used.
+
+This fixes the integration region for rigid axis-aligned entrance-pupil shears,
+including the piecewise elliptical pupil defined by vignetting factors. It is not
+the complete exit-pupil integral. Combining it with exit-pupil aiming is explicitly
+rejected because that requires a different overlap map and integration measure.
+Physical surface-aperture clipping can still remove rays from the vignetted model.
+The least-squares surrogate and its large-phase limitation are unchanged; improved
+optimization outcomes on the Sigma and Summicron have not yet been established.
+
+Regression tests retain the analytic overlap area and centroid checks, asymmetric
+vignetting and signed-shear checks, and a synthetic aberrated pupil comparison against
+the FFT. They also cover independent orientation failures, optimizer configuration
+and trial round trips. The existing default golden values are unchanged.
+
+`ContrastOverlapFftTest` retains a traced-lens comparison on the existing generated
+US 4,123,144 Example 8 model (Summicron R 50/2, distinct from Example 9 above).
+On axis at 587.5618 nm, 24×48 contrast samples against a 256×256 pupil grid with a
+512×512 FFT give the following overlap-normalized phasors:
+
+| Nominal frequency, cycles/mm | Contracted pattern | Full overlap | FFT / zero-wavefront FFT |
+| --- | ---: | ---: | ---: |
+| 10 | 0.851104 | 0.853316 | 0.853218 |
+| 30 | 0.182496 | 0.219187 | 0.218926 |
+| 50 | 0.160375 | 0.156562 | 0.156675 |
+
+The comparison uses the same normalized entrance-pupil shear on both sides, with
+linear interpolation between FFT bins. It does not use rim-ray frequency calibration
+as an independent reference. Both orientations agree within 0.00027. The largest
+old discrepancy is approximately 0.0364. At 30 cycles/mm the old result is pessimistic,
+confirming that the contracted-region error has no universal sign.
+
+Validation: the full offline `rayoptics` reactor suite passed 315 tests with no
+failures or errors and one skipped test. A subsequent 40-test run passed the retained
+traced-lens comparison and additional orientation-centering and goal-validity checks.
+
+All implementation changes are in Beam42-owned files. The ported `Trace`, `Field`,
+`WaveAbr` and `Analyses` files are unchanged. The new quadrature, result representation,
+optimizer plumbing and tests need back-porting to `rayoptics-cpp`; no C++ checkout
+was changed. Regenerate C++ expectations from Java when enabling the new mode.
+
+The remaining off-axis measurement is to repeat the
 direct sum on the `DiffractionMTF` grid off axis over the contracted circle, option A's
 inscribed circle and the true overlap, on the Sigma and the Summicron. That separates the
 sampling region from the FFT's entrance-pupil grid, and needs no change to the code.

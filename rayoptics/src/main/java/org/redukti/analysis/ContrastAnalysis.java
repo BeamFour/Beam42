@@ -17,6 +17,8 @@ import java.util.List;
 public class ContrastAnalysis {
 
     public static ContrastAnalysisResult eval(OpticalModel opticalModel, ContrastOptions options) {
+        if (options.overlapQuadrature && options.aimExitPupil)
+            throw new IllegalArgumentException("Entrance-pupil overlap quadrature cannot be combined with exit-pupil aiming");
         if (options.aimExitPupil && options.calibrateFrequency) {
             throw new IllegalArgumentException(
                     "Exit-pupil aiming cannot be combined with contrast frequency calibration");
@@ -54,6 +56,11 @@ public class ContrastAnalysis {
                 // Direct exit-pupil aiming is the alternative: when enabled, trace_triplets() adjusts each
                 // partner separately. This is an expensive iterative adjustment of the shift amount.
                 // It is enabled by options.aimExitPupil. By default, aimExitPupil is off.
+                if (options.overlapQuadrature) {
+                    wavelengthResults.add(eval_overlap_block(opticalModel, fields[fieldIndex], wavelength,
+                            shift, sagittalShift, tangentialShift, options));
+                    continue;
+                }
                 var traced = trace_by_wavelength(opticalModel,
                         (rays, field, tracedWavelength, focus) -> sample(
                                 opticalModel, rays, field, tracedWavelength, focus, options),
@@ -111,7 +118,7 @@ public class ContrastAnalysis {
             ContrastAnalysisResult.WavelengthResult wavelength, int orientation) {
         double weightedSum = 0.0;
         double weightSum = 0.0;
-        for (var sample : wavelength.samples()) {
+        for (var sample : wavelength.samples(orientation)) {
             if (!sample.valid()) continue;
             double difference = orientation == Orientation.SAGITTAL
                     ? sample.sagittalOpdDifference() : sample.tangentialOpdDifference();
@@ -120,6 +127,59 @@ public class ContrastAnalysis {
             weightSum += sample.weight();
         }
         return weightSum > 0.0 ? weightedSum / weightSum : 0.0;
+    }
+
+    private static ContrastAnalysisResult.WavelengthResult eval_overlap_block(
+            OpticalModel model, Field field, double wavelength, double nominalShift,
+            double sagittalShift, double tangentialShift, ContrastOptions options) {
+        double focus = model.optical_spec.defocus().get_focus();
+        var central = Trace.setup_pupil_coords(model, field,
+                model.optical_spec.wvls.central_wvl(), focus, null, null);
+        var coordinates = Trace.setup_pupil_coords(model, field, wavelength, focus,
+                central.ref_sphere.image_pt.project_xy(), null);
+        field.chief_ray = coordinates.chief_ray_pkg;
+        field.ref_sphere = coordinates.ref_sphere;
+        var traceOptions = options.traceOptions.copy();
+        traceOptions.pupil_type = PupilType.REL_PUPIL;
+        traceOptions.apply_vignetting = false;
+        traceOptions.rayerr_filter = "summary";
+        var sagittal = trace_overlap_pairs(model, field, wavelength, focus, sagittalShift,
+                Orientation.SAGITTAL, options, traceOptions);
+        var tangential = trace_overlap_pairs(model, field, wavelength, focus, tangentialShift,
+                Orientation.TANGENTIAL, options, traceOptions);
+        return new ContrastAnalysisResult.WavelengthResult(
+                wavelength, nominalShift, sagittal, 0, 0, tangential);
+    }
+
+    private static List<ContrastAnalysisResult.Sample> trace_overlap_pairs(
+            OpticalModel model, Field field, double wavelength, double focus, double shift,
+            int orientation, ContrastOptions options, TraceOptions traceOptions) {
+        var rule = PupilOverlapQuadrature.generate(field, orientation, shift, options.numRings, options.numSpokes);
+        boolean x = orientation == Orientation.SAGITTAL;
+        var displacement = x ? new Vector2(shift, 0) : new Vector2(0, shift);
+        var samples = new ArrayList<ContrastAnalysisResult.Sample>(rule.points().size());
+        for (var point : rule.points()) {
+            var reference = Trace.trace_safe(model, point.pupil(), field, wavelength, traceOptions);
+            var partnerPupil = point.pupil().plus(displacement);
+            var partner = Trace.trace_safe(model, partnerPupil, field, wavelength, traceOptions);
+            double difference = Double.NaN;
+            ContrastAnalysisResult.Failure failure = null;
+            if (reference.pkg == null)
+                failure = reference.err == null ? new ContrastAnalysisResult.Failure("reference", "MissingRay", -1)
+                        : failure("reference", reference.err);
+            else if (partner.pkg == null)
+                failure = partner.err == null ? new ContrastAnalysisResult.Failure("partner", "MissingRay", -1)
+                        : failure("partner", partner.err);
+            else {
+                difference = opd(model, partner.pkg, field, wavelength, focus, partnerPupil)
+                        - opd(model, reference.pkg, field, wavelength, focus, point.pupil());
+                if (!Double.isFinite(difference))
+                    failure = new ContrastAnalysisResult.Failure("OPD", "NonFiniteWavefrontDifference", -1);
+            }
+            samples.add(new ContrastAnalysisResult.Sample(point.pupil(),
+                    x ? difference : 0, x ? 0 : difference, point.weight(), failure == null, failure));
+        }
+        return samples;
     }
 
     /**

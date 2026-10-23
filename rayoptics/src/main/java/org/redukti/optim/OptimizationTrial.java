@@ -433,6 +433,7 @@ public final class OptimizationTrial {
         private Boolean calibrateContrast;
         private Boolean exitPupilAiming;
         private Boolean centerContrast;
+        private Boolean overlapQuadrature;
         private int contrastSettingsLine;
 
         private final Map<Integer, MtfRows> mtf = new LinkedHashMap<>();
@@ -806,6 +807,11 @@ public final class OptimizationTrial {
                     centerContrast = yesNo(line, w, 3);
                     contrastSettingsLine = line;
                 }
+                case "overlap-quadrature" -> {
+                    once(line, "goal contrast overlap-quadrature");
+                    overlapQuadrature = yesNo(line, w, 3);
+                    contrastSettingsLine = line;
+                }
                 default -> {
                     if (w.length >= 4 && (lower(w[3]).equals("sag") || lower(w[3]).equals("tan"))) {
                         int frequency = positiveInt(line, w[2], "contrast frequency");
@@ -1106,6 +1112,7 @@ public final class OptimizationTrial {
                 if (calibrateContrast != null) c.calibrateContrastFrequency = calibrateContrast;
                 if (exitPupilAiming != null) c.aimContrastAtExitPupil = exitPupilAiming;
                 if (centerContrast != null) c.centerContrastResiduals = centerContrast;
+                if (overlapQuadrature != null) c.contrastOverlapQuadrature = overlapQuadrature;
                 if (balanceFields != null) {
                     c.contrastBalanceFields = balanceFlags();
                     c.contrastBalanceWeight = balanceWeight;

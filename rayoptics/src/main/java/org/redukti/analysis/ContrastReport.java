@@ -28,8 +28,8 @@ public class ContrastReport {
     public static double rms(ContrastAnalysisResult.WavelengthResult block, int orientation) {
         double sum = 0.0;
         double weight = 0.0;
-        for (int i = 0; i < block.samples().size(); i++) {
-            var sample = block.samples().get(i);
+        for (int i = 0; i < block.samples(orientation).size(); i++) {
+            var sample = block.samples(orientation).get(i);
             if (!sample.valid()) continue;
             double residual = orientation == Orientation.SAGITTAL
                     ? block.sagittalResidual(i) : block.tangentialResidual(i);
@@ -41,8 +41,8 @@ public class ContrastReport {
     }
 
     /** True if any sample of the block failed to trace. */
-    private static boolean incomplete(ContrastAnalysisResult.WavelengthResult block) {
-        for (var sample : block.samples())
+    private static boolean incomplete(ContrastAnalysisResult.WavelengthResult block, int orientation) {
+        for (var sample : block.samples(orientation))
             if (!sample.valid()) return true;
         return false;
     }
@@ -62,6 +62,7 @@ public class ContrastReport {
                 .append(", calibrate ").append(yesNo(options.calibrateFrequency))
                 .append(", exit-pupil-aiming ").append(yesNo(options.aimExitPupil))
                 .append(", centering ").append(yesNo(options.centerResiduals))
+                .append(", overlap-quadrature ").append(yesNo(options.overlapQuadrature))
                 .append("\n\n");
 
         var fields = opticalModel.optical_spec.fov.fields;
@@ -92,7 +93,7 @@ public class ContrastReport {
                     for (var field : result.fields) {
                         var block = field.wavelengths().get(wi);
                         double value = rms(block, orientation);
-                        boolean partial = incomplete(block);
+                        boolean partial = incomplete(block, orientation);
                         anyIncomplete |= partial;
                         cell(sb, Double.isNaN(value) ? "-"
                                 : VALUE_FORMAT.format(value) + (partial ? "*" : ""));

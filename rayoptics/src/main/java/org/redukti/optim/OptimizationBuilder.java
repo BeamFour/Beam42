@@ -279,6 +279,14 @@ public final class OptimizationBuilder {
         return this;
     }
 
+    /** Use independent fixed-count quadrature over each entrance-pupil overlap.
+     * Off by default; cannot be combined with exit-pupil aiming.
+     */
+    public OptimizationBuilder contrastOverlapQuadrature(boolean value) {
+        configuration.contrastOverlapQuadrature = value;
+        return this;
+    }
+
     /**
      * Subtract the constant part of each contrast block, so the residuals carry the
      * variance the OTF modulus depends on rather than the un-centred second moment.

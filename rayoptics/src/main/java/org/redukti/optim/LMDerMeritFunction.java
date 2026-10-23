@@ -269,17 +269,22 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
         for (var contrast : analysis._contrasts) {
             for (var field : contrast.fields) {
                 for (var wavelength : field.wavelengths()) {
-                    for (var sample : wavelength.samples()) {
-                        if (sample.valid()) continue;
-                        invalidCount++;
-                        if (first == null) {
-                            var failure = sample.failure();
-                            first = "first failure: " + failure.ray() + " ray encountered "
-                                    + failure.exceptionType() + " at surface " + failure.surface()
-                                    + ", field=" + field.field().y
-                                    + ", wavelength=" + wavelength.wavelength() + " nm"
-                                    + ", frequency=" + contrast.spatialFrequency + " cycles/mm"
-                                    + ", pupil=" + sample.pupil();
+                    var orientations = wavelength.samples() == wavelength.tangentialSamples()
+                            ? java.util.List.of(wavelength.samples())
+                            : java.util.List.of(wavelength.samples(), wavelength.tangentialSamples());
+                    for (var orientationSamples : orientations) {
+                        for (var sample : orientationSamples) {
+                            if (sample.valid()) continue;
+                            invalidCount++;
+                            if (first == null) {
+                                var failure = sample.failure();
+                                first = "first failure: " + failure.ray() + " ray encountered "
+                                        + failure.exceptionType() + " at surface " + failure.surface()
+                                        + ", field=" + field.field().y
+                                        + ", wavelength=" + wavelength.wavelength() + " nm"
+                                        + ", frequency=" + contrast.spatialFrequency + " cycles/mm"
+                                        + ", pupil=" + sample.pupil();
+                            }
                         }
                     }
                 }

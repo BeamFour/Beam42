@@ -16,6 +16,32 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class ContrastAnalysisTest {
 
     @Test
+    void overlapQuadratureUsesIndependentNormalizedPairsAndPreservesCount() {
+        var model = MtfTest.buildTestModel();
+        var options = new ContrastOptions(40).num_rings(4).num_spokes(12).overlap_quadrature(true);
+        var result = ContrastAnalysis.eval(model, options);
+        for (var field : result.fields)
+            for (var block : field.wavelengths()) {
+                assertEquals(48, block.samples().size());
+                assertEquals(48, block.tangentialSamples().size());
+                for (int axis : new int[]{0, 1}) {
+                    assertEquals(1, block.samples(axis).stream().mapToDouble(
+                            ContrastAnalysisResult.Sample::weight).sum(), 1e-14);
+                    for (var sample : block.samples(axis)) {
+                        assertTrue(sample.valid(), () -> String.valueOf(sample.failure()));
+                        assertTrue(Double.isFinite(axis == 0 ? sample.sagittalResidual() : sample.tangentialResidual()));
+                    }
+                }
+                assertFalse(block.samples().get(0).pupil().equals(block.tangentialSamples().get(0).pupil()));
+            }
+        var copied = ContrastAnalysis.eval(model, options.with_frequency(20));
+        assertTrue(copied.fields.get(0).wavelengths().get(0).samples()
+                != copied.fields.get(0).wavelengths().get(0).tangentialSamples());
+        assertThrows(IllegalArgumentException.class,
+                () -> ContrastAnalysis.eval(model, options.aim_exit_pupil(true)));
+    }
+
+    @Test
     void exitPupilAimingRealisesBothRequestedShearVectors() {
         var model = MtfTest.buildTestModel();
         int fieldIndex = 1;

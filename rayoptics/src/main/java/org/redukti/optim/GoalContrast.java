@@ -45,8 +45,8 @@ public class GoalContrast extends Goal {
         var wavelengths = contrast.fields.get(_field).wavelengths();
         if (_wavelength_index >= wavelengths.size()) return LMDerMeritFunction.BIGVAL;
         var wavelength = wavelengths.get(_wavelength_index);
-        if (_sample_index >= wavelength.samples().size()) return LMDerMeritFunction.BIGVAL;
-        if (!wavelength.samples().get(_sample_index).valid()) return LMDerMeritFunction.BIGVAL;
+        if (_sample_index >= wavelength.samples(_orientation).size()) return LMDerMeritFunction.BIGVAL;
+        if (!wavelength.samples(_orientation).get(_sample_index).valid()) return LMDerMeritFunction.BIGVAL;
         // Read through the block rather than the sample: the residual carries the block's
         // constant offset, which is zero unless residual centering is enabled.
         return _orientation == Orientation.SAGITTAL

@@ -324,6 +324,21 @@ class OptimizationTrialTest {
             """;
 
     @Test
+    void preservesOverlapQuadratureThroughTrialRoundTrip() throws Exception {
+        String trial = """
+                [trial 1]
+                fields 0 1
+                goal contrast 20
+                goal contrast overlap-quadrature yes
+                """;
+        var builder = read(withTrials(SUMMICRON, trial));
+        String written = builder.toTrial(1);
+        assertTrue(written.contains("overlap-quadrature yes"));
+        assertEquals(written, OptimizationTrial.parse(withTrials(SUMMICRON, written), 1).toTrial());
+        assertTrue(builder.build().analysis()._contrast_overlap_quadrature);
+    }
+
+    @Test
     void readsAndWritesTheSameTrial() throws Exception {
         // Written differently - shorthand, other spacing, other order, defaults spelt out -
         // and read, the trial is written back in the builder's form. Goals of one kind keep

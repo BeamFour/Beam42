@@ -836,6 +836,721 @@ differ from those above. The aperture-checked and `None` rows came from a scratc
 calling that report with `check_apertures(true)` on the model LensTool2 builds; it
 reproduced the LensTool2 output of the time exactly and was not retained.
 
+### Checked against a diffraction MTF: the contrast samples miss the overlap rim
+
+`DiffractionMTF` computes the MTF as the Fourier transform of the PSF from a uniform
+`RayGrid`, independently of the contrast quadrature and shear. Its frequency scale is
+the grid's own: a shift of `k` grid intervals is `k/(n_pupil-1)` of the cutoff, taken per
+direction from the rim rays. On an aberration-free circular pupil it reproduces the
+analytic diffraction limit to 9e-4 at 128 rays across the pupil and 4e-4 at 256.
+
+The phasor is the MTF relative to the diffraction limit, so it was compared with the
+FFT MTF divided by the FFT MTF of the same pupil with zero wavefront, d line, contrast
+apertures checked, 24×48 or 40×80 sampling, FFT at 128 to 512 rays. Both sides were
+converged to the third decimal.
+
+On axis, Sigma 40/1.4: they agree to 2e-4 (50 cyc/mm: 0.9817 against 0.9815). On axis,
+Summicron 50/2, they do not, and a direct sum of `exp(i2πΔW)` on the FFT's own grid
+locates the cause:
+
+| sagittal, on axis | 10 | 30 | 50 cyc/mm |
+| --- | --- | --- | --- |
+| direct sum over the true overlap | 0.9428 | 0.6898 | 0.4229 |
+| FFT, `DiffractionMTF` | 0.9428 | 0.6899 | 0.4230 |
+| direct sum over the contracted circle | 0.9480 | 0.7211 | 0.4389 |
+| contrast phasor, 40×80 | 0.9482 | 0.7217 | 0.4401 |
+
+The FFT is the overlap integral. The contrast analysis integrates over something else:
+`generate_quadrature` contracts the whole pattern about a point offset by `−(sₓ+s_y)/2`
+until every sample and both its partners lie inside the pupil. That is a circle of
+radius about `1 − s/√2`, shared by both orientations, rather than the lens-shaped overlap
+of the pupil with its shifted copy, which differs per orientation. The omitted region is
+the overlap rim, where spherical aberration is largest, so the contrast analysis reads
+optimistic, and more so the more aberrated the rim. The contrast residuals use the
+same samples, so the merit carries the same omission.
+
+Off axis the phasor also reads high, most at the outer fields tangentially (Sigma, full
+field, 50 cyc/mm: 0.668 against 0.549). Frequency calibration and exit-pupil aiming
+reduce this (to 0.617 and 0.603) but do not remove it. The contracted circle accounts for
+at least part of the rest; that has not been separated from the entrance-pupil grid of
+the FFT, which treats the pupil mapping as linear.
+
+### The problem: one contracted circle stands in for two overlaps
+
+The OTF at a frequency is an integral over the overlap of the pupil with a copy of itself
+shifted by the shear `s`. For a circular pupil the overlap is lens shaped: the
+intersection of two unit circles whose centres are `s` apart. The sagittal and
+tangential shears point in different directions, so each orientation has its own
+overlap.
+
+`ContrastAnalysis.generate_quadrature` instead lays one Gaussian quadrature pattern over
+the vignetted pupil, then contracts the whole pattern about the point
+`−(sₓ + s_y)/2` until every sample and both of its partners are inside the pupil. On a
+circular pupil that is a circle of radius about `1 − s/√2`. Both orientations are sampled
+over that one circle.
+
+Consequences:
+
+* The rim of each overlap is not sampled. Wavefront error is usually largest there, so
+  σ and the phasor both read low aberration, and the error grows with aberration at the
+  rim. On the Sigma on axis it is 2e-4 in the phasor; on the Summicron on axis it is
+  0.031 at 30 cyc/mm.
+* The omitted area grows with frequency, since `s ∝ ν`. At 50 cyc/mm on an f/2 lens the
+  circle radius is about 0.92 of the pupil.
+* The circle is the intersection of both orientations' constraints, so each orientation
+  loses more than its own overlap requires.
+* The contrast residuals use these samples, so the optimizer's merit carries the same
+  omission: it does not see aberration confined to the overlap rim.
+
+The contraction exists for good reasons, and a fix has to keep them. The sample count
+and the relative quadrature weights are fixed, so the residual vector has a stable layout
+and the Jacobian sees no samples appearing or disappearing. No partner ray lands outside
+the vignetted pupil.
+
+### Possible solutions
+
+At the time of the measurements none of these had been tried. Option C now has an
+opt-in entrance-pupil implementation, described below. Each changes every contrast residual, so each needs the
+Otus golden values regenerated and the change carried to the C++ port.
+
+**A. One pattern per orientation, inscribed in that orientation's overlap.** Centre the
+sagittal pattern at `−sₓ/2` and contract it to the largest circle inside the sagittal
+overlap, radius about `1 − s/2`; likewise for tangential. Simple, and keeps a fixed
+sample count with smooth weights. It recovers part of the rim but not the two tips of
+the lens-shaped region. It doubles the reference rays traced, because the two
+orientations no longer share them.
+
+**B. Full-pupil pattern with a per-orientation mask.** Lay the pattern over the whole
+vignetted pupil, uncontracted, and count a sample for an orientation only when its
+partner for that orientation is inside the pupil. This integrates over the exact
+overlap. The mask depends only on the shear and the vignetting factors, so for a fixed
+shear and frozen vignetting it does not change between iterations and the merit stays
+smooth; with frequency calibration, or vignetting recomputed during the solve, samples
+can switch in and out. Accuracy is limited where the mask cuts through the pattern,
+which a Gaussian rule is not designed for. The partner rays outside the overlap still
+need tracing, or a rule for skipping them.
+
+**C. A quadrature built for the overlap.** Map a quadrature rule onto the lens-shaped
+region of each orientation, so the samples cover the exact overlap with weights that
+integrate it accurately. Most accurate; most work. The vignetted pupil is not a circle,
+so the region is the overlap of two vignetted pupils, and the map has to follow the
+vignetting kink at the pupil axes.
+
+**D. Keep the contraction and correct for it.** Leave the sampling as it is and
+document that the contrast measures the inscribed circle. This is the current state. It
+is adequate where the rim carries little aberration, as on the Sigma, and misleading
+where it carries a lot.
+
+### Review of the diagnosis and proposed solutions (2026-10-23)
+
+The common-region diagnosis agrees with the code: the reference ray and both partners
+must lie inside the pupil, although each orientation needs only its own two-pupil
+overlap. The on-axis direct-sum comparison above isolates this integration error.
+The numerical lens results have not been independently reproduced in this review;
+some original scratch drivers were not retained.
+
+The bias is not necessarily optimistic. Omitting complex phasors can increase or
+decrease their average modulus. Optimism is the observed result for the cases above,
+not a general bound. The finite Gaussian pattern also has its outer nodes inside
+the nominal circle, so its fitted contraction depends slightly on sampling density.
+
+For uniform pupil transmission, absolute MTF is the overlap-normalized phasor modulus
+times overlap area divided by pupil area. A phasor normalized to unit sample weight
+is therefore relative to the zero-wavefront result for the same pupil. Polychromatic
+OTFs require the wavelength-dependent overlap factors and spectral weights before
+complex summation. Earlier descriptions of the phasor as an absolute diffraction-MTF
+evaluator should be read with this qualification. Geometric MTF agreement is an
+empirical comparison, not a validation of diffraction MTF; see J. A. Díaz and
+V. N. Mahajan, "Geometrical optical transfer function: is it worth calculating?,"
+Applied Optics 56, 7998–8004 (2017), https://doi.org/10.1364/AO.56.007998.
+
+Option A improves coverage but still omits part of each overlap. It uses four rays
+per paired sample instead of three: approximately one third more traces, although
+the reference-ray count doubles. For a circular f/2 pupil at 546.074 nm and
+50 cycles/mm, the current circle covers approximately 91.5% of the true overlap;
+option A covers 96.1%. These are geometric area fractions, not MTF error bounds.
+
+Option B is useful as an independent integration reference. It requires separate
+orientation validity; a failed tangential partner must not discard a sagittal pair.
+Changing masks can make optimization discontinuous when the shear or pupil changes.
+
+Option C is preferred for the integration fix. Fixed-count quadrature mapped onto
+each overlap can vary nodes and area weights continuously without a binary mask.
+For circular pupils, midpoint polar coordinates give
+`r_max(theta) = sqrt(1 - s^2 sin(theta)^2 / 4) - s abs(cos(theta)) / 2`.
+An alternative is to integrate along slices parallel to the shear, with Gaussian
+nodes along each slice. The latter also accommodates the piecewise elliptical
+pupil defined by the existing vignetting factors.
+
+Option D has no universal correction: the omitted wavefront phase was never sampled.
+Correcting the region also does not remove the large-phase limitation of the
+least-squares residual. The 0.1–0.15 wave range is empirical, not a universal threshold.
+
+Off-axis exit-pupil aiming remains a separate problem. Its partner separation is
+corrected, but its reference nodes, integration measure and overlap are still defined
+in entrance-pupil coordinates. The FFT reference assumes linear pupil mapping too.
+Agreement on one entrance-pupil grid does not establish the physical off-axis OTF.
+
+### Implemented: independent entrance-pupil overlap quadrature
+
+> **Not on `main`.** The overlap quadrature, its tests, and the Otus, Leica 75/2 and
+> Summicron comparison tests described in this and the following subsections are on
+> the unmerged branch `experimental_overlap_quadrature`. They were left out because the
+> comparisons below showed no optimizer benefit that justifies the added code paths.
+> The options, builder methods and trial line named here do not exist on `main`.
+
+Enable the new path with `ContrastOptions.overlap_quadrature(true)`,
+`OptimizationBuilder.contrastOverlapQuadrature(true)`, or the trial line
+`goal contrast overlap-quadrature yes`. The default retains the contracted pattern
+for comparison with existing solves and golden values.
+
+`PupilOverlapQuadrature` integrates each orientation's two-pupil intersection along
+slices parallel to the shear. At transverse coordinate `b sin(theta)`, a pupil slice
+is `[-a_low cos(theta), a_high cos(theta)]`. Its intersection with the shifted slice
+has width `(a_low + a_high) cos(theta) - abs(s)`. Gaussian nodes cover that interval;
+transverse Gaussian nodes cover the two half intervals up to
+`acos(abs(s)/(a_low+a_high))`. Splitting at the transverse pupil axis handles the
+vignetting scale change. Weights include the slice width and transverse Jacobian.
+
+Each orientation retains `rings × spokes` residuals, with independent reference and
+partner rays, weights and validity. Four rays replace each old three-ray triplet.
+Centering, reports, contrast goals, balance goals and initial-failure diagnostics use
+the corresponding orientation's samples. Weights sum to one over each overlap;
+`Rule.overlapFraction()` supplies the separately required diffraction factor.
+Empty overlap is rejected. No binary boundary mask is used.
+
+This fixes the integration region for rigid axis-aligned entrance-pupil shears,
+including the piecewise elliptical pupil defined by vignetting factors. It is not
+the complete exit-pupil integral. Combining it with exit-pupil aiming is explicitly
+rejected because that requires a different overlap map and integration measure.
+Physical surface-aperture clipping can still remove rays from the vignetted model.
+The least-squares surrogate and its large-phase limitation are unchanged; improved
+optimization outcomes on the Sigma and Summicron have not yet been established.
+
+Regression tests retain the analytic overlap area and centroid checks, asymmetric
+vignetting and signed-shear checks, and a synthetic aberrated pupil comparison against
+the FFT. They also cover independent orientation failures, optimizer configuration
+and trial round trips. The existing default golden values are unchanged.
+
+`ContrastOverlapFftTest` retains a traced-lens comparison on the existing generated
+US 4,123,144 Example 8 model (Summicron R 50/2, distinct from Example 9 above).
+On axis at 587.5618 nm, 24×48 contrast samples against a 256×256 pupil grid with a
+512×512 FFT give the following overlap-normalized phasors:
+
+| Nominal frequency, cycles/mm | Contracted pattern | Full overlap | FFT / zero-wavefront FFT |
+| --- | ---: | ---: | ---: |
+| 10 | 0.851104 | 0.853316 | 0.853218 |
+| 30 | 0.182496 | 0.219187 | 0.218926 |
+| 50 | 0.160375 | 0.156562 | 0.156675 |
+
+The comparison uses the same normalized entrance-pupil shear on both sides, with
+linear interpolation between FFT bins. It does not use rim-ray frequency calibration
+as an independent reference. Both orientations agree within 0.00027. The largest
+old discrepancy is approximately 0.0364. At 30 cycles/mm the old result is pessimistic,
+confirming that the contracted-region error has no universal sign.
+
+Validation: the full offline `rayoptics` reactor suite passed 315 tests with no
+failures or errors and one skipped test. A subsequent 40-test run passed the retained
+traced-lens comparison and additional orientation-centering and goal-validity checks.
+
+All implementation changes are in Beam42-owned files. The ported `Trace`, `Field`,
+`WaveAbr` and `Analyses` files are unchanged. The new quadrature, result representation,
+optimizer plumbing and tests need back-porting to `rayoptics-cpp`; no C++ checkout
+was changed. Regenerate C++ expectations from Java when enabling the new mode.
+
+The remaining off-axis measurement is to repeat the
+direct sum on the `DiffractionMTF` grid off axis over the contracted circle, option A's
+inscribed circle and the true overlap, on the Sigma and the Summicron. That separates the
+sampling region from the FFT's entrance-pupil grid, and needs no change to the code.
+
+---
+
+### Otus optimization comparison (2026-10-23)
+
+`ZeissOtusML50mmTest.optimizesPatentPrescriptionUsingOverlapQuadrature` uses the
+existing contrast test's prescription, variables, weights, constraints and solver.
+The only optimization setting changed is `contrastOverlapQuadrature(true)`.
+Both optimize the original squared-OPD residuals at 20 cycles/mm, with 4×8 contrast
+sampling, ray-aberration goals and the existing paraxial anchors. Exit-pupil aiming,
+frequency calibration and residual centering remain off. The existing baseline
+golden values are unchanged.
+
+Independent geometric MTF at 40 cycles/mm and the baseline's GQ spot measure give:
+
+| Field | Contracted sag | Overlap sag | Contracted tan | Overlap tan | Contracted spot | Overlap spot |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0.0 | 0.907920 | 0.888843 | 0.907920 | 0.888843 | 2.443825 | 2.767385 |
+| 0.3 | 0.861465 | 0.837660 | 0.802540 | 0.818522 | 3.523623 | 3.780481 |
+| 0.7 | 0.758228 | 0.754220 | 0.802917 | 0.816424 | 4.034198 | 4.085174 |
+| 1.0 | 0.789821 | 0.781202 | 0.802231 | 0.768039 | 3.977086 | 4.133292 |
+
+The mean of the eight MTF values falls from 0.829130 to 0.819219; the minimum falls
+from 0.758228 to 0.754220. Tangential MTF improves at fields 0.3 and 0.7; the other
+six values and all four spot values worsen. The 64-ray hexapolar spot check also
+worsens at all four fields. The focal length is essentially unchanged (50.150873
+versus 50.150558 mm), as is the f-number (1.428184 versus 1.427639).
+
+Both solves converge. Native merit RMS falls from 0.087201 to 0.007391 for the
+contracted pattern and from 0.082864 to 0.006918 for overlap quadrature. The final
+native merit values are not comparable because the sampled regions and weights
+differ. Cross-scoring both final lenses with the same 32×64 full-overlap integral at
+20 cycles/mm gives an equal-block RMS of 0.045591 waves for the contracted result
+and 0.047840 for the overlap result. These dense scores agree with 24×48 to less
+than 2e-9 waves.
+
+Full-overlap cross-scores at different integration densities are:
+
+| Evaluation sampling | Contracted final lens | Overlap final lens |
+| --- | ---: | ---: |
+| 4×8 | 0.046836 | 0.042858 |
+| 8×16 | 0.045278 | 0.047946 |
+| 12×24 | 0.045585 | 0.047815 |
+| 24×48 | 0.045591 | 0.047840 |
+| 32×64 | 0.045591 | 0.047840 |
+
+The 4×8 overlap rule underestimates its optimized lens's dense RMS by 10.4%;
+8×16 differs by 0.22% and 12×24 by 0.052%. At 4×8 the overlap result appears
+better than the contracted result under this common score, but the ordering
+reverses with denser evaluation. This demonstrates integration error in the coarse
+rule; it does not establish that sampling is the sole cause of the optimization
+outcome. Equal point counts do not give equal accuracy for the two different rules.
+
+This test does not demonstrate better optimization with overlap quadrature at 4×8.
+It records a mixed MTF trade-off and a worse dense overlap score. Correcting the
+integration region does not guarantee a better numerical optimum at a fixed low
+sample count. The next comparison should run both modes at higher density (8×16 or
+12×24), retaining the same squared-OPD merit and independent MTF evaluation.
+No phasor goal or other replacement merit was introduced. The paired tests passed,
+including all existing baseline golden values and the new measured overlap values.
+Only the test and this review were changed; the regression and its Java expectations
+need carrying to the C++ port if that port maintains equivalent optimization tests.
+
+Follow-up: repeat the paired comparison on a lens with larger residual aberrations,
+such as the Summicron 50/2 already used in the analysis comparisons. Check convergence
+of the pupil integration separately from optimization performance, and retain the
+Zemax-style squared-OPD merit. An improvement on the corrected Otus alone would not
+establish the result for a more aberrated starting design.
+
+### Otus optimization at 8×16 (2026-10-23)
+
+The two additional tests `optimizesPatentPrescriptionUsingDenseContractedQuadrature`
+and `optimizesPatentPrescriptionUsingDenseOverlapQuadrature` repeat the paired
+experiment at 8×16. The prescription, variables, constraints, weights, 20 cycles/mm
+contrast goal and solver tolerances are unchanged. Both converge with solver status 1.
+The tests save the final prescriptions under `rayoptics/target/otus-overlap-8x16/`
+for subsequent inspection; no input prescription is modified.
+
+Independent geometric MTF at 40 cycles/mm:
+
+| Field | Contracted sag | Overlap sag | Contracted tan | Overlap tan |
+| --- | ---: | ---: | ---: | ---: |
+| 0.0 | 0.911547 | 0.912412 | 0.911547 | 0.912412 |
+| 0.3 | 0.866133 | 0.869034 | 0.816279 | 0.812090 |
+| 0.7 | 0.793209 | 0.815107 | 0.806975 | 0.805758 |
+| 1.0 | 0.801782 | 0.808272 | 0.775843 | 0.762744 |
+
+| Metric | Contracted | Overlap |
+| --- | ---: | ---: |
+| Mean MTF, 20 cycles/mm | 0.953483 | 0.954172 |
+| Minimum MTF, 20 cycles/mm | 0.936597 | 0.931841 |
+| Mean MTF, 40 cycles/mm | 0.835414 | 0.837229 |
+| Minimum MTF, 40 cycles/mm | 0.775843 | 0.762744 |
+| Dense full-overlap RMS at 20 cycles/mm, waves | 0.044012 | 0.043442 |
+| Focal length, mm | 50.150945 | 50.150951 |
+| f-number | 1.418421 | 1.414007 |
+
+The common 32×64 overlap RMS improves by 1.30%. All four sagittal MTF values improve,
+but tangential MTF worsens at the three nonzero fields. The mean MTF rises slightly
+at both evaluated frequencies while the minimum falls. The GQ spot values are
+`[2.387031, 3.455374, 3.894257, 4.020533]` for the contracted result and
+`[2.389572, 3.422869, 3.758328, 4.068223]` for overlap: the two middle fields improve
+and the axis and full field worsen. The 64-ray hexapolar check has the same ordering.
+The small f-number difference should also be kept in mind when judging small MTF gains.
+
+Full-overlap cross-scores remain sampling-dependent after optimization:
+
+| Evaluation sampling | Contracted final lens | Overlap final lens |
+| --- | ---: | ---: |
+| 4×8 | 0.044703 | 0.044592 |
+| 8×16 | 0.043758 | 0.042761 |
+| 12×24 | 0.044008 | 0.043432 |
+| 24×48 | 0.044012 | 0.043442 |
+| 32×64 | 0.044012 | 0.043442 |
+
+The 8×16 score on the overlap-optimized lens underestimates its dense score by 1.57%,
+compared with 10.4% for the previous 4×8 optimized lens. The 12×24 evaluation differs
+from the dense score by 0.024%; 24×48 and 32×64 agree within 4e-10 waves. These are
+evaluation checks on the final lenses, not proof that optimizing at 12×24 would be
+converged. Native final merit RMS values (0.003843 and 0.003789) are not directly
+comparable between pupil regions.
+
+Both paired tests pass. This is a modest improvement in the common dense contrast
+score and a different MTF trade-off, not a uniform performance win. The Otus result
+does not justify changing the merit function or making overlap quadrature the default.
+The subsequent more-aberrated-lens comparison remains necessary. Only tests and this
+review changed; equivalent C++ optimization tests would need the same experiment.
+
+### Leica 75/2 Mandler factory comparison (2026-10-23)
+
+`LeicaApo75mmMandlerTest` runs two fresh optimizations from the committed,
+unmodified `Examples/jfotoptix/leica-r-apo-75mm-f2-mandler/specs-original.txt`,
+the input used by the example's `main`. Both use `createContrastSetup()` unchanged;
+only the overlap-quadrature flag differs. No saved optimized lens is needed.
+
+The factory uses 6×12 sampling, 11 fields from 0 to 1, contrast goals at 10, 20
+and 40 cycles/mm, 29 variables and 14,331 goals. It freezes `SetVig` vignetting,
+disables spot aperture checking, and disables residual centering, frequency
+calibration and exit-pupil aiming. Existing constraints and balance goals of
+weight 4 remain in both runs. Both solves return status 1; solve times are 276 s
+(contracted) and 469 s (overlap).
+
+For an independent physical check, each final prescription is rebuilt with fresh
+`SetVig` vignetting and aperture checking. The following geometric MTF values use
+64-ray hexapolar spot sampling and the factory's polychromatic configuration.
+Means and minima include both orientations at all 11 fields, with equal weight.
+
+| Metric | Initial | Contracted final | Overlap final |
+| --- | ---: | ---: | ---: |
+| Mean MTF, 10 cycles/mm | 0.709302 | 0.922730 | 0.909017 |
+| Minimum MTF, 10 cycles/mm | 0.574974 | 0.657149 | 0.640006 |
+| Mean MTF, 20 cycles/mm | 0.541632 | 0.816020 | 0.760170 |
+| Minimum MTF, 20 cycles/mm | 0.412148 | 0.439164 | 0.299482 |
+| Mean MTF, 40 cycles/mm | 0.293787 | 0.609171 | 0.479776 |
+| Minimum MTF, 40 cycles/mm | 0.051313 | 0.254430 | 0.067239 |
+
+Selected fields at 40 cycles/mm:
+
+| Field | Contracted sag | Overlap sag | Contracted tan | Overlap tan |
+| --- | ---: | ---: | ---: | ---: |
+| 0.0 | 0.736087 | 0.665574 | 0.735963 | 0.665181 |
+| 0.3 | 0.729515 | 0.697879 | 0.704316 | 0.642154 |
+| 0.5 | 0.697147 | 0.631971 | 0.698551 | 0.489090 |
+| 0.7 | 0.530288 | 0.365232 | 0.389285 | 0.109424 |
+| 0.9 | 0.622487 | 0.406277 | 0.354065 | 0.129027 |
+| 1.0 | 0.610901 | 0.575687 | 0.254430 | 0.067239 |
+
+Overlap is worse in both orientations at every sampled field at 40 cycles/mm.
+The largest sagittal/tangential separation within the balanced fields (0–0.9)
+rises from 0.268422 to 0.277250 at 40 cycles/mm, and from 0.263393 to 0.388647
+at 20 cycles/mm. Full field, excluded from the balance goals, has separations
+0.356471 and 0.508448 at 40 cycles/mm. Spot mean radius worsens at fields 0–0.9
+but improves slightly at full field (21.755 to 21.163). Focal lengths are
+74.521432 and 74.427738 mm; both f-numbers are 2.05.
+
+Common full-overlap evaluation of the frozen optimization models gives these
+equal-block RMS values in waves (32×64, pooling squared RMS equally across
+fields, wavelengths and orientations; not the weighted optimizer merit):
+
+| Frequency, cycles/mm | Contracted final | Overlap final |
+| --- | ---: | ---: |
+| 10 | 0.07560049 | 0.07532942 |
+| 20 | 0.14345712 | 0.14354346 |
+| 40 | 0.26048496 | 0.26389367 |
+
+Evaluation at 12×24 differs from 32×64 by less than 3.6e-8 waves for these six
+scores; 24×48 differs by less than 1.7e-9. This establishes evaluation stability
+on the final lenses, not convergence of optimization at 6×12. Native merit RMS
+falls from 0.236883 to 0.024564 (contracted), and from 0.349371 to 0.028025
+(overlap); the different integration regions prevent a direct comparison.
+
+The frozen, aperture-unchecked geometric report also worsens, so rebuilding the
+vignetting does not explain the ordering. A separate d-line diffraction check
+at pupil grid 256 agrees in direction: at field 0.7 and 40 cycles/mm,
+sagittal/tangential MTF changes from 0.493189/0.372464 to 0.323032/0.179065;
+at full field, from 0.625947/0.148746 to 0.568511/0.087791. Across the tested
+fields and frequencies, changing the grid from 128 to 256 changes MTF by at
+most 0.004074. These monochromatic entrance-pupil FFT values are corroborating
+diagnostics, not the same quantity as polychromatic geometric MTF or a validation
+of nonlinear exit-pupil mapping.
+
+**Conclusion:** correcting the pupil integration alone does not resolve this
+lens's sagittal/tangential divergence at the factory settings. The overlap run
+is substantially worse in independent MTF, and its common dense OPD score is
+also slightly worse at 20 and 40 cycles/mm. This is not evidence for replacing
+the Zemax squared-OPD merit. Changed pupil coverage changes the optimization
+landscape; optimization sampling convergence has not yet been established.
+Entrance-to-exit pupil frequency mapping also remains uncorrected in this setup.
+
+The unequal factory weights were assigned to counter previously observed
+optimization tendencies. Their presence is not evidence that they caused the
+original divergence; a uniform-weight comparison is needed to separate those effects.
+The factory's balance goals do not require equal MTF. They match weighted OPD
+energies, and the unequal orientation weights allow different unweighted
+energies: at field 0.9, weights 0.5 and 0.1 target five times as much tangential
+energy. Thus pupil correction cannot by itself guarantee coincident MTF curves.
+The next controlled check is a higher-density paired optimization with the same
+merit and weights, followed by pupil-mapping diagnostics if the discrepancy
+persists. Do not retune the balance goals during that comparison.
+
+Both tests pass. Final prescriptions are saved in
+`rayoptics/target/mandler-overlap-comparison/`; the run log is
+`rayoptics/target/mandler-overlap-comparison.log`. Only the new test and this
+review changed. Equivalent C++ optimization tests remain to be added; no
+production implementation or upstream-ported file changed.
+
+### Leica 75/2 with uniform orientation/field weights (2026-10-23)
+
+The author clarified that the factory's unequal weights were chosen to counter
+the original tendencies. The additional tests
+`optimizesUsingUniformContractedQuadrature` and
+`optimizesUsingUniformOverlapQuadrature` therefore set every sagittal and
+tangential field weight to 1. They retain the factory's other settings,
+including 6×12 sampling and balance goals of strength 4 on fields 0–0.9.
+The factory itself is unchanged. The uniform setup is reproduced in the test
+because the factory's weight argument does not control its hardcoded arrays.
+
+Both solves return status 1, taking 245 s (contracted) and 450 s (overlap).
+Independent geometric MTF uses the same fresh, aperture-checked models and
+64-ray hexapolar sampling as the preceding comparison.
+
+| Metric | Uniform contracted | Uniform overlap |
+| --- | ---: | ---: |
+| Mean MTF, 10 cycles/mm | 0.953580 | 0.953474 |
+| Minimum MTF, 10 cycles/mm | 0.864880 | 0.885868 |
+| Mean MTF, 20 cycles/mm | 0.853860 | 0.847214 |
+| Minimum MTF, 20 cycles/mm | 0.758727 | 0.759451 |
+| Mean MTF, 40 cycles/mm | 0.588307 | 0.565691 |
+| Minimum MTF, 40 cycles/mm | 0.390515 | 0.368717 |
+
+Selected fields at 40 cycles/mm:
+
+| Field | Contracted sag | Overlap sag | Contracted tan | Overlap tan |
+| --- | ---: | ---: | ---: | ---: |
+| 0.0 | 0.539789 | 0.484178 | 0.539842 | 0.483497 |
+| 0.3 | 0.568089 | 0.531206 | 0.540248 | 0.520746 |
+| 0.5 | 0.572275 | 0.545651 | 0.678932 | 0.661914 |
+| 0.7 | 0.390515 | 0.368717 | 0.791997 | 0.774482 |
+| 0.8 | 0.391858 | 0.373396 | 0.810216 | 0.801098 |
+| 0.9 | 0.544126 | 0.539764 | 0.756143 | 0.752727 |
+| 1.0 | 0.694624 | 0.726313 | 0.644945 | 0.642733 |
+
+The uniform contracted baseline reproduces the original tendency: sagittal MTF
+dips around fields 0.7–0.8 while tangential MTF remains high. At field 0.8 the
+40 cycles/mm separation is 0.418358; overlap increases it to 0.427702. Equal
+weights remove the unequal-energy target, but equal OPD energies still do not
+require equal MTF. This experiment does not isolate the balance goal's strength
+or establish optimization sampling convergence.
+
+Common 32×64 full-overlap RMS on the frozen optimization models, in waves:
+
+| Frequency, cycles/mm | Uniform contracted | Uniform overlap |
+| --- | ---: | ---: |
+| 10 | 0.05341654 | 0.05217366 |
+| 20 | 0.10086550 | 0.09939325 |
+| 40 | 0.18368725 | 0.18454615 |
+
+The dense score improves at 10 and 20 cycles/mm but worsens at 40. Evaluation
+at 12×24 differs from 32×64 by less than 3.9e-8 waves, and 24×48 by less than
+1.7e-10. Native merit RMS falls from 0.073018 to 0.015375 (contracted) and
+from 0.099051 to 0.016322 (overlap). Focal lengths are 74.637944 and
+74.610285 mm; both f-numbers are 2.05.
+
+The d-line diffraction check corroborates the split: at field 0.7 and
+40 cycles/mm, the 256-grid sagittal/tangential values are 0.333832/0.786519
+(contracted) and 0.311660/0.774122 (overlap). The largest 128-to-256 grid
+difference across the tested fields and frequencies is below 0.003738.
+The same monochromatic and pupil-mapping limitations noted above apply.
+
+**Conclusion:** the compensating weights change which orientation is favored;
+they do not explain away the original failure to balance MTF. Overlap quadrature
+alone does not remove that failure in this uniform-weight experiment. The next
+controlled test remains higher-density paired optimization with these same
+uniform weights and unchanged merit, followed by pupil-mapping checks. The
+present evidence does not justify changing the Zemax squared-OPD merit.
+
+Both new tests pass. Final prescriptions use the names `MandlerUniformContracted.txt`
+and `MandlerUniformOverlap.txt` in the existing target output directory; the log is
+`rayoptics/target/mandler-uniform-comparison.log`. Only tests and this review changed;
+equivalent C++ tests remain outstanding.
+
+### Leica 75/2 uniform weights at 12×24 (2026-10-23)
+
+`optimizesUsingDenseUniformContractedQuadrature` and
+`optimizesUsingDenseUniformOverlapQuadrature` repeat the uniform-weight pair at
+12×24. The original prescription, 29 variables, constraints, frequency goals,
+balance strength 4, frozen vignetting and solver tolerances are unchanged.
+Each setup has 57,099 goals. Both return solver status 1; solve times are
+923 s (contracted) and 1,274 s (overlap). The targeted offline Maven run passes
+both tests with no failures or errors, taking about 37.5 minutes including
+diagnostics.
+
+Independent aperture-checked geometric MTF, using the same evaluation as before:
+
+| Metric | Contracted 6×12 | Contracted 12×24 | Overlap 6×12 | Overlap 12×24 |
+| --- | ---: | ---: | ---: | ---: |
+| Mean MTF, 10 cycles/mm | 0.953580 | 0.951960 | 0.953474 | 0.954460 |
+| Minimum MTF, 10 cycles/mm | 0.864880 | 0.852199 | 0.885868 | 0.886143 |
+| Mean MTF, 20 cycles/mm | 0.853860 | 0.853810 | 0.847214 | 0.849429 |
+| Minimum MTF, 20 cycles/mm | 0.758727 | 0.756624 | 0.759451 | 0.759922 |
+| Mean MTF, 40 cycles/mm | 0.588307 | 0.596069 | 0.565691 | 0.570040 |
+| Minimum MTF, 40 cycles/mm | 0.390515 | 0.402798 | 0.368717 | 0.367844 |
+
+Selected fields at 40 cycles/mm for the 12×24 pair:
+
+| Field | Contracted sag | Overlap sag | Contracted tan | Overlap tan |
+| --- | ---: | ---: | ---: | ---: |
+| 0.0 | 0.553491 | 0.494044 | 0.553613 | 0.494221 |
+| 0.3 | 0.583983 | 0.544417 | 0.556453 | 0.519085 |
+| 0.5 | 0.586177 | 0.559853 | 0.679930 | 0.659647 |
+| 0.7 | 0.402798 | 0.368071 | 0.783189 | 0.785491 |
+| 0.8 | 0.403561 | 0.367844 | 0.801336 | 0.812138 |
+| 0.9 | 0.547007 | 0.529925 | 0.755609 | 0.756864 |
+| 1.0 | 0.682078 | 0.719304 | 0.646775 | 0.632956 |
+
+Both sampling densities retain the sagittal dip. At field 0.8 the
+sagittal/tangential separation changes from 0.418358 to 0.397775 when the
+contracted optimization density increases, and from 0.427702 to 0.444294 for
+overlap. Thus raising the density does not reverse the earlier MTF conclusion.
+At 12×24, overlap improves mean and minimum MTF at 10 cycles/mm; at 20 it
+improves the minimum slightly but lowers the mean; at 40 both measures worsen.
+
+Common 32×64 full-overlap RMS on the frozen optimization models, in waves:
+
+| Frequency, cycles/mm | Contracted 6×12 | Contracted 12×24 | Overlap 6×12 | Overlap 12×24 |
+| --- | ---: | ---: | ---: | ---: |
+| 10 | 0.05341654 | 0.05548963 | 0.05217366 | 0.05143877 |
+| 20 | 0.10086550 | 0.10398132 | 0.09939325 | 0.09816942 |
+| 40 | 0.18368725 | 0.18653137 | 0.18454615 | 0.18265978 |
+
+For the 12×24 pair, overlap improves this common score by 7.30%, 5.59% and
+2.08% at 10, 20 and 40 cycles/mm respectively. This equal-block diagnostic
+omits the optimizer's other goals and is not its total merit.
+
+Sampling checks on the final 12×24 lenses:
+
+| Evaluation sampling | Contracted RMS at 40 | Overlap RMS at 40 |
+| --- | ---: | ---: |
+| 6×12 | 0.18554401 | 0.18149964 |
+| 12×24 | 0.18653134 | 0.18265976 |
+| 24×48 | 0.18653137 | 0.18265978 |
+| 32×64 | 0.18653137 | 0.18265978 |
+
+The 6×12 evaluation underestimates the overlap lens's dense score by 0.85%,
+0.77% and 0.64% at the three frequencies. Across both lenses and all three
+frequencies, 12×24 evaluation differs from 32×64 by less than 2.9e-8 waves,
+and 24×48 by less than 2.9e-10. Final-lens evaluation is stable; the change
+between optimization densities still prevents a claim of fully converged
+optimization.
+
+Native merit RMS falls from 0.032234 to 0.007447 (contracted) and from
+0.049538 to 0.008237 (overlap). Do not compare these directly across pupil
+regions or densities: the integration region differs, and the reported RMS
+divides the sum of squares by a different goal count. Final focal lengths
+are 74.634952 and 74.633012 mm; both f-numbers are 2.05.
+
+The diffraction check retains the same ordering near the sagittal dip. At field
+0.7 and 40 cycles/mm, the 256-grid d-line sagittal/tangential values are
+0.349256/0.788096 (contracted) and 0.312322/0.782552 (overlap). Across the
+tested fields and frequencies, the largest 128-to-256 difference is below
+0.003615. The earlier monochromatic and entrance-pupil limitations still apply.
+
+**Conclusion:** at higher density, overlap produces a better common dense OPD
+score, but does not produce better high-frequency MTF or resolve the meridional
+split. The 6×12 optimization density is not the sole explanation. This supports
+retaining the pupil correction as an integration correction, but does not establish
+an optimization-performance benefit or justify making it the default.
+It also does not establish that a different merit function is needed.
+
+The next diagnostic should check the realized image frequency and exit-pupil
+shear per field, wavelength and orientation, and compare the OPD distributions
+with the existing phasor diagnostic. Frequency calibration and exit-pupil aiming
+remain disabled in these tests. That check can investigate the remaining pupil
+approximations without changing the Zemax squared-OPD merit or retuning weights.
+
+Final prescriptions are `MandlerUniformContracted12x24.txt` and
+`MandlerUniformOverlap12x24.txt` in `rayoptics/target/mandler-overlap-comparison/`.
+The log is `rayoptics/target/mandler-uniform-12x24.log`. Only tests and this review
+changed; no production or upstream-ported files changed. Equivalent C++ tests
+remain outstanding.
+
+### Summicron fixed-lens exit-pupil aiming check (2026-10-23)
+
+`SummicronExitPupilDiagnosticTest.comparesOrdinaryAndAimedReferenceSphereShear`
+uses the Accepted, committed and unmodified
+`Examples/jfotoptix/leica-m-summicron-50mm-f2/US004123144_Example09P.txt`, the
+original input identified for the contrast/MTF comparison. It does not use the
+modified working `prescription.txt` or generated README to select the input.
+There is no optimization. The model uses `SetVig`, fields 0–1 in steps of 0.1,
+all three wavelengths (587.5618, 486.1327 and 656.2725 nm), frequencies
+10/20/40 cycles/mm and 6×12 sampling. Partner tracing has aperture checking off,
+matching the contrast setup. Frequency calibration and overlap quadrature are off.
+
+The test traces the same reference sample coordinates with ordinary entrance-pupil
+displacements and with exit-pupil aiming. For each pair it measures the achieved
+transverse separation on the wavelength-specific reference sphere. The requested
+vector is `(D, 0)` sagittally or `(0, D)` tangentially, where
+`D = abs(R) * lambda * frequency / abs(n_image)`. The diagnostic records signed
+along-direction separation divided by D, maximum absolute cross-direction
+displacement, maximum two-dimensional vector error, and failures by category.
+Reported mean ratios are arithmetic sample means, not quadrature-weighted means.
+
+Each mode covers 198 field/wavelength/frequency/orientation blocks and 14,256
+ray pairs. Neither mode has a reference-ray, partner-ray or coordinate failure.
+
+| Metric across all sampled pairs | Ordinary | Exit-pupil aimed |
+| --- | ---: | ---: |
+| Minimum achieved/requested along-direction separation | 0.86344613 | 0.99999038 |
+| Maximum achieved/requested along-direction separation | 1.00990629 | 1.00000970 |
+| Maximum absolute cross-direction displacement, mm | 0.02872552 | 0.0000025984 |
+| Maximum vector error, mm | 0.21716164 | 0.0000026050 |
+| Maximum vector error divided by requested separation | 13.6554% | 0.0009705% |
+
+Selected ordinary-tracing ratios at 40 cycles/mm and 587.5618 nm:
+
+| Field | Sag min | Sag mean | Sag max | Tan min | Tan mean | Tan max |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0.0 | 1.001692 | 1.002841 | 1.007270 | 1.001692 | 1.002841 | 1.007270 |
+| 0.5 | 0.980086 | 0.981880 | 0.986330 | 0.955952 | 0.960747 | 0.965294 |
+| 1.0 | 0.924433 | 0.925183 | 0.926188 | 0.863874 | 0.865865 | 0.870822 |
+
+**Conclusion:** exit-pupil aiming already corrects the per-partner mapping to its
+reference-sphere target accurately on this Summicron. The worst aimed vector
+error is about 2.61 nm, within the existing solver tolerance. Ordinary rigid
+entrance-pupil displacements have a substantial orientation-dependent error
+off axis. There is no evidence here for adding another aiming correction.
+
+This is an end-to-end check of the production aiming target and its numerical
+solution, not an independent validation of the optical derivation of that target.
+The coordinate measurement uses the same reference-sphere convention as aiming.
+It does not measure actual aberrated-ray direction-cosine differences as a second
+definition of frequency. No claim about MTF improvement follows from this check.
+
+Aiming accuracy also does not establish the correct integration domain, area
+weights or aperture survival. The current entrance-pupil overlap option remains
+incompatible with exit-pupil aiming. All preceding paired overlap optimization
+experiments had aiming and frequency calibration disabled, so they did not test
+complete exit-pupil overlap integration. Any further pupil work should address
+that distinction explicitly rather than introduce a duplicate aiming correction
+or replace the Zemax squared-OPD merit on the basis of these measurements.
+
+The targeted offline Maven run passes (one test, no failures or errors).
+The test asserts zero aimed failures and vector error within the existing aiming
+acceptance tolerance. Per-block results are written to
+`rayoptics/target/summicron-exit-pupil-diagnostic.csv`; the run log is
+`rayoptics/target/summicron-exit-pupil-diagnostic.log`. Only the new diagnostic
+test and this review changed. No production or upstream-ported file changed;
+an equivalent C++ diagnostic remains outstanding.
+
+### Phasor diagnostic restored (2026-10-23)
+
+> **Not on `main`.** This diagnostic is on the branch `experimental_overlap_quadrature`
+> with the overlap quadrature; `ContrastReport` on `main` writes the RMS table only.
+
+`WavelengthResult.phasor(orientation)` now computes the normalized weighted complex
+average of `exp(i 2 pi dW)` over valid samples. It exposes real and imaginary
+components, modulus and valid weight. Raw OPD differences preserve the original
+image reference; residual-centering offsets do not alter this diagnostic.
+The contrast report retains the RMS table and adds the phasor-modulus table from
+the same rays. No extra tracing or optimizer evaluation is required.
+
+The phasor describes the sampled region. It is not absolute diffraction MTF and
+includes no overlap-area factor. No wavelength pooling is performed. Contracted
+sampling and nonlinear pupil mapping retain the limitations described above.
+The optimizer still uses its existing squared-OPD goals; no phasor goal has been
+restored. An instrumented optimization comparison is deferred until this diagnostic
+change is reviewed and committed. The calculation and regression tests need
+back-porting to `rayoptics-cpp`; no C++ checkout was changed.
+
 ---
 
 ## 7. The shear is applied at the entrance pupil, not the exit pupil
@@ -1493,9 +2208,17 @@ measurement and defects that need a fix, because they want different kinds of ef
     directions for the same design change despite agreeing statically. Consequences
     unknown; noted so it is not rediscovered.
 
+13. **The contrast quadrature samples a contracted circle, not the pupil overlap.** It
+    misses the overlap rim, so its integral differs from the OTF where the rim is
+    aberrated. See [the problem](#the-problem-one-contracted-circle-stands-in-for-two-overlaps)
+    and [possible solutions](#possible-solutions) in §6. Option C was implemented and
+    measured; it corrects the integral but did not improve optimized MTF on the Otus
+    or the Leica 75/2, and is kept on the unmerged branch `experimental_overlap_quadrature`.
+    Open: the off-axis region measurement described in §6.
+
 ### Latent
 
-13. **§6, if a case for it appears.** The least-squares residual stops tracking MTF above
+14. **§6, if a case for it appears.** The least-squares residual stops tracking MTF above
     ~0.1 waves; that is measured and not in doubt. What is missing is any current
     demonstration that it costs a design anything. A phasor MTF goal was implemented and
     reverted - read the outcome subsection *and* both postscripts before retrying, since
@@ -1685,6 +2408,33 @@ wrote `0`, `1` or `2` directly; the upstream-ported files (`Trace`, `SequentialM
 
 It also validates, which the goals did not: `GoalGeoMTF`, `GoalRayAberration` and
 `GoalMTFProxy` used to accept any integer and silently read the sagittal fan for it.
+
+## Diffraction MTF review fixes (2026-10-23)
+
+`Analyses.calc_psf` now keeps the pupil mask separate from phase. The upstream
+implementation removes samples with phase `1+0i`, including valid samples with
+zero OPD. An all-zero wavefront therefore produced a `NaN` PSF, and isolated
+zero samples created holes in the pupil. Finite OPD samples now remain illuminated;
+non-finite samples and FFT padding are excluded. This is an intentional correction
+to the ported function.
+
+`DiffractionMTF` now requires an even pupil grid of at least four samples per side.
+A two-sample grid contains only bounding-box corners, which can all lie outside
+a circular pupil. `calc_psf` rejects a PSF without a finite positive peak, and the
+MTF transform rejects a non-finite or non-positive total intensity before normalization.
+Empty pupils now raise `IllegalArgumentException` instead of returning `NaN`.
+
+Regression tests cover a zero-OPD circular pupil against the analytic diffraction
+limit, PSF invariance under a constant piston with mixed zero and nonzero OPD,
+an empty pupil, invalid PSF intensity, and two-sample grid rejection. The existing
+upstream comparison tests remain in place.
+
+Validation: `DiffractionMTFTest` and `AnalysesTest` pass all 15 tests with no
+failures or errors in the offline Maven reactor run.
+
+These changes are in the `rayoptics` module and need back-porting to
+`rayoptics-cpp`, including regression tests and regenerated Java expectations where
+affected. No C++ checkout was changed.
 
 ## How the numbers were obtained
 

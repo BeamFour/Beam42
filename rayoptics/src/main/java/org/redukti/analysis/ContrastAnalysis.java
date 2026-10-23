@@ -230,7 +230,7 @@ public class ContrastAnalysis {
         var sample = new ContrastAnalysisResult.Sample(
                 rays.pupil(), sagittal, tangential, rays.weight(), valid,
                 valid ? null : new ContrastAnalysisResult.Failure(
-                        "OPD", "NonFiniteWavefrontDifference", -1));
+                        "OPD", "NonFiniteWavefrontDifference", -1), reference);
         return sample;
     }
 

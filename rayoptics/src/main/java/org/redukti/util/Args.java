@@ -102,6 +102,11 @@ public final class Args {
      */
     public boolean output_contrast_report = false;
     /**
+     * Draw where in the pupil each contrast frequency loses contrast. See
+     * {@link org.redukti.analysis.ContrastPupilMap}.
+     */
+    public boolean output_contrast_pupil_maps = false;
+    /**
      * Write the monochromatic geometric MTF as a table, in the layout of the contrast
      * report. See {@link org.redukti.analysis.MonochromaticMTFReport}.
      */
@@ -192,6 +197,9 @@ public final class Args {
             }
             else if (arg1.equals("--output-contrast-report")) {
                 arguments.output_contrast_report = true;
+            }
+            else if (arg1.equals("--output-contrast-pupil-maps")) {
+                arguments.output_contrast_pupil_maps = true;
             }
             else if (arg1.equals("--output-wavelength-mtf-report")) {
                 arguments.output_wavelength_mtf_report = true;

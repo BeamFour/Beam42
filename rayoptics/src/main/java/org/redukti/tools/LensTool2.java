@@ -11,6 +11,7 @@ import org.redukti.mathlib.M;
 import org.redukti.optim.OptimizationPipeline;
 import org.redukti.optim.OptimizationTrial;
 import org.redukti.optim.Var;
+import org.redukti.plotter.ContrastPupilMapPlot;
 import org.redukti.plotter.GeoMTFByFieldPlot;
 import org.redukti.plotter.GeoMTFPlot;
 import org.redukti.plotter.PupilMapPlot;
@@ -22,6 +23,8 @@ import org.redukti.layout.LayoutOptions;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.parax.FirstOrderData;
 import org.redukti.rayoptics.raytr.TraceOptions;
+import org.redukti.rayoptics.specs.FieldSnapshot;
+import org.redukti.rayoptics.util.Orientation;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.RayOpticsModelBuilder;
 import org.redukti.spec.VigType;
@@ -451,13 +454,63 @@ public class LensTool2 {
      * sample rather than per field.
      */
     private static void generateContrastReport(OpticalModel opm, Args arguments, String outname, String filename_suffix) throws Exception {
-        var options = new ContrastOptions(0.0)
+        Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile,
+                suffixed_name(outname, filename_suffix, ".txt"), arguments.outdir),
+                ContrastReport.report(opm, arguments.mtf_freqs, contrastReportOptions()));
+    }
+
+    private static ContrastOptions contrastReportOptions() {
+        return new ContrastOptions(0.0)
                 .num_rings(CONTRAST_NUM_RINGS)
                 .num_spokes(CONTRAST_NUM_SPOKES)
                 .aim_exit_pupil(true);
-        Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile,
-                suffixed_name(outname, filename_suffix, ".txt"), arguments.outdir),
-                ContrastReport.report(opm, arguments.mtf_freqs, options));
+    }
+
+    /**
+     * Writes the contrast pupil maps at the reference wavelength, for the same three fields
+     * as the spot diagrams, sampled as the contrast report is. A frequency the analysis
+     * cannot sample is left out of the maps and reported on the console.
+     */
+    private static void generateContrastPupilMaps(OpticalModel opm, Args arguments, String filename_suffix) throws Exception {
+        int[] freqs = arguments.mtf_freqs;
+        var results = new ContrastAnalysisResult[freqs.length];
+        for (int k = 0; k < freqs.length; k++) {
+            try {
+                results[k] = ContrastAnalysis.eval(opm, contrastReportOptions().with_frequency(freqs[k]));
+            }
+            catch (IllegalArgumentException e) {
+                System.err.println("No contrast pupil map at " + freqs[k] + " cycles/mm: " + e.getMessage());
+            }
+        }
+        int wi = opm.optical_spec.wvls.reference_wvl;
+        var fields = opm.optical_spec.fov.fields;
+        for (int fi = 0; fi < fields.length; fi++) {
+            String name;
+            if (fields[fi].y == 0.0)
+                name = "contrast-pupil";
+            else if (fields[fi].y == 0.7)
+                name = "contrast-pupil-semi-skew";
+            else if (fields[fi].y == 1.0)
+                name = "contrast-pupil-skew";
+            else
+                continue;
+            var maps = new ContrastPupilMap[freqs.length][2];
+            FieldSnapshot snapshot = null;
+            for (int k = 0; k < freqs.length; k++) {
+                if (results[k] == null)
+                    continue;
+                var field = results[k].fields.get(fi);
+                snapshot = field.field();
+                var block = field.wavelengths().get(wi);
+                maps[k][0] = new ContrastPupilMap(block, Orientation.SAGITTAL);
+                maps[k][1] = new ContrastPupilMap(block, Orientation.TANGENTIAL);
+            }
+            if (snapshot == null)
+                continue;
+            Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile,
+                    suffixed_name(name, filename_suffix, ".svg"), arguments.outdir),
+                    new ContrastPupilMapPlot(snapshot, freqs, maps).plot());
+        }
     }
 
     // The optimizer's default contrast sampling, see OptimizationConfiguration
@@ -739,6 +792,8 @@ public class LensTool2 {
                     + PupilMapAnalysis.DEFAULT_NUM_SAMPLES);
             System.err.println("       --output-wavelength-mtf-report writes mtf-w-wavelength-report.txt: the monochromatic geometric MTF");
             System.err.println("         per --mtf frequency, wavelength, orientation and field, in the layout of the contrast report");
+            System.err.println("       --output-contrast-pupil-maps writes contrast-pupil[-semi-skew|-skew].svg: where in the pupil each --mtf");
+            System.err.println("         frequency loses contrast, sagittal and tangential, at the reference wavelength");
             System.err.println("       --output-contrast-report writes contrast-report-w.txt: the RMS contrast OPD difference");
             System.err.println("         per --mtf frequency, wavelength, orientation and field, for the weighted MTF wavelengths");
             System.err.println("       --mtf takes spatial frequencies in cycles/mm and defaults to 10,30,50, which is what the reports under Examples/ use");
@@ -839,6 +894,8 @@ public class LensTool2 {
                 // reference sphere set up for its last wavelength.
                 if (arguments.output_contrast_report)
                     generateContrastReport(opm, arguments, "contrast-report-w", scenario_filesuffix);
+                if (arguments.output_contrast_pupil_maps)
+                    generateContrastPupilMaps(opm, arguments, scenario_filesuffix);
             }
             createREADME(SB,
                     arguments.specfile,

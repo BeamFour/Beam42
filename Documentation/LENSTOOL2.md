@@ -315,6 +315,7 @@ Everything else has a default.
 | `--output-pupil-maps` | off | Additionally measure and draw which part of each field's pupil the lens passes, and which surface blocks the rest. See below.  Not linked to the README.                                                                                                                                                                                                       |
 | `--pupil-map-samples <n>` | 121 | Samples per axis in a pupil map. Only consulted with `--output-pupil-maps`. Minimum 2.                                                                                                                                                                                                                                                                         |
 | `--output-wavelength-mtf-report` | off | Additionally write the monochromatic geometric MTF per frequency, wavelength, orientation and field, in the layout of the contrast report. See below. Not linked to the README. |
+| `--output-contrast-pupil-maps` | off | Additionally draw where in the pupil each frequency loses contrast. See below. Not linked to the README. |
 | `--output-contrast-report` | off | Additionally write the RMS contrast OPD difference per frequency, wavelength, orientation and field. See below. Not linked to the README. |
 | `--output-ray-aberration-plots` | off | Additionally emit transverse ray aberration **and** wavefront (OPD) fan plots, tangential and sagittal, for each field.  Not linked to the README.                                                                                                                                                                                                             |
 | `--verbose` | off | Log the optimizer's progress to stderr, one line per iteration: merit, evaluations so far, elapsed time. Warnings are always shown.                                                                                                                                                                                                                            |
@@ -447,6 +448,28 @@ monochromatic geometric MTF in the same layout and for the same wavelengths, so
 the two files can be compared row by row. The values are those of the weighted
 MTF before the wavelengths are combined.
 
+### Contrast pupil maps
+
+`--output-contrast-pupil-maps` draws where in the pupil each `--mtf` frequency loses
+contrast, at the reference wavelength. `contrast-pupil<suffix>.svg`,
+`contrast-pupil-semi-skew<suffix>.svg` and `contrast-pupil-skew<suffix>.svg` cover fields
+0, 0.7 and 1.0, with a row per frequency, sagittal on the left and tangential on the right.
+The samples and settings are those of the contrast report.
+
+* **Circles** - one per sample, at its pupil position. The radius is
+  `½(1 − cos(Δφ − φ̄))`, where `Δφ` is the sample's phase difference across the shear and
+  `φ̄` the phase of the block's mean. No circle means the pair is in phase with the
+  block; full size means half a wave from it. Large circles mark where the MTF is lost.
+* **Hands** - the average phase of the two rays, `π(W(p) + W(p+s))`. Their turning
+  shows the shape of the wavefront.
+* **Panel heading** - the phasor `|Σ w·exp(iΔφ)| / Σw`, which is `1 − 2 × the
+  weighted mean circle size`, and the RMS OPD difference. The phasor is the MTF
+  relative to an aberration-free pupil over the sampled region.
+
+Each panel is scaled so the vignetted pupil fills it. Zemax's contrast pupil map uses
+`Δφ` without subtracting `φ̄`; the two agree sagittally on a rotationally symmetric lens.
+Subtracting `φ̄` keeps a pure image shift from showing as loss.
+
 ## Output files
 
 `<suffix>` is empty for a single configuration lens, or `-0`, `-1`, ... for a
@@ -474,6 +497,7 @@ spec with multiple configurations (a zoom, for instance).
 | `pupil-skew<suffix>.svg` | `--output-pupil-maps` | Measured pupil map, full field. Not included in the README. |
 | `pupil-report<suffix>.txt` | `--output-pupil-maps` | Per field: the vignetting scales, how far the bundle reaches, and how well each candidate mapping describes it. |
 | `mtf-w-wavelength-report<suffix>.txt` | `--output-wavelength-mtf-report` | Monochromatic geometric MTF per `--mtf` frequency, wavelength, orientation and field, for the wavelengths of the weighted MTF. |
+| `contrast-pupil[-semi-skew\|-skew]<suffix>.svg` | `--output-contrast-pupil-maps` | Contrast loss across the pupil, fields 0, 0.7 and 1.0, per `--mtf` frequency and orientation. |
 | `contrast-report-w<suffix>.txt` | `--output-contrast-report` | RMS contrast OPD difference per `--mtf` frequency, wavelength, orientation and field, for the wavelengths of the weighted MTF. |
 | `rayabbr-fld<i>-{tan,sag}<suffix>.svg` | `--output-ray-aberration-plots` | Transverse ray aberration fans. Not included in the README.                               |
 | `opdabbr-fld<i>-{tan,sag}<suffix>.svg` | `--output-ray-aberration-plots` | Wavefront (OPD) fans. Not included in the README.                                         |

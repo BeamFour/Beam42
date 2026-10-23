@@ -32,10 +32,19 @@ public class ContrastAnalysisResult {
      *                                for all samples in a wavelength and field adds up to 1.
      *                                The sum over valid samples may be less than 1.
      *                                See {@link ContrastAnalysis#generate_quadrature}.
+     * @param referenceOpd            the reference ray's OPD in waves, so that the shifted
+     *                                rays' OPDs are this plus the differences; NaN when not
+     *                                recorded
      */
     public record Sample(Vector2 pupil, double sagittalOpdDifference,
                          double tangentialOpdDifference, double weight, boolean valid,
-                         Failure failure) {
+                         Failure failure, double referenceOpd) {
+
+        public Sample(Vector2 pupil, double sagittalOpdDifference,
+                      double tangentialOpdDifference, double weight, boolean valid,
+                      Failure failure) {
+            this(pupil, sagittalOpdDifference, tangentialOpdDifference, weight, valid, failure, Double.NaN);
+        }
 
         public double sagittalResidual() { return Math.sqrt(weight) * sagittalOpdDifference; }
         public double tangentialResidual() { return Math.sqrt(weight) * tangentialOpdDifference; }

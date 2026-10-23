@@ -729,6 +729,110 @@ replaces it for current runs is not settled; [finding 8](#8-vignetting-is-a-movi
 covers what has been measured since, and the [open questions](#open-questions) list what
 has not.
 
+### Re-measured on a second lens: the Summicron 50/2
+
+Measured 2026-10-23 on the unoptimized `Accepted` prescription
+`Examples/jfotoptix/leica-m-summicron-50mm-f2/US004123144_Example09P.txt`, with
+LensTool2 `--output-contrast-report --output-wavelength-mtf-report`: 11 fields, the five
+weighted-MTF wavelengths, 10/30/50 cyc/mm, 24×48 sampling, exit-pupil aiming on. For
+each field and frequency the 10 rows (5 wavelengths × 2 orientations) were rank
+correlated (Spearman) between the RMS OPD difference σ, the phasor, and the geometric
+MTF.
+
+Phasor against geometric MTF, ideal +1:
+
+```text
+freq     0    0.1   0.2   0.3   0.4   0.5   0.6   0.7   0.8   0.9   1.0
+  10  0.90  0.96  0.96  0.94  0.95  0.98  1.00  1.00  1.00  1.00  1.00
+  30  1.00  0.98  0.99  0.96  0.96  0.95  0.88  0.93  0.90  0.99  1.00
+  50  0.98  0.96  0.99  0.94  0.96  0.90  0.96  0.82  0.98  0.99  0.94
+```
+
+σ against phasor, ideal −1:
+
+```text
+freq     0    0.1   0.2   0.3   0.4   0.5   0.6   0.7   0.8   0.9   1.0
+  10 -0.94 -0.76 -0.84 -0.78 -0.89 -0.87 -0.90 -0.84 -0.87 -0.87 -0.88
+  30 -0.36 -0.49 -0.27 -0.39 -0.52 -0.42 -0.26 -0.19 -0.16 -0.62 -0.81
+  50 -0.65 -0.55 -0.54 -0.50 -0.48 -0.41 -0.30 -0.25 -0.04 -0.27 -0.60
+```
+
+- The phasor matches the geometric MTF, as on the Leica, so the geometric MTF is a
+  usable reference here.
+- σ ranks the blocks correctly at 10 cyc/mm, where σ is mostly below 0.1 waves, and
+  at the two outer fields, where astigmatism dominates.
+- At 30 and 50 cyc/mm, on axis to field 0.8, σ is 0.13 to 0.5 waves and its ranking
+  is close to uncorrelated with the phasor. On axis at 30 cyc/mm, e and g have σ 0.191
+  and 0.196 but phasors 0.48 and 0.73.
+
+This confirms the ~0.1 wave validity limit on a second design: in that range the merit
+misjudges which wavelength and field is worse. It does not show that a solve is harmed
+by it; that is still unmeasured.
+
+**The vignetting model does not cause it.** Contrast rays are traced with aperture
+checking off, so the vignetting factors are the only bound on the sampled bundle. The
+same measurement was repeated with `VigType.None` and with contrast aperture checking
+on, where a sample counts only if all three of its rays pass every surface aperture:
+
+| vignetting, contrast apertures | phasor vs geo MTF | σ vs phasor, 30 cyc/mm | σ vs phasor, 50 cyc/mm |
+| --- | --- | --- | --- |
+| SetPupil, off (default) | 0.82 to 1.00 | −0.16 to −0.81 | −0.04 to −0.65 |
+| SetPupil, on | 0.84 to 1.00 | −0.26 to −0.87 | −0.07 to −0.67 |
+| None, on | 0.79 to 1.00 | −0.16 to −0.87 | +0.16 to −0.65 |
+| None, off | −0.39 to 1.00 | +0.45 to −0.54 | +0.49 to −0.88 |
+
+Whenever the bundle is bounded, by the factors or by the apertures, the result is the
+same. Without either, the contrast samples cover the whole unit pupil, including light
+the lens blocks: σ at full field, 10 cyc/mm, d line rises from 0.11 to 1.58 waves.
+The spot trace clips at the apertures, so the geometric MTF is unchanged and the two
+reports then describe different bundles.
+
+Share of sample weight that passes the apertures, d line, 10 cyc/mm:
+
+```text
+field        0    0.2   0.4   0.6   0.8   1.0
+SetPupil   1.00  0.98  0.97  0.96  0.95  0.95
+None       1.00  0.90  0.77  0.63  0.47  0.27
+```
+
+`SetPupil` admits 1-5% of the off-axis samples from light a surface aperture stops.
+
+### Re-measured on a corrected lens: the Sigma 40/1.4
+
+The same measurement on the `Accepted` prescription
+`Examples/jfotoptix/sigma-40mm-f1.4/Sigma-40mmf1.4.txt`. Median σ over the 10 rows, in
+waves, axis to full field:
+
+| freq | Summicron 50/2 | Sigma 40/1.4 |
+| --- | --- | --- |
+| 10 | 0.07 to 0.31 | 0.02 to 0.06 |
+| 30 | 0.19 to 0.72 | 0.07 to 0.14 |
+| 50 | 0.26 to 0.97 | 0.11 to 0.21 |
+
+σ against phasor, default settings, ideal −1:
+
+```text
+freq     0    0.1   0.2   0.3   0.4   0.5   0.6   0.7   0.8   0.9   1.0
+  10 -0.94 -0.99 -1.00 -0.99 -0.99 -0.94 -1.00 -0.96 -0.98 -0.93 -0.99
+  30 -0.94 -1.00 -1.00 -0.98 -0.98 -0.89 -0.85 -0.85 -0.87 -0.76 -0.96
+  50 -0.94 -1.00 -1.00 -0.99 -1.00 -0.90 -0.79 -0.93 -0.76 -0.36 -0.76
+```
+
+The phasor matches the geometric MTF here too (0.60 to 1.00, mostly above 0.95), and the
+vignetting and aperture variants behave as on the Summicron. Where σ is below about
+0.15 waves, σ ranks blocks as the phasor does; the weakest cells are at 50 cyc/mm near
+full field, where σ is about 0.2 waves.
+
+Across the two lenses the merit's ranking is reliable below roughly 0.1-0.15 waves and
+degrades steadily above it. A design that starts outside that range is steered by a
+measure that misjudges which block is worst. Untested: optimizing at 10 cyc/mm first,
+where both lenses are mostly in range, then raising the frequency.
+
+The default rows come from LensTool2 `--output-contrast-report
+--output-wavelength-mtf-report`. The aperture-checked and `None` rows came from a scratch
+driver calling `ContrastReport` with `check_apertures(true)` on the model LensTool2
+builds; it reproduced the default LensTool2 output exactly and was not retained.
+
 ---
 
 ## 7. The shear is applied at the entrance pupil, not the exit pupil

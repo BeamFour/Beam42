@@ -1457,6 +1457,74 @@ The log is `rayoptics/target/mandler-uniform-12x24.log`. Only tests and this rev
 changed; no production or upstream-ported files changed. Equivalent C++ tests
 remain outstanding.
 
+### Summicron fixed-lens exit-pupil aiming check (2026-10-23)
+
+`SummicronExitPupilDiagnosticTest.comparesOrdinaryAndAimedReferenceSphereShear`
+uses the Accepted, committed and unmodified
+`Examples/jfotoptix/leica-m-summicron-50mm-f2/US004123144_Example09P.txt`, the
+original input identified for the contrast/MTF comparison. It does not use the
+modified working `prescription.txt` or generated README to select the input.
+There is no optimization. The model uses `SetVig`, fields 0–1 in steps of 0.1,
+all three wavelengths (587.5618, 486.1327 and 656.2725 nm), frequencies
+10/20/40 cycles/mm and 6×12 sampling. Partner tracing has aperture checking off,
+matching the contrast setup. Frequency calibration and overlap quadrature are off.
+
+The test traces the same reference sample coordinates with ordinary entrance-pupil
+displacements and with exit-pupil aiming. For each pair it measures the achieved
+transverse separation on the wavelength-specific reference sphere. The requested
+vector is `(D, 0)` sagittally or `(0, D)` tangentially, where
+`D = abs(R) * lambda * frequency / abs(n_image)`. The diagnostic records signed
+along-direction separation divided by D, maximum absolute cross-direction
+displacement, maximum two-dimensional vector error, and failures by category.
+Reported mean ratios are arithmetic sample means, not quadrature-weighted means.
+
+Each mode covers 198 field/wavelength/frequency/orientation blocks and 14,256
+ray pairs. Neither mode has a reference-ray, partner-ray or coordinate failure.
+
+| Metric across all sampled pairs | Ordinary | Exit-pupil aimed |
+| --- | ---: | ---: |
+| Minimum achieved/requested along-direction separation | 0.86344613 | 0.99999038 |
+| Maximum achieved/requested along-direction separation | 1.00990629 | 1.00000970 |
+| Maximum absolute cross-direction displacement, mm | 0.02872552 | 0.0000025984 |
+| Maximum vector error, mm | 0.21716164 | 0.0000026050 |
+| Maximum vector error divided by requested separation | 13.6554% | 0.0009705% |
+
+Selected ordinary-tracing ratios at 40 cycles/mm and 587.5618 nm:
+
+| Field | Sag min | Sag mean | Sag max | Tan min | Tan mean | Tan max |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0.0 | 1.001692 | 1.002841 | 1.007270 | 1.001692 | 1.002841 | 1.007270 |
+| 0.5 | 0.980086 | 0.981880 | 0.986330 | 0.955952 | 0.960747 | 0.965294 |
+| 1.0 | 0.924433 | 0.925183 | 0.926188 | 0.863874 | 0.865865 | 0.870822 |
+
+**Conclusion:** exit-pupil aiming already corrects the per-partner mapping to its
+reference-sphere target accurately on this Summicron. The worst aimed vector
+error is about 2.61 nm, within the existing solver tolerance. Ordinary rigid
+entrance-pupil displacements have a substantial orientation-dependent error
+off axis. There is no evidence here for adding another aiming correction.
+
+This is an end-to-end check of the production aiming target and its numerical
+solution, not an independent validation of the optical derivation of that target.
+The coordinate measurement uses the same reference-sphere convention as aiming.
+It does not measure actual aberrated-ray direction-cosine differences as a second
+definition of frequency. No claim about MTF improvement follows from this check.
+
+Aiming accuracy also does not establish the correct integration domain, area
+weights or aperture survival. The current entrance-pupil overlap option remains
+incompatible with exit-pupil aiming. All preceding paired overlap optimization
+experiments had aiming and frequency calibration disabled, so they did not test
+complete exit-pupil overlap integration. Any further pupil work should address
+that distinction explicitly rather than introduce a duplicate aiming correction
+or replace the Zemax squared-OPD merit on the basis of these measurements.
+
+The targeted offline Maven run passes (one test, no failures or errors).
+The test asserts zero aimed failures and vector error within the existing aiming
+acceptance tolerance. Per-block results are written to
+`rayoptics/target/summicron-exit-pupil-diagnostic.csv`; the run log is
+`rayoptics/target/summicron-exit-pupil-diagnostic.log`. Only the new diagnostic
+test and this review changed. No production or upstream-ported file changed;
+an equivalent C++ diagnostic remains outstanding.
+
 ### Phasor diagnostic restored (2026-10-23)
 
 `WavelengthResult.phasor(orientation)` now computes the normalized weighted complex

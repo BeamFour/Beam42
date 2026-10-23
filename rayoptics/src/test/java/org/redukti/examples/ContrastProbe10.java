@@ -37,7 +37,7 @@ public class ContrastProbe10 {
                     double sw = 0, m = 0, m2 = 0, re = 0, im = 0;
                     for (var w : c.fields.get(f).wavelengths())
                         for (var s : w.samples()) {
-                            double d = dir == 0 ? s.sagittalDifference() : s.tangentialDifference();
+                            double d = dir == 0 ? s.sagittalOpdDifference() : s.tangentialOpdDifference();
                             sw += s.weight();
                             m += s.weight() * d;
                             m2 += s.weight() * d * d;

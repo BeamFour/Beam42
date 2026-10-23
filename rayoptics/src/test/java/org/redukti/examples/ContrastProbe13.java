@@ -97,8 +97,8 @@ public class ContrastProbe13 {
                 for (var w : fr.wavelengths())
                     for (var s : w.samples()) {
                         sw += s.weight();
-                        mt += s.weight() * s.tangentialDifference();
-                        t2 += s.weight() * s.tangentialDifference() * s.tangentialDifference();
+                        mt += s.weight() * s.tangentialOpdDifference();
+                        t2 += s.weight() * s.tangentialOpdDifference() * s.tangentialOpdDifference();
                     }
                 mt /= sw; t2 /= sw;
                 sb.append(String.format(" %8.5f", Math.sqrt(Math.max(0, t2 - mt * mt))));

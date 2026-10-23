@@ -98,8 +98,8 @@ class ContrastAnalysisTest {
                 assertEquals(1.0, wavelength.samples().stream()
                         .mapToDouble(ContrastAnalysisResult.Sample::weight).sum(), 1.0e-14);
                 for (var sample : wavelength.samples()) {
-                    assertTrue(Double.isFinite(sample.sagittalDifference()));
-                    assertTrue(Double.isFinite(sample.tangentialDifference()));
+                    assertTrue(Double.isFinite(sample.sagittalOpdDifference()));
+                    assertTrue(Double.isFinite(sample.tangentialOpdDifference()));
                     assertTrue(Double.isFinite(sample.sagittalResidual()));
                     assertTrue(Double.isFinite(sample.tangentialResidual()));
                 }

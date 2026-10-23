@@ -32,7 +32,7 @@ public class ContrastProbe5 {
             for (var fr : c.fields)
                 for (var w : fr.wavelengths())
                     for (var s : w.samples()) {
-                        maxAbs = Math.max(maxAbs, Math.abs(s.tangentialDifference()));
+                        maxAbs = Math.max(maxAbs, Math.abs(s.tangentialOpdDifference()));
                         maxR = Math.max(maxR, s.pupil().len());
                     }
             System.out.printf("freq=%6.0f shift=%.4f  maxSampleRadius=%.5f  max|dW|=%.6f%n",

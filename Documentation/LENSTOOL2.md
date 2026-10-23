@@ -466,9 +466,8 @@ The samples and settings are those of the contrast report.
   weighted mean circle size`, and the RMS OPD difference. The phasor is the MTF
   relative to an aberration-free pupil over the sampled region.
 
-Each panel is scaled so the vignetted pupil fills it. Zemax's contrast pupil map uses
-`Δφ` without subtracting `φ̄`; the two agree sagittally on a rotationally symmetric lens.
-Subtracting `φ̄` keeps a pure image shift from showing as loss.
+Each panel is scaled so the vignetted pupil fills it. 
+Subtracting `φ̄` from `Δφ` keeps a pure image shift from showing as loss.
 
 ## Output files
 

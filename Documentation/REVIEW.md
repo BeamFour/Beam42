@@ -1059,6 +1059,66 @@ sampling region from the FFT's entrance-pupil grid, and needs no change to the c
 
 ---
 
+### Otus optimization comparison (2026-10-23)
+
+`ZeissOtusML50mmTest.optimizesPatentPrescriptionUsingOverlapQuadrature` uses the
+existing contrast test's prescription, variables, weights, constraints and solver.
+The only optimization setting changed is `contrastOverlapQuadrature(true)`.
+Both optimize the original squared-OPD residuals at 20 cycles/mm, with 4×8 contrast
+sampling, ray-aberration goals and the existing paraxial anchors. Exit-pupil aiming,
+frequency calibration and residual centering remain off. The existing baseline
+golden values are unchanged.
+
+Independent geometric MTF at 40 cycles/mm and the baseline's GQ spot measure give:
+
+| Field | Contracted sag | Overlap sag | Contracted tan | Overlap tan | Contracted spot | Overlap spot |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0.0 | 0.907920 | 0.888843 | 0.907920 | 0.888843 | 2.443825 | 2.767385 |
+| 0.3 | 0.861465 | 0.837660 | 0.802540 | 0.818522 | 3.523623 | 3.780481 |
+| 0.7 | 0.758228 | 0.754220 | 0.802917 | 0.816424 | 4.034198 | 4.085174 |
+| 1.0 | 0.789821 | 0.781202 | 0.802231 | 0.768039 | 3.977086 | 4.133292 |
+
+The mean of the eight MTF values falls from 0.829130 to 0.819219; the minimum falls
+from 0.758228 to 0.754220. Tangential MTF improves at fields 0.3 and 0.7; the other
+six values and all four spot values worsen. The 64-ray hexapolar spot check also
+worsens at all four fields. The focal length is essentially unchanged (50.150873
+versus 50.150558 mm), as is the f-number (1.428184 versus 1.427639).
+
+Both solves converge. Native merit RMS falls from 0.087201 to 0.007391 for the
+contracted pattern and from 0.082864 to 0.006918 for overlap quadrature. The final
+native merit values are not comparable because the sampled regions and weights
+differ. Cross-scoring both final lenses with the same 32×64 full-overlap integral at
+20 cycles/mm gives an equal-block RMS of 0.045591 waves for the contracted result
+and 0.047840 for the overlap result. These dense scores agree with 24×48 to less
+than 2e-9 waves.
+
+Full-overlap cross-scores at different integration densities are:
+
+| Evaluation sampling | Contracted final lens | Overlap final lens |
+| --- | ---: | ---: |
+| 4×8 | 0.046836 | 0.042858 |
+| 8×16 | 0.045278 | 0.047946 |
+| 12×24 | 0.045585 | 0.047815 |
+| 24×48 | 0.045591 | 0.047840 |
+| 32×64 | 0.045591 | 0.047840 |
+
+The 4×8 overlap rule underestimates its optimized lens's dense RMS by 10.4%;
+8×16 differs by 0.22% and 12×24 by 0.052%. At 4×8 the overlap result appears
+better than the contracted result under this common score, but the ordering
+reverses with denser evaluation. This demonstrates integration error in the coarse
+rule; it does not establish that sampling is the sole cause of the optimization
+outcome. Equal point counts do not give equal accuracy for the two different rules.
+
+This test does not demonstrate better optimization with overlap quadrature at 4×8.
+It records a mixed MTF trade-off and a worse dense overlap score. Correcting the
+integration region does not guarantee a better numerical optimum at a fixed low
+sample count. The next comparison should run both modes at higher density (8×16 or
+12×24), retaining the same squared-OPD merit and independent MTF evaluation.
+No phasor goal or other replacement merit was introduced. The paired tests passed,
+including all existing baseline golden values and the new measured overlap values.
+Only the test and this review were changed; the regression and its Java expectations
+need carrying to the C++ port if that port maintains equivalent optimization tests.
+
 ### Phasor diagnostic restored (2026-10-23)
 
 `WavelengthResult.phasor(orientation)` now computes the normalized weighted complex

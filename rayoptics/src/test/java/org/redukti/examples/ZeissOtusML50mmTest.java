@@ -76,6 +76,10 @@ class ZeissOtusML50mmTest {
      * measurement below, where the cost of an extra frequency is a table lookup.
      */
     private static OptimizationSetup frozenContrastSetup(Prescription prescription) {
+        return frozenContrastSetup(prescription, false);
+    }
+
+    private static OptimizationSetup frozenContrastSetup(Prescription prescription, boolean overlapQuadrature) {
         double[] fieldWeights = {1.0, 1.0, 1.0, 1.0};
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
@@ -89,6 +93,7 @@ class ZeissOtusML50mmTest {
                 // were generated, so keep them to preserve the merit.
                 .rayAberrationGoals()
                 .contrastSampling(4, 8)
+                .contrastOverlapQuadrature(overlapQuadrature)
                 // One frequency, not three. Each entry costs a full
                 // ContrastAnalysis.eval per merit evaluation - 4 fields x 3
                 // wavelengths x rings x spokes samples x 3 rays - and that trace
@@ -190,6 +195,85 @@ class ZeissOtusML50mmTest {
                 "40 cycle/mm tangential MTF");
         System.out.println("Contrast Otus: elapsedMs=" + elapsedMillis
                 + " initialRms=" + initialRms + " finalRms=" + finalRms);
+        printContrastDiagnostics("Contracted", analysis);
+    }
+
+    @Test
+    void optimizesPatentPrescriptionUsingOverlapQuadrature() throws Exception {
+        Path input = repositoryRoot().resolve(
+                "Examples/jfotoptix/cosina-otus-ml-50mm-f1.4/JP2026-105585_Example01.txt");
+        var prescription = ZeissOtusML50mm.getPrescription(input.toString(), false, false);
+        var setup = frozenContrastSetup(prescription, true);
+        var analysis = setup.analysis();
+        assertTrue(analysis._contrast_overlap_quadrature);
+        assertTrue(!analysis._contrast_aim_exit_pupil && !analysis._contrast_calibrate_frequency
+                && !analysis._contrast_center_residuals);
+        analysis.compute();
+        var merit = setup.meritFunction(false);
+        double initialRms = merit.getRMS();
+        long started = System.nanoTime();
+        int status = merit.getSolver().solve();
+        long elapsedMillis = (System.nanoTime() - started) / 1_000_000;
+        double finalRms = merit.getRMS();
+        assertTrue(status > 0, "Optimizer failed with status " + status);
+        assertTrue(finalRms < initialRms, "Overlap contrast merit did not improve");
+
+        // Use exactly the baseline's independent spot and geometric MTF evaluation.
+        analysis.required_analyses(true, true, true);
+        analysis.compute();
+        double[] spotRms = java.util.Arrays.stream(analysis._spots)
+                .mapToDouble(spot -> spot.get_mean_radius()).toArray();
+        double[] hexapolarSpotRms = SpotAnalysis.eval(analysis._opt_model,
+                        new SpotOptions().use_hexapolar().num_rays(64))
+                .spot_results.stream().mapToDouble(spot -> spot.get_mean_radius()).toArray();
+        // Measured regression values, not a claim that overlap quadrature beats
+        // the contracted baseline at this sampling density. See REVIEW.md.
+        assertEquals(0.0069180830, finalRms, 1.0e-6);
+        assertArrayEquals(new double[]{2.76738509, 3.78048141, 4.08517397, 4.13329158}, spotRms, 1.0e-6);
+        assertArrayEquals(new double[]{2.77295670, 4.02153034, 4.20537846, 4.17489227}, hexapolarSpotRms, 1.0e-6);
+        assertArrayEquals(new double[]{0.88884288, 0.83766013, 0.75421964, 0.78120245},
+                analysis._mtfs[2].sag_mtf_by_field, 1.0e-6);
+        assertArrayEquals(new double[]{0.88884288, 0.81852165, 0.81642384, 0.76803906},
+                analysis._mtfs[2].tan_mtf_by_field, 1.0e-6);
+        System.out.println("Overlap Otus: elapsedMs=" + elapsedMillis
+                + " initialRms=" + initialRms + " finalRms=" + finalRms);
+        System.out.println("Overlap spot RMS: " + java.util.Arrays.toString(spotRms));
+        System.out.println("Overlap hexapolar spot RMS: " + java.util.Arrays.toString(hexapolarSpotRms));
+        for (int i = 0; i < analysis._mtfs.length; i++) {
+            for (double value : analysis._mtfs[i].sag_mtf_by_field)
+                assertTrue(Double.isFinite(value) && value >= 0 && value <= 1);
+            for (double value : analysis._mtfs[i].tan_mtf_by_field)
+                assertTrue(Double.isFinite(value) && value >= 0 && value <= 1);
+        }
+        printContrastDiagnostics("Overlap", analysis);
+    }
+
+    private static void printContrastDiagnostics(String label, org.redukti.optim.Analysis analysis) {
+        System.out.println(label + " paraxial: efl=" + analysis._pfo[ParaxHelper.Effective_focal_length]
+                + " fno=" + analysis._pfo[ParaxHelper.Fno]);
+        for (var mtf : analysis._mtfs)
+            System.out.println(label + " MTF " + mtf.freq
+                    + " sag=" + java.util.Arrays.toString(mtf.sag_mtf_by_field)
+                    + " tan=" + java.util.Arrays.toString(mtf.tan_mtf_by_field));
+        // Cross-score both designs using the same dense full-overlap integral.
+        // Their native solver merit values describe different sampled regions.
+        for (int rings : new int[]{4, 8, 12, 24, 32}) {
+            var dense = org.redukti.analysis.ContrastAnalysis.eval(analysis._opt_model,
+                    new org.redukti.analysis.ContrastOptions(20).num_rings(rings).num_spokes(2 * rings)
+                            .overlap_quadrature(true));
+            double sum = 0;
+            int blocks = 0;
+            for (var field : dense.fields)
+                for (var block : field.wavelengths())
+                    for (int axis : new int[]{0, 1}) {
+                        double rms = org.redukti.analysis.ContrastReport.rms(block, axis);
+                        assertTrue(Double.isFinite(rms));
+                        sum += rms * rms;
+                        blocks++;
+                    }
+            System.out.println(label + " dense overlap " + rings + "x" + 2 * rings
+                    + " block RMS=" + Math.sqrt(sum / blocks));
+        }
     }
 
     @Test

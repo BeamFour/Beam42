@@ -732,9 +732,9 @@ has not.
 ### Re-measured on a second lens: the Summicron 50/2
 
 Measured 2026-10-23 on the unoptimized `Accepted` prescription
-`Examples/jfotoptix/leica-m-summicron-50mm-f2/US004123144_Example09P.txt`, with
-LensTool2 `--output-contrast-report --output-wavelength-mtf-report`: 11 fields, the five
-weighted-MTF wavelengths, 10/30/50 cyc/mm, 24×48 sampling, exit-pupil aiming on. For
+`Examples/jfotoptix/leica-m-summicron-50mm-f2/US004123144_Example09P.txt`: 11 fields, the
+five weighted-MTF wavelengths, 10/30/50 cyc/mm, 24×48 sampling, exit-pupil aiming on; see
+the end of the Sigma subsection below for how the values were produced. For
 each field and frequency the 10 rows (5 wavelengths × 2 orientations) were rank
 correlated (Spearman) between the RMS OPD difference σ, the phasor, and the geometric
 MTF.
@@ -828,10 +828,13 @@ degrades steadily above it. A design that starts outside that range is steered b
 measure that misjudges which block is worst. Untested: optimizing at 10 cyc/mm first,
 where both lenses are mostly in range, then raising the frequency.
 
-The default rows come from LensTool2 `--output-contrast-report
---output-wavelength-mtf-report`. The aperture-checked and `None` rows came from a scratch
-driver calling `ContrastReport` with `check_apertures(true)` on the model LensTool2
-builds; it reproduced the default LensTool2 output exactly and was not retained.
+The geometric MTF comes from LensTool2 `--output-wavelength-mtf-report`. σ and the
+phasor come from a version of `ContrastReport` that also tabulated the phasor, run at
+24×48 sampling; it has been set aside and is not in the code. LensTool2
+`--output-contrast-report` now writes σ alone, at the optimizer's 6×12, so its values
+differ from those above. The aperture-checked and `None` rows came from a scratch driver
+calling that report with `check_apertures(true)` on the model LensTool2 builds; it
+reproduced the LensTool2 output of the time exactly and was not retained.
 
 ---
 

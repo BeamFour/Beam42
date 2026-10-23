@@ -54,10 +54,10 @@ public class ContrastProbe {
                     double sumw = 0, ms = 0, mt = 0, s2 = 0, t2 = 0, rmax = 0;
                     for (var s : w.samples()) {
                         sumw += s.weight();
-                        ms += s.weight() * s.sagittalDifference();
-                        mt += s.weight() * s.tangentialDifference();
-                        s2 += s.weight() * s.sagittalDifference() * s.sagittalDifference();
-                        t2 += s.weight() * s.tangentialDifference() * s.tangentialDifference();
+                        ms += s.weight() * s.sagittalOpdDifference();
+                        mt += s.weight() * s.tangentialOpdDifference();
+                        s2 += s.weight() * s.sagittalOpdDifference() * s.sagittalOpdDifference();
+                        t2 += s.weight() * s.tangentialOpdDifference() * s.tangentialOpdDifference();
                         rmax = Math.max(rmax, s.pupil().len());
                     }
                     ms /= sumw; mt /= sumw; s2 /= sumw; t2 /= sumw;

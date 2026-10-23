@@ -114,7 +114,7 @@ public class ContrastAnalysis {
         for (var sample : wavelength.samples()) {
             if (!sample.valid()) continue;
             double difference = orientation == Orientation.SAGITTAL
-                    ? sample.sagittalDifference() : sample.tangentialDifference();
+                    ? sample.sagittalOpdDifference() : sample.tangentialOpdDifference();
             if (!Double.isFinite(difference)) continue;
             weightedSum += sample.weight() * difference;
             weightSum += sample.weight();

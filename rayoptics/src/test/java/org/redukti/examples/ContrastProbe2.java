@@ -22,8 +22,8 @@ public class ContrastProbe2 {
         for (var f : c.fields)
             for (var w : f.wavelengths())
                 for (var s : w.samples()) {
-                    v.add(Math.sqrt(s.weight()) * s.sagittalDifference());
-                    v.add(Math.sqrt(s.weight()) * s.tangentialDifference());
+                    v.add(Math.sqrt(s.weight()) * s.sagittalOpdDifference());
+                    v.add(Math.sqrt(s.weight()) * s.tangentialOpdDifference());
                 }
         return v.stream().mapToDouble(Double::doubleValue).toArray();
     }
@@ -69,10 +69,10 @@ public class ContrastProbe2 {
                     double sw = 0, ms = 0, mt = 0, s2 = 0, t2 = 0;
                     for (var s : w.samples()) {
                         sw += s.weight();
-                        ms += s.weight() * s.sagittalDifference();
-                        mt += s.weight() * s.tangentialDifference();
-                        s2 += s.weight() * s.sagittalDifference() * s.sagittalDifference();
-                        t2 += s.weight() * s.tangentialDifference() * s.tangentialDifference();
+                        ms += s.weight() * s.sagittalOpdDifference();
+                        mt += s.weight() * s.tangentialOpdDifference();
+                        s2 += s.weight() * s.sagittalOpdDifference() * s.sagittalOpdDifference();
+                        t2 += s.weight() * s.tangentialOpdDifference() * s.tangentialOpdDifference();
                     }
                     sosTotal += s2 + t2;
                     sosMean += (ms * ms + mt * mt) / sw;
@@ -98,8 +98,8 @@ public class ContrastProbe2 {
                 double sw = 0, mt = 0, t2 = 0;
                 for (var w : c.fields.get(f).wavelengths())
                     for (var s : w.samples()) {
-                        sw += s.weight(); mt += s.weight() * s.tangentialDifference();
-                        t2 += s.weight() * s.tangentialDifference() * s.tangentialDifference();
+                        sw += s.weight(); mt += s.weight() * s.tangentialOpdDifference();
+                        t2 += s.weight() * s.tangentialOpdDifference() * s.tangentialOpdDifference();
                     }
                 mt /= sw; t2 /= sw;
                 double var = Math.max(0, t2 - mt * mt);

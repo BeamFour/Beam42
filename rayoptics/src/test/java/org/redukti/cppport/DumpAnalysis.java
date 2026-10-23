@@ -141,8 +141,8 @@ public class DumpAnalysis {
                     var s = w.samples().get(si);
                     sb.append("   [").append(si).append("] pupil=").append(s.pupil().x)
                             .append(",").append(s.pupil().y)
-                            .append(" sag=").append(s.sagittalDifference())
-                            .append(" tan=").append(s.tangentialDifference())
+                            .append(" sag=").append(s.sagittalOpdDifference())
+                            .append(" tan=").append(s.tangentialOpdDifference())
                             .append(" w=").append(s.weight())
                             .append(" valid=").append(s.valid())
                             .append(" fail=")

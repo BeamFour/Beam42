@@ -44,10 +44,10 @@ public class ContrastProbe9 {
                 for (var w : c.fields.get(f).wavelengths())
                     for (var s : w.samples()) {
                         sw += s.weight();
-                        ms += s.weight() * s.sagittalDifference();
-                        mt += s.weight() * s.tangentialDifference();
-                        s2 += s.weight() * s.sagittalDifference() * s.sagittalDifference();
-                        t2 += s.weight() * s.tangentialDifference() * s.tangentialDifference();
+                        ms += s.weight() * s.sagittalOpdDifference();
+                        mt += s.weight() * s.tangentialOpdDifference();
+                        s2 += s.weight() * s.sagittalOpdDifference() * s.sagittalOpdDifference();
+                        t2 += s.weight() * s.tangentialOpdDifference() * s.tangentialOpdDifference();
                     }
                 ms /= sw; mt /= sw; s2 /= sw; t2 /= sw;
                 System.out.printf(

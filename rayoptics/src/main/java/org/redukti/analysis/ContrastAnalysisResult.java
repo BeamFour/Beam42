@@ -18,12 +18,27 @@ public class ContrastAnalysisResult {
         this.spatialFrequency = spatialFrequency;
     }
 
-    public record Sample(Vector2 pupil, double sagittalDifference,
-                         double tangentialDifference, double weight, boolean valid,
+    /**
+     * One pupil point of a contrast analysis: the wavefront difference the frequency's
+     * pupil shear produces there, in each orientation.
+     *
+     * @param pupil                   the reference ray's pupil coordinate
+     * @param sagittalOpdDifference   OPD of the sagittally shifted ray less the reference
+     *                                ray's OPD, in waves
+     * @param tangentialOpdDifference OPD of the tangentially shifted ray less the
+     *                                reference ray's OPD, in waves
+     * @param weight                  the reference ray's gaussian-quadrature weight times the
+     *                                vignetting factor, normalized so that the sum of weights
+     *                                for all samples in a wavelength and field adds up to 1.
+     *                                The sum over valid samples may be less than 1.
+     *                                See {@link ContrastAnalysis#generate_quadrature}.
+     */
+    public record Sample(Vector2 pupil, double sagittalOpdDifference,
+                         double tangentialOpdDifference, double weight, boolean valid,
                          Failure failure) {
 
-        public double sagittalResidual() { return Math.sqrt(weight) * sagittalDifference; }
-        public double tangentialResidual() { return Math.sqrt(weight) * tangentialDifference; }
+        public double sagittalResidual() { return Math.sqrt(weight) * sagittalOpdDifference; }
+        public double tangentialResidual() { return Math.sqrt(weight) * tangentialOpdDifference; }
     }
 
     public record Failure(String ray, String exceptionType, int surface) {
@@ -61,12 +76,12 @@ public class ContrastAnalysisResult {
          */
         public double sagittalResidual(int index) {
             var sample = samples.get(index);
-            return Math.sqrt(sample.weight()) * (sample.sagittalDifference() - sagittalOffset);
+            return Math.sqrt(sample.weight()) * (sample.sagittalOpdDifference() - sagittalOffset);
         }
 
         public double tangentialResidual(int index) {
             var sample = samples.get(index);
-            return Math.sqrt(sample.weight()) * (sample.tangentialDifference() - tangentialOffset);
+            return Math.sqrt(sample.weight()) * (sample.tangentialOpdDifference() - tangentialOffset);
         }
     }
 

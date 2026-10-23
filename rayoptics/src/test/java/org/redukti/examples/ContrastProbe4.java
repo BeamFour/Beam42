@@ -62,8 +62,8 @@ public class ContrastProbe4 {
             for (var w : f.wavelengths())
                 for (var x : w.samples()) {
                     sw += x.weight();
-                    mt += x.weight() * x.tangentialDifference();
-                    t2 += x.weight() * x.tangentialDifference() * x.tangentialDifference();
+                    mt += x.weight() * x.tangentialOpdDifference();
+                    t2 += x.weight() * x.tangentialOpdDifference() * x.tangentialOpdDifference();
                 }
             mt /= sw; t2 /= sw;
             sb.append(String.format(" %.4f", Math.sqrt(Math.max(0, t2 - mt * mt))));

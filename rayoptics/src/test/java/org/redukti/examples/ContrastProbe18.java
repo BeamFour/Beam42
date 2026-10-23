@@ -58,9 +58,9 @@ public class ContrastProbe18 {
                 for (var wavelength : result.fields.get(fi).wavelengths()) {
                     for (var s : wavelength.samples()) {
                         if (!s.valid()) continue;
-                        sagSos += s.weight() * s.sagittalDifference() * s.sagittalDifference();
-                        tanSos += s.weight() * s.tangentialDifference() * s.tangentialDifference();
-                        tanMeanWeighted += s.weight() * s.tangentialDifference();
+                        sagSos += s.weight() * s.sagittalOpdDifference() * s.sagittalOpdDifference();
+                        tanSos += s.weight() * s.tangentialOpdDifference() * s.tangentialOpdDifference();
+                        tanMeanWeighted += s.weight() * s.tangentialOpdDifference();
                         weightSum += s.weight();
                     }
                 }

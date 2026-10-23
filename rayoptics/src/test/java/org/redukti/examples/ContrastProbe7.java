@@ -25,10 +25,10 @@ public class ContrastProbe7 {
             for (var w : f.wavelengths())
                 for (var s : w.samples()) {
                     sw += s.weight();
-                    mt += s.weight() * s.tangentialDifference();
-                    t2 += s.weight() * s.tangentialDifference() * s.tangentialDifference();
-                    ms += s.weight() * s.sagittalDifference();
-                    s2 += s.weight() * s.sagittalDifference() * s.sagittalDifference();
+                    mt += s.weight() * s.tangentialOpdDifference();
+                    t2 += s.weight() * s.tangentialOpdDifference() * s.tangentialOpdDifference();
+                    ms += s.weight() * s.sagittalOpdDifference();
+                    s2 += s.weight() * s.sagittalOpdDifference() * s.sagittalOpdDifference();
                 }
             mt /= sw; t2 /= sw; ms /= sw; s2 /= sw;
             sb.append(String.format("  sag=%.4f tan=%.4f",

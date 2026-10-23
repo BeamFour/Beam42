@@ -836,6 +836,115 @@ differ from those above. The aperture-checked and `None` rows came from a scratc
 calling that report with `check_apertures(true)` on the model LensTool2 builds; it
 reproduced the LensTool2 output of the time exactly and was not retained.
 
+### Checked against a diffraction MTF: the contrast samples miss the overlap rim
+
+`DiffractionMTF` computes the MTF as the Fourier transform of the PSF from a uniform
+`RayGrid`, independently of the contrast quadrature and shear. Its frequency scale is
+the grid's own: a shift of `k` grid intervals is `k/(n_pupil-1)` of the cutoff, taken per
+direction from the rim rays. On an aberration-free circular pupil it reproduces the
+analytic diffraction limit to 9e-4 at 128 rays across the pupil and 4e-4 at 256.
+
+The phasor is the MTF relative to the diffraction limit, so it was compared with the
+FFT MTF divided by the FFT MTF of the same pupil with zero wavefront, d line, contrast
+apertures checked, 24×48 or 40×80 sampling, FFT at 128 to 512 rays. Both sides were
+converged to the third decimal.
+
+On axis, Sigma 40/1.4: they agree to 2e-4 (50 cyc/mm: 0.9817 against 0.9815). On axis,
+Summicron 50/2, they do not, and a direct sum of `exp(i2πΔW)` on the FFT's own grid
+locates the cause:
+
+| sagittal, on axis | 10 | 30 | 50 cyc/mm |
+| --- | --- | --- | --- |
+| direct sum over the true overlap | 0.9428 | 0.6898 | 0.4229 |
+| FFT, `DiffractionMTF` | 0.9428 | 0.6899 | 0.4230 |
+| direct sum over the contracted circle | 0.9480 | 0.7211 | 0.4389 |
+| contrast phasor, 40×80 | 0.9482 | 0.7217 | 0.4401 |
+
+The FFT is the overlap integral. The contrast analysis integrates over something else:
+`generate_quadrature` contracts the whole pattern about a point offset by `−(sₓ+s_y)/2`
+until every sample and both its partners lie inside the pupil. That is a circle of
+radius about `1 − s/√2`, shared by both orientations, rather than the lens-shaped overlap
+of the pupil with its shifted copy, which differs per orientation. The omitted region is
+the overlap rim, where spherical aberration is largest, so the contrast analysis reads
+optimistic, and more so the more aberrated the rim. The contrast residuals use the
+same samples, so the merit carries the same omission.
+
+Off axis the phasor also reads high, most at the outer fields tangentially (Sigma, full
+field, 50 cyc/mm: 0.668 against 0.549). Frequency calibration and exit-pupil aiming
+reduce this (to 0.617 and 0.603) but do not remove it. The contracted circle accounts for
+at least part of the rest; that has not been separated from the entrance-pupil grid of
+the FFT, which treats the pupil mapping as linear.
+
+### The problem: one contracted circle stands in for two overlaps
+
+The OTF at a frequency is an integral over the overlap of the pupil with a copy of itself
+shifted by the shear `s`. For a circular pupil the overlap is lens shaped: the
+intersection of two unit circles whose centres are `s` apart. The sagittal and
+tangential shears point in different directions, so each orientation has its own
+overlap.
+
+`ContrastAnalysis.generate_quadrature` instead lays one Gaussian quadrature pattern over
+the vignetted pupil, then contracts the whole pattern about the point
+`−(sₓ + s_y)/2` until every sample and both of its partners are inside the pupil. On a
+circular pupil that is a circle of radius about `1 − s/√2`. Both orientations are sampled
+over that one circle.
+
+Consequences:
+
+* The rim of each overlap is not sampled. Wavefront error is usually largest there, so
+  σ and the phasor both read low aberration, and the error grows with aberration at the
+  rim. On the Sigma on axis it is 2e-4 in the phasor; on the Summicron on axis it is
+  0.031 at 30 cyc/mm.
+* The omitted area grows with frequency, since `s ∝ ν`. At 50 cyc/mm on an f/2 lens the
+  circle radius is about 0.92 of the pupil.
+* The circle is the intersection of both orientations' constraints, so each orientation
+  loses more than its own overlap requires.
+* The contrast residuals use these samples, so the optimizer's merit carries the same
+  omission: it does not see aberration confined to the overlap rim.
+
+The contraction exists for good reasons, and a fix has to keep them. The sample count
+and the relative quadrature weights are fixed, so the residual vector has a stable layout
+and the Jacobian sees no samples appearing or disappearing. No partner ray lands outside
+the vignetted pupil.
+
+### Possible solutions
+
+None of these has been tried. Each changes every contrast residual, so each needs the
+Otus golden values regenerated and the change carried to the C++ port.
+
+**A. One pattern per orientation, inscribed in that orientation's overlap.** Centre the
+sagittal pattern at `−sₓ/2` and contract it to the largest circle inside the sagittal
+overlap, radius about `1 − s/2`; likewise for tangential. Simple, and keeps a fixed
+sample count with smooth weights. It recovers part of the rim but not the two tips of
+the lens-shaped region. It doubles the reference rays traced, because the two
+orientations no longer share them.
+
+**B. Full-pupil pattern with a per-orientation mask.** Lay the pattern over the whole
+vignetted pupil, uncontracted, and count a sample for an orientation only when its
+partner for that orientation is inside the pupil. This integrates over the exact
+overlap. The mask depends only on the shear and the vignetting factors, so for a fixed
+shear and frozen vignetting it does not change between iterations and the merit stays
+smooth; with frequency calibration, or vignetting recomputed during the solve, samples
+can switch in and out. Accuracy is limited where the mask cuts through the pattern,
+which a Gaussian rule is not designed for. The partner rays outside the overlap still
+need tracing, or a rule for skipping them.
+
+**C. A quadrature built for the overlap.** Map a quadrature rule onto the lens-shaped
+region of each orientation, so the samples cover the exact overlap with weights that
+integrate it accurately. Most accurate; most work. The vignetted pupil is not a circle,
+so the region is the overlap of two vignetted pupils, and the map has to follow the
+vignetting kink at the pupil axes.
+
+**D. Keep the contraction and correct for it.** Leave the sampling as it is and
+document that the contrast measures the inscribed circle. This is the current state. It
+is adequate where the rim carries little aberration, as on the Sigma, and misleading
+where it carries a lot.
+
+Before choosing, measure how each candidate region changes the off-axis gap: repeat the
+direct sum on the `DiffractionMTF` grid off axis over the contracted circle, option A's
+inscribed circle and the true overlap, on the Sigma and the Summicron. That separates the
+sampling region from the FFT's entrance-pupil grid, and needs no change to the code.
+
 ---
 
 ## 7. The shear is applied at the entrance pupil, not the exit pupil
@@ -1492,10 +1601,15 @@ measurement and defects that need a fix, because they want different kinds of ef
 12. **`SetVig` and `SetPupil` differentiate differently**, moving `vuy` in opposite
     directions for the same design change despite agreeing statically. Consequences
     unknown; noted so it is not rediscovered.
+13. **The contrast quadrature samples a contracted circle, not the pupil overlap.** It
+    misses the overlap rim and reads optimistic where the rim is aberrated. See
+    [the problem](#the-problem-one-contracted-circle-stands-in-for-two-overlaps) and
+    [possible solutions](#possible-solutions) in §6. Next step: the off-axis region
+    measurement described there.
 
 ### Latent
 
-13. **§6, if a case for it appears.** The least-squares residual stops tracking MTF above
+14. **§6, if a case for it appears.** The least-squares residual stops tracking MTF above
     ~0.1 waves; that is measured and not in doubt. What is missing is any current
     demonstration that it costs a design anything. A phasor MTF goal was implemented and
     reverted - read the outcome subsection *and* both postscripts before retrying, since

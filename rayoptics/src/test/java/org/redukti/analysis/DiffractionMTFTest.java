@@ -35,8 +35,7 @@ class DiffractionMTFTest {
         for (int i = 0; i < n; i++)
             for (int j = 0; j < n; j++) {
                 double x = -1 + 2.0 * i / (n - 1), y = -1 + 2.0 * j / (n - 1);
-                // calc_psf drops points whose OPD is exactly zero, so a token piston stands in for none
-                W[i][j] = x * x + y * y <= 1 ? 1e-9 : Double.NaN;
+                W[i][j] = x * x + y * y <= 1 ? 0.0 : Double.NaN;
             }
         var mtf = DiffractionMTF.modulus_of_transform(Analyses.calc_psf(W, n, 2 * n));
         int c = n;
@@ -95,7 +94,18 @@ class DiffractionMTFTest {
         var opm = model();
         var fld = opm.optical_spec.fov.fields[0];
         double wvl = opm.optical_spec.wvls.central_wvl();
+        assertThrows(IllegalArgumentException.class, () -> new DiffractionMTF(opm, fld, wvl, 0.0, 2, 4));
         assertThrows(IllegalArgumentException.class, () -> new DiffractionMTF(opm, fld, wvl, 0.0, 63, 128));
         assertThrows(IllegalArgumentException.class, () -> new DiffractionMTF(opm, fld, wvl, 0.0, 64, 100));
+    }
+
+    @Test
+    void rejectsPsfWithoutFinitePositiveIntensity() {
+        assertThrows(IllegalArgumentException.class,
+                () -> DiffractionMTF.modulus_of_transform(new double[8][8]));
+        var psf = new double[8][8];
+        psf[4][4] = Double.NaN;
+        assertThrows(IllegalArgumentException.class,
+                () -> DiffractionMTF.modulus_of_transform(psf));
     }
 }

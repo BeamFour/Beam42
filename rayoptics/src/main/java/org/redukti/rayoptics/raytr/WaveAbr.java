@@ -220,6 +220,173 @@ public class WaveAbr {
     }
 
     /**
+     * Pre-calculate the part of the OPD calc independent of focus.
+     */
+    public static PreOpdPkg wave_abr_pre_calc(FirstOrderData fod, Field fld, double wvl, double foc, RayPkg ray_pkg, ChiefRayPkg chief_ray_pkg, ReferenceSphere ref_sphere) {
+        if (M.is_kinda_big(ref_sphere.ref_sphere_radius))
+            return wave_abr_pre_calc_inf_ref(fod, fld, wvl, foc, ray_pkg,
+                                             chief_ray_pkg, ref_sphere);
+        else
+            return wave_abr_pre_calc_finite_pup(fod, fld, wvl, foc, ray_pkg,
+                                                chief_ray_pkg, ref_sphere);
+    }
+
+    /**
+     * Given pre-calculated info and a ref. sphere, return the ray's OPD.
+     */
+    public static double wave_abr_calc(FirstOrderData fod, Field fld, double wvl, double foc, RayPkg ray_pkg, ChiefRayPkg chief_ray_pkg,
+                                       PreOpdPkg pre_opd_pkg, ReferenceSphere ref_sphere) {
+        if (M.is_kinda_big(ref_sphere.ref_sphere_radius))
+            return wave_abr_calc_inf_ref(fod, fld, wvl, foc, ray_pkg,
+                                         chief_ray_pkg, (PreOpdPkg.InfRef) pre_opd_pkg, ref_sphere);
+        else
+            return wave_abr_calc_finite_pup(fod, fld, wvl, foc, ray_pkg,
+                                            chief_ray_pkg, (PreOpdPkg.FinitePup) pre_opd_pkg, ref_sphere);
+    }
+
+    /**
+     * Pre-calculate the part of the OPD calc independent of focus.
+     */
+    private static PreOpdPkg.FinitePup wave_abr_pre_calc_finite_pup(FirstOrderData fod, Field fld, double wvl, double foc, RayPkg ray_pkg, ChiefRayPkg chief_ray_pkg, ReferenceSphere ref_sphere) {
+        var cr = chief_ray_pkg.chief_ray;
+        var cr_exp_seg = chief_ray_pkg.cr_exp_seg;
+        var cr_ray = cr.ray;
+        var cr_op = cr.op_delta;
+        var cr_exp_pt = cr_exp_seg.exp_pt;
+        var cr_exp_dist = cr_exp_seg.exp_dst;
+        var ifc = cr_exp_seg.ifc;
+
+        var ray = ray_pkg.ray;
+        var ray_op = ray_pkg.op_delta;
+
+        final int k = -2; // last interface in sequence
+
+        // eq 3.12
+        double e1 = eic_distance(new RayData(ray.get(1).p, ray.get(0).d),
+                new RayData(cr_ray.get(1).p, cr_ray.get(0).d));
+        // eq 3.13
+        double ekp = eic_distance(new RayData(Lists.get(ray,k).p, Lists.get(ray,k).d),
+                new RayData(Lists.get(cr_ray,k).p, Lists.get(cr_ray,k).d));
+
+        double pre_opd = -Math.abs(fod.n_obj)*e1 - ray_op + Math.abs(fod.n_img)*ekp + cr_op;
+
+        RayData tafter = Transform.transform_after_surface(ifc, new RayData(Lists.get(ray,k).p, Lists.get(ray,k).d));
+        Vector3 b4_pt = tafter.pt;
+        Vector3 b4_dir = tafter.dir;
+        double dst = ekp - cr_exp_dist;
+        Vector3 eic_exp_pt = b4_pt.minus(b4_dir.times(dst));
+        Vector3 p_coord = eic_exp_pt.minus(cr_exp_pt);
+
+        return new PreOpdPkg.FinitePup(pre_opd, p_coord, b4_pt, b4_dir);
+    }
+
+    /**
+     * Given pre-calculated info and a ref. sphere, return the ray's OPD.
+     */
+    private static double wave_abr_calc_finite_pup(FirstOrderData fod, Field fld, double wvl, double foc, RayPkg ray_pkg, ChiefRayPkg chief_ray_pkg,
+                                                   PreOpdPkg.FinitePup pre_opd_pkg, ReferenceSphere ref_sphere) {
+        var cr = chief_ray_pkg.chief_ray;
+        var ref_dir = ref_sphere.ref_dir;
+        var ref_sphere_radius = ref_sphere.ref_sphere_radius;
+        var pre_opd = pre_opd_pkg.pre_opd();
+        var p_coord = pre_opd_pkg.p_coord();
+        var b4_dir = pre_opd_pkg.b4_dir();
+
+        double F = ref_dir.dot(b4_dir) - b4_dir.dot(p_coord)/ref_sphere_radius;
+        double J = p_coord.dot(p_coord)/ref_sphere_radius - 2.0*ref_dir.dot(p_coord);
+
+        double sign_soln = ref_dir.z*Lists.get(cr.ray,-1).d.z < 0 ? -1 : 1;
+        // Upstream uses math.sqrt, which raises on a negative argument; Math.sqrt returns NaN.
+        double denom = F + sign_soln*Math.sqrt(F*F - J/ref_sphere_radius);
+        double ep = denom == 0 ? 0 : J/denom;
+
+        double opd = pre_opd - Math.abs(fod.n_img)*ep;
+        return opd;
+    }
+
+    /**
+     * Pre-calculate the part of the OPD calc independent of focus.
+     */
+    private static PreOpdPkg.InfRef wave_abr_pre_calc_inf_ref(FirstOrderData fod, Field fld, double wvl, double foc,
+                                                              RayPkg ray_pkg, ChiefRayPkg chief_ray_pkg, ReferenceSphere ref_sphere) {
+        var cr = chief_ray_pkg.chief_ray;
+        var cr_ray = cr.ray;
+        var cr_op = cr.op_delta;
+        var lcl_tfrm_last = ref_sphere.lcl_tfrm_last;
+
+        var ray = ray_pkg.ray;
+        var ray_op = ray_pkg.op_delta;
+
+        int k = -2; // last interface in sequence
+        var n_obj = Math.abs(fod.n_obj);
+        var n_img = Math.abs(fod.n_img);
+
+        // eq 3.12
+        var e1 = eic_distance(new RayData(ray.get(1).p, ray.get(0).d),
+                              new RayData(cr_ray.get(1).p, cr_ray.get(0).d));
+
+        Vector3 p_b4;
+        Vector3 d_b4;
+        Vector3 p_cr_b4;
+        Vector3 d_cr_b4;
+
+        if (lcl_tfrm_last != null) {
+            var rt = lcl_tfrm_last.rt;
+            var t = lcl_tfrm_last.t;
+
+            p_b4 = rt.multiply(Lists.get(ray,k).p.minus(t));
+            d_b4 = rt.multiply(Lists.get(ray,k).d);
+            p_cr_b4 = rt.multiply(Lists.get(cr_ray,k).p.minus(t));
+            d_cr_b4 = rt.multiply(Lists.get(cr_ray,k).d);
+        }
+        else {
+            p_b4 = Lists.get(ray,k).p;
+            d_b4 = Lists.get(ray,k).d;
+            p_cr_b4 = Lists.get(cr_ray,k).p;
+            d_cr_b4 = Lists.get(cr_ray,k).d;
+        }
+        var op_b4 = ray_dist_to_perp_from_origin(new RayData(p_b4, d_b4));
+        var op_cr_b4 = ray_dist_to_perp_from_origin(new RayData(p_cr_b4, d_cr_b4));
+
+        var P1_P2 = dist_to_shortest_join(new RayData(Lists.get(cr_ray,-1).p, Lists.get(cr_ray,-1).d),
+                                          new RayData(Lists.get(ray,-1).p, Lists.get(ray,-1).d));
+        var P1 = P1_P2.first;
+        var P2 = P1_P2.second;
+        var rF0 = (P1.first.plus(P2.first)).divide(2.0);
+
+        var V_B = ray_op + op_b4;
+        var V_BE = cr_op + op_cr_b4;
+
+        var W0 = V_B - V_BE + n_img * d_b4.minus(d_cr_b4).dot(rF0);
+
+        var pre_opd = -n_obj*e1 - W0;
+
+        return new PreOpdPkg.InfRef(pre_opd, W0, p_b4, d_b4, p_cr_b4, d_cr_b4);
+    }
+
+    /**
+     * Given pre-calculated info and a ref. sphere, return the ray's OPD.
+     */
+    private static double wave_abr_calc_inf_ref(FirstOrderData fod, Field fld, double wvl, double foc, RayPkg ray_pkg, ChiefRayPkg chief_ray_pkg,
+                                                PreOpdPkg.InfRef pre_opd_pkg, ReferenceSphere ref_sphere) {
+        var image_pt = ref_sphere.image_pt;
+        var pre_opd = pre_opd_pkg.pre_opd();
+        var d_b4 = pre_opd_pkg.d_b4();
+        var d_cr_b4 = pre_opd_pkg.d_cr_b4();
+        var ray = ray_pkg.ray;
+
+        var n_img = Math.abs(fod.n_img);
+
+        var ta = Lists.get(ray,-1).p.minus(image_pt);
+        var numer = d_cr_b4.minus(d_b4.times(d_b4.dot(d_cr_b4))).dot(ta);
+        var denom = 1.0 + d_b4.dot(d_cr_b4);
+        var W_inf = n_img * numer / denom;
+
+        var opd = pre_opd - W_inf;
+        return opd;
+    }
+
+    /**
      * Given a ray, a chief ray and an image pt, compute the data required to calculate the
      * optical path difference. A by-product of the calculation is the coordinate of the test ray’s
      * reference-sphere intersection relative to the chief-ray exit-pupil point.

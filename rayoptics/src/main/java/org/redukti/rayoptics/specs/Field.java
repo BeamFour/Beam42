@@ -133,6 +133,42 @@ public class Field {
     }
 
     /**
+     * returns a bbox of the vignetted pupil ray extents.
+     *
+     * @return {{minx, miny}, {maxx, maxy}}
+     */
+    public double[][] vignetting_bbox(PupilSpec pupil_spec, double oversize) {
+        var poly = new double[pupil_spec.pupil_rays.length][];
+        for (int i = 0; i < poly.length; i++) {
+            var vig_pup_ray = apply_vignetting(pupil_spec.pupil_rays[i]);
+            poly[i] = vig_pup_ray;
+        }
+        var vig_bbox = bbox_from_poly(poly);
+        for (var corner : vig_bbox) {
+            corner[0] *= oversize;
+            corner[1] *= oversize;
+        }
+        return vig_bbox;
+    }
+
+    public double[][] vignetting_bbox(PupilSpec pupil_spec) {
+        return vignetting_bbox(pupil_spec, 1.);
+    }
+
+    /** Port of upstream gui.util.bbox_from_poly, for a list of 2d points. */
+    private static double[][] bbox_from_poly(double[][] poly) {
+        double minx = Double.POSITIVE_INFINITY, miny = Double.POSITIVE_INFINITY;
+        double maxx = Double.NEGATIVE_INFINITY, maxy = Double.NEGATIVE_INFINITY;
+        for (var p : poly) {
+            minx = Math.min(minx, p[0]);
+            miny = Math.min(miny, p[1]);
+            maxx = Math.max(maxx, p[0]);
+            maxy = Math.max(maxy, p[1]);
+        }
+        return new double[][]{{minx, miny}, {maxx, maxy}};
+    }
+
+    /**
      * Resets vignetting values to 0.
      */
     public void clear_vignetting() {

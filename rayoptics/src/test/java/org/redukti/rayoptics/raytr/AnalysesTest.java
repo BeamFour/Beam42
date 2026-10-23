@@ -81,6 +81,29 @@ class AnalysesTest {
     }
 
     @Test
+    void calcPsfPreservesZeroOpdAndPistonInvariance() {
+        var wavefront = new double[4][4];
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                wavefront[i][j] = (i == 0 || j == 0) ? Double.NaN : (i - j) * 0.125;
+        var original = Analyses.calc_psf(wavefront, 4, 8);
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                wavefront[i][j] += 0.03125;
+        var shifted = Analyses.calc_psf(wavefront, 4, 8);
+        for (int i = 0; i < 8; i++)
+            assertArrayEquals(original[i], shifted[i], 1e-14);
+        assertEquals(1.0, Analyses.calc_psf(new double[4][4], 4, 8)[4][4], 1e-14);
+    }
+
+    @Test
+    void calcPsfRejectsAnEmptyPupil() {
+        var wavefront = new double[4][4];
+        for (var row : wavefront) java.util.Arrays.fill(row, Double.NaN);
+        assertThrows(IllegalArgumentException.class, () -> Analyses.calc_psf(wavefront, 4, 8));
+    }
+
+    @Test
     void psfSamplingMatchesUpstream() {
         assertArrayEquals(new int[]{57, 20, 7}, Analyses.psf_sampling(null, 20, 7));
         assertArrayEquals(new int[]{64, 31, 5}, Analyses.psf_sampling(64, null, 5));

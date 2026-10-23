@@ -250,16 +250,20 @@ public class Analyses {
 
     /**
      * Calculate the point spread function of wavefront W.
+     * Unlike upstream, the pupil mask is kept separate from phase so zero OPD
+     * remains illuminated. Non-finite samples and padding are excluded.
      *
      * @param wavefront ndim x ndim array of wavefront errors. No data
      *                  condition is indicated by nan
      * @param ndim      The sampling across the wavefront
      * @param maxdim    The total width of the sampling grid
      * @return AP, the PSF of the input wavefront
+     * @throws IllegalArgumentException if the PSF has no finite positive peak
      */
     public static double[][] calc_psf(double[][] wavefront, int ndim, int maxdim) {
         int maxdim_by_2 = maxdim / 2;
         var W = new double[maxdim][maxdim];
+        var pupil = new boolean[maxdim][maxdim];
         int nd2 = ndim / 2;
         int lo = maxdim_by_2 - (nd2 - 1);
         int hi = maxdim_by_2 + (nd2 + 1);
@@ -272,26 +276,20 @@ public class Analyses {
         for (int i = lo; i < hi; i++) {
             if (wavefront[i - lo].length != hi - lo)
                 throw new IllegalArgumentException("wavefront must be square");
-            for (int j = lo; j < hi; j++)
+            for (int j = lo; j < hi; j++) {
                 W[i][j] = nan_to_num(wavefront[i - lo][j - lo]);
+                pupil[i][j] = Double.isFinite(wavefront[i - lo][j - lo]);
+            }
         }
 
         // phase = np.exp(1j*2*np.pi*W), as interleaved real and imaginary parts by row
         var phase = new double[maxdim][2 * maxdim];
         for (int i = 0; i < maxdim; i++) {
             for (int j = 0; j < maxdim; j++) {
+                if (!pupil[i][j]) continue;
                 double angle = 2 * Math.PI * W[i][j];
                 phase[i][2 * j] = Math.cos(angle);
                 phase[i][2 * j + 1] = Math.sin(angle);
-            }
-        }
-
-        for (int i = 0; i < phase.length; i++) {
-            for (int j = 0; j < phase.length; j++) {
-                if (phase[i][2 * j] == 1 && phase[i][2 * j + 1] == 0) {
-                    phase[i][2 * j] = 0;
-                    phase[i][2 * j + 1] = 0;
-                }
             }
         }
 
@@ -306,6 +304,8 @@ public class Analyses {
                     AP_max = Math.max(AP_max, AP[i][j]);
             }
         }
+        if (!(AP_max > 0) || !Double.isFinite(AP_max))
+            throw new IllegalArgumentException("wavefront must produce a finite, nonzero PSF");
         for (int i = 0; i < maxdim; i++)
             for (int j = 0; j < maxdim; j++)
                 AP[i][j] = AP[i][j] / AP_max;

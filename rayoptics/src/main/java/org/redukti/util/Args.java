@@ -96,6 +96,16 @@ public final class Args {
      * {@link PupilMapAnalysis}.
      */
     public boolean output_pupil_maps = false;
+    /**
+     * Write the contrast OPD differences beside the other reports, at each --mtf
+     * frequency. See {@link org.redukti.analysis.ContrastReport}.
+     */
+    public boolean output_contrast_report = false;
+    /**
+     * Write the monochromatic geometric MTF as a table, in the layout of the contrast
+     * report. See {@link org.redukti.analysis.MonochromaticMTFReport}.
+     */
+    public boolean output_wavelength_mtf_report = false;
     /** Log the optimizer's progress to the console, one line per iteration. */
     public boolean verbose = false;
     /** Log everything, including the ray-optics info messages and debug traces. */
@@ -179,6 +189,12 @@ public final class Args {
             }
             else if (arg1.equals("--output-pupil-maps")) {
                 arguments.output_pupil_maps = true;
+            }
+            else if (arg1.equals("--output-contrast-report")) {
+                arguments.output_contrast_report = true;
+            }
+            else if (arg1.equals("--output-wavelength-mtf-report")) {
+                arguments.output_wavelength_mtf_report = true;
             }
             else if (arg1.equals("--verbose")) {
                 arguments.verbose = true;

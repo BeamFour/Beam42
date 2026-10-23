@@ -34,6 +34,7 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Handler;
@@ -338,17 +339,28 @@ public class LensTool2 {
         return spotAnalysis;
     }
 
-    private static void generateMTFs(OpticalModel opm, Args arguments, double[] fields, Map<Double,Double> wv_wts, String outname, String filename_suffix) throws Exception {
+    /**
+     * @param wavelengthReport also write {@code <outname>-wavelength-report<suffix>.txt}, the
+     *                         monochromatic MTF tabulated like the contrast report
+     */
+    private static void generateMTFs(OpticalModel opm, Args arguments, double[] fields, Map<Double,Double> wv_wts, String outname, String filename_suffix,
+                                     boolean wavelengthReport) throws Exception {
         var spotAnalysis = SpotAnalysis.eval(opm, spotOptions(arguments));
         var mtfs = new ArrayList<PolyMTF>();
+        var monoMtfs = new ArrayList<List<MonochromaticGeometricMTF>>();
+        var monoFields = new double[spotAnalysis.spot_results.size()];
         for (int i = 0; i < spotAnalysis.spot_results.size(); i++) {
             var spotFld = spotAnalysis.spot_results.get(i);
             var cfg = spotFld.mtfHistogramConfig();
             PolyMTF polyMtfForField = null;
+            var monoForField = new ArrayList<MonochromaticGeometricMTF>();
+            monoMtfs.add(monoForField);
+            monoFields[i] = spotFld.fld.y;
             for (var intercepts: spotFld.intercepts) {
                 String filename = suffixed_name("mtf-fld" + i + "-" + (int)intercepts.wvl, filename_suffix,  ".svg");
                 var output_file = Helper.getOutputFileWithPath(arguments.specfile,filename,arguments.outdir);
                 var mtf = new MonochromaticGeometricMTF(intercepts, cfg);
+                monoForField.add(mtf);
                 if (polyMtfForField == null)
                     polyMtfForField = new PolyMTF(mtf.mtf.fft_size,mtf.h2d.pixel_size);
                 var wt = wv_wts.getOrDefault(intercepts.wvl,0.0);
@@ -371,6 +383,10 @@ public class LensTool2 {
         Helper.createOutputFile(mtffile,plot.plot());
         var mtfdata = Helper.getOutputFileWithPath(arguments.specfile,suffixed_name(outname, filename_suffix, ".csv"),arguments.outdir);
         Helper.createOutputFile(mtfdata,plot.toString());
+        if (wavelengthReport)
+            Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile,
+                    suffixed_name(outname + "-wavelength-report", filename_suffix, ".txt"), arguments.outdir),
+                    MonochromaticMTFReport.report(monoFields, monoMtfs, freqs));
     }
 
     private static void generateRayAberrationPlots(OpticalModel opm, Args arguments, String filname_suffix) throws Exception {
@@ -427,6 +443,26 @@ public class LensTool2 {
                     new PupilMapPlot(map).plot());
         }
     }
+
+    /**
+     * Writes the contrast OPD differences at each --mtf frequency, with the optimizer's
+     * default sampling. Exit-pupil aiming is on: too slow for every optimizer evaluation,
+     * but affordable once per report, and it realises the requested frequency at every
+     * sample rather than per field.
+     */
+    private static void generateContrastReport(OpticalModel opm, Args arguments, String outname, String filename_suffix) throws Exception {
+        var options = new ContrastOptions(0.0)
+                .num_rings(CONTRAST_NUM_RINGS)
+                .num_spokes(CONTRAST_NUM_SPOKES)
+                .aim_exit_pupil(true);
+        Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile,
+                suffixed_name(outname, filename_suffix, ".txt"), arguments.outdir),
+                ContrastReport.report(opm, arguments.mtf_freqs, options));
+    }
+
+    // The optimizer's default contrast sampling, see OptimizationConfiguration
+    private static final int CONTRAST_NUM_RINGS = 6;
+    private static final int CONTRAST_NUM_SPOKES = 12;
 
     // Sampling defaults, should be defaulted via Args preferably
     private static final int HEXAPOLAR_NUM_RINGS = 64;
@@ -701,6 +737,10 @@ public class LensTool2 {
             System.err.println("       --output-pupil-maps writes pupil[-semi-skew|-skew].svg and pupil-report.txt: the part of each field's pupil the lens passes,");
             System.err.println("         the surface that blocks the rest, and how well the vignetting factors describe it; --pupil-map-samples sets the grid, default "
                     + PupilMapAnalysis.DEFAULT_NUM_SAMPLES);
+            System.err.println("       --output-wavelength-mtf-report writes mtf-w-wavelength-report.txt: the monochromatic geometric MTF");
+            System.err.println("         per --mtf frequency, wavelength, orientation and field, in the layout of the contrast report");
+            System.err.println("       --output-contrast-report writes contrast-report-w.txt: the RMS contrast OPD difference");
+            System.err.println("         per --mtf frequency, wavelength, orientation and field, for the weighted MTF wavelengths");
             System.err.println("       --mtf takes spatial frequencies in cycles/mm and defaults to 10,30,50, which is what the reports under Examples/ use");
             System.err.println("       --real-ray-aiming aims the chief ray by tracing a real ray at the entrance pupil, --paraxial-ray-aiming uses paraxial aiming; real is the default");
             System.err.println("       --patent fetches the prescription from the PhotonsToPhotos Optical Bench, e.g. --patent JP1993-034592 --example 2 --outdir ef14mm");
@@ -784,12 +824,21 @@ public class LensTool2 {
                 addSpotReportToREADME(SB,spotAnalysis);
                 spotAnalysis = null;
                 addMTFsToREADME(SB,scenario_filesuffix,arguments.mtf_freqs);
-                generateMTFs(opm, arguments, fields, prescription.get_wvl_wts(), "mtf", scenario_filesuffix);
+                generateMTFs(opm, arguments, fields, prescription.get_wvl_wts(), "mtf", scenario_filesuffix, false);
                 if (arguments.do_ray_aberrations)
                     generateRayAberrationPlots(opm, arguments, scenario_filesuffix);
                 // Generate MTF with weighted average across wavelengths
                 opm = createSystem(prescriptionForWeightedMTF, true, analysisVigType, realRayAiming, fields, config);
-                generateMTFs(opm, arguments, fields, prescriptionForWeightedMTF.get_wvl_wts(), "mtf-w", scenario_filesuffix);
+                // The wavelength report from the weighted model only, whose wavelengths include
+                // the unweighted ones, matching the contrast report.
+                generateMTFs(opm, arguments, fields, prescriptionForWeightedMTF.get_wvl_wts(), "mtf-w", scenario_filesuffix,
+                        arguments.output_wavelength_mtf_report);
+                // From the weighted model only: its wavelengths include the unweighted ones,
+                // and the values are per wavelength, so they agree where the two overlap.
+                // Last on this model: the contrast trace leaves each field's chief ray and
+                // reference sphere set up for its last wavelength.
+                if (arguments.output_contrast_report)
+                    generateContrastReport(opm, arguments, "contrast-report-w", scenario_filesuffix);
             }
             createREADME(SB,
                     arguments.specfile,

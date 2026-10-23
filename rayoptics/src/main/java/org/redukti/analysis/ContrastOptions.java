@@ -29,6 +29,18 @@ public class ContrastOptions {
         this.traceOptions.check_apertures = false;
     }
 
+    /** These options at another spatial frequency. */
+    public ContrastOptions with_frequency(double spatialFrequency) {
+        var result = new ContrastOptions(spatialFrequency);
+        result.numRings = numRings;
+        result.numSpokes = numSpokes;
+        result.traceOptions = traceOptions.copy();
+        result.calibrateFrequency = calibrateFrequency;
+        result.aimExitPupil = aimExitPupil;
+        result.centerResiduals = centerResiduals;
+        return result;
+    }
+
     public ContrastOptions num_rings(int value) {
         if (value < 1) throw new IllegalArgumentException("Number of rings must be at least 1");
         numRings = value;

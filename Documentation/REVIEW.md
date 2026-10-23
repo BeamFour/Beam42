@@ -1184,6 +1184,179 @@ does not justify changing the merit function or making overlap quadrature the de
 The subsequent more-aberrated-lens comparison remains necessary. Only tests and this
 review changed; equivalent C++ optimization tests would need the same experiment.
 
+### Leica 75/2 Mandler factory comparison (2026-10-23)
+
+`LeicaApo75mmMandlerTest` runs two fresh optimizations from the committed,
+unmodified `Examples/jfotoptix/leica-r-apo-75mm-f2-mandler/specs-original.txt`,
+the input used by the example's `main`. Both use `createContrastSetup()` unchanged;
+only the overlap-quadrature flag differs. No saved optimized lens is needed.
+
+The factory uses 6×12 sampling, 11 fields from 0 to 1, contrast goals at 10, 20
+and 40 cycles/mm, 29 variables and 14,331 goals. It freezes `SetVig` vignetting,
+disables spot aperture checking, and disables residual centering, frequency
+calibration and exit-pupil aiming. Existing constraints and balance goals of
+weight 4 remain in both runs. Both solves return status 1; solve times are 276 s
+(contracted) and 469 s (overlap).
+
+For an independent physical check, each final prescription is rebuilt with fresh
+`SetVig` vignetting and aperture checking. The following geometric MTF values use
+64-ray hexapolar spot sampling and the factory's polychromatic configuration.
+Means and minima include both orientations at all 11 fields, with equal weight.
+
+| Metric | Initial | Contracted final | Overlap final |
+| --- | ---: | ---: | ---: |
+| Mean MTF, 10 cycles/mm | 0.709302 | 0.922730 | 0.909017 |
+| Minimum MTF, 10 cycles/mm | 0.574974 | 0.657149 | 0.640006 |
+| Mean MTF, 20 cycles/mm | 0.541632 | 0.816020 | 0.760170 |
+| Minimum MTF, 20 cycles/mm | 0.412148 | 0.439164 | 0.299482 |
+| Mean MTF, 40 cycles/mm | 0.293787 | 0.609171 | 0.479776 |
+| Minimum MTF, 40 cycles/mm | 0.051313 | 0.254430 | 0.067239 |
+
+Selected fields at 40 cycles/mm:
+
+| Field | Contracted sag | Overlap sag | Contracted tan | Overlap tan |
+| --- | ---: | ---: | ---: | ---: |
+| 0.0 | 0.736087 | 0.665574 | 0.735963 | 0.665181 |
+| 0.3 | 0.729515 | 0.697879 | 0.704316 | 0.642154 |
+| 0.5 | 0.697147 | 0.631971 | 0.698551 | 0.489090 |
+| 0.7 | 0.530288 | 0.365232 | 0.389285 | 0.109424 |
+| 0.9 | 0.622487 | 0.406277 | 0.354065 | 0.129027 |
+| 1.0 | 0.610901 | 0.575687 | 0.254430 | 0.067239 |
+
+Overlap is worse in both orientations at every sampled field at 40 cycles/mm.
+The largest sagittal/tangential separation within the balanced fields (0–0.9)
+rises from 0.268422 to 0.277250 at 40 cycles/mm, and from 0.263393 to 0.388647
+at 20 cycles/mm. Full field, excluded from the balance goals, has separations
+0.356471 and 0.508448 at 40 cycles/mm. Spot mean radius worsens at fields 0–0.9
+but improves slightly at full field (21.755 to 21.163). Focal lengths are
+74.521432 and 74.427738 mm; both f-numbers are 2.05.
+
+Common full-overlap evaluation of the frozen optimization models gives these
+equal-block RMS values in waves (32×64, pooling squared RMS equally across
+fields, wavelengths and orientations; not the weighted optimizer merit):
+
+| Frequency, cycles/mm | Contracted final | Overlap final |
+| --- | ---: | ---: |
+| 10 | 0.07560049 | 0.07532942 |
+| 20 | 0.14345712 | 0.14354346 |
+| 40 | 0.26048496 | 0.26389367 |
+
+Evaluation at 12×24 differs from 32×64 by less than 3.6e-8 waves for these six
+scores; 24×48 differs by less than 1.7e-9. This establishes evaluation stability
+on the final lenses, not convergence of optimization at 6×12. Native merit RMS
+falls from 0.236883 to 0.024564 (contracted), and from 0.349371 to 0.028025
+(overlap); the different integration regions prevent a direct comparison.
+
+The frozen, aperture-unchecked geometric report also worsens, so rebuilding the
+vignetting does not explain the ordering. A separate d-line diffraction check
+at pupil grid 256 agrees in direction: at field 0.7 and 40 cycles/mm,
+sagittal/tangential MTF changes from 0.493189/0.372464 to 0.323032/0.179065;
+at full field, from 0.625947/0.148746 to 0.568511/0.087791. Across the tested
+fields and frequencies, changing the grid from 128 to 256 changes MTF by at
+most 0.004074. These monochromatic entrance-pupil FFT values are corroborating
+diagnostics, not the same quantity as polychromatic geometric MTF or a validation
+of nonlinear exit-pupil mapping.
+
+**Conclusion:** correcting the pupil integration alone does not resolve this
+lens's sagittal/tangential divergence at the factory settings. The overlap run
+is substantially worse in independent MTF, and its common dense OPD score is
+also slightly worse at 20 and 40 cycles/mm. This is not evidence for replacing
+the Zemax squared-OPD merit. Changed pupil coverage changes the optimization
+landscape; optimization sampling convergence has not yet been established.
+Entrance-to-exit pupil frequency mapping also remains uncorrected in this setup.
+
+The unequal factory weights were assigned to counter previously observed
+optimization tendencies. Their presence is not evidence that they caused the
+original divergence; a uniform-weight comparison is needed to separate those effects.
+The factory's balance goals do not require equal MTF. They match weighted OPD
+energies, and the unequal orientation weights allow different unweighted
+energies: at field 0.9, weights 0.5 and 0.1 target five times as much tangential
+energy. Thus pupil correction cannot by itself guarantee coincident MTF curves.
+The next controlled check is a higher-density paired optimization with the same
+merit and weights, followed by pupil-mapping diagnostics if the discrepancy
+persists. Do not retune the balance goals during that comparison.
+
+Both tests pass. Final prescriptions are saved in
+`rayoptics/target/mandler-overlap-comparison/`; the run log is
+`rayoptics/target/mandler-overlap-comparison.log`. Only the new test and this
+review changed. Equivalent C++ optimization tests remain to be added; no
+production implementation or upstream-ported file changed.
+
+### Leica 75/2 with uniform orientation/field weights (2026-10-23)
+
+The author clarified that the factory's unequal weights were chosen to counter
+the original tendencies. The additional tests
+`optimizesUsingUniformContractedQuadrature` and
+`optimizesUsingUniformOverlapQuadrature` therefore set every sagittal and
+tangential field weight to 1. They retain the factory's other settings,
+including 6×12 sampling and balance goals of strength 4 on fields 0–0.9.
+The factory itself is unchanged. The uniform setup is reproduced in the test
+because the factory's weight argument does not control its hardcoded arrays.
+
+Both solves return status 1, taking 245 s (contracted) and 450 s (overlap).
+Independent geometric MTF uses the same fresh, aperture-checked models and
+64-ray hexapolar sampling as the preceding comparison.
+
+| Metric | Uniform contracted | Uniform overlap |
+| --- | ---: | ---: |
+| Mean MTF, 10 cycles/mm | 0.953580 | 0.953474 |
+| Minimum MTF, 10 cycles/mm | 0.864880 | 0.885868 |
+| Mean MTF, 20 cycles/mm | 0.853860 | 0.847214 |
+| Minimum MTF, 20 cycles/mm | 0.758727 | 0.759451 |
+| Mean MTF, 40 cycles/mm | 0.588307 | 0.565691 |
+| Minimum MTF, 40 cycles/mm | 0.390515 | 0.368717 |
+
+Selected fields at 40 cycles/mm:
+
+| Field | Contracted sag | Overlap sag | Contracted tan | Overlap tan |
+| --- | ---: | ---: | ---: | ---: |
+| 0.0 | 0.539789 | 0.484178 | 0.539842 | 0.483497 |
+| 0.3 | 0.568089 | 0.531206 | 0.540248 | 0.520746 |
+| 0.5 | 0.572275 | 0.545651 | 0.678932 | 0.661914 |
+| 0.7 | 0.390515 | 0.368717 | 0.791997 | 0.774482 |
+| 0.8 | 0.391858 | 0.373396 | 0.810216 | 0.801098 |
+| 0.9 | 0.544126 | 0.539764 | 0.756143 | 0.752727 |
+| 1.0 | 0.694624 | 0.726313 | 0.644945 | 0.642733 |
+
+The uniform contracted baseline reproduces the original tendency: sagittal MTF
+dips around fields 0.7–0.8 while tangential MTF remains high. At field 0.8 the
+40 cycles/mm separation is 0.418358; overlap increases it to 0.427702. Equal
+weights remove the unequal-energy target, but equal OPD energies still do not
+require equal MTF. This experiment does not isolate the balance goal's strength
+or establish optimization sampling convergence.
+
+Common 32×64 full-overlap RMS on the frozen optimization models, in waves:
+
+| Frequency, cycles/mm | Uniform contracted | Uniform overlap |
+| --- | ---: | ---: |
+| 10 | 0.05341654 | 0.05217366 |
+| 20 | 0.10086550 | 0.09939325 |
+| 40 | 0.18368725 | 0.18454615 |
+
+The dense score improves at 10 and 20 cycles/mm but worsens at 40. Evaluation
+at 12×24 differs from 32×64 by less than 3.9e-8 waves, and 24×48 by less than
+1.7e-10. Native merit RMS falls from 0.073018 to 0.015375 (contracted) and
+from 0.099051 to 0.016322 (overlap). Focal lengths are 74.637944 and
+74.610285 mm; both f-numbers are 2.05.
+
+The d-line diffraction check corroborates the split: at field 0.7 and
+40 cycles/mm, the 256-grid sagittal/tangential values are 0.333832/0.786519
+(contracted) and 0.311660/0.774122 (overlap). The largest 128-to-256 grid
+difference across the tested fields and frequencies is below 0.003738.
+The same monochromatic and pupil-mapping limitations noted above apply.
+
+**Conclusion:** the compensating weights change which orientation is favored;
+they do not explain away the original failure to balance MTF. Overlap quadrature
+alone does not remove that failure in this uniform-weight experiment. The next
+controlled test remains higher-density paired optimization with these same
+uniform weights and unchanged merit, followed by pupil-mapping checks. The
+present evidence does not justify changing the Zemax squared-OPD merit.
+
+Both new tests pass. Final prescriptions use the names `MandlerUniformContracted.txt`
+and `MandlerUniformOverlap.txt` in the existing target output directory; the log is
+`rayoptics/target/mandler-uniform-comparison.log`. Only tests and this review changed;
+equivalent C++ tests remain outstanding.
+
 ### Phasor diagnostic restored (2026-10-23)
 
 `WavelengthResult.phasor(orientation)` now computes the normalized weighted complex

@@ -80,6 +80,11 @@ class ZeissOtusML50mmTest {
     }
 
     private static OptimizationSetup frozenContrastSetup(Prescription prescription, boolean overlapQuadrature) {
+        return frozenContrastSetup(prescription, overlapQuadrature, 4, 8);
+    }
+
+    private static OptimizationSetup frozenContrastSetup(Prescription prescription, boolean overlapQuadrature,
+                                                         int rings, int spokes) {
         double[] fieldWeights = {1.0, 1.0, 1.0, 1.0};
         return OptimizationBuilder.builder(prescription)
                 .fields(0.0, 0.3, 0.7, 1.0)
@@ -92,7 +97,7 @@ class ZeissOtusML50mmTest {
                 // Ray fans are opt-in now; they were unconditional when these values
                 // were generated, so keep them to preserve the merit.
                 .rayAberrationGoals()
-                .contrastSampling(4, 8)
+                .contrastSampling(rings, spokes)
                 .contrastOverlapQuadrature(overlapQuadrature)
                 // One frequency, not three. Each entry costs a full
                 // ContrastAnalysis.eval per merit evaluation - 4 fields x 3
@@ -246,6 +251,53 @@ class ZeissOtusML50mmTest {
                 assertTrue(Double.isFinite(value) && value >= 0 && value <= 1);
         }
         printContrastDiagnostics("Overlap", analysis);
+    }
+
+    @Test
+    void optimizesPatentPrescriptionUsingDenseContractedQuadrature() throws Exception {
+        optimizeDenseContrast(false);
+    }
+
+    @Test
+    void optimizesPatentPrescriptionUsingDenseOverlapQuadrature() throws Exception {
+        optimizeDenseContrast(true);
+    }
+
+    private static void optimizeDenseContrast(boolean overlap) throws Exception {
+        Path input = repositoryRoot().resolve(
+                "Examples/jfotoptix/cosina-otus-ml-50mm-f1.4/JP2026-105585_Example01.txt");
+        var prescription = ZeissOtusML50mm.getPrescription(input.toString(), false, false);
+        var setup = frozenContrastSetup(prescription, overlap, 8, 16);
+        var analysis = setup.analysis();
+        assertEquals(overlap, analysis._contrast_overlap_quadrature);
+        assertEquals(8, analysis._contrast_num_rings);
+        assertEquals(16, analysis._contrast_num_spokes);
+        analysis.compute();
+        var merit = setup.meritFunction(false);
+        double initial = merit.getRMS();
+        long started = System.nanoTime();
+        int status = merit.getSolver().solve();
+        long elapsedMillis = (System.nanoTime() - started) / 1_000_000;
+        double result = merit.getRMS();
+        assertTrue(status > 0, "Optimizer failed with status " + status);
+        assertTrue(Double.isFinite(result) && result < initial);
+        analysis.required_analyses(true, true, true);
+        analysis.compute();
+        String label = overlap ? "Overlap8x16" : "Contracted8x16";
+        double[] spots = java.util.Arrays.stream(analysis._spots)
+                .mapToDouble(spot -> spot.get_mean_radius()).toArray();
+        double[] hexSpots = SpotAnalysis.eval(analysis._opt_model,
+                        new SpotOptions().use_hexapolar().num_rays(64))
+                .spot_results.stream().mapToDouble(spot -> spot.get_mean_radius()).toArray();
+        System.out.println(label + " solve: elapsedMs=" + elapsedMillis + " initialRms=" + initial
+                + " finalRms=" + result + " status=" + status);
+        System.out.println(label + " spot RMS=" + java.util.Arrays.toString(spots));
+        System.out.println(label + " hexapolar spot RMS=" + java.util.Arrays.toString(hexSpots));
+        printContrastDiagnostics(label, analysis);
+        Path directory = repositoryRoot().resolve("rayoptics/target/otus-overlap-8x16");
+        Files.createDirectories(directory);
+        Files.writeString(directory.resolve(label + ".txt"),
+                prescription.to_opt_bench_str(new StringBuilder()).toString());
     }
 
     private static void printContrastDiagnostics(String label, org.redukti.optim.Analysis analysis) {

@@ -1119,6 +1119,71 @@ including all existing baseline golden values and the new measured overlap value
 Only the test and this review were changed; the regression and its Java expectations
 need carrying to the C++ port if that port maintains equivalent optimization tests.
 
+Follow-up: repeat the paired comparison on a lens with larger residual aberrations,
+such as the Summicron 50/2 already used in the analysis comparisons. Check convergence
+of the pupil integration separately from optimization performance, and retain the
+Zemax-style squared-OPD merit. An improvement on the corrected Otus alone would not
+establish the result for a more aberrated starting design.
+
+### Otus optimization at 8×16 (2026-10-23)
+
+The two additional tests `optimizesPatentPrescriptionUsingDenseContractedQuadrature`
+and `optimizesPatentPrescriptionUsingDenseOverlapQuadrature` repeat the paired
+experiment at 8×16. The prescription, variables, constraints, weights, 20 cycles/mm
+contrast goal and solver tolerances are unchanged. Both converge with solver status 1.
+The tests save the final prescriptions under `rayoptics/target/otus-overlap-8x16/`
+for subsequent inspection; no input prescription is modified.
+
+Independent geometric MTF at 40 cycles/mm:
+
+| Field | Contracted sag | Overlap sag | Contracted tan | Overlap tan |
+| --- | ---: | ---: | ---: | ---: |
+| 0.0 | 0.911547 | 0.912412 | 0.911547 | 0.912412 |
+| 0.3 | 0.866133 | 0.869034 | 0.816279 | 0.812090 |
+| 0.7 | 0.793209 | 0.815107 | 0.806975 | 0.805758 |
+| 1.0 | 0.801782 | 0.808272 | 0.775843 | 0.762744 |
+
+| Metric | Contracted | Overlap |
+| --- | ---: | ---: |
+| Mean MTF, 20 cycles/mm | 0.953483 | 0.954172 |
+| Minimum MTF, 20 cycles/mm | 0.936597 | 0.931841 |
+| Mean MTF, 40 cycles/mm | 0.835414 | 0.837229 |
+| Minimum MTF, 40 cycles/mm | 0.775843 | 0.762744 |
+| Dense full-overlap RMS at 20 cycles/mm, waves | 0.044012 | 0.043442 |
+| Focal length, mm | 50.150945 | 50.150951 |
+| f-number | 1.418421 | 1.414007 |
+
+The common 32×64 overlap RMS improves by 1.30%. All four sagittal MTF values improve,
+but tangential MTF worsens at the three nonzero fields. The mean MTF rises slightly
+at both evaluated frequencies while the minimum falls. The GQ spot values are
+`[2.387031, 3.455374, 3.894257, 4.020533]` for the contracted result and
+`[2.389572, 3.422869, 3.758328, 4.068223]` for overlap: the two middle fields improve
+and the axis and full field worsen. The 64-ray hexapolar check has the same ordering.
+The small f-number difference should also be kept in mind when judging small MTF gains.
+
+Full-overlap cross-scores remain sampling-dependent after optimization:
+
+| Evaluation sampling | Contracted final lens | Overlap final lens |
+| --- | ---: | ---: |
+| 4×8 | 0.044703 | 0.044592 |
+| 8×16 | 0.043758 | 0.042761 |
+| 12×24 | 0.044008 | 0.043432 |
+| 24×48 | 0.044012 | 0.043442 |
+| 32×64 | 0.044012 | 0.043442 |
+
+The 8×16 score on the overlap-optimized lens underestimates its dense score by 1.57%,
+compared with 10.4% for the previous 4×8 optimized lens. The 12×24 evaluation differs
+from the dense score by 0.024%; 24×48 and 32×64 agree within 4e-10 waves. These are
+evaluation checks on the final lenses, not proof that optimizing at 12×24 would be
+converged. Native final merit RMS values (0.003843 and 0.003789) are not directly
+comparable between pupil regions.
+
+Both paired tests pass. This is a modest improvement in the common dense contrast
+score and a different MTF trade-off, not a uniform performance win. The Otus result
+does not justify changing the merit function or making overlap quadrature the default.
+The subsequent more-aberrated-lens comparison remains necessary. Only tests and this
+review changed; equivalent C++ optimization tests would need the same experiment.
+
 ### Phasor diagnostic restored (2026-10-23)
 
 `WavelengthResult.phasor(orientation)` now computes the normalized weighted complex

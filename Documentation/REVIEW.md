@@ -1357,6 +1357,106 @@ and `MandlerUniformOverlap.txt` in the existing target output directory; the log
 `rayoptics/target/mandler-uniform-comparison.log`. Only tests and this review changed;
 equivalent C++ tests remain outstanding.
 
+### Leica 75/2 uniform weights at 12×24 (2026-10-23)
+
+`optimizesUsingDenseUniformContractedQuadrature` and
+`optimizesUsingDenseUniformOverlapQuadrature` repeat the uniform-weight pair at
+12×24. The original prescription, 29 variables, constraints, frequency goals,
+balance strength 4, frozen vignetting and solver tolerances are unchanged.
+Each setup has 57,099 goals. Both return solver status 1; solve times are
+923 s (contracted) and 1,274 s (overlap). The targeted offline Maven run passes
+both tests with no failures or errors, taking about 37.5 minutes including
+diagnostics.
+
+Independent aperture-checked geometric MTF, using the same evaluation as before:
+
+| Metric | Contracted 6×12 | Contracted 12×24 | Overlap 6×12 | Overlap 12×24 |
+| --- | ---: | ---: | ---: | ---: |
+| Mean MTF, 10 cycles/mm | 0.953580 | 0.951960 | 0.953474 | 0.954460 |
+| Minimum MTF, 10 cycles/mm | 0.864880 | 0.852199 | 0.885868 | 0.886143 |
+| Mean MTF, 20 cycles/mm | 0.853860 | 0.853810 | 0.847214 | 0.849429 |
+| Minimum MTF, 20 cycles/mm | 0.758727 | 0.756624 | 0.759451 | 0.759922 |
+| Mean MTF, 40 cycles/mm | 0.588307 | 0.596069 | 0.565691 | 0.570040 |
+| Minimum MTF, 40 cycles/mm | 0.390515 | 0.402798 | 0.368717 | 0.367844 |
+
+Selected fields at 40 cycles/mm for the 12×24 pair:
+
+| Field | Contracted sag | Overlap sag | Contracted tan | Overlap tan |
+| --- | ---: | ---: | ---: | ---: |
+| 0.0 | 0.553491 | 0.494044 | 0.553613 | 0.494221 |
+| 0.3 | 0.583983 | 0.544417 | 0.556453 | 0.519085 |
+| 0.5 | 0.586177 | 0.559853 | 0.679930 | 0.659647 |
+| 0.7 | 0.402798 | 0.368071 | 0.783189 | 0.785491 |
+| 0.8 | 0.403561 | 0.367844 | 0.801336 | 0.812138 |
+| 0.9 | 0.547007 | 0.529925 | 0.755609 | 0.756864 |
+| 1.0 | 0.682078 | 0.719304 | 0.646775 | 0.632956 |
+
+Both sampling densities retain the sagittal dip. At field 0.8 the
+sagittal/tangential separation changes from 0.418358 to 0.397775 when the
+contracted optimization density increases, and from 0.427702 to 0.444294 for
+overlap. Thus raising the density does not reverse the earlier MTF conclusion.
+At 12×24, overlap improves mean and minimum MTF at 10 cycles/mm; at 20 it
+improves the minimum slightly but lowers the mean; at 40 both measures worsen.
+
+Common 32×64 full-overlap RMS on the frozen optimization models, in waves:
+
+| Frequency, cycles/mm | Contracted 6×12 | Contracted 12×24 | Overlap 6×12 | Overlap 12×24 |
+| --- | ---: | ---: | ---: | ---: |
+| 10 | 0.05341654 | 0.05548963 | 0.05217366 | 0.05143877 |
+| 20 | 0.10086550 | 0.10398132 | 0.09939325 | 0.09816942 |
+| 40 | 0.18368725 | 0.18653137 | 0.18454615 | 0.18265978 |
+
+For the 12×24 pair, overlap improves this common score by 7.30%, 5.59% and
+2.08% at 10, 20 and 40 cycles/mm respectively. This equal-block diagnostic
+omits the optimizer's other goals and is not its total merit.
+
+Sampling checks on the final 12×24 lenses:
+
+| Evaluation sampling | Contracted RMS at 40 | Overlap RMS at 40 |
+| --- | ---: | ---: |
+| 6×12 | 0.18554401 | 0.18149964 |
+| 12×24 | 0.18653134 | 0.18265976 |
+| 24×48 | 0.18653137 | 0.18265978 |
+| 32×64 | 0.18653137 | 0.18265978 |
+
+The 6×12 evaluation underestimates the overlap lens's dense score by 0.85%,
+0.77% and 0.64% at the three frequencies. Across both lenses and all three
+frequencies, 12×24 evaluation differs from 32×64 by less than 2.9e-8 waves,
+and 24×48 by less than 2.9e-10. Final-lens evaluation is stable; the change
+between optimization densities still prevents a claim of fully converged
+optimization.
+
+Native merit RMS falls from 0.032234 to 0.007447 (contracted) and from
+0.049538 to 0.008237 (overlap). Do not compare these directly across pupil
+regions or densities: the integration region differs, and the reported RMS
+divides the sum of squares by a different goal count. Final focal lengths
+are 74.634952 and 74.633012 mm; both f-numbers are 2.05.
+
+The diffraction check retains the same ordering near the sagittal dip. At field
+0.7 and 40 cycles/mm, the 256-grid d-line sagittal/tangential values are
+0.349256/0.788096 (contracted) and 0.312322/0.782552 (overlap). Across the
+tested fields and frequencies, the largest 128-to-256 difference is below
+0.003615. The earlier monochromatic and entrance-pupil limitations still apply.
+
+**Conclusion:** at higher density, overlap produces a better common dense OPD
+score, but does not produce better high-frequency MTF or resolve the meridional
+split. The 6×12 optimization density is not the sole explanation. This supports
+retaining the pupil correction as an integration correction, but does not establish
+an optimization-performance benefit or justify making it the default.
+It also does not establish that a different merit function is needed.
+
+The next diagnostic should check the realized image frequency and exit-pupil
+shear per field, wavelength and orientation, and compare the OPD distributions
+with the existing phasor diagnostic. Frequency calibration and exit-pupil aiming
+remain disabled in these tests. That check can investigate the remaining pupil
+approximations without changing the Zemax squared-OPD merit or retuning weights.
+
+Final prescriptions are `MandlerUniformContracted12x24.txt` and
+`MandlerUniformOverlap12x24.txt` in `rayoptics/target/mandler-overlap-comparison/`.
+The log is `rayoptics/target/mandler-uniform-12x24.log`. Only tests and this review
+changed; no production or upstream-ported files changed. Equivalent C++ tests
+remain outstanding.
+
 ### Phasor diagnostic restored (2026-10-23)
 
 `WavelengthResult.phasor(orientation)` now computes the normalized weighted complex

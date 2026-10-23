@@ -45,8 +45,18 @@ class LeicaApo75mmMandlerTest {
         optimize(true, true);
     }
 
+    @Test
+    void optimizesUsingDenseUniformContractedQuadrature() throws Exception {
+        optimize(false, true, 12);
+    }
+
+    @Test
+    void optimizesUsingDenseUniformOverlapQuadrature() throws Exception {
+        optimize(true, true, 12);
+    }
+
     // Mirrors the factory settings, replacing only its orientation/field weights.
-    private static OptimizationBuilder.OptimizationSetup uniformSetup(Prescription prescription) {
+    private static OptimizationBuilder.OptimizationSetup uniformSetup(Prescription prescription, int rings) {
         double[] fields = {0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1};
         double[] weights = new double[fields.length];
         Arrays.fill(weights, 1.0);
@@ -54,7 +64,7 @@ class LeicaApo75mmMandlerTest {
         return OptimizationBuilder.builder(prescription)
                 .fields(fields).varyAllCurvatures().varyAllThicknesses()
                 .applyCurvatureConstraints().applyThicknessConstraints(5.0)
-                .contrastSampling(6, 12)
+                .contrastSampling(rings, 2 * rings)
                 .contrastGoals(contrast(10, weights, weights), contrast(20, weights, weights),
                         contrast(40, weights, weights))
                 .calibrateContrastFrequency(false).centerContrastResiduals(false)
@@ -64,21 +74,26 @@ class LeicaApo75mmMandlerTest {
     }
 
     private static void optimize(boolean overlap, boolean uniform) throws Exception {
+        optimize(overlap, uniform, 6);
+    }
+
+    private static void optimize(boolean overlap, boolean uniform, int rings) throws Exception {
         var prescription = LeicaApo75mmMandler.getPrescription(ContrastProbes.leicaInputPath(), false, false);
-        var setup = uniform ? uniformSetup(prescription)
+        var setup = uniform ? uniformSetup(prescription, rings)
                 : LeicaApo75mmMandler.createContrastSetup(prescription, false, false,
                 new double[]{1, 1, 1, 1});
         var analysis = setup.analysis();
         // Goals read this flag through the shared Analysis; no goals or weights are rebuilt.
         analysis.using_contrast_overlap_quadrature(overlap);
-        assertEquals(6, analysis._contrast_num_rings);
-        assertEquals(12, analysis._contrast_num_spokes);
+        assertEquals(rings, analysis._contrast_num_rings);
+        assertEquals(2 * rings, analysis._contrast_num_spokes);
         assertTrue(analysis._freeze_vignetting);
         assertEquals(VigType.SetVig, analysis._vig_type);
         assertFalse(analysis._contrast_center_residuals);
         assertFalse(analysis._contrast_aim_exit_pupil);
         assertFalse(analysis._contrast_calibrate_frequency);
         String label = "Mandler" + (uniform ? "Uniform" : "") + (overlap ? "Overlap" : "Contracted");
+        if (rings != 6) label += rings + "x" + 2 * rings;
         System.out.println(label + " START: variables=" + setup.variables().length
                 + " goals=" + setup.goals().length);
         analysis.compute();
@@ -107,10 +122,10 @@ class LeicaApo75mmMandlerTest {
                 + " fno=" + analysis._pfo[ParaxHelper.Fno]);
         for (var mtf : analysis._mtfs)
             printMtf(label + " frozen-unclipped", mtf);
-        for (int rings : new int[]{12, 24, 32}) {
+        for (int evaluationRings : new int[]{6, 12, 24, 32}) {
             for (int frequency : FREQUENCIES) {
                 var contrast = ContrastAnalysis.eval(analysis._opt_model,
-                        new ContrastOptions(frequency).num_rings(rings).num_spokes(2 * rings)
+                        new ContrastOptions(frequency).num_rings(evaluationRings).num_spokes(2 * evaluationRings)
                                 .overlap_quadrature(true));
                 double sum = 0;
                 int blocks = 0;
@@ -122,7 +137,7 @@ class LeicaApo75mmMandlerTest {
                             sum += rms * rms;
                             blocks++;
                         }
-                System.out.println(label + " overlap score " + frequency + " " + rings + "x" + 2 * rings
+                System.out.println(label + " overlap score " + frequency + " " + evaluationRings + "x" + 2 * evaluationRings
                         + " blockRms=" + Math.sqrt(sum / blocks));
             }
         }

@@ -1800,6 +1800,33 @@ wrote `0`, `1` or `2` directly; the upstream-ported files (`Trace`, `SequentialM
 It also validates, which the goals did not: `GoalGeoMTF`, `GoalRayAberration` and
 `GoalMTFProxy` used to accept any integer and silently read the sagittal fan for it.
 
+## Diffraction MTF review fixes (2026-10-23)
+
+`Analyses.calc_psf` now keeps the pupil mask separate from phase. The upstream
+implementation removes samples with phase `1+0i`, including valid samples with
+zero OPD. An all-zero wavefront therefore produced a `NaN` PSF, and isolated
+zero samples created holes in the pupil. Finite OPD samples now remain illuminated;
+non-finite samples and FFT padding are excluded. This is an intentional correction
+to the ported function.
+
+`DiffractionMTF` now requires an even pupil grid of at least four samples per side.
+A two-sample grid contains only bounding-box corners, which can all lie outside
+a circular pupil. `calc_psf` rejects a PSF without a finite positive peak, and the
+MTF transform rejects a non-finite or non-positive total intensity before normalization.
+Empty pupils now raise `IllegalArgumentException` instead of returning `NaN`.
+
+Regression tests cover a zero-OPD circular pupil against the analytic diffraction
+limit, PSF invariance under a constant piston with mixed zero and nonzero OPD,
+an empty pupil, invalid PSF intensity, and two-sample grid rejection. The existing
+upstream comparison tests remain in place.
+
+Validation: `DiffractionMTFTest` and `AnalysesTest` pass all 15 tests with no
+failures or errors in the offline Maven reactor run.
+
+These changes are in the `rayoptics` module and need back-porting to
+`rayoptics-cpp`, including regression tests and regenerated Java expectations where
+affected. No C++ checkout was changed.
+
 ## How the numbers were obtained
 
 The probe programs that produced every figure in this document live in

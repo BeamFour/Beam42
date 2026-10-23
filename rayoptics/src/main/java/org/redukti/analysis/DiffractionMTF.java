@@ -47,12 +47,12 @@ public class DiffractionMTF {
     public final double[][] mtf;
 
     /**
-     * @param n_pupil rays across the pupil; even, as {@link Analyses#calc_psf} requires
+     * @param n_pupil rays across the pupil; even and at least 4
      * @param maxdim  FFT size; at least {@code 2 * n_pupil} so the MTF does not wrap
      */
     public DiffractionMTF(OpticalModel opm, Field fld, double wvl, double foc, int n_pupil, int maxdim) {
-        if (n_pupil < 2 || n_pupil % 2 != 0)
-            throw new IllegalArgumentException("n_pupil must be even and at least 2");
+        if (n_pupil < 4 || n_pupil % 2 != 0)
+            throw new IllegalArgumentException("n_pupil must be even and at least 4");
         if (maxdim < 2 * n_pupil)
             throw new IllegalArgumentException("maxdim must be at least 2 * n_pupil");
         this.fld = fld;
@@ -175,6 +175,8 @@ public class DiffractionMTF {
             for (int j = 0; j < n; j++)
                 mtf[(i + shift) % n][(j + shift) % n] = Math.hypot(x[i][2 * j], x[i][2 * j + 1]);
         double dc = mtf[shift][shift];
+        if (!(dc > 0) || !Double.isFinite(dc))
+            throw new IllegalArgumentException("PSF must have finite, positive total intensity");
         for (int i = 0; i < n; i++)
             for (int j = 0; j < n; j++)
                 mtf[i][j] /= dc;

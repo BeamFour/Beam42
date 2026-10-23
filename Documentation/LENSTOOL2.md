@@ -315,7 +315,7 @@ Everything else has a default.
 | `--output-pupil-maps` | off | Additionally measure and draw which part of each field's pupil the lens passes, and which surface blocks the rest. See below.  Not linked to the README.                                                                                                                                                                                                       |
 | `--pupil-map-samples <n>` | 121 | Samples per axis in a pupil map. Only consulted with `--output-pupil-maps`. Minimum 2.                                                                                                                                                                                                                                                                         |
 | `--output-wavelength-mtf-report` | off | Additionally write the monochromatic geometric MTF per frequency, wavelength, orientation and field, in the layout of the contrast report. See below. Not linked to the README. |
-| `--output-contrast-report` | off | Additionally write the RMS contrast OPD difference per frequency, wavelength, orientation and field. See below. Not linked to the README. |
+| `--output-contrast-report` | off | Additionally write RMS contrast OPD differences and normalized phasor moduli per frequency, wavelength, orientation and field. See below. Not linked to the README. |
 | `--output-ray-aberration-plots` | off | Additionally emit transverse ray aberration **and** wavefront (OPD) fan plots, tangential and sagittal, for each field.  Not linked to the README.                                                                                                                                                                                                             |
 | `--verbose` | off | Log the optimizer's progress to stderr, one line per iteration: merit, evaluations so far, elapsed time. Warnings are always shown.                                                                                                                                                                                                                            |
 | `--debug` | off | Log everything, including the ray-optics info messages (each field's vignetting and real entrance pupil) and debug traces (the vignetting, pupil and wide angle searches). These fire on every chief ray aim, so during an optimization they run to thousands of lines per iteration. For a subset, pass a standard `-Djava.util.logging.config.file` instead. |
@@ -435,6 +435,19 @@ traced. A value marked `*` had samples that failed to trace. Lower is better; a
 large gap between `tan` and `sag` at a field is the astigmatism the contrast
 balance goal acts on.
 
+A second table gives the normalized phasor modulus, `|sum(w exp(i 2 pi dW)) / sum(w)|`,
+from the same valid samples, with `dW` in waves. Values lie between zero and one;
+higher is better. Constant OPD differences rotate the complex phasor without changing
+its modulus. The calculation uses raw differences, independent of residual centering.
+The API also exposes the real and imaginary components and valid sample weight through
+`WavelengthResult.phasor(orientation)`.
+
+This is an average over the sampled region, not absolute diffraction MTF. It omits
+the diffraction overlap factor; a contracted pattern also omits part of the true
+overlap. Failed samples are excluded and marked `*`. No valid weight is shown as `-`.
+No extra rays are traced. The optimizer continues to use squared OPD differences;
+this diagnostic does not change its merit function or sampling.
+
 Sampling is the optimizer's default, 6 rings by 12 spokes. Exit-pupil aiming is
 on, so every shifted ray realises the requested frequency; the optimizer leaves it
 off by default because of its cost per evaluation. Values are therefore somewhat
@@ -474,7 +487,7 @@ spec with multiple configurations (a zoom, for instance).
 | `pupil-skew<suffix>.svg` | `--output-pupil-maps` | Measured pupil map, full field. Not included in the README. |
 | `pupil-report<suffix>.txt` | `--output-pupil-maps` | Per field: the vignetting scales, how far the bundle reaches, and how well each candidate mapping describes it. |
 | `mtf-w-wavelength-report<suffix>.txt` | `--output-wavelength-mtf-report` | Monochromatic geometric MTF per `--mtf` frequency, wavelength, orientation and field, for the wavelengths of the weighted MTF. |
-| `contrast-report-w<suffix>.txt` | `--output-contrast-report` | RMS contrast OPD difference per `--mtf` frequency, wavelength, orientation and field, for the wavelengths of the weighted MTF. |
+| `contrast-report-w<suffix>.txt` | `--output-contrast-report` | RMS contrast OPD difference and normalized phasor modulus per `--mtf` frequency, wavelength, orientation and field, for the wavelengths of the weighted MTF. |
 | `rayabbr-fld<i>-{tan,sag}<suffix>.svg` | `--output-ray-aberration-plots` | Transverse ray aberration fans. Not included in the README.                               |
 | `opdabbr-fld<i>-{tan,sag}<suffix>.svg` | `--output-ray-aberration-plots` | Wavefront (OPD) fans. Not included in the README.                                         |
 

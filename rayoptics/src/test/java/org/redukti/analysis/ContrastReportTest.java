@@ -33,16 +33,20 @@ class ContrastReportTest {
 
         String report = ContrastReport.report(model, new int[]{10, 40}, options);
 
-        var lines = report.lines().filter(line -> line.startsWith(" ")).toList();
+        var tables = report.split("Normalized phasor modulus[^\\n]*\\n\\n", 2);
+        var lines = tables[0].lines().filter(line -> line.startsWith(" ")).toList();
+        var phasorLines = tables[1].lines().filter(line -> line.startsWith(" ")).toList();
         var header = lines.get(0).trim().split("\\s+");
         int fields = model.optical_spec.fov.fields.length;
         int wavelengths = model.optical_spec.wvls.wavelengths.length;
         assertEquals(3 + fields, header.length);
         assertEquals("freq", header[0]);
         assertEquals(1 + 2 * 2 * wavelengths, lines.size());
+        assertEquals(lines.size(), phasorLines.size());
 
         // First row: lowest frequency, first wavelength, tangential.
         var row = lines.get(1).trim().split("\\s+");
+        var phasorRow = phasorLines.get(1).trim().split("\\s+");
         assertEquals("10", row[0]);
         assertEquals("tan", row[2]);
         assertEquals("sag", lines.get(2).trim().split("\\s+")[2]);
@@ -52,6 +56,7 @@ class ContrastReportTest {
         for (int fi = 0; fi < fields; fi++) {
             var block = result.fields.get(fi).wavelengths().get(0);
             assertEquals(format.format(ContrastReport.rms(block, Orientation.TANGENTIAL)), row[3 + fi]);
+            assertEquals(format.format(block.phasor(Orientation.TANGENTIAL).modulus()), phasorRow[3 + fi]);
         }
     }
 

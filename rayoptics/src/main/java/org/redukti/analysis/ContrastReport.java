@@ -5,6 +5,7 @@ package org.redukti.analysis;
 
 import org.redukti.mathlib.M;
 import org.redukti.rayoptics.optical.OpticalModel;
+import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.util.Orientation;
 
 import java.text.DecimalFormat;
@@ -17,6 +18,7 @@ import java.text.DecimalFormat;
  * samples of that block, in waves: {@code sqrt(sum w dW^2 / sum w)}. Its square is the
  * block's contribution to the contrast merit before field, orientation and wavelength
  * weights, normalized by the weight of the samples that traced.
+     * A second table reports the normalized phasor modulus from the same traced rays.
  */
 public class ContrastReport {
 
@@ -66,12 +68,9 @@ public class ContrastReport {
                 .append("\n\n");
 
         var fields = opticalModel.optical_spec.fov.fields;
-        cell(sb, "freq");
-        cell(sb, "wvl");
-        cell(sb, "dir");
-        for (var field : fields)
-            cell(sb, LABEL_FORMAT.format(field.y));
-        sb.append('\n');
+        tableHeader(sb, fields);
+        var phasors = new StringBuilder("Normalized phasor modulus (dimensionless; higher is better)\n\n");
+        tableHeader(phasors, fields);
 
         var notes = new StringBuilder();
         boolean anyIncomplete = false;
@@ -90,6 +89,9 @@ public class ContrastReport {
                     cell(sb, Integer.toString(frequency));
                     cell(sb, LABEL_FORMAT.format(wavelengths[wi]));
                     cell(sb, Orientation.name(orientation));
+                    cell(phasors, Integer.toString(frequency));
+                    cell(phasors, LABEL_FORMAT.format(wavelengths[wi]));
+                    cell(phasors, Orientation.name(orientation));
                     for (var field : result.fields) {
                         var block = field.wavelengths().get(wi);
                         double value = rms(block, orientation);
@@ -97,11 +99,19 @@ public class ContrastReport {
                         anyIncomplete |= partial;
                         cell(sb, Double.isNaN(value) ? "-"
                                 : VALUE_FORMAT.format(value) + (partial ? "*" : ""));
+                        double modulus = block.phasor(orientation).modulus();
+                        cell(phasors, Double.isNaN(modulus) ? "-"
+                                : VALUE_FORMAT.format(modulus) + (partial ? "*" : ""));
                     }
                     sb.append('\n');
+                    phasors.append('\n');
                 }
             }
         }
+        sb.append('\n').append(phasors);
+        sb.append("\nPhasor = |sum(w exp(i 2 pi dW)) / sum(w)| over valid samples.\n")
+                .append("This is the sampled-region average, not absolute diffraction MTF.\n")
+                .append("No diffraction overlap factor is included. Optimizer goals still use squared OPD differences.\n");
         if (anyIncomplete)
             sb.append("\n* some samples failed to trace; the value is over the samples that did\n");
         if (!notes.isEmpty())
@@ -111,6 +121,15 @@ public class ContrastReport {
 
     private static void cell(StringBuilder sb, String value) {
         sb.append(" ".repeat(Math.max(1, COLUMN_WIDTH - value.length()))).append(value);
+    }
+
+    private static void tableHeader(StringBuilder sb, Field[] fields) {
+        cell(sb, "freq");
+        cell(sb, "wvl");
+        cell(sb, "dir");
+        for (var field : fields)
+            cell(sb, LABEL_FORMAT.format(field.y));
+        sb.append('\n');
     }
 
     private static String yesNo(boolean value) {

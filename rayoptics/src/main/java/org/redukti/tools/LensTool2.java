@@ -739,7 +739,7 @@ public class LensTool2 {
                     + PupilMapAnalysis.DEFAULT_NUM_SAMPLES);
             System.err.println("       --output-wavelength-mtf-report writes mtf-w-wavelength-report.txt: the monochromatic geometric MTF");
             System.err.println("         per --mtf frequency, wavelength, orientation and field, in the layout of the contrast report");
-            System.err.println("       --output-contrast-report writes contrast-report-w.txt: the RMS contrast OPD difference");
+            System.err.println("       --output-contrast-report writes contrast-report-w.txt: RMS OPD differences and normalized phasor moduli");
             System.err.println("         per --mtf frequency, wavelength, orientation and field, for the weighted MTF wavelengths");
             System.err.println("       --mtf takes spatial frequencies in cycles/mm and defaults to 10,30,50, which is what the reports under Examples/ use");
             System.err.println("       --real-ray-aiming aims the chief ray by tracing a real ray at the entrance pupil, --paraxial-ray-aiming uses paraxial aiming; real is the default");

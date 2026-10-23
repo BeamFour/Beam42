@@ -13,15 +13,10 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class ContrastOverlapFftTest {
     private static double phasor(ContrastAnalysisResult.WavelengthResult block, int axis) {
-        double re = 0, im = 0;
         for (var sample : block.samples(axis)) {
             assertTrue(sample.valid(), () -> String.valueOf(sample.failure()));
-            double phase = 2 * Math.PI * (axis == 0
-                    ? sample.sagittalOpdDifference() : sample.tangentialOpdDifference());
-            re += sample.weight() * Math.cos(phase);
-            im += sample.weight() * Math.sin(phase);
         }
-        return Math.hypot(re, im);
+        return block.phasor(axis).modulus();
     }
 
     private static double along(double[][] mtf, double k, int axis) {

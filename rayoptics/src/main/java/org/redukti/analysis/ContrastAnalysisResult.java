@@ -47,6 +47,13 @@ public class ContrastAnalysisResult {
     public record Failure(String ray, String exceptionType, int surface) {
     }
 
+    /** Weighted average of exp(i 2 pi dW) over valid samples, using raw OPD in waves.
+     * This describes the sampled region, not the absolute diffraction OTF.
+     */
+    public record Phasor(double real, double imaginary, double validWeight) {
+        public double modulus() { return Math.hypot(real, imaginary); }
+    }
+
     /**
      * One (frequency, field, wavelength) block of samples, with the constant part of the
      * wavefront difference that is to be removed from each orientation.
@@ -83,6 +90,28 @@ public class ContrastAnalysisResult {
         public WavelengthResult withOffsets(double sagittal, double tangential) {
             return new WavelengthResult(wavelength, normalizedPupilShift, samples,
                     sagittal, tangential, tangentialSamples);
+        }
+
+        /** Diagnostic calculation from existing rays; optimizer residuals are unchanged.
+         * Centering offsets are not applied, so complex phases retain the original
+         * image reference. No valid weight gives NaN components and modulus.
+         */
+        public Phasor phasor(int orientation) {
+            double real = 0, imaginary = 0, weight = 0;
+            for (var sample : samples(orientation)) {
+                if (!sample.valid()) continue;
+                double difference = orientation == Orientation.SAGITTAL
+                        ? sample.sagittalOpdDifference() : sample.tangentialOpdDifference();
+                if (!Double.isFinite(difference) || !Double.isFinite(sample.weight()) || sample.weight() <= 0)
+                    continue;
+                double phase = 2 * Math.PI * difference;
+                if (!Double.isFinite(phase)) continue;
+                real += sample.weight() * Math.cos(phase);
+                imaginary += sample.weight() * Math.sin(phase);
+                weight += sample.weight();
+            }
+            return weight > 0 ? new Phasor(real / weight, imaginary / weight, weight)
+                    : new Phasor(Double.NaN, Double.NaN, 0);
         }
 
         /**

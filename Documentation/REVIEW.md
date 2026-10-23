@@ -1059,6 +1059,23 @@ sampling region from the FFT's entrance-pupil grid, and needs no change to the c
 
 ---
 
+### Phasor diagnostic restored (2026-10-23)
+
+`WavelengthResult.phasor(orientation)` now computes the normalized weighted complex
+average of `exp(i 2 pi dW)` over valid samples. It exposes real and imaginary
+components, modulus and valid weight. Raw OPD differences preserve the original
+image reference; residual-centering offsets do not alter this diagnostic.
+The contrast report retains the RMS table and adds the phasor-modulus table from
+the same rays. No extra tracing or optimizer evaluation is required.
+
+The phasor describes the sampled region. It is not absolute diffraction MTF and
+includes no overlap-area factor. No wavelength pooling is performed. Contracted
+sampling and nonlinear pupil mapping retain the limitations described above.
+The optimizer still uses its existing squared-OPD goals; no phasor goal has been
+restored. An instrumented optimization comparison is deferred until this diagnostic
+change is reviewed and committed. The calculation and regression tests need
+back-porting to `rayoptics-cpp`; no C++ checkout was changed.
+
 ## 7. The shear is applied at the entrance pupil, not the exit pupil
 
 **Severity: moderate. Same class as finding 1, an order of magnitude smaller.**

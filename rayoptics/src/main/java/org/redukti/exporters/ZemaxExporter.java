@@ -9,6 +9,9 @@ import org.redukti.spec.SurfaceType;
 import org.redukti.util.Args;
 import org.redukti.util.Helper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ZemaxExporter {
 
 
@@ -45,25 +48,29 @@ public class ZemaxExporter {
         else
             sb.append("FLOA\n");
         var img_ht = prescription._diameter_image_circle/2.0;
-        sb.append(String.format("""
+        sb.append("""
                 ENVD 20 1 0
                 GFAC 0 0
                 GCAT SCHOTT HOYA OHARA NIKON-HIKARI NIKON HIKARI SUMITA CDGM CORNING LACROIX
                 RAIM 0 2 1 1 0 1 0 0 0
                 SDMA 0 1 0
-                FTYP 3 0 9 3 0 0 0 9
-                ROPD 2
-                HYPR 0
-                PICB 1
-                XFLN 0 0 0 0 0 0 0 0 0 0 0 0
-                YFLN 0 2.16 4.33 6.5 8.65 10.8 12.98 15.14 %f 0 0 0 0 0 0 0 0
-                FWGN 10 9 9 8 8 7 7 7 3 1 1 1
-                VDXN 0 0 0 0 0 0 0 0 0 0 0 0
-                VDYN 0 0 0 0 0 0 0 0 0 0 0 0
-                VCXN 0 0 0 0 0 0 0 0 0 0 0 0
-                VCYN 0 0 0 0 0 0 0 0 0 0 0 0
-                VANN 0 0 0 0 0 0 0 0 0 0 0 0
-                """, img_ht));
+                """);
+        if (prescription._vignetting == null) {
+            sb.append("FTYP 3 0 9 3 0 0 0 9\n");
+            output_rop_lines(sb);
+            sb.append(String.format("""
+                    XFLN 0 0 0 0 0 0 0 0 0 0 0 0
+                    YFLN 0 2.16 4.33 6.5 8.65 10.8 12.98 15.14 %f 0 0 0 0 0 0 0 0
+                    FWGN 10 9 9 8 8 7 7 7 3 1 1 1
+                    VDXN 0 0 0 0 0 0 0 0 0 0 0 0
+                    VDYN 0 0 0 0 0 0 0 0 0 0 0 0
+                    VCXN 0 0 0 0 0 0 0 0 0 0 0 0
+                    VCYN 0 0 0 0 0 0 0 0 0 0 0 0
+                    VANN 0 0 0 0 0 0 0 0 0 0 0 0
+                    """, img_ht));
+        }
+        else
+            output_vignetted_fields(prescription, sb);
         if (d_line_only) {
             sb.append("""
                     WAVM 1 0.5875618 1
@@ -105,6 +112,105 @@ public class ZemaxExporter {
                 GSTD 0 100 100 100 100 100 100 0 1 1 0 0 1 1 1 1 1 1
                 NSCD 100 500 0 1.0E-3 5 1.0E-6 0 0 0 0 0 0 1000000 0 2
                 """);
+    }
+
+    private static void output_rop_lines(StringBuilder sb) {
+        sb.append("""
+                ROPD 2
+                HYPR 0
+                PICB 1
+                """);
+    }
+
+    /** Zemax holds at most this many fields. */
+    private static final int MAX_FIELDS = 12;
+
+    /**
+     * Fields as angles, the fractions of the half angle of view our models use, with the
+     * vignetting factors they were computed with. These are the values of the first
+     * configuration; {@link #output_configurations} sets the others.
+     */
+    private void output_vignetted_fields(Prescription prescription, StringBuilder sb) {
+        var fields = vignetting_by_config(prescription, 0);
+        int n = fields.size();
+        double half_angle = half_angle_of_view(prescription, 0);
+        sb.append("FTYP 0 0 ").append(n).append(" 3 0 0 0 ").append(n).append("\n");
+        output_rop_lines(sb);
+        var x = new double[n];
+        var y = new double[n];
+        var weights = new double[n];
+        var vdx = new double[n];
+        var vdy = new double[n];
+        var vcx = new double[n];
+        var vcy = new double[n];
+        for (int i = 0; i < n; i++) {
+            var v = fields.get(i);
+            y[i] = v.field() * half_angle;
+            weights[i] = 1;
+            vdx[i] = decenter(v.vux(), v.vlx());
+            vdy[i] = decenter(v.vuy(), v.vly());
+            vcx[i] = compression(v.vux(), v.vlx());
+            vcy[i] = compression(v.vuy(), v.vly());
+        }
+        field_line(sb, "XFLN", x);
+        field_line(sb, "YFLN", y);
+        field_line(sb, "FWGN", weights);
+        field_line(sb, "VDXN", vdx);
+        field_line(sb, "VDYN", vdy);
+        field_line(sb, "VCXN", vcx);
+        field_line(sb, "VCYN", vcy);
+        field_line(sb, "VANN", new double[0]);
+    }
+
+    /** One value per field, padded with zeros to {@link #MAX_FIELDS}. */
+    private static void field_line(StringBuilder sb, String key, double[] values) {
+        sb.append(key);
+        for (int i = 0; i < MAX_FIELDS; i++)
+            sb.append(" ").append(i < values.length ? values[i] : 0);
+        sb.append("\n");
+    }
+
+    /*
+     * Zemax maps a pupil coordinate P to VD + P(1 - VC); our factors move the edges at
+     * +1 and -1 to 1 - vu and -1 + vl. Matching the two edges gives the decenter and
+     * compression below.
+     */
+    static double decenter(double upper, double lower) {
+        return (lower - upper) / 2.0;
+    }
+
+    static double compression(double upper, double lower) {
+        return (upper + lower) / 2.0;
+    }
+
+    /** The half angle of view of a configuration, as the model builder takes it. */
+    private static double half_angle_of_view(Prescription prescription, int config) {
+        double angle_of_view = config == 0 ? prescription._angle_of_view_in_degrees
+                : prescription._angle_of_views_by_scenario[config];
+        return angle_of_view / 2.0;
+    }
+
+    /** The vignetting rows of one configuration, checked against those of the first. */
+    private static List<Prescription.FieldVignetting> vignetting_by_config(Prescription prescription, int config) {
+        var rows = new ArrayList<Prescription.FieldVignetting>();
+        var first = new ArrayList<Double>();
+        for (var v : prescription._vignetting) {
+            if (v.config() == config)
+                rows.add(v);
+            if (v.config() == 0)
+                first.add(v.field());
+        }
+        if (rows.isEmpty() || rows.size() > MAX_FIELDS)
+            throw new IllegalArgumentException("Configuration " + config + " has " + rows.size()
+                    + " vignetted fields; Zemax needs 1 to " + MAX_FIELDS);
+        if (rows.size() != first.size())
+            throw new IllegalArgumentException("Configuration " + config
+                    + " has different fields from the first configuration");
+        for (int i = 0; i < rows.size(); i++)
+            if (rows.get(i).field() != first.get(i))
+                throw new IllegalArgumentException("Configuration " + config
+                        + " has different fields from the first configuration");
+        return rows;
     }
 
     private void output_object(Prescription prescription, StringBuilder sb) {
@@ -214,6 +320,35 @@ public class ZemaxExporter {
             if (surface._thickness_by_scenario != null) {
                 for (int j = 0; j < surface._thickness_by_scenario.length; j++) {
                     sb.append("THIC    ").append(i+1).append("   ").append(j+1).append(" ").append(surface._thickness_by_scenario[j]).append("  0 0 0 1 1 1 0 0\n");
+                }
+            }
+        }
+        if (prescription._vignetting != null)
+            output_vignetting_configurations(prescription, sb);
+    }
+
+    /**
+     * The field angle and vignetting factors of every field in every configuration, as
+     * one multi-configuration operand per field and quantity.
+     */
+    private void output_vignetting_configurations(Prescription prescription, StringBuilder sb) {
+        int num_configs = prescription.get_num_configurations();
+        var by_config = new ArrayList<List<Prescription.FieldVignetting>>();
+        for (int config = 0; config < num_configs; config++)
+            by_config.add(vignetting_by_config(prescription, config));
+        int num_fields = by_config.get(0).size();
+        for (int fi = 0; fi < num_fields; fi++) {
+            for (String op : new String[]{"YFIE", "FVDX", "FVDY", "FVCX", "FVCY"}) {
+                for (int config = 0; config < num_configs; config++) {
+                    var v = by_config.get(config).get(fi);
+                    double value = switch (op) {
+                        case "YFIE" -> v.field() * half_angle_of_view(prescription, config);
+                        case "FVDX" -> decenter(v.vux(), v.vlx());
+                        case "FVDY" -> decenter(v.vuy(), v.vly());
+                        case "FVCX" -> compression(v.vux(), v.vlx());
+                        default -> compression(v.vuy(), v.vly());
+                    };
+                    sb.append(op).append("    ").append(fi+1).append("   ").append(config+1).append(" ").append(value).append("  0 0 0 1 1 1 0 0\n");
                 }
             }
         }

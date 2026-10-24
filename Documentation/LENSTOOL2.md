@@ -316,7 +316,7 @@ Everything else has a default.
 | `--pupil-map-samples <n>` | 121 | Samples per axis in a pupil map. Only consulted with `--output-pupil-maps`. Minimum 2.                                                                                                                                                                                                                                                                         |
 | `--output-wavelength-mtf-report` | off | Additionally write the monochromatic geometric MTF per frequency, wavelength, orientation and field, in the layout of the contrast report. See below. Not linked to the README. |
 | `--output-diffraction-mtf` | off | Additionally write the polychromatic diffraction MTF by field, for the same wavelengths and weights as the geometric MTF plots. The pupil is sampled by a 64 x 64 ray grid. Not linked to the README. |
-| `--export-vignetting` | off | Add a `[vignetting]` section to the generated `prescription.txt`, holding the vignetting factors of each field and configuration. See [`prescription.txt` round trips](#prescriptiontxt-round-trips). |
+| `--export-vignetting` | off | Add a `[vignetting]` section to the generated `prescription.txt`, holding the vignetting factors of each field and configuration, and write the same fields and factors to the Zemax file. See [`prescription.txt` round trips](#prescriptiontxt-round-trips). |
 | `--output-contrast-pupil-maps` | off | Additionally draw where in the pupil each frequency loses contrast. See below. Not linked to the README. |
 | `--output-contrast-report` | off | Additionally write the RMS contrast OPD difference per frequency, wavelength, orientation and field. See below. Not linked to the README. |
 | `--output-ray-aberration-plots` | off | Additionally emit transverse ray aberration **and** wavefront (OPD) fan plots, tangential and sagittal, for each field.  Not linked to the README.                                                                                                                                                                                                             |
@@ -646,6 +646,18 @@ config	field	vux	vlx	vuy	vly
 `config` numbers the configurations as written in `scenarios`, and `field` is the
 fraction of the half angle of view. The section is informational. LensTool2 ignores it
 when reading a prescription and always computes the vignetting from `--vig-type`.
+
+The Zemax file then defines its fields as angles (`FTYP 0`) at these fractions of each
+configuration's half angle of view, instead of the default fixed image heights, and
+carries the factors as `VDX`, `VDY`, `VCX`, `VCY`:
+
+* `VCY = (vuy + vly) / 2`, `VDY = (vly - vuy) / 2`, and the same in x. This puts the
+  pupil edges where Beam42 puts them. Inside the pupil Zemax compresses linearly, while
+  Beam42 scales each half separately.
+* A zoom gets `YFIE`, `FVDX`, `FVDY`, `FVCX` and `FVCY` multi-configuration operands.
+* Beam42's pupil coordinates are on the paraxial entrance pupil, centred on the aimed
+  chief ray. On lenses with strong pupil aberration the same factors describe a
+  different pupil in Zemax, depending on its ray aiming setting.
 
 ### MTF wavelengths and weights
 

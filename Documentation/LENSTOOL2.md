@@ -316,6 +316,7 @@ Everything else has a default.
 | `--pupil-map-samples <n>` | 121 | Samples per axis in a pupil map. Only consulted with `--output-pupil-maps`. Minimum 2.                                                                                                                                                                                                                                                                         |
 | `--output-wavelength-mtf-report` | off | Additionally write the monochromatic geometric MTF per frequency, wavelength, orientation and field, in the layout of the contrast report. See below. Not linked to the README. |
 | `--output-diffraction-mtf` | off | Additionally write the polychromatic diffraction MTF by field, for the same wavelengths and weights as the geometric MTF plots. The pupil is sampled by a 64 x 64 ray grid. Not linked to the README. |
+| `--export-vignetting` | off | Add a `[vignetting]` section to the generated `prescription.txt`, holding the vignetting factors of each field and configuration. See [`prescription.txt` round trips](#prescriptiontxt-round-trips). |
 | `--output-contrast-pupil-maps` | off | Additionally draw where in the pupil each frequency loses contrast. See below. Not linked to the README. |
 | `--output-contrast-report` | off | Additionally write the RMS contrast OPD difference per frequency, wavelength, orientation and field. See below. Not linked to the README. |
 | `--output-ray-aberration-plots` | off | Additionally emit transverse ray aberration **and** wavefront (OPD) fan plots, tangential and sagittal, for each field.  Not linked to the README.                                                                                                                                                                                                             |
@@ -630,6 +631,21 @@ without resizing them again. Two output details can still vary:
   using Beam42 on <date>`.
 * The Zemax file is named after the input file, so re-running on
   `prescription.txt` yields `prescription.zmx` and the report links to that name.
+
+With `--export-vignetting` the generated prescription also has a `[vignetting]`
+section: one row per configuration and field, with the factors set by
+`--vig-type`, rounded to four decimal places.
+
+```
+[vignetting]
+config	field	vux	vlx	vuy	vly
+0	0	0	0	0	0
+0	1	0.1888	0.1888	0.648	0.5587
+```
+
+`config` numbers the configurations as written in `scenarios`, and `field` is the
+fraction of the half angle of view. The section is informational. LensTool2 ignores it
+when reading a prescription and always computes the vignetting from `--vig-type`.
 
 ### MTF wavelengths and weights
 

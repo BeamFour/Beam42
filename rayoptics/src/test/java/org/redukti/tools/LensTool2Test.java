@@ -2,6 +2,7 @@ package org.redukti.tools;
 
 import org.junit.jupiter.api.Test;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
+import org.redukti.mathlib.M;
 import org.redukti.rayoptics.seq.Glass;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.spec.Prescription;
@@ -81,6 +82,45 @@ class LensTool2Test {
         assertArrayEquals(new double[]{8, 10}, stopOnly.get_surfaces()[2]._diameter_by_scenario);
         var unchanged = LensTool2.prescriptionWithAnalysisApertures(prescription, models, VigType.SetPupil);
         assertEquals(10.0, unchanged.get_surfaces()[2]._diameter);
+    }
+
+    @Test
+    void vignettingIsWrittenOnlyWhenRequestedAndNotReadBack() throws Exception {
+        var prescription = stoppedPrescription();
+        var models = new OpticalModel[2];
+        for (int config = 0; config < 2; config++)
+            models[config] = LensTool2.createSystem(prescription, true, VigType.SetVig,
+                    false, new double[]{0.0, 1.0}, config);
+        var saved = LensTool2.prescriptionWithAnalysisApertures(prescription, models, VigType.SetVig);
+        String withoutVignetting = saved.to_opt_bench_str(new StringBuilder()).toString();
+        assertFalse(withoutVignetting.contains("[vignetting]"));
+
+        saved.set_vignetting_from(models);
+        String text = saved.to_opt_bench_str(new StringBuilder()).toString();
+        assertTrue(text.contains("[vignetting]\nconfig\tfield\tvux\tvlx\tvuy\tvly\n"));
+        assertEquals(4, saved._vignetting.size());
+        for (int config = 0; config < 2; config++) {
+            var fields = models[config].optical_spec.fov.fields;
+            for (int fi = 0; fi < 2; fi++) {
+                var v = saved._vignetting.get(2 * config + fi);
+                assertEquals(config, v.config());
+                assertEquals(fields[fi].y, v.field());
+                assertEquals(fields[fi].vuy, v.vuy(), 0.00005);
+                assertEquals(fields[fi].vly, v.vly(), 0.00005);
+                assertEquals(fields[fi].vux, v.vux(), 0.00005);
+                assertEquals(fields[fi].vlx, v.vlx(), 0.00005);
+                var df = M.decimal_format(Prescription.APERTURE_DECIMALS);
+                assertTrue(text.contains(config + "\t" + df.format(v.field()) + "\t" + df.format(v.vux())
+                        + "\t" + df.format(v.vlx()) + "\t" + df.format(v.vuy()) + "\t" + df.format(v.vly()) + "\n"));
+            }
+        }
+
+        // a prescription read back does not carry the section on
+        var specs = new OpticalBenchDataImporter.LensSpecifications();
+        specs.parse_buffer(text);
+        var restored = LensTool2.createPrescription(specs, true, false);
+        assertNull(restored._vignetting);
+        assertEquals(withoutVignetting, restored.to_opt_bench_str(new StringBuilder()).toString());
     }
 
     @Test

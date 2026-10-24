@@ -116,6 +116,11 @@ public final class Args {
      * {@link org.redukti.analysis.PolyDiffractionMTF}.
      */
     public boolean output_diffraction_mtf = false;
+    /**
+     * Write the analysis vignetting factors into the generated prescription, as its
+     * [vignetting] section.
+     */
+    public boolean export_vignetting = false;
     /** Log the optimizer's progress to the console, one line per iteration. */
     public boolean verbose = false;
     /** Log everything, including the ray-optics info messages and debug traces. */
@@ -211,6 +216,9 @@ public final class Args {
             }
             else if (arg1.equals("--output-diffraction-mtf")) {
                 arguments.output_diffraction_mtf = true;
+            }
+            else if (arg1.equals("--export-vignetting")) {
+                arguments.export_vignetting = true;
             }
             else if (arg1.equals("--verbose")) {
                 arguments.verbose = true;

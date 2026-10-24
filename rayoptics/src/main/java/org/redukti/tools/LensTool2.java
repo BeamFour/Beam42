@@ -826,6 +826,8 @@ public class LensTool2 {
             System.err.println("         per --mtf frequency, wavelength, orientation and field, in the layout of the contrast report");
             System.err.println("       --output-diffraction-mtf writes mtf-diffraction.svg/.csv and mtf-diffraction-w.svg/.csv: the polychromatic");
             System.err.println("         diffraction MTF by field, for the same wavelengths and weights as mtf and mtf-w; not linked to the README");
+            System.err.println("       --export-vignetting adds a [vignetting] section to prescription.txt: the vignetting factors");
+            System.err.println("         of each field and configuration, as set by --vig-type");
             System.err.println("       --output-contrast-pupil-maps writes contrast-pupil[-semi-skew|-skew].svg: where in the pupil each --mtf");
             System.err.println("         frequency loses contrast, sagittal and tangential, at the reference wavelength");
             System.err.println("       --output-contrast-report writes contrast-report-w.txt: the RMS contrast OPD difference");
@@ -869,6 +871,8 @@ public class LensTool2 {
                 analysisModels[config] = createSystem(prescription, true, analysisVigType,
                         realRayAiming, fields, config);
             var outputPrescription = prescriptionWithAnalysisApertures(prescription, analysisModels, analysisVigType);
+            if (arguments.export_vignetting)
+                outputPrescription.set_vignetting_from(analysisModels);
             String prescription_output = prescriptionOutput(outputPrescription, arguments.specfile);
             Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile, "prescription.txt", arguments.outdir), prescription_output);
             ZemaxExporter zemaxExporter = new ZemaxExporter();

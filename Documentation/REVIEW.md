@@ -2508,9 +2508,9 @@ classes, their tests and this review changed. The upstream implementation in
 `Analyses`, and `RayGrid` and other upstream-ported files, were left unchanged.
 The phase-reference correction and regression cases need back-porting to C++.
 
-### P2: fixed report sampling has no convergence check or override
+### P2 (partly addressed): report sampling needs manual convergence checks
 
-`LensTool2` fixes the pupil sampling at 64 and the FFT size at 128. This is not
+At review time, `LensTool2` fixed the pupil sampling at 64 and the FFT size at 128. This is not
 adequate for every prescription or focus. A separate Sigma probe at the reference
 wavelength, on axis, adds **1 mm of deliberate defocus**. Its tangential OTF
 modulus at 10 cycles/mm is:
@@ -2545,6 +2545,38 @@ not committed regression tests. The review itself made no implementation changes
 the subsequent P1 correction and its regression tests are described
 above. P2 still needs an implementation decision and equivalent C++ back-porting
 if changed.
+
+#### Manual sampling control (2026-10-24)
+
+`--diffraction-pupil-rays N` now selects an N x N pupil grid and a 2N x 2N
+FFT for both `mtf-diffraction` and `mtf-diffraction-w`, including all selected
+configurations. The default remains 64; N must be even and at least 4. Missing,
+non-integer, invalid and integer-overflowing doubled sizes are rejected.
+The option only changes diffraction reporting, not geometric MTF or optimizer
+sampling. It does not enable diffraction output by itself.
+
+For example, add `--output-diffraction-mtf --diffraction-pupil-rays 128` to a
+`LensTool2` command. To check sampling manually, generate separate output directories
+at 64, 128 and 256 and compare the requested MTF values. There is no automatic
+refinement, convergence check or undersampling warning in this change. P2's
+accuracy concern therefore remains open; this implements the manual override only.
+`Analyses` and other upstream-ported files remain unchanged. The option and its
+validation need equivalent C++ back-porting.
+
+Validation: 27 tests pass in `LensTool2Test`, `DiffractionMTFTest` and
+`PolyDiffractionMTFTest`. Parser checks cover the unchanged default, valid sampling,
+missing and invalid values, and subsequent option parsing. An end-to-end run on
+the committed Summicron Example 9 with `--diffraction-pupil-rays 128 --mtf 10,40`
+generates all four diffraction SVG/CSV files under
+`rayoptics/target/diffraction-sampling-smoke/`. The test and smoke-run logs are
+`rayoptics/target/diffraction-sampling-option-test.log` and
+`rayoptics/target/diffraction-sampling-smoke.log`.
+
+For comparison, the public [OpticStudio FFT MTF documentation](https://ansyshelp.ansys.com/public/Views/Secured/Zemax/v252/en/OpticStudio_User_Guide/OpticStudio_Help/topics/FFT_MTF.html)
+describes selectable pupil sampling such as 32 x 32 and 64 x 64, and attempts to
+detect aliasing and report an error. It warns that low sampling cannot always be
+detected. It does not describe automatic sample-count refinement. The effective-grid
+scaling discussed for FFT PSF should not be assumed to define FFT MTF sampling.
 
 ## How the numbers were obtained
 

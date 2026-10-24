@@ -7,12 +7,30 @@ import org.redukti.rayoptics.seq.Glass;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.VigType;
+import org.redukti.util.Args;
 
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class LensTool2Test {
+    @Test
+    void diffractionPupilSamplingDefaultsAndValidatesExplicitValues() {
+        assertEquals(64, Args.parseArguments(new String[]{"--output-diffraction-mtf"}).diffraction_pupil_rays);
+        for (int n : new int[]{4, 64, 128, 256}) {
+            var arguments = Args.parseArguments(new String[]{"--diffraction-pupil-rays", "" + n,
+                    "--output-diffraction-mtf", "--mtf", "10,40"});
+            assertEquals(n, arguments.diffraction_pupil_rays);
+            assertTrue(arguments.output_diffraction_mtf);
+            assertArrayEquals(new int[]{10, 40}, arguments.mtf_freqs);
+        }
+        for (String value : new String[]{"0", "-4", "2", "3", "65", "abc", "2147483646"})
+            assertThrows(IllegalArgumentException.class,
+                    () -> Args.parseArguments(new String[]{"--diffraction-pupil-rays", value}));
+        assertThrows(IllegalArgumentException.class,
+                () -> Args.parseArguments(new String[]{"--diffraction-pupil-rays"}));
+    }
+
     @Test
     void referencedDistancesRejectMissingAndUndefinedSelectedValues() throws Exception {
         for (String values : new String[]{"45", "45\tundefined", "45\t", "45\tNaN", "45\tnonsense"}) {

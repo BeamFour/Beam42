@@ -116,6 +116,8 @@ public final class Args {
      * {@link org.redukti.analysis.PolyDiffractionMTF}.
      */
     public boolean output_diffraction_mtf = false;
+    /** Rays across the diffraction pupil; the FFT size is twice this value. */
+    public int diffraction_pupil_rays = 64;
     /**
      * Write the analysis vignetting factors into the generated prescription, as its
      * [vignetting] section.
@@ -216,6 +218,14 @@ public final class Args {
             }
             else if (arg1.equals("--output-diffraction-mtf")) {
                 arguments.output_diffraction_mtf = true;
+            }
+            else if (arg1.equals("--diffraction-pupil-rays")) {
+                int sampling = parse_positive_int(arg1, arg2);
+                if (sampling < 4 || sampling % 2 != 0 || sampling > Integer.MAX_VALUE / 2)
+                    throw new IllegalArgumentException(arg1
+                            + " requires an even integer of at least 4 whose doubled FFT size fits in an integer");
+                arguments.diffraction_pupil_rays = sampling;
+                i++;
             }
             else if (arg1.equals("--export-vignetting")) {
                 arguments.export_vignetting = true;

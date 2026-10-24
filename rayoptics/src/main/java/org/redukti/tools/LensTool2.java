@@ -392,10 +392,6 @@ public class LensTool2 {
                     MonochromaticMTFReport.report(monoFields, monoMtfs, freqs));
     }
 
-    /** Pupil sampling of the diffraction MTF: rays across the pupil, and the FFT size. */
-    private static final int DIFFRACTION_MTF_PUPIL_RAYS = 64;
-    private static final int DIFFRACTION_MTF_FFT_SIZE = 128;
-
     /**
      * Writes the polychromatic diffraction MTF by field as {@code <outname><suffix>.svg} and
      * {@code .csv}, weighting the wavelengths of the model by {@code wv_wts}. Not linked to
@@ -413,7 +409,7 @@ public class LensTool2 {
         var mtfs = new ArrayList<PolyDiffractionMTF>();
         for (var fld : opm.optical_spec.fov.fields)
             mtfs.add(new PolyDiffractionMTF(opm, fld, wvls, weights, 0.0,
-                    DIFFRACTION_MTF_PUPIL_RAYS, DIFFRACTION_MTF_FFT_SIZE));
+                    arguments.diffraction_pupil_rays, 2 * arguments.diffraction_pupil_rays));
         var mtfResults = new ArrayList<MTFResultByFreq>();
         for (var freq : arguments.mtf_freqs)
             mtfResults.add(MTFResultByFreq.from_diffraction(opm, mtfs, freq));
@@ -826,6 +822,8 @@ public class LensTool2 {
             System.err.println("         per --mtf frequency, wavelength, orientation and field, in the layout of the contrast report");
             System.err.println("       --output-diffraction-mtf writes mtf-diffraction.svg/.csv and mtf-diffraction-w.svg/.csv: the polychromatic");
             System.err.println("         diffraction MTF by field, for the same wavelengths and weights as mtf and mtf-w; not linked to the README");
+            System.err.println("       --diffraction-pupil-rays N sets rays across the diffraction pupil (default 64; even, at least 4)");
+            System.err.println("         the FFT size is 2N x 2N; applies to both diffraction wavelength sets, without automatic refinement");
             System.err.println("       --export-vignetting adds a [vignetting] section to prescription.txt: the vignetting factors");
             System.err.println("         of each field and configuration, as set by --vig-type");
             System.err.println("       --output-contrast-pupil-maps writes contrast-pupil[-semi-skew|-skew].svg: where in the pupil each --mtf");

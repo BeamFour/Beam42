@@ -29,6 +29,10 @@ import org.redukti.rayoptics.util.Lists;
  * uniform in the entrance pupil, so pupil aberration that distorts the exit pupil
  * non-uniformly is not accounted for.
  *
+ * <p>The FFT gives the MTF only at multiples of {@code nu_cutoff / (n_pupil - 1)}.
+ * {@link #sagittal_otf} and {@link #tangential_otf} evaluate the complex OTF at any
+ * frequency from the line spread, with the phase relative to the reference image point.
+ *
  * <p>The approach, and the analytic reference {@link #diffraction_limited}, follow
  * M. J. Hayford's "Diffraction MTF" notebook for ray-optics issue #182, in
  * https://github.com/mjhoptics/ray-optics-notebooks. This is an independent implementation.
@@ -45,6 +49,9 @@ public class DiffractionMTF {
     public final double nu_cutoff_y;
     /** maxdim x maxdim, first index along x, zero frequency at [maxdim/2][maxdim/2] */
     public final double[][] mtf;
+    /** line spreads along x and y, unit sum, the reference image point at maxdim/2 */
+    private final double[] lsf_x;
+    private final double[] lsf_y;
 
     /**
      * @param n_pupil rays across the pupil; even and at least 4
@@ -69,6 +76,8 @@ public class DiffractionMTF {
                 n_pupil, true, Double.NaN, 1.0);
         var psf = Analyses.calc_psf(grid.grid[2], n_pupil, maxdim);
         mtf = modulus_of_transform(psf);
+        lsf_x = line_spread(psf, true);
+        lsf_y = line_spread(psf, false);
     }
 
     /**
@@ -128,6 +137,63 @@ public class DiffractionMTF {
     /** MTF of the aberration-free pupil with the same cutoff, along y. */
     public double tangential_diffraction_limited(double nu) {
         return diffraction_limited(nu, nu_cutoff_y);
+    }
+
+    /**
+     * Sagittal OTF at frequency {@code nu} in cycles per system length unit, as {re, im}.
+     * Evaluated at {@code nu} exactly; see {@link #otf}.
+     */
+    public double[] sagittal_otf(double nu) {
+        return otf(lsf_x, nu, nu_cutoff_x, n_pupil);
+    }
+
+    /**
+     * Tangential OTF at frequency {@code nu} in cycles per system length unit, as {re, im}.
+     * Evaluated at {@code nu} exactly; see {@link #otf}.
+     */
+    public double[] tangential_otf(double nu) {
+        return otf(lsf_y, nu, nu_cutoff_y, n_pupil);
+    }
+
+    /**
+     * OTF at frequency {@code nu}, as {re, im}: the Fourier transform of the line spread,
+     * {@code sum lsf[i] exp(-2 pi i nu x_i)}, with {@code x_i} measured from the reference
+     * image point at {@code lsf.length / 2}. The phase is relative to that point.
+     *
+     * <p>The FFT of the PSF has bins {@code nu_cutoff / (n_pupil - 1)} apart, so the PSF
+     * samples are {@code (n_pupil - 1) / (maxdim nu_cutoff)} apart. At a bin frequency the
+     * modulus equals the FFT value; between bins this is the band-limited interpolation of
+     * the bins. 0 at and beyond the cutoff.
+     *
+     * @param lsf unit-sum line spread of maxdim samples
+     */
+    static double[] otf(double[] lsf, double nu, double nu_cutoff, int n_pupil) {
+        if (Math.abs(nu) >= nu_cutoff) return new double[]{0.0, 0.0};
+        int maxdim = lsf.length;
+        int centre = maxdim / 2;
+        double dx = (n_pupil - 1) / (maxdim * nu_cutoff);
+        double re = 0, im = 0;
+        for (int i = 0; i < maxdim; i++) {
+            double angle = -2 * Math.PI * nu * (i - centre) * dx;
+            re += lsf[i] * Math.cos(angle);
+            im += lsf[i] * Math.sin(angle);
+        }
+        return new double[]{re, im};
+    }
+
+    /** The PSF integrated across y (along x) or across x (along y), normalized to unit sum. */
+    static double[] line_spread(double[][] psf, boolean x) {
+        int n = psf.length;
+        var lsf = new double[n];
+        double sum = 0;
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++) {
+                lsf[x ? i : j] += psf[i][j];
+                sum += psf[i][j];
+            }
+        for (int i = 0; i < n; i++)
+            lsf[i] /= sum;
+        return lsf;
     }
 
     /** Linear interpolation along the central row or column, which holds k = 0 at maxdim/2. */

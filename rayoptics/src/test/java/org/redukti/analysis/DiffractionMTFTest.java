@@ -5,6 +5,7 @@ import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.Analyses;
 import org.redukti.rayoptics.raytr.RayGrid;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -87,6 +88,56 @@ class DiffractionMTFTest {
             assertEquals(mtf.sagittal(nu), mtf.tangential(nu), 1e-6);
         assertEquals(0.0, mtf.sagittal(mtf.nu_cutoff_x));
         assertTrue(mtf.sagittal(30) < mtf.sagittal_diffraction_limited(30));
+    }
+
+    @Test
+    void otfModulusAtTheFftBinsIsTheMtf() throws Exception {
+        // Off axis, where the two cutoffs differ and the tangential OTF has a phase.
+        var opm = model();
+        var fields = opm.optical_spec.fov.fields;
+        var fld = fields[fields.length - 1];
+        double wvl = opm.optical_spec.wvls.central_wvl();
+        int n = 64;
+        var mtf = new DiffractionMTF(opm, fld, wvl, 0.0, n, 2 * n);
+        for (int k = 0; k < n - 1; k++) {
+            double nu_x = k * mtf.nu_cutoff_x / (n - 1);
+            double nu_y = k * mtf.nu_cutoff_y / (n - 1);
+            var s = mtf.sagittal_otf(nu_x);
+            var t = mtf.tangential_otf(nu_y);
+            assertEquals(mtf.sagittal(nu_x), Math.hypot(s[0], s[1]), 1e-12);
+            assertEquals(mtf.tangential(nu_y), Math.hypot(t[0], t[1]), 1e-12);
+        }
+        var dc = mtf.tangential_otf(0.0);
+        assertEquals(1.0, dc[0], 1e-12);
+        assertEquals(0.0, dc[1], 1e-12);
+        // a real line spread: OTF(-nu) is the conjugate of OTF(nu)
+        var plus = mtf.tangential_otf(40.0);
+        var minus = mtf.tangential_otf(-40.0);
+        assertEquals(plus[0], minus[0], 1e-12);
+        assertEquals(plus[1], -minus[1], 1e-12);
+        assertArrayEquals(new double[]{0.0, 0.0}, mtf.sagittal_otf(mtf.nu_cutoff_x));
+    }
+
+    @Test
+    void otfBetweenTheBinsOfAnAberrationFreePupilIsTheDiffractionLimit() {
+        int n = 128;
+        var W = new double[n][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++) {
+                double x = -1 + 2.0 * i / (n - 1), y = -1 + 2.0 * j / (n - 1);
+                W[i][j] = x * x + y * y <= 1 ? 0.0 : Double.NaN;
+            }
+        var psf = Analyses.calc_psf(W, n, 2 * n);
+        var lsf_x = DiffractionMTF.line_spread(psf, true);
+        var lsf_y = DiffractionMTF.line_spread(psf, false);
+        for (int k = 0; k < n - 2; k += 7) {
+            double nu = (k + 0.5) / (n - 1);
+            double expected = DiffractionMTF.diffraction_limited(nu, 1.0);
+            var x = DiffractionMTF.otf(lsf_x, nu, 1.0, n);
+            var y = DiffractionMTF.otf(lsf_y, nu, 1.0, n);
+            assertEquals(expected, Math.hypot(x[0], x[1]), 2e-3);
+            assertEquals(expected, Math.hypot(y[0], y[1]), 2e-3);
+        }
     }
 
     @Test

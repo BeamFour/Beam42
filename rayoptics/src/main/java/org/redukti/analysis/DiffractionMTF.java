@@ -45,16 +45,18 @@ public class DiffractionMTF {
     public final double foc;
     public final int n_pupil;
     public final int maxdim;
-    /** reference image point of the wavefront and the OTF phase; null for this wavelength's chief ray */
+    /** OTF phase reference in the image plane; null for this wavelength's chief ray */
     public final Vector2 image_pt_2d;
     /** cycles per system length unit */
     public final double nu_cutoff_x;
     public final double nu_cutoff_y;
     /** maxdim x maxdim, first index along x, zero frequency at [maxdim/2][maxdim/2] */
     public final double[][] mtf;
-    /** line spreads along x and y, unit sum, the reference image point at maxdim/2 */
+    /** line spreads along x and y, unit sum, this wavelength's chief-ray image point at maxdim/2 */
     private final double[] lsf_x;
     private final double[] lsf_y;
+    /** Chief-ray image point minus the requested OTF phase reference, in system length units. */
+    private final Vector2 reference_displacement;
 
     /**
      * @param n_pupil rays across the pupil; even and at least 4
@@ -67,10 +69,12 @@ public class DiffractionMTF {
     /**
      * @param n_pupil     rays across the pupil; even and at least 4
      * @param maxdim      FFT size; at least {@code 2 * n_pupil} so the MTF does not wrap
-     * @param image_pt_2d image point the wavefront is referenced to, x and y in the image
+     * @param image_pt_2d image point the OTF phase is referenced to, x and y in the image
      *                    plane; null for this wavelength's chief ray. Pass the same point,
      *                    e.g. {@link #image_point} of the reference wavelength, for every
      *                    wavelength of a field so that their OTF phases include lateral colour.
+     *                    The PSF is computed about this wavelength's own chief-ray image point;
+     *                    the reference displacement is applied analytically to the complex OTF.
      */
     public DiffractionMTF(OpticalModel opm, Field fld, double wvl, double foc, int n_pupil, int maxdim,
                           Vector2 image_pt_2d) {
@@ -89,7 +93,11 @@ public class DiffractionMTF {
         nu_cutoff_x = cutoffs[0];
         nu_cutoff_y = cutoffs[1];
 
-        var grid = new RayGrid(opm, fld, wvl, foc, image_pt_2d, null, null, null,
+        reference_displacement = image_pt_2d == null ? Vector2.vector2_0
+                : image_point(opm, fld, wvl, foc).minus(image_pt_2d);
+        // Keep lateral colour out of the finite, periodic FFT window. It changes the
+        // OTF's reference phase, not the physical image plane or this wavelength's blur.
+        var grid = new RayGrid(opm, fld, wvl, foc, null, null, null, null,
                 n_pupil, true, Double.NaN, 1.0);
         var psf = Analyses.calc_psf(grid.grid[2], n_pupil, maxdim);
         mtf = modulus_of_transform(psf);
@@ -171,7 +179,7 @@ public class DiffractionMTF {
      * Evaluated at {@code nu} exactly; see {@link #otf}.
      */
     public double[] sagittal_otf(double nu) {
-        return otf(lsf_x, nu, nu_cutoff_x, n_pupil);
+        return translate_otf(otf(lsf_x, nu, nu_cutoff_x, n_pupil), nu, reference_displacement.x);
     }
 
     /**
@@ -179,7 +187,15 @@ public class DiffractionMTF {
      * Evaluated at {@code nu} exactly; see {@link #otf}.
      */
     public double[] tangential_otf(double nu) {
-        return otf(lsf_y, nu, nu_cutoff_y, n_pupil);
+        return translate_otf(otf(lsf_y, nu, nu_cutoff_y, n_pupil), nu, reference_displacement.y);
+    }
+
+    /** Express an intrinsic complex OTF relative to a displaced image-plane origin. */
+    private static double[] translate_otf(double[] value, double nu, double displacement) {
+        if (displacement == 0.0 || (value[0] == 0.0 && value[1] == 0.0)) return value;
+        double angle = -2 * Math.PI * nu * displacement;
+        double c = Math.cos(angle), s = Math.sin(angle);
+        return new double[]{value[0] * c - value[1] * s, value[0] * s + value[1] * c};
     }
 
     /**

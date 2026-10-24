@@ -58,6 +58,35 @@ class PolyDiffractionMTFTest {
     }
 
     @Test
+    void combinesIntrinsicComplexOtfsWithAnalyticLateralColourPhase() throws Exception {
+        var opm = DiffractionMTFTest.polychromatic_model();
+        var fld = opm.optical_spec.fov.fields[1];
+        var wvls = opm.optical_spec.wvls;
+        double focus = 0.01;
+        var poly = new PolyDiffractionMTF(opm, fld, wvls.wavelengths, wvls.spectral_wts,
+                focus, N, 2 * N);
+        var own = new DiffractionMTF[wvls.wavelengths.length];
+        for (int wi = 0; wi < own.length; wi++)
+            own[wi] = new DiffractionMTF(opm, fld, wvls.wavelengths[wi], focus, N, 2 * N);
+        for (int axis : new int[]{0, 1})
+            for (double nu : new double[]{-80, -40, 0, 40, 80}) {
+                double re = 0, im = 0, sum = 0;
+                for (int wi = 0; wi < own.length; wi++) {
+                    var point = DiffractionMTF.image_point(opm, fld, wvls.wavelengths[wi], focus);
+                    double delta = axis == 0 ? point.x - poly.image_pt_2d.x : point.y - poly.image_pt_2d.y;
+                    double angle = -2 * Math.PI * nu * delta;
+                    var otf = axis == 0 ? own[wi].sagittal_otf(nu) : own[wi].tangential_otf(nu);
+                    double weight = wvls.spectral_wts[wi];
+                    re += weight * (otf[0] * Math.cos(angle) - otf[1] * Math.sin(angle));
+                    im += weight * (otf[0] * Math.sin(angle) + otf[1] * Math.cos(angle));
+                    sum += weight;
+                }
+                assertEquals(Math.hypot(re, im) / sum,
+                        axis == 0 ? poly.sagittal(nu) : poly.tangential(nu), 1e-12);
+            }
+    }
+
+    @Test
     void resultsByFrequencyAreInCyclesPerMillimetre() throws Exception {
         var opm = DiffractionMTFTest.polychromatic_model();
         var wvls = opm.optical_spec.wvls;

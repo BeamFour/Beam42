@@ -15,9 +15,10 @@ import java.util.List;
  * Polychromatic diffraction MTF of one field: the modulus of the weighted sum of the
  * monochromatic OTFs, divided by the sum of the weights.
  *
- * <p>Every wavelength is referenced to the image point of the reference wavelength's chief
- * ray, so lateral colour appears as a phase difference between the OTFs and lowers the
- * sum. The OTFs are evaluated at the requested frequency, since the FFT bins of each
+ * <p>Each monochromatic PSF is computed about its own chief-ray image point. Its complex
+ * OTF is translated analytically to the reference wavelength's chief-ray image point,
+ * so lateral colour appears as a phase difference without shifting the PSF through the
+ * finite FFT window. The OTFs are evaluated at the requested frequency, since the FFT bins of each
  * wavelength fall at different frequencies. A wavelength contributes nothing beyond its
  * own cutoff.
  */

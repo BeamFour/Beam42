@@ -3,6 +3,7 @@ package org.redukti.analysis;
 import org.junit.jupiter.api.Test;
 import org.redukti.examples.ExampleFinder;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
+import org.redukti.mathlib.Vector2;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.Analyses;
 import org.redukti.rayoptics.raytr.RayGrid;
@@ -186,6 +187,41 @@ class DiffractionMTFTest {
                 assertEquals(Math.hypot(a[0], a[1]), Math.hypot(b[0], b[1]), 1e-3);
                 double shift = Math.atan2(b[1], b[0]) - Math.atan2(a[1], a[0]);
                 assertEquals(0.0, Math.IEEEremainder(shift + 2 * Math.PI * nu * dy, 2 * Math.PI), 1e-2);
+            }
+        }
+    }
+
+    @Test
+    void referenceTranslationsBeyondTheFftWindowPreserveBlurAndComplexPhase() throws Exception {
+        var opm = polychromatic_model();
+        var fld = opm.optical_spec.fov.fields[1];
+        double wvl = opm.optical_spec.wvls.central_wvl();
+        double focus = 0.01;
+        int n = 64;
+        var ownPoint = DiffractionMTF.image_point(opm, fld, wvl, focus);
+        var own = new DiffractionMTF(opm, fld, wvl, focus, n, 2 * n);
+        for (int axis : new int[]{0, 1}) {
+            double cutoff = axis == 0 ? own.nu_cutoff_x : own.nu_cutoff_y;
+            // More than a full image-window width; padding alone cannot hold this shift.
+            double windowWidth = (n - 1) / cutoff;
+            for (int sign : new int[]{-1, 1}) {
+                double offset = sign * 1.75 * windowWidth;
+                var commonPoint = ownPoint.plus(axis == 0 ? new Vector2(offset, 0) : new Vector2(0, offset));
+                var common = new DiffractionMTF(opm, fld, wvl, focus, n, 2 * n, commonPoint);
+                for (double nu : new double[]{-40, -10, 0, 10, 40, cutoff, 2 * cutoff}) {
+                    var a = axis == 0 ? own.sagittal_otf(nu) : own.tangential_otf(nu);
+                    var b = axis == 0 ? common.sagittal_otf(nu) : common.tangential_otf(nu);
+                    // Moving the reference by +offset moves the image by -offset relative to it.
+                    double angle = 2 * Math.PI * nu * offset;
+                    assertArrayEquals(new double[]{
+                            a[0] * Math.cos(angle) - a[1] * Math.sin(angle),
+                            a[0] * Math.sin(angle) + a[1] * Math.cos(angle)}, b, 1e-12);
+                    assertEquals(Math.hypot(a[0], a[1]), Math.hypot(b[0], b[1]), 1e-12);
+                    assertEquals(own.sagittal(nu), common.sagittal(nu), 1e-12);
+                    assertEquals(own.tangential(nu), common.tangential(nu), 1e-12);
+                    assertArrayEquals(axis == 0 ? own.tangential_otf(nu) : own.sagittal_otf(nu),
+                            axis == 0 ? common.tangential_otf(nu) : common.sagittal_otf(nu), 1e-12);
+                }
             }
         }
     }

@@ -2442,11 +2442,12 @@ Scope: the four curve-generation commits `71687594` through `335c952d`, covering
 complex monochromatic OTF evaluation, `PolyDiffractionMTF`, field curves and the
 `LensTool2 --output-diffraction-mtf` option. The targeted offline Maven run passes
 all 13 `DiffractionMTFTest` and `PolyDiffractionMTFTest` tests. The following cases
-are not covered by those tests. These are open findings, not implemented fixes.
+were not covered by those tests at review time. P1 is now fixed as described
+below; P2 remains open.
 
-### P1: common-reference displacement can wrap the PSF and corrupt OTF phase
+### P1 (fixed): common-reference displacement can wrap the PSF and corrupt OTF phase
 
-`PolyDiffractionMTF` passes the reference wavelength's image point into every
+Before the fix, `PolyDiffractionMTF` passed the reference wavelength's image point into every
 monochromatic wavefront calculation. A wavelength displaced far enough from that
 point has its PSF wrapped across the finite FFT image window. The subsequent
 arbitrary-frequency transform of the line spread uses the wrapped coordinates,
@@ -2462,7 +2463,7 @@ FFT gives 1.255084 rad. The 64-sample image window has half-width 0.026845 mm,
 less than the requested displacement. This is an artificial reference-shift
 test, not a claim that this Sigma has 30 micrometres of lateral colour.
 
-Proposed fix within the existing scalar FFT model: calculate each monochromatic
+The fix within the existing scalar FFT model is to calculate each monochromatic
 PSF about its own chief-ray image point at the same physical image plane, then
 express its OTF relative to the common image point through an analytic translation
 phase. For displacement `delta = own_image_point - common_image_point`, use
@@ -2473,12 +2474,39 @@ image plane unchanged. This removes the additional FFT-window demand caused by
 the choice of common reference; it does not correct pupil-mapping approximations
 or guarantee adequate sampling of the intrinsic PSF.
 
-Apply the reference handling consistently to `DiffractionMTF`'s explicit image-point
-API as well as `PolyDiffractionMTF`. Regression checks should include reference
-translations beyond half the FFT window, both axes and signs, negative frequencies,
-invariance of monochromatic magnitude under reference translation, and agreement
-with adequately sampled small-shift results. Confirm the translation sign against
-the image-coordinate convention and preserve lateral-colour cancellation in the sum.
+#### Implementation and validation
+
+`DiffractionMTF` now supplies a null image reference to `RayGrid`, so each PSF
+is calculated about that wavelength's chief-ray image point. It stores that
+point minus the caller's requested phase reference and applies
+the analytic complex rotation in `sagittal_otf` and `tangential_otf`. The explicit
+image-point argument now selects the OTF phase origin rather than changing the
+wavefront reference sphere. A null argument retains the previous own-chief-ray
+behavior. The sampled MTF magnitude is independent of the requested phase origin.
+`PolyDiffractionMTF` continues to request a common phase reference and sum the
+complex OTFs, so lateral colour is retained without displacing the FFT PSFs.
+The physical image plane and focus are unchanged.
+
+Regression tests cover reference translations exceeding a full image-window width,
+both axes and signs, positive and negative frequencies, DC and cutoff behavior,
+unchanged monochromatic magnitude, unchanged phase on the perpendicular axis, and
+nonzero focus. An additional polychromatic test compares the combined result with
+separately computed intrinsic complex OTFs and their chief-ray displacements.
+The existing small-shift phase-sign and lateral-colour cancellation tests also pass.
+
+The original Sigma probe now gives phase 1.256637061 rad for the +0.030 mm
+reference shift at 40 cycles/mm with both 64 and 128 pupil samples. At 64 samples,
+the monochromatic modulus remains 0.946177100 for reference shifts 0, 0.010,
+0.030 and 0.050 mm. The deliberately defocused sampling results in P2 are
+unchanged. Post-fix output is retained in
+`rayoptics/target/diffraction-reference-fix-probe.log`.
+
+Validation: the targeted offline Maven run passes 22 tests in `DiffractionMTFTest`,
+`PolyDiffractionMTFTest` and `AnalysesTest`, with no failures or errors. Its log is
+`rayoptics/target/diffraction-reference-fix.log`. Only the Beam42 diffraction
+classes, their tests and this review changed. The upstream implementation in
+`Analyses`, and `RayGrid` and other upstream-ported files, were left unchanged.
+The phase-reference correction and regression cases need back-porting to C++.
 
 ### P2: fixed report sampling has no convergence check or override
 
@@ -2513,8 +2541,10 @@ colour, not this broader intrinsic-PSF sampling issue.
 Reproduction source and output are currently in
 `rayoptics/target/DiffractionReviewProbe.java` and
 `rayoptics/target/diffraction-review-probe.log`; these are temporary artifacts,
-not committed regression tests. No implementation changed during this review.
-Any eventual Java fixes and regression cases need equivalent C++ back-porting.
+not committed regression tests. The review itself made no implementation changes;
+the subsequent P1 correction and its regression tests are described
+above. P2 still needs an implementation decision and equivalent C++ back-porting
+if changed.
 
 ## How the numbers were obtained
 

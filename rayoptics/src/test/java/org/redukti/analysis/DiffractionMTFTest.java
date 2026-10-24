@@ -1,9 +1,14 @@
 package org.redukti.analysis;
 
 import org.junit.jupiter.api.Test;
+import org.redukti.examples.ExampleFinder;
+import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.Analyses;
 import org.redukti.rayoptics.raytr.RayGrid;
+import org.redukti.spec.Prescription;
+import org.redukti.spec.RayOpticsModelBuilder;
+import org.redukti.spec.VigType;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -11,6 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DiffractionMTFTest {
+
+    private static final String SUMMICRON = "Examples/jfotoptix/leica-summicron-50mm-f2/US004123144_Example08P.txt";
 
     private static OpticalModel model() throws Exception {
         var build = Class.forName("org.redukti.rayoptics.upstream.US004123144Example08PUpstreamTest")
@@ -137,6 +144,49 @@ class DiffractionMTFTest {
             var y = DiffractionMTF.otf(lsf_y, nu, 1.0, n);
             assertEquals(expected, Math.hypot(x[0], x[1]), 2e-3);
             assertEquals(expected, Math.hypot(y[0], y[1]), 2e-3);
+        }
+    }
+
+    /** The committed prescription of the test lens, with its five wavelengths. */
+    private static OpticalModel polychromatic_model() throws Exception {
+        var specs = new OpticalBenchDataImporter.LensSpecifications();
+        specs.parse_file(ExampleFinder.geoPathToExample(SUMMICRON));
+        Prescription prescription = Prescription.build_prescription(specs, true, false, false);
+        return new RayOpticsModelBuilder(prescription)
+                .build_optical_model(true, new double[]{0.0, 1.0}, false, VigType.SetPupil, true, 0);
+    }
+
+    @Test
+    void aCommonImagePointPutsLateralColourInTheOtfPhase() throws Exception {
+        var opm = polychromatic_model();
+        var fld = opm.optical_spec.fov.fields[1];
+        var wvls = opm.optical_spec.wvls;
+        double ref = wvls.central_wvl();
+        int n = 64;
+        var image_pt = DiffractionMTF.image_point(opm, fld, ref, 0.0);
+
+        // Referenced to its own chief ray, the reference wavelength is unchanged.
+        var own_ref = new DiffractionMTF(opm, fld, ref, 0.0, n, 2 * n);
+        var common_ref = new DiffractionMTF(opm, fld, ref, 0.0, n, 2 * n, image_pt);
+        for (double nu : new double[]{10, 40, 80}) {
+            assertArrayEquals(own_ref.tangential_otf(nu), common_ref.tangential_otf(nu), 1e-12);
+            assertArrayEquals(own_ref.sagittal_otf(nu), common_ref.sagittal_otf(nu), 1e-12);
+        }
+
+        // Any other wavelength keeps its modulus, and its phase changes by -2 pi nu dy, where
+        // dy is its lateral colour: here 5 microns in F, -0.8 in C.
+        for (double wvl : wvls.wavelengths) {
+            if (wvl == ref) continue;
+            double dy = DiffractionMTF.image_point(opm, fld, wvl, 0.0).y - image_pt.y;
+            var own = new DiffractionMTF(opm, fld, wvl, 0.0, n, 2 * n);
+            var common = new DiffractionMTF(opm, fld, wvl, 0.0, n, 2 * n, image_pt);
+            for (double nu : new double[]{10, 40, 80}) {
+                var a = own.tangential_otf(nu);
+                var b = common.tangential_otf(nu);
+                assertEquals(Math.hypot(a[0], a[1]), Math.hypot(b[0], b[1]), 1e-3);
+                double shift = Math.atan2(b[1], b[0]) - Math.atan2(a[1], a[0]);
+                assertEquals(0.0, Math.IEEEremainder(shift + 2 * Math.PI * nu * dy, 2 * Math.PI), 1e-2);
+            }
         }
     }
 

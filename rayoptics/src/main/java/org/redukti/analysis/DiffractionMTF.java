@@ -4,6 +4,7 @@
 package org.redukti.analysis;
 
 import org.redukti.mathlib.FFTUtil;
+import org.redukti.mathlib.Vector2;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.Analyses;
 import org.redukti.rayoptics.raytr.RayGrid;
@@ -44,6 +45,8 @@ public class DiffractionMTF {
     public final double foc;
     public final int n_pupil;
     public final int maxdim;
+    /** reference image point of the wavefront and the OTF phase; null for this wavelength's chief ray */
+    public final Vector2 image_pt_2d;
     /** cycles per system length unit */
     public final double nu_cutoff_x;
     public final double nu_cutoff_y;
@@ -58,6 +61,19 @@ public class DiffractionMTF {
      * @param maxdim  FFT size; at least {@code 2 * n_pupil} so the MTF does not wrap
      */
     public DiffractionMTF(OpticalModel opm, Field fld, double wvl, double foc, int n_pupil, int maxdim) {
+        this(opm, fld, wvl, foc, n_pupil, maxdim, null);
+    }
+
+    /**
+     * @param n_pupil     rays across the pupil; even and at least 4
+     * @param maxdim      FFT size; at least {@code 2 * n_pupil} so the MTF does not wrap
+     * @param image_pt_2d image point the wavefront is referenced to, x and y in the image
+     *                    plane; null for this wavelength's chief ray. Pass the same point,
+     *                    e.g. {@link #image_point} of the reference wavelength, for every
+     *                    wavelength of a field so that their OTF phases include lateral colour.
+     */
+    public DiffractionMTF(OpticalModel opm, Field fld, double wvl, double foc, int n_pupil, int maxdim,
+                          Vector2 image_pt_2d) {
         if (n_pupil < 4 || n_pupil % 2 != 0)
             throw new IllegalArgumentException("n_pupil must be even and at least 4");
         if (maxdim < 2 * n_pupil)
@@ -67,12 +83,13 @@ public class DiffractionMTF {
         this.foc = foc;
         this.n_pupil = n_pupil;
         this.maxdim = maxdim;
+        this.image_pt_2d = image_pt_2d;
 
         double[] cutoffs = cutoff_frequencies(opm, fld, wvl);
         nu_cutoff_x = cutoffs[0];
         nu_cutoff_y = cutoffs[1];
 
-        var grid = new RayGrid(opm, fld, wvl, foc, null, null, null, null,
+        var grid = new RayGrid(opm, fld, wvl, foc, image_pt_2d, null, null, null,
                 n_pupil, true, Double.NaN, 1.0);
         var psf = Analyses.calc_psf(grid.grid[2], n_pupil, maxdim);
         mtf = modulus_of_transform(psf);
@@ -105,6 +122,16 @@ public class DiffractionMTF {
         double n_img = Math.abs(opm.optical_spec.parax_data.fod.n_img);
         double wl = opm.nm_to_sys_units(wvl);
         return new double[]{2 * n_img * na_x / wl, 2 * n_img * na_y / wl};
+    }
+
+    /**
+     * Where the chief ray of {@code wvl} meets the image plane shifted by {@code foc}: the
+     * point {@link RayGrid} references the wavefront to when given no image point.
+     */
+    public static Vector2 image_point(OpticalModel opm, Field fld, double wvl, double foc) {
+        var last = Lists.get(Trace.get_chief_ray_pkg(opm, fld, wvl, foc).chief_ray.ray, -1);
+        var p = last.p.plus(last.d.times(foc / last.d.z));
+        return new Vector2(p.x, p.y);
     }
 
     private static org.redukti.mathlib.Vector3 image_direction(org.redukti.rayoptics.raytr.RayPkg pkg) {
@@ -160,6 +187,11 @@ public class DiffractionMTF {
      * {@code sum lsf[i] exp(-2 pi i nu x_i)}, with {@code x_i} measured from the reference
      * image point at {@code lsf.length / 2}. The phase is relative to that point.
      *
+     * <p>The PSF of {@link Analyses#calc_psf} is mirrored with respect to the image plane:
+     * index {@code i} lies at {@code x_i = -(i - lsf.length / 2) dx}. With the sign taken
+     * here, a PSF displaced by {@code d} in the image has its phase changed by
+     * {@code -2 pi nu d}.
+     *
      * <p>The FFT of the PSF has bins {@code nu_cutoff / (n_pupil - 1)} apart, so the PSF
      * samples are {@code (n_pupil - 1) / (maxdim nu_cutoff)} apart. At a bin frequency the
      * modulus equals the FFT value; between bins this is the band-limited interpolation of
@@ -174,7 +206,7 @@ public class DiffractionMTF {
         double dx = (n_pupil - 1) / (maxdim * nu_cutoff);
         double re = 0, im = 0;
         for (int i = 0; i < maxdim; i++) {
-            double angle = -2 * Math.PI * nu * (i - centre) * dx;
+            double angle = 2 * Math.PI * nu * (i - centre) * dx;
             re += lsf[i] * Math.cos(angle);
             im += lsf[i] * Math.sin(angle);
         }

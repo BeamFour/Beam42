@@ -111,6 +111,11 @@ public final class Args {
      * report. See {@link org.redukti.analysis.MonochromaticMTFReport}.
      */
     public boolean output_wavelength_mtf_report = false;
+    /**
+     * Write the polychromatic diffraction MTF by field, for both wavelength sets. See
+     * {@link org.redukti.analysis.PolyDiffractionMTF}.
+     */
+    public boolean output_diffraction_mtf = false;
     /** Log the optimizer's progress to the console, one line per iteration. */
     public boolean verbose = false;
     /** Log everything, including the ray-optics info messages and debug traces. */
@@ -203,6 +208,9 @@ public final class Args {
             }
             else if (arg1.equals("--output-wavelength-mtf-report")) {
                 arguments.output_wavelength_mtf_report = true;
+            }
+            else if (arg1.equals("--output-diffraction-mtf")) {
+                arguments.output_diffraction_mtf = true;
             }
             else if (arg1.equals("--verbose")) {
                 arguments.verbose = true;

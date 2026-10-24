@@ -392,6 +392,38 @@ public class LensTool2 {
                     MonochromaticMTFReport.report(monoFields, monoMtfs, freqs));
     }
 
+    /** Pupil sampling of the diffraction MTF: rays across the pupil, and the FFT size. */
+    private static final int DIFFRACTION_MTF_PUPIL_RAYS = 64;
+    private static final int DIFFRACTION_MTF_FFT_SIZE = 128;
+
+    /**
+     * Writes the polychromatic diffraction MTF by field as {@code <outname><suffix>.svg} and
+     * {@code .csv}, weighting the wavelengths of the model by {@code wv_wts}. Not linked to
+     * the README.
+     *
+     * <p>Leaves each field's chief ray and reference sphere set up by the last wavelength's
+     * wavefront trace.
+     */
+    private static void generateDiffractionMTFs(OpticalModel opm, Args arguments, double[] fields, Map<Double,Double> wv_wts,
+                                                String outname, String filename_suffix) throws Exception {
+        var wvls = opm.optical_spec.wvls.wavelengths;
+        var weights = new double[wvls.length];
+        for (int i = 0; i < wvls.length; i++)
+            weights[i] = wv_wts.getOrDefault(wvls[i], 0.0);
+        var mtfs = new ArrayList<PolyDiffractionMTF>();
+        for (var fld : opm.optical_spec.fov.fields)
+            mtfs.add(new PolyDiffractionMTF(opm, fld, wvls, weights, 0.0,
+                    DIFFRACTION_MTF_PUPIL_RAYS, DIFFRACTION_MTF_FFT_SIZE));
+        var mtfResults = new ArrayList<MTFResultByFreq>();
+        for (var freq : arguments.mtf_freqs)
+            mtfResults.add(MTFResultByFreq.from_diffraction(opm, mtfs, freq));
+        var plot = new GeoMTFByFieldPlot(mtfResults, fields);
+        Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile,
+                suffixed_name(outname, filename_suffix, ".svg"), arguments.outdir), plot.plot());
+        Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile,
+                suffixed_name(outname, filename_suffix, ".csv"), arguments.outdir), plot.toString());
+    }
+
     private static void generateRayAberrationPlots(OpticalModel opm, Args arguments, String filname_suffix) throws Exception {
         var rayAber = TransverseRayAberrationAnalysis.eval(opm, 21, false, new TraceOptions());
         for (var fan_results: rayAber.results) {
@@ -792,6 +824,8 @@ public class LensTool2 {
                     + PupilMapAnalysis.DEFAULT_NUM_SAMPLES);
             System.err.println("       --output-wavelength-mtf-report writes mtf-w-wavelength-report.txt: the monochromatic geometric MTF");
             System.err.println("         per --mtf frequency, wavelength, orientation and field, in the layout of the contrast report");
+            System.err.println("       --output-diffraction-mtf writes mtf-diffraction.svg/.csv and mtf-diffraction-w.svg/.csv: the polychromatic");
+            System.err.println("         diffraction MTF by field, for the same wavelengths and weights as mtf and mtf-w; not linked to the README");
             System.err.println("       --output-contrast-pupil-maps writes contrast-pupil[-semi-skew|-skew].svg: where in the pupil each --mtf");
             System.err.println("         frequency loses contrast, sagittal and tangential, at the reference wavelength");
             System.err.println("       --output-contrast-report writes contrast-report-w.txt: the RMS contrast OPD difference");
@@ -882,6 +916,9 @@ public class LensTool2 {
                 generateMTFs(opm, arguments, fields, prescription.get_wvl_wts(), "mtf", scenario_filesuffix, false);
                 if (arguments.do_ray_aberrations)
                     generateRayAberrationPlots(opm, arguments, scenario_filesuffix);
+                // Last on this model: it leaves the fields set up for its last wavelength.
+                if (arguments.output_diffraction_mtf)
+                    generateDiffractionMTFs(opm, arguments, fields, prescription.get_wvl_wts(), "mtf-diffraction", scenario_filesuffix);
                 // Generate MTF with weighted average across wavelengths
                 opm = createSystem(prescriptionForWeightedMTF, true, analysisVigType, realRayAiming, fields, config);
                 // The wavelength report from the weighted model only, whose wavelengths include
@@ -896,6 +933,9 @@ public class LensTool2 {
                     generateContrastReport(opm, arguments, "contrast-report-w", scenario_filesuffix);
                 if (arguments.output_contrast_pupil_maps)
                     generateContrastPupilMaps(opm, arguments, scenario_filesuffix);
+                // After the contrast outputs, which expect the fields as the contrast trace left them.
+                if (arguments.output_diffraction_mtf)
+                    generateDiffractionMTFs(opm, arguments, fields, prescriptionForWeightedMTF.get_wvl_wts(), "mtf-diffraction-w", scenario_filesuffix);
             }
             createREADME(SB,
                     arguments.specfile,

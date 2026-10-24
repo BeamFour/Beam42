@@ -315,6 +315,7 @@ Everything else has a default.
 | `--output-pupil-maps` | off | Additionally measure and draw which part of each field's pupil the lens passes, and which surface blocks the rest. See below.  Not linked to the README.                                                                                                                                                                                                       |
 | `--pupil-map-samples <n>` | 121 | Samples per axis in a pupil map. Only consulted with `--output-pupil-maps`. Minimum 2.                                                                                                                                                                                                                                                                         |
 | `--output-wavelength-mtf-report` | off | Additionally write the monochromatic geometric MTF per frequency, wavelength, orientation and field, in the layout of the contrast report. See below. Not linked to the README. |
+| `--output-diffraction-mtf` | off | Additionally write the polychromatic diffraction MTF by field, for the same wavelengths and weights as the geometric MTF plots. The pupil is sampled by a 64 x 64 ray grid. Not linked to the README. |
 | `--output-contrast-pupil-maps` | off | Additionally draw where in the pupil each frequency loses contrast. See below. Not linked to the README. |
 | `--output-contrast-report` | off | Additionally write the RMS contrast OPD difference per frequency, wavelength, orientation and field. See below. Not linked to the README. |
 | `--output-ray-aberration-plots` | off | Additionally emit transverse ray aberration **and** wavefront (OPD) fan plots, tangential and sagittal, for each field.  Not linked to the README.                                                                                                                                                                                                             |
@@ -490,6 +491,8 @@ spec with multiple configurations (a zoom, for instance).
 | `spot-report<suffix>.txt` | yes | Mean and max spot radius per field.                                                                 |
 | `mtf<suffix>.svg` / `.csv` | yes | Geometric MTF by field, equal weighted across wavelengths.                                          |
 | `mtf-w<suffix>.svg` / `.csv` | yes | Geometric MTF by field, weighted across wavelengths.                                                |
+| `mtf-diffraction<suffix>.svg` / `.csv` | `--output-diffraction-mtf` | Diffraction MTF by field, equal weighted across wavelengths. Not included in the README. |
+| `mtf-diffraction-w<suffix>.svg` / `.csv` | `--output-diffraction-mtf` | Diffraction MTF by field, weighted across wavelengths. Not included in the README. |
 | `mtf-fld<i>-<wavelength><suffix>.svg` | `--output-wavelength-mtfs` | Monochromatic MTF per field and wavelength. Not included in the README.                             |
 | `pupil<suffix>.svg` | `--output-pupil-maps` | Measured pupil map, axial field. Not included in the README. |
 | `pupil-semi-skew<suffix>.svg` | `--output-pupil-maps` | Measured pupil map, 0.7 field. Not included in the README. |

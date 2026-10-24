@@ -2436,6 +2436,86 @@ These changes are in the `rayoptics` module and need back-porting to
 `rayoptics-cpp`, including regression tests and regenerated Java expectations where
 affected. No C++ checkout was changed.
 
+## Diffraction MTF curve review (2026-10-24)
+
+Scope: the four curve-generation commits `71687594` through `335c952d`, covering
+complex monochromatic OTF evaluation, `PolyDiffractionMTF`, field curves and the
+`LensTool2 --output-diffraction-mtf` option. The targeted offline Maven run passes
+all 13 `DiffractionMTFTest` and `PolyDiffractionMTFTest` tests. The following cases
+are not covered by those tests. These are open findings, not implemented fixes.
+
+### P1: common-reference displacement can wrap the PSF and corrupt OTF phase
+
+`PolyDiffractionMTF` passes the reference wavelength's image point into every
+monochromatic wavefront calculation. A wavelength displaced far enough from that
+point has its PSF wrapped across the finite FFT image window. The subsequent
+arbitrary-frequency transform of the line spread uses the wrapped coordinates,
+so the recovered OTF phase can be wrong. Summing these OTFs can then give incorrect
+polychromatic cancellation even when each monochromatic magnitude appears reasonable.
+
+A probe of the committed `Examples/jfotoptix/sigma-40mm-f1.4/Sigma-40mmf1.4.txt`
+uses `SetVig`, the reference wavelength on axis, nominal focus and a requested
+image-reference displacement of +0.030 mm in y. At 40 cycles/mm the expected
+reference-translation phase is +1.256637 rad modulo 2 pi. A 64-sample pupil
+with a 128-square FFT gives 0.332965 rad; a 128-sample pupil with a 256-square
+FFT gives 1.255084 rad. The 64-sample image window has half-width 0.026845 mm,
+less than the requested displacement. This is an artificial reference-shift
+test, not a claim that this Sigma has 30 micrometres of lateral colour.
+
+Proposed fix within the existing scalar FFT model: calculate each monochromatic
+PSF about its own chief-ray image point at the same physical image plane, then
+express its OTF relative to the common image point through an analytic translation
+phase. For displacement `delta = own_image_point - common_image_point`, use
+`OTF_common(nu) = OTF_own(nu) * exp(-i * 2 pi * nu * delta_axis)` before the
+weighted complex sum. Retain the intrinsic complex OTF, including asymmetric
+aberration phase; do not replace it with its modulus. Keep the focus and physical
+image plane unchanged. This removes the additional FFT-window demand caused by
+the choice of common reference; it does not correct pupil-mapping approximations
+or guarantee adequate sampling of the intrinsic PSF.
+
+Apply the reference handling consistently to `DiffractionMTF`'s explicit image-point
+API as well as `PolyDiffractionMTF`. Regression checks should include reference
+translations beyond half the FFT window, both axes and signs, negative frequencies,
+invariance of monochromatic magnitude under reference translation, and agreement
+with adequately sampled small-shift results. Confirm the translation sign against
+the image-coordinate convention and preserve lateral-colour cancellation in the sum.
+
+### P2: fixed report sampling has no convergence check or override
+
+`LensTool2` fixes the pupil sampling at 64 and the FFT size at 128. This is not
+adequate for every prescription or focus. A separate Sigma probe at the reference
+wavelength, on axis, adds **1 mm of deliberate defocus**. Its tangential OTF
+modulus at 10 cycles/mm is:
+
+| Pupil samples | FFT size | MTF at 10 cycles/mm | Full image-window width, mm |
+| --- | --- | ---: | ---: |
+| 64 | 128 | 0.591631 | 0.053690 |
+| 128 | 256 | 0.061165 | 0.108231 |
+| 256 | 512 | 0.089983 | 0.217315 |
+
+These numbers are from an intentionally defocused stress test, not the nominal
+Sigma report. Neither the 128 nor the 256 result has been established as converged.
+They demonstrate that the fixed default cannot be assumed accurate for all lenses.
+
+The defocused wavefront varies rapidly across the pupil and produces a broad PSF.
+Coarse pupil sampling aliases the phase, while the finite periodic FFT image window
+wraps the broad PSF. Both affect the line spread used to evaluate MTF. In this
+implementation `dx = (n_pupil - 1) / (maxdim * cutoff)`, so the full image window
+is `(n_pupil - 1) / cutoff`. Increasing only FFT padding reduces pixel spacing
+but does not enlarge that window. Increasing pupil sampling improves wavefront
+sampling and enlarges the image window.
+
+Expose pupil sampling in the report options and add a convergence or undersampling
+check. A higher fixed default alone cannot guarantee accuracy. The analytic
+reference-translation fix above addresses the extra displacement from lateral
+colour, not this broader intrinsic-PSF sampling issue.
+
+Reproduction source and output are currently in
+`rayoptics/target/DiffractionReviewProbe.java` and
+`rayoptics/target/diffraction-review-probe.log`; these are temporary artifacts,
+not committed regression tests. No implementation changed during this review.
+Any eventual Java fixes and regression cases need equivalent C++ back-porting.
+
 ## How the numbers were obtained
 
 The probe programs that produced every figure in this document live in

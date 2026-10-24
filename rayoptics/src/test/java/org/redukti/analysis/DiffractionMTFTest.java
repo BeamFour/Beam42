@@ -148,7 +148,7 @@ class DiffractionMTFTest {
     }
 
     /** The committed prescription of the test lens, with its five wavelengths. */
-    private static OpticalModel polychromatic_model() throws Exception {
+    static OpticalModel polychromatic_model() throws Exception {
         var specs = new OpticalBenchDataImporter.LensSpecifications();
         specs.parse_file(ExampleFinder.geoPathToExample(SUMMICRON));
         Prescription prescription = Prescription.build_prescription(specs, true, false, false);

@@ -13,6 +13,9 @@ import org.redukti.rayoptics.raytr.TraceOptions;
 import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.util.Lists;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 /**
  * Monochromatic diffraction MTF of one field, from the Fourier transform of the PSF.
  *
@@ -57,6 +60,14 @@ public class DiffractionMTF {
     private final double[] lsf_y;
     /** Chief-ray image point minus the requested OTF phase reference, in system length units. */
     private final Vector2 reference_displacement;
+    /**
+     * How much of the PSF window the geometric spot needs; see {@link #spot_to_window}.
+     * Above 1 the PSF wraps around in its window and the MTF is unreliable.
+     */
+    public final double spot_to_window;
+
+    /** Fraction of the grid rays the PSF window must hold for the MTF to be trusted. */
+    public static final double WINDOW_RAY_FRACTION = 0.99;
 
     /**
      * @param n_pupil rays across the pupil; even and at least 4
@@ -100,6 +111,8 @@ public class DiffractionMTF {
         var grid = new RayGrid(opm, fld, wvl, foc, null, null, null, null,
                 n_pupil, true, Double.NaN, 1.0);
         var psf = Analyses.calc_psf(grid.grid[2], n_pupil, maxdim);
+        spot_to_window = spot_to_window(grid, image_point(opm, fld, wvl, foc),
+                (n_pupil - 1) / (2 * nu_cutoff_x), (n_pupil - 1) / (2 * nu_cutoff_y));
         mtf = modulus_of_transform(psf);
         lsf_x = line_spread(psf, true);
         lsf_y = line_spread(psf, false);
@@ -140,6 +153,45 @@ public class DiffractionMTF {
         var last = Lists.get(Trace.get_chief_ray_pkg(opm, fld, wvl, foc).chief_ray.ray, -1);
         var p = last.p.plus(last.d.times(foc / last.d.z));
         return new Vector2(p.x, p.y);
+    }
+
+    /**
+     * Extent of the geometric spot relative to the PSF window.
+     *
+     * <p>The PSF covers {@code (n_pupil - 1) / nu_cutoff} in each direction, centred on the
+     * chief-ray image point. A ray landing outside that window carries energy that the
+     * periodic FFT folds back in from the opposite side. Each grid ray's distance from the
+     * chief-ray image point is divided by the window half-width, taking the larger of x and y;
+     * the result is the value that {@link #WINDOW_RAY_FRACTION} of the rays do not exceed.
+     * At most 1 the window holds the spot.
+     *
+     * @return 0 if no ray traced
+     */
+    static double spot_to_window(RayGrid grid, Vector2 chief, double half_width_x, double half_width_y) {
+        var extents = new ArrayList<Double>();
+        for (var row : grid.grid_pkg.grid())
+            for (var item : row) {
+                if (item.ray_pkg == null) continue;
+                var last = Lists.get(item.ray_pkg.ray, -1);
+                double x = last.p.x + last.d.x * (grid.foc / last.d.z);
+                double y = last.p.y + last.d.y * (grid.foc / last.d.z);
+                extents.add(Math.max(Math.abs(x - chief.x) / half_width_x,
+                        Math.abs(y - chief.y) / half_width_y));
+            }
+        if (extents.isEmpty()) return 0.0;
+        Collections.sort(extents);
+        int k = (int) Math.ceil(WINDOW_RAY_FRACTION * extents.size()) - 1;
+        return extents.get(Math.max(k, 0));
+    }
+
+    /**
+     * Smallest even {@code n_pupil} whose window would hold the spot measured at this one.
+     * The window grows with {@code n_pupil - 1}; the spot does not change.
+     */
+    public int suggested_n_pupil() {
+        if (spot_to_window <= 1.0) return n_pupil;
+        int n = (int) Math.ceil((n_pupil - 1) * spot_to_window) + 1;
+        return n % 2 == 0 ? n : n + 1;
     }
 
     private static org.redukti.mathlib.Vector3 image_direction(org.redukti.rayoptics.raytr.RayPkg pkg) {

@@ -2498,8 +2498,8 @@ The original Sigma probe now gives phase 1.256637061 rad for the +0.030 mm
 reference shift at 40 cycles/mm with both 64 and 128 pupil samples. At 64 samples,
 the monochromatic modulus remains 0.946177100 for reference shifts 0, 0.010,
 0.030 and 0.050 mm. The deliberately defocused sampling results in P2 are
-unchanged. Post-fix output is retained in
-`rayoptics/target/diffraction-reference-fix-probe.log`.
+unchanged. [DiffractionProbe.java](../rayoptics/src/test/java/org/redukti/examples/DiffractionProbe.java)
+reproduces these figures.
 
 Validation: the targeted offline Maven run passes 22 tests in `DiffractionMTFTest`,
 `PolyDiffractionMTFTest` and `AnalysesTest`, with no failures or errors. Its log is
@@ -2538,10 +2538,8 @@ check. A higher fixed default alone cannot guarantee accuracy. The analytic
 reference-translation fix above addresses the extra displacement from lateral
 colour, not this broader intrinsic-PSF sampling issue.
 
-Reproduction source and output are currently in
-`rayoptics/target/DiffractionReviewProbe.java` and
-`rayoptics/target/diffraction-review-probe.log`; these are temporary artifacts,
-not committed regression tests. The review itself made no implementation changes;
+[DiffractionProbe.java](../rayoptics/src/test/java/org/redukti/examples/DiffractionProbe.java)
+reproduces the defocus table, which the P1 fix did not change. The review itself made no implementation changes;
 the subsequent P1 correction and its regression tests are described
 above. P2 still needs an implementation decision and equivalent C++ back-porting
 if changed.
@@ -2578,6 +2576,49 @@ detect aliasing and report an error. It warns that low sampling cannot always be
 detected. It does not describe automatic sample-count refinement. The effective-grid
 scaling discussed for FFT PSF should not be assumed to define FFT MTF sampling.
 
+#### Undersampling warning (2026-10-24)
+
+`DiffractionMTF.spot_to_window` measures each grid ray's image-plane distance from
+the chief-ray image point, divided by the PSF window half-width
+`(n_pupil - 1) / (2 cutoff)` in x and y, taking the larger. It reports the value
+that 99% of the rays do not exceed. Above 1 the PSF wraps in its window. The same
+bound is the Nyquist condition on the wavefront: a transverse error at the window
+edge is a phase change of half a wave between adjacent pupil samples. So one check
+covers both effects described above.
+
+`LensTool2` prints a warning to stderr for each field where any wavelength exceeds 1,
+naming the worst wavelength and the even `--diffraction-pupil-rays` value that would
+hold the spot. The spot does not change with sampling, so that value is
+`(n - 1) * spot_to_window + 1`, rounded up to even. Sampling is still not raised
+automatically.
+
+Calibration, monochromatic at 486.1 nm, 64 rays, nominal focus. The error is the largest
+change in the exact-frequency OTF modulus at 10, 30 and 50 cycles/mm, sagittal and
+tangential, going to 256 rays.
+
+| Lens | Field | Rays outside window | 99% extent | Error |
+| --- | --- | ---: | ---: | ---: |
+| Summicron Example 9 | 0.0 | 0.0% | 0.82 | 0.0028 |
+| | 0.5 | 0.0% | 0.84 | 0.0036 |
+| | 0.6 | 0.3% | 0.75 | 0.0052 |
+| | 0.7 | 1.4% | 1.14 | 0.0119 |
+| | 0.8 | 3.6% | 1.65 | 0.0329 |
+| | 0.9 | 7.5% | 2.18 | 0.0534 |
+| | 1.0 | 14.0% | 2.60 | 0.0542 |
+| Sigma 40mm f/1.4 | 0.0 to 1.0 | at most 0.9% | at most 0.97 | at most 0.0127 |
+
+The warning starts where the error reaches about 0.01. In the polychromatic report the
+errors are smaller, because the other wavelengths dilute them: on the Summicron at 64 rays,
+the largest change from 64 to 256 rays is 0.019 (field 0.9, 10 cycles/mm sagittal).
+At the suggested 168 rays it is at most 0.002. The 1 mm defocus case above needs about 870
+rays.
+
+The threshold is measured on these two lenses only.
+[DiffractionProbe2.java](../rayoptics/src/test/java/org/redukti/examples/DiffractionProbe2.java)
+reproduces the table.
+`DiffractionMTF` is a Beam42 file and `RayGrid` was left unchanged. The check needs
+back-porting to C++.
+
 ## How the numbers were obtained
 
 The probe programs that produced every figure in this document live in
@@ -2603,6 +2644,8 @@ module's classpath and can reach the package-private helpers on `ZeissOtusML50mm
 | [ContrastProbe14.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe14.java) | §8 — **refutes** its own hypothesis: contrast sampling coverage is 82-95% and identical in x and y, so the contraction does not starve the sagittal direction. Kept as the record of a ruled-out cause |
 | [ContrastProbe15.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe15.java) | §8 — the three-mode comparison and the on-axis symmetry violation under `Paraxial` |
 | [ContrastProbe16.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe16.java) | §8 — vignetting drift per Jacobian step, and the smoothness sweep showing it is differentiable |
+| [DiffractionProbe.java](../rayoptics/src/test/java/org/redukti/examples/DiffractionProbe.java) | Diffraction MTF review P1 and P2 — Sigma sampling, reference-shift phase, 1 mm defocus |
+| [DiffractionProbe2.java](../rayoptics/src/test/java/org/redukti/examples/DiffractionProbe2.java) | Diffraction MTF undersampling warning — spot extent against the PSF window, and the error it predicts |
 
 `ContrastProbes.java` in the same package holds the shared prescription-path lookups.
 Probes 1–8 use the Otus; 9–13 use the Leica 75/2; 14–16 run both. The Otus figures in §7

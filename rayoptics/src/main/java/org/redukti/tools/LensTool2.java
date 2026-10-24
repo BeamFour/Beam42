@@ -410,6 +410,11 @@ public class LensTool2 {
         for (var fld : opm.optical_spec.fov.fields)
             mtfs.add(new PolyDiffractionMTF(opm, fld, wvls, weights, 0.0,
                     arguments.diffraction_pupil_rays, 2 * arguments.diffraction_pupil_rays));
+        for (int fi = 0; fi < mtfs.size(); fi++) {
+            var warning = diffractionWindowWarning(mtfs.get(fi), fields[fi]);
+            if (warning != null)
+                System.err.println(outname + filename_suffix + ": " + warning);
+        }
         var mtfResults = new ArrayList<MTFResultByFreq>();
         for (var freq : arguments.mtf_freqs)
             mtfResults.add(MTFResultByFreq.from_diffraction(opm, mtfs, freq));
@@ -418,6 +423,22 @@ public class LensTool2 {
                 suffixed_name(outname, filename_suffix, ".svg"), arguments.outdir), plot.plot());
         Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile,
                 suffixed_name(outname, filename_suffix, ".csv"), arguments.outdir), plot.toString());
+    }
+
+    /**
+     * A warning when the geometric spot of the field does not fit the PSF window at some
+     * wavelength, naming the worst wavelength; null when it fits at every wavelength.
+     */
+    static String diffractionWindowWarning(PolyDiffractionMTF mtf, double field) {
+        DiffractionMTF worst = null;
+        for (var mono : mtf.mono)
+            if (worst == null || mono.spot_to_window > worst.spot_to_window)
+                worst = mono;
+        if (worst == null || worst.spot_to_window <= 1.0)
+            return null;
+        return String.format("diffraction MTF at field %.2f may be wrong: the spot at %.1f nm is %.2f times"
+                        + " the PSF window; try --diffraction-pupil-rays %d",
+                field, worst.wvl, worst.spot_to_window, worst.suggested_n_pupil());
     }
 
     private static void generateRayAberrationPlots(OpticalModel opm, Args arguments, String filname_suffix) throws Exception {

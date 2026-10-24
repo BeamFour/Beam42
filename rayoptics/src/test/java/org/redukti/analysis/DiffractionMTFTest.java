@@ -6,6 +6,7 @@ import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.mathlib.Vector2;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.Analyses;
+import org.redukti.rayoptics.raytr.GridItem;
 import org.redukti.rayoptics.raytr.RayGrid;
 import org.redukti.spec.Prescription;
 import org.redukti.spec.RayOpticsModelBuilder;
@@ -244,5 +245,41 @@ class DiffractionMTFTest {
         psf[4][4] = Double.NaN;
         assertThrows(IllegalArgumentException.class,
                 () -> DiffractionMTF.modulus_of_transform(psf));
+    }
+
+    @Test
+    void theInFocusSpotFitsThePsfWindow() throws Exception {
+        var opm = polychromatic_model();
+        var m = new DiffractionMTF(opm, opm.optical_spec.fov.fields[0],
+                opm.optical_spec.wvls.central_wvl(), 0.0, 64, 128);
+        assertTrue(m.spot_to_window > 0 && m.spot_to_window <= 1.0, "" + m.spot_to_window);
+        assertEquals(64, m.suggested_n_pupil());
+    }
+
+    @Test
+    void aDefocusedSpotOverflowsTheWindowUntilTheSuggestedSampling() throws Exception {
+        var opm = polychromatic_model();
+        var fld = opm.optical_spec.fov.fields[0];
+        double wvl = opm.optical_spec.wvls.central_wvl();
+        // at f/2, 0.2 mm of defocus blurs to about 0.1 mm, against a 64-ray window of about 0.07 mm
+        var m = new DiffractionMTF(opm, fld, wvl, 0.2, 64, 128);
+        assertTrue(m.spot_to_window > 1.0, "" + m.spot_to_window);
+        int n = m.suggested_n_pupil();
+        assertEquals(0, n % 2);
+        assertTrue(n > 64);
+        // the spot does not change with the sampling; the window grows with n - 1
+        var fits = new DiffractionMTF(opm, fld, wvl, 0.2, n, 2 * n);
+        assertEquals(m.spot_to_window * 63 / (n - 1), fits.spot_to_window, 0.02);
+        assertTrue(fits.spot_to_window <= 1.02, "" + fits.spot_to_window);
+    }
+
+    @Test
+    void spotToWindowIsZeroWhenNoRayTraces() throws Exception {
+        var opm = polychromatic_model();
+        var grid = new RayGrid(opm, opm.optical_spec.fov.fields[0], opm.optical_spec.wvls.central_wvl(),
+                0.0, null, null, null, null, 8, true, Double.NaN, 1.0);
+        for (var row : grid.grid_pkg.grid())
+            row.replaceAll(item -> new GridItem(item.pupil, null));
+        assertEquals(0.0, DiffractionMTF.spot_to_window(grid, Vector2.vector2_0, 1.0, 1.0));
     }
 }

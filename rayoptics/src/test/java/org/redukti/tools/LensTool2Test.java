@@ -1,6 +1,8 @@
 package org.redukti.tools;
 
 import org.junit.jupiter.api.Test;
+import org.redukti.analysis.DiffractionMTF;
+import org.redukti.analysis.PolyDiffractionMTF;
 import org.redukti.importers.obench.OpticalBenchDataImporter;
 import org.redukti.mathlib.M;
 import org.redukti.rayoptics.seq.Glass;
@@ -139,6 +141,31 @@ class LensTool2Test {
         var restored = LensTool2.createPrescription(specs, true, false);
         assertNull(restored._vignetting);
         assertEquals(withoutVignetting, restored.to_opt_bench_str(new StringBuilder()).toString());
+    }
+
+    @Test
+    void diffractionWindowWarningNamesTheWorstWavelengthAndTheRaysNeeded() throws Exception {
+        var opm = LensTool2.createSystem(stoppedPrescription(), true, VigType.None,
+                false, new double[]{0.0, 1.0}, 0);
+        var fld = opm.optical_spec.fov.fields[0];
+        var wvls = opm.optical_spec.wvls;
+        for (double focus : new double[]{0.0, 0.5}) {
+            var mtf = new PolyDiffractionMTF(opm, fld, wvls.wavelengths, wvls.spectral_wts, focus, 16, 32);
+            DiffractionMTF worst = mtf.mono.get(0);
+            for (var mono : mtf.mono)
+                if (mono.spot_to_window > worst.spot_to_window) worst = mono;
+            var warning = LensTool2.diffractionWindowWarning(mtf, 0.0);
+            if (focus > 0)
+                assertTrue(worst.spot_to_window > 1.0, "" + worst.spot_to_window);
+            if (worst.spot_to_window <= 1.0) {
+                assertNull(warning);
+                continue;
+            }
+            assertNotNull(warning);
+            assertTrue(warning.contains("field 0.00"), warning);
+            assertTrue(warning.contains(String.format("%.1f nm", worst.wvl)), warning);
+            assertTrue(warning.endsWith("--diffraction-pupil-rays " + worst.suggested_n_pupil()), warning);
+        }
     }
 
     @Test

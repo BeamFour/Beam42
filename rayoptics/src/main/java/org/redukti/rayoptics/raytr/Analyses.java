@@ -4,12 +4,14 @@
 package org.redukti.rayoptics.raytr;
 
 import org.redukti.mathlib.Vector2;
-import org.redukti.mathlib.fftpack.ComplexDoubleFFT;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.specs.Field;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.redukti.mathlib.FFTUtil.fft2;
+import static org.redukti.mathlib.FFTUtil.fftshift;
 
 /**
  * Aberration calculations for (fld, wvl, foc), including focus and image shift.
@@ -318,45 +320,5 @@ public class Analyses {
         if (x == Double.POSITIVE_INFINITY) return Double.MAX_VALUE;
         if (x == Double.NEGATIVE_INFINITY) return -Double.MAX_VALUE;
         return x;
-    }
-
-    /** numpy.fft.fftshift over both axes of a square complex array, rows interleaved re, im. */
-    static double[][] fftshift(double[][] x) {
-        int n = x.length;
-        int shift = n / 2;
-        var y = new double[n][2 * n];
-        for (int i = 0; i < n; i++) {
-            int si = (i + shift) % n;
-            for (int j = 0; j < n; j++) {
-                int sj = (j + shift) % n;
-                y[si][2 * sj] = x[i][2 * j];
-                y[si][2 * sj + 1] = x[i][2 * j + 1];
-            }
-        }
-        return y;
-    }
-
-    /** numpy.fft.fft2 of a square complex array, rows interleaved re, im. */
-    static double[][] fft2(double[][] x) {
-        int n = x.length;
-        var fft = new ComplexDoubleFFT(n);
-        var y = new double[n][];
-        for (int i = 0; i < n; i++) {
-            y[i] = x[i].clone();
-            fft.ft(y[i]);
-        }
-        var column = new double[2 * n];
-        for (int j = 0; j < n; j++) {
-            for (int i = 0; i < n; i++) {
-                column[2 * i] = y[i][2 * j];
-                column[2 * i + 1] = y[i][2 * j + 1];
-            }
-            fft.ft(column);
-            for (int i = 0; i < n; i++) {
-                y[i][2 * j] = column[2 * i];
-                y[i][2 * j + 1] = column[2 * i + 1];
-            }
-        }
-        return y;
     }
 }

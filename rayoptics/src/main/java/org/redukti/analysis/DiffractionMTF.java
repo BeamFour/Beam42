@@ -3,7 +3,7 @@
 // License GPL v3
 package org.redukti.analysis;
 
-import org.redukti.mathlib.fftpack.ComplexDoubleFFT;
+import org.redukti.mathlib.FFTUtil;
 import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.Analyses;
 import org.redukti.rayoptics.raytr.RayGrid;
@@ -149,31 +149,17 @@ public class DiffractionMTF {
     static double[][] modulus_of_transform(double[][] psf) {
         int n = psf.length;
         int shift = n / 2;
-        // fftshift the PSF into interleaved complex rows
+        // the PSF as interleaved complex rows
         var x = new double[n][2 * n];
         for (int i = 0; i < n; i++)
             for (int j = 0; j < n; j++)
-                x[(i + shift) % n][2 * ((j + shift) % n)] = psf[i][j];
-        var fft = new ComplexDoubleFFT(n);
-        for (int i = 0; i < n; i++)
-            fft.ft(x[i]);
-        var column = new double[2 * n];
-        for (int j = 0; j < n; j++) {
-            for (int i = 0; i < n; i++) {
-                column[2 * i] = x[i][2 * j];
-                column[2 * i + 1] = x[i][2 * j + 1];
-            }
-            fft.ft(column);
-            for (int i = 0; i < n; i++) {
-                x[i][2 * j] = column[2 * i];
-                x[i][2 * j + 1] = column[2 * i + 1];
-            }
-        }
-        // fftshift the transform, take the modulus, normalize to the zero frequency
+                x[i][2 * j] = psf[i][j];
+        var F = FFTUtil.fftshift(FFTUtil.fft2(FFTUtil.fftshift(x)));
+        // take the modulus, normalize to the zero frequency
         var mtf = new double[n][n];
         for (int i = 0; i < n; i++)
             for (int j = 0; j < n; j++)
-                mtf[(i + shift) % n][(j + shift) % n] = Math.hypot(x[i][2 * j], x[i][2 * j + 1]);
+                mtf[i][j] = Math.hypot(F[i][2 * j], F[i][2 * j + 1]);
         double dc = mtf[shift][shift];
         if (!(dc > 0) || !Double.isFinite(dc))
             throw new IllegalArgumentException("PSF must have finite, positive total intensity");

@@ -307,6 +307,7 @@ public class Analyses {
         double AP_max = Double.NEGATIVE_INFINITY;
         for (int i = 0; i < maxdim; i++) {
             for (int j = 0; j < maxdim; j++) {
+                // Math.hypot(re, im) calculates |F|, and a * a produces the intensity, matching NumPy’s abs(...)**2.
                 double a = Math.hypot(F[i][2 * j], F[i][2 * j + 1]);
                 AP[i][j] = a * a;
                 if (!Double.isNaN(AP[i][j]))

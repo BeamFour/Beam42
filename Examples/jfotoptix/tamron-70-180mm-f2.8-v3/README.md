@@ -1,4 +1,4 @@
-# 70-180mm F/2.8 Di III VXD
+# Tamron 70-180mm F/2.8 Di III VXD
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |

@@ -284,7 +284,11 @@ public class Analyses {
             }
         }
 
+        // Upstream
         // phase = np.exp(1j*2*np.pi*W), as interleaved real and imaginary parts by row
+        // We use Euler's formula: exp(i*2*pi*W) = cos(2*pi*W) + i*sin(2*pi*W).
+        // Store each complex value as adjacent real and imaginary components.
+        // Masked samples remain 0+0i; valid samples with zero OPD become 1+0i.
         var phase = new double[maxdim][2 * maxdim];
         for (int i = 0; i < maxdim; i++) {
             for (int j = 0; j < maxdim; j++) {
@@ -295,6 +299,9 @@ public class Analyses {
             }
         }
 
+        // Upstream
+        // AP = abs(fftshift(fft2(fftshift(phase))))**2
+        // AP_max = np.nanmax(AP)
         var F = fftshift(fft2(fftshift(phase)));
         var AP = new double[maxdim][maxdim];
         double AP_max = Double.NEGATIVE_INFINITY;
@@ -308,6 +315,8 @@ public class Analyses {
         }
         if (!(AP_max > 0) || !Double.isFinite(AP_max))
             throw new IllegalArgumentException("wavefront must produce a finite, nonzero PSF");
+        // Upstream
+        // AP = AP/AP_max
         for (int i = 0; i < maxdim; i++)
             for (int j = 0; j < maxdim; j++)
                 AP[i][j] = AP[i][j] / AP_max;

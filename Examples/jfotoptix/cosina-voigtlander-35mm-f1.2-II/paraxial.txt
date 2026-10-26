@@ -1,7 +1,7 @@
 efl               35.81
 f                 35.81
 f'                35.81
-ffl             -0.3004
+ffl             -0.3003
 pp1               35.51
 bfl               23.51
 ppk              -12.30
@@ -17,8 +17,8 @@ na obj        1.444e-09
 n obj             1.000
 img_dist          23.51
 img_ht            22.20
-exp_dist         -25.61
+exp_dist         -25.60
 exp_radius        19.81
-na img          -0.3740
+na img          -0.4032
 n img             1.000
 optical invariant        8.952

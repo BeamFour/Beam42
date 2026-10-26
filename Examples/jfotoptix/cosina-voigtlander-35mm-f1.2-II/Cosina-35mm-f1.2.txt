@@ -9,7 +9,7 @@ Image Height	43.28
 Total Length	undefined
 Magnification	0
 d0	Infinity
-Bf	23.5
+Bf	23.4914
 [lens data]
 1	200.000	1.60	1.48749	42.30	70.4	FC5	Hoya
 2	41.361	9.55		34.82

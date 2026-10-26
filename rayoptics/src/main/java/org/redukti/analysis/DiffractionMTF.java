@@ -110,6 +110,7 @@ public class DiffractionMTF {
         // OTF's reference phase, not the physical image plane or this wavelength's blur.
         var grid = new RayGrid(opm, fld, wvl, foc, null, null, null, null,
                 n_pupil, true, Double.NaN, 1.0);
+        // grid.grid[2] is the grid of opd in waves
         var psf = Analyses.calc_psf(grid.grid[2], n_pupil, maxdim);
         spot_to_window = spot_to_window(grid, image_point(opm, fld, wvl, foc),
                 (n_pupil - 1) / (2 * nu_cutoff_x), (n_pupil - 1) / (2 * nu_cutoff_y));

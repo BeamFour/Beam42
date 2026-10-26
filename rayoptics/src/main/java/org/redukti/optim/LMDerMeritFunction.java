@@ -290,9 +290,26 @@ public class LMDerMeritFunction implements MinPack.Lmder_Function {
                     + " contrast samples contain failed rays; " + first);
     }
 
+    private void validateMtfProxyGoals() {
+        for (var diagnostic : GoalMTFProxy.frequencyDiagnostics(functions)) {
+            String prefix = "MTF proxy frequency=" + diagnostic.frequency() + " cycles/model-length: ";
+            if (diagnostic.validSamples() > 0) {
+                String summary = prefix + "max abs(pi*f*delta)=" + diagnostic.maxArgument()
+                        + " at " + diagnostic.worstSample().sampleDescription();
+                if (diagnostic.outsideMonotonicInterval())
+                    logger.warning(summary + "; at or above pi/2, merit reduction can increase aberration");
+                else logger.config(summary);
+            }
+            if (diagnostic.invalidSamples() > 0)
+                logger.warning(prefix + diagnostic.invalidSamples() + " invalid samples; first: "
+                        + diagnostic.firstInvalidSample().sampleDescription());
+        }
+    }
+
     private void validateInputs() {
         analysis.compute();
         validateInitialContrastSamples();
+        validateMtfProxyGoals();
     }
 
     public Solver getSolver() {

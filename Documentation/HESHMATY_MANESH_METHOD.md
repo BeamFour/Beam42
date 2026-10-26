@@ -1,8 +1,8 @@
 # Heshmaty-Manesh method for geometric OTF optimization
 
 This note describes the sine-transformed transverse-aberration merit function and
-reviews `GoalMTFProxy` within its existing ray-fan scope. The implementation changes
-below are recommendations; they have not been applied.
+describes `GoalMTFProxy` within its existing ray-fan scope. The validation,
+invalid-sample handling and initial frequency diagnostic below are implemented.
 
 ## Method
 
@@ -97,9 +97,9 @@ Keep the selected frequency fixed during a solve. Automatically changing it as t
 design changes would change the objective and its derivatives. Do not clamp the
 sine argument or replace it by its absolute value as a periodicity fix.
 
-## Recommended changes to GoalMTFProxy
+## GoalMTFProxy implementation
 
-### Required corrections
+### Validation and residual handling
 
 1. **Require a zero target.** Retain the existing constructor signature for
    compatibility, but reject a nonzero or non-finite target. An overload without a
@@ -131,18 +131,21 @@ sine argument or replace it by its absolute value as a periodicity fix.
    uses the analysis convention of nanometres and selects the fan; it is not an
    additional factor in the sine argument.
 
-The current `1.0` failure return is within the valid sine range. Although it is the
+The former `1.0` failure return is within the valid sine range. Although it is the
 largest squared residual for a zero-target, unit-weight sample, the solver treats
 it as a usable observation, including during Jacobian estimation. `BIGVAL` marks
-the evaluation as invalid under the existing solver convention. The current
-missing-fan exception can escape the solver's goal-evaluation loop.
+the evaluation as invalid under the existing solver convention. Missing fans now
+return that penalty rather than throwing from the solver's goal-evaluation loop.
 
 ### Frequency diagnostic
 
-Add an explicit preflight check after the initial `Analysis.compute()`. For each
-frequency, inspect the samples selected by positive-weight proxy goals and report
-the largest `abs(pi*f*delta)`, together with its field, orientation, wavelength and
-sample index. Report invalid samples separately. Flag values at or above `pi/2`.
+`LMDerMeritFunction.getSolver()` runs a preflight check after the initial
+`Analysis.compute()`. For each frequency, it inspects the samples selected by
+positive-weight proxy goals and reports the largest `abs(pi*f*delta)`, together
+with its field, orientation, wavelength and sample index. Safe maxima are logged
+at CONFIG level; values at or above `pi/2` and invalid samples produce warnings.
+`GoalMTFProxy.frequencyDiagnostics(goals)` exposes the same summaries for callers
+that manage their own solver setup. It reads existing results without tracing rays.
 
 This check diagnoses the sampled merit; it cannot establish a bound over unsampled
 pupil positions. An initial pass also does not guarantee that later trial designs
@@ -150,12 +153,12 @@ stay in the monotonic interval. A runtime diagnostic can report crossings withou
 altering the residual. Rejecting such trials would be an additional domain
 constraint and should be a separate, explicit option.
 
-The diagnostic belongs in goal setup or a dedicated helper. It should not rebuild
-the analysis inside each `value()` call.
+There is no automatic runtime diagnostic or additional domain constraint. Neither
+`value()` nor the diagnostic changes the selected frequency or clamps residuals.
 
 ### Regression checks
 
-Use synthetic fan results to verify:
+`GoalMTFProxyTest` uses synthetic fan results to verify:
 
 - Zero, positive and negative aberrations, including
   `f = 10/mm`, `delta = +/-0.025 mm`, which give `+/-sqrt(0.5)`.
@@ -165,9 +168,9 @@ Use synthetic fan results to verify:
 - Invalid samples remain invalid in both residual and Jacobian evaluation.
 - The periodic zero at `delta = 1/f` is retained and the frequency diagnostic flags it.
 
-These corrections can be confined to Beam42-owned optimizer code and tests. The
-ported tracing code does not need modification. Changes under `rayoptics/` must
-also be carried across to rayoptics-cpp, with corresponding expectation updates.
+The corrections are confined to Beam42-owned optimizer code and tests. Ported
+tracing code is unchanged. The changes to `GoalMTFProxy` and the solver preflight
+still need back-porting to rayoptics-cpp, with corresponding expectation updates.
 
 ## References
 

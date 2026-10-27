@@ -48,7 +48,7 @@ The derivation starts from the real part of the geometric OTF. For normalized pu
 weights `q_j`, with `sum(q_j) = 1`, its sampled expression is
 
 $$
-\operatorname{Re}L(f)\approx
+\mathrm{Re}\,L(f)\approx
 1-2\sum_j q_j\sin^2(\pi f\delta_j).
 $$
 

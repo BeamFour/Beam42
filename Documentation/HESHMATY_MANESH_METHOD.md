@@ -8,18 +8,18 @@ invalid-sample handling and initial frequency diagnostic below are implemented.
 
 Heshmaty-Manesh [1, Chapter 3, pp. 30-32] defines sagittal and tangential terms as
 
-\[
+$$
 G_s(s)=\sum_j\sin^2(\pi s\,\delta\xi_j),\qquad
 G_t(t)=\sum_j\sin^2(\pi t\,\delta\eta_j).
-\]
+$$
 
 Here, `s` and `t` are spatial frequencies, and `delta xi` and `delta eta` are the
 X and Y components of transverse ray aberration. Equation 3.9 combines these terms
 with the remaining squared aberration or constraint errors:
 
-\[
+$$
 \Psi=\sum_n[G_s(s)+G_t(t)]_n+\sum_i d_i^2.
-\]
+$$
 
 The accompanying procedure replaces each controlled transverse ray aberration by
 `sin(pi * frequency * aberration)` and passes the resulting residual array to the
@@ -28,10 +28,10 @@ The transformation is also described by Kidger and Benham [2, Section 2.2].
 
 For Beam42's weight convention, one goal supplies
 
-\[
+$$
 r_j=\sin(\pi f\delta_j),\qquad
 \Psi_{\mathrm{proxy}}=\sum_j w_j r_j^2.
-\]
+$$
 
 `LMDerMeritFunction` multiplies each goal error by `sqrt(weight)` before the solver
 squares it. Consequently:
@@ -47,10 +47,10 @@ squares it. Consequently:
 The derivation starts from the real part of the geometric OTF. For normalized pupil
 weights `q_j`, with `sum(q_j) = 1`, its sampled expression is
 
-\[
+$$
 \operatorname{Re}L(f)\approx
 1-2\sum_j q_j\sin^2(\pi f\delta_j).
-\]
+$$
 
 The method does not directly compute diffraction MTF or the modulus of a complex OTF.
 In particular, the tangential imaginary OTF component is omitted in the thesis.
@@ -67,15 +67,15 @@ not a prerequisite for retaining this goal within its current scope.
 For an aberration magnitude `A`, the squared sine increases monotonically with `A`
 only within the first interval
 
-\[
+$$
 |\pi f\delta|<\frac{\pi}{2}.
-\]
+$$
 
 Heshmaty-Manesh recommends a preliminary ray trace and a frequency satisfying
 
-\[
+$$
 f<\frac{1}{2A_{\max}},
-\]
+$$
 
 where `A_max` is the largest absolute controlled transverse-aberration component.
 At the boundary the derivative is zero. Beyond it, reducing the merit can increase
@@ -85,9 +85,9 @@ and an aberration of 0.1 mm gives another zero residual.
 
 For small arguments,
 
-\[
+$$
 \sin^2(\pi f\delta)\approx(\pi f)^2\delta^2.
-\]
+$$
 
 The merit then approaches ordinary transverse-aberration least squares, scaled
 relative to the other constraints. Frequency therefore affects both aberration

@@ -33,15 +33,37 @@ For each sample, three rays are traced:
 - a sagittal partner at `p + (s, 0)`;
 - a tangential partner at `p + (0, s)`.
 
-The nominal entrance-pupil displacement is
+The incoherent diffraction cutoff is the image-space spatial frequency at and above
+which the diffraction-limited MTF is zero. For a clear circular pupil, the nominal
+paraxial relation is
 
 ```text
+frequency_cutoff = 1 / (lambda F#)
+```
+
+Here `lambda` is the wavelength in system length units, `F#` is the dimensionless
+working f-number, and frequency is measured in cycles per system length unit. For
+example, with wavelength in mm, frequency is in cycles/mm.
+
+In the pupil autocorrelation, the separation of the two pupil centres scales linearly
+with spatial frequency. At cutoff the circles just touch: their physical centre
+separation is one pupil diameter, or two pupil radii. Beam42 uses dimensionless
+entrance-pupil coordinates normalized by the pupil radius, so the nominal separation
+`s` is 2 at cutoff. Thus
+
+```text
+s / 2 = frequency / frequency_cutoff
+s = 2 frequency / frequency_cutoff
 s = 2 lambda F# frequency
 ```
 
-where `lambda` is the wavelength, `F#` is the working f-number, and `frequency` is the
-requested spatial frequency. With calibration disabled, this same nominal displacement
-is used in both directions. With calibration enabled, sagittal and tangential scale
+The factor of 2 comes from radius normalization; `s` is the full separation between
+the reference and partner rays, not the displacement of each ray about a midpoint.
+At half the cutoff frequency, `s = 1`. This linear scaling applies to separation,
+not to the MTF value.
+
+With calibration disabled, this same nominal displacement is used in both directions.
+With calibration enabled, sagittal and tangential scale
 factors are measured separately for every field and wavelength, so the actual entrance-
 pupil displacements may differ from each other and from `s`.
 

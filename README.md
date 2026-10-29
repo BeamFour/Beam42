@@ -47,65 +47,6 @@ The project has two fairly independent components:
 * The MTF feature in BeamFour has been updated to match the RayOptics functionality for computing single wavelength 
   MTFs for a specific field.
 
-## Computations and verification
-
-The tables below describe the RayOptics component. **Upstream comparison** means that Java results are checked against
-values captured by running [Michael Hayford's Python Ray-Optics](https://github.com/mjhoptics/ray-optics) on equivalent models. The generated regression suite covers five lenses,
-including a wide-angle lens and the supported aspheric coefficient conventions. It compares first-order data, paraxial
-rays, chief-ray aiming, vignetting, full ray segments, aberration fans and Seidel coefficients. These are numerical
-comparisons within tolerances, not a claim of identical results for every possible optical system. Coverage is
-limited to these lenses: reflective systems, decentered surfaces and every surface profile or model operation are
-not separately compared. The
-[upstream regression tests](rayoptics/src/test/java/org/redukti/rayoptics/upstream) contain the captured values;
-[the comparison scripts](rayoptics/src/main/python/README.md) describe how they are generated and the tolerances used.
-
-### Ray-Optics foundation
-
-| Computation | Origin and implementation | Verification | Reference |
-| --- | --- | --- | --- |
-| Sequential optical model: surfaces, gaps, apertures, fields, wavelengths and coordinate transforms | Ported model and specification classes | Model-construction comparisons with upstream's optical-bench importer; generated ray tests exercise the resulting geometry | [Ray-Optics](https://github.com/mjhoptics/ray-optics) |
-| Surface sag, normals and intersections: spherical, conic, even-polynomial and radial-polynomial aspheres | Ported surface profiles | Upstream comparison of ray intersection points and normals across the five lens models | [Spencer and Murty (1962)](https://doi.org/10.1364/JOSA.52.000672) |
-| Sequential real-ray tracing: local coordinates, refraction, reflection and optical path | Ported `RayTrace` kernel | Upstream comparison of per-surface points, directions, distances, normals and optical-path increments for sampled lens rays | [Spencer and Murty (1962)](https://doi.org/10.1364/JOSA.52.000672) |
-| Paraxial tracing and first-order properties: focal lengths, principal planes, pupils, numerical apertures, magnification and optical invariant | Ported `FirstOrder`, `ParaxModel` and supporting calculations | Upstream comparison of axial and principal paraxial rays and all `FirstOrderData` fields | Ray-Optics |
-| Third-order aberrations: Seidel sums and aspheric contributions | Ported `ThirdOrder` calculations | Upstream comparison of per-surface coefficients and totals | Ray-Optics |
-| Chief-ray and pupil aiming, including wide-angle entrance-pupil location | Ported `Trace` and `Wideangle` calculations, using Java numerical solvers | Upstream comparison of aim coordinates or entrance-pupil position, including the wide-angle case | Ray-Optics |
-| Vignetting factors and pupil-coordinate mapping | Ported `VigCalc` and field calculations | Upstream comparison of the four vignetting factors per field; caller-array mutation differs as noted below | Ray-Optics |
-| Transverse ray aberrations and defocus | Ported ray/image-plane geometry, exposed through project analysis classes | Upstream comparison of x/y aberration fans by field and wavelength | Ray-Optics |
-| Wavefront aberration and optical path difference (OPD), including refocusing and finite/infinite reference-sphere calculations | Ported `WaveAbr`; project analysis classes provide fan evaluation | Upstream comparison of OPD fans and selected wavefront-grid values; additional geometric tests for the finite reference sphere | [Hopkins (1981)](https://doi.org/10.1080/713820605); [Mikš (2002)](https://doi.org/10.1364/JOSAA.19.001187) |
-| Wavefront grids, FFT point-spread function (PSF) and PSF sampling/scaling | Ported `RayGrid` and `Analyses`, with a project correction to pupil masking | `AnalysesTest` compares selected upstream grid OPDs, refocusing, PSF values and sampling; zero-OPD and piston-invariance tests cover the correction | Ray-Optics |
-| Grid-sampled spot intercepts | Ported `SpotAnalysis.spot()` and `eval_grid()` | Project spot-analysis tests; the generated upstream suite compares ray fans rather than a separate spot-grid result | Ray-Optics |
-
-The port uses Java solvers in place of SciPy, so solver-dependent results can differ within convergence tolerances.
-Two intentional differences are relevant here: PSF calculation retains valid zero-OPD pupil samples, and applying
-vignetting does not modify the caller's pupil-coordinate array. Glass dispersion also needs separate treatment:
-the `nd`/`vd` model uses a GNU Optical formula rather than upstream opticalglass's Buchdahl model, so the generated
-comparisons use the d-line. The table does not claim upstream equivalence for dispersion away from that wavelength.
-
-### Project extensions and other numerical sources
-
-"Project" identifies an implementation in Beam42, including implementations of published methods. These calculations
-use the foundation above; their tests are not upstream Ray-Optics comparisons unless stated explicitly.
-
-| Computation or output | Origin and implementation | Verification in this repository | Reference |
-| --- | --- | --- | --- |
-| Hexapolar pupil sampling | Based on GNU Optical, integrated into tracing and spot analysis | Exercised by spot-analysis and MTF sampling-pattern tests | [GNU Optical](https://www.gnu.org/software/goptical/) |
-| Gaussian-quadrature pupil sampling, including annular pupils | Project additions to tracing and spot analysis | `GaussianQuadraturePatternTest` checks sampling geometry, weights and polynomial moments | [Forbes (1988, with erratum)](https://doi.org/10.1364/JOSAA.5.001943); [Bauman and Xiao (2010)](https://doi.org/10.1117/12.872773) |
-| Gauss-Legendre nodes and weights | Direct implementation plus a port of the Legendre path in Netlib `gaussq.f`, using the Golub-Welsch method | `GaussQTest` checks published nodes/weights, agreement between implementations and polynomial moments | [Golub and Welsch (1969)](https://doi.org/10.1090/S0025-5718-69-99647-1) |
-| Weighted spot centroid, RMS radius, maximum radius and polychromatic spot statistics | Project additions around the ported intercept calculation | `WeightedSpotAnalysisTest` checks weighted statistics, units and sampling selection | Forbes; Bauman and Xiao |
-| Geometric PSF, line-spread functions and monochromatic/polychromatic geometric MTF | Project histogram and Fourier-transform calculations | `MtfTest` compares pupil-sampling patterns; report and wavelength tests cover integration with the analysis tools | [Steinich and Blahnik (2012)](https://doi.org/10.1515/aot-2012-0002) for wavelength weights |
-| Monochromatic diffraction OTF/MTF and polychromatic combination with lateral color | Project implementation built on the ported wavefront/PSF routines; follows Hayford's diffraction-MTF notebook | `DiffractionMTFTest` checks the circular-pupil diffraction limit, pupil-overlap integral, Fourier consistency and phase shifts; `PolyDiffractionMTFTest` checks wavelength combination | [Hayford's notebooks](https://github.com/mjhoptics/ray-optics-notebooks); Steinich and Blahnik for wavelength weights |
-| Contrast analysis and optimization residuals from sheared-pupil wavefront differences | Project implementation, including weighted centering and wavelength balance | `ContrastAnalysisTest`, `ContrastResidualCenteringTest` and optimizer goal tests | [Elliott et al. (2017)](https://doi.org/10.1117/12.2292761) |
-| Exit-pupil aiming for contrast analysis and frequency calibration | Project inverse pupil mapping and shear calculations | Contrast tests check the requested shear vectors and frequency conversion | Hopkins (1981); Elliott et al. |
-| Measured transmitted-pupil maps and contrast pupil maps | Project ray-bundle analyses and plots | `PupilMapAnalysisTest` and `ContrastPupilMapTest` | Uses the tracing and contrast methods above |
-| Optimization variables, merit functions, constraints and configuration pipeline | Project optimizer using the MINPACK Levenberg-Marquardt solver | Optimizer unit and integration tests, including goal construction, constraints and trial runs | Elliott et al. for contrast goals; [Moré et al. (1980)](https://doi.org/10.2172/6997568) for MINPACK |
-| Nonlinear systems and least squares (MINPACK) | Ported from the Fortran version of MINPACK; used for ray aiming and Levenberg-Marquardt optimization | MINPACK solver tests, two-dimensional aiming tests and optimizer tests | [Moré et al. (1980)](https://doi.org/10.2172/6997568); [MINPACK license](LICENSE-Minpack.txt) |
-| Scalar root finding (secant and Brent methods) | Java secant solver ported from SciPy's secant method in `scipy/optimize/_zeros_py.py`; Java Brent solver, used where upstream calls SciPy's `brentq`, is derived from BeamFour's ray-surface intersection code, which follows *Numerical Recipes* | Upstream aiming and vignetting comparisons exercise the solvers | [SciPy secant implementation](https://github.com/scipy/scipy/blob/main/scipy/optimize/_zeros_py.py); [BeamFour](https://github.com/StellarSoftwareBerkeley/BeamFour); W. H. Press et al., *Numerical Recipes in C*, 2nd ed. (1992) |
-| FFT calculations | Ported jfftpack routines with project FFT utilities | `FFTUtilTest`, plus the upstream PSF and analytical diffraction-MTF checks | [jfftpack license and attribution](LICENSE-jfftpack.txt) |
-| Glass-catalog lookup and wavelength-dependent refractive indices | Project catalog integration and AGF formulas; `nd`/`vd` dispersion comes from GNU Optical | Glass-catalog and importer tests; no general upstream dispersion-equivalence claim | [Glass catalogs](Documentation/GLASS_CATALOGS.md) |
-| Lens layout construction | Project implementation | `Layout2DTest` and `Layout2DIntegrationTest` | [LensTool2](Documentation/LENSTOOL2.md) |
-| Plotting and SVG rendering | Derived from GNU Optical; used by the project's layout and analysis outputs | Plotting and SVG renderer tests, plus layout integration tests | [GNU Optical](https://www.gnu.org/software/goptical/); [license notices](#license) |
-| Analysis reports, importers and exporters | Project implementation | Report, importer and exporter tests; model-construction comparisons also check imported geometry | [LensTool2](Documentation/LENSTOOL2.md) |
-
 ## Roadmap
 
 * Perhaps the biggest challenge is to make the optimizer useful in real world scenarios and be able to compete with the likes of Zemax.
@@ -197,6 +138,66 @@ Citations follow the style used by Optica (formerly OSA) journals: author(s), "t
   better technique for optimizing on MTF," in *International Optical Design Conference 2017*, Proc. SPIE 10590,
   1059014 (2017), [doi:10.1117/12.2292761](https://doi.org/10.1117/12.2292761).
   Very effective optimization approach that directly targets MTF.
+
+## Computations and verification
+
+The tables below describe the RayOptics component. **Upstream comparison** means that Java results are checked against
+values captured by running [Michael Hayford's Python Ray-Optics](https://github.com/mjhoptics/ray-optics) on equivalent models. The generated regression suite covers five lenses,
+including a wide-angle lens and the supported aspheric coefficient conventions. It compares first-order data, paraxial
+rays, chief-ray aiming, vignetting, full ray segments, aberration fans and Seidel coefficients. These are numerical
+comparisons within tolerances, not a claim of identical results for every possible optical system. Coverage is
+limited to these lenses: reflective systems, decentered surfaces and every surface profile or model operation are
+not separately compared. The
+[upstream regression tests](rayoptics/src/test/java/org/redukti/rayoptics/upstream) contain the captured values;
+[the comparison scripts](rayoptics/src/main/python/README.md) describe how they are generated and the tolerances used.
+
+### Ray-Optics foundation
+
+| Computation | Origin and implementation | Verification | Reference |
+| --- | --- | --- | --- |
+| Sequential optical model: surfaces, gaps, apertures, fields, wavelengths and coordinate transforms | Ported model and specification classes | Model-construction comparisons with upstream's optical-bench importer; generated ray tests exercise the resulting geometry | [Ray-Optics](https://github.com/mjhoptics/ray-optics) |
+| Surface sag, normals and intersections: spherical, conic, even-polynomial and radial-polynomial aspheres | Ported surface profiles | Upstream comparison of ray intersection points and normals across the five lens models | [Spencer and Murty (1962)](https://doi.org/10.1364/JOSA.52.000672) |
+| Sequential real-ray tracing: local coordinates, refraction, reflection and optical path | Ported `RayTrace` kernel | Upstream comparison of per-surface points, directions, distances, normals and optical-path increments for sampled lens rays | [Spencer and Murty (1962)](https://doi.org/10.1364/JOSA.52.000672) |
+| Paraxial tracing and first-order properties: focal lengths, principal planes, pupils, numerical apertures, magnification and optical invariant | Ported `FirstOrder`, `ParaxModel` and supporting calculations | Upstream comparison of axial and principal paraxial rays and all `FirstOrderData` fields | Ray-Optics |
+| Third-order aberrations: Seidel sums and aspheric contributions | Ported `ThirdOrder` calculations | Upstream comparison of per-surface coefficients and totals | Ray-Optics |
+| Chief-ray and pupil aiming, including wide-angle entrance-pupil location | Ported `Trace` and `Wideangle` calculations, using Java numerical solvers | Upstream comparison of aim coordinates or entrance-pupil position, including the wide-angle case | Ray-Optics |
+| Vignetting factors and pupil-coordinate mapping | Ported `VigCalc` and field calculations | Upstream comparison of the four vignetting factors per field; caller-array mutation differs as noted below | Ray-Optics |
+| Transverse ray aberrations and defocus | Ported ray/image-plane geometry, exposed through project analysis classes | Upstream comparison of x/y aberration fans by field and wavelength | Ray-Optics |
+| Wavefront aberration and optical path difference (OPD), including refocusing and finite/infinite reference-sphere calculations | Ported `WaveAbr`; project analysis classes provide fan evaluation | Upstream comparison of OPD fans and selected wavefront-grid values; additional geometric tests for the finite reference sphere | [Hopkins (1981)](https://doi.org/10.1080/713820605); [Mikš (2002)](https://doi.org/10.1364/JOSAA.19.001187) |
+| Wavefront grids, FFT point-spread function (PSF) and PSF sampling/scaling | Ported `RayGrid` and `Analyses`, with a project correction to pupil masking | `AnalysesTest` compares selected upstream grid OPDs, refocusing, PSF values and sampling; zero-OPD and piston-invariance tests cover the correction | Ray-Optics |
+| Grid-sampled spot intercepts | Ported `SpotAnalysis.spot()` and `eval_grid()` | Project spot-analysis tests; the generated upstream suite compares ray fans rather than a separate spot-grid result | Ray-Optics |
+
+The port uses Java solvers in place of SciPy, so solver-dependent results can differ within convergence tolerances.
+Two intentional differences are relevant here: PSF calculation retains valid zero-OPD pupil samples, and applying
+vignetting does not modify the caller's pupil-coordinate array. Glass dispersion also needs separate treatment:
+the `nd`/`vd` model uses a GNU Optical formula rather than upstream opticalglass's Buchdahl model, so the generated
+comparisons use the d-line. The table does not claim upstream equivalence for dispersion away from that wavelength.
+
+### Project extensions and other numerical sources
+
+"Project" identifies an implementation in Beam42, including implementations of published methods. These calculations
+use the foundation above; their tests are not upstream Ray-Optics comparisons unless stated explicitly.
+
+| Computation or output | Origin and implementation | Verification in this repository | Reference |
+| --- | --- | --- | --- |
+| Hexapolar pupil sampling | Based on GNU Optical, integrated into tracing and spot analysis | Exercised by spot-analysis and MTF sampling-pattern tests | [GNU Optical](https://www.gnu.org/software/goptical/) |
+| Gaussian-quadrature pupil sampling, including annular pupils | Project additions to tracing and spot analysis | `GaussianQuadraturePatternTest` checks sampling geometry, weights and polynomial moments | [Forbes (1988, with erratum)](https://doi.org/10.1364/JOSAA.5.001943); [Bauman and Xiao (2010)](https://doi.org/10.1117/12.872773) |
+| Gauss-Legendre nodes and weights | Direct implementation plus a port of the Legendre path in Netlib `gaussq.f`, using the Golub-Welsch method | `GaussQTest` checks published nodes/weights, agreement between implementations and polynomial moments | [Golub and Welsch (1969)](https://doi.org/10.1090/S0025-5718-69-99647-1) |
+| Weighted spot centroid, RMS radius, maximum radius and polychromatic spot statistics | Project additions around the ported intercept calculation | `WeightedSpotAnalysisTest` checks weighted statistics, units and sampling selection | Forbes; Bauman and Xiao |
+| Geometric PSF, line-spread functions and monochromatic/polychromatic geometric MTF | Project histogram and Fourier-transform calculations | `MtfTest` compares pupil-sampling patterns; report and wavelength tests cover integration with the analysis tools | [Steinich and Blahnik (2012)](https://doi.org/10.1515/aot-2012-0002) for wavelength weights |
+| Monochromatic diffraction OTF/MTF and polychromatic combination with lateral color | Project implementation built on the ported wavefront/PSF routines; follows Hayford's diffraction-MTF notebook | `DiffractionMTFTest` checks the circular-pupil diffraction limit, pupil-overlap integral, Fourier consistency and phase shifts; `PolyDiffractionMTFTest` checks wavelength combination | [Hayford's notebooks](https://github.com/mjhoptics/ray-optics-notebooks); Steinich and Blahnik for wavelength weights |
+| Contrast analysis and optimization residuals from sheared-pupil wavefront differences | Project implementation, including weighted centering and wavelength balance | `ContrastAnalysisTest`, `ContrastResidualCenteringTest` and optimizer goal tests | [Elliott et al. (2017)](https://doi.org/10.1117/12.2292761) |
+| Exit-pupil aiming for contrast analysis and frequency calibration | Project inverse pupil mapping and shear calculations | Contrast tests check the requested shear vectors and frequency conversion | Hopkins (1981); Elliott et al. |
+| Measured transmitted-pupil maps and contrast pupil maps | Project ray-bundle analyses and plots | `PupilMapAnalysisTest` and `ContrastPupilMapTest` | Uses the tracing and contrast methods above |
+| Optimization variables, merit functions, constraints and configuration pipeline; nonlinear systems and least squares (MINPACK) | Project optimizer using the MINPACK Levenberg-Marquardt solver (`lmder`); two-dimensional ray aiming uses the MINPACK Powell hybrid (dogleg) solver (`hybrd1`). MINPACK is ported from the Fortran version | Optimizer unit and integration tests, including goal construction, constraints and trial runs; MINPACK solver tests, including the `lmder` and `hybrd` test problems ported from the Netlib MINPACK Fortran examples; two-dimensional aiming tests | Elliott et al. for contrast goals; [Moré et al. (1980)](https://doi.org/10.2172/6997568) and [MINPACK license](LICENSE-Minpack.txt) for MINPACK |
+| Scalar root finding (secant method) | Java secant solver ported from SciPy's secant method in `scipy/optimize/_zeros_py.py` | Upstream aiming and vignetting comparisons exercise the solver | [SciPy secant implementation](https://github.com/scipy/scipy/blob/main/scipy/optimize/_zeros_py.py) |
+| Scalar root finding (Brent method) | Java Brent solver, used where upstream calls SciPy's `brentq`; derived from BeamFour's ray-surface intersection code, which follows *Numerical Recipes* | Fallback in the wide-angle entrance-pupil search when the secant method does not converge | [BeamFour](https://github.com/StellarSoftwareBerkeley/BeamFour); W. H. Press et al., *Numerical Recipes in C*, 2nd ed. (1992) |
+| FFT calculations | Ported jfftpack routines with project FFT utilities | `FFTUtilTest`, plus the upstream PSF and analytical diffraction-MTF checks | [jfftpack license and attribution](LICENSE-jfftpack.txt) |
+| Glass-catalog lookup and wavelength-dependent refractive indices | Project catalog integration and AGF formulas; `nd`/`vd` dispersion comes from GNU Optical | Glass-catalog and importer tests; no general upstream dispersion-equivalence claim | [Glass catalogs](Documentation/GLASS_CATALOGS.md) |
+| Lens layout construction | Project implementation | `Layout2DTest` and `Layout2DIntegrationTest` | [LensTool2](Documentation/LENSTOOL2.md) |
+| Plotting and SVG rendering | Derived from GNU Optical; used by the project's layout and analysis outputs | Plotting and SVG renderer tests, plus layout integration tests | [GNU Optical](https://www.gnu.org/software/goptical/); [license notices](#license) |
+| Analysis reports, importers and exporters | Project implementation | Report, importer and exporter tests; model-construction comparisons also check imported geometry | [LensTool2](Documentation/LENSTOOL2.md) |
+
 
 ## Related Projects
 

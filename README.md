@@ -1,12 +1,12 @@
 # Beam42 Optical Ray Tracer
 
-This project is an attempt to create a basic geometric optical analysis software. My interest is mostly in analyzing 
+This project aims to create a basic geometric optical analysis software. My interest is mostly in analyzing 
 photographic lens designs.
 
 The project combines solutions from the following open source projects:
 
-* **BEAM FOUR** - incorporates [BeamFour](https://github.com/StellarSoftwareBerkeley/BeamFour), originally written by the late [Michael Lampton](https://web.archive.org/web/20220919091447/http://www.ssl.berkeley.edu/~mlampton/).
 * **RayOptics** - a Java port of Michael Hayford's [Ray-Optics](https://github.com/mjhoptics/ray-optics).
+* **BEAM FOUR** - incorporates [BeamFour](https://github.com/StellarSoftwareBerkeley/BeamFour), originally written by the late [Michael Lampton](https://web.archive.org/web/20220919091447/http://www.ssl.berkeley.edu/~mlampton/).
 
 ## Features and Goals
 
@@ -14,29 +14,25 @@ The project has two fairly independent components:
 
 ### RayOptics
 
-* This is derived from Michael Hayford's Ray-Optics project. This version is mainly focused on photographic lenses.
-* The foundational optical computations (optical system definition, ray aiming and tracing, transverse and wavefront
-  aberrations, and vignetting) are ported from upstream Ray-Optics and checked numerically against the original
-  implementation. The extensions listed below build on this foundation.
+* This is derived from Michael Hayford's [Ray-Optics](https://github.com/mjhoptics/ray-optics) project. This version is mainly focused on photographic lenses.
 * Can import lens specifications in the format supported by [PhotonsToPhotos Optical Bench](https://www.photonstophotos.net/GeneralTopics/Lenses/OpticalBench/OpticalBenchHub.htm).
 * Can export to Zemax, BEAM FOUR, MJH Ray Optics.
 * Features [a command line tool](Documentation/LENSTOOL2.md) that takes in the lens specification and generates the following outputs:
     * Spot diagrams (SVG)
     * Layout diagrams (SVG)
-    * Geometric MTF by Field plots (SVG)
+    * Geometric / Diffraction MTF by Field plots (SVG)
     * Ray aberration plots
     * OPD plots
     * Paraxial report
     * Zemax file
-    * A markdown README that brings together all of the above
+    * A markdown README that brings together above
     * For examples see links below.
 * Features [an optimizer](Documentation/OPTIMIZER.md) with the following capabilities:
     * Set variables on surface properties, widths. Aspherics are supported.
     * Set goals targeting MTF, ray aberrations or spot sizes.
     * Constrain by paraxial parameters.
     * Constrain curvatures and thicknesses to avoid altering the design drastically.
-    * Weights can be set to influence the outcome.
-    * The underlying solver is the MINPACK Levenberg-Marquardt solver; constraints are implemented by assigning weights.
+    * Add weights to influence the outcome.
 
 ### BeamFour
 
@@ -105,11 +101,6 @@ Citations follow the style used by Optica (formerly OSA) journals: author(s), "t
   Optica Acta 28, 667–714 (1981), [doi:10.1080/713820605](https://doi.org/10.1080/713820605).
   RayOptics calculation of optical path difference is based on this paper.
 
-* G. W. Forbes, "Optical system assessment for design: numerical ray tracing in the Gaussian pupil,"
-  J. Opt. Soc. Am. A 5, 1943–1956 (1988), [doi:10.1364/JOSAA.5.001943](https://doi.org/10.1364/JOSAA.5.001943);
-  erratum, J. Opt. Soc. Am. A 6, 1123 (1989), [doi:10.1364/JOSAA.6.001123](https://doi.org/10.1364/JOSAA.6.001123).
-  Original paper on the Gaussian quadrature pupil sampling pattern. Very effective!
-
 * A. Mikš, "Dependence of the wave-front aberration on the radius of the reference sphere,"
   J. Opt. Soc. Am. A 19, 1187–1190 (2002),
   [doi:10.1364/JOSAA.19.001187](https://doi.org/10.1364/JOSAA.19.001187).
@@ -119,10 +110,10 @@ Citations follow the style used by Optica (formerly OSA) journals: author(s), "t
   [doi:10.1090/S0025-5718-69-99647-1](https://doi.org/10.1090/S0025-5718-69-99647-1).
   Nodes and weights from the eigenvalues and eigenvectors of a tridiagonal Jacobi matrix.
 
-* J. J. Moré, B. S. Garbow, and K. E. Hillstrom, *User Guide for MINPACK-1*, Argonne National Laboratory
-  report ANL-80-74 (1980),
-  [doi:10.2172/6997568](https://doi.org/10.2172/6997568).
-  Nonlinear equation and least-squares solvers used for ray aiming and optimization.
+* G. W. Forbes, "Optical system assessment for design: numerical ray tracing in the Gaussian pupil,"
+  J. Opt. Soc. Am. A 5, 1943–1956 (1988), [doi:10.1364/JOSAA.5.001943](https://doi.org/10.1364/JOSAA.5.001943);
+  erratum, J. Opt. Soc. Am. A 6, 1123 (1989), [doi:10.1364/JOSAA.6.001123](https://doi.org/10.1364/JOSAA.6.001123).
+  Original paper on the Gaussian quadrature pupil sampling pattern. Very effective!
 
 * B. J. Bauman and H. Xiao, "Gaussian quadrature for optical design with noncircular pupils and fields, and broad
   wavelength range," in *International Optical Design Conference 2010*, Proc. SPIE 7652, 76522S (2010),
@@ -130,14 +121,20 @@ Citations follow the style used by Optica (formerly OSA) journals: author(s), "t
   Open-access version: LLNL-CONF-442492,
   [UNT Digital Library](https://digital.library.unt.edu/ark:/67531/metadc865679/).
 
-* T. Steinich and V. Blahnik, "Optical design of camera optics for mobile phones," Adv. Opt. Technol. 1, 51–58 (2012),
-  [doi:10.1515/aot-2012-0002](https://doi.org/10.1515/aot-2012-0002).
-  Source of the wavelength weights used for the weighted polychromatic MTF.
-
 * E. Elliott, K. Moore, C. Normanshire, S. Gay, J. Aiona, and M. G. Nicholson, "Contrast optimization: a faster and
   better technique for optimizing on MTF," in *International Optical Design Conference 2017*, Proc. SPIE 10590,
   1059014 (2017), [doi:10.1117/12.2292761](https://doi.org/10.1117/12.2292761).
   Very effective optimization approach that directly targets MTF.
+
+* J. J. Moré, B. S. Garbow, and K. E. Hillstrom, *User Guide for MINPACK-1*, Argonne National Laboratory
+  report ANL-80-74 (1980),
+  [doi:10.2172/6997568](https://doi.org/10.2172/6997568).
+  Nonlinear equation and least-squares solvers used for ray aiming and optimization.
+
+* T. Steinich and V. Blahnik, "Optical design of camera optics for mobile phones," Adv. Opt. Technol. 1, 51–58 (2012),
+  [doi:10.1515/aot-2012-0002](https://doi.org/10.1515/aot-2012-0002).
+  Source of the wavelength weights used for the weighted polychromatic MTF.
+
 
 ## RayOptics Computations and verification
 
@@ -145,21 +142,27 @@ The RayOptics module is in large part based on foundational work done by others.
 
 ### Ray-Optics foundation
 
-The biggest piece is ported from on [Michael Hayford's Python Ray-Optics](https://github.com/mjhoptics/ray-optics).
+The biggest piece is ported from on Michael Hayford's [Ray-Optics](https://github.com/mjhoptics/ray-optics).
+Unless specified otherwise the results are verified by capturing results
+from upstream and comparing them to project generated results. Discrepancies
+in results are due to differences in math functions between Python libs and
+Java; results can differ even though mathematical operations are identical.
 
-| Computation | Origin and implementation | Verification | Reference |
-| --- | --- | --- | --- |
-| Sequential optical model: surfaces, gaps, apertures, fields, wavelengths and coordinate transforms | Ported model and specification classes | Model-construction comparisons with upstream's optical-bench importer; generated ray tests exercise the resulting geometry | [Ray-Optics](https://github.com/mjhoptics/ray-optics) |
-| Surface sag, normals and intersections: spherical, conic, even-polynomial and radial-polynomial aspheres | Ported surface profiles | Upstream comparison of ray intersection points and normals across the five lens models | [Spencer and Murty (1962)](https://doi.org/10.1364/JOSA.52.000672) |
-| Sequential real-ray tracing: local coordinates, refraction, reflection and optical path | Ported `RayTrace` kernel | Upstream comparison of per-surface points, directions, distances, normals and optical-path increments for sampled lens rays | [Spencer and Murty (1962)](https://doi.org/10.1364/JOSA.52.000672) |
-| Paraxial tracing and first-order properties: focal lengths, principal planes, pupils, numerical apertures, magnification and optical invariant | Ported `FirstOrder`, `ParaxModel` and supporting calculations | Upstream comparison of axial and principal paraxial rays and all `FirstOrderData` fields | Ray-Optics |
-| Third-order aberrations: Seidel sums and aspheric contributions | Ported `ThirdOrder` calculations | Upstream comparison of per-surface coefficients and totals | Ray-Optics |
-| Chief-ray and pupil aiming, including wide-angle entrance-pupil location | Ported `Trace` and `Wideangle` calculations, using Java numerical solvers | Upstream comparison of aim coordinates or entrance-pupil position, including the wide-angle case | Ray-Optics |
-| Vignetting factors and pupil-coordinate mapping | Ported `VigCalc` and field calculations | Upstream comparison of the four vignetting factors per field; caller-array mutation differs as noted below | Ray-Optics |
-| Transverse ray aberrations and defocus | Ported ray/image-plane geometry, exposed through project analysis classes | Upstream comparison of x/y aberration fans by field and wavelength | Ray-Optics |
-| Wavefront aberration and optical path difference (OPD), including refocusing and finite/infinite reference-sphere calculations | Ported `WaveAbr`; project analysis classes provide fan evaluation | Upstream comparison of OPD fans and selected wavefront-grid values; additional geometric tests for the finite reference sphere | [Hopkins (1981)](https://doi.org/10.1080/713820605); [Mikš (2002)](https://doi.org/10.1364/JOSAA.19.001187) |
-| Wavefront grids, FFT point-spread function (PSF) and PSF sampling/scaling | Ported `RayGrid` and `Analyses`, with a project correction to pupil masking | `AnalysesTest` compares selected upstream grid OPDs, refocusing, PSF values and sampling; zero-OPD and piston-invariance tests cover the correction | Ray-Optics |
-| Grid-sampled spot intercepts | Ported `SpotAnalysis.spot()` and `eval_grid()` | Project spot-analysis tests; the generated upstream suite compares ray fans rather than a separate spot-grid result | Ray-Optics |
+The methodology used for these tests is covered in [UPSTREAM_VERIFICATION.md](Documentation/UPSTREAM_VERIFICATION.md).
+
+| Computation                                                                                                                                    | Origin and implementation                                                   | Verification                                                            | Reference                                                                                                   |
+|------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|-------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|
+| Sequential optical model: surfaces, gaps, apertures, fields, wavelengths and coordinate transforms                                             | Ported model and specification classes                                      | Upstream comparison                                                     | [Ray-Optics](https://github.com/mjhoptics/ray-optics)                                                       |
+| Surface sag, normals and intersections: spherical, conic, even-polynomial and radial-polynomial aspheres                                       | Ported surface profiles                                                     | Upstream comparison                                                     | [Spencer and Murty (1962)](https://doi.org/10.1364/JOSA.52.000672)                                          |
+| Sequential real-ray tracing: local coordinates, refraction, reflection and optical path                                                        | Ported `RayTrace` kernel                                                    | Upstream comparison                                                     | [Spencer and Murty (1962)](https://doi.org/10.1364/JOSA.52.000672)                                          |
+| Paraxial tracing and first-order properties: focal lengths, principal planes, pupils, numerical apertures, magnification and optical invariant | Ported `FirstOrder`, `ParaxModel` and supporting calculations               | Upstream comparison                                                     | Ray-Optics                                                                                                  |
+| Third-order aberrations: Seidel sums and aspheric contributions                                                                                | Ported `ThirdOrder` calculations                                            | Upstream comparison                                                     | Ray-Optics                                                                                                  |
+| Chief-ray and pupil aiming, including wide-angle entrance-pupil location                                                                       | Ported `Trace` and `Wideangle` calculations, using Java numerical solvers   | Upstream comparison                                                     | Ray-Optics                                                                                                  |
+| Vignetting factors and pupil-coordinate mapping                                                                                                | Ported `VigCalc` and field calculations                                     | Upstream comparison                                                     | Ray-Optics                                                                                                  |
+| Transverse ray aberrations and defocus                                                                                                         | Ported ray/image-plane geometry, exposed through project analysis classes   | Upstream comparison                                                     | Ray-Optics                                                                                                  |
+| Wavefront aberration and optical path difference (OPD), including refocusing and finite/infinite reference-sphere calculations                 | Ported `WaveAbr`; project analysis classes provide fan evaluation           | Upstream comparison                                                     | [Hopkins (1981)](https://doi.org/10.1080/713820605); [Mikš (2002)](https://doi.org/10.1364/JOSAA.19.001187) |
+| Wavefront grids, FFT point-spread function (PSF) and PSF sampling/scaling                                                                      | Ported `RayGrid` and `Analyses`, with a project correction to pupil masking | Upstream comparison                                                     | Ray-Optics                                                                                                  |
+| Grid-sampled spot intercepts                                                                                                                   | Ported `SpotAnalysis.spot()` and `eval_grid()`                              | Upstream comparison of ray fans rather than a separate spot-grid result | Ray-Optics                                                                                                  |
 
 * The port uses Java solvers in place of SciPy, so solver-dependent results can differ within convergence tolerances.
 * An intentional difference with upstream is that PSF calculation retains valid zero-OPD pupil samples

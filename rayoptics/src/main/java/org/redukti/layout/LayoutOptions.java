@@ -14,9 +14,12 @@ public final class LayoutOptions {
     public boolean clipRays = false;
     public int surfaceSamples = 101;
     public double margin = 0.05;
+    /** Index of the field whose reference spheres are drawn; null draws none. */
+    public Integer referenceSphereField = null;
 
     public LayoutOptions fanRayCount(int count) { this.fanRayCount = count; return this; }
     public LayoutOptions useTraceFan(boolean value) { this.useTraceFan = value; return this; }
     public LayoutOptions drawReferenceRays(boolean value) { this.drawReferenceRays = value; return this; }
     public LayoutOptions clipRays(boolean value) { this.clipRays = value; return this; }
+    public LayoutOptions referenceSphereField(int field) { this.referenceSphereField = field; return this; }
 }

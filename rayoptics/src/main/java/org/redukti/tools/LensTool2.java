@@ -608,6 +608,16 @@ public class LensTool2 {
                 config);
     }
 
+    /** Draws one field's reference spheres over the layout. Not linked from the README. */
+    private static void doReferenceSphereDiagram(Prescription prescription, Args arguments, int config, String filename_suffix) throws Exception {
+        double[] fields = {0.0, arguments.reference_sphere_field};
+        var opm = createSystem(prescription, true, LAYOUT_VIG_TYPE, true, fields, config);
+        String diagram = new Layout2D().renderSvg(opm, 1000, 500,
+                new LayoutOptions().drawReferenceRays(false).referenceSphereField(1));
+        Files.writeString(Helper.getOutputFileWithPath(arguments.specfile,
+                suffixed_name("layout-reference-spheres",filename_suffix,".svg"),arguments.outdir), diagram);
+    }
+
     public static void doLayoutDiagrams(Prescription prescription,Args arguments, int config, String filename_suffix) throws Exception {
         // First we use rayoptics to get ray starts
         // For very wide angle lenses, blindly spraying rays doesn't work very well
@@ -839,6 +849,8 @@ public class LensTool2 {
             System.err.println("       --output-pupil-maps writes pupil[-semi-skew|-skew].svg and pupil-report.txt: the part of each field's pupil the lens passes,");
             System.err.println("         the surface that blocks the rest, and how well the vignetting factors describe it; --pupil-map-samples sets the grid, default "
                     + PupilMapAnalysis.DEFAULT_NUM_SAMPLES);
+            System.err.println("       --output-reference-spheres writes layout-reference-spheres.svg: experimental, the chief and rim rays of one field");
+            System.err.println("         with the reference spheres at its real entrance and exit pupils; --reference-sphere-field sets the relative field, default 1.0");
             System.err.println("       --output-wavelength-mtf-report writes mtf-w-wavelength-report.txt: the monochromatic geometric MTF");
             System.err.println("         per --mtf frequency, wavelength, orientation and field, in the layout of the contrast report");
             System.err.println("       --output-diffraction-mtf writes mtf-diffraction.svg/.csv and mtf-diffraction-w.svg/.csv: the polychromatic");
@@ -918,6 +930,8 @@ public class LensTool2 {
                 Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile, suffixed_name("vig", scenario_filesuffix, ".txt"), arguments.outdir), osp.list_str(new StringBuilder()).toString());
                 Helper.createOutputFile(Helper.getOutputFileWithPath(arguments.specfile, suffixed_name("paraxial", scenario_filesuffix, ".txt"), arguments.outdir), fod.toString());
                 doLayoutDiagrams(outputPrescription, arguments, config, scenario_filesuffix);
+                if (arguments.output_reference_spheres)
+                    doReferenceSphereDiagram(outputPrescription, arguments, config, scenario_filesuffix);
 
 //            StringBuilder buf = new StringBuilder();
 //            for (int i = 0; i < fields.length; i++) {

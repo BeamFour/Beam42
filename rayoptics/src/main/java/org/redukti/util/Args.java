@@ -96,6 +96,10 @@ public final class Args {
      * {@link PupilMapAnalysis}.
      */
     public boolean output_pupil_maps = false;
+    /** Draw a layout with one field's chief and rim rays and its reference spheres. Experimental. */
+    public boolean output_reference_spheres = false;
+    /** Relative field drawn by --output-reference-spheres. */
+    public double reference_sphere_field = 1.0;
     /**
      * Write the contrast OPD differences beside the other reports, at each --mtf
      * frequency. See {@link org.redukti.analysis.ContrastReport}.
@@ -206,6 +210,13 @@ public final class Args {
             }
             else if (arg1.equals("--output-pupil-maps")) {
                 arguments.output_pupil_maps = true;
+            }
+            else if (arg1.equals("--output-reference-spheres")) {
+                arguments.output_reference_spheres = true;
+            }
+            else if (arg1.equals("--reference-sphere-field")) {
+                arguments.reference_sphere_field = parse_relative_field(arg1, arg2);
+                i++;
             }
             else if (arg1.equals("--output-contrast-report")) {
                 arguments.output_contrast_report = true;
@@ -445,6 +456,20 @@ public final class Args {
     /** The accepted --use-spot-pattern spellings, for usage and error messages. */
     public static String spot_pattern_names() {
         return "hex, grid, gaussian";
+    }
+
+    private static double parse_relative_field(String option, String value) {
+        if (value == null)
+            throw new IllegalArgumentException(option + " requires a relative field from 0 to 1");
+        try {
+            double parsed = Double.parseDouble(value);
+            if (!(parsed >= 0.0 && parsed <= 1.0))
+                throw new IllegalArgumentException(option + " must be from 0 to 1, got " + value);
+            return parsed;
+        }
+        catch (NumberFormatException e) {
+            throw new IllegalArgumentException(option + " must be from 0 to 1, got " + value);
+        }
     }
 
     private static int parse_positive_int(String option, String value) {

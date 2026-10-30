@@ -17,14 +17,18 @@ import org.redukti.rayoptics.raytr.TraceOptions;
 import org.redukti.rayoptics.seq.Interface;
 import org.redukti.rayoptics.seq.SequentialModel;
 import org.redukti.rayoptics.specs.Field;
+import org.redukti.render.rendering.Renderer;
 import org.redukti.render.rendering.RendererSvg;
 import org.redukti.render.rendering.RendererViewport;
 import org.redukti.render.rendering.Rgb;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 /** Draws a static y-z (meridional) view of a rayoptics model. */
 public final class Layout2D {
@@ -36,13 +40,40 @@ public final class Layout2D {
             Rgb.rgb_cyan, Rgb.rgb_yellow
     };
 
+    private static final Rgb CHIEF_RAY_COLOR = Rgb.rgb_red;
+    private static final Rgb RIM_RAY_COLOR = Rgb.rgb_blue;
+    private static final Rgb SPHERE_COLOR = Rgb.rgb_green;
+
     private static final double STOP_STROKE_WIDTH = 2.5;
+    private static final double SPHERE_STROKE_WIDTH = 1.5;
+    private static final String VIRTUAL_RAY_DASHES = "6,4";
+    private static final int SPHERE_SAMPLES = 65;
+    /** A reference surface extends past the rim rays by this fraction of its span. */
+    private static final double SPHERE_OVERHANG = 0.1;
+    /** Length of the incident rays in front of their first feature, relative to the lens. */
+    private static final double RAY_LEAD = 0.15;
+    /** A pupil further than this from the lens, in lens lengths, is not drawn. */
+    private static final double MAX_PUPIL_DISTANCE = 3.0;
+    private static final int LABEL_SIZE = 12;
+    private static final double CAPTION_LINE_PIXELS = 16.0;
 
     /** A renderer-independent path, retained until the viewport bounds are known. */
-    private record Polyline(List<Vector2> points, Rgb color, double strokeWidth) {
+    private record Polyline(List<Vector2> points, Rgb color, double strokeWidth, String dashes) {
         private Polyline(List<Vector2> points, Rgb color) {
-            this(points, color, 1.0);
+            this(points, color, 1.0, null);
         }
+        private Polyline(List<Vector2> points, Rgb color, double strokeWidth) {
+            this(points, color, strokeWidth, null);
+        }
+    }
+
+    /** A marked point; retained like Polyline, and not counted in the viewport. */
+    private record Marker(Vector2 point, String label, Rgb color, Renderer.PointStyle style) {}
+
+    /** Reference sphere annotations gathered while the geometry is built. */
+    private static final class Annotations {
+        final List<Marker> markers = new ArrayList<>();
+        final List<String> caption = new ArrayList<>();
     }
 
     /** Renders a complete layout into a standalone SVG document. */
@@ -69,10 +100,22 @@ public final class Layout2D {
         List<Polyline> geometry = new ArrayList<>();
         if (options.drawElements) addElements(geometry, model, elementModel, options.surfaceSamples);
         if (options.drawReferenceRays || options.fanRayCount > 0) addRays(geometry, model, options);
+        Annotations annotations = new Annotations();
+        if (options.referenceSphereField != null)
+            addReferenceSpheres(geometry, annotations, model, options);
 
         Bounds bounds = bounds(geometry);
         if (!bounds.valid()) bounds = modelBounds(model);
         bounds.pad(options.margin);
+        double unitsPerPixel = 0.0;
+        if (!annotations.caption.isEmpty()) {
+            // The caption has a fixed size in pixels, so reserve it at the final scale
+            Vector2 resolution = renderer.get_2d_output_res();
+            double captionPixels = annotations.caption.size() * CAPTION_LINE_PIXELS + CAPTION_LINE_PIXELS / 2.0;
+            unitsPerPixel = Math.max((bounds.maxX - bounds.minX) / resolution.x(),
+                    (bounds.maxY - bounds.minY) / (resolution.y() - captionPixels));
+            bounds.maxY += captionPixels * unitsPerPixel;
+        }
         renderer.set_window(new Vector2Pair(new Vector2(bounds.minX, bounds.minY),
                 new Vector2(bounds.maxX, bounds.maxY)), true);
 
@@ -80,12 +123,157 @@ public final class Layout2D {
             renderer.draw_segment(new Vector2(bounds.minX, 0.0), new Vector2(bounds.maxX, 0.0), AXIS_COLOR);
         for (Polyline line : geometry) {
             renderer.set_stroke_width(line.strokeWidth);
+            renderer.set_stroke_dasharray(line.dashes);
             if (line.points.size() == 2)
                 renderer.draw_segment(line.points.get(0), line.points.get(1), line.color);
             else if (line.points.size() > 2)
                 renderer.draw_polygon(line.points.toArray(new Vector2[0]), line.color, false, false);
         }
         renderer.set_stroke_width(1.0);
+        renderer.set_stroke_dasharray(null);
+        drawAnnotations(renderer, annotations, bounds, unitsPerPixel);
+    }
+
+    /** Draws the pupil markers, then the caption at the top left of the drawing. */
+    private void drawAnnotations(RendererViewport renderer, Annotations annotations, Bounds bounds,
+                                 double unitsPerPixel) {
+        Vector2 right = new Vector2(1.0, 0.0);
+        for (Marker marker : annotations.markers) {
+            renderer.draw_point(marker.point, marker.color, marker.style);
+            if (marker.label != null)
+                renderer.draw_text(marker.point, right, marker.label,
+                        EnumSet.of(Renderer.TextAlignMask.TextAlignLeft, Renderer.TextAlignMask.TextAlignBottom),
+                        LABEL_SIZE, marker.color);
+        }
+        double y = bounds.maxY;
+        for (String line : annotations.caption) {
+            renderer.draw_text(new Vector2(bounds.minX, y), right, line,
+                    EnumSet.of(Renderer.TextAlignMask.TextAlignLeft, Renderer.TextAlignMask.TextAlignTop),
+                    LABEL_SIZE, ELEMENT_COLOR);
+            y -= CAPTION_LINE_PIXELS * unitsPerPixel;
+        }
+    }
+
+    /**
+     * Overlays one field's chief and rim rays and its reference spheres. Object
+     * and image space segments are continued to the spheres, dashed where the
+     * continuation is virtual.
+     */
+    private void addReferenceSpheres(List<Polyline> out, Annotations annotations,
+                                     OpticalModel model, LayoutOptions options) {
+        SequentialModel sm = model.seq_model;
+        Field field = model.optical_spec.fov.fields[options.referenceSphereField];
+        double wavelength = sm.central_wavelength();
+        ReferenceSpheres spheres = ReferenceSpheres.compute(model, field, wavelength, traceOptions(options));
+
+        double firstZ = sm.gbl_tfrms.get(1).t.z;
+        double lastZ = sm.gbl_tfrms.get(sm.gbl_tfrms.size() - 2).t.z;
+        double imageZ = sm.gbl_tfrms.get(sm.gbl_tfrms.size() - 1).t.z;
+        double length = Math.abs(imageZ - firstZ);
+        boolean drawEntrance = nearLens(spheres.entrance, firstZ, imageZ, length);
+        boolean drawExit = nearLens(spheres.exit, firstZ, imageZ, length);
+
+        addReferenceRay(out, sm, spheres.chief, spheres, CHIEF_RAY_COLOR, drawEntrance, drawExit, length);
+        for (ReferenceSpheres.Ray rim : spheres.rims)
+            addReferenceRay(out, sm, rim, spheres, RIM_RAY_COLOR, drawEntrance, drawExit, length);
+
+        List<ReferenceSpheres.Ray> rays = new ArrayList<>(spheres.rims);
+        rays.add(spheres.chief);
+        if (drawEntrance) addSection(out, annotations, spheres.entrance, "E", spheres.chief.incidentDir(),
+                rays.stream().map(ReferenceSpheres.Ray::entranceHit).toList());
+        if (drawExit) addSection(out, annotations, spheres.exit, "E'", spheres.chief.emergentDir(),
+                rays.stream().map(ReferenceSpheres.Ray::exitHit).filter(Objects::nonNull).toList());
+
+        annotations.caption.add(String.format(Locale.ROOT,
+                "Field %.3f, %.1f deg, %.1f nm. Red chief ray, blue rim rays, green reference surfaces, dashed virtual, grey paraxial pupils",
+                Math.max(Math.abs(field.x), Math.abs(field.y)),
+                Math.toDegrees(Math.atan2(spheres.chief.incidentDir().y(), spheres.chief.incidentDir().x())),
+                wavelength));
+        annotations.caption.add(String.format(Locale.ROOT, "E %s, %s from first surface, paraxial %.3f%s",
+                spheres.entrance.isPlane() ? "(plane)" : String.format(Locale.ROOT, "(R %.3f)", spheres.entrance.radius()),
+                String.format(Locale.ROOT, "%.3f", spheres.entrance.pupil().x() - firstZ),
+                spheres.entrance.paraxialPupil().x() - firstZ, drawEntrance ? "" : ", not drawn"));
+        annotations.caption.add(String.format(Locale.ROOT, "E' (R %.3f), %.3f from last surface, paraxial %.3f%s",
+                spheres.exit.radius(), spheres.exit.pupil().x() - lastZ,
+                spheres.exit.paraxialPupil().x() - lastZ, drawExit ? "" : ", not drawn"));
+    }
+
+    /** Reports whether a pupil is close enough to the lens to share a drawing with it. */
+    private static boolean nearLens(ReferenceSpheres.Section section, double firstZ, double imageZ, double length) {
+        double z = section.pupil().x();
+        double limit = MAX_PUPIL_DISTANCE * length;
+        return Double.isFinite(z) && z > Math.min(firstZ, imageZ) - limit && z < Math.max(firstZ, imageZ) + limit;
+    }
+
+    /** Draws a ray through the lens, its incident lead-in and its continuations to the spheres. */
+    private void addReferenceRay(List<Polyline> out, SequentialModel sm, ReferenceSpheres.Ray ray,
+                                 ReferenceSpheres spheres, Rgb color,
+                                 boolean drawEntrance, boolean drawExit, double length) {
+        addRay(out, sm, ray.pkg(), color);
+
+        Vector2 first = ray.firstPoint();
+        Vector2 incident = ray.incidentDir();
+        double hitDistance = drawEntrance ? alongRay(first, incident, ray.entranceHit()) : 0.0;
+        double lead = length * RAY_LEAD - Math.min(hitDistance, 0.0);
+        Vector2 centre = spheres.entrance.centre();
+        if (centre != null)
+            lead = Math.min(lead, alongRay(centre, incident, first));
+        out.add(new Polyline(List.of(pointAlong(first, incident, -lead), first), color));
+        if (hitDistance > 0.0)
+            out.add(new Polyline(List.of(first, ray.entranceHit()), color, 1.0, VIRTUAL_RAY_DASHES));
+
+        Vector2 exitHit = ray.exitHit();
+        if (drawExit && exitHit != null && alongRay(ray.lastPoint(), ray.emergentDir(), exitHit) < 0.0)
+            out.add(new Polyline(List.of(ray.lastPoint(), exitHit), color, 1.0, VIRTUAL_RAY_DASHES));
+    }
+
+    /** Draws a reference surface over the span of the rays, and marks its pupil. */
+    private void addSection(List<Polyline> out, Annotations annotations, ReferenceSpheres.Section section,
+                            String label, Vector2 chiefDirection, List<Vector2> hits) {
+        Vector2 pupil = section.pupil();
+        List<Vector2> points = new ArrayList<>();
+        if (section.isPlane()) {
+            Vector2 tangent = new Vector2(-chiefDirection.y(), chiefDirection.x());
+            double low = 0.0, high = 0.0;
+            for (Vector2 hit : hits) {
+                double offset = alongRay(pupil, tangent, hit);
+                low = Math.min(low, offset);
+                high = Math.max(high, offset);
+            }
+            double overhang = (high - low) * SPHERE_OVERHANG;
+            points.add(pointAlong(pupil, tangent, low - overhang));
+            points.add(pointAlong(pupil, tangent, high + overhang));
+        } else {
+            Vector2 centre = section.centre();
+            double reference = angle(centre, pupil);
+            double low = 0.0, high = 0.0;
+            for (Vector2 hit : hits) {
+                double delta = Math.IEEEremainder(angle(centre, hit) - reference, 2.0 * Math.PI);
+                low = Math.min(low, delta);
+                high = Math.max(high, delta);
+            }
+            double overhang = (high - low) * SPHERE_OVERHANG;
+            for (int i = 0; i < SPHERE_SAMPLES; i++) {
+                double theta = reference + low - overhang
+                        + (high - low + 2.0 * overhang) * i / (SPHERE_SAMPLES - 1.0);
+                points.add(pointAlong(centre, new Vector2(Math.cos(theta), Math.sin(theta)), section.radius()));
+            }
+        }
+        out.add(new Polyline(points, SPHERE_COLOR, SPHERE_STROKE_WIDTH));
+        annotations.markers.add(new Marker(pupil, label, SPHERE_COLOR, Renderer.PointStyle.PointStyleCross));
+        annotations.markers.add(new Marker(section.paraxialPupil(), null, AXIS_COLOR, Renderer.PointStyle.PointStyleRound));
+    }
+
+    private static double alongRay(Vector2 from, Vector2 direction, Vector2 to) {
+        return (to.x() - from.x()) * direction.x() + (to.y() - from.y()) * direction.y();
+    }
+
+    private static Vector2 pointAlong(Vector2 from, Vector2 direction, double distance) {
+        return new Vector2(from.x() + direction.x() * distance, from.y() + direction.y() * distance);
+    }
+
+    private static double angle(Vector2 centre, Vector2 point) {
+        return Math.atan2(point.y() - centre.y(), point.x() - centre.x());
     }
 
     /** Dispatches inferred physical elements to their geometry builders. */

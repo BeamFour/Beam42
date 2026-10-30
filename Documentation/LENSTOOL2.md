@@ -315,6 +315,8 @@ Everything else has a default.
 | `--output-pupil-maps` | off | Additionally measure and draw which part of each field's pupil the lens passes, and which surface blocks the rest. See below.  Not linked to the README.                                                                                                                                                                                                       |
 | `--pupil-map-samples <n>` | 121 | Samples per axis in a pupil map. Only consulted with `--output-pupil-maps`. Minimum 2.                                                                                                                                                                                                                                                                         |
 | `--output-wavelength-mtf-report` | off | Additionally write the monochromatic geometric MTF per frequency, wavelength, orientation and field, in the layout of the contrast report. See below. Not linked to the README. |
+| `--output-reference-spheres` | off | Experimental. Additionally draw one field's chief and rim rays with its reference spheres. See below. Not linked to the README. |
+| `--reference-sphere-field <f>` | 1.0 | Relative field drawn by `--output-reference-spheres`, from 0 to 1. |
 | `--output-diffraction-mtf` | off | Additionally write the polychromatic diffraction MTF by field, for the same wavelengths and weights as the geometric MTF plots. Not linked to the README. |
 | `--diffraction-pupil-rays <N>` | `64` | Rays across each axis of the diffraction pupil grid. N must be even and at least 4. Both diffraction output sets use an N x N pupil grid and a 2N x 2N FFT. Larger values increase cost and can reduce aliasing; sampling is not increased automatically. A warning is printed for each field whose geometric spot does not fit the PSF window, with the N that would hold it. |
 | `--export-vignetting` | off | Add a `[vignetting]` section to the generated `prescription.txt`, holding the vignetting factors of each field and configuration, and write the same fields and factors to the Zemax file. See [`prescription.txt` round trips](#prescriptiontxt-round-trips). |
@@ -382,6 +384,25 @@ pattern is chosen.
 `gaussian` is an efficient choice, particularly for the optimizer; see
 [GAUSSIAN_QUADRATURE.md](GAUSSIAN_QUADRATURE.md) for the implementation details. `hex` is the default and used by the committed
 reports under `Examples/`.
+
+### Reference spheres
+
+`--output-reference-spheres` is experimental. It writes a layout with the chief and
+upper and lower rim rays of one field, at the central wavelength, and the reference
+surfaces of that field.
+
+* `E` is the real entrance pupil found by ray aiming. `E'` is where the chief ray
+  crosses the axis in image space, or the paraxial exit pupil for the axial field. Both
+  move with field. A grey circle marks each paraxial pupil. The caption gives both
+  distances.
+* The entrance surface is a plane normal to the chief ray for an object at infinity,
+  and otherwise a sphere centred on the object point.
+* The exit sphere is centred where the chief ray meets the image plane and passes
+  through `E'`, as in the OPD calculation. See [OPD.md](OPD.md).
+* Each surface spans the rim rays and 10% beyond. Dashed lines are virtual ray
+  continuations.
+* A pupil more than three lens lengths away is not drawn, and the caption says so.
+* The field is built with `set-pupil` and real ray aiming, as the layouts are.
 
 ### Pupil maps
 
@@ -487,6 +508,7 @@ spec with multiple configurations (a zoom, for instance).
 | `layout<suffix>.svg` | yes | Layout with reference rays.                                                                         |
 | `layoutonly<suffix>.svg` | yes | Elements only, no rays.                                                                             |
 | `layout-fan<suffix>.svg` | yes | Layout with a 9 ray fan. Generated but not currently linked from the report.                        |
+| `layout-reference-spheres<suffix>.svg` | `--output-reference-spheres` | Experimental. One field's chief and rim rays with its reference spheres. Not included in the README. |
 | `spot<suffix>.svg` | yes | Spot diagram, axial field.                                                                          |
 | `spot-semi-skew<suffix>.svg` | yes | Spot diagram, 0.7 field.                                                                            |
 | `spot-skew<suffix>.svg` | yes | Spot diagram, full field.                                                                           |

@@ -8,10 +8,10 @@ F-Number	2.9104	2.9103
 Image Height	43.266	43.266
 Magnification	0	0
 Bf	1.0	1.0
-d5	2.0014	53.1842
-d15	27.1298	2.0
-d29	5.1074	2.4998
-d32	14.5385	16.9614
+d5	1.9939721634400287	53.18426673158565
+d15	27.172491528929616	1.9985897049622432
+d29	5.083034181716018	2.5008794702760677
+d32	14.639500184728753	16.9514363541919
 d37	17.2805	17.2805
 [lens data]
 1	155.5198	1.5	1.8061	63.5	33.27	NBFD15	Hoya
@@ -72,7 +72,7 @@ original assignee	Tamron Co Ltd
 link	https://patents.google.com/patent/US20250076623A1/en
 [report data]
 lens name	Tamron 70-180mm F/2.8 Di III VXD G2
-status	Candidate
+status	Accepted
 scenarios	0	1
 names	70mm f2.8	180mm f2.8
 

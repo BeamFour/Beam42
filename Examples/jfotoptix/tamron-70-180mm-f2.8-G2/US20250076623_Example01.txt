@@ -93,7 +93,7 @@ current assignee	Tamron Co Ltd
 original assignee	Tamron Co Ltd
 link	https://patents.google.com/patent/US20250076623A1/en
 [report data]
-lens name	Tamron 70-180mm F/2.8 Di III VXD G2
+lens name	Tamron 70-180mm F2.8 Di III VC VXD G2
 scenarios	0	2
 names	70mm f2.8	180mm f2.8
 status	Accepted

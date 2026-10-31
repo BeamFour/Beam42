@@ -391,7 +391,7 @@ public class ContrastAnalysis {
             RayResult sagittal;
             RayResult tangential;
             if (aim_exit_pupil && reference.pkg != null) {
-                var referenceCoordinate = ExitPupilAiming.sphere_coord(
+                var referenceCoordinate = ExitPupilAiming.ref_sphere_intersection(
                         reference.pkg, fld.chief_ray, fld.ref_sphere);
                 if (referenceCoordinate == null) {
                     var error = new ExitPupilAiming.ExitPupilAimException(

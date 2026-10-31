@@ -46,14 +46,14 @@ public final class ExitPupilAiming {
     }
 
     /** Result of aiming one ray at a transverse coordinate on the reference sphere. */
-    public record Result(Vector2 pupil, RayResult ray, Vector3 exitCoordinate,
+    public record Result(Vector2 pupil, RayResult ray, Vector3 ref_sphere_intersect_in_exit_pupil_coord,
                          int iterations, double error) {
     }
 
     /**
-     * Aim a ray so its transverse coordinate on the exit-pupil reference sphere equals
-     * {@code targetExitPupilCoord}. The initial entrance-pupil coordinate is normally the traditional
-     * entrance-pupil displacement and is therefore already a close guess.
+     * Determine the entrance pupil coordinates for ray aiming such that the aimed
+     * ray get as close as possible to the desired target reference sphere coordinate
+     * in the coordinate system of the exit pupil.
      */
     public static Result aim(
             OpticalModel opticalModel,
@@ -78,16 +78,16 @@ public final class ExitPupilAiming {
         Evaluation current = evaluate(
                 opticalModel, pupil, targetExitPupilCoord, field, wavelength, traceOptions);
         if (current.ray.err != null) {
-            return new Result(pupil, current.ray, current.coordinate, 0, Double.NaN);
+            return new Result(pupil, current.ray, current.ref_sphere_intersect_in_exit_pupil_coord, 0, Double.NaN);
         }
-        if (current.coordinate == null)
+        if (current.ref_sphere_intersect_in_exit_pupil_coord == null)
             return failed(pupil, new ExitPupilAimException(
                     "Exit-pupil coordinate could not be computed"));
 
         for (int iteration = 0; iteration <= MAX_ITERATIONS; iteration++) {
             double error = current.residual.len();
             if (error <= targetTolerance) {
-                return new Result(pupil, current.ray, current.coordinate, iteration, error);
+                return new Result(pupil, current.ray, current.ref_sphere_intersect_in_exit_pupil_coord, iteration, error);
             }
             if (iteration == MAX_ITERATIONS) break;
 
@@ -97,12 +97,12 @@ public final class ExitPupilAiming {
             Evaluation yProbe = evaluate(opticalModel,
                     pupil.plus(new Vector2(0.0, ENTRANCE_STEP)), targetExitPupilCoord,
                     field, wavelength, traceOptions);
-            if (xProbe.coordinate == null || yProbe.coordinate == null) break;
+            if (xProbe.ref_sphere_intersect_in_exit_pupil_coord == null || yProbe.ref_sphere_intersect_in_exit_pupil_coord == null) break;
 
-            double j00 = (xProbe.coordinate.x - current.coordinate.x) / ENTRANCE_STEP;
-            double j10 = (xProbe.coordinate.y - current.coordinate.y) / ENTRANCE_STEP;
-            double j01 = (yProbe.coordinate.x - current.coordinate.x) / ENTRANCE_STEP;
-            double j11 = (yProbe.coordinate.y - current.coordinate.y) / ENTRANCE_STEP;
+            double j00 = (xProbe.ref_sphere_intersect_in_exit_pupil_coord.x - current.ref_sphere_intersect_in_exit_pupil_coord.x) / ENTRANCE_STEP;
+            double j10 = (xProbe.ref_sphere_intersect_in_exit_pupil_coord.y - current.ref_sphere_intersect_in_exit_pupil_coord.y) / ENTRANCE_STEP;
+            double j01 = (yProbe.ref_sphere_intersect_in_exit_pupil_coord.x - current.ref_sphere_intersect_in_exit_pupil_coord.x) / ENTRANCE_STEP;
+            double j11 = (yProbe.ref_sphere_intersect_in_exit_pupil_coord.y - current.ref_sphere_intersect_in_exit_pupil_coord.y) / ENTRANCE_STEP;
             double determinant = j00 * j11 - j01 * j10;
             if (!Double.isFinite(determinant) || Math.abs(determinant) < 1.0e-14) break;
 
@@ -119,7 +119,7 @@ public final class ExitPupilAiming {
                 Vector2 trialPupil = pupil.plus(new Vector2(dx * scale, dy * scale));
                 Evaluation trial = evaluate(opticalModel, trialPupil, targetExitPupilCoord,
                         field, wavelength, traceOptions);
-                if (trial.coordinate != null && trial.residual.len() < error) {
+                if (trial.ref_sphere_intersect_in_exit_pupil_coord != null && trial.residual.len() < error) {
                     accepted = trial;
                     acceptedPupil = trialPupil;
                     break;
@@ -132,7 +132,7 @@ public final class ExitPupilAiming {
 
         double finalError = current.residual.len();
         if (finalError <= acceptableTolerance)
-            return new Result(pupil, current.ray, current.coordinate,
+            return new Result(pupil, current.ray, current.ref_sphere_intersect_in_exit_pupil_coord,
                     MAX_ITERATIONS, finalError);
         return failed(pupil, new ExitPupilAimException(
                 "Exit-pupil aiming did not converge; residual=" + current.residual.len()
@@ -144,21 +144,34 @@ public final class ExitPupilAiming {
         return new Result(pupil, new RayResult(null, error), null, MAX_ITERATIONS, Double.NaN);
     }
 
-    private record Evaluation(RayResult ray, Vector3 coordinate, Vector2 residual) {
+    private record Evaluation(RayResult ray, Vector3 ref_sphere_intersect_in_exit_pupil_coord, Vector2 residual) {
     }
 
+    /**
+     * Traces a test ray for given pupil to determine the intersection of the test
+     * ray with the reference sphere associated with the Field. Returns the difference
+     * between the desired target and achieved intersection.
+     */
     private static Evaluation evaluate(
-            OpticalModel opticalModel, Vector2 pupil, Vector2 target,
+            OpticalModel opticalModel, Vector2 pupil, Vector2 targetRefSphereIntersection,
             Field field, double wavelength, TraceOptions traceOptions) {
         RayResult ray = Trace.trace_safe(opticalModel, pupil, field, wavelength, traceOptions);
         if (ray.pkg == null) return new Evaluation(ray, null, null);
-        Vector3 coordinate = sphere_coord(ray.pkg, field.chief_ray, field.ref_sphere);
-        if (coordinate == null) return new Evaluation(ray, null, null);
-        return new Evaluation(ray, coordinate,
-                new Vector2(coordinate.x - target.x, coordinate.y - target.y));
+        Vector3 achievedRefSphereIntersection = ref_sphere_intersection(ray.pkg, field.chief_ray, field.ref_sphere);
+        if (achievedRefSphereIntersection == null) return new Evaluation(ray, null, null);
+        return new Evaluation(ray, achievedRefSphereIntersection,
+                new Vector2(achievedRefSphereIntersection.x - targetRefSphereIntersection.x, achievedRefSphereIntersection.y - targetRefSphereIntersection.y));
     }
 
-    public static Vector3 sphere_coord(
+    /**
+     * Computes the intersection of the test ray with the reference sphere, and returns
+     * the intersection point in the exit pupil coordinate system.
+     *
+     * @param rayPkg test ray
+     * @param chiefRayPkg chief ray
+     * @param referenceSphere Reference Sphere
+     */
+    public static Vector3 ref_sphere_intersection(
             RayPkg rayPkg, ChiefRayPkg chiefRayPkg, ReferenceSphere referenceSphere) {
         if (rayPkg == null || rayPkg.ray == null) return null;
         if (chiefRayPkg == null || referenceSphere == null) return null;
@@ -171,7 +184,7 @@ public final class ExitPupilAiming {
         var testRay = rayPkg.ray;
         if (testRay.size() != chiefRay.size()) return null;
 
-        return WaveAbr.wave_abr_calc_finite_pupil(rayPkg, chiefRayPkg, referenceSphere).ray_exit_pupil_coord();
+        return WaveAbr.wave_abr_calc_finite_pupil(rayPkg, chiefRayPkg, referenceSphere).ref_sphere_intersect_in_cr_exp_coord();
     }
 
     /** A ray traced successfully, but its requested exit-pupil coordinate was not found. */

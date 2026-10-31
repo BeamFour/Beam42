@@ -6,6 +6,12 @@ package org.redukti.rayoptics.raytr;
 import org.redukti.mathlib.Vector3;
 
 /**
+ * Constituents required to compute the Optical Path Difference. Given the
+ * values here and the refractive indices in object space (n_obj) and image
+ * space (n_img), OPD is given by
+ * <pre>
+ *     OPD = -n_obj e1 + (cr_op - ray_op) + n_img(ekp - ep)
+ * </ptr>
  *
  * @param ray_pkg A test aperture ray
  * @param chief_ray_pkg The chief ray
@@ -13,7 +19,7 @@ import org.redukti.mathlib.Vector3;
  * @param e1 Object space geometric difference between chief ray and aperture ray from entry pupil to first surface.
  * @param ekp Image space geometric difference between chief ray amd aperture ray from last surface to exit pupil excluding impact of focus.
  * @param ep Image space geometric adjustment for focus
- * @param ray_exit_pupil_coord coordinate of B′, the test ray’s intersection
+ * @param ref_sphere_intersect_in_cr_exp_coord coordinate of B′, the test ray’s intersection
  *                             with the reference sphere, in the coordinate
  *                             system whose origin is the chief-ray exit-pupil
  *                             point Ē′
@@ -27,7 +33,7 @@ public record FinitePupilWaveAberrationResult(
         double e1,
         double ekp,
         double ep,
-        Vector3 ray_exit_pupil_coord,
+        Vector3 ref_sphere_intersect_in_cr_exp_coord,
         double ray_op,
         double cr_op ) {
 }

@@ -29,11 +29,11 @@ class ContrastAnalysisTest {
                     assertNull(rays.referenceError());
                     assertNull(rays.sagittalError());
                     assertNull(rays.tangentialError());
-                    var reference = ExitPupilAiming.sphere_coord(
+                    var reference = ExitPupilAiming.ref_sphere_intersection(
                             rays.reference(), field.chief_ray, field.ref_sphere);
-                    var sagittal = ExitPupilAiming.sphere_coord(
+                    var sagittal = ExitPupilAiming.ref_sphere_intersection(
                             rays.sagittal(), field.chief_ray, field.ref_sphere);
-                    var tangential = ExitPupilAiming.sphere_coord(
+                    var tangential = ExitPupilAiming.ref_sphere_intersection(
                             rays.tangential(), field.chief_ray, field.ref_sphere);
                     assertNotNull(reference);
                     assertNotNull(sagittal);

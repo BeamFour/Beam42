@@ -126,11 +126,11 @@ class US003549241Example05Test {
         assertNull(rays.referenceError());
         assertNull(rays.sagittalError());
         assertNull(rays.tangentialError());
-        Vector3 reference = ExitPupilAiming.sphere_coord(
+        Vector3 reference = ExitPupilAiming.ref_sphere_intersection(
                 rays.reference(), field.chief_ray, field.ref_sphere);
-        Vector3 sagittal = ExitPupilAiming.sphere_coord(
+        Vector3 sagittal = ExitPupilAiming.ref_sphere_intersection(
                 rays.sagittal(), field.chief_ray, field.ref_sphere);
-        Vector3 tangential = ExitPupilAiming.sphere_coord(
+        Vector3 tangential = ExitPupilAiming.ref_sphere_intersection(
                 rays.tangential(), field.chief_ray, field.ref_sphere);
         assertNotNull(reference);
         assertNotNull(sagittal);

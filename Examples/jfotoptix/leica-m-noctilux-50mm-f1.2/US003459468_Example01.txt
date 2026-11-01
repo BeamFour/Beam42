@@ -12,20 +12,20 @@ Magnification	0
 d0	Infinity
 Bf	27.68
 [lens data]
-1	59.852	6.760	1.816	53.20	46.6	S-LAH59
+1	59.852	6.760	1.81550	53.20	44.54	TAFD10	Hoya
 2	237.692	0.208		53.20	
-3	29.900	11.752	1.883	46.90	40.8	S-LAH58
-4	126.568	2.184	1.7847	50.91	26.08	SF56A
+3	29.900	11.752	1.9	46.90	40.5	S-LAH58	Ohara
+4	126.568	2.184	1.792	50.91	25.9	N-SF56	schott
 5	18.148	8.112		29.02	
 6	AS	5.928		24.96	
-7	-23.400	1.612	1.834	27.77	37.2	S-LAH60
-8	72.020	9.412	1.883	37.54	40.8	S-LAH58
+7	-23.400	1.612	1.83641	27.77	30.21	E37-30	CORNING
+8	72.020	9.412	1.9	37.54	40.5	S-LAH58	Ohara
 9	-34.580	0.052		36.92	
-10	61.360	6.084	1.691	32.34	54.71	N-LAK9
+10	61.360	6.084	1.69100	32.34	54.84	LAL9	Ohara
 11	-55.796	Bf		32.34	
 [aspherical data]
-1	59.852	0	1.3760557542916125e-06	-4.2081581348626472e-09	4.6417352416315871e-12	-6.5028478406979683e-16	-2.4271933545977478e-18	1.2537429436726918e-21
-11	-55.796	0	5.8830637995534828e-06	-1.7933404046501903e-08	2.6343962522714114e-11	9.7202318251988374e-15	-2.9045076471071499e-17	-5.2502092880781844e-22
+1	59.852	0	0	0	0	0
+11	-55.796	0	0	0	0	0
 [figure]
 source	Data/US003459468_Figure01.png
 originX	348
@@ -38,4 +38,68 @@ originY	397.5
 ppmm	9.163
 [notes]
 The original glass types were in terms of wavelength E - replaced by modern glass types
-The original aspheric is non-standard. 
+The original aspheric is non-standard.
+[patent info]
+country	US
+number	US3459468
+example	EX 1
+year applied	1965
+inventors	Helmut Marx,Paul Sindel
+current assignee	Ernst Leitz Wetzlar GmbH
+original assignee	Ernst Leitz Wetzlar GmbH
+link	https://patents.google.com/patent/US12181644B2/en
+[report data]
+lens name	Leica 50mm Noctilux f/1.2
+[trial 1]
+description         Opt aspherics
+fields              0.0 0.3 0.7 1.0
+vignetting          set-vig frozen
+vary aspherics    	0  K  1:1e6  2:1e9  3:1e11  4:1e14
+vary aspherics    	10  K  1:1e6  2:1e9  3:1e11  4:1e14
+vary thicknesses   	all
+vary curvatures		all
+constrain          	curvatures
+constrain 			edges
+constrain          	thicknesses
+goal contrast       sampling 6 12
+goal contrast       20
+goal contrast      	calibrate yes
+outdir				try1
+[trial 4]
+description         Opt aspherics
+fields              0.0 0.3 0.7 1.0
+vignetting          set-vig frozen
+vary aspherics    	0  K  1:1e6  2:1e9  3:1e11  4:1e14
+vary aspherics    	10  K  1:1e6  2:1e9  3:1e11  4:1e14
+vary curvatures     all
+vary thicknesses   	all
+constrain           curvatures
+constrain 			edges
+constrain          	thicknesses
+goal contrast       sampling 6 12
+goal contrast       10
+goal contrast   	sag  4  2 2 4
+goal contrast   	tan  4 .1 2 2
+#goal contrast   	balance  all weight 8
+#goal contrast      calibrate yes
+outdir				try4
+[trial 5]
+description       MTF targets	Finished in 1587 secs
+fields            0 0.2 0.4 0.6 0.8 1.0
+check-spot-apertures  yes
+vary curvatures   all
+vary aspherics    	0  K  1:1e6  2:1e9  3:1e11  4:1e14
+vary aspherics    	10  K  1:1e6  2:1e9  3:1e11  4:1e14
+goal spot-rms           10 10 20 30 45 50
+goal spot-rms weights   1  1  1  1  1  1
+goal mtf   10 sag       81 80 75 75 60 40
+goal mtf   10 tan       81 60 55 65 60 40
+goal mtf   20 sag       52 40 40 40 45 25
+goal mtf   20 tan       52 30 25 10 34 20
+goal spot sampling    gaussian 6 12
+goal ray-aberrations  no
+constrain 			edges
+outdir				try5
+[pipeline 9]
+outdir        pipeline9
+trials        1 5

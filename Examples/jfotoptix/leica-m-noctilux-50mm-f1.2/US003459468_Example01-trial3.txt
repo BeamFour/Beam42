@@ -36,7 +36,7 @@ original assignee	Ernst Leitz Wetzlar GmbH
 link	https://patents.google.com/patent/US12181644B2/en
 [report data]
 lens name	Leica 50mm Noctilux f/1.2
-
+status	Accepted
 [trial 3]
 description           MTF targets	Finished in 1587 secs
 configuration         0

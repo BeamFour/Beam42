@@ -11,7 +11,38 @@ import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.*;
 import org.redukti.rayoptics.specs.Field;
 
-/** Inverse entrance-to-exit-pupil mapping used by contrast tracing. */
+/**
+ * Inverse entrance-to-exit-pupil mapping used by contrast tracing.
+ *
+ * <p><b>Why a linear shift on the reference sphere is the right target.</b> The OTF is the
+ * autocorrelation of the exit-pupil function at a fixed separation, and the aberration
+ * enters that function's phase, not the separation. The separation is measured in Hopkins'
+ * <em>reduced</em> coordinates, which are the transverse direction cosines of the chord
+ * from the pupil point to the image point. For a pupil point {@code B'} on the sphere of
+ * radius {@code R} about the image point {@code O}, with {@code c = B' - Ebar'} the stored
+ * coordinate relative to the chief-ray exit-pupil point and {@code r} the reference
+ * direction,
+ *
+ * <pre>{@code u = (O - B')/R = r - c/R}</pre>
+ *
+ * <p>so the transverse components of {@code u} are linear in {@code c} with coefficient
+ * {@code -1/R} exactly - no obliquity factor, whatever the field angle. A transverse shift
+ * of {@code R*lambda*nu/n} therefore produces a chord-direction difference of exactly
+ * {@code lambda*nu/n}, which is the separation the OTF at {@code nu} integrates over.
+ * Measured on the Leica 75/2: the realised chord-direction difference is the requested one
+ * to six decimals at every field, axis and pupil radius, and the two coordinates sit on
+ * the sphere to nine. See {@code ContrastProbe19} and the 2026-11-01 measurement in
+ * Documentation/REVIEW.md.
+ *
+ * <p><b>What it deliberately does not do.</b> It does not make each pair's own fringes
+ * land on {@code nu}. A traced ray's direction is the chord direction plus
+ * {@code grad W / n}, so the pair's fringe frequency differs from {@code nu} by the
+ * wavefront-slope difference across the shear - up to 8% at the edge of the pupil off
+ * axis on that lens, and almost independent of {@code nu}, because both terms scale with
+ * the shear and the ratio is set by the local second derivative of the wavefront. That
+ * spread is the aberration being measured, not an error in the shear; equalising it would
+ * make the sampling geometry a function of the design under optimization.
+ */
 public final class ExitPupilAiming {
 
     private static final int MAX_ITERATIONS = 10;
@@ -24,10 +55,13 @@ public final class ExitPupilAiming {
      * Physical separation on the finite reference sphere corresponding to an
      * image-space spatial frequency.
      *
-     * <p>Two image-space ray directions form fringes of frequency {@code nu} when
-     * {@code n*|delta d| = lambda*nu}. On a reference sphere of radius {@code R},
-     * the corresponding pupil-coordinate separation is {@code R*lambda*nu/n}.
-     * This avoids converting through the paraxial exit-pupil radius and f-number.
+     * <p>The OTF's separation is {@code lambda*nu/n} in reduced coordinates - the
+     * transverse direction cosines of the pupil-to-image chord - and those are the stored
+     * sphere coordinate divided by {@code R}, so the physical separation is
+     * {@code R*lambda*nu/n}. See the class comment for the derivation and for what this
+     * does not claim about the pair's own fringe frequency. Taking {@code R} from the
+     * traced reference sphere avoids converting through the paraxial exit-pupil radius
+     * and f-number.
      */
     public static double referenceSphereShift(
             OpticalModel opticalModel, Field field, double wavelength,

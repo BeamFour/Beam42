@@ -25,9 +25,9 @@ that landed afterwards and does not belong to any single finding.
 | [4](#4-the-three-frequencies-are-near-collinear--two-thirds-of-the-ray-budget-is-wasted) | Frequencies near-collinear | **Open** |
 | [5](#5-high-frequencies-fail-without-a-diagnostic) | High-frequency degeneracy | **Partly fixed** — the silent collapse now throws; the ~0.707×cutoff ceiling remains |
 | [6](#6-the-least-squares-reduction-only-tracks-mtf-in-the-small-phase-regime) | Least-squares only valid at small phase | **Open, but downgraded.** The diagnosis stands; the regression that motivated it turned out to be defocus — see the [postscript](#postscript-the-motivating-regression-was-defocus) |
-| [7](#7-the-shear-is-applied-at-the-entrance-pupil-not-the-exit-pupil) | Shear applied at entrance, not exit, pupil | **Fixed, opt-in.** `aimContrastAtExitPupil()` inverse-aims every partner to its requested reference-sphere separation; block calibration remains a cheaper approximation |
+| [7](#7-the-shear-is-applied-at-the-entrance-pupil-not-the-exit-pupil) | Shear applied at entrance, not exit, pupil | **Fixed, opt-in.** `aimContrastAtExitPupil()` inverse-aims every partner to its requested reference-sphere separation, and that separation was measured on 2026-11-01 to realise the requested frequency exactly in chord directions; block calibration remains a cheaper approximation |
 | [8](#8-vignetting-is-a-moving-mode-dependent-reference-frame) | Vignetting is a moving, mode-dependent reference frame | **Partly addressed.** Mode is configurable and the factors can be frozen; the perverse incentive it exposes is unmeasured |
-| [9](#9-frequency-normalization-uses-ray-direction-not-hopkins-exit-pupil-shear) | Frequency normalization used image-ray direction rather than exit-pupil separation | **Resolved by tracing.** Residual rescaling remains removed; direct two-dimensional reference-sphere aiming now traces the ray whose OPD is required |
+| [9](#9-frequency-normalization-uses-ray-direction-not-hopkins-exit-pupil-shear) | Frequency normalization used image-ray direction rather than exit-pupil separation | **Resolved by tracing.** Residual rescaling remains removed; direct two-dimensional reference-sphere aiming traces the ray whose OPD is required. Whether the merit should instead hold each pair's own fringe frequency fixed is recorded as open at the end of the finding |
 
 Findings 6 and 8 are two attempts at the same symptom — a Leica 75/2 mid-field sagittal
 MTF drop — and neither currently explains it. Finding 6 blamed the least-squares
@@ -1558,8 +1558,13 @@ back-porting to `rayoptics-cpp`; no C++ checkout was changed.
 **Severity: moderate. Same class as finding 1, an order of magnitude smaller.**
 
 > **MITIGATED, opt-in.** `calibrate_frequency` corrects the field-dependent part; see
-> "The 90% correction" below. The exact treatment is with the upstream ray-optics
-> project.
+> "The 90% correction" below, and `aimContrastAtExitPupil()` for the per-ray treatment.
+> The exact treatment of the pupil mapping itself is with the upstream ray-optics project.
+>
+> **2026-11-01:** the aiming was challenged as not targeting the frequency coordinate and
+> removed on what is now the `exit_pupil_removal` branch. Measurement showed its
+> construction exact, and it is retained here; see [the two positions](#two-positions-on-what-the-shear-should-target-2026-11-01)
+> and the measurement that follows them.
 
 The OTF is the autocorrelation of the **exit** pupil function, and the paper computes the
 shear there. `trace_contrast` works in `PupilType.REL_PUPIL`, and
@@ -1819,6 +1824,12 @@ residuals to 14256 while the constraint count stayed at ~29; see items 2 and 3 u
 > `WaveAbr.wave_abr_calc_finite_pupil()` as a by-product of the OPD and read through
 > `ExitPupilAiming.sphere_coord()`. Names below are kept as they were when the finding was
 > written, with current equivalents noted.
+>
+> **2026-11-01:** aiming at a linear x/y offset on the reference sphere was challenged as
+> not being the frequency coordinate. Measured: the shift realises `lambda nu / n` in
+> chord directions exactly, and the per-pair discrepancy that prompted the challenge is
+> the local wavefront curvature. The two positions and the measurement are recorded at the
+> end of this finding.
 
 The frequency-measurement and normalization options added after finding 7 exposed useful
 diagnostics, but the quantity named `realized_frequency` was not the spatial frequency
@@ -2015,6 +2026,148 @@ percent in the opposite direction. The two errors cancelled. Re-deriving the pro
 exit-pupil metric alone moved it to 1.0141, which is worse. That cancellation is a property
 of the lenses tested, not a principle, so `calibrate_frequency`'s accuracy should not be
 assumed to carry to other designs; direct aiming has no such dependence.
+
+### Two positions on what the shear should target (2026-11-01)
+
+The aiming was challenged on the grounds that a linear x/y shift on the reference sphere
+is not the MTF frequency coordinate, and removed on what is now the `exit_pupil_removal`
+branch. Two positions on what a per-ray target should be came out of that, disagreeing
+about which difference carries the frequency. They are recorded together because the
+disagreement is about principle, not code; the measurement in the next section settles
+position A's *construction* and leaves the choice of metric open.
+
+**Position A — fixed shear in reduced exit-pupil coordinates.** The OTF is the
+autocorrelation at a fixed separation `(s,t)`, and the aberration enters the pupil
+function's phase, not the separation. Reduced coordinates are the transverse direction
+cosines of the chord from the pupil point to the image point, `xi = (X - O)_t / R`, so the
+separation for frequency `nu` is
+
+```text
+delta xi = lambda nu / n_img,     i.e.   delta X_t = R lambda nu / n_img
+```
+
+and every pair at that separation has chord directions differing by exactly
+`lambda nu / n_img` whatever the aberration. Each pair's *actual* fringe frequency then
+differs from `nu` by the wavefront-slope difference across the shear, which on this view
+is not an error to correct: it is what an aberrated pupil means, and it is the same
+quantity the OPD difference already measures.
+
+*Objections, and what became of them.* The doubt was that this formula did not deliver the
+requested frequency in practice - the per-sample spread in finding 7 and the field
+dependence `calibrate_frequency` exists to remove - so either the construction had a defect
+(candidates: the frame the shift is applied in, the sphere the coordinates are taken on,
+the `n_img` factor) or the reduced-coordinate account was incomplete. **Measured and
+cleared:** see the next section. The shift realises `lambda nu / n_img` in chord
+directions exactly, at every field and pupil radius, and all three candidate defects are
+clean. What the spread in finding 7 actually measures is the ray-direction metric, which
+differs from the chord metric by the local wavefront curvature.
+
+**Position B — aim each pair at the requested fringe frequency.** For two rays
+interfering at the image, the frequency is set by their actual image-space direction
+cosines,
+
+```text
+nu = (n_img / lambda) (d2 - d1)
+```
+
+so a pair realises `nu` only when that difference is `lambda nu / n_img`. Since the
+difference includes the wavefront slope, the sphere displacement that achieves it depends
+on the reference ray's position, field, wavelength and aberration: there is no constant
+sphere shift that gives the same frequency everywhere in an aberrated pupil. The proposal
+is to adjust each partner's entrance-pupil coordinate until
+`d2x - d1x = lambda nu / n_img` and `d2y - d1y = 0`, then read the sphere coordinates
+afterwards if they are wanted.
+
+*Objections.* Three, none measured yet.
+
+1. It is not the Hopkins autocorrelation. Pairs are selected by their own fringe
+   frequency rather than taken at a fixed pupil separation, so the result is a
+   well-defined quantity but not `D(s,t)`.
+2. The sampling becomes a function of the aberration being optimized. Improving the lens
+   moves the partners to different pupil separations, so the merit's own geometry shifts
+   under the solver - the coupling this finding measured as roughly nine times the
+   sensitivity of the geometric metric to a rear-surface perturbation, now built into the
+   sample positions rather than confined to a diagnostic.
+3. Solvability fails where it matters. At high `nu` on an aberrated lens the two
+   conditions need not have a solution inside the pupil, and where the slope difference
+   is non-monotonic they may have several. The quadrature weights assume a geometric
+   pattern tiling the overlap; partners placed wherever the solve lands them leave the
+   weights integrating nothing defined, and put the fixed residual layout the optimizer
+   needs at risk.
+
+**Where this leaves the choice.** Position A's construction is verified, so the open
+question is no longer whether the shift is built correctly but which difference the merit
+should hold fixed: the pupil separation, as the autocorrelation does, or each pair's own
+fringe frequency. The measurement below quantifies what separates them - up to 8% of pupil
+separation at the edge of the pupil off-axis - and position B's three objections above
+stand unmeasured. The integration measure, still generated in entrance-pupil coordinates,
+is a larger question than either.
+
+### Measured 2026-11-01: does the sphere shift target the frequency?
+
+*This is the measurement that bears on the two positions above. It was run on the branch
+that kept the aiming, which is now `main`; the branch that removed it is kept as
+`exit_pupil_removal`.*
+
+[ContrastProbe19.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe19.java)
+aims a partner at the sphere coordinate the implementation asks for and scores the achieved
+pair two ways: the **chord** metric, the direction cosines of the line from each sphere
+point to the image point (`u = ref_dir - c/R`, Hopkins' reduced coordinate), and the **ray**
+metric, the traced rays' own image-space directions. Leica 75/2, 50 cyc/mm, requested
+`|delta u| = lambda nu / n = 2.9378e-2`:
+
+| field | axis | pupil r | R [mm] | shift [mm] | chord ratio | ray ratio |
+| --- | --- | --- | --- | --- | --- | --- |
+| 0 | sag | 0.00 | 75.77 | 2.2260 | 1.000000 | 1.000167 |
+| 0 | sag | 0.85 | 75.77 | 2.2260 | 0.999999 | 0.986299 |
+| 6 | sag | 0.85 | 78.31 | 2.3005 | 1.000000 | 0.971149 |
+| 6 | tan | 0.85 | 78.31 | 2.3005 | 1.000000 | 0.916267 |
+| 10 | sag | 0.85 | 83.79 | 2.4617 | 1.000000 | 0.937078 |
+| 10 | tan | 0.85 | 83.79 | 2.4617 | 1.000000 | 0.925642 |
+
+**The construction is exact, and not by tautology.** The chord ratio is 1.000000 at every
+field, axis and pupil radius. Alone that would only say the Newton solve converged, since
+the partner is driven to `c_ref + shift` by definition. The independent check in the same
+probe is what makes it a result: `|O - (Ebar' + c)| / R` is `1.000000000` for reference and
+partner at every point, so the stored coordinate is image-gap axes translated to the
+chief-ray exit-pupil point, with both points exactly on the sphere of radius `R` about the
+image point. Given that, `u` is a unit chord vector and `delta u_t = -delta c_t / R` holds
+exactly, so a transverse shift of `R lambda nu / n` gives a chord-direction difference of
+exactly `lambda nu / n`. No obliquity factor enters: the transverse components of `u` are
+linear in `c` with coefficient `-1/R` whatever the field angle. The frame, the sphere and
+the `n_img` factor are all clear on this lens.
+
+**A trap for whoever repeats this.** `ReferenceSphere.image_pt` is stored *before* the
+final gap shift, while `R` is built from `image_pt + (0, 0, image_thi)` minus the chief-ray
+exit-pupil point. Using `image_pt` as the sphere centre gives `|O - (Ebar' + c)| / R` of
+about 0.48, which looks exactly like a frame error and is not one. The first run of this
+probe made that mistake.
+
+**The ray-metric gap is wavefront curvature, and it does not shrink with frequency.** The
+ray ratio departs from one by up to 8% at the pupil edge off-axis, nearly independently of
+`nu`: at field 10, sagittal, r = 0.85 it is 0.952 at 5 cyc/mm, 0.950 at 10, 0.944 at 30 and
+0.937 at 50. That is what the slope account predicts. The ray direction is the chord
+direction plus `grad W / n`, so
+
+```text
+delta d = delta u + (grad W(B' + delta) - grad W(B')) / n
+        ~ delta u (1 + R W'' / n)
+```
+
+Both terms scale with the shear, leaving the *ratio* set by the local second derivative of
+the wavefront rather than by the frequency. The pairs' own fringe frequencies are spread
+around `nu` by the local pupil curvature - a property of the aberration being measured,
+not an error in the shear.
+
+**What that implies for aiming at the fringe frequency instead.** Equalising every pair's
+ray-direction difference means moving each partner's pupil separation by up to the same 8%,
+in a pattern set by the current design's wavefront curvature: the autocorrelation variable
+distorted by the quantity under measurement, and moving as the solver works. The
+`nu`-independence says it does not become negligible at low frequency either.
+
+**Not measured.** Whether the sampling and the overlap measure, which are still generated
+in entrance-pupil coordinates, matter more than the per-pair shear this fixes. That is the
+larger integration question already noted above, and it is untouched by this result.
 
 ## Smaller items
 
@@ -2644,6 +2797,7 @@ module's classpath and can reach the package-private helpers on `ZeissOtusML50mm
 | [ContrastProbe14.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe14.java) | §8 — **refutes** its own hypothesis: contrast sampling coverage is 82-95% and identical in x and y, so the contraction does not starve the sagittal direction. Kept as the record of a ruled-out cause |
 | [ContrastProbe15.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe15.java) | §8 — the three-mode comparison and the on-axis symmetry violation under `Paraxial` |
 | [ContrastProbe16.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe16.java) | §8 — vignetting drift per Jacobian step, and the smoothness sweep showing it is differentiable |
+| [ContrastProbe19.java](../rayoptics/src/test/java/org/redukti/examples/ContrastProbe19.java) | chord against ray frequency metric for an aimed pair, plus the on-sphere check (§9) |
 | [DiffractionProbe.java](../rayoptics/src/test/java/org/redukti/examples/DiffractionProbe.java) | Diffraction MTF review P1 and P2 — Sigma sampling, reference-shift phase, 1 mm defocus |
 | [DiffractionProbe2.java](../rayoptics/src/test/java/org/redukti/examples/DiffractionProbe2.java) | Diffraction MTF undersampling warning — spot extent against the PSF window, and the error it predicts |
 

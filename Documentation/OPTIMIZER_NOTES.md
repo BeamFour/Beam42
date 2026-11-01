@@ -290,20 +290,27 @@ delta = 2 lambda F# nu
 ```
 
 This remains the initial guess supplied to the inverse aiming solve. The physical target
-is derived directly on the field- and wavelength-specific reference sphere. Two
-image-space directions form fringes of frequency `nu` when
+is derived directly on the field- and wavelength-specific reference sphere.
+
+Hopkins' `(s,t)` is a separation in *reduced* coordinates, which are the transverse
+direction cosines of the chord from the pupil point to the image point. For a pupil point
+`B'` on the sphere of radius `R` about the image point `O`, writing `c = B' - Ebar'` for
+the stored coordinate relative to the chief-ray exit-pupil point and `r` for the reference
+direction,
 
 ```text
-n_img |Delta d| = lambda nu.
+u = (O - B')/R = r - c/R
 ```
 
-On a reference sphere of radius `R`, the corresponding pupil-coordinate separation is
+so the transverse components of `u` are linear in `c` with coefficient `-1/R`, exactly and
+at any field angle - there is no obliquity factor to apply. The reduced separation for
+frequency `nu` is `lambda nu / n_img`, so the physical separation on the sphere is
 
 ```text
 Delta = |R| lambda nu / |n_img|,
 ```
 
-so Beam42 asks for
+and Beam42 asks for
 
 ```text
 Delta X_sag = (Delta, 0)
@@ -403,6 +410,46 @@ do not claim that the resulting optimized MTF must improve. On the Leica APO 75/
 final independently measured MTF difference was small and mixed, which is consistent
 with the remaining quadrature approximation and with optimization finding a nearby
 design basin.
+
+#### What aiming fixes, and what it does not
+
+Aiming settles the *frequency coordinate of a ray pair*: measured on the Leica 75/2, the
+realised chord-direction difference equals the requested `lambda nu / n_img` to six
+decimals at every field, axis and pupil radius, with both coordinates on the reference
+sphere to nine. `ContrastProbe19` reports it, and the 2026-11-01 section of REVIEW.md has
+the table.
+
+Three things it does not fix, in rough order of how much they are likely to matter.
+
+**1. The integration measure is still an entrance-pupil one.** The quadrature points are
+generated on the unit entrance pupil, mapped through the vignetting factors, and
+contracted into the shear overlap. Their weights carry the vignetting Jacobian of that
+map, not the Jacobian of the entrance-to-exit-pupil mapping. The autocorrelation is an
+integral over the overlap in reduced exit-pupil coordinates, so the samples' *positions
+and weights* remain approximate even now that each pair's *separation* is exact. This is
+the larger of the two approximations and is untouched by aiming.
+
+**2. A pair's own fringes do not land on `nu`, and should not be made to.** The traced
+ray's direction is the chord direction plus `grad W / n_img`, so a pair's actual fringe
+frequency differs from `nu` by the wavefront-slope difference across the shear - up to 8
+percent at the pupil edge off axis on that lens, and nearly independent of `nu`, because
+both terms scale with the shear and the ratio is set by the local second derivative of the
+wavefront. That spread is the aberration under measurement. Aiming instead at a fixed
+ray-direction difference would hold the pairs' fringe frequencies equal by moving their
+pupil separations, which makes the sampling geometry a function of the design being
+optimized, and the adjustment does not become negligible at low frequency. REVIEW.md
+records both positions and the objections to each.
+
+**3. The least-squares reduction is still a small-phase proxy.** Summing `w (delta W)^2`
+tracks the MTF only while the phase is small; beyond about a tenth of a wave the
+relationship between residual energy and contrast is no longer monotone in the way the
+merit assumes. Aiming improves where the samples sit in frequency; it does not change what
+is done with them afterwards.
+
+To close gap 1, the base sampler would have to be separated from the shear and overlap
+transformation so that points and weights can be generated in reduced exit-pupil
+coordinates, with the overlap region computed there. That also needs stable sample counts
+and partner validity, which is why it is not a drop-in change.
 
 ### Per-sample frequency measurement
 

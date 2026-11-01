@@ -65,7 +65,7 @@ goal contrast       sampling 6 12
 goal contrast       20
 goal contrast      	calibrate yes
 outdir				try1
-[trial 4]
+[trial 2]
 description         Opt aspherics
 fields              0.0 0.3 0.7 1.0
 vignetting          set-vig frozen
@@ -83,7 +83,7 @@ goal contrast   	tan  4 .1 2 2
 #goal contrast   	balance  all weight 8
 #goal contrast      calibrate yes
 outdir				try4
-[trial 5]
+[trial 3]
 description       MTF targets	Finished in 1587 secs
 fields            0 0.2 0.4 0.6 0.8 1.0
 check-spot-apertures  yes
@@ -99,7 +99,6 @@ goal mtf   20 tan       52 30 25 10 34 20
 goal spot sampling    gaussian 6 12
 goal ray-aberrations  no
 constrain 			edges
-outdir				try5
-[pipeline 9]
+[pipeline 4]
 outdir        pipeline9
 trials        1 5

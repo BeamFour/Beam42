@@ -21,11 +21,9 @@ better technique for optimizing on MTF," in *International Optical Design Confer
 
 ### What a sample means
 
-A contrast sample is one location `p = (x, y)` in the entrance pupil at which the
-wavefront is compared with slightly displaced copies of itself. The OTF shear is
-physically defined at the exit pupil, but Beam42 launches rays in entrance-pupil
-coordinates. The optional frequency calibration described below rescales those launch
-coordinates so that the ray pairs realise the requested image-space frequency.
+A contrast sample is one location `p = (x, y)` in the exit pupil at which the
+wavefront is compared with slightly displaced copies of itself. The displacement is
+determined based on the wavelength and desired spatial frequency in the MTF.
 
 For each sample, three rays are traced:
 
@@ -48,7 +46,7 @@ example, with wavelength in mm, frequency is in cycles/mm.
 In the pupil autocorrelation, the separation of the two pupil centres scales linearly
 with spatial frequency. At cutoff the circles just touch: their physical centre
 separation is one pupil diameter, or two pupil radii. Beam42 uses dimensionless
-entrance-pupil coordinates normalized by the pupil radius, so the nominal separation
+exit-pupil coordinates normalized by the pupil radius, so the nominal separation
 `s` is 2 at cutoff. Thus
 
 ```text
@@ -64,7 +62,7 @@ not to the MTF value.
 
 With calibration disabled, this same nominal displacement is used in both directions.
 With calibration enabled, sagittal and tangential scale
-factors are measured separately for every field and wavelength, so the actual entrance-
+factors are measured separately for every field and wavelength, so the actual exit-
 pupil displacements may differ from each other and from `s`.
 
 The analysis calculates two wavefront differences:
@@ -205,11 +203,12 @@ The relation
 s = 2 lambda F# frequency
 ```
 
-describes the shear of the exit-pupil autocorrelation. `REL_PUPIL`, however, specifies
-where a ray passes through the entrance pupil. Pupil aberration means that a rigid shift
-at the entrance pupil does not generally produce the same normalized shift at the exit
-pupil. Without correction, the realized spatial frequency can therefore vary with field,
-wavelength and direction, with the largest error normally occurring at outer fields.
+describes the shear of the exit-pupil autocorrelation. In RayOptics when aimining rays,
+`REL_PUPIL`, specifies where a ray passes through the entrance pupil. 
+Pupil aberration means that a rigid shift at the entrance pupil does not generally 
+produce the same normalized shift at the exit pupil. Without correction, the realized 
+spatial frequency can therefore vary with field, wavelength and direction, with the 
+largest error normally occurring at outer fields.
 
 Enable the correction through the builder:
 
@@ -244,7 +243,7 @@ historical values.
 
 ### Direct exit-pupil aiming
 
-The direct correction is available as an opt-in alternative to block calibration:
+A second more accurate but quite expensive calibration is available via:
 
 ```java
 .aimContrastAtExitPupil()

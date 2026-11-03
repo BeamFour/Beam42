@@ -1,8 +1,5 @@
 [descriptive data]
 title	JP2025-108279 Example 1
-#patent	country	number	example	year	inventors	org	link
-patent	JP	JP 2025-108279	EX 1	2025	Shoju Yomogita, Shibata	Cosina Inc	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2025-108279/11/en
-lens name	Voigtlander APO Lanthar 50mm f3.5
 [constants]
 [variable distances]
 Focal Length	49.10
@@ -42,3 +39,15 @@ originY	217.51
 ppmm	17.653
 [notes]
 Bill: Bf not drawn to scale. Not quite Cosina APO-Lanthar 50mm F3.5 [Type 1 & 2]
+[patent info]
+country	JP
+number	JP 2025-108279
+example	EX 1
+year applied	2025
+inventors	Shoju Yomogita, Shibata
+current assignee	Cosina Inc
+original assignee	Cosina Inc
+link	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2025-108279/11/en
+[report data]
+lens name	Voigtlander APO Lanthar 50mm f3.5
+Status	Accepted

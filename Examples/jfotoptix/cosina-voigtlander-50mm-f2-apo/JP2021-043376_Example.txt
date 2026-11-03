@@ -47,3 +47,15 @@ Aperture Diameter(m)	33.257
 19	-112.348	0	-5.6981E-5	1.8942E-7	-4.8687E-10	7.6837E-13
 [figure]
 [notes]
+[patent info]
+country	JP
+number	JP2021-043376
+example	EX 5
+year applied	2019
+inventors	Nakano-shi, Nagano
+current assignee	Cosina Inc
+original assignee	Cosina Inc
+link	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-2021-043376/11/en
+[report data]
+lens name	Voigtlander APO Lanthar 50mm f2.0
+status	Candidate

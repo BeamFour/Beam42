@@ -117,67 +117,6 @@ sum_p w_p deltaW(p)^2
 It does not calculate MTF directly. It minimizes a smooth least-squares proxy for the
 loss of contrast.
 
-### Residual centring
-
-For a single wavelength block the sum above is the un-centred second moment, and it
-decomposes as
-
-```text
-sum_p w_p deltaW(p)^2 = Var(deltaW) + mean(deltaW)^2
-```
-
-Only the first term describes the monochromatic loss of contrast. The OTF modulus depends
-on the *variance* of the phase difference, through
-`|OTF| = |<exp(i Phi)>| ~ 1 - Var(Phi)/2`. A constant `deltaW` across
-the pupil is wavefront tilt, which displaces the image: it moves the phase transfer
-function and leaves the modulus untouched. The geometric MTF used to validate the
-surrogate is translation invariant too, since spot analysis measures about the centroid.
-
-Enable centring through the builder:
-
-```java
-.centerContrastResiduals(true)
-```
-
-For the reference wavelength the residual becomes
-`sqrt(w_p) (deltaW(p) - deltaW_bar_ref)`, where `deltaW_bar_ref` is its
-quadrature-weighted mean over the valid samples. The same reference-wavelength offset is
-then subtracted from every other wavelength.
-
-Two properties are worth knowing before enabling it.
-
-**Defocus is not removed.** Defocus makes `deltaW` vary linearly across the pupil in the
-shear direction rather than being constant, so its mean over a symmetric pupil is already
-zero. Only the constant part goes; defocus, coma, spherical and astigmatism keep their
-full contribution.
-
-**The reference-wavelength mean is subtracted per (frequency, field, orientation), not a
-separate mean per wavelength.** A tilt
-common to every wavelength is a harmless image shift. A tilt that differs between
-wavelengths is lateral colour, and that genuinely does reduce polychromatic MTF, because
-the per-wavelength complex transfer functions acquire different phases and partly cancel.
-Subtracting the reference wavelength's mean from every wavelength discards the common part
-and preserves every wavelength's displacement relative to the reference. This follows the
-same reference-image convention as Beam42's polychromatic spot analysis. It is exactly the
-centred variance for the reference wavelength; across all wavelengths it is a second
-moment about that reference image, deliberately retaining lateral colour rather than the
-variance about a combined polychromatic mean.
-
-The sagittal mean is identically zero on a rotationally symmetric system, since `deltaW`
-is odd about the shear centre, so in practice only tangential residuals move. That does
-not make the change sagittal-neutral. The tangential block loses up to 57 percent of its
-sum of squares, so the balance between the two orientations shifts, and the two trade
-against each other through the astigmatic focus split. Measured on the Leica 75/2, centring
-raises sagittal's weight relative to tangential by a factor of about 2 at fields 0.7
-through 1.0.
-
-There is a second reason to prefer it. The common `mean^2` term is *reducible* by adding tilt,
-which costs no MTF, so leaving it in offers the solver merit reduction that buys no optical
-improvement.
-
-Centring is off by default because it changes every contrast residual and therefore every
-committed regression value.
-
 ### Operating range and limitation
 
 The proxy is most faithful in the small-phase regime:
@@ -195,6 +134,28 @@ through one or more cycles. In that regime, the squared wavefront differences no
 uniquely determine MTF and can improve while independently measured MTF gets worse.
 Contrast merit should therefore be validated against a separate spot/MTF analysis.
 
+### Residual centring
+
+For a single wavelength block the sum above is the un-centred second moment, and it
+decomposes as
+
+```text
+sum_p w_p deltaW(p)^2 = Var(deltaW) + mean(deltaW)^2
+```
+
+Enable centring through the builder:
+
+```java
+.centerContrastResiduals(true)
+```
+
+For the reference wavelength the residual becomes
+`sqrt(w_p) (deltaW(p) - deltaW_bar_ref)`, where `deltaW_bar_ref` is its
+quadrature-weighted mean over the valid samples. The same reference-wavelength offset is
+then subtracted from every other wavelength.
+
+Centring is off by default.
+
 ### Exit-pupil frequency calibration
 
 The relation
@@ -203,8 +164,8 @@ The relation
 s = 2 lambda F# frequency
 ```
 
-describes the shear of the exit-pupil autocorrelation. In RayOptics when aimining rays,
-`REL_PUPIL`, specifies where a ray passes through the entrance pupil. 
+describes the shear of the exit-pupil autocorrelation. In RayOptics when aiming rays,
+`REL_PUPIL` specifies where a ray passes through the entrance pupil. 
 Pupil aberration means that a rigid shift at the entrance pupil does not generally 
 produce the same normalized shift at the exit pupil. Without correction, the realized 
 spatial frequency can therefore vary with field, wavelength and direction, with the 
@@ -231,15 +192,10 @@ which is small compared with the full contrast sampling pattern.
 This is a calibration rather than an exact construction in exit-pupil coordinates. It
 removes the dominant field- and direction-dependent frequency bias, but uses one scale
 factor for the complete pupil. Residual variation caused by nonlinear pupil mapping
-across individual samples remains. It can be measured diagnostically, but correcting it
-properly requires aiming the displaced ray to the requested exit-pupil separation.
+across individual samples remains.
 
-Calibration is off by default because it changes the sampled frequencies and therefore
-the numerical merit function. It is cheaper than direct aiming and can remove much of a
-wide-field bias, but it is not the preferred reference for new accuracy work: its probe
-uses an image-ray direction metric and one scale cannot represent the nonlinear
-two-dimensional pupil map. Old regression cases may leave it disabled to preserve their
-historical values.
+Calibration is off by default. It is cheaper than direct aiming and can remove much of a
+wide-field bias.
 
 ### Direct exit-pupil aiming
 

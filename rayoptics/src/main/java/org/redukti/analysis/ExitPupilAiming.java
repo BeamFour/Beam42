@@ -63,7 +63,7 @@ public final class ExitPupilAiming {
      * traced reference sphere avoids converting through the paraxial exit-pupil radius
      * and f-number.
      */
-    public static double referenceSphereShift(
+    public static double reference_sphere_shift(
             OpticalModel opticalModel, Field field, double wavelength,
             double spatialFrequency) {
         if (field.ref_sphere == null
@@ -191,7 +191,7 @@ public final class ExitPupilAiming {
             Field field, double wavelength, TraceOptions traceOptions) {
         RayResult ray = Trace.trace_safe(opticalModel, pupil, field, wavelength, traceOptions);
         if (ray.pkg == null) return new Evaluation(ray, null, null);
-        Vector3 achievedRefSphereIntersection = ref_sphere_intersection(ray.pkg, field.chief_ray, field.ref_sphere);
+        Vector3 achievedRefSphereIntersection = reference_sphere_intersection(ray.pkg, field.chief_ray, field.ref_sphere);
         if (achievedRefSphereIntersection == null) return new Evaluation(ray, null, null);
         return new Evaluation(ray, achievedRefSphereIntersection,
                 new Vector2(achievedRefSphereIntersection.x - targetRefSphereIntersection.x, achievedRefSphereIntersection.y - targetRefSphereIntersection.y));
@@ -205,7 +205,7 @@ public final class ExitPupilAiming {
      * @param chiefRayPkg chief ray
      * @param referenceSphere Reference Sphere
      */
-    public static Vector3 ref_sphere_intersection(
+    public static Vector3 reference_sphere_intersection(
             RayPkg rayPkg, ChiefRayPkg chiefRayPkg, ReferenceSphere referenceSphere) {
         if (rayPkg == null || rayPkg.ray == null) return null;
         if (chiefRayPkg == null || referenceSphere == null) return null;

@@ -4,9 +4,7 @@ import org.redukti.mathlib.Vector2;
 import org.redukti.mathlib.Vector3;
 import org.redukti.analysis.ContrastAnalysis;
 import org.redukti.analysis.ExitPupilAiming;
-import org.redukti.rayoptics.optical.OpticalModel;
 import org.redukti.rayoptics.raytr.*;
-import org.redukti.rayoptics.specs.Field;
 import org.redukti.rayoptics.util.Lists;
 
 /**
@@ -66,14 +64,14 @@ public class ContrastProbe19 {
             f.chief_ray = coords.chief_ray_pkg;
             f.ref_sphere = coords.ref_sphere;
             double R = f.ref_sphere.ref_sphere_radius;
-            double shift = ExitPupilAiming.referenceSphereShift(m, f, wvl, freq);
+            double shift = ExitPupilAiming.reference_sphere_shift(m, f, wvl, freq);
 
             for (int axis = 0; axis < 2; axis++) {
                 for (double r : new double[]{0.0, 0.5, 0.85}) {
                     var pupil = axis == 0 ? new Vector2(r, 0.0) : new Vector2(0.0, r);
                     var ref = Trace.trace_safe(m, pupil, f, wvl, to);
                     if (ref.pkg == null) { System.out.printf("%4d  %s  %5.2f   reference ray failed%n", fi, axis == 0 ? "sag" : "tan", r); continue; }
-                    var cRef = ExitPupilAiming.ref_sphere_intersection(ref.pkg, f.chief_ray, f.ref_sphere);
+                    var cRef = ExitPupilAiming.reference_sphere_intersection(ref.pkg, f.chief_ray, f.ref_sphere);
                     if (cRef == null) { System.out.printf("%4d  %s  %5.2f   no sphere coordinate%n", fi, axis == 0 ? "sag" : "tan", r); continue; }
 
                     var target = axis == 0

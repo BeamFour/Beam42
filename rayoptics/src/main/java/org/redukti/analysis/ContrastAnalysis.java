@@ -306,7 +306,7 @@ public class ContrastAnalysis {
                 // The vectors below are target offsets from each reference ray's sphere
                 // coordinate. trace_triplets() inverse-aims the partners to those targets;
                 // the supplied normalized entrance-pupil shifts provide the initial guesses.
-                double physicalShift = ExitPupilAiming.referenceSphereShift(
+                double physicalShift = ExitPupilAiming.reference_sphere_shift(
                         opt_model, field, wavelength, spatial_frequency);
                 sagittalExitShift = new Vector2(physicalShift, 0.0);
                 tangentialExitShift = new Vector2(0.0, physicalShift);
@@ -391,7 +391,7 @@ public class ContrastAnalysis {
             RayResult sagittal;
             RayResult tangential;
             if (aim_exit_pupil && reference.pkg != null) {
-                var referenceCoordinate = ExitPupilAiming.ref_sphere_intersection(
+                var referenceCoordinate = ExitPupilAiming.reference_sphere_intersection(
                         reference.pkg, fld.chief_ray, fld.ref_sphere);
                 if (referenceCoordinate == null) {
                     var error = new ExitPupilAiming.ExitPupilAimException(

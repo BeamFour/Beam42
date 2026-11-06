@@ -93,7 +93,7 @@ class US003549241Example05Test {
                 sagittalShift.times(sagittalScale), tangentialShift.times(tangentialScale),
                 40.0, new TraceOptions(), false);
 
-        double requestedShift = ExitPupilAiming.referenceSphereShift(
+        double requestedShift = ExitPupilAiming.reference_sphere_shift(
                 model, field, wavelength, 40.0);
         double legacyParaxialShift = normalizedShift
                 * Math.abs(model.optical_spec.parax_data.fod.exp_radius);
@@ -126,11 +126,11 @@ class US003549241Example05Test {
         assertNull(rays.referenceError());
         assertNull(rays.sagittalError());
         assertNull(rays.tangentialError());
-        Vector3 reference = ExitPupilAiming.ref_sphere_intersection(
+        Vector3 reference = ExitPupilAiming.reference_sphere_intersection(
                 rays.reference(), field.chief_ray, field.ref_sphere);
-        Vector3 sagittal = ExitPupilAiming.ref_sphere_intersection(
+        Vector3 sagittal = ExitPupilAiming.reference_sphere_intersection(
                 rays.sagittal(), field.chief_ray, field.ref_sphere);
-        Vector3 tangential = ExitPupilAiming.ref_sphere_intersection(
+        Vector3 tangential = ExitPupilAiming.reference_sphere_intersection(
                 rays.tangential(), field.chief_ray, field.ref_sphere);
         assertNotNull(reference);
         assertNotNull(sagittal);

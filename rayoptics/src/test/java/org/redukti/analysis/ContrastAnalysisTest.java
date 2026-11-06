@@ -29,11 +29,11 @@ class ContrastAnalysisTest {
                     assertNull(rays.referenceError());
                     assertNull(rays.sagittalError());
                     assertNull(rays.tangentialError());
-                    var reference = ExitPupilAiming.ref_sphere_intersection(
+                    var reference = ExitPupilAiming.reference_sphere_intersection(
                             rays.reference(), field.chief_ray, field.ref_sphere);
-                    var sagittal = ExitPupilAiming.ref_sphere_intersection(
+                    var sagittal = ExitPupilAiming.reference_sphere_intersection(
                             rays.sagittal(), field.chief_ray, field.ref_sphere);
-                    var tangential = ExitPupilAiming.ref_sphere_intersection(
+                    var tangential = ExitPupilAiming.reference_sphere_intersection(
                             rays.tangential(), field.chief_ray, field.ref_sphere);
                     assertNotNull(reference);
                     assertNotNull(sagittal);
@@ -48,7 +48,7 @@ class ContrastAnalysisTest {
                 new Vector2(0.0, normalizedShift),
                 40.0, new TraceOptions(), true);
 
-        double physicalShift = ExitPupilAiming.referenceSphereShift(
+        double physicalShift = ExitPupilAiming.reference_sphere_shift(
                 model, model.optical_spec.fov.fields[fieldIndex], wavelength, 40.0);
 
         double tolerance = Math.max(1.0e-9,

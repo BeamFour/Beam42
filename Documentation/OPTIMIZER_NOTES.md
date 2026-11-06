@@ -265,7 +265,39 @@ frequency `nu` is `lambda nu / n_img`, so the physical separation on the sphere 
 Delta = |R| lambda nu / |n_img|,
 ```
 
-and Beam42 asks for
+This follows from the propagation phase in Hopkins' equations (10.3)-(10.5).
+Consider one transverse direction. Let `x` be a physical reference-sphere coordinate
+relative to the chief-ray sphere point, and `xi` an image-plane displacement from the
+reference focus. Within the near-focus approximation of (10.3), the contribution from
+`x` has the propagation factor
+
+```text
+exp(i 2 pi n_img xi x / (lambda R)).
+```
+
+A phase factor independent of `x` is omitted because it cancels when forming intensity.
+Intensity is amplitude times its complex conjugate, so the cross term from two pupil
+points `x1` and `x2` contains
+
+```text
+exp(i 2 pi n_img xi (x1 - x2) / (lambda R)).
+```
+
+Comparing this with the image spatial-frequency factor `exp(i 2 pi nu xi)` gives
+
+```text
+nu = n_img (x1 - x2) / (lambda R)
+|x1 - x2| = |R| lambda |nu| / |n_img|.
+```
+
+Thus the OTF at frequency `nu` collects pupil-point pairs with this transverse
+separation, as expressed by the autocorrelation in (10.22)-(10.26). Their wavefront
+differences determine the phase of each contribution. The separation is a difference
+in transverse sphere coordinates, not a distance along the curved sphere. The same
+derivation applies to the other transverse direction. Here `lambda` is the vacuum
+wavelength and `R` is the actual sphere radius, rather than its axial projection.
+
+Beam42 asks for
 
 ```text
 Delta X_sag = (Delta, 0)

@@ -14,6 +14,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ContrastPupilMapTest {
 
+    @Test
+    void mapRetainsStoredReferencePositionsWhenInvalidSamplesAreOmitted() {
+        var first = new Vector2(-0.31, 0.22);
+        var last = new Vector2(0.14, -0.42);
+        var block = new ContrastAnalysisResult.WavelengthResult(587.5618, 0.1, List.of(
+                new ContrastAnalysisResult.Sample(first, 0.1, 0.2, 0.3, true, null),
+                new ContrastAnalysisResult.Sample(new Vector2(0, 0), 0, 0, 0.4, false, null),
+                new ContrastAnalysisResult.Sample(last, -0.1, -0.2, 0.3, true, null)));
+        for (int orientation : new int[]{Orientation.SAGITTAL, Orientation.TANGENTIAL}) {
+            var map = new ContrastPupilMap(block, orientation);
+            assertEquals(2, map.points.size());
+            assertEquals(first, map.points.get(0).pupil());
+            assertEquals(last, map.points.get(1).pupil());
+        }
+    }
+
     private static ContrastAnalysisResult.WavelengthResult block(double[] differences, double[] weights,
                                                                 double[] references) {
         var samples = new ArrayList<ContrastAnalysisResult.Sample>();

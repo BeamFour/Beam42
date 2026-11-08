@@ -810,6 +810,9 @@ public final class OptimizationBuilder {
     public OptimizationSetup build() {
         validate();
         Analysis analysis = new Analysis(prescription, copy(configuration.fields), copy(configuration.mtfFrequencies), configuration.scenario);
+        // GoalContrast captures node identities before the remaining analysis is configured.
+        analysis._contrast_num_rings = configuration.contrastRings;
+        analysis._contrast_num_spokes = configuration.contrastSpokes;
         List<Var> variables = buildVariables();
         List<Goal> goals = buildGoals(analysis, variables);
         if (goals.size() < variables.size())
@@ -972,19 +975,20 @@ public final class OptimizationBuilder {
             }
         }
 
-        int contrastSamples = configuration.contrastRings * configuration.contrastSpokes;
         for (int contrast_index = 0; contrast_index < configuration.contrastGoals.size(); contrast_index++) {
             ContrastGoals curve = configuration.contrastGoals.get(contrast_index);
             for (int field = 0; field < configuration.fields.length; field++) {
                 for (int wavelength = 0; wavelength < prescription._wvls.length; wavelength++) {
                     double wavelengthWeight = prescription._wts[wavelength];
-                    for (int sample = 0; sample < contrastSamples; sample++) {
-                        result.add(new GoalContrast(analysis, contrast_index, curve.frequency, field + 1,
-                                wavelength, sample, Orientation.SAGITTAL,
-                                wavelengthWeight * curve.sagittalWeights[field]));
-                        result.add(new GoalContrast(analysis, contrast_index, curve.frequency, field + 1,
-                                wavelength, sample, Orientation.TANGENTIAL,
-                                wavelengthWeight * curve.tangentialWeights[field]));
+                    for (int spoke = 0; spoke < configuration.contrastSpokes; spoke++) {
+                        for (int ring = 0; ring < configuration.contrastRings; ring++) {
+                            result.add(new GoalContrast(analysis, contrast_index, curve.frequency, field + 1,
+                                    wavelength, ring, spoke, Orientation.SAGITTAL,
+                                    wavelengthWeight * curve.sagittalWeights[field]));
+                            result.add(new GoalContrast(analysis, contrast_index, curve.frequency, field + 1,
+                                    wavelength, ring, spoke, Orientation.TANGENTIAL,
+                                    wavelengthWeight * curve.tangentialWeights[field]));
+                        }
                     }
                 }
             }

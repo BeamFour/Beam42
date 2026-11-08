@@ -459,10 +459,16 @@ contrast, at the reference wavelength. `contrast-pupil<suffix>.svg`,
 0, 0.7 and 1.0, with a row per frequency, sagittal on the left and tangential on the right.
 The samples and settings are those of the contrast report.
 
-* **Circles** - one per sample, at its pupil position. The radius is
+Markers use the stored normalized entrance-pupil reference coordinates, after
+vignetting and overlap contraction. They do not show the shifted partner, pair
+midpoint or exit-pupil sphere intersection. The outline is the vignetting-factor
+pupil model, not a measured physical aperture boundary.
+
+* **Circles** - one per valid lossy sample, at its reference position. The radius is
   `½(1 − cos(Δφ − φ̄))`, where `Δφ` is the sample's phase difference across the shear and
-  `φ̄` the phase of the block's mean. No circle means the pair is in phase with the
-  block; full size means half a wave from it. Large circles mark where the MTF is lost.
+  `φ̄` the phase of the block's mean. Zero loss has no circle; invalid samples are
+  omitted entirely. Full size means half a wave from the block's mean phase.
+  Large circles mark where the MTF is lost.
 * **Hands** - the average phase of the two rays, `π(W(p) + W(p+s))`. Their turning
   shows the shape of the wavefront.
 * **Panel heading** - the phasor `|Σ w·exp(iΔφ)| / Σw`, which is `1 − 2 × the

@@ -21,6 +21,28 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 class OptimizationBuilderTest {
 
+    @Test
+    void contrastGoalsStoreExplicitRingAndSpokeInTracingOrder() {
+        var setup = OptimizationBuilder.builder(dLinePrescription())
+                .fields(0.0).contrastSampling(2, 4)
+                .contrastGoals(OptimizationBuilder.contrast(30, new double[]{1}))
+                .build();
+        var goals = Arrays.stream(setup.goals()).filter(GoalContrast.class::isInstance)
+                .map(GoalContrast.class::cast).toList();
+        assertEquals(16, goals.size());
+        for (int spoke = 0; spoke < 4; spoke++)
+            for (int ring = 0; ring < 2; ring++) {
+                int index = spoke * 2 + ring;
+                for (int direction = 0; direction < 2; direction++) {
+                    var goal = goals.get(2 * index + direction);
+                    assertEquals(ring, goal._ring_index);
+                    assertEquals(spoke, goal._spoke_index);
+                    assertEquals(index, goal._sample_index);
+                    assertEquals(direction == 0 ? Orientation.SAGITTAL : Orientation.TANGENTIAL, goal._orientation);
+                }
+            }
+    }
+
     /** The same lens evaluated at the d line alone. */
     private static Prescription dLinePrescription() {
         return lens(new Prescription(50.0, 1.4, 40.0, 43.28,

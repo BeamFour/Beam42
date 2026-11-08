@@ -85,6 +85,13 @@ share the reference ray, saving one ray relative to tracing the two pairs separa
 
 ### Sample and residual counts
 
+`GoalContrast` stores the nominal GQ node as zero-based ring and spoke indices.
+The flattened sample index is `spoke * numRings + ring`; spoke ordering follows
+`theta = 2 pi (spoke + 1) / numSpokes`. Failed rays retain their slots and receive
+a penalty. Vignetting and overlap contraction can change the node's tracing
+coordinates and weight, but not its identity. Changing the ring or spoke count
+requires rebuilding the goals; existing goals return a penalty for a changed pattern.
+
 With the default 6-ring by 12-spoke pattern, each field, wavelength, and frequency uses
 
 ```text

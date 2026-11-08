@@ -18,11 +18,15 @@ import java.util.EnumSet;
  * Draws {@link ContrastPupilMap}s for one field: a row per frequency, sagittal on the
  * left and tangential on the right.
  *
- * <p>Each contrast sample is a circle at its reference ray's pupil position. The circle's
+ * <p>Each contrast sample is a circle at its stored normalized entrance-pupil reference
+ * position, after vignetting and overlap contraction. This is not the partner position,
+ * pair midpoint or exit-pupil reference-sphere intersection. The circle's
  * radius is proportional to the sample's contrast loss, from nothing when the pair is in
  * phase with the block to the full radius at half a wave. The line through each sample is
  * a clock hand at the pair's average phase, so neighbouring hands turning shows the shape of
- * the wavefront. The outline is the vignetted pupil, scaled in each panel to fill it.
+ * the wavefront. The outline is the vignetting-factor pupil model, not a measured aperture
+ * boundary. Markers and outline share the same translation and uniform scale in each panel.
+ * Invalid samples are omitted; zero-loss samples have no loss circle.
  */
 public class ContrastPupilMapPlot {
 

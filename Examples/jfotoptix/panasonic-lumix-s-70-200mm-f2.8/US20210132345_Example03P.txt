@@ -121,3 +121,17 @@ originY	117.67
 ppmm	2.153
 [notes]
 Bill: Adjusted H' for the usual convention.
+[patent info]
+country	US
+number	US 2021/0132345
+example	3
+year applied	2020
+inventors	Takehiro Nishioka, Hisayuki Ii
+current assignee	Panasonic Intellectual Property Management Co Ltd
+original assignee	Panasonic Intellectual Property Management Co Ltd
+link	https://patents.google.com/patent/US20210132345A1/en
+[report data]
+lens name	Panasonic Lumix S Pro 70-200mm F2.8 OIS
+scenarios	0	2
+names	70mm f2.8	200mm f2.8
+status	Todo

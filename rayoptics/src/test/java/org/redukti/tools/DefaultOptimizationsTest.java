@@ -9,6 +9,13 @@ import static org.junit.jupiter.api.Assertions.*;
 /** Which airspaces the routine optimization picks out of a prescription. */
 class DefaultOptimizationsTest {
 
+    @Test
+    void routineFieldsIncludeTheWholeFieldOnlyWhenRequested() {
+        assertArrayEquals(new double[]{0.0}, DefaultOptimizations.optimizationFields(false));
+        assertArrayEquals(new double[]{0.0, 0.1, 0.2, 0.3, 0.4, 0.5,
+                0.6, 0.7, 0.8, 0.9, 1.0}, DefaultOptimizations.optimizationFields(true));
+    }
+
     /**
      * A two configuration zoom shaped like the patents that model the sensor stack:
      * two airspaces that move with the zoom, then a cover glass, then the fixed gap

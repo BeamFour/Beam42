@@ -68,6 +68,8 @@ public final class Args {
      * a prime, the variable airspaces other than the back focus on a zoom.
      */
     public boolean optimize = false;
+    /** Use fields 0.0 through 1.0 in steps of 0.1 for routine optimization. */
+    public boolean optimize_all_fields = false;
     /**
      * Objective for {@link #optimize}: "contrast" or "mtf". Contrast is the
      * default because the geometric MTF merit surface is rough at the scale the
@@ -258,10 +260,15 @@ public final class Args {
                 arguments.update_specfile = true;
             }
             else if (arg1.equals("--optimize")) {
-                // Followed by a trial number it runs that [trial n]; on its own it is the
-                // routine airspace optimization.
+                // A number selects a trial or pipeline; all-fields selects the
+                // routine airspace optimization across the full field.
                 if (arg2 != null && !arg2.startsWith("--")) {
-                    arguments.optimize_trial = parse_trial_number(arg2);
+                    if (arg2.equals("all-fields")) {
+                        arguments.optimize = true;
+                        arguments.optimize_all_fields = true;
+                    }
+                    else
+                        arguments.optimize_trial = parse_trial_number(arg2);
                     i++;
                 }
                 else
@@ -331,7 +338,7 @@ public final class Args {
             // reported below
         }
         throw new IllegalArgumentException(
-                "--optimize takes the number of a [trial n] or [pipeline n] section, found '" + value + "'");
+                "--optimize takes all-fields or the number of a [trial n] or [pipeline n] section, found '" + value + "'");
     }
 
     /** Accepts contrast or mtf, rejecting anything else rather than defaulting. */

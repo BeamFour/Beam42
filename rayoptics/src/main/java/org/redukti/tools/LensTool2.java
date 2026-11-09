@@ -661,7 +661,7 @@ public class LensTool2 {
                     ? DefaultOptimizations.Objective.MTF
                     : DefaultOptimizations.Objective.CONTRAST;
             var result = DefaultOptimizations.optimizeThicknesses(prescription, surfaces,
-                    arguments.mtf_freqs, config, vigType, objective);
+                    arguments.mtf_freqs, config, vigType, objective, arguments.optimize_all_fields);
             System.out.printf("Optimized %s for configuration %d on %s: status %d, merit %.6g -> %.6g%s%n",
                     what, config, arguments.optimize_goal, result.status(), result.before(), result.after(),
                     result.improved() ? "" : " (no improvement)");
@@ -826,12 +826,13 @@ public class LensTool2 {
             System.err.println("       [--output-ray-aberration-plots] [--output-wavelength-mtfs] [--auto-size-spot-diagrams] \\");
             System.err.println("       [--use-spot-pattern " + Args.spot_pattern_names() + "] [--spot-grid-size count] [--vig-type " + Args.vig_type_names() + "] \\");
             System.err.println("       [--real-ray-aiming|--paraxial-ray-aiming] [--mtf freq,freq,...] \\");
-            System.err.println("       [--assign-glass-types [--index-line d|e] [--abbe-line d|e] [--force] [--update-specfile]] [--optimize [--optimize-goal contrast|mtf] | --optimize trial]");
+            System.err.println("       [--assign-glass-types [--index-line d|e] [--abbe-line d|e] [--force] [--update-specfile]] [--optimize [--optimize-goal contrast|mtf] | --optimize all-fields | --optimize trial]");
             System.err.println("       --assign-glass-types matches each surface's nd/vd to a catalog glass for this run;");
             System.err.println("         --force re-matches surfaces that already name a glass, --update-specfile writes the result back to the specfile");
             System.err.println("         --index-line e when the prescription quotes the refractive index at the e line rather than the d line");
             System.err.println("         --abbe-line e  when it also quotes the Abbe number as ve; Leica patents use ne with ve, ne with vd is usually an error");
             System.err.println("       --optimize varies the back focus on a prime, or airspaces whose thickness differs across the selected configurations on a zoom, at the central field");
+            System.err.println("       --optimize all-fields uses fields 0.0 through 1.0 in steps of 0.1, with the same airspace variables");
             System.err.println("       --optimize-goal defaults to contrast; mtf uses the geometric MTF directly, which stalls more easily");
             System.err.println("       --optimize n runs the specfile's [trial n] section, writes the result as <specfile>-trial<n>.txt and reports on it");
             System.err.println("         a [pipeline n] section runs its trials in order, each starting from the last result, and writes <specfile>-pipeline<n>.txt");

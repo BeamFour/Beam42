@@ -329,6 +329,7 @@ Everything else has a default.
 | `--force` | off | With `--assign-glass-types`, re-match surfaces that already name a recognised glass.                                                                                                                                                                                                                                                                           |
 | `--update-specfile` | off | With `--assign-glass-types`, also write the matched prescription back over the input file. Rejected on its own.                                                                                                                                                                                                                                                |
 | `--optimize` | off | Run the routine airspace optimization before reporting: the back focus on a prime, or airspaces whose thickness differs across the selected configurations on a zoom. See below. |
+Add| `--optimize all-fields` | off | Run routine airspace optimization over fields 0.0 through 1.0 in steps of 0.1, with equal field weights and the same variables. |
 | `--optimize <n>` | off | Run the spec file's `[trial n]` or `[pipeline n]` section instead, and report on its result. See [OPTIMIZER.md](OPTIMIZER.md).                                                                                                                                                                                                                                 |
 | `--optimize-goal <contrast\|mtf>` | `contrast` | Objective for `--optimize`.                                                                                                                                                                                                                                                                                                                                    |
 | `--real-ray-aiming` / `--paraxial-ray-aiming` | real | Chief ray aiming algorithm. Real aiming traces an actual ray at the entrance pupil; paraxial aiming is faster but does not hold up on very wide angle lenses. Applies to the analysis model, not the layout diagrams.                                                                                                                                          |
@@ -588,7 +589,9 @@ Effective focal length and f-number are anchored to the prescription throughout,
 so an optimized airspace cannot quietly turn the lens into a different one.
 
 **On the objective.** Both goals target the central field at the `--mtf`
-frequencies. `contrast` is the default, as it is the more effective option.
+frequencies by default. Use `--optimize all-fields` to target fields 0.0 through
+1.0 in steps of 0.1 with equal weights. This keeps the same distance variables
+and works with either `--optimize-goal`. `contrast` is the default, as it is the more effective option.
 Use `--optimize-goal mtf` only if you want to check that out.
 
 `--optimize` **with a number** triggers an optimization 

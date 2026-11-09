@@ -3,6 +3,8 @@
 // License GPL v3
 package org.redukti.tools;
 
+import java.util.Arrays;
+
 import org.redukti.optim.LMDerMeritFunction;
 import org.redukti.optim.OptimizationBuilder;
 import org.redukti.spec.Prescription;
@@ -14,8 +16,8 @@ import org.redukti.spec.VigType;
  * almost always needs, wired up so that LensTool2 can run them without the
  * caller having to build a merit function by hand.
  *
- * <p>Both target MTF at the central field, which is what the manual runs this
- * replaces have used and what tends to converge. Effective focal length and
+ * <p>Both target the central field by default, with an option to use fields
+ * 0.0 through 1.0 in steps of 0.1. Effective focal length and
  * f-number are anchored to the prescription by {@link OptimizationBuilder}
  * itself, so optimizing an airspace cannot quietly turn the lens into a
  * different one.
@@ -30,8 +32,17 @@ public final class DefaultOptimizations {
 
     private DefaultOptimizations() {}
 
-    /** Central field, the single field these optimizations are judged on. */
+    /** Default field selection for routine optimization. */
     private static final double[] CENTRAL_FIELD = {0.0};
+    static double[] optimizationFields(boolean allFields) {
+        if (!allFields)
+            return CENTRAL_FIELD.clone();
+        double[] fields = new double[11];
+        for (int i = 0; i < fields.length; i++)
+            fields[i] = i / 10.0;
+        return fields;
+    }
+
     /** Goals aim at perfect contrast, so the solver simply maximizes it. */
     private static final double PERFECT_MTF = 1.0;
     /** Pupil sampling for the contrast objective. */
@@ -146,23 +157,35 @@ public final class DefaultOptimizations {
                                              int[] mtfFrequencies, int configuration,
                                              VigType vigType,
                                              Objective objective) throws Exception {
+        return optimizeThicknesses(prescription, surfaces, mtfFrequencies, configuration,
+                vigType, objective, false);
+    }
+
+    /** Runs routine optimization with an optional full-field objective. */
+    public static Result optimizeThicknesses(Prescription prescription, int[] surfaces,
+                                             int[] mtfFrequencies, int configuration,
+                                             VigType vigType, Objective objective,
+                                             boolean allFields) throws Exception {
+        double[] fields = optimizationFields(allFields);
+        double[] targets = new double[fields.length];
+        Arrays.fill(targets, PERFECT_MTF);
         if (surfaces.length == 0)
             throw new IllegalArgumentException("no surfaces to optimize");
         var builder = OptimizationBuilder.builder(prescription)
-                .fields(CENTRAL_FIELD)
+                .fields(fields)
                 .mtfFrequencies(mtfFrequencies)
                 .scenario(configuration)
                 .vignetting(vigType)
                 .varyThicknesses(surfaces)
                 .applyThicknessConstraints();
-        // Goals at the central field, both meridians, driving contrast up.
+        // Goals at every selected field, both meridians, driving contrast up.
         // Without them the only residuals are the automatic focal length and
         // f-number anchors, which do not depend on an airspace at all, and the
         // solve sits still.
         if (objective == Objective.CONTRAST) {
             var goals = new OptimizationBuilder.ContrastGoals[mtfFrequencies.length];
             for (int i = 0; i < mtfFrequencies.length; i++)
-                goals[i] = OptimizationBuilder.contrast(mtfFrequencies[i], new double[]{1.0});
+                goals[i] = OptimizationBuilder.contrast(mtfFrequencies[i], targets);
             builder = builder
                     .contrastSampling(CONTRAST_RINGS, CONTRAST_SPOKES)
                     .calibrateContrastFrequency(true)
@@ -172,7 +195,7 @@ public final class DefaultOptimizations {
             var goals = new OptimizationBuilder.MtfGoals[mtfFrequencies.length];
             for (int i = 0; i < mtfFrequencies.length; i++)
                 goals[i] = OptimizationBuilder.mtf(mtfFrequencies[i],
-                        new double[]{PERFECT_MTF}, new double[]{PERFECT_MTF});
+                        targets, targets);
             builder = builder.mtfGoals(goals);
         }
         var setup = builder.build();

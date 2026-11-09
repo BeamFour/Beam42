@@ -62,6 +62,15 @@ class OptimizationTrialRunTest {
 
         var last = Args.parseArguments(new String[]{"--specfile", "lens.txt", "--optimize"});
         assertTrue(last.optimize);
+        assertFalse(last.optimize_all_fields);
+
+        var allFields = Args.parseArguments(new String[]{"--optimize", "all-fields",
+                "--optimize-goal", "mtf", "--mtf", "10,20"});
+        assertTrue(allFields.optimize);
+        assertTrue(allFields.optimize_all_fields);
+        assertNull(allFields.optimize_trial);
+        assertEquals("mtf", allFields.optimize_goal);
+        assertArrayEquals(new int[]{10, 20}, allFields.mtf_freqs);
 
         var e = assertThrows(IllegalArgumentException.class,
                 () -> Args.parseArguments(new String[]{"--optimize", "two"}));

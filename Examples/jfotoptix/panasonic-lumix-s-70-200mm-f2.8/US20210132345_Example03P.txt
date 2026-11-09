@@ -134,4 +134,4 @@ link	https://patents.google.com/patent/US20210132345A1/en
 lens name	Panasonic Lumix S Pro 70-200mm F2.8 OIS
 scenarios	0	2
 names	70mm f2.8	200mm f2.8
-status	Todo
+status	Candidate

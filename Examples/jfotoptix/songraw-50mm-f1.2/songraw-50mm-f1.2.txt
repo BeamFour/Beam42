@@ -1,8 +1,5 @@
 [descriptive data]
 title	CN119148346A Example 1 (SongRaw FE 50mm f/1.2)
-#patent	country	number	example	year	inventors	org	link
-patent	CN	CN119148346A	EX 1	2024	CHANG YUWEN	SHENZHEN SONGRUO PHOTOGRAPHY EQUIPMENT CO LTD 	https://worldwide.espacenet.com/patent/search?q=pn%3DCN119148346A
-lens name	SongRaw FE 50mm f/1.2
 [constants]
 [variable distances]
 Focal Length	49.017	
@@ -46,3 +43,15 @@ Bf	0.505
 27	500.0	0	-1.6629E-006	-5.56053E-008	4.94078E-010	-1.31612E-012	1.35237E-015
 [notes]
 Thanks to Arimaiciai
+[patent info]
+country	CN
+number	CN119148346A
+example	EX 1
+year applied	2024
+inventors	CHANG YUWEN
+current assignee	SHENZHEN SONGRUO PHOTOGRAPHY EQUIPMENT CO LTD
+original assignee	SHENZHEN SONGRUO PHOTOGRAPHY EQUIPMENT CO LTD
+link	https://worldwide.espacenet.com/patent/search?q=pn%3DCN119148346A
+[report data]
+lens name	SongRaw FE 50mm f/1.2
+status	Accepted

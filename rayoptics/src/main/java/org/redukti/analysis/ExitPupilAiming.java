@@ -16,19 +16,25 @@ import org.redukti.rayoptics.specs.Field;
  *
  * <p><b>Why a linear shift on the reference sphere is the right target.</b> The OTF is the
  * autocorrelation of the exit-pupil function at a fixed separation, and the aberration
- * enters that function's phase, not the separation. The separation is measured in Hopkins'
- * <em>reduced</em> coordinates, which are the transverse direction cosines of the chord
- * from the pupil point to the image point. For a pupil point {@code B'} on the sphere of
- * radius {@code R} about the image point {@code O}, with {@code c = B' - Ebar'} the stored
- * coordinate relative to the chief-ray exit-pupil point and {@code r} the reference
- * direction,
+ * enters that function's phase, not the separation. Hopkins measures the separation in
+ * <em>reduced</em> pupil coordinates {@code x' = (X' - Xbar')/h'}, eqs (5.1) and (10.9),
+ * with reduced frequency {@code s = lambda*nu/(N'*n*u'_k)} (after 10.28). Using
+ * {@code h' = R'*u'_k} and {@code R = R'/N'}, where {@code R'} is the axial projection of
+ * the sphere radius {@code R}, the physical separation is {@code s*h' = R*lambda*nu/n}.
+ * Hopkins' obliquity factor {@code N'} cancels because {@code R}, not {@code R'}, is used.
+ *
+ * <p>Equivalently, for a pupil point {@code B'} on the sphere of radius {@code R} about the
+ * image point {@code O}, with {@code c = B' - Ebar'} the stored coordinate relative to the
+ * chief-ray exit-pupil point and {@code r} the reference direction, the chord direction is
  *
  * <pre>{@code u = (O - B')/R = r - c/R}</pre>
  *
- * <p>so the transverse components of {@code u} are linear in {@code c} with coefficient
- * {@code -1/R} exactly - no obliquity factor, whatever the field angle. A transverse shift
- * of {@code R*lambda*nu/n} therefore produces a chord-direction difference of exactly
- * {@code lambda*nu/n}, which is the separation the OTF at {@code nu} integrates over.
+ * <p>so its transverse components are linear in {@code c} with coefficient {@code -1/R}.
+ * Hopkins' reduced coordinates are proportional to these direction cosines, with factor
+ * {@code -R/h'} for a given field. A transverse shift of {@code R*lambda*nu/n} therefore
+ * produces a chord-direction difference of {@code lambda*nu/n}. Both {@code c} and
+ * {@code nu} are transverse to the optical axis: {@code c} is in image-space axes and
+ * {@code nu} is the image-plane frequency.
  * Measured on the Leica 75/2: the realised chord-direction difference is the requested one
  * to six decimals at every field, axis and pupil radius, and the two coordinates sit on
  * the sphere to nine. See {@code ContrastProbe19} and the 2026-11-01 measurement in
@@ -55,10 +61,10 @@ public final class ExitPupilAiming {
      * Physical separation on the finite reference sphere corresponding to an
      * image-space spatial frequency.
      *
-     * <p>The OTF's separation is {@code lambda*nu/n} in reduced coordinates - the
-     * transverse direction cosines of the pupil-to-image chord - and those are the stored
-     * sphere coordinate divided by {@code R}, so the physical separation is
-     * {@code R*lambda*nu/n}. See the class comment for the derivation and for what this
+     * <p>The OTF's separation is {@code lambda*nu/n} in transverse direction cosines of
+     * the pupil-to-image chord, which are the stored sphere coordinate divided by
+     * {@code R}, so the physical separation is {@code R*lambda*nu/n}. Hopkins' reduced
+     * coordinates give the same result. See the class comment for the derivation and for what this
      * does not claim about the pair's own fringe frequency. Taking {@code R} from the
      * traced reference sphere avoids converting through the paraxial exit-pupil radius
      * and f-number.

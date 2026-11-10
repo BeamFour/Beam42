@@ -254,25 +254,40 @@ delta = 2 lambda F# nu
 This remains the initial guess supplied to the inverse aiming solve. The physical target
 is derived directly on the field- and wavelength-specific reference sphere.
 
-Hopkins' `(s,t)` is a separation in *reduced* coordinates, which are the transverse
-direction cosines of the chord from the pupil point to the image point. For a pupil point
-`B'` on the sphere of radius `R` about the image point `O`, writing `c = B' - Ebar'` for
-the stored coordinate relative to the chief-ray exit-pupil point and `r` for the reference
-direction,
+Hopkins' `(s,t)` is a separation in *reduced* pupil coordinates `x' = (X' - Xbar')/h'`,
+(5.1) and (10.9), where `X'` is the transverse coordinate of the sphere point in the
+image-space axes and `h'` a normalizing height. After (10.28) the reduced frequency is
+`s = lambda nu / (N' n_img u'_k)`. With `h' = R' u'_k` and `R = R'/N'`, where `R'` is the
+axial projection of the sphere radius `R` and `N'` the axial direction cosine of the
+reference direction `r` (the line from the chief-ray pupil point to the image point), the
+physical separation on the sphere is
+
+```text
+Delta = s h' = |R| lambda nu / |n_img|.
+```
+
+Hopkins' obliquity factor `N'` from (10.7) cancels exactly because `R`, not `R'`, is used.
+
+An equivalent view uses the chord from the pupil point to the image point. For a pupil
+point `B'` on the sphere of radius `R` about the image point `O`, writing `c = B' - Ebar'`
+for the stored coordinate relative to the chief-ray exit-pupil point and `r` for the
+reference direction, the chord direction is
 
 ```text
 u = (O - B')/R = r - c/R
 ```
 
-so the transverse components of `u` are linear in `c` with coefficient `-1/R`, exactly and
-at any field angle - there is no obliquity factor to apply. The reduced separation for
-frequency `nu` is `lambda nu / n_img`, so the physical separation on the sphere is
+so its transverse components are linear in `c` with coefficient `-1/R`, and the separation
+above is a chord-direction difference of `lambda nu / n_img`. Hopkins' reduced coordinates
+are proportional to these direction cosines, with the constant factor `-R/h'` for a given
+field.
 
-```text
-Delta = |R| lambda nu / |n_img|,
-```
+Both `c` and `nu` are taken transverse to the optical axis: `c` is expressed in the
+image-space axes and `nu` is the frequency in the image plane, as in Hopkins and in
+conventional MTF reporting. Measured perpendicular to the chief ray instead, the tangential
+separation would differ by `N'`.
 
-This follows from the propagation phase in Hopkins' equations (10.3)-(10.5).
+The relation follows from the propagation phase in Hopkins' equations (10.3)-(10.5).
 Consider one transverse direction. Let `x` be a physical reference-sphere coordinate
 relative to the chief-ray sphere point, and `xi` an image-plane displacement from the
 reference focus. Within the near-focus approximation of (10.3), the contribution from

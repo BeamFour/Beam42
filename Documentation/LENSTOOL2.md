@@ -1,7 +1,7 @@
 # LensTool2
 
 `LensTool2` is the command line front end to Beam42's RayOptics module. It takes a
-single lens specification file and generates a full set of analysis outputs:
+single lens specification file and generates a set of analysis outputs:
 layout and spot diagrams, geometric MTF plots, a paraxial report, a Zemax export
 and a `README.md` that ties them together. The reports under `Examples/` are all
 produced by this tool.
@@ -60,20 +60,20 @@ alongside.
 The input is the tab delimited format used by the
 [PhotonsToPhotos Optical Bench](https://www.photonstophotos.net/GeneralTopics/Lenses/OpticalBench/OpticalBenchHub.htm),
 with several extensions added by Beam42. Sections are introduced by a name in square
-brackets. Lines beginning with `#` are treated as comments.
+brackets. Beam42 treats lines beginning with `#` as comments, this is an extension.
 
-| Section | Origin | Purpose                                                                                                                               |
-| --- | --- |---------------------------------------------------------------------------------------------------------------------------------------|
-| `[descriptive data]` | Optical Bench | `title`, and other free form descriptive fields.                                                                                      |
-| `[constants]` | Optical Bench | Selects how `[aspherical data]` coefficients are interpreted. See below.                                                              |
-| `[variable distances]` | Optical Bench | System values and named airspaces. Three rows are mandatory, see below. Each row may carry **several values**, one per configuration. |
-| `[lens data]` | Optical Bench, **extended** | The surface table. Beam42 accepts glass and catalog name columns, see below.                                                          |
-| `[aspherical data]` | Optical Bench | Aspheric coefficients.                                                                                                                |
-| `[notes]` | **Beam42 extension** | Source prescription filename recorded in the generated prescription. Informational only. |
-| `[patent info]` | **Beam42 extension** | Provenance for the patent report.                                                                                                     |
-| `[report data]` | **Beam42 extension** | Report title and, importantly, which configurations to process.                                                                       |
-| `[trial n]` | **Beam42 extension** | An optimization run described in the file. See [OPTIMIZER.md](OPTIMIZER.md) for details.                                                      |
-| `[pipeline n]` | **Beam42 extension** | A set of optimization runs, each starting from the result of the one before. See [OPTIMIZER.md](OPTIMIZER.md) for details.                                         |
+| Section                | Origin                      | Purpose                                                                                                                               |
+|------------------------|-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| `[descriptive data]`   | Optical Bench               | `title`, and other free form descriptive fields.                                                                                      |
+| `[constants]`          | Optical Bench               | Selects how `[aspherical data]` coefficients are interpreted. See below.                                                              |
+| `[variable distances]` | Optical Bench               | System values and named airspaces. Three rows are mandatory, see below. Each row may carry **several values**, one per configuration. |
+| `[lens data]`          | Optical Bench, **extended** | The surface table. Beam42 accepts glass and catalog name columns, see below.                                                          |
+| `[aspherical data]`    | Optical Bench               | Aspheric coefficients.                                                                                                                |
+| `[notes]`              | **Beam42 extension**        | Source prescription filename recorded in the generated prescription. Informational only.                                              |
+| `[patent info]`        | **Beam42 extension**        | Provenance for the patent report.                                                                                                     |
+| `[report data]`        | **Beam42 extension**        | Report title and, importantly, which configurations to process.                                                                       |
+| `[trial n]`            | **Beam42 extension**        | An optimization run described in the file. See [OPTIMIZER.md](OPTIMIZER.md) for details.                                              |
+| `[pipeline n]`         | **Beam42 extension**        | A set of optimization runs, each starting from the result of the one before. See [OPTIMIZER.md](OPTIMIZER.md) for details.            |
 
 Unrecognized sections are skipped.
 
@@ -82,11 +82,11 @@ Unrecognized sections are skipped.
 The importer uses two constants to choose the coefficient convention for
 `[aspherical data]`:
 
-| Constant present | Aspheric type |
-| --- | --- |
-| Positive `AsphericalOddCount` | `RADIAL` (radial, both odd and even powers) |
-| `AsphericalA2` (without a positive `AsphericalOddCount`) | `EVEN A2` |
-| Neither | `EVEN` |
+| Constant present                                         | Aspheric type                               |
+|----------------------------------------------------------|---------------------------------------------|
+| Positive `AsphericalOddCount`                            | `RADIAL` (radial, both odd and even powers) |
+| `AsphericalA2` (without a positive `AsphericalOddCount`) | `EVEN A2`                                   |
+| Neither                                                  | `EVEN`                                      |
 
 `AsphericalOddCount` is a non-negative integer that counts odd powers starting at
 A3. Coefficients are ordered by increasing power, including the declared odd
@@ -119,16 +119,18 @@ for how README and Zemax coefficient lists differ from this input convention.
 Each row is a name followed by one value per configuration / scenario. The first value after 
 the variable name is given scenario number 0, and rest are numbered sequentially.
 
-Three of the variables are **mandatory** for LensTool2.
-
 If multiple configurations are present in `scenarios` (see `[report data]` below) then each
 must have a corresponding value. It is an error if the required value is missing, `undefined` or non-positive.
 
-| Row | Meaning |
-| --- | --- |
-| `Focal Length` | Effective focal length in mm. |
-| `F-Number` | The f/#, which becomes the pupil specification. |
+Three of the variables are **mandatory** for LensTool2.
+
+| Row             | Meaning                                                |
+|-----------------|--------------------------------------------------------|
+| `Focal Length`  | Effective focal length in mm.                          |
+| `F-Number`      | The f/#, which becomes the pupil specification.        |
 | `Angle of View` | **Full** angle of view in degrees, not the half angle. |
+
+Example error message if `Angle of View` is missing.
 
 ```
 Failed due to: The prescription does not specify 'Angle of View'; add it to the
@@ -138,26 +140,26 @@ If the Optical Bench spec file omits values required by LensTool2, you must manu
 
 LensTool2 treats the following as optional:
 
-| Row | If present                                                                                                                                                                | If absent                                                                                     |
-| --- |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
-| `Image Height` | Sets the image circle diameter. Only the **first** value is read, so it does not vary per configuration.                                                                  | Defaults to 43.2 mm, i.e. 35 mm format.                                                       |
-| `Aperture Diameter` | Overrides the diameter given on the aperture stop (`AS`) row in `[lens data]`, one value per configuration. This allows a zoom to vary its stop diameter by focal length. | The diameter defined on the aperture stop (`AS`) row in `[lens data]` is used.                |
-| Named airspaces (`Bf`, `d12`, `d20`, ...) | Any row whose name appears in a thickness column of `[lens data]`, supplying one thickness per configuration. Zero is a valid thickness. | An undefined variable, or a missing, empty or non-numeric value for a selected scenario, is an error. |
+| Row                                       | If present                                                                                                                                                                | If absent                                                                                             |
+|-------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| `Image Height`                            | Sets the image circle diameter. Only the **first** value is read, so it does not vary per configuration.                                                                  | Defaults to 43.2 mm, i.e. 35 mm format.                                                               |
+| `Aperture Diameter`                       | Overrides the diameter given on the aperture stop (`AS`) row in `[lens data]`, one value per configuration. This allows a zoom to vary its stop diameter by focal length. | The diameter defined on the aperture stop (`AS`) row in `[lens data]` is used.                        |
+| Named airspaces (`Bf`, `d12`, `d20`, ...) | Any row whose name appears in a thickness column of `[lens data]`, supplying one thickness per configuration. Zero is a valid thickness.                                  | An undefined variable, or a missing, empty or non-numeric value for a selected scenario, is an error. |
 
 ### `[lens data]` glass columns
 
 The surface table is tab delimited, one row per surface:
 
 | Column | Contents                                                                                                   |
-| --- |------------------------------------------------------------------------------------------------------------|
-| 1 | Surface id, also referenced by `[aspherical data]`. Note that this is a string value.                      |
-| 2 | Radius of curvature, or `Infinity`, or one of `AS` (aperture stop), `FS` (field stop), `CG` (cover glass). |
-| 3 | Thickness to the next surface. May name a variable from `[variable distances]`, e.g. `d12`.                |
-| 4 | Refractive index nd.                                                                                       |
-| 5 | Clear diameter. For `AS` row can be overridden by variable named `Aperture Diameter`.                      |
-| 6 | Abbe number vd.                                                                                            |
-| 7 | **Beam42 extension** - glass name, e.g. `S-LAH66`.                                                         |
-| 8 | **Beam42 extension** - catalog name, e.g. `Ohara`.                                                         |
+|--------|------------------------------------------------------------------------------------------------------------|
+| 1      | Surface id, also referenced by `[aspherical data]`. Note that this is a string value.                      |
+| 2      | Radius of curvature, or `Infinity`, or one of `AS` (aperture stop), `FS` (field stop), `CG` (cover glass). |
+| 3      | Thickness to the next surface. May name a variable from `[variable distances]`, e.g. `d12`.                |
+| 4      | Refractive index nd.                                                                                       |
+| 5      | Clear diameter. For `AS` row can be overridden by variable named `Aperture Diameter`.                      |
+| 6      | Abbe number vd.                                                                                            |
+| 7      | **Beam42 extension** - glass name, e.g. `S-LAH66`.                                                         |
+| 8      | **Beam42 extension** - catalog name, e.g. `Ohara`.                                                         |
 
 Columns 7 and 8 let a surface name a real catalog glass instead of relying on
 the tabulated nd/vd in columns 4 and 6. The glass is then looked up in the
@@ -203,12 +205,12 @@ link	https://patents.google.com/patent/US20150146085A1/en
 
 ### `[report data]`
 
-| Key | Effect                                                                                                                                    |
-| --- |-------------------------------------------------------------------------------------------------------------------------------------------|
+| Key         | Effect                                                                                                                                    |
+|-------------|-------------------------------------------------------------------------------------------------------------------------------------------|
 | `lens name` | Display name used as the report heading.                                                                                                  |
-| `status` | `TODO`, `Candidate` or `Accepted`. If absent defaults to `TODO`. This is purely for documentation.                                        |
+| `status`    | `TODO`, `Candidate` or `Accepted`. If absent defaults to `TODO`. This is purely for documentation.                                        |
 | `scenarios` | **Selects which configurations are processed.** A list of zero based column indices into the multi valued rows of `[variable distances]`. |
-| `names` | A label for each selected configuration, in the same order.                                                                               |
+| `names`     | A label for each selected configuration, in the same order.                                                                               |
 
 ### `scenarios`
 
@@ -277,11 +279,11 @@ Important:
 
 The status marker is mainly for documentation:
 
-| Value | Meaning                                                                                         |
-| --- |-------------------------------------------------------------------------------------------------|
-| `TODO` | Work in progress, not to be relied upon. This is the default status. |
-| `Candidate` | Complete enough to look at, but not signed off.                                                 |
-| `Accepted` | Signed off. This is the version a report or a test should be based on.                          |
+| Value       | Meaning                                                                |
+|-------------|------------------------------------------------------------------------|
+| `TODO`      | Work in progress, not to be relied upon. This is the default status.   |
+| `Candidate` | Complete enough to look at, but not signed off.                        |
+| `Accepted`  | Signed off. This is the version a report or a test should be based on. |
 
 The value is case insensitive and stored in its canonical spelling, so `accepted`
 and `Accepted` are the same. If absent it defaults to `TODO`.
@@ -299,44 +301,43 @@ Generated from `Otus55.txt`, status **Accepted**
 Either `--specfile` or `--patent` with `--example` and `--outdir` is required. 
 Everything else has a default.
 
-| Option | Default | Effect                                                                                                                                                                                                                                                                                                                                                         |
-| --- | --- |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `--specfile <file>` | *one of these two* | The lens specification to analyse.                                                                                                                                                                                                                                                                                                                             |
-| `--patent <number> --example <n>` | *one of these two* | Download the prescription from the Optical Bench instead of reading a file. Requires `--outdir`.                                                                                                                                                                                                                                                               |
-| `--outdir <dir>` | alongside the spec file | Directory for generated files, the Zemax export included. **Required** with `--patent`.                                                                                                                                                                                                                                                                        |
-| `--only-d-line` | off | Build the prescription and Zemax export for the d-line alone instead of the full wavelength set.                                                                                                                                                                                                                                                               |
-| `--dont-use-glass-types` | off (glass types used) | Ignore named glass types in the spec and use the supplied index/dispersion instead. Useful when a catalogue glass is unavailable or suspect.                                                                                                                                                                                                                   |
-| `--vig-type <type>` | `set-pupil` | Aperture and vignetting calculation run once the model is built, for the models the **analysis** outputs are computed from. See below. Accepts either the enum spelling (`SetPupil`) or kebab case (`set-pupil`), case insensitive.                                                                                                                            |
-| `--use-spot-pattern <pattern>` | `hex` | Pupil sampling pattern for the spot report and MTF. The spot diagrams themselves are always drawn with `hex`. One of `hex` (hexapolar), `grid`, or `gaussian` (also accepted as `gq`). See below.                                                                                                                                                              |
-| `--spot-grid-size <n>` | 64 | Samples per dimension for the rectangular grid. Only consulted when `--use-spot-pattern grid` is in effect; ignored for the other patterns. Minimum 2.                                                                                                                                                                                                         |
-| `--auto-size-spot-diagrams` | off | Scale each spot diagram to its own spot size. By default all spot diagrams share a fixed 600 unit radius so that fields stay visually comparable.                                                                                                                                                                                                              |
-| `--mtf <f1,f2,...>` | `10,30,50` | Spatial frequencies in cycles/mm for the MTF by field plots. Every report under `Examples/` uses the default, so change it only when comparing against a manufacturer's own choice of frequencies.                                                                                                                                                             |
-| `--output-wavelength-mtfs` | off | Additionally emit a per wavelength monochromatic MTF plot for each field. Not linked to the README.                                                                                                                                                                                                                                                            |
-| `--output-pupil-maps` | off | Additionally measure and draw which part of each field's pupil the lens passes, and which surface blocks the rest. See below.  Not linked to the README.                                                                                                                                                                                                       |
-| `--pupil-map-samples <n>` | 121 | Samples per axis in a pupil map. Only consulted with `--output-pupil-maps`. Minimum 2.                                                                                                                                                                                                                                                                         |
-| `--output-wavelength-mtf-report` | off | Additionally write the monochromatic geometric MTF per frequency, wavelength, orientation and field, in the layout of the contrast report. See below. Not linked to the README. |
-| `--output-diffraction-mtf` | off | Additionally write the polychromatic diffraction MTF by field, for the same wavelengths and weights as the geometric MTF plots. Not linked to the README. |
-| `--diffraction-pupil-rays <N>` | `64` | Rays across each axis of the diffraction pupil grid. N must be even and at least 4. Both diffraction output sets use an N x N pupil grid and a 2N x 2N FFT. Larger values increase cost and can reduce aliasing; sampling is not increased automatically. A warning is printed for each field whose geometric spot does not fit the PSF window, with the N that would hold it. |
-| `--export-vignetting` | off | Add a `[vignetting]` section to the generated `prescription.txt`, holding the vignetting factors of each field and configuration, and write the same fields and factors to the Zemax file. See [`prescription.txt` round trips](#prescriptiontxt-round-trips). |
-| `--output-contrast-pupil-maps` | off | Additionally draw where in the pupil each frequency loses contrast. See below. Not linked to the README. |
-| `--output-contrast-report` | off | Additionally write the RMS contrast OPD difference per frequency, wavelength, orientation and field. See below. Not linked to the README. |
-| `--output-ray-aberration-plots` | off | Additionally emit transverse ray aberration **and** wavefront (OPD) fan plots, tangential and sagittal, for each field.  Not linked to the README.                                                                                                                                                                                                             |
-| `--verbose` | off | Log the optimizer's progress to stderr, one line per iteration: merit, evaluations so far, elapsed time. Warnings are always shown.                                                                                                                                                                                                                            |
-| `--debug` | off | Log everything, including the ray-optics info messages (each field's vignetting and real entrance pupil) and debug traces (the vignetting, pupil and wide angle searches). These fire on every chief ray aim, so during an optimization they run to thousands of lines per iteration. For a subset, pass a standard `-Djava.util.logging.config.file` instead. |
-| `--assign-glass-types` | off | Match each surface's refractive index and Abbe number to a catalog glass before analysing, so the model uses the full dispersion curve instead of a two number approximation. Applies to this run only.                                                                                                                                                        |
-| `--index-line <d\|e>` | `d` | Specifies how the refractive index is quoted in the input file, for `--assign-glass-types`. See below.                                                                                                                                                                                                                                                         |
-| `--abbe-line <d\|e>` | `d` | Specifies how the Abbe number is quoted in the input file. Independent of `--index-line`.                                                                                                                                                                                                                                                                      |
-| `--force` | off | With `--assign-glass-types`, re-match surfaces that already name a recognised glass.                                                                                                                                                                                                                                                                           |
-| `--update-specfile` | off | With `--assign-glass-types`, also write the matched prescription back over the input file. Rejected on its own.                                                                                                                                                                                                                                                |
-| `--optimize` | off | Run the routine airspace optimization before reporting: the back focus on a prime, or airspaces whose thickness differs across the selected configurations on a zoom. See below. |
-Add| `--optimize all-fields` | off | Run routine airspace optimization over fields 0.0 through 1.0 in steps of 0.1, with equal field weights and the same variables. |
-| `--optimize <n>` | off | Run the spec file's `[trial n]` or `[pipeline n]` section instead, and report on its result. See [OPTIMIZER.md](OPTIMIZER.md).                                                                                                                                                                                                                                 |
-| `--optimize-goal <contrast\|mtf>` | `contrast` | Objective for `--optimize`.                                                                                                                                                                                                                                                                                                                                    |
-| `--real-ray-aiming` / `--paraxial-ray-aiming` | real | Chief ray aiming algorithm. Real aiming traces an actual ray at the entrance pupil; paraxial aiming is faster but does not hold up on very wide angle lenses. Applies to the analysis model, not the layout diagrams.                                                                                                                                          |
+| Option                                        | Default                 | Effect                                                                                                                                                                                                                                                                                                                                                                         |
+|-----------------------------------------------|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `--specfile <file>`                           | *one of these two*      | The lens specification to analyse.                                                                                                                                                                                                                                                                                                                                             |
+| `--patent <number> --example <n>`             | *one of these two*      | Download the prescription from the Optical Bench instead of reading a file. Requires `--outdir`.                                                                                                                                                                                                                                                                               |
+| `--outdir <dir>`                              | alongside the spec file | Directory for generated files, the Zemax export included. **Required** with `--patent`.                                                                                                                                                                                                                                                                                        |
+| `--only-d-line`                               | off                     | Build the prescription and Zemax export for the d-line alone instead of the full wavelength set.                                                                                                                                                                                                                                                                               |
+| `--dont-use-glass-types`                      | off (glass types used)  | Ignore named glass types in the spec and use the supplied index/dispersion instead. Useful when a catalogue glass is unavailable or suspect.                                                                                                                                                                                                                                   |
+| `--vig-type <type>`                           | `set-pupil`             | Aperture and vignetting calculation run once the model is built, for the models the **analysis** outputs are computed from. See below. Accepts either the enum spelling (`SetPupil`) or kebab case (`set-pupil`), case insensitive.                                                                                                                                            |
+| `--use-spot-pattern <pattern>`                | `hex`                   | Pupil sampling pattern for the spot report and MTF. The spot diagrams themselves are always drawn with `hex`. One of `hex` (hexapolar), `grid`, or `gaussian` (also accepted as `gq`). See below.                                                                                                                                                                              |
+| `--spot-grid-size <n>`                        | 64                      | Samples per dimension for the rectangular grid. Only consulted when `--use-spot-pattern grid` is in effect; ignored for the other patterns. Minimum 2.                                                                                                                                                                                                                         |
+| `--auto-size-spot-diagrams`                   | off                     | Scale each spot diagram to its own spot size. By default all spot diagrams share a fixed 600 unit radius so that fields stay visually comparable.                                                                                                                                                                                                                              |
+| `--mtf <f1,f2,...>`                           | `10,30,50`              | Spatial frequencies in cycles/mm for the MTF by field plots. Every report under `Examples/` uses the default, so change it only when comparing against a manufacturer's own choice of frequencies.                                                                                                                                                                             |
+| `--output-wavelength-mtfs`                    | off                     | Additionally emit a per wavelength monochromatic MTF plot for each field. Not linked to the README.                                                                                                                                                                                                                                                                            |
+| `--output-pupil-maps`                         | off                     | Additionally measure and draw which part of each field's pupil the lens passes, and which surface blocks the rest. See below.  Not linked to the README.                                                                                                                                                                                                                       |
+| `--pupil-map-samples <n>`                     | 121                     | Samples per axis in a pupil map. Only consulted with `--output-pupil-maps`. Minimum 2.                                                                                                                                                                                                                                                                                         |
+| `--output-wavelength-mtf-report`              | off                     | Additionally write the monochromatic geometric MTF per frequency, wavelength, orientation and field, in the layout of the contrast report. See below. Not linked to the README.                                                                                                                                                                                                |
+| `--output-diffraction-mtf`                    | off                     | Additionally write the polychromatic diffraction MTF by field, for the same wavelengths and weights as the geometric MTF plots. Not linked to the README.                                                                                                                                                                                                                      |
+| `--diffraction-pupil-rays <N>`                | `64`                    | Rays across each axis of the diffraction pupil grid. N must be even and at least 4. Both diffraction output sets use an N x N pupil grid and a 2N x 2N FFT. Larger values increase cost and can reduce aliasing; sampling is not increased automatically. A warning is printed for each field whose geometric spot does not fit the PSF window, with the N that would hold it. |
+| `--export-vignetting`                         | off                     | Add a `[vignetting]` section to the generated `prescription.txt`, holding the vignetting factors of each field and configuration, and write the same fields and factors to the Zemax file. See [`prescription.txt` round trips](#prescriptiontxt-round-trips).                                                                                                                 |
+| `--output-contrast-pupil-maps`                | off                     | Additionally draw where in the pupil each frequency loses contrast. See below. Not linked to the README.                                                                                                                                                                                                                                                                       |
+| `--output-contrast-report`                    | off                     | Additionally write the RMS contrast OPD difference per frequency, wavelength, orientation and field. See below. Not linked to the README.                                                                                                                                                                                                                                      |
+| `--output-ray-aberration-plots`               | off                     | Additionally emit transverse ray aberration **and** wavefront (OPD) fan plots, tangential and sagittal, for each field.  Not linked to the README.                                                                                                                                                                                                                             |
+| `--verbose`                                   | off                     | Log the optimizer's progress to stderr, one line per iteration: merit, evaluations so far, elapsed time. Warnings are always shown.                                                                                                                                                                                                                                            |
+| `--debug`                                     | off                     | Log everything, including the ray-optics info messages (each field's vignetting and real entrance pupil) and debug traces (the vignetting, pupil and wide angle searches). These fire on every chief ray aim, so during an optimization they run to thousands of lines per iteration. For a subset, pass a standard `-Djava.util.logging.config.file` instead.                 |
+| `--assign-glass-types`                        | off                     | Match each surface's refractive index and Abbe number to a catalog glass before analysing, so the model uses the full dispersion curve instead of a two number approximation. Applies to this run only.                                                                                                                                                                        |
+| `--index-line <d\|e>`                         | `d`                     | Specifies how the refractive index is quoted in the input file, for `--assign-glass-types`. See below.                                                                                                                                                                                                                                                                         |
+| `--abbe-line <d\|e>`                          | `d`                     | Specifies how the Abbe number is quoted in the input file. Independent of `--index-line`.                                                                                                                                                                                                                                                                                      |
+| `--force`                                     | off                     | With `--assign-glass-types`, re-match surfaces that already name a recognised glass.                                                                                                                                                                                                                                                                                           |
+| `--update-specfile`                           | off                     | With `--assign-glass-types`, also write the matched prescription back over the input file. Rejected on its own.                                                                                                                                                                                                                                                                |
+| `--optimize`                                  | off                     | Run routine airspace optimization over field 0. See below.                                                                                                                                                                                                                                                                                                                     |
+| `--optimize all-fields`                       | off                     | Run routine airspace optimization over fields 0.0 through 1.0 in steps of 0.1, with equal field weights and the same variables.                                                                                                                                                                                                                                                | 
+| `--optimize <n>`                              | off                     | Run the spec file's `[trial n]` or `[pipeline n]` section instead, and report on its result. See [OPTIMIZER.md](OPTIMIZER.md).                                                                                                                                                                                                                                                 |
+| `--optimize-goal <contrast\|mtf>`             | `contrast`              | Objective for `--optimize`.                                                                                                                                                                                                                                                                                                                                                    |
+| `--real-ray-aiming` / `--paraxial-ray-aiming` | real                    | Chief ray aiming algorithm. Real aiming traces an actual ray at the entrance pupil; paraxial aiming is faster but does not hold up on very wide angle lenses. Applies to the analysis model, not the layout diagrams.                                                                                                                                                          |
 
 Invalid values for `--mtf`, `--vig-type`, `--use-spot-pattern`,
-`--spot-grid-size` and `--pupil-map-samples` are rejected with an error rather than silently falling back
-to the default, since each of them changes the numbers that come out.
+`--spot-grid-size` and `--pupil-map-samples` are rejected with an error.
 
 ### Vignetting types
 
@@ -356,15 +357,15 @@ sensitivity to the variables rather than one that measures the lens exactly.
 A `[trial n]` section states its own with a `vignetting` line; see
 [OPTIMIZER.md](OPTIMIZER.md).
 
-| Value | What it does                                                                                    | When to use it |
-| --- |-------------------------------------------------------------------------------------------------| --- |
-| `none` | No aperture or vignetting calculation at all.                                                   | Trace the prescription exactly as authored. |
-| `paraxial` | Applies paraxial vignetting factors.                                                            | Cheap approximation. |
-| `set-vig` | Computes vignetting factors from the apertures already in the file.                             | The apertures are trusted and you want the vignetting that follows from them. |
-| `set-pupil` *(default)* | Derives the pupil spec from the authored stop diameter. Apertures unchanged, f/# may shift.     | The stop diameter in the prescription is the reliable number. |
-| `set-stop-aperture` | Sizes the stop diameter to satisfy the pupil spec, then recomputes vignetting.                  | The quoted f/# is trusted and the stop diameter is not. |
-| `set-apertures` | Computes vignetting, then sizes every clear aperture to just pass the vignetted rays.           | Apertures were estimated and you want them rebuilt from the rays. |
-| `set-fnum` | Sizes the stop from the quoted f/#, then sizes every other aperture to pass the resulting rays. | A prescription quoting an exact f/# whose apertures were scaled off a patent drawing. |
+| Value                   | What it does                                                                                    | When to use it                                                                        |
+|-------------------------|-------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| `none`                  | No aperture or vignetting calculation at all.                                                   | Trace the prescription exactly as authored.                                           |
+| `paraxial`              | Applies paraxial vignetting factors.                                                            | Cheap approximation.                                                                  |
+| `set-vig`               | Computes vignetting factors from the apertures already in the file.                             | The apertures are trusted and you want the vignetting that follows from them.         |
+| `set-pupil` *(default)* | Derives the pupil spec from the authored stop diameter. Apertures unchanged, f/# may shift.     | The stop diameter in the prescription is the reliable number.                         |
+| `set-stop-aperture`     | Sizes the stop diameter to satisfy the pupil spec, then recomputes vignetting.                  | The quoted f/# is trusted and the stop diameter is not.                               |
+| `set-apertures`         | Computes vignetting, then sizes every clear aperture to just pass the vignetted rays.           | Apertures were estimated and you want them rebuilt from the rays.                     |
+| `set-fnum`              | Sizes the stop from the quoted f/#, then sizes every other aperture to pass the resulting rays. | A prescription quoting an exact f/# whose apertures were scaled off a patent drawing. |
 
 ### Spot patterns
 
@@ -374,11 +375,11 @@ every spot and MTF number. It does not affect the spot diagram SVGs: those are
 always drawn from `hex` sampling at 21 rings, so they look the same whichever
 pattern is chosen.
 
-| Value | Sampling | Density |
-| --- | --- | --- |
-| `hex` *(default)* | Concentric rings with the ray count per ring growing with radius, giving roughly uniform area coverage. | 64 rings |
-| `grid` | A square lattice across the pupil, clipped to the aperture. Density set by `--spot-grid-size`. | 64 x 64 |
-| `gaussian` | Gaussian quadrature nodes: fewer rays for the same accuracy, because the nodes and weights are chosen to integrate the pupil exactly. | 14 rings, 20 spokes |
+| Value             | Sampling                                                                                                                              | Density             |
+|-------------------|---------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| `hex` *(default)* | Concentric rings with the ray count per ring growing with radius, giving roughly uniform area coverage.                               | 64 rings            |
+| `grid`            | A square lattice across the pupil, clipped to the aperture. Density set by `--spot-grid-size`.                                        | 64 x 64             |
+| `gaussian`        | Gaussian quadrature nodes: fewer rays for the same accuracy, because the nodes and weights are chosen to integrate the pupil exactly. | 14 rings, 20 spokes |
 
 `gaussian` is an efficient choice, particularly for the optimizer; see
 [GAUSSIAN_QUADRATURE.md](GAUSSIAN_QUADRATURE.md) for the implementation details. `hex` is the default and used by the committed
@@ -484,34 +485,34 @@ Subtracting `φ̄` from `Δφ` keeps a pure image shift from showing as loss.
 `<suffix>` is empty for a single configuration lens, or `-0`, `-1`, ... for a
 spec with multiple configurations (a zoom, for instance).
 
-| File | Always generated | Contents                                                                                            |
-| --- | --- |-----------------------------------------------------------------------------------------------------|
-| `README.md` | yes | Markdown report collecting the prescription, diagrams and tables below.                             |
-| `prescription.txt` | yes | Optical Bench compatible prescription, tab delimited, reduced to what was actually used. See below. |
-| `<specfile>.zmx` | yes | Zemax export.                                                                                       |
-| `paraxial<suffix>.txt` | yes | First order / paraxial data.                                                                        |
-| `vig<suffix>.txt` | yes | Field and vignetting summary.                                                                       |
-| `layout<suffix>.svg` | yes | Layout with reference rays.                                                                         |
-| `layoutonly<suffix>.svg` | yes | Elements only, no rays.                                                                             |
-| `layout-fan<suffix>.svg` | yes | Layout with a 9 ray fan. Generated but not currently linked from the report.                        |
-| `spot<suffix>.svg` | yes | Spot diagram, axial field.                                                                          |
-| `spot-semi-skew<suffix>.svg` | yes | Spot diagram, 0.7 field.                                                                            |
-| `spot-skew<suffix>.svg` | yes | Spot diagram, full field.                                                                           |
-| `spot-report<suffix>.txt` | yes | Mean and max spot radius per field.                                                                 |
-| `mtf<suffix>.svg` / `.csv` | yes | Geometric MTF by field, equal weighted across wavelengths.                                          |
-| `mtf-w<suffix>.svg` / `.csv` | yes | Geometric MTF by field, weighted across wavelengths.                                                |
-| `mtf-diffraction<suffix>.svg` / `.csv` | `--output-diffraction-mtf` | Diffraction MTF by field, equal weighted across wavelengths. Not included in the README. |
-| `mtf-diffraction-w<suffix>.svg` / `.csv` | `--output-diffraction-mtf` | Diffraction MTF by field, weighted across wavelengths. Not included in the README. |
-| `mtf-fld<i>-<wavelength><suffix>.svg` | `--output-wavelength-mtfs` | Monochromatic MTF per field and wavelength. Not included in the README.                             |
-| `pupil<suffix>.svg` | `--output-pupil-maps` | Measured pupil map, axial field. Not included in the README. |
-| `pupil-semi-skew<suffix>.svg` | `--output-pupil-maps` | Measured pupil map, 0.7 field. Not included in the README. |
-| `pupil-skew<suffix>.svg` | `--output-pupil-maps` | Measured pupil map, full field. Not included in the README. |
-| `pupil-report<suffix>.txt` | `--output-pupil-maps` | Per field: the vignetting scales, how far the bundle reaches, and how well each candidate mapping describes it. |
-| `mtf-w-wavelength-report<suffix>.txt` | `--output-wavelength-mtf-report` | Monochromatic geometric MTF per `--mtf` frequency, wavelength, orientation and field, for the wavelengths of the weighted MTF. |
-| `contrast-pupil[-semi-skew\|-skew]<suffix>.svg` | `--output-contrast-pupil-maps` | Contrast loss across the pupil, fields 0, 0.7 and 1.0, per `--mtf` frequency and orientation. |
-| `contrast-report-w<suffix>.txt` | `--output-contrast-report` | RMS contrast OPD difference per `--mtf` frequency, wavelength, orientation and field, for the wavelengths of the weighted MTF. |
-| `rayabbr-fld<i>-{tan,sag}<suffix>.svg` | `--output-ray-aberration-plots` | Transverse ray aberration fans. Not included in the README.                               |
-| `opdabbr-fld<i>-{tan,sag}<suffix>.svg` | `--output-ray-aberration-plots` | Wavefront (OPD) fans. Not included in the README.                                         |
+| File                                            | Always generated                 | Contents                                                                                                                       |
+|-------------------------------------------------|----------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| `README.md`                                     | yes                              | Markdown report collecting the prescription, diagrams and tables below.                                                        |
+| `prescription.txt`                              | yes                              | Optical Bench compatible prescription, tab delimited, reduced to what was actually used. See below.                            |
+| `<specfile>.zmx`                                | yes                              | Zemax export.                                                                                                                  |
+| `paraxial<suffix>.txt`                          | yes                              | First order / paraxial data.                                                                                                   |
+| `vig<suffix>.txt`                               | yes                              | Field and vignetting summary.                                                                                                  |
+| `layout<suffix>.svg`                            | yes                              | Layout with reference rays.                                                                                                    |
+| `layoutonly<suffix>.svg`                        | yes                              | Elements only, no rays.                                                                                                        |
+| `layout-fan<suffix>.svg`                        | yes                              | Layout with a 9 ray fan. Generated but not currently linked from the report.                                                   |
+| `spot<suffix>.svg`                              | yes                              | Spot diagram, axial field.                                                                                                     |
+| `spot-semi-skew<suffix>.svg`                    | yes                              | Spot diagram, 0.7 field.                                                                                                       |
+| `spot-skew<suffix>.svg`                         | yes                              | Spot diagram, full field.                                                                                                      |
+| `spot-report<suffix>.txt`                       | yes                              | Mean and max spot radius per field.                                                                                            |
+| `mtf<suffix>.svg` / `.csv`                      | yes                              | Geometric MTF by field, equal weighted across wavelengths.                                                                     |
+| `mtf-w<suffix>.svg` / `.csv`                    | yes                              | Geometric MTF by field, weighted across wavelengths.                                                                           |
+| `mtf-diffraction<suffix>.svg` / `.csv`          | `--output-diffraction-mtf`       | Diffraction MTF by field, equal weighted across wavelengths. Not included in the README.                                       |
+| `mtf-diffraction-w<suffix>.svg` / `.csv`        | `--output-diffraction-mtf`       | Diffraction MTF by field, weighted across wavelengths. Not included in the README.                                             |
+| `mtf-fld<i>-<wavelength><suffix>.svg`           | `--output-wavelength-mtfs`       | Monochromatic MTF per field and wavelength. Not included in the README.                                                        |
+| `pupil<suffix>.svg`                             | `--output-pupil-maps`            | Measured pupil map, axial field. Not included in the README.                                                                   |
+| `pupil-semi-skew<suffix>.svg`                   | `--output-pupil-maps`            | Measured pupil map, 0.7 field. Not included in the README.                                                                     |
+| `pupil-skew<suffix>.svg`                        | `--output-pupil-maps`            | Measured pupil map, full field. Not included in the README.                                                                    |
+| `pupil-report<suffix>.txt`                      | `--output-pupil-maps`            | Per field: the vignetting scales, how far the bundle reaches, and how well each candidate mapping describes it.                |
+| `mtf-w-wavelength-report<suffix>.txt`           | `--output-wavelength-mtf-report` | Monochromatic geometric MTF per `--mtf` frequency, wavelength, orientation and field, for the wavelengths of the weighted MTF. |
+| `contrast-pupil[-semi-skew\|-skew]<suffix>.svg` | `--output-contrast-pupil-maps`   | Contrast loss across the pupil, fields 0, 0.7 and 1.0, per `--mtf` frequency and orientation.                                  |
+| `contrast-report-w<suffix>.txt`                 | `--output-contrast-report`       | RMS contrast OPD difference per `--mtf` frequency, wavelength, orientation and field, for the wavelengths of the weighted MTF. |
+| `rayabbr-fld<i>-{tan,sag}<suffix>.svg`          | `--output-ray-aberration-plots`  | Transverse ray aberration fans. Not included in the README.                                                                    |
+| `opdabbr-fld<i>-{tan,sag}<suffix>.svg`          | `--output-ray-aberration-plots`  | Wavefront (OPD) fans. Not included in the README.                                                                              |
 
 ### Aspheric coefficient ordering in the outputs
 
@@ -529,12 +530,12 @@ A4, A6, ...; for radial surfaces they correspond to A1, A2, A3, ... . The
 polynomial coefficients follow the radius and conic constant in an Optical
 Bench aspheric row:
 
-| Type | Optical Bench / `prescription.txt` coefficient sequence | Full coefficients / README `P1`, `P2`, ... |
-| --- | --- |--------------------------------------------|
-| `EVEN` | `A4, A6, ...` | `0, A4, A6, ...` (the first slot is A2) |
-| `EVEN A2` | `A2, A4, A6, ...` | `A2, A4, A6, ...` |
-| `RADIAL`, count 1 | `A3, A4, A6, A8, ...` | `0, 0, A3, A4, 0, A6, 0, A8, ...`          |
-| `RADIAL`, count 2 | `A3, A4, A5, A6, A8, ...` | `0, 0, A3, A4, A5, A6, 0, A8, ...`         |
+| Type              | Optical Bench / `prescription.txt` coefficient sequence | Full coefficients / README `P1`, `P2`, ... |
+|-------------------|---------------------------------------------------------|--------------------------------------------|
+| `EVEN`            | `A4, A6, ...`                                           | `0, A4, A6, ...` (the first slot is A2)    |
+| `EVEN A2`         | `A2, A4, A6, ...`                                       | `A2, A4, A6, ...`                          |
+| `RADIAL`, count 1 | `A3, A4, A6, A8, ...`                                   | `0, 0, A3, A4, 0, A6, 0, A8, ...`          |
+| `RADIAL`, count 2 | `A3, A4, A5, A6, A8, ...`                               | `0, 0, A3, A4, A5, A6, 0, A8, ...`         |
 
 These zero placeholders are restored on import and omitted again when writing
 `prescription.txt`; they do not represent a change to the surface. Do not copy
@@ -558,10 +559,10 @@ including zeros for A1 and A2.
 usually needs, before the report is generated, so every output reflects the
 optimized design. What it varies depends on the lens:
 
-| Lens | Varied |
-| --- | --- |
-| Prime | The back focus airspace, located automatically. |
-| Zoom | The airspaces whose thickness changes between the configurations being reported, one configuration at a time. |
+| Lens  | Varied                                                                                                        |
+|-------|---------------------------------------------------------------------------------------------------------------|
+| Prime | The back focus airspace, located automatically.                                                               |
+| Zoom  | The airspaces whose thickness changes between the configurations being reported, one configuration at a time. |
 
 On a **prime** ending in a cover glass the back focus is taken as the airspace
 **in front of** the cover glass, not the short gap between cover glass and
@@ -675,9 +676,9 @@ The two MTF by field curves differ only in which wavelengths they combine, and
 both sets are **fixed in the code** - there is no option to choose wavelengths or
 weights.
 
-| Output | Wavelengths | Weights |
-| --- | --- | --- |
-| `mtf` | d, F, C | 1.0, 1.0, 1.0 - equal |
+| Output  | Wavelengths   | Weights                      |
+|---------|---------------|------------------------------|
+| `mtf`   | d, F, C       | 1.0, 1.0, 1.0 - equal        |
 | `mtf-w` | d, C, e, F, g | 1.0, 0.475, 0.98, 0.49, 0.15 |
 
 `--only-d-line` is the one thing that changes this: it reduces **both** to the d
@@ -689,12 +690,12 @@ camera optics for mobile phones," Adv. Opt. Technol. **1**(1–2), 51–58 (2012
 to the d line. Wavelengths are as quoted in the paper.
 
 | Line | Wavelength | Weight | Relative |
-| --- | --- | --- | --- |
-| C | 656.28 nm | 151 | 0.475 |
-| d | 587.56 nm | 318 | 1.0 |
-| e | 546.07 nm | 312 | 0.98 |
-| F | 486.13 nm | 157 | 0.49 |
-| g | 435.84 nm | 49 | 0.15 |
+|------|------------|--------|----------|
+| C    | 656.28 nm  | 151    | 0.475    |
+| d    | 587.56 nm  | 318    | 1.0      |
+| e    | 546.07 nm  | 312    | 0.98     |
+| F    | 486.13 nm  | 157    | 0.49     |
+| g    | 435.84 nm  | 49     | 0.15     |
 
 A polychromatic MTF depends on the weights used. Manufacturers rarely publish
 the weighting behind their MTF charts, so curves from different brands are not
@@ -790,12 +791,12 @@ Most prescriptions quote the refractive index as nd and the Abbe number as vd,
 and that is what matching assumes. Not all do, and the two columns vary
 independently, so they are selected independently:
 
-| Option | Meaning |
-| --- | --- |
-| `--index-line d` *(default)* | The index column is nd. |
-| `--index-line e` | The index column is ne, at 546.07 nm. |
-| `--abbe-line d` *(default)* | The Abbe column is vd. |
-| `--abbe-line e` | The Abbe column is ve. |
+| Option                       | Meaning                               |
+|------------------------------|---------------------------------------|
+| `--index-line d` *(default)* | The index column is nd.               |
+| `--index-line e`             | The index column is ne, at 546.07 nm. |
+| `--abbe-line d` *(default)*  | The Abbe column is vd.                |
+| `--abbe-line e`              | The Abbe column is ve.                |
 
 Two combinations turn up in practice, and they have different causes:
 
@@ -806,11 +807,11 @@ Two combinations turn up in practice, and they have different causes:
 
 Examples:
 
-| Lens | nd/vd | ne/vd | ne/ve |
-| --- | --- | --- | --- |
-| Leica R Elmarit 28mm f2.8 | 0 assigned | 0 assigned | **8 of 8** |
-| Leica R APO 280mm f2.8 | 0 assigned | - | **8 of 8** |
-| Sony FE 14mm F1.8 GM | 0 assigned | **14 of 14** | 0 assigned |
+| Lens                      | nd/vd      | ne/vd        | ne/ve      |
+|---------------------------|------------|--------------|------------|
+| Leica R Elmarit 28mm f2.8 | 0 assigned | 0 assigned   | **8 of 8** |
+| Leica R APO 280mm f2.8    | 0 assigned | -            | **8 of 8** |
+| Sony FE 14mm F1.8 GM      | 0 assigned | **14 of 14** | 0 assigned |
 
 ```bash
 java -jar rayoptics/target/lenstool.jar --specfile input.txt --assign-glass-types \

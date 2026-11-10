@@ -59,4 +59,15 @@ source	Data/CN119667909_Figure01.png
 originX	15.49
 originY	427.14
 ppmm	9.349
-[notes]
+[patent info]
+country	CN
+number	CN119667909
+example	EX 1
+year applied	2025
+inventors	CHANG YUWEN
+current assignee	SHENZHEN SONGRUO PHOTOGRAPHY EQUIPMENT CO LTD
+original assignee	SHENZHEN SONGRUO PHOTOGRAPHY EQUIPMENT CO LTD
+link	https://worldwide.espacenet.com/patent/search?q=pn%3DCN119667909A
+[report data]
+lens name	SongRaw AF 85mm f/1.2
+status	Accepted

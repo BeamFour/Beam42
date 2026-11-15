@@ -9,25 +9,23 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ID  | Radius | Thickness | Diameter | nd  | vd  | Glass Make | Glass |
 | --- | ---    | ---       | ---      | --- | --- | ---        | ---   |
 | 1 | 65.0 | 3.75 | 38.48 | 1.8061 | 40.73 | Hoya | NBFD13 |
-| 2 | 560.365 | 0.1 | 38.48 |  |  |  |
+| 2 | 560.365 | 0.1 | 37.8459 |  |  |  |
 | 3 | 22.6 | 5.5 | 32.0 | 1.8061 | 40.73 | Hoya | NBFD13 |
-| 4 | 37.9305 | 1.9 | 31.0 |  |  |  |
-| 5 | 42.5 | 1.25 | 30.0 | 1.74077 | 27.76 | Hoya | E-FD13 |
+| 4 | 37.9305 | 1.9 | 29.7277 |  |  |  |
+| 5 | 42.5 | 1.25 | 27.869 | 1.74077 | 27.76 | Hoya | E-FD13 |
 | 6 | 16.2885 | 6.5 | 23.5 |  |  |  |
-| 7 | AS | 6.0 | 22.9 |  |  |  |
-| 8 | -18.4 | 1.0 | 23.0 | 1.74077 | 27.76 | Hoya | E-FD13 |
-| 9 | 110.0 | 8.75 | 27.0 | 1.7859 | 43.93 | Hoya | NBFD11 |
-| 10 | -16.5 | 1.25 | 27.0 | 1.70154 | 41.15 | Hoya | BAFD7 |
-| 11 | -36.4595 | 0.05 | 30.0 |  |  |  |
-| 12 | -400.0 | 3.25 | 30.0 | 1.7859 | 43.93 | Hoya | NBFD11 |
+| 7 | AS | 6.0 | 23.1844 |  |  |  |
+| 8 | -18.4 | 1.0 | 22.8631 | 1.74077 | 27.76 | Hoya | E-FD13 |
+| 9 | 110.0 | 8.75 | 26.241 | 1.7859 | 43.93 | Hoya | NBFD11 |
+| 10 | -16.5 | 1.25 | 26.8397 | 1.70154 | 41.15 | Hoya | BAFD7 |
+| 11 | -36.4595 | 0.05 | 29.2609 |  |  |  |
+| 12 | -400.0 | 3.25 | 29.8569 | 1.7859 | 43.93 | Hoya | NBFD11 |
 | 13 | -44.939 | 0.05 | 30.0 |  |  |  |
 | 14 | 300.0 | 2.5 | 30.0 | 1.7859 | 43.93 | Hoya | NBFD11 |
-| 15 | -99.2345 | 37.65 | 30.0 |  |  |  |
+| 15 | -99.2345 | 37.653 | 30.0 |  |  |  |
 ## Layouts
-![Layout Only](./layoutonly.svg)
-![Layout Field 0.0](./layout.svg)
-![Layout Field 0.7](./layout-semi-skew.svg)
-![Layout Field 1.0](./layout-skew.svg)
+![Layout Elements](./layoutonly.svg)
+![Layout](./layout.svg)
 ## Spot Diagrams
 ![Spot Diagram Field 0.0](./spot.svg)
 ![Spot Diagram Field 0.7](./spot-semi-skew.svg)
@@ -47,7 +45,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | fno | 1.4
 | enp_dist_P | 22.454
 | enp_radius | 17.856
-| exp_dist_P' | -32.63
+| exp_dist_P' | -32.633
 | exp_radius | 25.141
 | m | -0
 | red | -2.0000847578614724E8
@@ -56,25 +54,35 @@ Note that where glass types are shown the refractive index and abbe number is as
 | img_ht | 21.223
 | obj_ang | 23
 | obj_na | 0
-| img_na | -0.336|
+| img_na | -0.357|
 ## Spot Analysis
-| Field | Spot Mean Radius | Spot Max Radius |
+| Field | Spot Mean Radius (µm) | Spot Max Radius (µm) |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 15.822 | 33.194|
- | Field(x=0.0, y=0.1) | 18.62 | 67.026|
- | Field(x=0.0, y=0.2) | 31.746 | 132.554|
- | Field(x=0.0, y=0.3) | 54.068 | 232.093|
- | Field(x=0.0, y=0.4) | 82.591 | 351.481|
- | Field(x=0.0, y=0.5) | 94.163 | 385.437|
- | Field(x=0.0, y=0.6) | 116.157 | 431.418|
- | Field(x=0.0, y=0.7) | 124.012 | 454.118|
- | Field(x=0.0, y=0.8) | 130.492 | 485.444|
- | Field(x=0.0, y=0.9) | 137.067 | 502.825|
- | Field(x=0.0, y=1.0) | 139.064 | 485.022|
-## Geometric MTF
-![Geometrical MTF](./mtf.svg)
-* 10,30,50 cycles/mm
-* Black lines represent sagittal, blue tangential
+ | Field(x=0.0, y=0.0) | 16.294 | 32.479|
+ | Field(x=0.0, y=0.1) | 19.271 | 71.821|
+ | Field(x=0.0, y=0.2) | 32.342 | 148.537|
+ | Field(x=0.0, y=0.3) | 54.465 | 248.518|
+ | Field(x=0.0, y=0.4) | 77.239 | 329.072|
+ | Field(x=0.0, y=0.5) | 99.053 | 385.252|
+ | Field(x=0.0, y=0.6) | 112.295 | 432.475|
+ | Field(x=0.0, y=0.7) | 120.518 | 452.562|
+ | Field(x=0.0, y=0.8) | 126.978 | 483.846|
+ | Field(x=0.0, y=0.9) | 132.002 | 500.71|
+ | Field(x=0.0, y=1.0) | 133.211 | 484.93|
+## Polychromatic Geometric MTF
+![Polychromatic Geometrical MTF](./mtf.svg)
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
+* To generate above, MTFs for wavelengths 587.5618(d), 486.1327(F), 656.2725(C) were calculated across 10 fields, and then averaged
+## Polychromatic Geometric MTF (Weighted)
+![Polychromatic Geometrical MTF Weighted](./mtf-w.svg)
+* 10=red,30=blue,50=black cycles/mm
+* Solid lines represent sagittal, dashed lines tangential
+* To generate above, MTFs for wavelengths 587.5618(d) wt(1.0), 656.2725(C) wt(0.475), 546.074(e) wt(0.98), 486.1327(F) wt(0.49), 435.8343(g) wt(0.15) were calculated across 10 fields, and then combined using weighted average
 ## Resources
-* [OpticalBench Compatible Data File, tab delimited](./JP-S40-028384_Example01.txt)
+* [OpticalBench Compatible Data File, tab delimited](./prescription.txt)
 * [Zemax file](./JP-S40-028384_Example01.zmx)
+
+Generated from `JP-S40-028384_Example01.txt`, status **Accepted**
+
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-11-15

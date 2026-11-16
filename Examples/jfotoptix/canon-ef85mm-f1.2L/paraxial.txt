@@ -12,13 +12,13 @@ red          -1.176e+08
 obj_dist      1.000e+10
 obj_ang           14.60
 enp_dist          71.65
-enp_radius        35.41
-na obj        3.541e-09
+enp_radius        35.42
+na obj        3.542e-09
 n obj             1.000
 img_dist          40.26
 img_ht            22.14
 exp_dist         -48.58
-exp_radius        37.01
-na img          -0.4166
+exp_radius        37.02
+na img          -0.4167
 n img             1.000
-optical invariant        9.225
+optical invariant        9.227

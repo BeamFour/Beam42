@@ -9,21 +9,21 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ID  | Radius | Thickness | Diameter | nd  | vd  | Glass Make | Glass |
 | --- | ---    | ---       | ---      | --- | --- | ---        | ---   |
 | 1 | 88.791 | 8.296 | 70.91 | 1.6968 | 55.46 | Hoya | LAC14 |
-| 2 | 795.473 | 0.153 | 70.91 |  |  |  |
-| 3 | 63.682 | 5.789 | 65.78 | 1.6516 | 58.55 | Ohara | S-LAL7 |
-| 4 | 103.156 | 0.204 | 64.46 |  |  |  |
-| 5 | 48.263 | 16.839 | 59.82 | 1.60311 | 60.69 | Hoya | BACD14 |
-| 6 | 64.94 | 2.363 | 47.87 |  |  |  |
-| 7 | 95.702 | 3.018 | 47.87 | 1.7552 | 27.53 | Hoya | E-FD4 |
-| 8 | 27.617 | 10.787 | 39.2 |  |  |  |
-| 9 | AS | 7.99 | 37.855 |  |  |  |
-| 10 | -33.091 | 2.771 | 37.34 | 1.68893 | 31.16 | Hoya | E-FD8 |
-| 11 | 68.774 | 15.98 | 43.9 | 1.804 | 46.58 | Ohara | LAH65 |
-| 12 | -49.657 | 0.153 | 43.9 |  |  |  |
+| 2 | 795.473 | 0.153 | 70.3171 |  |  |  |
+| 3 | 63.682 | 5.789 | 65.6955 | 1.6516 | 58.55 | Ohara | S-LAL7 |
+| 4 | 103.156 | 0.204 | 64.2767 |  |  |  |
+| 5 | 48.263 | 16.839 | 59.5981 | 1.60311 | 60.69 | Hoya | BACD14 |
+| 6 | 64.94 | 2.363 | 47.3147 |  |  |  |
+| 7 | 95.702 | 3.018 | 46.3211 | 1.7552 | 27.53 | Hoya | E-FD4 |
+| 8 | 27.617 | 10.787 | 38.7397 |  |  |  |
+| 9 | AS | 7.99 | 37.8629 |  |  |  |
+| 10 | -33.091 | 2.771 | 37.1626 | 1.68893 | 31.16 | Hoya | E-FD8 |
+| 11 | 68.774 | 15.98 | 41.4476 | 1.804 | 46.58 | Ohara | LAH65 |
+| 12 | -49.657 | 0.153 | 43.753 |  |  |  |
 | 13 | 158.525 | 7.65 | 42.42 | 1.883 | 40.81 | Hoya | TAFD30 |
 | 14 | -174.896 | 1.224 | 42.42 |  |  |  |
-| 15 | 128.036 | 3.494 | 45.92 | 1.60311 | 60.69 | Hoya | BACD14 |
-| 16 | 511.7 | 40.26 | 45.92 |  |  |  |
+| 15 | 128.036 | 3.494 | 43.2255 | 1.60311 | 60.69 | Hoya | BACD14 |
+| 16 | 511.7 | 40.26 | 43.1943 |  |  |  |
 ## Aspherical Data
 | ID  | Type | k   | P1 | P2 | P3 | P4 |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -40,7 +40,7 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ---       | ---   |
 | effective_focal_length |85.013
 | back_focal_length | 40.259
-| optical_invariant | 9.225
+| optical_invariant | 9.227
 | object_distance | 1.0E10
 | image_distance | 40.259
 | power | 0.012
@@ -49,9 +49,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 | ffl_F | -9.702
 | fno | 1.2
 | enp_dist_P | 71.651
-| enp_radius | 35.415
+| enp_radius | 35.422
 | exp_dist_P' | -48.58
-| exp_radius | 37.008
+| exp_radius | 37.016
 | m | -0
 | red | -1.1762856267539608E8
 | n_obj | 1
@@ -63,9 +63,9 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Spot Analysis
 | Field | Spot Mean Radius (µm) | Spot Max Radius (µm) |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 18.333 | 53.165|
- | Field(x=0.0, y=0.1) | 17.363 | 52.263|
- | Field(x=0.0, y=0.2) | 19.248 | 67.306|
+ | Field(x=0.0, y=0.0) | 18.352 | 53.343|
+ | Field(x=0.0, y=0.1) | 17.303 | 52.263|
+ | Field(x=0.0, y=0.2) | 19.248 | 67.308|
  | Field(x=0.0, y=0.3) | 22.29 | 91.729|
  | Field(x=0.0, y=0.4) | 24.751 | 102.173|
  | Field(x=0.0, y=0.5) | 25.995 | 102.655|

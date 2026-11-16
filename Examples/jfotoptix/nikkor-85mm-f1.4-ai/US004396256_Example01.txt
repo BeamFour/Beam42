@@ -10,10 +10,10 @@ Image Height	43.2
 Total Length	undefined
 Magnification	0
 d0	Infinity
-Bf	42.5345
+Bf	42.79
 Aperture Diameter	34.244
 [lens data]
-1	66.4360	7.4970	1.77279	60.79	49.4
+1	66.4360	7.4970	1.77279	60.79	49.4	M-TAF1	Hoya
 2	346.5960	1.4960		60.79
 3	37.1280	9.6985	1.69680	52.91	55.6	LAL14	Ohara
 4	96.5005	1.4960		51.06	
@@ -22,9 +22,9 @@ Aperture Diameter	34.244
 7	23.6385	11.7990		36.26
 7AS	AS	7.7000		34.244
 8	-31.4075	1.4960	1.58144	35.14	40.8	E-FL5	Hoya
-9	79.8065	8.7040	1.74443	38.80	49.4
+9	79.8065	8.7040	1.74443	38.80	49.4	N-LAF35	Schott
 10	-39.8055	0.3995		38.80
-11	106.0035	4.8025	1.74443	34.04	49.4
+11	106.0035	4.8025	1.74443	34.04	49.4	N-LAF35	Schott
 12	-322.4050	Bf		32.90
 [figure]
 source	Data/US004396256_Figure01P.png
@@ -37,3 +37,21 @@ originX	96
 originY	468
 ppmm	11.345
 [notes]
+[trial 1]
+description             MTF targets
+wavelengths             d C e F g  weights standard
+fields                  0 0.2 0.4 0.6 0.8 1.0
+check-spot-apertures    yes
+vignetting              set-vig frozen
+vary curvatures         0 9 10 11 12
+vary thicknesses   	    12
+#goal spot-rms           10 10 20 30 45 50
+#goal spot-rms weights   1  1  1  1  1  1
+#goal mtf   10 sag       73 73 72 68 57 40
+#goal mtf   10 tan       73 75 73 69 67 63
+goal mtf   30 sag       55 45 45 38 30 22
+goal mtf   30 tan       55 45 46 37 28 25
+goal spot sampling      gaussian 6 12
+goal ray-aberrations    no
+constrain 			    edges
+outdir				    try1

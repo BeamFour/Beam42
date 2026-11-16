@@ -40,7 +40,7 @@ original assignee	Canon Inc
 link	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-H01-302311/11/en
 [report data]
 lens name	Canon EF85mm f1.2L USM Prototype
-status	TODO
+status	Candidate
 
 [notes]
 source prescription	JP1989-302311_Example04.txt

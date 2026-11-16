@@ -1,0 +1,39 @@
+[descriptive data]
+title	US 4,396,256 Example 1 (Nikon AI Nikkor 85mm f/1.4S)
+[constants]
+Scaled	85	1
+[variable distances]
+Focal Length	85
+Angle of View	28.5
+F-Number	1.4
+Image Height	43.2
+Total Length	undefined
+Magnification	0
+d0	Infinity
+Bf	42.6275
+Aperture Diameter	34.244
+[lens data]
+1	66.4360	7.4970	1.77279	60.79	49.4
+2	346.5960	1.4960		60.79
+3	37.1280	9.6985	1.69680	52.91	55.6
+4	96.5005	1.4960		51.06	
+5	167.2800	6.5025	1.78470	51.06	26.1
+6	-120.0030	2.7965	1.75520	51.06	27.5
+7	23.6385	11.7990		36.26
+7AS	AS	7.7000		34.244
+8	-31.4075	1.4960	1.58144	35.14	40.8
+9	79.8065	8.7040	1.74443	38.80	49.4
+10	-39.8055	0.3995		38.80
+11	106.0035	4.8025	1.74443	34.04	49.4
+12	-322.4050	Bf		32.90
+[figure]
+source	Data/US004396256_Figure01P.png
+originX	59
+originY	488
+ppmm	10.846
+[figure]
+source	Data/US004396256_Figure01.png
+originX	96
+originY	468
+ppmm	11.345
+[notes]

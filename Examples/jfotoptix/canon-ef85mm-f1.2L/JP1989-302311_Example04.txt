@@ -1,0 +1,47 @@
+[descriptive data]
+title	JP 1989-302311 Example 4
+[constants]
+Scaled	85	100
+[variable distances]
+Focal Length	85
+Angle of View	29.2
+F-Number	1.2
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf(p)	undefined
+Bf	40.26
+[lens data]
+1	88.791	8.296	1.69680	70.91	55.5
+2	795.473	0.153		70.91	
+3	63.682	5.789	1.65160	65.78	58.6
+4	103.156	0.204		64.46
+5	48.263	16.839	1.60311	59.82	60.7
+6	64.940	2.363		47.87
+7	95.702	3.018	1.75520	47.87	27.5
+8	27.617	10.787		39.20
+8AS	AS	7.99		37.855
+9	-33.091	2.771	1.68893	37.34	31.1
+10	68.774	15.980	1.80400	43.90	46.6
+11	-49.657	0.153		43.90
+12	158.525	7.650	1.88300	42.42	40.8
+13	-174.896	1.224		42.42
+14	128.036	3.494	1.60311	45.92	60.7
+15	511.700	Bf		45.92
+[aspherical data]
+5	48.263	0	-3.690E-08	2.563E-11	-6.126E-14
+[group data]
+G5-G8	9	15	58.225
+[figure]
+caption	Canon EF85mm f1.2L USM
+source	Data/JP1989-302311_Figure01P.png
+originX	42.49
+originY	120.53
+ppmm	2.003
+[figure]
+source	Data/JP1989-302311_Figure01.png
+originX	79.94
+originY	491.89
+ppmm	8.893
+[notes]
+Bill: Close to Canon EF85mm f1.2L USM

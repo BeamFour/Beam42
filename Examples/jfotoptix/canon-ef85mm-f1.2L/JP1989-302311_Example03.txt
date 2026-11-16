@@ -1,0 +1,41 @@
+[descriptive data]
+title	JP 1989-302311 Example 3
+[constants]
+Scaled	85	100
+[variable distances]
+Focal Length	85
+Angle of View	29.2
+F-Number	1.2
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf(p)	undefined
+Bf	40.06
+[lens data]
+1	83.921	7.888	1.60311	70.91	60.7
+2	522.835	0.153		70.91	
+3	53.916	7.735	1.60311	65.78	60.7
+4	119.646	0.204		65.00
+5	47.923	16.388	1.60311	59.13	60.7
+6	51.255	2.559		43.30
+7	105.723	2.763	1.76182	47.24	26.6
+8	27.277	9.390		37.00
+8AS	AS	8.35		36.2167
+9	-31.680	2.253	1.67270	38.03	32.1
+10	67.550	10.243	1.80610	42.80	40.9
+11	-46.572	0.153		42.80	
+12	127.823	5.126	1.78590	40.52	44.2
+13	-150.051	0.510		40.52	
+14	128.036	3.494	1.60311	37.85	60.7
+15	512.159	Bf		37.85	
+[aspherical data]
+5	47.923	0	-6.541E-08	1.052E-11	-7.564E-14
+[group data]
+G5-G8	9	15	57.800
+[figure]
+source	Data/JP1989-302311_Figure01.png
+originX	79.94
+originY	491.89
+ppmm	8.893
+[notes]
+Bill: F-Number restricted to f/1.25 by s6/s7

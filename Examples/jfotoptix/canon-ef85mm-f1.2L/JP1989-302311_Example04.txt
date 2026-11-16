@@ -45,3 +45,15 @@ originY	491.89
 ppmm	8.893
 [notes]
 Bill: Close to Canon EF85mm f1.2L USM
+[patent info]
+country	JP
+number	JP-H01-302311
+example	4
+year applied	1989
+inventors	Endo Hiroshi
+current assignee	Canon Inc
+original assignee	Canon Inc
+link	https://www.j-platpat.inpit.go.jp/c1801/PU/JP-H01-302311/11/en
+[report data]
+lens name	Canon EF85mm f1.2L USM Prototype
+status	Todo

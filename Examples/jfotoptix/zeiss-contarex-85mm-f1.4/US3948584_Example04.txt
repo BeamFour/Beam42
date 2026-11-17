@@ -32,5 +32,5 @@ current assignee	Carl Zeiss AG
 original assignee	Carl Zeiss AG
 link	https://patents.google.com/patent/US3948584A/en
 [report data]
-lens name	Carl Zeiss f.Contarex 1.4/85mm Planar T*
+lens name	Carl Zeiss Contarex 1.4/85mm Planar T*
 status	Todo

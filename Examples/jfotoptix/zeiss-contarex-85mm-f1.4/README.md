@@ -1,4 +1,4 @@
-# Carl Zeiss f.Contarex 1.4/85mm Planar T*
+# Carl Zeiss Contarex 1.4/85mm Planar T*
 ## Patent Information
 | Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
 | ---     | ---           | ---     | ---                 | ---       | ---          | ---  |

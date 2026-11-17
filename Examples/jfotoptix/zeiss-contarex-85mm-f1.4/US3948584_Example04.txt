@@ -3,11 +3,11 @@ title	US3948584 Example 4 Fig 3
 [variable distances]
 Focal Length	85
 Angle of View	40
-F-Number	1.5
+F-Number	1.7
 Angle of View	28.5
 Image Height	43.2
 Magnification	0
-Bf	38.335
+Bf	38.198
 [lens data]
 1	57.902	11.0075	1.6516	60.56	58.49	LAC7	Hoya
 2	Infinity	0.0102		60.56

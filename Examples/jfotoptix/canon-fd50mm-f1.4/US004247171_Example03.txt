@@ -40,3 +40,16 @@ originY	472.30
 ppmm	19.858
 [notes]	
 Bill: F-Number restricted to f/1.420 by s4/s5 Also JP 1978-122423
+[patent info]
+country	US
+number	US4247171
+example	3
+year applied	1977
+inventors	Sadahiko Tsuji
+current assignee	Canon Inc
+original assignee	Canon Inc
+link	https://patents.google.com/patent/US4247171A/en
+[report data]
+lens name	Canon New FD 50mm f1.4
+status	Accepted
+

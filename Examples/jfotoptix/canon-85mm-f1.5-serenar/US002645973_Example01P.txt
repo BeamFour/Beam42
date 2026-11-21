@@ -1,0 +1,36 @@
+[descriptive data]
+title	US 2,645,973 Example 1 (Canon Serenar 85mm f1.5)
+[constants]
+Scaled	85	1
+[variable distances]
+Focal Length	85.00
+Angle of View	30
+F-Number	1.5
+Image Height	43.2
+Magnification	0
+d0	Infinity
+Bf	44.79
+[lens data]
+1	69.870	8.925	1.6228	60.48	56.9
+2	807.500	0.170		60.48	
+3	37.400	7.225	1.6385	51.96	55.5
+4	68.425	16.150	1.5163	51.96	64.0
+5	-157.250	1.700	1.6889	51.96	31.1
+6	21.420	9.100		30.91
+6AS	AS	7.050		30.595
+7	-26.350	1.275	1.5317	30.42	48.9
+8	48.620	8.755	1.6584	34.46	50.8
+9	-37.400	0.170		34.46
+10	127.500	5.100	1.6385	35.32	55.5
+11	-71.910	Bf		35.32	
+[figure]
+source	Data/US002645973_Figure01.png
+originX	97.12
+originY	481.10
+ppmm	10.918
+[figure]
+source	Data/US002645973_Figure01P.png
+originX	35.66
+originY	90.54
+ppmm	3.206
+[notes]

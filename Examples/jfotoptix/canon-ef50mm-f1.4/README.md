@@ -1,3 +1,8 @@
+# Canon EF 50mm f1.4
+## Patent Information
+| Country | Patent Number | Example | Year of Application | Inventors | Organisation | Link |
+| ---     | ---           | ---     | ---                 | ---       | ---          | ---  |
+|US | JP 1994-242370 | 2 | 1993 | KATO MASATAKE | Canon Inc | [link](https://patentscope.wipo.int/search/en/detail.jsf?docId=JP266281146) |
 ## Surface Data
 Note that where glass types are shown the refractive index and abbe number is as per assigned glass type
 
@@ -79,4 +84,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 
 Generated from `JP1994-242370_Example02P.txt`, status **TODO**
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-10-17
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-11-21

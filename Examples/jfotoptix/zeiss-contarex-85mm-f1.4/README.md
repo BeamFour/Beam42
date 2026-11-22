@@ -8,19 +8,19 @@ Note that where glass types are shown the refractive index and abbe number is as
 
 | ID  | Radius | Thickness | Diameter | nd  | vd  | Glass Make | Glass |
 | --- | ---    | ---       | ---      | --- | --- | ---        | ---   |
-| 1 | 57.902 | 11.0075 | 60.56 | 1.6516 | 58.4 | Hoya | LAC7 |
-| 2 | 0.0 | 0.0102 | 58.8962 |  |  |  |
-| 3 | 39.542 | 10.404 | 48.8157 | 1.6516 | 58.4 | Hoya | LAC7 |
+| 1 | 57.902 | 11.0075 | 60.56 | 1.65113 | 55.89 | Schott | N-LAK22 |
+| 2 | 0.0 | 0.102 | 58.8965 |  |  |  |
+| 3 | 39.542 | 10.404 | 48.8183 | 1.65113 | 55.89 | Schott | N-LAK22 |
 | 4 | 93.1005 | 2.499 | 42.99 |  |  |  |
-| 5 | 440.5125 | 10.71 | 41.9509 | 1.7618 | 26.91 | Hoya | FDS5 |
+| 5 | 440.5125 | 10.71 | 41.9502 | 1.76182 | 26.53 | Schott | N-SF14 |
 | 6 | 24.786 | 7.70525 | 27.78 |  |  |  |
-| 7 | AS | 7.70525 | 27.0233 |  |  |  |
-| 8 | -37.066 | 1.4025 | 29.4991 | 1.57501 | 41.49 | Schott | LF7 |
+| 7 | AS | 7.70525 | 27.0416 |  |  |  |
+| 8 | -37.06595 | 1.4025 | 30.2837 | 1.57501 | 41.51 | Hikari | J-LF7 |
 | 9 | 60.435 | 0.0 | 36.6 |  |  |  |
-| 10 | 60.435 | 7.6075 | 36.6 | 1.744 | 44.87 | Hoya | LAF20 |
+| 10 | 60.435 | 7.6075 | 36.6 | 1.744 | 44.79 | Ohara | S-LAM2 |
 | 11 | -43.112 | 2.006 | 36.6 |  |  |  |
-| 12 | 83.5805 | 5.304 | 36.6 | 1.713 | 53.94 | Hoya | LAC8 |
-| 13 | -1000.54 | 38.198 | 36.6 |  |  |  |
+| 12 | 83.5805 | 5.304 | 36.6 | 1.713 | 53.83 | Schott | N-LAK8 |
+| 13 | -1000.535 | 38.194 | 36.6 |  |  |  |
 ## Layouts
 ![Layout Elements](./layoutonly.svg)
 ![Layout](./layout.svg)
@@ -31,42 +31,42 @@ Note that where glass types are shown the refractive index and abbe number is as
 ## Paraxial Parameters
 | parameter | value |
 | ---       | ---   |
-| effective_focal_length |84.857
-| back_focal_length | 38.269
-| optical_invariant | 9.084
+| effective_focal_length |84.965
+| back_focal_length | 38.288
+| optical_invariant | 10.308
 | object_distance | 1.0E10
-| image_distance | 38.269
+| image_distance | 38.288
 | power | 0.012
-| pp1_H | 31.261
-| ppk_H' | -46.588
-| ffl_F | -53.596
-| fno | 1.7
-| enp_dist_P | 61.555
-| enp_radius | 24.958
-| exp_dist_P' | -24.193
-| exp_radius | 18.392
+| pp1_H | 31.335
+| ppk_H' | -46.677
+| ffl_F | -53.63
+| fno | 1.5
+| enp_dist_P | 61.78
+| enp_radius | 28.322
+| exp_dist_P' | -24.17
+| exp_radius | 20.85
 | m | -0
-| red | -1.1784501224149634E8
+| red | -1.1769580191125403E8
 | n_obj | 1
 | n_img | 1
-| img_ht | 30.886
+| img_ht | 30.925
 | obj_ang | 20
 | obj_na | 0
-| img_na | -0.294|
+| img_na | -0.333|
 ## Spot Analysis
 | Field | Spot Mean Radius (µm) | Spot Max Radius (µm) |
 | ---   | ---              | ---             |
- | Field(x=0.0, y=0.0) | 15.051 | 38.977|
- | Field(x=0.0, y=0.1) | 15.055 | 49.798|
- | Field(x=0.0, y=0.2) | 15.857 | 64.024|
- | Field(x=0.0, y=0.3) | 17.653 | 85.391|
- | Field(x=0.0, y=0.4) | 21.343 | 117.827|
- | Field(x=0.0, y=0.5) | 28.093 | 165.915|
- | Field(x=0.0, y=0.6) | 29.415 | 132.634|
- | Field(x=0.0, y=0.7) | 35.058 | 155.014|
- | Field(x=0.0, y=0.8) | 64.17 | 251.946|
- | Field(x=0.0, y=0.9) | 100.995 | 321.191|
- | Field(x=0.0, y=1.0) | 139.997 | 369.919|
+ | Field(x=0.0, y=0.0) | 10.127 | 23.79|
+ | Field(x=0.0, y=0.1) | 10.22 | 36.611|
+ | Field(x=0.0, y=0.2) | 11.346 | 52.898|
+ | Field(x=0.0, y=0.3) | 13.724 | 76.918|
+ | Field(x=0.0, y=0.4) | 18.205 | 112.309|
+ | Field(x=0.0, y=0.5) | 26.087 | 163.021|
+ | Field(x=0.0, y=0.6) | 26.869 | 128.186|
+ | Field(x=0.0, y=0.7) | 37.085 | 180.743|
+ | Field(x=0.0, y=0.8) | 62.116 | 236.939|
+ | Field(x=0.0, y=0.9) | 99.262 | 299.273|
+ | Field(x=0.0, y=1.0) | 138.265 | 348.656|
 ## Polychromatic Geometric MTF
 ![Polychromatic Geometrical MTF](./mtf.svg)
 * 10=red,30=blue,50=black cycles/mm
@@ -83,4 +83,4 @@ Note that where glass types are shown the refractive index and abbe number is as
 
 Generated from `US3948584_Example04.txt`, status **TODO**
 
-Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-11-17
+Report / Zemax file generated using [Beam42](https://github.com/BeamFour/Beam42) on 2026-11-22

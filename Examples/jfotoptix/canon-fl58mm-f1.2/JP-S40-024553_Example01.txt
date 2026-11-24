@@ -12,17 +12,17 @@ Magnification	0
 d0	Infinity
 Bf	29.9
 [lens data]
-1	42.65	6.35	1.7234	42.00	38.0		
+1	42.65	6.35	1.7234	42.00	38.0	BAFD8	Hoya		candidate=CDGM/H-ZBAF21,nd=1.72341,vd=37.99,dnd=0.00001,dvd=0.01	candidate=Hoya/BAFD8,nd=1.72342,vd=37.99,dnd=0.00002,dvd=0.01	candidate=CORNING/D23-38,nd=1.72349,vd=38.00,dnd=0.00009,dvd=0.00
 2	273.15	0.1		42.00
-3	26.45	10.25	1.6676	33.43	41.9		
-4	-131.8	2.2	1.7552	33.43	27.5
+3	26.45	10.25	1.6676	33.43	41.9	BAFD6	Hoya		candidate=SUMITA/BASF6,nd=1.66755,vd=41.89,dnd=0.00005,dvd=0.01	candidate=Hoya/BAFD6,nd=1.66755,vd=41.93,dnd=0.00005,dvd=0.03	candidate=Ohara/BAH26,nd=1.66755,vd=41.93,dnd=0.00005,dvd=0.03
+4	-131.8	2.2	1.7552	33.43	27.5	E-FD4	Hoya	candidate=Hoya/E-FD4,nd=1.75520,vd=27.53,dnd=0.00000,dvd=0.03	candidate=Hoya/E-FD4L,nd=1.75520,vd=27.53,dnd=0.00000,dvd=0.03	candidate=Hoya/FD4,nd=1.75520,vd=27.53,dnd=0.00000,dvd=0.03
 5	16.35	6.325		24.2
 6	AS	6.325		22.637
-7	-17.55	1.5	1.5927	24.2	35.4
-8	52.75	9.9	1.713	28.5	53.89
+7	-17.55	1.5	1.5927	24.2	35.4	FF5	Hoya	candidate=Hoya/FF5,nd=1.59270,vd=35.45,dnd=0.00000,dvd=0.05	candidate=Ohara/S-FTM16,nd=1.59270,vd=35.31,dnd=0.00000,dvd=0.09	candidate=Ohara/FTM16,nd=1.59270,vd=35.30,dnd=0.00000,dvd=0.10
+8	52.75	9.9	1.713	28.5	53.89	LAC8	Hoya	candidate=Hoya/LAC8,nd=1.71300,vd=53.94,dnd=0.00000,dvd=0.05	candidate=Hoya/M-LAC8,nd=1.71300,vd=53.94,dnd=0.00000,dvd=0.05	candidate=Ohara/LAL8,nd=1.71300,vd=53.85,dnd=0.00000,dvd=0.04
 9	-27.75	0.1		28.5
-10	0	1.75	1.72	28.5	50.31
+10	0	1.75	1.72	28.5	50.31	LAC10	Hoya	candidate=Hoya/LAC10,nd=1.72000,vd=50.34,dnd=0.00000,dvd=0.03	candidate=Ohara/S-LAL10,nd=1.72000,vd=50.23,dnd=0.00000,dvd=0.08	candidate=Schott/LAK10,nd=1.72000,vd=50.41,dnd=0.00000,dvd=0.10
 11	-76.4	0.1		28.5
-12	112.05	2.2	1.744	28.5	44.9
+12	112.05	2.2	1.744	28.5	44.9	LAF2	Hoya	candidate=Hoya/LAF2,nd=1.74400,vd=44.90,dnd=0.00000,dvd=0.00	candidate=Hoya/LAF20,nd=1.74400,vd=44.87,dnd=0.00000,dvd=0.03	candidate=CORNING/D44-45,nd=1.74400,vd=44.82,dnd=0.00000,dvd=0.08
 13	-109.75	Bf		28.5
 [notes]

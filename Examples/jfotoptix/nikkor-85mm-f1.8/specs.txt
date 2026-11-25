@@ -1,5 +1,5 @@
 [descriptive data]
-title	Nikkor AI 85mm f1.8 Reverse Engineered by Zhongfu/Agusta
+title	Nikkor AI 85mm f1.8 Reverse Engineered by Zhongfu/Augusta
 [variable distances]
 Focal Length	85
 F-Number	1.8
@@ -22,5 +22,7 @@ Bf	43.2
 10	81.04756	5.6	1.744	29	44.72	LAF2	Schott
 11	-400	Bf		29
 [report data]
-lens name	Nikkor AI 85mm f1.8 Reverse Engineered by Zhongfu/Agusta
+lens name	Nikkor AI 85mm f1.8 Reverse Engineered by Zhongfu/Augusta
 status	Todo
+[notes]
+specs obtained from https://zhuanlan.zhihu.com/p/2010871760141191050

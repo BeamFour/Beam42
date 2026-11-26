@@ -29,7 +29,7 @@ Aperture Diameter	28.280
 12	-79.45200	0.1942		36.62
 13	372.92700	1.7440	1.62299	36.11	58.2	BSM15	Ohara
 14	-610.82450	Bf		36.11
-[!aspherical data]
+[aspherical data]
 3	39.16335	-1	9.378696E-07	2.017257E-09	-8.475334E-12	1.070054E-14
 [figure]
 source	Data/JP1985-040604_Figure01.png
